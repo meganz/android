@@ -4,7 +4,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.domain.usecase.DefaultGetAlbums
+import mega.privacy.android.domain.usecase.DefaultGetThumbnail
+import mega.privacy.android.domain.usecase.GetAlbums
+import mega.privacy.android.domain.usecase.GetThumbnail
 
 @Module
 @InstallIn(ViewModelComponent::class)

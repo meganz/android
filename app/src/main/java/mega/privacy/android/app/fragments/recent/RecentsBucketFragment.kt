@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
@@ -19,7 +20,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
-import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
@@ -46,12 +47,18 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.mutateIconSecondary
 import mega.privacy.android.app.utils.callManager
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class RecentsBucketFragment : BaseFragment() {
+class RecentsBucketFragment : Fragment() {
+
+    @Inject
+    @MegaApi
+    lateinit var megaApi: MegaApiAndroid
 
     private val viewModel by viewModels<RecentsBucketViewModel>()
 
@@ -199,7 +206,7 @@ class RecentsBucketFragment : BaseFragment() {
                 openAudioVideo(index, node, isMedia, localPath)
             }
             mime.isURL -> {
-                manageURLNode(context, megaApi, node)
+                manageURLNode(requireContext(), megaApi, node)
             }
             mime.isPdf -> {
                 openPdf(index, node, localPath)
@@ -209,7 +216,7 @@ class RecentsBucketFragment : BaseFragment() {
             }
             else -> {
                 onNodeTapped(
-                    context,
+                    requireContext(),
                     node,
                     {
                         (requireActivity() as ManagerActivity).saveNodeByTap(it)

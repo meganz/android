@@ -2,8 +2,8 @@ package test.mega.privacy.android.app.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
-import mega.privacy.android.app.domain.entity.user.UserChanges
-import mega.privacy.android.app.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserId
 import nz.mega.sdk.MegaUser
 import org.junit.Test
 import org.mockito.kotlin.mock

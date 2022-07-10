@@ -115,7 +115,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         if (aB != null) {
-            aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
+            aB.setTitle(getString(R.string.title_chat_explorer));
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
         } else {

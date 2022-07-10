@@ -125,7 +125,7 @@ class UploadUseCase @Inject constructor(
     ): Completable =
         upload(
             context,
-            (collisionResult.nameCollision as NameCollision.Upload).absolutePath!!,
+            (collisionResult.nameCollision as NameCollision.Upload).absolutePath,
             if (rename) collisionResult.renameName!! else collisionResult.nameCollision.name,
             collisionResult.nameCollision.lastModified,
             collisionResult.nameCollision.parentHandle

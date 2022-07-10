@@ -6,11 +6,10 @@ import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.UserCredentials
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_REENABLE_CU_PREFERENCE
 import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.domain.entity.SyncRecord
+import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.sync.SyncListener
 import mega.privacy.android.app.sync.camerauploads.callback.RemoveBackupCallback
@@ -22,6 +21,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.domain.entity.SyncRecord
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS
 import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_INVALID
@@ -719,7 +719,12 @@ object CameraUploadSyncManager {
             lastEmail = megaApi.myUser.email
             myUserHandle = megaApi.myUser.handle.toString() + ""
         }
-        val credentials = UserCredentials(lastEmail, fastLoginSession, "", "", myUserHandle)
+        val credentials =
+            UserCredentials(lastEmail,
+                fastLoginSession,
+                "",
+                "",
+                myUserHandle)
         val dbH = DatabaseHandler.getDbHandler(megaApplication)
         dbH.saveCredentials(credentials)
     }

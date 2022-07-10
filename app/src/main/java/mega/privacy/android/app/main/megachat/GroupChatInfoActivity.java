@@ -287,7 +287,7 @@ public class GroupChatInfoActivity extends PasscodeActivity
             aB = getSupportActionBar();
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
-            aB.setTitle(getString(R.string.group_chat_info_label).toUpperCase());
+            aB.setTitle(getString(R.string.group_chat_info_label));
 
             recyclerView = findViewById(R.id.chat_group_contact_properties_list);
             recyclerView.addItemDecoration(new PositionDividerItemDecoration(this, getOutMetrics()));

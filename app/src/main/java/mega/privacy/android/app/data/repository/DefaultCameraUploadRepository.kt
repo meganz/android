@@ -9,10 +9,10 @@ import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.entity.SyncRecord
 import mega.privacy.android.app.domain.repository.CameraUploadRepository
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.domain.entity.SyncRecord
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaTransfer
@@ -226,6 +226,6 @@ class DefaultCameraUploadRepository @Inject constructor(
 
     // TODO SUSPEND AND CONTINUATION INSTEAD OF CALLBACK LISTENER
     override fun fastLogin(listener: MegaRequestListenerInterface) {
-        megaApiGateway.fastLogin(databaseHandler.credentials.session, listener)
+        databaseHandler.credentials.session?.let { megaApiGateway.fastLogin(it, listener) }
     }
 }

@@ -3,11 +3,6 @@ package mega.privacy.android.app.main.controllers
 import android.Manifest
 import android.app.Activity
 import android.app.NotificationManager
-import mega.privacy.android.app.utils.contacts.MegaContactGetter
-import mega.privacy.android.app.textEditor.TextEditorViewModel
-import mega.privacy.android.app.constants.SettingsConstants
-import nz.mega.sdk.MegaApiJava
-import com.jeremyliao.liveeventbus.LiveEventBus
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -22,6 +17,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.print.PrintHelper
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,9 +27,9 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
+import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.data.repository.DefaultPushesRepository.Companion.PUSH_TOKEN
-import mega.privacy.android.app.domain.entity.SyncRecordType
 import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileStorageActivity
@@ -47,6 +43,7 @@ import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.psa.PsaManager.stopChecking
 import mega.privacy.android.app.sync.removeBackupsBeforeLogout
+import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.CacheFolderManager.removeOldTempFolders
 import mega.privacy.android.app.utils.ChatUtil.removeEmojisSharedPreferences
@@ -65,9 +62,12 @@ import mega.privacy.android.app.utils.Util.isOffline
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.app.utils.ZoomUtil.resetZoomLevel
+import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.domain.entity.SyncRecordType
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
 import timber.log.Timber

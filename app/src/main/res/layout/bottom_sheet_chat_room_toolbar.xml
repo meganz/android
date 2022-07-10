@@ -131,7 +131,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/file_icon"
                         android:layout_centerHorizontal="true"
-                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant2.Grey54White87" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -167,7 +167,7 @@
                         android:layout_below="@id/voice_icon"
                         android:layout_centerHorizontal="true"
                         android:text="@string/chat_room_toolbar_voice_call_option"
-                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant2.Grey54White87" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -203,7 +203,7 @@
                         android:layout_below="@id/video_icon"
                         android:layout_centerHorizontal="true"
                         android:text="@string/upload_to_video"
-                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant2.Grey54White87" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -238,7 +238,7 @@
                         android:layout_below="@id/scan_icon"
                         android:layout_centerHorizontal="true"
                         android:text="@string/chat_room_toolbar_scan_option"
-                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant2.Grey54White87" />
                 </RelativeLayout>
 
             </LinearLayout>
@@ -282,7 +282,7 @@
                         android:layout_below="@id/gif_icon"
                         android:layout_centerHorizontal="true"
                         android:text="@string/chat_room_toolbar_gif_option"
-                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant2.Grey54White87" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -318,7 +318,7 @@
                         android:layout_below="@id/location_icon"
                         android:layout_centerHorizontal="true"
                         android:text="@string/file_properties_info_location"
-                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant2.Grey54White87" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -354,7 +354,7 @@
                         android:layout_below="@id/contact_icon"
                         android:layout_centerHorizontal="true"
                         android:text="@string/attachment_upload_panel_contact"
-                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant2.Grey54White87" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -388,8 +388,8 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/voice_clip_icon"
                         android:layout_centerHorizontal="true"
-                        android:text="@string/chat_room_toolbar_voice_call_option"
-                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant5" />
+                        android:text="@string/chat_room_toolbar_voice_clip_option"
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Variant2.Grey54White87" />
                 </RelativeLayout>
 
             </LinearLayout>

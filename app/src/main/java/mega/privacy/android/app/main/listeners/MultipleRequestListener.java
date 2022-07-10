@@ -186,12 +186,12 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                             int success = max_items - error;
 
                             if (success > 0) {
-                                message += "\n" + getString(R.string.number_correctly_invite_contact_request, success);
+                                message += "\n" + getQuantityString(R.plurals.number_correctly_invite_contact_request, success, success);
                             }
                         } else if (error > 0) {
                             message = getString(R.string.number_no_invite_contact_request, max_items - error, error);
                         } else {
-                            message = getString(R.string.number_correctly_invite_contact_request, max_items);
+                            message = getQuantityString(R.plurals.number_correctly_invite_contact_request, max_items, max_items);
                         }
                     }
                     break;

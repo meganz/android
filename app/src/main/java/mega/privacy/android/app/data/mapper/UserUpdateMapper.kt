@@ -1,8 +1,8 @@
 package mega.privacy.android.app.data.mapper
 
-import mega.privacy.android.app.domain.entity.user.UserChanges
-import mega.privacy.android.app.domain.entity.user.UserId
-import mega.privacy.android.app.domain.entity.user.UserUpdate
+import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserUpdate
 import nz.mega.sdk.MegaUser
 
 /**

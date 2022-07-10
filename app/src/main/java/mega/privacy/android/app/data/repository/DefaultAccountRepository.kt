@@ -5,8 +5,6 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.UserCredentials
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.extensions.failWithException
 import mega.privacy.android.app.data.extensions.isType
@@ -14,17 +12,18 @@ import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.entity.UserAccount
-import mega.privacy.android.app.domain.entity.user.UserId
-import mega.privacy.android.app.domain.exception.MegaException
-import mega.privacy.android.app.domain.exception.NoLoggedInUserException
-import mega.privacy.android.app.domain.exception.NotMasterBusinessAccountException
-import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.DBUtil
+import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.NoLoggedInUserException
+import mega.privacy.android.domain.exception.NotMasterBusinessAccountException
+import mega.privacy.android.domain.repository.AccountRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
@@ -52,7 +51,7 @@ class DefaultAccountRepository @Inject constructor(
     private val monitorMultiFactorAuth: MonitorMultiFactorAuth,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val userUpdateMapper: UserUpdateMapper,
-    private val dbH: DatabaseHandler,
+    private val localStorageGateway: MegaLocalStorageGateway,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -148,7 +147,8 @@ class DefaultAccountRepository @Inject constructor(
         megaApiGateway.getNumUnreadUserAlerts()
     }
 
-    override suspend fun getCredentials(): UserCredentials? = dbH.credentials
+    override suspend fun getSession(): String? =
+        localStorageGateway.getUserCredentials()?.session
 
     override fun retryPendingConnections(disconnect: Boolean) {
         megaApiGateway.retryPendingConnections()

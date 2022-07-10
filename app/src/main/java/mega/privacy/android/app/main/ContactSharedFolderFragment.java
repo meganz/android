@@ -145,7 +145,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             moreButton.setVisibility(View.VISIBLE);
         }
 
-        String label = foldersInvisible + " " + getResources().getString(R.string.contact_info_button_more).toUpperCase(Locale.getDefault());
+        String label = foldersInvisible + " " + getResources().getString(R.string.contact_info_button_more);
         moreButton.setText(label);
 
     }

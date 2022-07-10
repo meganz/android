@@ -11,9 +11,9 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.domain.entity.ThemeMode
-import mega.privacy.android.app.domain.usecase.GetThemeMode
 import mega.privacy.android.app.presentation.theme.AndroidTheme
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
 /**

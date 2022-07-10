@@ -130,7 +130,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
         aB = getSupportActionBar();
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
-        tB.setTitle(getString(R.string.section_qr_code).toUpperCase());
+        tB.setTitle(getString(R.string.section_qr_code));
 
         rootLevelLayout = findViewById(R.id.root_level_layout);
 

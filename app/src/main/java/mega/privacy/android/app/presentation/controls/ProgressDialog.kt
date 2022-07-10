@@ -23,8 +23,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.ThemeMode
 import mega.privacy.android.app.presentation.theme.AndroidTheme
+import mega.privacy.android.domain.entity.ThemeMode
 
 @Composable
 fun ProgressDialog(
@@ -32,7 +32,7 @@ fun ProgressDialog(
     progress: Float,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
-    cancelButtonText: String = stringResource(id = R.string.general_cancel).uppercase(),
+    cancelButtonText: String = stringResource(id = R.string.general_cancel),
 ) {
     Dialog(
         onDismissRequest = {},

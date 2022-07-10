@@ -285,9 +285,7 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -297,6 +295,7 @@ import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
@@ -354,7 +353,6 @@ import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.main.tasks.FillDBContactsTask;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
-import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
@@ -374,6 +372,7 @@ import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
+import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaViewHolder;
@@ -415,6 +414,8 @@ import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
+import mega.privacy.android.domain.entity.ContactRequest;
+import mega.privacy.android.domain.entity.ContactRequestStatus;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -3690,7 +3691,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (parentNode != null) {
                     if (megaApi.getRootNode() != null) {
                         if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || viewModel.getState().getValue().getBrowserParentHandle() == -1) {
-                            aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
+                            aB.setTitle(getString(R.string.section_cloud_drive));
                             viewModel.setIsFirstNavigationLevel(true);
                         } else {
                             aB.setTitle(parentNode.getName());
@@ -3702,7 +3703,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else {
                     if (megaApi.getRootNode() != null) {
                         viewModel.setBrowserParentHandle(megaApi.getRootNode().getHandle());
-                        aB.setTitle(getString(R.string.title_mega_info_empty_screen).toUpperCase());
+                        aB.setTitle(getString(R.string.title_mega_info_empty_screen));
                         viewModel.setIsFirstNavigationLevel(true);
                     } else {
                         viewModel.setBrowserParentHandle(-1);
@@ -3719,7 +3720,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     viewModel.setRubbishBinParentHandle(INVALID_HANDLE);
                     viewModel.setIsFirstNavigationLevel(true);
                 } else if (viewModel.getState().getValue().getRubbishBinParentHandle() == INVALID_HANDLE || node == null || node.getHandle() == rubbishNode.getHandle()) {
-                    aB.setTitle(StringResourcesUtils.getString(R.string.section_rubbish_bin).toUpperCase());
+                    aB.setTitle(StringResourcesUtils.getString(R.string.section_rubbish_bin));
                     viewModel.setIsFirstNavigationLevel(true);
                 } else {
                     aB.setTitle(node.getName());
@@ -3738,14 +3739,14 @@ public class ManagerActivity extends TransfersManagementActivity
                             if (viewModel.getState().getValue().getIncomingParentHandle() != -1) {
                                 MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getIncomingParentHandle());
                                 if (node == null) {
-                                    aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
+                                    aB.setTitle(getResources().getString(R.string.title_shared_items));
                                 } else {
                                     aB.setTitle(node.getName());
                                 }
 
                                 viewModel.setIsFirstNavigationLevel(false);
                             } else {
-                                aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
+                                aB.setTitle(getResources().getString(R.string.title_shared_items));
                                 viewModel.setIsFirstNavigationLevel(true);
                             }
                         } else {
@@ -3761,7 +3762,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 aB.setTitle(node.getName());
                                 viewModel.setIsFirstNavigationLevel(false);
                             } else {
-                                aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
+                                aB.setTitle(getResources().getString(R.string.title_shared_items));
                                 viewModel.setIsFirstNavigationLevel(true);
                             }
                         }
@@ -3770,7 +3771,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     case LINKS_TAB:
                         if (isLinksAdded()) {
                             if (viewModel.getState().getValue().getLinksParentHandle() == INVALID_HANDLE) {
-                                aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
+                                aB.setTitle(getResources().getString(R.string.title_shared_items));
                                 viewModel.setIsFirstNavigationLevel(true);
                             } else {
                                 MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getLinksParentHandle());
@@ -3780,7 +3781,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                         break;
                     default: {
-                        aB.setTitle(getResources().getString(R.string.title_shared_items).toUpperCase());
+                        aB.setTitle(getResources().getString(R.string.title_shared_items));
                         viewModel.setIsFirstNavigationLevel(true);
                         break;
                     }
@@ -3790,7 +3791,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case INBOX: {
                 aB.setSubtitle(null);
                 if (viewModel.getState().getValue().getInboxParentHandle() == megaApi.getInboxNode().getHandle() || viewModel.getState().getValue().getInboxParentHandle() == -1) {
-                    aB.setTitle(getResources().getString(R.string.section_inbox).toUpperCase());
+                    aB.setTitle(getResources().getString(R.string.section_inbox));
                     viewModel.setIsFirstNavigationLevel(true);
                 } else {
                     MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getInboxParentHandle());
@@ -3801,13 +3802,13 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case NOTIFICATIONS: {
                 aB.setSubtitle(null);
-                aB.setTitle(getString(R.string.title_properties_chat_contact_notifications).toUpperCase());
+                aB.setTitle(getString(R.string.title_properties_chat_contact_notifications));
                 viewModel.setIsFirstNavigationLevel(true);
                 break;
             }
             case CHAT: {
                 abL.setVisibility(View.VISIBLE);
-                aB.setTitle(getString(R.string.section_chat).toUpperCase());
+                aB.setTitle(getString(R.string.section_chat));
 
                 viewModel.setIsFirstNavigationLevel(true);
                 break;
@@ -3819,12 +3820,12 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (searchViewModel.getState().getValue().getSearchQuery() != null) {
                         searchViewModel.setTextSubmitted(true);
                         if (!searchViewModel.getState().getValue().getSearchQuery().isEmpty()) {
-                            aB.setTitle(getString(R.string.action_search).toUpperCase() + ": " + searchViewModel.getState().getValue().getSearchQuery());
+                            aB.setTitle(getString(R.string.action_search) + ": " + searchViewModel.getState().getValue().getSearchQuery());
                         } else {
-                            aB.setTitle(getString(R.string.action_search).toUpperCase() + ": " + "");
+                            aB.setTitle(getString(R.string.action_search) + ": " + "");
                         }
                     } else {
-                        aB.setTitle(getString(R.string.action_search).toUpperCase() + ": " + "");
+                        aB.setTitle(getString(R.string.action_search) + ": " + "");
                     }
 
                 } else {
@@ -3838,7 +3839,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case TRANSFERS: {
                 aB.setSubtitle(null);
-                aB.setTitle(getString(R.string.section_transfers).toUpperCase());
+                aB.setTitle(getString(R.string.section_transfers));
                 setFirstNavigationLevel(true);
                 break;
             }
@@ -3846,13 +3847,13 @@ public class ManagerActivity extends TransfersManagementActivity
                 aB.setSubtitle(null);
                 if (getPhotosFragment() != null && photosFragment.isEnablePhotosFragmentShown()) {
                     setFirstNavigationLevel(false);
-                    aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
+                    aB.setTitle(getString(R.string.settings_camera_upload_on));
                 } else {
                     if (isInAlbumContent) {
                         aB.setTitle(getString(R.string.title_favourites_album));
                     } else {
                         setFirstNavigationLevel(true);
-                        aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
+                        aB.setTitle(getString(R.string.sortby_type_photo_first));
                     }
                 }
                 break;
@@ -3877,7 +3878,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
 
                 if (titleId != -1) {
-                    aB.setTitle(getString(titleId).toUpperCase(Locale.getDefault()));
+                    aB.setTitle(getString(titleId));
                 }
             }
             default: {
@@ -4203,6 +4204,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     /**
      * Updates the Transfers tab index.
+     *
      * @param showCompleted True if should show the Completed tab, false otherwise.
      */
     private void updateTransfersTab(Boolean showCompleted) {
@@ -6782,13 +6784,22 @@ public class ManagerActivity extends TransfersManagementActivity
 
     @Override
     public void showNewFolderDialog(String typedText) {
-        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, typedText);
+        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
+        if (parent == null) {
+            return;
+        }
+
+        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, parent, typedText);
     }
 
     @Override
     public void showNewTextFileDialog(String typedName) {
-        newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
-                getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), typedName,
+        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
+        if (parent == null) {
+            return;
+        }
+
+        newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this, parent, typedName,
                 drawerItem == DrawerItem.HOMEPAGE);
     }
 
@@ -7028,7 +7039,6 @@ public class ManagerActivity extends TransfersManagementActivity
      * Showing the full screen mask by adding the mask layout to the window content
      */
     private void addMask() {
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.grey_600_085_dark_grey_070));
         windowContent.addView(fabMaskLayout);
     }
 
@@ -7036,7 +7046,6 @@ public class ManagerActivity extends TransfersManagementActivity
      * Removing the full screen mask
      */
     private void removeMask() {
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
         windowContent.removeView(fabMaskLayout);
     }
 
@@ -7155,9 +7164,9 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setMessage(getString(R.string.alert_remove_several_shares, shares.size()))
-                .setPositiveButton(R.string.general_remove, (dialog, which) -> nC.removeSeveralFolderShares(shares))
-                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {
+        builder.setMessage(getQuantityString(R.plurals.alert_remove_several_shares, shares.size(), shares.size()))
+                .setPositiveButton(R.string.shared_items_outgoing_unshare_confirm_dialog_button_yes, (dialog, which) -> nC.removeSeveralFolderShares(shares))
+                .setNegativeButton(R.string.shared_items_outgoing_unshare_confirm_dialog_button_no, (dialog, which) -> {
                 })
                 .show();
     }
@@ -9883,23 +9892,23 @@ public class ManagerActivity extends TransfersManagementActivity
         supportInvalidateOptionsMenu();
     }
 
-    public void updateContactRequests(List<MegaContactRequest> requests) {
+    public void updateContactRequests(List<ContactRequest> requests) {
         Timber.d("onContactRequestsUpdate");
 
         if (requests != null) {
             for (int i = 0; i < requests.size(); i++) {
-                MegaContactRequest req = requests.get(i);
+                ContactRequest req = requests.get(i);
                 if (req.isOutgoing()) {
                     Timber.d("SENT REQUEST");
-                    Timber.d("STATUS: %d, Contact Handle: %d", req.getStatus(), req.getHandle());
-                    if (req.getStatus() == MegaContactRequest.STATUS_ACCEPTED) {
+                    Timber.d("STATUS: %s, Contact Handle: %d", req.getStatus(), req.getHandle());
+                    if (req.getStatus() == ContactRequestStatus.Accepted) {
                         cC.addContactDB(req.getTargetEmail());
                     }
                 } else {
                     Timber.d("RECEIVED REQUEST");
                     setContactTitleSection();
-                    Timber.d("STATUS: %d Contact Handle: %d", req.getStatus(), req.getHandle());
-                    if (req.getStatus() == MegaContactRequest.STATUS_ACCEPTED) {
+                    Timber.d("STATUS: %s Contact Handle: %d", req.getStatus(), req.getHandle());
+                    if (req.getStatus() == ContactRequestStatus.Accepted) {
                         cC.addContactDB(req.getSourceEmail());
                     }
                 }

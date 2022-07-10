@@ -309,7 +309,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
 
         cancelButton = v.findViewById(R.id.cancel_text);
         cancelButton.setOnClickListener(this);
-        cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+        cancelButton.setText(getString(R.string.general_cancel));
 
         fabSelect = v.findViewById(R.id.fab_select);
         fabSelect.setOnClickListener(this);
@@ -320,7 +320,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
             v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
             mLayoutManager = new LinearLayoutManager(context);
             recyclerView.setLayoutManager(mLayoutManager);
-            recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
+            recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getResources().getDisplayMetrics()));
         } else {
             recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
             v.findViewById(R.id.file_list_view_browser).setVisibility(View.GONE);
@@ -379,16 +379,17 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
 
 
         if (modeCloud == MOVE || modeCloud == COPY) {
-            optionButton.setText(StringResourcesUtils.getString(modeCloud == MOVE ? R.string.context_move
-                    : R.string.context_copy).toUpperCase(Locale.getDefault()));
+            optionButton.setText(StringResourcesUtils.getString(modeCloud == MOVE
+                    ? R.string.context_move
+                    : R.string.context_copy));
 
             if (((FileExplorerActivity) context).getDeepBrowserTree() > 0) {
                 checkCopyMoveButton();
             }
         } else if (modeCloud == FileExplorerActivity.UPLOAD) {
-            optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+            optionButton.setText(getString(R.string.context_upload));
         } else if (modeCloud == FileExplorerActivity.IMPORT) {
-            optionButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
+            optionButton.setText(getString(R.string.add_to_cloud));
         } else if (isMultiselect()) {
             optionButton.setText(getString(R.string.context_send));
             if (adapter != null && adapter.getSelectedItemCount() > 0) {
@@ -399,9 +400,9 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
         } else if (modeCloud == FileExplorerActivity.SELECT) {
             optionsBar.setVisibility(View.GONE);
         } else if (modeCloud == FileExplorerActivity.SELECT_CAMERA_FOLDER) {
-            optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
+            optionButton.setText(getString(R.string.general_select));
         } else {
-            optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
+            optionButton.setText(getString(R.string.general_select));
         }
 
         Timber.d("deepBrowserTree value: %s", ((FileExplorerActivity) context).getDeepBrowserTree());

@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -44,8 +45,8 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.FragmentTimelineBinding
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.featuretoggle.PhotosFilterAndSortToggle
-import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -91,8 +92,10 @@ import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
+import javax.inject.Inject
 
 
 /**
@@ -101,9 +104,13 @@ import nz.mega.sdk.MegaChatApiJava
  * TimelineFragment's logic is pretty much similar to previous PhotosFragment
  */
 @AndroidEntryPoint
-class TimelineFragment : BaseFragment(), PhotosTabCallback,
+class TimelineFragment : Fragment(), PhotosTabCallback,
     GestureScaleCallback,
     GalleryCardAdapter.Listener {
+
+    @Inject
+    @MegaApi
+    lateinit var megaApi: MegaApiAndroid
 
     private lateinit var mManagerActivity: ManagerActivity
 
@@ -401,7 +408,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
      */
     private fun setupOtherViews() {
         binding.emptyEnableCuButton.setOnClickListener { enableCameraUploadClick() }
-        setImageViewAlphaIfDark(context, binding.emptyHintImage, DARK_IMAGE_ALPHA)
+        setImageViewAlphaIfDark(requireContext(), binding.emptyHintImage, DARK_IMAGE_ALPHA)
         setEmptyState()
     }
 
@@ -872,12 +879,12 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         listView.layoutManager = layoutManager
 
         if (selectedView == ALL_VIEW) {
-            val imageMargin = ZoomUtil.getMargin(context, currentZoom)
-            ZoomUtil.setMargin(context, params, currentZoom)
+            val imageMargin = ZoomUtil.getMargin(requireContext(), currentZoom)
+            ZoomUtil.setMargin(requireContext(), params, currentZoom)
             val gridWidth =
-                ZoomUtil.getItemWidth(context, outMetrics, currentZoom, spanCount, isPortrait)
-            val icSelectedWidth = ZoomUtil.getSelectedFrameWidth(context, currentZoom)
-            val icSelectedMargin = ZoomUtil.getSelectedFrameMargin(context, currentZoom)
+                ZoomUtil.getItemWidth(requireContext(), resources.displayMetrics, currentZoom, spanCount, isPortrait)
+            val icSelectedWidth = ZoomUtil.getSelectedFrameWidth(requireContext(), currentZoom)
+            val icSelectedMargin = ZoomUtil.getSelectedFrameMargin(requireContext(), currentZoom)
             val itemSizeConfig = GalleryItemSizeConfig(
                 currentZoom, gridWidth,
                 icSelectedWidth, imageMargin,
@@ -894,7 +901,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             layoutManager.apply {
                 spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
                 val itemDimen =
-                    ZoomUtil.getItemWidth(context, outMetrics, currentZoom, spanCount, isPortrait)
+                    ZoomUtil.getItemWidth(requireContext(), resources.displayMetrics, currentZoom, spanCount, isPortrait)
                 gridAdapter.setItemDimen(itemDimen)
             }
 
@@ -905,7 +912,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
                 resources.getDimensionPixelSize(if (isPortrait) R.dimen.card_margin_portrait else R.dimen.card_margin_landscape)
 
             val cardWidth: Int =
-                (outMetrics.widthPixels - cardMargin * spanCount * 2 - cardMargin * 2) / spanCount
+                (resources.displayMetrics.widthPixels - cardMargin * spanCount * 2 - cardMargin * 2) / spanCount
 
             cardAdapter =
                 GalleryCardAdapter(selectedView, cardWidth, cardMargin, this)
@@ -924,7 +931,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListView() {
         scaleGestureHandler = ScaleGestureHandler(
-            context,
+            requireContext(),
             this
         )
         with(listView) {
@@ -1087,7 +1094,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
                     // Draw the green outline for the thumbnail view at once
                     val thumbnailView =
                         itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
-                    thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
+                    thumbnailView.hierarchy.roundingParams = getRoundingParams(requireContext())
 
                     val imageView = itemView.findViewById<ImageView>(
                         R.id.icon_selected
@@ -1133,7 +1140,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
             activity.hideKeyboardSearch()  // Make the snack bar visible to the user
             activity.showSnackbar(
                 Constants.SNACKBAR_TYPE,
-                context.getString(R.string.error_server_connection_problem),
+                StringResourcesUtils.getString(R.string.error_server_connection_problem),
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
         }
@@ -1151,9 +1158,9 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
         if (!this::menu.isInitialized)
             return
         val menuItem = this.menu.findItem(menuItemId)
-        var colorRes = ColorUtils.getThemeColor(context, R.attr.colorControlNormal)
+        var colorRes = ColorUtils.getThemeColor(requireContext(), R.attr.colorControlNormal)
         if (!isEnable) {
-            colorRes = ContextCompat.getColor(context, R.color.grey_038_white_038)
+            colorRes = ContextCompat.getColor(requireContext(), R.color.grey_038_white_038)
         }
         DrawableCompat.setTint(
             menuItem.icon ?: return,
@@ -1231,7 +1238,7 @@ class TimelineFragment : BaseFragment(), PhotosTabCallback,
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             val params = viewTypePanel.layoutParams
-            params.width = outMetrics.heightPixels
+            params.width = resources.displayMetrics.heightPixels
             viewTypePanel.layoutParams = params
         }
 

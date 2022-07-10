@@ -9,12 +9,12 @@ import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.app.domain.entity.FavouriteInfo
-import mega.privacy.android.app.domain.repository.FavouritesRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
+import mega.privacy.android.domain.entity.FavouriteFolderInfo
+import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.repository.FavouritesRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaNode
@@ -33,7 +33,7 @@ class DefaultFavouritesRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorNodeChangeFacade: MonitorNodeChangeFacade,
     private val favouriteInfoMapper: FavouriteInfoMapper,
-    private val cacheFolder: CacheFolderGateway
+    private val cacheFolder: CacheFolderGateway,
 ) :
     FavouritesRepository {
 

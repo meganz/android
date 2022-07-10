@@ -235,7 +235,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
 
-        aB.setTitle(getString(R.string.title_chat_shared_files_info).toUpperCase());
+        aB.setTitle(getString(R.string.title_chat_shared_files_info));
 
         container = (RelativeLayout) findViewById(R.id.node_history_main_layout);
 

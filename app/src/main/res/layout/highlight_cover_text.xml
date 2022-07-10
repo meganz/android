@@ -12,7 +12,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/new_meeting"
-        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor.Variant1"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AccentColor"
         tools:ignore="RtlSymmetry" />
 
 </RelativeLayout>

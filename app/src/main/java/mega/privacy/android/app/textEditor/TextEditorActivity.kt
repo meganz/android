@@ -7,9 +7,15 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
+import android.provider.Settings.System.FONT_SCALE
+import android.provider.Settings.System.getFloat
+import android.util.TypedValue.COMPLEX_UNIT_PX
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewPropertyAnimator
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -27,15 +33,15 @@ import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.EventConstants.EVENT_PERFORM_SCROLL
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
-import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.ActionNodeCallback
+import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
-import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.usecase.exception.MegaException
+import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
@@ -51,6 +57,7 @@ import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
+import org.jetbrains.anko.configuration
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
@@ -100,11 +107,15 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         binding.fileEditorScrollView.scrollY = scrollY
     }
 
+    private var originalContentTextSize: Float = 0f
+    private var originalNameTextSize: Float = 0f
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        getOriginalTextSize()
 
         setSupportActionBar(binding.fileEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -155,8 +166,31 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
     override fun onResume() {
         super.onResume()
+        // Because of the onResume function of PasscodeActivity invokes setAppFontSize function of Util, the font scale of configuration cannot be more than 1.1.
+        // The PasscodeActivity is used for many places, so this is a workaround for making text size of current page follow system font size.
+        setTextSizeBasedOnSystem(binding.contentEditText, originalContentTextSize)
+        setTextSizeBasedOnSystem(binding.contentText, originalContentTextSize)
+        setTextSizeBasedOnSystem(binding.nameText, originalNameTextSize)
 
         viewModel.updateNode()
+    }
+
+    /**
+     * Set text size based on system font scale
+     * @param textView TextView that will be set text size
+     * @param originalTextSize original text size
+     */
+    private fun setTextSizeBasedOnSystem(textView: TextView, originalTextSize: Float) {
+        val size = originalTextSize * getFloat(contentResolver, FONT_SCALE)
+        textView.setTextSize(COMPLEX_UNIT_PX, size)
+    }
+
+    /**
+     * Get original text size for setting text size based on system font scale
+     */
+    private fun getOriginalTextSize() {
+        originalContentTextSize = binding.contentText.textSize / configuration.fontScale
+        originalNameTextSize = binding.nameText.textSize / configuration.fontScale
     }
 
     override fun onDestroy() {
@@ -187,7 +221,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             if (viewModel.isCreateMode()) {
                 viewModel.saveFile(this, intent.getBooleanExtra(FROM_HOME_PAGE, false))
             } else if (viewModel.isReadingContent()) {
-                viewModel.checkIfNeedsStopHttpServer()
+                viewModel.finishBeforeClosing()
             }
 
             super.onBackPressed()
@@ -476,6 +510,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             nameCollisionActivityContract.launch(arrayListOf(collision))
         }
         viewModel.onExceptionThrown().observe(this, ::manageException)
+        viewModel.onFatalError().observe(this) {
+            showFatalErrorWarningAndFinish()
+        }
 
         LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java)
             .observeForever(performScrollObserver)
@@ -877,5 +914,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         if (!manageCopyMoveException(throwable) && throwable is MegaException) {
             showSnackbar(throwable.message!!)
         }
+    }
+
+    /**
+     * Shows the fatal warning and finishes the activity.
+     */
+    private fun showFatalErrorWarningAndFinish() {
+        showSnackbar(getString(R.string.error_temporary_unavaible))
+        Handler(Looper.getMainLooper()).postDelayed({ finish() }, LONG_SNACKBAR_DURATION)
     }
 }

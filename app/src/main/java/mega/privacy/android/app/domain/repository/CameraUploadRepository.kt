@@ -1,7 +1,7 @@
 package mega.privacy.android.app.domain.repository
 
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
-import mega.privacy.android.app.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.SyncRecord
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaTransfer

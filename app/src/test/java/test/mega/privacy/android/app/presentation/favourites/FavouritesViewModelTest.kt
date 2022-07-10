@@ -8,13 +8,14 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.domain.entity.FavouriteInfo
-import mega.privacy.android.app.domain.usecase.GetAllFavorites
-import mega.privacy.android.app.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.usecase.GetAllFavorites
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.app.presentation.favourites.FavouritesViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
+import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -32,6 +33,11 @@ class FavouritesViewModelTest {
     private val favouriteMapper = mock<FavouriteMapper>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
 
+    private val megaNode = mock<MegaNode>()
+
+    private val fetchNodeWrapper =
+        mock<FetchNodeWrapper> { onBlocking { invoke(any()) }.thenReturn(megaNode) }
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
@@ -43,7 +49,8 @@ class FavouritesViewModelTest {
             megaUtilWrapper = mock(),
             getCloudSortOrder = getCloudSortOrder,
             removeFavourites = mock(),
-            favouriteMapper = favouriteMapper
+            favouriteMapper = favouriteMapper,
+            fetchNode = fetchNodeWrapper
         )
     }
 
@@ -68,7 +75,7 @@ class FavouritesViewModelTest {
 
     @Test
     fun `test that start with loading state and load favourites success`() = runTest {
-        val node = mock<MegaNode>()
+        val node = megaNode
         whenever(node.handle).thenReturn(123)
         whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
         whenever(node.size).thenReturn(1000L)
@@ -86,10 +93,15 @@ class FavouritesViewModelTest {
             parentId = node.parentHandle,
             base64Id = node.base64Handle,
             modificationTime = node.modificationTime,
-            node = node,
             hasVersion = false,
             numChildFolders = 0,
-            numChildFiles = 0
+            numChildFiles = 0,
+            isImage = false,
+            isVideo = false,
+            isFolder = true,
+            isFavourite = true,
+            isExported = false,
+            isTakenDown = false,
         )
         val list = listOf(favourite)
         whenever(getCloudSortOrder()).thenReturn(1)
@@ -97,7 +109,7 @@ class FavouritesViewModelTest {
             flowOf(list)
         )
         whenever(stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
-        whenever(favouriteMapper(any(), any(), any(), any())).thenReturn(mock())
+        whenever(favouriteMapper(any(), any(), any(), any(), any())).thenReturn(mock())
         underTest.favouritesState.test {
             assertTrue(awaitItem() is FavouriteLoadState.Loading)
             assertTrue(awaitItem() is FavouriteLoadState.Success)

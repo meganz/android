@@ -6,10 +6,10 @@ import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.repository.ThumbnailRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.domain.repository.ThumbnailRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import java.io.File

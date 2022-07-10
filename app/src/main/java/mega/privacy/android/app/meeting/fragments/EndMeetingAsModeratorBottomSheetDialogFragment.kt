@@ -52,7 +52,7 @@ class EndMeetingAsModeratorBottomSheetDialogFragment : BottomSheetDialogFragment
      * Assign moderator listener will close the page and open assign moderator activity
      */
     private fun endForAll() {
-        dismiss()
+        dismissAllowingStateLoss()
         callBackEndForAll?.invoke()
     }
 
@@ -60,7 +60,7 @@ class EndMeetingAsModeratorBottomSheetDialogFragment : BottomSheetDialogFragment
      * Leave anyway listener, will leave meeting directly
      */
     private fun leaveMeeting() {
-        dismiss()
+        dismissAllowingStateLoss()
         callBackLeaveMeeting?.invoke()
     }
 

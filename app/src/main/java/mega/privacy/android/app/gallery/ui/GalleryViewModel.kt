@@ -14,13 +14,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.gallery.repository.GalleryItemRepository
+import mega.privacy.android.domain.usecase.GetCameraSortOrder
 
 abstract class GalleryViewModel(
     private val galleryItemRepository: GalleryItemRepository,

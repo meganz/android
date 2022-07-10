@@ -1,6 +1,8 @@
 package mega.privacy.android.app.data.mapper
 
-import mega.privacy.android.app.domain.entity.FavouriteInfo
+import mega.privacy.android.app.utils.MegaNodeUtil.isImage
+import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 
 /**
@@ -21,7 +23,6 @@ internal fun toFavouriteInfo(
     numberOfChildFolders: Int,
     numberOfChildFiles: Int,
 ) = FavouriteInfo(
-    node = megaNode,
     id = megaNode.handle,
     name = megaNode.name,
     size = megaNode.size,
@@ -32,5 +33,11 @@ internal fun toFavouriteInfo(
     hasVersion = hasVersion,
     numChildFolders = numberOfChildFolders,
     numChildFiles = numberOfChildFiles,
-    thumbnailPath = thumbnailPath
+    thumbnailPath = thumbnailPath,
+    isFolder = megaNode.isFolder,
+    isImage = megaNode.isImage(),
+    isVideo = megaNode.isVideo(),
+    isFavourite = megaNode.isFavourite,
+    isExported = megaNode.isExported,
+    isTakenDown = megaNode.isTakenDown,
 )

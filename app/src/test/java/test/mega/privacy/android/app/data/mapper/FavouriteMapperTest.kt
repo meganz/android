@@ -2,11 +2,11 @@ package test.mega.privacy.android.app.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.FavouriteInfo
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.mapper.toFavourite
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -56,10 +56,15 @@ class FavouriteMapperTest {
             parentId = expectedHandle,
             base64Id = "",
             modificationTime = expectedModificationTime,
-            node = testNode,
             hasVersion = expectedHasVersion,
             numChildFiles = 0,
-            numChildFolders = 0
+            numChildFolders = 0,
+            isImage = false,
+            isVideo = false,
+            isFolder = true,
+            isFavourite = expectedIsFavourite,
+            isExported = expectedIsExported,
+            isTakenDown = expectedIsTakenDown,
         )
 
 
@@ -69,10 +74,7 @@ class FavouriteMapperTest {
             }.thenReturn(expectedInfo)
         }
 
-        val isAvailableOffline: (MegaNode) -> Boolean = mock()
-        whenever(isAvailableOffline(testNode)).thenReturn(false)
-
-        val actual = toFavourite(favouriteInfo, isAvailableOffline, stringUtil)
+        val actual = toFavourite(testNode, favouriteInfo, false, stringUtil)
 
         assertThat(actual.handle).isEqualTo(expectedHandle)
         assertThat(actual.name).isEqualTo(expectedName)
@@ -132,10 +134,15 @@ class FavouriteMapperTest {
             parentId = expectedHandle,
             base64Id = "",
             modificationTime = expectedModificationTime,
-            node = testNode,
             hasVersion = expectedHasVersion,
             numChildFiles = 0,
-            numChildFolders = 0
+            numChildFolders = 0,
+            isImage = false,
+            isVideo = false,
+            isFolder = false,
+            isFavourite = expectedIsFavourite,
+            isExported = expectedIsExported,
+            isTakenDown = expectedIsTakenDown,
         )
 
 
@@ -147,10 +154,7 @@ class FavouriteMapperTest {
         val getFileIcon: (String) -> Int = mock()
         whenever(getFileIcon(expectedName)).thenReturn(expectedIcon)
 
-        val isAvailableOffline: (MegaNode) -> Boolean = mock()
-        whenever(isAvailableOffline(testNode)).thenReturn(false)
-
-        val actual = toFavourite(favouriteInfo, isAvailableOffline, stringUtil, getFileIcon)
+        val actual = toFavourite(testNode, favouriteInfo, false, stringUtil, getFileIcon)
 
         assertThat(actual.handle).isEqualTo(expectedHandle)
         assertThat(actual.name).isEqualTo(expectedName)

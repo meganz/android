@@ -32,6 +32,7 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
@@ -131,7 +132,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
         View v = getListView(inflater, container);
 
         if (adapter == null) {
-            adapter = new MegaNodeAdapter(context, this, nodes,
+            adapter = new MegaNodeAdapter(requireActivity(), this, nodes,
                     managerActivity.getParentHandleLinks(), recyclerView, LINKS_ADAPTER,
                     ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
         }
@@ -178,9 +179,9 @@ public class LinksFragment extends MegaNodeBaseFragment {
 
         if (megaApi.getRootNode().getHandle() == managerActivity.getParentHandleOutgoing()
                 || managerActivity.getParentHandleOutgoing() == -1) {
-            ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
+            ColorUtils.setImageViewAlphaIfDark(requireContext(), emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
             emptyImageView.setImageResource(R.drawable.ic_zero_data_public_links);
-            textToShow = context.getString(R.string.context_empty_links);
+            textToShow = StringResourcesUtils.getString(R.string.context_empty_links);
         }
 
         setFinalEmptyView(textToShow);

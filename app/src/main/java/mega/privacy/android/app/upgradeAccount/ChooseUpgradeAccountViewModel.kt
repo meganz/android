@@ -196,8 +196,7 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
      * @return The formatted string.
      */
     fun generateByteString(context: Context, gb: Long, labelType: Int): Spanned {
-        var textToShow =
-            "[A] " + getSizeStringGBBased(gb) + " [/A] " + storageOrTransferLabel(labelType)
+        var textToShow = storageOrTransferLabel(gb, labelType)
         try {
             textToShow = textToShow.replace(
                 "[A]", "<font color='"
@@ -215,12 +214,15 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
     /**
      * Gets the label to show depending on labelType.
      *
+     * @param gb        Size to show in the string.
      * @param labelType TYPE_STORAGE_LABEL or TYPE_TRANSFER_LABEL.
      */
-    private fun storageOrTransferLabel(labelType: Int): String? {
+    private fun storageOrTransferLabel(gb: Long, labelType: Int): String {
         return when (labelType) {
-            TYPE_STORAGE_LABEL -> getString(R.string.label_storage_upgrade_account)
-            TYPE_TRANSFER_LABEL -> getString(R.string.label_transfer_quota_upgrade_account)
+            TYPE_STORAGE_LABEL -> getString(R.string.account_upgrade_storage_label,
+                getSizeStringGBBased(gb))
+            TYPE_TRANSFER_LABEL -> getString(R.string.account_upgrade_transfer_quota_label,
+                getSizeStringGBBased(gb))
             else -> ""
         }
     }

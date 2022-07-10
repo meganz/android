@@ -24,25 +24,37 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.BaseFragment;
+import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
+import nz.mega.sdk.MegaApiAndroid;
 import timber.log.Timber;
 
-public class AchievementsFragment extends BaseFragment implements OnClickListener
+@AndroidEntryPoint
+public class AchievementsFragment extends Fragment implements OnClickListener
         , GetAchievementsListener.DataCallback {
+
+    @Inject
+    @MegaApi
+    MegaApiAndroid megaApi;
+
     private RelativeLayout registrationLayout;
     private LinearLayout separatorRegistration;
     private RelativeLayout figuresInstallAppLayout;
@@ -96,13 +108,10 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
     private TextView daysLeftInstallDesktopText;
 
-    private AchievementsActivity mActivity;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Timber.d("onCreateView");
 
-        mActivity = (AchievementsActivity) super.mActivity;
         boolean enabledAchievements = megaApi.isAchievementsEnabled();
         Timber.d("The achievements are: %s", enabledAchievements);
 
@@ -118,7 +127,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
         boolean isPortrait = Util.isScreenInPortrait(MegaApplication.getInstance());
 
-        titleReferralBonuses.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
+        titleReferralBonuses.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, getResources().getDisplayMetrics()));
 
         figuresReferralBonusesLayout = (RelativeLayout) v.findViewById(R.id.figures_referral_bonuses_layout);
         figuresReferralBonusesLayout.setVisibility(View.GONE);
@@ -130,7 +139,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
         registrationLayout.setOnClickListener(this);
 
         TextView titleRegistration = (TextView) v.findViewById(R.id.title_registration);
-        titleRegistration.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
+        titleRegistration.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, getResources().getDisplayMetrics()));
 
         figuresRegistrationLayout = (RelativeLayout) v.findViewById(R.id.figures_registration_layout);
 
@@ -138,7 +147,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
         installAppLayout.setOnClickListener(this);
 
         TextView titleInstallApp = (TextView) v.findViewById(R.id.title_install_app);
-        titleInstallApp.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
+        titleInstallApp.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, getResources().getDisplayMetrics()));
 
         figuresInstallAppLayout = (RelativeLayout) v.findViewById(R.id.figures_install_app_layout);
         figuresInstallAppLayout.setVisibility(View.GONE);
@@ -148,7 +157,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
         if (megaApi.smsAllowedState() == 2) {
             addPhoneLayout.setOnClickListener(this);
             TextView titleAddPhone = v.findViewById(R.id.title_add_phone);
-            titleAddPhone.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
+            titleAddPhone.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, getResources().getDisplayMetrics()));
         } else {
             v.findViewById(R.id.separator_add_phone).setVisibility(View.GONE);
             addPhoneLayout.setVisibility(View.GONE);
@@ -161,7 +170,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
         installDesktopLayout.setOnClickListener(this);
 
         TextView titleInstallDesktop = (TextView) v.findViewById(R.id.title_install_desktop);
-        titleInstallDesktop.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
+        titleInstallDesktop.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, getResources().getDisplayMetrics()));
 
         figuresInstallDesktopLayout = (RelativeLayout) v.findViewById(R.id.figures_install_desktop_layout);
         figuresInstallDesktopLayout.setVisibility(View.GONE);
@@ -232,8 +241,8 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
         figureUnlockedRewardStorage.setText("...");
 
-        if (Util.isDarkMode(context)) {
-            int backgroundColor = ColorUtils.getColorForElevation(context, 1f);
+        if (Util.isDarkMode(requireContext())) {
+            int backgroundColor = ColorUtils.getColorForElevation(requireContext(), 1f);
             v.findViewById(R.id.unlocked_rewards_layout).setBackgroundColor(backgroundColor);
             v.findViewById(R.id.card_view_2).setBackgroundColor(backgroundColor);
         }
@@ -245,12 +254,9 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (mActivity != null) {
-            ActionBar actionBar = mActivity.getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle(StringResourcesUtils.getString(R.string.achievements_title)
-                        .toUpperCase(Locale.getDefault()));
-            }
+        ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(StringResourcesUtils.getString(R.string.achievements_title));
         }
 
         // The root view has been created, fill it with the data when data ready
@@ -266,33 +272,33 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
         switch (v.getId()) {
             case R.id.referral_bonuses_layout: {
                 Timber.d("Go to section Referral bonuses");
-                mActivity.showFragment((transferReferrals > 0 || storageReferrals > 0)
+                ((AchievementsActivity) requireActivity()).showFragment((transferReferrals > 0 || storageReferrals > 0)
                         ? BONUSES_FRAGMENT : INVITE_FRIENDS_FRAGMENT, INVALID_TYPE);
                 break;
             }
             case R.id.install_app_layout: {
                 Timber.d("Go to info app install");
-                mActivity.showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
+                ((AchievementsActivity) requireActivity()).showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
                 break;
             }
             case R.id.add_phone_layout: {
                 Timber.d("Go to info add phone");
-                mActivity.showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
+                ((AchievementsActivity) requireActivity()).showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
                 break;
             }
             case R.id.registration_layout: {
                 Timber.d("Go to info registration");
-                mActivity.showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME);
+                ((AchievementsActivity) requireActivity()).showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME);
                 break;
             }
             case R.id.install_desktop_layout: {
                 Timber.d("Go to info desktop install");
-                mActivity.showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
+                ((AchievementsActivity) requireActivity()).showFragment(INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
                 break;
             }
             case R.id.invite_button: {
                 Timber.d("Invite friends");
-                mActivity.showFragment(INVITE_FRIENDS_FRAGMENT, -1);
+                ((AchievementsActivity) requireActivity()).showFragment(INVITE_FRIENDS_FRAGMENT, -1);
                 break;
             }
         }
@@ -305,7 +311,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
         MegaAchievementsDetails details = sFetcher.getAchievementsDetails();
         ArrayList<ReferralBonus> bonuses = sFetcher.getReferralBonuses();
 
-        if (details == null || context == null || bonuses == null) {
+        if (details == null || bonuses == null) {
             return;
         }
 
@@ -400,20 +406,20 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
                 long diffDays = diffTime / (1000 * 60 * 60 * 24);
 
                 if (diffDays <= 15) {
-                    daysLeftInstallAppText.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_400));
+                    daysLeftInstallAppText.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_600_red_400));
                 }
 
                 if (diffDays > 0) {
-                    daysLeftInstallAppText.setText(context.getResources().getString(R.string.general_num_days_left, (int) diffDays));
+                    daysLeftInstallAppText.setText(StringResourcesUtils.getString(R.string.general_num_days_left, (int) diffDays));
                     totalStorage = totalStorage + storageInstallApp;
                     totalTransfer = totalTransfer + transferInstallApp;
                     Timber.d("After mobile install: storage: %s transfer %s", getSizeString(totalStorage), getSizeString(totalTransfer));
                 } else {
-                    daysLeftInstallAppText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
+                    daysLeftInstallAppText.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.expired_border));
                     figuresInstallAppLayout.setAlpha(0.5f);
                     installAppIcon.setAlpha(0.5f);
-                    daysLeftInstallAppText.setPadding(scaleWidthPx(8, outMetrics), scaleHeightPx(4, outMetrics), scaleWidthPx(8, outMetrics), scaleHeightPx(4, outMetrics));
-                    daysLeftInstallAppText.setText(context.getResources().getString(R.string.expired_label));
+                    daysLeftInstallAppText.setPadding(scaleWidthPx(8, getResources().getDisplayMetrics()), scaleHeightPx(4, getResources().getDisplayMetrics()), scaleWidthPx(8, getResources().getDisplayMetrics()), scaleHeightPx(4, getResources().getDisplayMetrics()));
+                    daysLeftInstallAppText.setText(StringResourcesUtils.getString(R.string.expired_label));
                 }
 
             } else if (type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
@@ -448,20 +454,20 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
                 long diffDays = diffTime / (1000 * 60 * 60 * 24);
 
                 if (diffDays <= 15) {
-                    daysLeftAddPhoneText.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_400));
+                    daysLeftAddPhoneText.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_600_red_400));
                 }
 
                 if (diffDays > 0) {
-                    daysLeftAddPhoneText.setText(context.getResources().getString(R.string.general_num_days_left, (int) diffDays));
+                    daysLeftAddPhoneText.setText(StringResourcesUtils.getString(R.string.general_num_days_left, (int) diffDays));
                     totalStorage = totalStorage + storageAddPhone;
                     totalTransfer = totalTransfer + transferAddPhone;
                     Timber.d("After phone added: storage: %s transfer %s", getSizeString(totalStorage), getSizeString(totalTransfer));
                 } else {
-                    daysLeftAddPhoneText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
+                    daysLeftAddPhoneText.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.expired_border));
                     figuresAddPhoneLayout.setAlpha(0.5f);
                     addPhoneIcon.setAlpha(0.5f);
-                    daysLeftAddPhoneText.setPadding(scaleWidthPx(8, outMetrics), scaleHeightPx(4, outMetrics), scaleWidthPx(8, outMetrics), scaleHeightPx(4, outMetrics));
-                    daysLeftAddPhoneText.setText(context.getResources().getString(R.string.expired_label));
+                    daysLeftAddPhoneText.setPadding(scaleWidthPx(8, getResources().getDisplayMetrics()), scaleHeightPx(4, getResources().getDisplayMetrics()), scaleWidthPx(8, getResources().getDisplayMetrics()), scaleHeightPx(4, getResources().getDisplayMetrics()));
+                    daysLeftAddPhoneText.setText(StringResourcesUtils.getString(R.string.expired_label));
                 }
             } else if (type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL) {
                 Timber.d("MEGA_ACHIEVEMENT_DESKTOP_INSTALL");
@@ -495,20 +501,20 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
                 long diffDays = diffTime / (1000 * 60 * 60 * 24);
 
                 if (diffDays <= 15) {
-                    daysLeftInstallDesktopText.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_400));
+                    daysLeftInstallDesktopText.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_600_red_400));
                 }
 
                 if (diffDays > 0) {
-                    daysLeftInstallDesktopText.setText(context.getResources().getString(R.string.general_num_days_left, (int) diffDays));
+                    daysLeftInstallDesktopText.setText(StringResourcesUtils.getString(R.string.general_num_days_left, (int) diffDays));
                     totalStorage = totalStorage + storageInstallDesktop;
                     totalTransfer = totalTransfer + transferInstallDesktop;
                     Timber.d("After desktop install: storage: %s transfer %s", getSizeString(totalStorage), getSizeString(totalTransfer));
                 } else {
-                    daysLeftInstallDesktopText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
+                    daysLeftInstallDesktopText.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.expired_border));
                     figuresInstallDesktopLayout.setAlpha(0.5f);
                     installDesktopIcon.setAlpha(0.5f);
-                    daysLeftInstallDesktopText.setPadding(scaleWidthPx(8, outMetrics), scaleHeightPx(4, outMetrics), scaleWidthPx(8, outMetrics), scaleHeightPx(4, outMetrics));
-                    daysLeftInstallDesktopText.setText(context.getResources().getString(R.string.expired_label));
+                    daysLeftInstallDesktopText.setPadding(scaleWidthPx(8, getResources().getDisplayMetrics()), scaleHeightPx(4, getResources().getDisplayMetrics()), scaleWidthPx(8, getResources().getDisplayMetrics()), scaleHeightPx(4, getResources().getDisplayMetrics()));
+                    daysLeftInstallDesktopText.setText(StringResourcesUtils.getString(R.string.expired_label));
                 }
 
             } else if (type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME) {
@@ -542,20 +548,20 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
                 long diffDays = diffTime / (1000 * 60 * 60 * 24);
 
                 if (diffDays <= 15) {
-                    daysLeftRegistrationText.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_400));
+                    daysLeftRegistrationText.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_600_red_400));
                 }
 
                 if (diffDays > 0) {
-                    daysLeftRegistrationText.setText(context.getResources().getString(R.string.general_num_days_left, (int) diffDays));
+                    daysLeftRegistrationText.setText(StringResourcesUtils.getString(R.string.general_num_days_left, (int) diffDays));
                     totalStorage = totalStorage + storageRegistration;
                     totalTransfer = totalTransfer + transferRegistration;
                     Timber.d("After desktop install: storage: %d transfer %d", totalStorage, totalTransfer);
                 } else {
-                    daysLeftRegistrationText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
+                    daysLeftRegistrationText.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.expired_border));
                     figuresRegistrationLayout.setAlpha(0.5f);
                     registrationIcon.setAlpha(0.5f);
-                    daysLeftRegistrationText.setPadding(scaleWidthPx(8, outMetrics), scaleHeightPx(4, outMetrics), scaleWidthPx(8, outMetrics), scaleHeightPx(4, outMetrics));
-                    daysLeftRegistrationText.setText(context.getResources().getString(R.string.expired_label));
+                    daysLeftRegistrationText.setPadding(scaleWidthPx(8, getResources().getDisplayMetrics()), scaleHeightPx(4, getResources().getDisplayMetrics()), scaleWidthPx(8, getResources().getDisplayMetrics()), scaleHeightPx(4, getResources().getDisplayMetrics()));
+                    daysLeftRegistrationText.setText(StringResourcesUtils.getString(R.string.expired_label));
                 }
             } else {
                 Timber.d("MEGA_ACHIEVEMENT: %s", type);

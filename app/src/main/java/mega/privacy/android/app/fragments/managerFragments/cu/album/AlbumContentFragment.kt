@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,8 +31,8 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.databinding.FragmentAlbumContentBinding
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.gallery.data.MediaCardType
-import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -53,14 +54,20 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.app.utils.callManager
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
+import javax.inject.Inject
 
 /**
  * AlbumContentFragment is using to show album content when click album cover.
  */
 @AndroidEntryPoint
-class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCallback {
+class AlbumContentFragment : Fragment(), GestureScaleListener.GestureScaleCallback {
+
+    @Inject
+    @MegaApi
+    lateinit var megaApi: MegaApiAndroid
 
     private lateinit var mManagerActivity: ManagerActivity
 
@@ -202,7 +209,7 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
         binding.emptyHint.emptyHintImage.setImageResource(R.drawable.ic_zero_data_favourites)
 
         ColorUtils.setImageViewAlphaIfDark(
-            context,
+            requireContext(),
             binding.emptyHint.emptyHintImage,
             ColorUtils.DARK_IMAGE_ALPHA
         )
@@ -347,12 +354,12 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
         layoutManager = GridLayoutManager(context, spanCount)
         listView.layoutManager = layoutManager
 
-        val imageMargin = ZoomUtil.getMargin(context, currentZoom)
-        ZoomUtil.setMargin(context, params, currentZoom)
+        val imageMargin = ZoomUtil.getMargin(requireContext(), currentZoom)
+        ZoomUtil.setMargin(requireContext(), params, currentZoom)
         val gridWidth =
-            ZoomUtil.getItemWidth(context, outMetrics, currentZoom, spanCount, isPortrait)
-        val icSelectedWidth = ZoomUtil.getSelectedFrameWidth(context, currentZoom)
-        val icSelectedMargin = ZoomUtil.getSelectedFrameMargin(context, currentZoom)
+            ZoomUtil.getItemWidth(requireContext(), resources.displayMetrics, currentZoom, spanCount, isPortrait)
+        val icSelectedWidth = ZoomUtil.getSelectedFrameWidth(requireContext(), currentZoom)
+        val icSelectedMargin = ZoomUtil.getSelectedFrameMargin(requireContext(), currentZoom)
         val itemSizeConfig = GalleryItemSizeConfig(
             currentZoom, gridWidth,
             icSelectedWidth, imageMargin,
@@ -369,7 +376,7 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
         layoutManager.apply {
             spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
             val itemDimen =
-                ZoomUtil.getItemWidth(context, outMetrics, currentZoom, spanCount, isPortrait)
+                ZoomUtil.getItemWidth(requireContext(), resources.displayMetrics, currentZoom, spanCount, isPortrait)
             gridAdapter.setItemDimen(itemDimen)
         }
 
@@ -383,7 +390,7 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListView() {
         scaleGestureHandler = ScaleGestureHandler(
-            context,
+            requireContext(),
             this
         )
         with(listView) {
@@ -522,7 +529,7 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
                     // Draw the green outline for the thumbnail view at once
                     val thumbnailView =
                         itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
-                    thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
+                    thumbnailView.hierarchy.roundingParams = getRoundingParams(requireContext())
 
                     val imageView = itemView.findViewById<ImageView>(
                         R.id.icon_selected
@@ -562,7 +569,7 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
             activity.hideKeyboardSearch()  // Make the snack bar visible to the user
             activity.showSnackbar(
                 Constants.SNACKBAR_TYPE,
-                context.getString(R.string.error_server_connection_problem),
+                StringResourcesUtils.getString(R.string.error_server_connection_problem),
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
         }
@@ -580,9 +587,9 @@ class AlbumContentFragment : BaseFragment(), GestureScaleListener.GestureScaleCa
         if (!this::menu.isInitialized)
             return
         val menuItem = this.menu.findItem(menuItemId)
-        var colorRes = ColorUtils.getThemeColor(context, R.attr.colorControlNormal)
+        var colorRes = ColorUtils.getThemeColor(requireContext(), R.attr.colorControlNormal)
         if (!isEnable) {
-            colorRes = ContextCompat.getColor(context, R.color.grey_038_white_038)
+            colorRes = ContextCompat.getColor(requireContext(), R.color.grey_038_white_038)
         }
         DrawableCompat.setTint(
             menuItem.icon ?: return,

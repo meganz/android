@@ -31,11 +31,11 @@ import mega.privacy.android.app.activities.settingsActivities.FileManagementPref
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
-import mega.privacy.android.app.domain.entity.UserAccount
-import mega.privacy.android.app.domain.entity.user.UserId
 import mega.privacy.android.app.presentation.settings.SettingsFragment
 import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueFragment
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.user.UserId
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
 import org.junit.*
@@ -117,7 +117,7 @@ class SettingsFragmentTest {
             accountTypeString = "free",
         )
 
-        runBlocking{
+        runBlocking {
             whenever(TestSettingsModule.getAccountDetails(false)).thenReturn(TEST_USER_ACCOUNT)
             whenever(TestSettingsModule.getAccountDetails(true)).thenReturn(refreshUserAccount)
         }
@@ -414,7 +414,7 @@ class SettingsFragmentTest {
     fun test_that_report_issue_result_displays_a_snackbar() {
         var resultHandler: FragmentResultListener? = null
 
-        val scenario = launchFragmentInHiltContainer<SettingsFragment>(){
+        val scenario = launchFragmentInHiltContainer<SettingsFragment>() {
             resultHandler = this as FragmentResultListener
         }
         scenario?.moveToState(Lifecycle.State.CREATED)
@@ -422,7 +422,8 @@ class SettingsFragmentTest {
         scenario?.moveToState(Lifecycle.State.RESUMED)
 
         val resultMessage = "This is a success"
-        resultHandler?.onFragmentResult(REPORT_ISSUE, bundleOf(ReportIssueFragment::class.java.name to resultMessage))
+        resultHandler?.onFragmentResult(REPORT_ISSUE,
+            bundleOf(ReportIssueFragment::class.java.name to resultMessage))
 
 
         onView(withText(resultMessage))

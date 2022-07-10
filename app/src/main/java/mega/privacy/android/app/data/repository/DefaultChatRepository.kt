@@ -4,8 +4,8 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.app.domain.repository.ChatRepository
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import javax.inject.Inject
@@ -17,7 +17,7 @@ import javax.inject.Inject
  * @property chatGateway
  */
 class DefaultChatRepository @Inject constructor(
-    private val chatGateway: MegaChatApiGateway
+    private val chatGateway: MegaChatApiGateway,
 ) : ChatRepository {
     override fun notifyChatLogout(): Flow<Boolean> {
         return callbackFlow {

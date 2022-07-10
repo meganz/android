@@ -4,8 +4,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.domain.repository.LoginRepository
-import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.usecase.FastLogin
+import mega.privacy.android.domain.usecase.FetchNodes
+import mega.privacy.android.domain.usecase.InitMegaChat
 
 /**
  * Login module.

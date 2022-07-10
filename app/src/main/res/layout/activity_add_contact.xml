@@ -91,7 +91,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/menu_item_scan_code"
-					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor.Variant1"
+					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AccentColor"
 					android:paddingLeft="16dp"
 					android:layout_centerVertical="true"/>
 
@@ -113,7 +113,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/invite_contacts"
-					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor.Variant1"
+					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AccentColor"
 					android:paddingLeft="16dp"
 					android:layout_centerVertical="true"/>
 
@@ -135,7 +135,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/new_group_chat_label"
-					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor.Variant1"
+					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AccentColor"
 					android:paddingLeft="16dp"
 					android:layout_centerVertical="true"/>
 
@@ -157,7 +157,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/new_chat_link_label"
-					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor.Variant1"
+					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AccentColor"
 					android:paddingLeft="16dp"
 					android:layout_centerVertical="true"/>
 
@@ -180,7 +180,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/new_meeting"
-					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor.Variant1"
+					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AccentColor"
 					android:paddingLeft="16dp"
 					android:layout_centerVertical="true"/>
 
