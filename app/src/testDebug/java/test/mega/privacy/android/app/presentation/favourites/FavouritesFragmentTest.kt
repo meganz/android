@@ -4,16 +4,14 @@ import android.view.View
 import android.widget.ImageView
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -27,7 +25,7 @@ import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 import org.hamcrest.Matcher
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -66,22 +64,22 @@ class FavouritesFragmentTest {
         }
         launchFragmentInHiltContainer<FavouritesFragment>()
         // Check the empty view if is visible.
-        emptyView().check(matches(isDisplayed()))
+        emptyView().check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
         // Check the recycle view if is gone.
-        recycleView().check(matches(not(isDisplayed())))
+        recycleView().check(ViewAssertions.matches(Matchers.not(ViewMatchers.isDisplayed())))
         // Check the loading view if is gone.
-        loadingView().check(matches(not(isDisplayed())))
+        loadingView().check(ViewAssertions.matches(Matchers.not(ViewMatchers.isDisplayed())))
     }
 
     @Test
     fun test_that_the_recycler_view_is_displayed_when_favourites_is_not_empty() {
         launchFragmentInHiltContainer<FavouritesFragment>()
         // Check the recycle view if is visible.
-        recycleView().check(matches(isDisplayed()))
+        recycleView().check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
         // Check the empty layout if is gone
-        emptyView().check(matches(not(isDisplayed())))
+        emptyView().check(ViewAssertions.matches(Matchers.not(ViewMatchers.isDisplayed())))
         // Check the loading view if is gone.
-        loadingView().check(matches(not(isDisplayed())))
+        loadingView().check(ViewAssertions.matches(Matchers.not(ViewMatchers.isDisplayed())))
     }
 
     @Test
@@ -95,7 +93,8 @@ class FavouritesFragmentTest {
             )
         }
 
-        recycleView().perform(actionOnItemAtPosition<FavouritesViewHolder>(1, click()))
+        recycleView().perform(RecyclerViewActions.actionOnItemAtPosition<FavouritesViewHolder>(1,
+            ViewActions.click()))
         verify(mockNavController).navigate(
             HomepageFragmentDirections.actionHomepageFragmentToFavouritesFolderFragment(
                 0
@@ -119,9 +118,10 @@ class FavouritesFragmentTest {
             }
 
         }
-        recycleView().perform(actionOnItemAtPosition<FavouritesViewHolder>(1, threeDotClicked))
+        recycleView().perform(RecyclerViewActions.actionOnItemAtPosition<FavouritesViewHolder>(1,
+            threeDotClicked))
 
-        snackBarView().check(matches(withText(R.string.error_server_connection_problem)))
+        snackBarView().check(ViewAssertions.matches(ViewMatchers.withText(R.string.error_server_connection_problem)))
     }
 
     private fun initData() {
@@ -169,8 +169,9 @@ class FavouritesFragmentTest {
         }
     }
 
-    private fun emptyView() = onView(withId(R.id.empty_hint))
-    private fun recycleView() = onView(withId(R.id.file_list_view_browser))
-    private fun loadingView() = onView(withId(R.id.favourite_progressbar))
-    private fun snackBarView() = onView(withId(com.google.android.material.R.id.snackbar_text))
+    private fun emptyView() = Espresso.onView(ViewMatchers.withId(R.id.empty_hint))
+    private fun recycleView() = Espresso.onView(ViewMatchers.withId(R.id.file_list_view_browser))
+    private fun loadingView() = Espresso.onView(ViewMatchers.withId(R.id.favourite_progressbar))
+    private fun snackBarView() =
+        Espresso.onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
 }

@@ -3,15 +3,11 @@ package test.mega.privacy.android.app
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
-import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
-import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
-import androidx.compose.ui.test.onNodeWithText
 import androidx.core.util.Preconditions
 import androidx.fragment.app.Fragment
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.app.HiltTestActivity
 import mega.privacy.android.app.R
 
@@ -29,7 +25,7 @@ internal const val testFragmentTag = "underTest"
 internal inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     fragmentArgs: Bundle? = null,
     @StyleRes themeResId: Int = R.style.FragmentScenarioEmptyFragmentActivityTheme,
-    crossinline action: Fragment.() -> Unit = {}
+    crossinline action: Fragment.() -> Unit = {},
 ): ActivityScenario<HiltTestActivity>? {
     val startActivityIntent = Intent.makeMainActivity(
         ComponentName(
@@ -61,9 +57,4 @@ internal fun <T : Fragment> HiltTestActivity.testFragment(): T {
     return supportFragmentManager.findFragmentByTag(testFragmentTag) as T
 }
 
-internal fun SemanticsNodeInteractionsProvider.onNodeWithText(
-    @StringRes id: Int
-) = onNodeWithText(fromId(id = id))
 
-internal fun fromId(@StringRes id: Int) =
-    InstrumentationRegistry.getInstrumentation().targetContext.getString(id)

@@ -3,15 +3,9 @@ package test.mega.privacy.android.app.presentation.settings.advanced
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.ViewInteraction
-import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
-import androidx.test.espresso.matcher.ViewMatchers.hasSibling
-import androidx.test.espresso.matcher.ViewMatchers.isChecked
-import androidx.test.espresso.matcher.ViewMatchers.isEnabled
-import androidx.test.espresso.matcher.ViewMatchers.isNotChecked
-import androidx.test.espresso.matcher.ViewMatchers.isNotEnabled
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -21,7 +15,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.advanced.SettingsAdvancedFragment
-import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers
 import org.hamcrest.Matcher
 import org.junit.Before
 import org.junit.Rule
@@ -29,7 +23,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
+import test.mega.privacy.android.app.RecyclerViewAssertions
 import test.mega.privacy.android.app.di.TestInitialiseUseCases
 import test.mega.privacy.android.app.di.TestSettingsAdvancedUseCases
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
@@ -53,7 +47,7 @@ class SettingsAdvancedFragmentTest {
 
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
-        verifyPreference(isChecked())
+        verifyPreference(ViewMatchers.isChecked())
     }
 
     @Test
@@ -62,7 +56,7 @@ class SettingsAdvancedFragmentTest {
 
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
-        verifyPreference(isNotChecked())
+        verifyPreference(ViewMatchers.isNotChecked())
     }
 
     @Test
@@ -71,7 +65,7 @@ class SettingsAdvancedFragmentTest {
 
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
-        verifyPreference(isEnabled())
+        verifyPreference(ViewMatchers.isEnabled())
     }
 
     @Test
@@ -80,7 +74,7 @@ class SettingsAdvancedFragmentTest {
 
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
-        verifyPreference(isNotEnabled())
+        verifyPreference(ViewMatchers.isNotEnabled())
     }
 
     @Test
@@ -89,7 +83,7 @@ class SettingsAdvancedFragmentTest {
 
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
-        verifyPreference(isNotEnabled())
+        verifyPreference(ViewMatchers.isNotEnabled())
     }
 
     @Test
@@ -99,13 +93,13 @@ class SettingsAdvancedFragmentTest {
 
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
-        verifyPreference(isEnabled())
+        verifyPreference(ViewMatchers.isEnabled())
 
         isOnline.tryEmit(false)
 
         Thread.sleep(200) //TODO: Find an alternative. This is a hack to get around Robolectric not respecting idling resources.
 
-        verifyPreference(isNotEnabled())
+        verifyPreference(ViewMatchers.isNotEnabled())
     }
 
     @Test
@@ -115,13 +109,13 @@ class SettingsAdvancedFragmentTest {
 
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
-        verifyPreference(isNotEnabled())
+        verifyPreference(ViewMatchers.isNotEnabled())
 
         isOnline.tryEmit(true)
 
         Thread.sleep(200) //TODO: Find an alternative. This is a hack to get around Robolectric not respecting idling resources.
 
-        verifyPreference(isEnabled())
+        verifyPreference(ViewMatchers.isEnabled())
     }
 
     @Test
@@ -131,10 +125,11 @@ class SettingsAdvancedFragmentTest {
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
         onPreferences().perform(
-            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click())
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0,
+                ViewActions.click())
         )
 
-        verifyPreference(isChecked())
+        verifyPreference(ViewMatchers.isChecked())
 
         runBlocking { verify(TestSettingsAdvancedUseCases.setUseHttps).invoke(true) }
     }
@@ -147,10 +142,11 @@ class SettingsAdvancedFragmentTest {
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
         onPreferences().perform(
-            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click())
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0,
+                ViewActions.click())
         )
 
-        verifyPreference(isNotChecked())
+        verifyPreference(ViewMatchers.isNotChecked())
 
         runBlocking { verify(TestSettingsAdvancedUseCases.setUseHttps).invoke(false) }
     }
@@ -165,10 +161,10 @@ class SettingsAdvancedFragmentTest {
 
     private fun verifyPreference(enabled: Matcher<View>?): ViewInteraction? {
         return onPreferences().check(
-            withRowContaining(
-                allOf(
-                    hasDescendant(withText(R.string.setting_subtitle_use_https_only)),
-                    hasSibling(hasDescendant(enabled))
+            RecyclerViewAssertions.withRowContaining(
+                CoreMatchers.allOf(
+                    ViewMatchers.hasDescendant(ViewMatchers.withText(R.string.setting_subtitle_use_https_only)),
+                    ViewMatchers.hasSibling(ViewMatchers.hasDescendant(enabled))
                 )
             )
         )
