@@ -1427,7 +1427,7 @@ public class FileBrowserFragment extends RotatableFragment {
 
     public MediaDiscoveryFragment showMediaDiscovery(Unit u) {
         MediaDiscoveryFragment f = MediaDiscoveryFragment.getInstance(mediaHandle);
-        ((ManagerActivity) context).skipToMediaDiscoveryFragment(f);
+        ((ManagerActivity) context).skipToMediaDiscoveryFragment(f, mediaHandle);
         return f;
     }
 
