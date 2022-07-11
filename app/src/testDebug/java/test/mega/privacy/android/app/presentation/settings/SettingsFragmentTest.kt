@@ -2,21 +2,23 @@ package test.mega.privacy.android.app.presentation.settings
 
 import android.app.Activity
 import android.app.Instrumentation
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentResultListener
 import androidx.lifecycle.Lifecycle
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import androidx.test.espresso.Espresso.onView
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.intent.Intents.intended
-import androidx.test.espresso.intent.Intents.intending
-import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.intent.matcher.IntentMatchers
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.Suppress
@@ -30,24 +32,24 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.presentation.settings.SettingsFragment
 import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.user.UserId
-import org.hamcrest.Matchers.allOf
-import org.hamcrest.Matchers.not
-import org.junit.*
+import org.hamcrest.Matchers
+import org.junit.After
+import org.junit.Before
+import org.junit.Ignore
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withNoRowContaining
-import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
+import test.mega.privacy.android.app.RecyclerViewAssertions
 import test.mega.privacy.android.app.TEST_USER_ACCOUNT
 import test.mega.privacy.android.app.di.TestInitialiseUseCases
 import test.mega.privacy.android.app.di.TestSettingsModule
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
-
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -89,7 +91,7 @@ class SettingsFragmentTest {
         scenario?.moveToState(Lifecycle.State.RESUMED)
 
         onPreferences()
-            .check(withNoRowContaining(withText(R.string.settings_delete_account)))
+            .check(RecyclerViewAssertions.withNoRowContaining(ViewMatchers.withText(R.string.settings_delete_account)))
     }
 
     @Test
@@ -102,7 +104,7 @@ class SettingsFragmentTest {
         scenario?.moveToState(Lifecycle.State.RESUMED)
 
         onPreferences()
-            .check(withRowContaining(withText(R.string.settings_delete_account)))
+            .check(RecyclerViewAssertions.withRowContaining(ViewMatchers.withText(R.string.settings_delete_account)))
     }
 
 
@@ -131,7 +133,7 @@ class SettingsFragmentTest {
         scenario?.moveToState(Lifecycle.State.RESUMED)
 
         onPreferences()
-            .check(withNoRowContaining(withText(R.string.settings_delete_account)))
+            .check(RecyclerViewAssertions.withNoRowContaining(ViewMatchers.withText(R.string.settings_delete_account)))
 
 //        This test occasionally failed due to timing issues.
 //        Adding this receiver with an idling resource ensures that the verification only happens
@@ -153,7 +155,7 @@ class SettingsFragmentTest {
         }
 
         onPreferences()
-            .check(withRowContaining(withText(R.string.settings_delete_account)))
+            .check(RecyclerViewAssertions.withRowContaining(ViewMatchers.withText(R.string.settings_delete_account)))
 
         scenario?.onActivity {
             it.unregisterReceiver(
@@ -168,7 +170,7 @@ class SettingsFragmentTest {
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
-            .check(withRowContaining(withText(R.string.download_location)))
+            .check(RecyclerViewAssertions.withRowContaining(ViewMatchers.withText(R.string.download_location)))
     }
 
 
@@ -179,9 +181,9 @@ class SettingsFragmentTest {
 
         onPreferences()
             .check(
-                withRowContaining(
-                    allOf(
-                        withText(R.string.settings_delete_account),
+                RecyclerViewAssertions.withRowContaining(
+                    Matchers.allOf(
+                        ViewMatchers.withText(R.string.settings_delete_account),
                         withTextColorAlpha(1.0)
                     )
                 )
@@ -196,9 +198,9 @@ class SettingsFragmentTest {
 
         onPreferences()
             .check(
-                withRowContaining(
-                    allOf(
-                        withText(R.string.settings_delete_account),
+                RecyclerViewAssertions.withRowContaining(
+                    Matchers.allOf(
+                        ViewMatchers.withText(R.string.settings_delete_account),
                         withTextColorAlpha(0.5)
                     )
                 )
@@ -211,17 +213,19 @@ class SettingsFragmentTest {
         val newStartScreen = 1
         launchFragmentInHiltContainer<SettingsFragment>()
         val startScreenDescriptionStrings =
-            getApplicationContext<HiltTestApplication>().resources.getStringArray(
+            ApplicationProvider.getApplicationContext<HiltTestApplication>().resources.getStringArray(
                 R.array.settings_start_screen
             )
 
         onPreferences()
-            .check(withRowContaining(withText(startScreenDescriptionStrings[initialScreen])))
+            .check(RecyclerViewAssertions.withRowContaining(ViewMatchers.withText(
+                startScreenDescriptionStrings[initialScreen])))
 
         startScreen.tryEmit(newStartScreen)
 
         onPreferences()
-            .check(withRowContaining(withText(startScreenDescriptionStrings[newStartScreen])))
+            .check(RecyclerViewAssertions.withRowContaining(ViewMatchers.withText(
+                startScreenDescriptionStrings[newStartScreen])))
     }
 
     @Test
@@ -235,46 +239,50 @@ class SettingsFragmentTest {
 
         onPreferences()
             .check(
-                withRowContaining(
-                    allOf(
-                        withText(R.string.section_photo_sync), not(isEnabled())
+                RecyclerViewAssertions.withRowContaining(
+                    Matchers.allOf(
+                        ViewMatchers.withText(R.string.section_photo_sync),
+                        Matchers.not(ViewMatchers.isEnabled())
                     )
                 )
             )
 
         onPreferences()
             .check(
-                withRowContaining(
-                    allOf(
-                        withText(R.string.section_chat), not(isEnabled())
+                RecyclerViewAssertions.withRowContaining(
+                    Matchers.allOf(
+                        ViewMatchers.withText(R.string.section_chat),
+                        Matchers.not(ViewMatchers.isEnabled())
                     )
                 )
             )
 
         onPreferences()
             .check(
-                withRowContaining(
-                    allOf(
-                        withText(R.string.settings_2fa), not(isEnabled())
+                RecyclerViewAssertions.withRowContaining(
+                    Matchers.allOf(
+                        ViewMatchers.withText(R.string.settings_2fa),
+                        Matchers.not(ViewMatchers.isEnabled())
                     )
                 )
             )
 
         onPreferences()
             .check(
-                withRowContaining(
-                    allOf(
-                        withText(R.string.section_qr_code), not(isEnabled())
+                RecyclerViewAssertions.withRowContaining(
+                    Matchers.allOf(
+                        ViewMatchers.withText(R.string.section_qr_code),
+                        Matchers.not(ViewMatchers.isEnabled())
                     )
                 )
             )
 
         onPreferences()
             .check(
-                withRowContaining(
-                    allOf(
-                        withText(R.string.settings_delete_account), not(
-                            isEnabled()
+                RecyclerViewAssertions.withRowContaining(
+                    Matchers.allOf(
+                        ViewMatchers.withText(R.string.settings_delete_account), Matchers.not(
+                            ViewMatchers.isEnabled()
                         )
                     )
                 )
@@ -288,20 +296,20 @@ class SettingsFragmentTest {
 
         onPreferences()
             .check(
-                withRowContaining(
-                    allOf(
-                        hasDescendant(withText(R.string.hide_recent_setting_context)),
-                        hasSibling(hasDescendant(not(isChecked())))
+                RecyclerViewAssertions.withRowContaining(
+                    Matchers.allOf(
+                        ViewMatchers.hasDescendant(ViewMatchers.withText(R.string.hide_recent_setting_context)),
+                        ViewMatchers.hasSibling(ViewMatchers.hasDescendant(Matchers.not(ViewMatchers.isChecked())))
                     )
                 )
             )
         hide.tryEmit(true)
         onPreferences()
             .check(
-                withRowContaining(
-                    allOf(
-                        hasDescendant(withText(R.string.hide_recent_setting_context)),
-                        hasSibling(hasDescendant(isChecked()))
+                RecyclerViewAssertions.withRowContaining(
+                    Matchers.allOf(
+                        ViewMatchers.hasDescendant(ViewMatchers.withText(R.string.hide_recent_setting_context)),
+                        ViewMatchers.hasSibling(ViewMatchers.hasDescendant(ViewMatchers.isChecked()))
                     )
                 )
             )
@@ -310,10 +318,10 @@ class SettingsFragmentTest {
     @Suppress
     @Test
     fun test_that_when_fragment_is_launched_and_openSettingsStorage_is_set_FileManagementPreferencesActivity_is_launched() {
-        intending(
-            hasComponent(
+        Intents.intending(
+            IntentMatchers.hasComponent(
                 ComponentName(
-                    getApplicationContext<HiltTestApplication>(),
+                    ApplicationProvider.getApplicationContext<HiltTestApplication>(),
                     FileManagementPreferencesActivity::class.java.name
                 )
             )
@@ -329,10 +337,10 @@ class SettingsFragmentTest {
 
         launchFragmentInHiltContainer<SettingsFragment>(args)
 
-        intended(
-            hasComponent(
+        Intents.intended(
+            IntentMatchers.hasComponent(
                 ComponentName(
-                    getApplicationContext<HiltTestApplication>(),
+                    ApplicationProvider.getApplicationContext<HiltTestApplication>(),
                     FileManagementPreferencesActivity::class.java.name
                 )
             )
@@ -342,10 +350,10 @@ class SettingsFragmentTest {
 
     @Test
     fun test_that_when_fragment_is_launched_and_openSettingsStartScreen_is_set_StartScreenPreferencesActivity_is_launched() {
-        intending(
-            hasComponent(
+        Intents.intending(
+            IntentMatchers.hasComponent(
                 ComponentName(
-                    getApplicationContext<HiltTestApplication>(),
+                    ApplicationProvider.getApplicationContext<HiltTestApplication>(),
                     StartScreenPreferencesActivity::class.java.name
                 )
             )
@@ -361,10 +369,10 @@ class SettingsFragmentTest {
 
         launchFragmentInHiltContainer<SettingsFragment>(args)
 
-        intended(
-            hasComponent(
+        Intents.intended(
+            IntentMatchers.hasComponent(
                 ComponentName(
-                    getApplicationContext<HiltTestApplication>(),
+                    ApplicationProvider.getApplicationContext<HiltTestApplication>(),
                     StartScreenPreferencesActivity::class.java.name
                 )
             )
@@ -382,10 +390,10 @@ class SettingsFragmentTest {
 
         onPreferences()
             .check(
-                withRowContaining(
-                    allOf(
-                        hasDescendant(withText(R.string.setting_subtitle_2fa)),
-                        hasSibling(hasDescendant(isChecked()))
+                RecyclerViewAssertions.withRowContaining(
+                    Matchers.allOf(
+                        ViewMatchers.hasDescendant(ViewMatchers.withText(R.string.setting_subtitle_2fa)),
+                        ViewMatchers.hasSibling(ViewMatchers.hasDescendant(ViewMatchers.isChecked()))
                     )
                 )
             )
@@ -398,7 +406,7 @@ class SettingsFragmentTest {
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
-            .check(withRowContaining(withText(R.string.settings_help_report_issue)))
+            .check(RecyclerViewAssertions.withRowContaining(ViewMatchers.withText(R.string.settings_help_report_issue)))
     }
 
     @Test
@@ -407,7 +415,7 @@ class SettingsFragmentTest {
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
-            .check(withRowContaining(withText(R.string.settings_help_report_issue)))
+            .check(RecyclerViewAssertions.withRowContaining(ViewMatchers.withText(R.string.settings_help_report_issue)))
     }
 
     @Test
@@ -422,13 +430,12 @@ class SettingsFragmentTest {
         scenario?.moveToState(Lifecycle.State.RESUMED)
 
         val resultMessage = "This is a success"
-        resultHandler?.onFragmentResult(REPORT_ISSUE,
+        resultHandler?.onFragmentResult(SettingsConstants.REPORT_ISSUE,
             bundleOf(ReportIssueFragment::class.java.name to resultMessage))
 
 
-        onView(withText(resultMessage))
-            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+        Espresso.onView(ViewMatchers.withText(resultMessage))
+            .check(ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)))
     }
 
 }
-
