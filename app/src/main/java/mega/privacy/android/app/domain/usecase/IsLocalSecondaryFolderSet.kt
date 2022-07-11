@@ -1,4 +1,4 @@
-package mega.privacy.android.app.jobservices
+package mega.privacy.android.app.domain.usecase
 
 /**
  * Check the availability of camera upload local secondary folder

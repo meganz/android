@@ -1,4 +1,4 @@
-package mega.privacy.android.app.jobservices
+package mega.privacy.android.app.domain.usecase
 
 import mega.privacy.android.app.domain.repository.CameraUploadRepository
 import javax.inject.Inject

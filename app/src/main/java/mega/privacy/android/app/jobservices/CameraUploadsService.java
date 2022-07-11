@@ -51,7 +51,6 @@ import static mega.privacy.android.app.utils.Util.getLocalIpAddress;
 import static mega.privacy.android.app.utils.Util.getPhotoSyncNameWithIndex;
 import static mega.privacy.android.app.utils.Util.getProgressSize;
 import static mega.privacy.android.app.utils.Util.isCharging;
-import static mega.privacy.android.app.utils.Util.isOnWifi;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
@@ -106,9 +105,20 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository.SyncTimeStamp;
 import mega.privacy.android.app.domain.repository.CameraUploadRepository;
+import mega.privacy.android.app.domain.usecase.DeleteSyncRecord;
+import mega.privacy.android.app.domain.usecase.DeleteSyncRecordByFingerprint;
+import mega.privacy.android.app.domain.usecase.DeleteSyncRecordByLocalPath;
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath;
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary;
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery;
+import mega.privacy.android.app.domain.usecase.HasCredentials;
+import mega.privacy.android.app.domain.usecase.HasPreferences;
+import mega.privacy.android.app.domain.usecase.IsCameraUploadSyncEnabled;
+import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet;
+import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet;
+import mega.privacy.android.app.domain.usecase.IsSecondaryFolderEnabled;
+import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied;
+import mega.privacy.android.app.domain.usecase.SetSecondaryFolderPath;
 import mega.privacy.android.app.domain.usecase.UpdateCameraUploadTimeStamp;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
@@ -155,6 +165,30 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
 
     @Inject
     IsSecondaryFolderEnabled isSecondaryFolderEnabled;
+
+    @Inject
+    HasCredentials hasCredentials;
+
+    @Inject
+    HasPreferences hasPreferences;
+
+    @Inject
+    IsCameraUploadSyncEnabled isCameraUploadSyncEnabled;
+
+    @Inject
+    IsWifiNotSatisfied isWifiNotSatisfied;
+
+    @Inject
+    DeleteSyncRecord deleteSyncRecord;
+
+    @Inject
+    DeleteSyncRecordByLocalPath deleteSyncRecordByLocalPath;
+
+    @Inject
+    DeleteSyncRecordByFingerprint deleteSyncRecordByFingerprint;
+
+    @Inject
+    SetSecondaryFolderPath setSecondaryFolderPath;
 
     @Inject
     CameraUploadRepository cameraUploadRepository;
@@ -428,20 +462,19 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             @Override
             public void run() {
                 try {
-                    // TODO USE CASE
-                    if (!cameraUploadRepository.doCredentialsExist()) {
+                    if (!hasCredentials.invoke()) {
                         Timber.w("There are no user credentials");
                         finish();
                         return;
                     }
 
-                    if (!cameraUploadRepository.doPreferencesExist()) {
+                    if (!hasPreferences.invoke()) {
                         Timber.w("Preferences not defined, so not enabled");
                         finish();
                         return;
                     }
 
-                    if (!cameraUploadRepository.isSyncEnabled()) {
+                    if (!isCameraUploadSyncEnabled.invoke()) {
                         Timber.w("Sync enabled not defined or not enabled");
                         finish();
                         return;
@@ -460,6 +493,12 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
 
                     if (isTextEmpty(localPath.invoke())) {
                         Timber.w("LocalPath is not defined, so not enabled");
+                        finish();
+                        return;
+                    }
+
+                    if (isWifiNotSatisfied.invoke()) {
+                        Timber.w("Cannot start, WiFi required");
                         finish();
                         return;
                     }
@@ -816,7 +855,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                     MegaNode node = checkExsitBySize(parent, toUpload.length());
                     if (node != null && node.getOriginalFingerprint() == null) {
                         Timber.d("Node with handle: %d already exists, delete record from database.", node.getHandle());
-                        cameraUploadRepository.deleteSyncRecord(path, isSec);
+                        deleteSyncRecord.invoke(path, isSec);
                     } else {
                         totalToUpload++;
                         long lastModified = getLastModifiedTime(file);
@@ -825,7 +864,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                     }
                 } else {
                     Timber.d("Local file is unavailable, delete record from database.");
-                    cameraUploadRepository.deleteSyncRecord(path, isSec);
+                    deleteSyncRecord.invoke(path, isSec);
                 }
             }
         }
@@ -864,7 +903,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             if (exist != null) {
                 if (exist.getTimestamp() < file.getTimestamp()) {
                     Timber.d("Got newer time stamp.");
-                    cameraUploadRepository.deleteSyncRecordByLocalPath(exist.getLocalPath(), exist.isSecondary());
+                    deleteSyncRecordByLocalPath.invoke(exist.getLocalPath(), exist.isSecondary());
                 } else {
                     Timber.w("Duplicate sync records.");
                     continue;
@@ -878,7 +917,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                 File f = new File(file.getLocalPath());
                 if (!f.exists()) {
                     Timber.w("File does not exist, remove from database.");
-                    cameraUploadRepository.deleteSyncRecordByLocalPath(file.getLocalPath(), isSec);
+                    deleteSyncRecordByLocalPath.invoke(file.getLocalPath(), isSec);
                     continue;
                 }
             }
@@ -1036,7 +1075,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             localFolderUnavailableNotification(R.string.camera_notif_primary_local_unavailable, LOCAL_FOLDER_REMINDER_PRIMARY);
             disableCameraUploadSettingProcess();
             cameraUploadRepository.setSyncLocalPath(INVALID_NON_NULL_VALUE);
-            cameraUploadRepository.setSecondaryFolderPath(INVALID_NON_NULL_VALUE);
+            setSecondaryFolderPath.invoke(INVALID_NON_NULL_VALUE);
             //refresh settings fragment UI
             sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING));
             return SHOULD_RUN_STATE_FAILED;
@@ -1048,18 +1087,11 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             localFolderUnavailableNotification(R.string.camera_notif_secondary_local_unavailable, LOCAL_FOLDER_REMINDER_SECONDARY);
             // disable media upload only
             disableMediaUploadProcess();
-            cameraUploadRepository.setSecondaryFolderPath(INVALID_PATH);
+            setSecondaryFolderPath.invoke(INVALID_PATH);
             sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING));
             return SHOULD_RUN_STATE_FAILED;
         } else {
             mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_SECONDARY);
-        }
-
-        if (cameraUploadRepository.isSyncByWifiDefault()) {
-            if (!isOnWifi(this)) {
-                Timber.w("Not start, require WiFi.");
-                return SHOULD_RUN_STATE_FAILED;
-            }
         }
 
         if (megaApi.getRootNode() == null && !MegaApplication.isLoggingIn()) {
@@ -1377,7 +1409,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                 MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
                 String fingerPrint = node.getFingerprint();
                 boolean isSecondary = node.getParentHandle() == secondaryUploadHandle;
-                cameraUploadRepository.deleteSyncRecordByFingerprint(fingerPrint, fingerPrint, isSecondary);
+                deleteSyncRecordByFingerprint.invoke(fingerPrint, fingerPrint, isSecondary);
                 CameraUploadSyncManager.INSTANCE.onUploadSuccess(node, isSecondary);
             }
             updateUpload();
@@ -1543,7 +1575,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                     }
                 }
                 //delete database record
-                cameraUploadRepository.deleteSyncRecord(path, isSecondary);
+                deleteSyncRecord.invoke(path, isSecondary);
                 //delete temp files
                 if (path.startsWith(tempRoot)) {
                     File temp = new File(path);
@@ -1701,7 +1733,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             }
         } else {
             Timber.w("Compressed video not exists, remove from DB");
-            cameraUploadRepository.deleteSyncRecordByLocalPath(localPath, isSecondary);
+            deleteSyncRecordByLocalPath.invoke(localPath, isSecondary);
         }
     }
 

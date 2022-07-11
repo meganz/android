@@ -8,6 +8,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.repository.CameraUploadRepository
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -27,6 +28,7 @@ import javax.inject.Inject
  * @property megaApiGateway MegaApiGateway
  * @property threadPoolExecutor ThreadPoolExecutor
  * @property ioDispatcher CoroutineDispatcher
+ * @property megaLocalStorageFacade MegaLocalStorageGateway
  */
 class DefaultCameraUploadRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
@@ -34,6 +36,7 @@ class DefaultCameraUploadRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val threadPoolExecutor: ThreadPoolExecutor,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val megaLocalStorageFacade: MegaLocalStorageGateway,
 ) : CameraUploadRepository {
 
     /**

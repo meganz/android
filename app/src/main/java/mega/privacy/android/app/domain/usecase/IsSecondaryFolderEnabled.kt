@@ -1,4 +1,4 @@
-package mega.privacy.android.app.jobservices
+package mega.privacy.android.app.domain.usecase
 
 /**
  * Check preferences if secondary media folder is enabled

@@ -16,6 +16,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
+import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnlineWrapper
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 
@@ -34,6 +35,15 @@ class UtilWrapperModule {
         return object : IsOnlineWrapper {
             override fun isOnline(context: Context): Boolean {
                 return Util.isOnline(context)
+            }
+        }
+    }
+
+    @Provides
+    fun provideIsOnWifiWrapper(): IsOnWifiWrapper {
+        return object : IsOnWifiWrapper {
+            override fun isOnWifi(context: Context): Boolean {
+                return Util.isOnWifi(context)
             }
         }
     }

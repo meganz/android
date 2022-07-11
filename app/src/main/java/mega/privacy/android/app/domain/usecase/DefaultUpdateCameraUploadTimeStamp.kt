@@ -3,7 +3,6 @@ package mega.privacy.android.app.domain.usecase
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository.SyncTimeStamp
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.app.domain.repository.CameraUploadRepository
-import mega.privacy.android.app.jobservices.IsSecondaryFolderEnabled
 import timber.log.Timber
 import javax.inject.Inject
 

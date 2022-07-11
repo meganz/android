@@ -1,11 +1,10 @@
-package mega.privacy.android.app.jobservices
+package mega.privacy.android.app.domain.usecase
 
 import android.content.Context
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.domain.repository.CameraUploadRepository
-import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
