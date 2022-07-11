@@ -13,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMeetingListBinding
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.meeting.list.adapter.MeetingsAdapter
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -24,9 +25,7 @@ class MeetingListFragment : Fragment() {
     private lateinit var binding: FragmentMeetingListBinding
 
     private val viewModel by viewModels<MeetingListViewModel>()
-//    private val contactsAdapter by lazy {
-//        ContactListAdapter(::onContactClick, ::onContactInfoClick, ::onContactMoreClick)
-//    }
+    private val adapter by lazy { MeetingsAdapter(::onItemClick, ::onItemMoreClick) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,7 +55,7 @@ class MeetingListFragment : Fragment() {
     }
 
     private fun setupView() {
-//        binding.list.adapter = ConcatAdapter(adapterConfig, actionsAdapter, recentlyAddedAdapter, contactsAdapter)
+        binding.list.adapter = adapter
         binding.list.setHasFixedSize(true)
         binding.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -78,16 +77,16 @@ class MeetingListFragment : Fragment() {
     }
 
     private fun setupObservers() {
-//        viewModel.getContactActions().observe(viewLifecycleOwner) { items ->
-//            actionsAdapter.submitList(items)
-//        }
+        viewModel.getMeetings().observe(viewLifecycleOwner) { items ->
+            adapter.submitList(items)
+        }
     }
 
-    private fun onMeetingClick(chatId: Long) {
+    private fun onItemClick(chatId: Long) {
         TODO()
     }
 
-    private fun onContactMoreClick(userHandle: Long) {
+    private fun onItemMoreClick(userHandle: Long) {
         TODO()
     }
 }

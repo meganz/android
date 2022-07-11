@@ -32,7 +32,7 @@ class MeetingListViewModel @Inject constructor(
         retrieveMeetings()
     }
 
-    fun getGroups(): LiveData<List<MeetingItem>> =
+    fun getMeetings(): LiveData<List<MeetingItem>> =
         meetings.map { items ->
             if (!queryString.isNullOrBlank()) {
                 items.filter { (_, title, lastMessage, _, firstUser, lastUser) ->
