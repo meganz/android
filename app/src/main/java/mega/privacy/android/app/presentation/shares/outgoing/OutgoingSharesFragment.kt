@@ -15,14 +15,13 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment
+import mega.privacy.android.app.presentation.shares.managerState
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
-import mega.privacy.android.app.utils.SortUtil
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -35,70 +34,24 @@ import timber.log.Timber
 @AndroidEntryPoint
 class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
-    init {
-        viewerFrom = Constants.VIEWER_FROM_OUTGOING_SHARES
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        Timber.d("onCreateView")
-        if (megaApi.rootNode == null) {
+
+        if (megaApi.rootNode == null)
             return null
-        }
-        managerActivity.showFabButton()
-        val v: View
-        if (managerActivity.isList) {
-            v = getListView(inflater, container)
-            if (adapter == null) {
-                adapter = MegaNodeAdapter(requireActivity(),
-                    this,
-                    nodes,
-                    managerViewModel.state.value.outgoingParentHandle,
-                    recyclerView,
-                    Constants.OUTGOING_SHARES_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
-                    sortByHeaderViewModel)
-            }
-        } else {
-            v = getGridView(inflater, container)
-            if (adapter == null) {
-                adapter = MegaNodeAdapter(requireActivity(),
-                    this,
-                    nodes,
-                    managerViewModel.state.value.outgoingParentHandle,
-                    recyclerView,
-                    Constants.OUTGOING_SHARES_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
-                    sortByHeaderViewModel)
-            }
-            gridLayoutManager.spanSizeLookup =
-                adapter.getSpanSizeLookup(gridLayoutManager.spanCount)
-        }
-        adapter.parentHandle = managerViewModel.state.value.outgoingParentHandle
-        adapter.setListFragment(recyclerView)
-        if (managerViewModel.state.value.outgoingParentHandle == INVALID_HANDLE) {
-            Timber.w("Parent Handle == -1")
-            findNodes()
-            adapter.parentHandle = INVALID_HANDLE
-        } else {
-            managerActivity.hideTabs(true, SharesTab.OUTGOING_TAB)
-            val parentNode =
-                megaApi.getNodeByHandle(managerViewModel.state.value.outgoingParentHandle)
-            Timber.d("Parent Handle: %s", managerViewModel.state.value.outgoingParentHandle)
-            nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
-            adapter.setNodes(nodes)
-        }
-        managerActivity.setToolbarTitle()
-        managerActivity.invalidateOptionsMenu()
-        adapter.isMultipleSelect = false
-        recyclerView.adapter = adapter
-        visibilityFastScroller()
-        setEmptyView()
-        return v
+
+        val view =
+            if (managerActivity.isList) getListView(inflater, container)
+            else getGridView(inflater, container)
+
+        initAdapter()
+        refresh()
+
+        return view
     }
 
     override fun activateActionMode() {
@@ -110,51 +63,44 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     }
 
     override fun refresh() {
-        Timber.d("Parent Handle: %s", managerViewModel.state.value.outgoingParentHandle)
-        if (managerViewModel.state.value.outgoingParentHandle == -1L) {
-            findNodes()
+        nodes = if (isInvalidParentHandle()) {
+            megaApi.getOutShares(sortOrderManagement.getOrderOthers())
+                .filter { it.user != null }
+                .map { megaApi.getNodeByHandle(it.nodeHandle) }
+                .distinctBy { it.handle }
         } else {
-            val n = megaApi.getNodeByHandle(managerViewModel.state.value.outgoingParentHandle)
-            managerActivity.setToolbarTitle()
-            nodes = megaApi.getChildren(n, sortOrderManagement.getOrderCloud())
-            adapter.setNodes(nodes)
+            val parentNode = megaApi.getNodeByHandle(managerState().outgoingParentHandle)
+            megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
         }
+
+        adapter.setNodes(nodes)
+
+        managerActivity.showFabButton()
         managerActivity.invalidateOptionsMenu()
+        managerActivity.setToolbarTitle()
+
         visibilityFastScroller()
         hideActionMode()
         setEmptyView()
     }
 
-    fun findNodes() {
-        val outNodeList = megaApi.outShares
-        nodes.clear()
-        var lastFolder: Long = -1
-        for (k in outNodeList.indices) {
-            if (outNodeList[k].user != null) {
-                val mS = outNodeList[k]
-                val node = megaApi.getNodeByHandle(mS.nodeHandle)
-                if (lastFolder != node.handle) {
-                    lastFolder = node.handle
-                    nodes.add(node)
-                }
-            }
-        }
-        orderNodes()
-    }
-
     override fun itemClick(position: Int) {
-        if (adapter.isMultipleSelect) {
-            Timber.d("multiselect ON")
-            adapter.toggleSelection(position)
-            val selectedNodes = adapter.selectedNodes
-            if (selectedNodes.size > 0) {
-                updateActionModeTitle()
+        when {
+            // select mode
+            adapter.isMultipleSelect -> {
+                adapter.toggleSelection(position)
+                val selectedNodes = adapter.selectedNodes
+                if (selectedNodes.size > 0)
+                    updateActionModeTitle()
             }
-        } else if (nodes[position].isFolder) {
-            navigateToFolder(nodes[position])
-        } else {
-            //Is file
-            openFile(nodes[position], Constants.OUTGOING_SHARES_ADAPTER, position)
+
+            // click on a folder
+            nodes[position].isFolder ->
+                navigateToFolder(nodes[position])
+
+            // click on a file
+            else ->
+                openFile(nodes[position], Constants.OUTGOING_SHARES_ADAPTER, position)
         }
     }
 
@@ -162,116 +108,108 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         managerActivity.hideTabs(true, SharesTab.OUTGOING_TAB)
         managerViewModel.increaseOutgoingTreeDepth()
         Timber.d("deepBrowserTree after clicking folder%s", managerActivity.deepBrowserTreeOutgoing)
-        var lastFirstVisiblePosition: Int
-        if (managerActivity.isList) {
-            lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition()
-        } else {
-            lastFirstVisiblePosition =
+
+        val lastFirstVisiblePosition: Int = when {
+            managerActivity.isList ->
+                mLayoutManager.findFirstCompletelyVisibleItemPosition()
+
+            (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition() == -1 ->
+                (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
+
+            else ->
                 (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
-            if (lastFirstVisiblePosition == -1) {
-                lastFirstVisiblePosition =
-                    (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
-            }
         }
+
         lastPositionStack.push(lastFirstVisiblePosition)
         managerViewModel.setOutgoingParentHandle(node.handle)
-        managerActivity.invalidateOptionsMenu()
-        managerActivity.setToolbarTitle()
-        nodes = megaApi.getChildren(node, sortOrderManagement.getOrderCloud())
-        adapter.setNodes(nodes)
+
+        refresh()
+
         recyclerView.scrollToPosition(0)
-        visibilityFastScroller()
-        setEmptyView()
         checkScroll()
-        managerActivity.showFabButton()
-    }
-
-    override fun setNodes(nodes: List<MegaNode>) {
-        this.nodes = nodes
-        orderNodes()
-    }
-
-    private fun orderNodes() {
-        if (sortOrderManagement.getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
-            SortUtil.sortByNameDescending(nodes)
-        } else {
-            SortUtil.sortByNameAscending(nodes)
-        }
-        adapter.setNodes(nodes)
     }
 
     override fun onBackPressed(): Int {
         Timber.d("deepBrowserTree: %s", managerActivity.deepBrowserTreeOutgoing)
-        if (adapter == null) {
+
+        if (adapter == null)
             return 0
-        }
+
         managerViewModel.decreaseOutgoingTreeDepth()
         managerActivity.invalidateOptionsMenu()
-        return if (managerActivity.deepBrowserTreeOutgoing == 0) {
-            Timber.d("deepBrowserTree==0")
-            //In the beginning of the navigation
-            managerViewModel.setOutgoingParentHandle(INVALID_HANDLE)
-            managerActivity.hideTabs(false, SharesTab.OUTGOING_TAB)
-            managerActivity.setToolbarTitle()
-            findNodes()
-            visibilityFastScroller()
-            var lastVisiblePosition = 0
-            if (!lastPositionStack.empty()) {
-                lastVisiblePosition = lastPositionStack.pop()
-            }
-            if (lastVisiblePosition >= 0) {
-                if (managerActivity.isList) {
-                    mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                } else {
-                    gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+
+        return when {
+            managerState().outgoingTreeDepth == 0 -> {
+                //In the beginning of the navigation
+                managerViewModel.setOutgoingParentHandle(INVALID_HANDLE)
+                managerActivity.hideTabs(false, SharesTab.OUTGOING_TAB)
+
+                refresh()
+
+                val lastVisiblePosition =
+                    if (lastPositionStack.isNotEmpty())
+                        lastPositionStack.pop()
+                    else 0
+
+                if (lastVisiblePosition >= 0) {
+                    if (managerActivity.isList)
+                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                    else
+                        gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
                 }
-            }
-            recyclerView.visibility = View.VISIBLE
-            emptyImageView.visibility = View.GONE
-            emptyLinearLayout.visibility = View.GONE
-            managerActivity.showFabButton()
-            3
-        } else if (managerActivity.deepBrowserTreeOutgoing > 0) {
-            Timber.d("Keep navigation")
-            val parentNode =
-                megaApi.getParentNode(megaApi.getNodeByHandle(managerViewModel.state.value.outgoingParentHandle))
-            if (parentNode != null) {
+
                 recyclerView.visibility = View.VISIBLE
                 emptyImageView.visibility = View.GONE
                 emptyLinearLayout.visibility = View.GONE
-                managerViewModel.setOutgoingParentHandle(parentNode.handle)
-                managerActivity.setToolbarTitle()
-                managerActivity.invalidateOptionsMenu()
-                nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
-                adapter.setNodes(nodes)
-                visibilityFastScroller()
-                var lastVisiblePosition = 0
-                if (!lastPositionStack.empty()) {
-                    lastVisiblePosition = lastPositionStack.pop()
-                }
-                if (lastVisiblePosition >= 0) {
-                    if (managerActivity.isList) {
-                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                    } else {
-                        gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                3
+            }
+
+            managerState().outgoingTreeDepth > 0 -> {
+                Timber.d("deepTree>0")
+
+                val parentNode =
+                    megaApi.getParentNode(
+                        megaApi.getNodeByHandle(managerState().outgoingParentHandle)
+                    )
+
+                if (parentNode != null) {
+                    recyclerView.visibility = View.VISIBLE
+                    emptyImageView.visibility = View.GONE
+                    emptyLinearLayout.visibility = View.GONE
+                    managerViewModel.setOutgoingParentHandle(parentNode.handle)
+
+                    refresh()
+
+                    val lastVisiblePosition =
+                        if (lastPositionStack.isNotEmpty())
+                            lastPositionStack.pop()
+                        else 0
+
+                    if (lastVisiblePosition >= 0) {
+                        if (managerActivity.isList)
+                            mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        else
+                            gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
                     }
                 }
+
+                2
             }
-            managerActivity.showFabButton()
-            2
-        } else {
-            Timber.d("Back to Cloud")
-            managerViewModel.resetOutgoingTreeDepth()
-            0
+
+            else -> {
+                Timber.d("ELSE deepTree")
+                managerViewModel.resetOutgoingTreeDepth()
+                0
+            }
         }
     }
 
+    override fun setNodes(nodes: List<MegaNode>) {}
+
     override fun setEmptyView() {
         var textToShow: String? = null
-        val rootNode = megaApi.rootNode
-        if (rootNode != null && rootNode.handle == managerViewModel.state.value.outgoingParentHandle
-            || managerViewModel.state.value.outgoingParentHandle == -1L
-        ) {
+
+        if (isInvalidParentHandle()) {
             if (Util.isScreenInPortrait(requireContext())) {
                 emptyImageView.setImageResource(R.drawable.empty_outgoing_portrait)
             } else {
@@ -290,6 +228,48 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     override fun updateContact(contactHandle: Long) {
         adapter.updateItem(contactHandle)
     }
+
+    override fun viewerFrom(): Int = Constants.VIEWER_FROM_OUTGOING_SHARES
+
+    /**
+     * Initialize the adapter
+     */
+    private fun initAdapter() {
+        if (adapter == null) {
+            adapter = MegaNodeAdapter(
+                requireActivity(),
+                this,
+                nodes,
+                managerState().outgoingParentHandle,
+                recyclerView,
+                Constants.OUTGOING_SHARES_ADAPTER,
+                if (managerActivity.isList) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
+                sortByHeaderViewModel
+            )
+        } else {
+            adapter.parentHandle = managerState().outgoingParentHandle
+            adapter.setListFragment(recyclerView)
+        }
+
+        if (!managerActivity.isList)
+            gridLayoutManager.spanSizeLookup =
+                adapter.getSpanSizeLookup(gridLayoutManager.spanCount)
+
+        adapter.isMultipleSelect = false
+
+        recyclerView.adapter = adapter
+    }
+
+    /**
+     * Check if the parent handle is valid
+     *
+     * @return true if the parent handle is valid
+     */
+    private fun isInvalidParentHandle(): Boolean =
+        managerState().outgoingParentHandle == -1L ||
+                managerState().outgoingParentHandle == INVALID_HANDLE ||
+                megaApi.getNodeByHandle(managerState().outgoingParentHandle) == null
 
     private inner class ActionBarCallBack(currentTab: Tab?) : BaseActionBarCallBack(currentTab) {
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
@@ -317,12 +297,12 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             }
             val areAllNotTakenDown = selected.areAllNotTakenDown()
             if (areAllNotTakenDown) {
-                if (managerViewModel.state.value.outgoingParentHandle == INVALID_HANDLE) {
+                if (managerState().outgoingParentHandle == INVALID_HANDLE) {
                     control.removeShare().setVisible(true).showAsAction =
                         MenuItem.SHOW_AS_ACTION_ALWAYS
                 }
                 control.shareOut().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
-                if (managerViewModel.state.value.outgoingTreeDepth > 0) {
+                if (managerState().outgoingTreeDepth > 0) {
                     if (areAllFileNodesAndNotTakenDown(selected)) {
                         control.sendToChat().setVisible(true).showAsAction =
                             MenuItem.SHOW_AS_ACTION_ALWAYS

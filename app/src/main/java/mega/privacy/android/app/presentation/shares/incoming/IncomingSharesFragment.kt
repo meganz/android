@@ -15,6 +15,7 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment
+import mega.privacy.android.app.presentation.shares.managerState
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
@@ -36,10 +37,6 @@ import java.util.Collections
 @AndroidEntryPoint
 class IncomingSharesFragment : MegaNodeBaseFragment() {
 
-    init {
-        viewerFrom = Constants.VIEWER_FROM_INCOMING_SHARES
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,7 +51,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             if (managerActivity.isList) getListView(inflater, container)
             else getGridView(inflater, container)
 
-        setupAdapter()
+        initAdapter()
         refresh()
         selectNewlyAddedNodes()
 
@@ -62,12 +59,13 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     }
 
     override fun activateActionMode() {
-        if (!adapter.isMultipleSelect) {
-            super.activateActionMode()
-            actionMode =
-                (requireActivity() as AppCompatActivity).startSupportActionMode(ActionBarCallBack(
-                    SharesTab.INCOMING_TAB))
-        }
+        if (adapter.isMultipleSelect) return
+
+        super.activateActionMode()
+        actionMode =
+            (requireActivity() as AppCompatActivity).startSupportActionMode(
+                ActionBarCallBack(SharesTab.INCOMING_TAB)
+            )
     }
 
     override fun refresh() {
@@ -95,18 +93,17 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             adapter.isMultipleSelect -> {
                 adapter.toggleSelection(position)
                 val selectedNodes = adapter.selectedNodes
-                if (selectedNodes.size > 0) {
+                if (selectedNodes.size > 0)
                     updateActionModeTitle()
-                }
             }
+
             // click on a folder
-            nodes[position].isFolder -> {
+            nodes[position].isFolder ->
                 navigateToFolder(nodes[position])
-            }
+
             // click on a file
-            else -> {
+            else ->
                 openFile(nodes[position], Constants.INCOMING_SHARES_ADAPTER, position)
-            }
         }
     }
 
@@ -158,22 +155,19 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
                 refresh()
 
-                recyclerView.visibility = View.VISIBLE
-
-                var lastVisiblePosition = 0
-
-                if (lastPositionStack.isNotEmpty()) {
-                    lastVisiblePosition = lastPositionStack.pop()
-                }
+                val lastVisiblePosition =
+                    if (lastPositionStack.isNotEmpty())
+                        lastPositionStack.pop()
+                    else 0
 
                 if (lastVisiblePosition >= 0) {
-                    if (managerActivity.isList) {
+                    if (managerActivity.isList)
                         mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                    } else {
+                    else
                         gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                    }
                 }
-                managerActivity.showFabButton()
+
+                recyclerView.visibility = View.VISIBLE
                 emptyImageView.visibility = View.GONE
                 emptyLinearLayout.visibility = View.GONE
                 3
@@ -182,8 +176,9 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             managerState().incomingTreeDepth > 0 -> {
                 Timber.d("deepTree>0")
                 val parentNode =
-                    megaApi.getParentNode(megaApi.getNodeByHandle(
-                        managerState().incomingParentHandle))
+                    megaApi.getParentNode(
+                        megaApi.getNodeByHandle(managerState().incomingParentHandle)
+                    )
 
                 if (parentNode != null) {
                     recyclerView.visibility = View.VISIBLE
@@ -193,20 +188,19 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
                     refresh()
 
-                    var lastVisiblePosition = 0
-                    if (!lastPositionStack.empty()) {
-                        lastVisiblePosition = lastPositionStack.pop()
-                    }
+                    val lastVisiblePosition =
+                        if (lastPositionStack.isNotEmpty())
+                            lastPositionStack.pop()
+                        else 0
+
                     if (lastVisiblePosition >= 0) {
-                        if (managerActivity.isList) {
+                        if (managerActivity.isList)
                             mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                        } else {
+                        else
                             gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                        }
                     }
                 }
 
-                managerActivity.showFabButton()
                 2
             }
 
@@ -244,10 +238,12 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         adapter.updateItem(contactHandle)
     }
 
+    override fun viewerFrom() = Constants.VIEWER_FROM_INCOMING_SHARES
+
     /**
-     * Setup the adapter
+     * Initialize the adapter
      */
-    private fun setupAdapter() {
+    private fun initAdapter() {
         if (adapter == null) {
             adapter = MegaNodeAdapter(
                 requireActivity(),
@@ -270,7 +266,6 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 adapter.getSpanSizeLookup(gridLayoutManager.spanCount)
 
         adapter.isMultipleSelect = false
-
         recyclerView.adapter = adapter
     }
 
@@ -281,6 +276,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
      */
     private fun isInvalidParentHandle(): Boolean =
         managerState().incomingParentHandle == -1L ||
+                managerState().incomingParentHandle == INVALID_HANDLE ||
                 megaApi.getNodeByHandle(managerState().incomingParentHandle) == null
 
     /**
@@ -357,8 +353,3 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         }
     }
 }
-
-/**
- *
- */
-fun IncomingSharesFragment.managerState() = managerViewModel.state.value

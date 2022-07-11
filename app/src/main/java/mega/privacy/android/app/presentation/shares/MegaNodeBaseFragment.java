@@ -4,6 +4,7 @@ import static mega.privacy.android.app.components.dragger.DragToExitSupport.obse
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID;
 import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
+import static mega.privacy.android.app.presentation.shares.MegaNodeBaseFragmentExtensionsKt.managerState;
 import static mega.privacy.android.app.presentation.shares.links.LinksFragment.getLinksOrderCloud;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
@@ -129,8 +130,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     protected SortByHeaderViewModel sortByHeaderViewModel;
     public ManagerViewModel managerViewModel;
-
-    @NonNull protected int viewerFrom;
 
     public abstract void setNodes(List<MegaNode> nodes);
 
@@ -634,7 +633,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private void launchIntent(Intent intent, boolean internalIntent, int position) {
         if (intent != null) {
             if (internalIntent || isIntentAvailable(requireContext(), intent)) {
-                putThumbnailLocation(intent, recyclerView, position, viewerFrom, adapter);
+                putThumbnailLocation(intent, recyclerView, position, viewerFrom(), adapter);
                 startActivity(intent);
                 managerActivity.overridePendingTransition(0, 0);
             } else {
@@ -643,15 +642,17 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
     }
 
+    protected abstract int viewerFrom();
+
     private int getIntentOrder(int fragmentAdapter) {
         switch (fragmentAdapter) {
             case LINKS_ADAPTER:
                 return getLinksOrderCloud(sortOrderManagement.getOrderCloud(),
-                        managerViewModel.getState().getValue().isFirstNavigationLevel());
+                        managerState(this).isFirstNavigationLevel());
 
             case INCOMING_SHARES_ADAPTER:
             case OUTGOING_SHARES_ADAPTER:
-                if (managerViewModel.getState().getValue().isFirstNavigationLevel()) {
+                if (managerState(this).isFirstNavigationLevel()) {
                     return sortOrderManagement.getOrderOthers();
                 }
 
@@ -774,13 +775,13 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private long getParentHandle(int fragmentAdapter) {
         switch (fragmentAdapter) {
             case INCOMING_SHARES_ADAPTER:
-                return managerViewModel.getState().getValue().getIncomingParentHandle();
+                return managerState(this).getIncomingParentHandle();
 
             case OUTGOING_SHARES_ADAPTER:
-                return managerViewModel.getState().getValue().getOutgoingParentHandle();
+                return managerState(this).getOutgoingParentHandle();
 
             case LINKS_ADAPTER:
-                return managerViewModel.getState().getValue().getLinksParentHandle();
+                return managerState(this).getLinksParentHandle();
             default:
                 return INVALID_HANDLE;
         }
@@ -795,7 +796,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, viewerFrom);
+        observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, viewerFrom());
         checkScroll();
     }
 }
