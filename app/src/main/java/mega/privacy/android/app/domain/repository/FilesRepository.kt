@@ -75,12 +75,11 @@ interface FilesRepository {
     suspend fun getInboxNode(): MegaNode?
 
     /**
-     * Checks if the provided node has children.
+     * Checks if Inbox node has children.
      *
-     * @param node  The node to check.
-     * @return True if the node has children, false otherwise.
+     * @return True if Inbox has children, false otherwise.
      */
-    suspend fun hasChildren(node: MegaNode): Boolean
+    suspend fun hasInboxChildren(): Boolean
 
     /**
      * Downloads a file node in background.

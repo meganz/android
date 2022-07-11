@@ -106,8 +106,8 @@ class DefaultFilesRepository @Inject constructor(
         megaApiGateway.getInboxNode()
     }
 
-    override suspend fun hasChildren(node: MegaNode): Boolean = withContext(ioDispatcher) {
-        megaApiGateway.hasChildren(node)
+    override suspend fun hasInboxChildren(): Boolean = withContext(ioDispatcher) {
+        getInboxNode()?.let { megaApiGateway.hasChildren(it) } ?: false
     }
 
     override suspend fun downloadBackgroundFile(node: MegaNode): String =
