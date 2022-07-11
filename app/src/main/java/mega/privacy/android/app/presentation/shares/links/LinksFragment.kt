@@ -68,11 +68,13 @@ class LinksFragment : MegaNodeBaseFragment() {
     }
 
     override fun activateActionMode() {
-        if (!adapter.isMultipleSelect) {
-            super.activateActionMode()
-            actionMode =
-                (activity as AppCompatActivity?)?.startSupportActionMode(ActionBarCallBack(SharesTab.LINKS_TAB))
-        }
+        if (adapter.isMultipleSelect) return
+
+        super.activateActionMode()
+        actionMode =
+            (requireActivity() as AppCompatActivity).startSupportActionMode(
+                ActionBarCallBack(SharesTab.LINKS_TAB)
+            )
     }
 
     override fun setNodes(nodes: List<MegaNode>) {

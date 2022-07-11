@@ -55,11 +55,13 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     }
 
     override fun activateActionMode() {
-        if (!adapter.isMultipleSelect) {
-            super.activateActionMode()
-            actionMode =
-                (activity as AppCompatActivity?)?.startSupportActionMode(ActionBarCallBack(SharesTab.OUTGOING_TAB))
-        }
+        if (adapter.isMultipleSelect) return
+
+        super.activateActionMode()
+        actionMode =
+            (requireActivity() as AppCompatActivity).startSupportActionMode(
+                ActionBarCallBack(SharesTab.OUTGOING_TAB)
+            )
     }
 
     override fun refresh() {
