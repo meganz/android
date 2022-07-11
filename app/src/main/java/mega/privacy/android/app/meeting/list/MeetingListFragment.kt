@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.list
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +12,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMeetingListBinding
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.list.adapter.MeetingsAdapter
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
@@ -82,7 +85,11 @@ class MeetingListFragment : Fragment() {
     }
 
     private fun onItemClick(chatId: Long) {
-        TODO()
+        val intent = Intent(context, ChatActivity::class.java).apply {
+            action = Constants.ACTION_CHAT_SHOW_MESSAGES
+            putExtra(Constants.CHAT_ID, chatId)
+        }
+        startActivity(intent)
     }
 
     private fun onItemMoreClick(userHandle: Long) {

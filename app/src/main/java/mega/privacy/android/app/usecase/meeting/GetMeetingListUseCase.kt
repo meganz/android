@@ -153,21 +153,27 @@ class GetMeetingListUseCase @Inject constructor(
         val title = ChatUtil.getTitleChat(this)
         val formattedDate = TimeUtils.formatDateAndTime(context,
             chatListItem.lastTimestamp,
-            TimeUtils.DATE_LONG_FORMAT)
-        val firstUser = if (isGroup) {
-            getGroupUserFromHandle(getPeerHandle(0), listener)
-        } else {
-            getGroupUserFromHandle(chatListItem.peerHandle, listener)
-        }
-        val lastUser = if (isGroup) {
-            getGroupUserFromHandle(getPeerHandle(peerCount), listener)
-        } else {
-            null
+            TimeUtils.DATE_LONG_FORMAT
+        )
+        val firstUser: ContactGroupUser
+        var lastUser: ContactGroupUser? = null
+
+        when (peerCount) {
+            0L -> {
+                firstUser = getGroupUserFromHandle(megaChatApi.myUserHandle, listener)
+            }
+            1L -> {
+                firstUser = getGroupUserFromHandle(megaChatApi.myUserHandle, listener)
+                lastUser = getGroupUserFromHandle(getPeerHandle(0), listener)
+            }
+            else -> {
+                firstUser = getGroupUserFromHandle(getPeerHandle(0), listener)
+                lastUser = getGroupUserFromHandle(getPeerHandle(peerCount - 1), listener)
+            }
         }
 
         return MeetingItem(
             chatId = chatId,
-            isGroup = isGroup,
             title = title,
             lastMessage = chatListItem.lastMessage,
             firstUser = firstUser,
@@ -188,9 +194,18 @@ class GetMeetingListUseCase @Inject constructor(
         userHandle: Long,
         listener: OptionalMegaRequestListenerInterface,
     ): ContactGroupUser {
+        val myself = userHandle == megaChatApi.myUserHandle
         var userAvatar: File? = null
-        val userName = megaChatApi.getUserFirstnameFromCache(userHandle)
-        val userEmail = megaChatApi.getUserEmailFromCache(userHandle)
+        val userName = if (myself) {
+            megaChatApi.myFirstname
+        } else {
+            megaChatApi.getUserFirstnameFromCache(userHandle)
+        }
+        val userEmail = if (myself) {
+            megaChatApi.myEmail
+        } else {
+            megaChatApi.getUserEmailFromCache(userHandle)
+        }
         val userAvatarColor = megaApi.getUserAvatarColor(userHandle.toString()).toColorInt()
 
         if (userName.isNullOrBlank()) {
