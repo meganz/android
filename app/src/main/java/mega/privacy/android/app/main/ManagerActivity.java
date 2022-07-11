@@ -285,6 +285,7 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.meeting.list.MeetingListFragment;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.data.model.UserCredentials;
@@ -774,7 +775,8 @@ public class ManagerActivity extends TransfersManagementActivity
     private SearchFragment searchFragment;
     private PhotosFragment photosFragment;
     private AlbumContentFragment albumContentFragment;
-    private RecentChatsFragment recentChatsFragment;
+//    private RecentChatsFragment recentChatsFragment;
+    private MeetingListFragment meetingListFragment;
     private NotificationsFragment notificationsFragment;
     private TurnOnNotificationsFragment turnOnNotificationsFragment;
     private PermissionsFragment permissionsFragment;
@@ -1118,7 +1120,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
             if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)) {
                 if (getChatsFragment() != null) {
-                    recentChatsFragment.notifyPushChanged();
+//                    recentChatsFragment.notifyPushChanged();
                 }
             }
         }
@@ -1156,8 +1158,8 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param chatIdReceived The chat ID of a call.
      */
     private void updateVisibleCallElements(long chatIdReceived) {
-        if (getChatsFragment() != null && recentChatsFragment.isVisible()) {
-            recentChatsFragment.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
+        if (getChatsFragment() != null && getChatsFragment().isVisible()) {
+//            recentChatsFragment.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
         }
 
         if (isScreenInPortrait(ManagerActivity.this)) {
@@ -2438,10 +2440,10 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             if (drawerItem == DrawerItem.CHAT) {
-                recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-                if (recentChatsFragment != null) {
-                    recentChatsFragment.onlineStatusUpdate(megaChatApi.getOnlineStatus());
-                }
+                getChatsFragment();
+//                if (recentChatsFragment != null) {
+//                    recentChatsFragment.onlineStatusUpdate(megaChatApi.getOnlineStatus());
+//                }
             }
             setChatBadge();
 
@@ -3371,9 +3373,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
                 case CHAT:
                     setBottomNavigationMenuItemChecked(CHAT_BNV);
-                    if (getChatsFragment() != null && recentChatsFragment.isVisible()) {
-                        recentChatsFragment.setChats();
-                        recentChatsFragment.setStatus();
+                    if (getChatsFragment() != null && getChatsFragment().isVisible()) {
+//                        recentChatsFragment.setChats();
+//                        recentChatsFragment.setStatus();
                     }
                     MegaApplication.setRecentChatVisible(true);
                     break;
@@ -3550,14 +3552,14 @@ public class ManagerActivity extends TransfersManagementActivity
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, f, fTag);
         ft.commitNowAllowingStateLoss();
-        // refresh manually
-        if (f instanceof RecentChatsFragment) {
-            RecentChatsFragment rcf = (RecentChatsFragment) f;
-            if (rcf.isResumed()) {
-                rcf.refreshMegaContactsList();
-                rcf.setCustomisedActionBar();
-            }
-        }
+//        // refresh manually
+//        if (f instanceof RecentChatsFragment) {
+//            RecentChatsFragment rcf = (RecentChatsFragment) f;
+//            if (rcf.isResumed()) {
+//                rcf.refreshMegaContactsList();
+//                rcf.setCustomisedActionBar();
+//            }
+//        }
     }
 
     private void refreshFragment(String fTag) {
@@ -4239,14 +4241,15 @@ public class ManagerActivity extends TransfersManagementActivity
         ((MegaApplication) getApplication()).setRecentChatVisible(true);
         setToolbarTitle();
 
-        recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-        if (recentChatsFragment == null) {
-            recentChatsFragment = RecentChatsFragment.newInstance();
+        meetingListFragment = getChatsFragment();
+        if (meetingListFragment == null) {
+            meetingListFragment = MeetingListFragment.newInstance();
         } else {
             refreshFragment(FragmentTag.RECENT_CHAT.getTag());
         }
 
-        replaceFragment(recentChatsFragment, FragmentTag.RECENT_CHAT.getTag());
+        replaceFragment(new MeetingListFragment(), FragmentTag.RECENT_CHAT.getTag());
+//        replaceFragment(recentChatsFragment, FragmentTag.RECENT_CHAT.getTag());
 
         drawerLayout.closeDrawer(Gravity.LEFT);
     }
@@ -4889,10 +4892,10 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
             }
             case CHAT: {
-                recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-                if (recentChatsFragment != null) {
-                    recentChatsFragment.checkScroll();
-                }
+                meetingListFragment = getChatsFragment();
+//                if (recentChatsFragment != null) {
+//                    recentChatsFragment.checkScroll();
+//                }
                 break;
             }
             case RUBBISH_BIN: {
@@ -5082,8 +5085,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 setCallMenuItem(returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
                 if (drawerItem == DrawerItem.CHAT) {
                     if (getChatsFragment() != null) {
-                        recentChatsFragment.closeSearch();
-                        recentChatsFragment.setCustomisedActionBar();
+//                        recentChatsFragment.closeSearch();
+//                        recentChatsFragment.setCustomisedActionBar();
                         supportInvalidateOptionsMenu();
                     }
                 } else if (drawerItem == DrawerItem.HOMEPAGE) {
@@ -5143,10 +5146,13 @@ public class ManagerActivity extends TransfersManagementActivity
                 Timber.d("onQueryTextChange");
                 if (drawerItem == DrawerItem.CHAT) {
                     searchViewModel.setSearchQuery(newText);
-                    recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-                    if (recentChatsFragment != null) {
-                        recentChatsFragment.filterChats(newText, false);
+                    getChatsFragment();
+                    if (getChatsFragment() != null) {
+                        getChatsFragment().onSearchQuery(newText);
                     }
+//                    if (recentChatsFragment != null) {
+//                        recentChatsFragment.filterChats(newText, false);
+//                    }
                 } else if (drawerItem == DrawerItem.HOMEPAGE) {
                     if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
                         if (searchViewModel.getState().getValue().getTextSubmitted()) {
@@ -5305,9 +5311,9 @@ public class ManagerActivity extends TransfersManagementActivity
                         doNotDisturbMenuItem.setVisible(true);
                         openLinkMenuItem.setVisible(true);
 
-                        if (getChatsFragment() != null && recentChatsFragment.getItemCount() > 0) {
-                            searchMenuItem.setVisible(true);
-                        }
+//                        if (getChatsFragment() != null && recentChatsFragment.getItemCount() > 0) {
+//                            searchMenuItem.setVisible(true);
+//                        }
                     }
                     break;
 
@@ -5597,7 +5603,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         break;
                     case CHAT:
                         if (getChatsFragment() != null) {
-                            recentChatsFragment.selectAll();
+//                            recentChatsFragment.selectAll();
                         }
                         break;
 
@@ -7302,8 +7308,8 @@ public class ManagerActivity extends TransfersManagementActivity
     @Override
     public void confirmLeaveChats(@NotNull List<? extends MegaChatListItem> chats) {
         if (getChatsFragment() != null) {
-            recentChatsFragment.clearSelections();
-            recentChatsFragment.hideMultipleSelect();
+//            recentChatsFragment.clearSelections();
+//            recentChatsFragment.hideMultipleSelect();
         }
 
         for (MegaChatListItem chat : chats) {
@@ -10399,10 +10405,10 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
 
-        recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-        if (recentChatsFragment != null) {
-            recentChatsFragment.listItemUpdate(item);
-        }
+        getChatsFragment();
+//        if (recentChatsFragment != null) {
+//            recentChatsFragment.listItemUpdate(item);
+//        }
 
         if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
             Timber.d("Change unread count: %s", item.getUnreadCount());
@@ -10418,38 +10424,38 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         if (megaChatApi != null) {
-            recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+            getChatsFragment();
             if (userHandle == megaChatApi.getMyUserHandle()) {
                 Timber.d("My own status update");
                 setContactStatus();
                 if (drawerItem == DrawerItem.CHAT) {
-                    if (recentChatsFragment != null) {
-                        recentChatsFragment.onlineStatusUpdate(status);
-                    }
+//                    if (recentChatsFragment != null) {
+//                        recentChatsFragment.onlineStatusUpdate(status);
+//                    }
                 }
-            } else {
-                Timber.d("Status update for the user: %s", userHandle);
-                recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-                if (recentChatsFragment != null) {
-                    Timber.d("Update Recent chats view");
-                    recentChatsFragment.contactStatusUpdate(userHandle, status);
-                }
+//            } else {
+//                Timber.d("Status update for the user: %s", userHandle);
+//                recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+//                if (recentChatsFragment != null) {
+//                    Timber.d("Update Recent chats view");
+//                    recentChatsFragment.contactStatusUpdate(userHandle, status);
+//                }
             }
         }
     }
 
     private void onChatConnectionStateUpdate(long chatid, int newState) {
         Timber.d("Chat ID: %d, New state: %d", chatid, newState);
-        if (newState == MegaChatApi.CHAT_CONNECTION_ONLINE && chatid == -1) {
-            Timber.d("Online Connection: %s", chatid);
-            recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-            if (recentChatsFragment != null) {
-                recentChatsFragment.setChats();
-                if (drawerItem == DrawerItem.CHAT) {
-                    recentChatsFragment.setStatus();
-                }
-            }
-        }
+//        if (newState == MegaChatApi.CHAT_CONNECTION_ONLINE && chatid == -1) {
+//            Timber.d("Online Connection: %s", chatid);
+//            recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+//            if (recentChatsFragment != null) {
+//                recentChatsFragment.setChats();
+//                if (drawerItem == DrawerItem.CHAT) {
+//                    recentChatsFragment.setStatus();
+//                }
+//            }
+//        }
     }
 
     public void copyError() {
@@ -11165,8 +11171,8 @@ public class ManagerActivity extends TransfersManagementActivity
         return inboxFragment = (InboxFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
     }
 
-    private RecentChatsFragment getChatsFragment() {
-        return recentChatsFragment = (RecentChatsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+    private MeetingListFragment getChatsFragment() {
+        return meetingListFragment = (MeetingListFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
     }
 
     private PermissionsFragment getPermissionsFragment() {

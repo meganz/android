@@ -2,8 +2,6 @@ package mega.privacy.android.app.meeting.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -14,13 +12,18 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMeetingListBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.list.adapter.MeetingsAdapter
-import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
 
 @AndroidEntryPoint
 class MeetingListFragment : Fragment() {
+
+    companion object {
+        @JvmStatic
+        fun newInstance(): MeetingListFragment =
+            MeetingListFragment()
+    }
 
     private lateinit var binding: FragmentMeetingListBinding
 
@@ -33,20 +36,12 @@ class MeetingListFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentMeetingListBinding.inflate(inflater, container, false)
-        setHasOptionsMenu(true)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
         setupObservers()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.fragment_contact_search, menu)
-        menu.findItem(R.id.action_search)?.setupSearchView { query ->
-            viewModel.setSearchQuery(query)
-        }
     }
 
     override fun onDestroyView() {
@@ -80,6 +75,10 @@ class MeetingListFragment : Fragment() {
         viewModel.getMeetings().observe(viewLifecycleOwner) { items ->
             adapter.submitList(items)
         }
+    }
+
+    fun onSearchQuery(query: String?) {
+        viewModel.setSearchQuery(query)
     }
 
     private fun onItemClick(chatId: Long) {

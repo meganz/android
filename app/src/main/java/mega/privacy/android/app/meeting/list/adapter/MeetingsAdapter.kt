@@ -7,7 +7,7 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemMeetingBinding
 import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
-import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.TimeUtils
 
 class MeetingsAdapter constructor(
     private val itemCallback: (Long) -> Unit,
@@ -43,5 +43,5 @@ class MeetingsAdapter constructor(
         getItem(position).chatId
 
     override fun getSectionTitle(position: Int): String =
-        AvatarUtil.getFirstLetter(getItem(position).title)
+        TimeUtils.formatDate(getItem(position).timeStamp, TimeUtils.DATE_SHORT_SHORT_FORMAT)
 }

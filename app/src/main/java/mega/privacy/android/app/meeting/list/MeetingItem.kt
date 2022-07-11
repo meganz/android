@@ -3,13 +3,15 @@ package mega.privacy.android.app.meeting.list
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 
-data class MeetingItem constructor(
+data class MeetingItem(
     val chatId: Long,
+    val isGroup: Boolean,
     val title: String,
     val lastMessage: String,
-    val timeStamp: Long,
     val firstUser: ContactGroupUser,
-    val lastUser: ContactGroupUser,
+    val lastUser: ContactGroupUser?,
+    val timeStamp: Long,
+    val formattedDate: String,
 ) {
 
     class DiffCallback : DiffUtil.ItemCallback<MeetingItem>() {

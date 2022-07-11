@@ -19,6 +19,7 @@ import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -48,8 +49,8 @@ class GetMeetingListUseCase @Inject constructor(
 
                     if (error.errorCode == MegaError.API_OK) {
                         val index = meetings.indexOfFirst {
-                            request.nodeHandle in it.firstUser.handle..it.lastUser.handle
-                                    || request.email == it.firstUser.email || request.email == it.lastUser.email
+                            request.nodeHandle == it.firstUser.handle || request.nodeHandle == it.lastUser?.handle
+                                    || request.email == it.firstUser.email || request.email == it.lastUser?.email
                         }
 
                         if (index != Constants.INVALID_POSITION) {
@@ -63,7 +64,7 @@ class GetMeetingListUseCase @Inject constructor(
                                             )
                                         } else {
                                             currentItem.copy(
-                                                lastUser = currentItem.lastUser.copy(email = request.text)
+                                                lastUser = currentItem.lastUser?.copy(email = request.text)
                                             )
                                         }
                                 }
@@ -75,7 +76,7 @@ class GetMeetingListUseCase @Inject constructor(
                                             )
                                         } else {
                                             currentItem.copy(
-                                                lastUser = currentItem.lastUser.copy(firstName = request.text)
+                                                lastUser = currentItem.lastUser?.copy(firstName = request.text)
                                             )
                                         }
                                 }
@@ -87,7 +88,7 @@ class GetMeetingListUseCase @Inject constructor(
                                             )
                                         } else {
                                             currentItem.copy(
-                                                lastUser = currentItem.lastUser.copy(avatar = File(request.file).toUri())
+                                                lastUser = currentItem.lastUser?.copy(avatar = File(request.file).toUri())
                                             )
                                         }
                                 }
@@ -144,19 +145,35 @@ class GetMeetingListUseCase @Inject constructor(
     /**
      * Build MeetingItem given a MegaChatRoom
      *
-     * @param userAttrsListener Listener to deliver user attributes
+     * @param listener Listener to deliver user attributes
      * @return                  MeetingItem
      */
-    private fun MegaChatRoom.toMeetingItem(userAttrsListener: OptionalMegaRequestListenerInterface): MeetingItem {
+    private fun MegaChatRoom.toMeetingItem(listener: OptionalMegaRequestListenerInterface): MeetingItem {
         val chatListItem = megaChatApi.getChatListItem(chatId)
+        val title = ChatUtil.getTitleChat(this)
+        val formattedDate = TimeUtils.formatDateAndTime(context,
+            chatListItem.lastTimestamp,
+            TimeUtils.DATE_LONG_FORMAT)
+        val firstUser = if (isGroup) {
+            getGroupUserFromHandle(getPeerHandle(0), listener)
+        } else {
+            getGroupUserFromHandle(chatListItem.peerHandle, listener)
+        }
+        val lastUser = if (isGroup) {
+            getGroupUserFromHandle(getPeerHandle(peerCount), listener)
+        } else {
+            null
+        }
+
         return MeetingItem(
             chatId = chatId,
-            title = ChatUtil.getTitleChat(this),
+            isGroup = isGroup,
+            title = title,
             lastMessage = chatListItem.lastMessage,
+            firstUser = firstUser,
+            lastUser = lastUser,
             timeStamp = chatListItem.lastTimestamp,
-            firstUser = getGroupUserFromHandle(getPeerHandle(0), userAttrsListener),
-            lastUser = getGroupUserFromHandle(getPeerHandle(peerCount),
-                userAttrsListener)
+            formattedDate = formattedDate,
         )
     }
 
@@ -169,7 +186,7 @@ class GetMeetingListUseCase @Inject constructor(
      */
     private fun getGroupUserFromHandle(
         userHandle: Long,
-        listener: OptionalMegaRequestListenerInterface
+        listener: OptionalMegaRequestListenerInterface,
     ): ContactGroupUser {
         var userAvatar: File? = null
         val userName = megaChatApi.getUserFirstnameFromCache(userHandle)
