@@ -1463,7 +1463,10 @@ public class ManagerActivity extends TransfersManagementActivity
             comesFromNotificationsLevel = savedInstanceState.getInt("comesFromNotificationsLevel", 0);
             comesFromNotificationHandle = savedInstanceState.getLong("comesFromNotificationHandle", INVALID_VALUE);
             comesFromNotificationHandleSaved = savedInstanceState.getLong("comesFromNotificationHandleSaved", INVALID_VALUE);
-            comesFromNotificationSharedIndex = (SharesTab) savedInstanceState.getSerializable(COMES_FROM_NOTIFICATIONS_SHARED_INDEX);
+            if(savedInstanceState.getSerializable(COMES_FROM_NOTIFICATIONS_SHARED_INDEX) != null)
+                comesFromNotificationSharedIndex = (SharesTab) savedInstanceState.getSerializable(COMES_FROM_NOTIFICATIONS_SHARED_INDEX);
+            else
+                comesFromNotificationSharedIndex = SharesTab.NONE;
             onAskingPermissionsFragment = savedInstanceState.getBoolean("onAskingPermissionsFragment", false);
             if (onAskingPermissionsFragment) {
                 permissionsFragment = (PermissionsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.PERMISSIONS.getTag());
@@ -2067,7 +2070,10 @@ public class ManagerActivity extends TransfersManagementActivity
                         intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.setAction(ACTION_SHOW_TRANSFERS);
-                        intent.putExtra(TRANSFERS_TAB, getIntent().getSerializableExtra(TRANSFERS_TAB));
+                        if (getIntent().getSerializableExtra(TRANSFERS_TAB) != null)
+                            intent.putExtra(TRANSFERS_TAB, (TransfersTab) getIntent().getSerializableExtra(TRANSFERS_TAB));
+                        else
+                            intent.putExtra(TRANSFERS_TAB, TransfersTab.NONE);
                         startActivity(intent);
                         finish();
                         return;
@@ -2503,7 +2509,10 @@ public class ManagerActivity extends TransfersManagementActivity
                             }
 
                             drawerItem = DrawerItem.TRANSFERS;
-                            viewModel.setTransfersTab((TransfersTab) intentRec.getSerializableExtra(TRANSFERS_TAB));
+                            if (intentRec.getSerializableExtra(TRANSFERS_TAB) != null)
+                                viewModel.setTransfersTab((TransfersTab) intentRec.getSerializableExtra(TRANSFERS_TAB));
+                            else
+                                viewModel.setTransfersTab(TransfersTab.NONE);
                             setIntent(null);
                         } else if (intentRec.getAction().equals(ACTION_REFRESH_AFTER_BLOCKED)) {
                             drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -3196,7 +3205,10 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else if (intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
                     Timber.d("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
                     drawerItem = DrawerItem.TRANSFERS;
-                    viewModel.setTransfersTab((TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
+                    if (intent.getSerializableExtra(TRANSFERS_TAB) != null)
+                        viewModel.setTransfersTab((TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
+                    else
+                        viewModel.setTransfersTab(TransfersTab.NONE);
                     selectDrawerItem(drawerItem);
 
                     String text = getString(R.string.cam_sync_cancel_sync);
@@ -3224,7 +3236,10 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
 
                     drawerItem = DrawerItem.TRANSFERS;
-                    viewModel.setTransfersTab((TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
+                    if (intent.getSerializableExtra(TRANSFERS_TAB) != null)
+                        viewModel.setTransfersTab((TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
+                    else
+                        viewModel.setTransfersTab(TransfersTab.NONE);
                     selectDrawerItem(drawerItem);
                 } else if (intent.getAction().equals(ACTION_TAKE_SELFIE)) {
                     Timber.d("Intent take selfie");
@@ -7673,7 +7688,10 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
 
                 drawerItem = DrawerItem.TRANSFERS;
-                viewModel.setTransfersTab( (TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
+                if (intent.getSerializableExtra(TRANSFERS_TAB) != null)
+                    viewModel.setTransfersTab( (TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
+                else
+                    viewModel.setTransfersTab(TransfersTab.NONE);
                 selectDrawerItem(drawerItem);
                 return;
             }
