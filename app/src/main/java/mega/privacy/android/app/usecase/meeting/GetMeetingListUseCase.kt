@@ -84,11 +84,13 @@ class GetMeetingListUseCase @Inject constructor(
                                     meetings[index] =
                                         if (request.email == currentItem.firstUser.email) {
                                             currentItem.copy(
-                                                firstUser = currentItem.firstUser.copy(avatar = File(request.file).toUri())
+                                                firstUser = currentItem.firstUser.copy(avatar = File(
+                                                    request.file).toUri())
                                             )
                                         } else {
                                             currentItem.copy(
-                                                lastUser = currentItem.lastUser?.copy(avatar = File(request.file).toUri())
+                                                lastUser = currentItem.lastUser?.copy(avatar = File(
+                                                    request.file).toUri())
                                             )
                                         }
                                 }
@@ -106,6 +108,7 @@ class GetMeetingListUseCase @Inject constructor(
             )
 
             megaChatApi.getChatRoomsByType(MegaChatApi.CHAT_TYPE_MEETING_ROOM)
+                .filter { it.isActive && !it.isArchived }
                 .forEach { chatRoom ->
                     meetings.add(chatRoom.toMeetingItem(userAttrsListener))
                 }
@@ -118,20 +121,21 @@ class GetMeetingListUseCase @Inject constructor(
                     onNext = { change ->
                         if (emitter.isCancelled) return@subscribeBy
 
-                        when (change) {
-                            is Result.OnChatListItemUpdate -> {
-                                val chatId = change.item!!.chatId
-                                val index = meetings.indexOfFirst { it.chatId == chatId }
-                                if (index != Constants.INVALID_POSITION) {
-                                    val updatedMeeting = megaChatApi.getChatRoom(chatId).toMeetingItem(userAttrsListener)
-                                    meetings[index] = updatedMeeting
+                        val updateChange = change as Result.OnChatListItemUpdate
+                        val updatedChatId = requireNotNull(updateChange.item).chatId
+                        val updatedChatRoom = megaChatApi.getChatRoom(updatedChatId)
 
-                                    emitter.onNext(meetings.sortedByDescending { it.timeStamp })
-                                }
+                        val index = meetings.indexOfFirst { it.chatId == updatedChatId }
+                        if (index != Constants.INVALID_POSITION) {
+                            if (updatedChatRoom.isArchived || !updatedChatRoom.isActive) {
+                                meetings.removeAt(index)
+                            } else {
+                                meetings[index] = updatedChatRoom.toMeetingItem(userAttrsListener)
                             }
-                            else -> {
-                                // Nothing to do
-                            }
+                            emitter.onNext(meetings.sortedByDescending { it.timeStamp })
+                        } else if (updatedChatRoom.isMeeting && updatedChatRoom.isActive && !updatedChatRoom.isArchived) {
+                            meetings.add(updatedChatRoom.toMeetingItem(userAttrsListener))
+                            emitter.onNext(meetings.sortedByDescending { it.timeStamp })
                         }
                     },
                     onError = Timber::e
@@ -209,7 +213,9 @@ class GetMeetingListUseCase @Inject constructor(
         val userAvatarColor = megaApi.getUserAvatarColor(userHandle.toString()).toColorInt()
 
         if (userName.isNullOrBlank()) {
-            megaApi.getUserAttribute(userHandle.toString(), MegaApiJava.USER_ATTR_FIRSTNAME, listener)
+            megaApi.getUserAttribute(userHandle.toString(),
+                MegaApiJava.USER_ATTR_FIRSTNAME,
+                listener)
         }
 
         if (userEmail.isNullOrBlank()) {

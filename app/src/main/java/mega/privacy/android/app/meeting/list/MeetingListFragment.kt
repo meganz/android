@@ -92,7 +92,8 @@ class MeetingListFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun onItemMoreClick(userHandle: Long) {
-        TODO()
+    private fun onItemMoreClick(chatId: Long) {
+        MeetingListBottomSheetDialogFragment.newInstance(chatId)
+            .show(childFragmentManager)
     }
 }

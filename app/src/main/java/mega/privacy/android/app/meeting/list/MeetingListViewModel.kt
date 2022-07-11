@@ -9,6 +9,8 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.usecase.chat.ArchiveChatUseCase
+import mega.privacy.android.app.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.app.usecase.meeting.GetMeetingListUseCase
 import mega.privacy.android.app.utils.RxUtil.debounceImmediate
 import mega.privacy.android.app.utils.notifyObserver
@@ -19,6 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MeetingListViewModel @Inject constructor(
     private val getMeetingListUseCase: GetMeetingListUseCase,
+    private val archiveChatUseCase: ArchiveChatUseCase,
+    private val leaveChatUseCase: LeaveChatUseCase,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -48,6 +52,9 @@ class MeetingListViewModel @Inject constructor(
             }
         }
 
+    fun getMeeting(chatId: Long): LiveData<MeetingItem?> =
+        meetings.map { meeting -> meeting.find { it.chatId == chatId } }
+
     fun setSearchQuery(query: String?) {
         queryString = query
         meetings.notifyObserver()
@@ -65,5 +72,19 @@ class MeetingListViewModel @Inject constructor(
                 onError = Timber::e
             )
             .addTo(composite)
+    }
+
+    fun archiveChat(chatId: Long) {
+        archiveChatUseCase.archive(chatId, true)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onError = Timber::e)
+    }
+
+    fun leaveChat(chatId: Long) {
+        leaveChatUseCase.leave(chatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onError = Timber::e)
     }
 }
