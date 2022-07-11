@@ -63,15 +63,16 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     }
 
     override fun refresh() {
-        nodes = if (isInvalidParentHandle()) {
-            megaApi.getOutShares(sortOrderManagement.getOrderOthers())
-                .filter { it.user != null }
-                .map { megaApi.getNodeByHandle(it.nodeHandle) }
-                .distinctBy { it.handle }
-        } else {
-            val parentNode = megaApi.getNodeByHandle(managerState().outgoingParentHandle)
-            megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
-        }
+        nodes =
+            managerState().outgoingParentHandle.takeUnless { it == -1L || it == INVALID_HANDLE }
+                ?.let { megaApi.getNodeByHandle(managerState().outgoingParentHandle) }
+                ?.let { megaApi.getChildren(it, sortOrderManagement.getOrderCloud()) }
+                ?: run {
+                    megaApi.getOutShares(sortOrderManagement.getOrderOthers())
+                        .filter { it.user != null }
+                        .map { megaApi.getNodeByHandle(it.nodeHandle) }
+                        .distinctBy { it.handle }
+                }
 
         adapter.setNodes(nodes)
 

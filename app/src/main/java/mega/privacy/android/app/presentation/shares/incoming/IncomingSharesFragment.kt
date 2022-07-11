@@ -69,12 +69,13 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     }
 
     override fun refresh() {
-        nodes = if (isInvalidParentHandle()) {
-            megaApi.getInShares(sortOrderManagement.getOrderOthers())
-        } else {
-            val parentNode = megaApi.getNodeByHandle(managerState().incomingParentHandle)
-            megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
-        }
+        nodes =
+            (managerState().incomingParentHandle.takeUnless { it == -1L || it == INVALID_HANDLE }
+                ?.let { megaApi.getNodeByHandle(managerState().incomingParentHandle) }
+                ?.let { megaApi.getChildren(it, sortOrderManagement.getOrderCloud()) }
+                ?: run {
+                    megaApi.getInShares(sortOrderManagement.getOrderOthers())
+                })
 
         adapter.setNodes(nodes)
 

@@ -209,12 +209,14 @@ class LinksFragment : MegaNodeBaseFragment() {
             sortOrderManagement.getOrderCloud(),
             managerState().isFirstNavigationLevel
         )
-        nodes = if (isInvalidParentHandle()) {
-            megaApi.getPublicLinks(order)
-        } else {
-            val parentNode = megaApi.getNodeByHandle(managerState().linksParentHandle)
-            megaApi.getChildren(parentNode, order)
-        }
+
+        nodes =
+            managerState().linksParentHandle.takeUnless { it == -1L || it == MegaApiJava.INVALID_HANDLE }
+                ?.let { megaApi.getNodeByHandle(managerState().linksParentHandle) }
+                ?.let { megaApi.getChildren(it, order) }
+                ?: run {
+                    megaApi.getPublicLinks(order)
+                }
 
         adapter.setNodes(nodes)
 
