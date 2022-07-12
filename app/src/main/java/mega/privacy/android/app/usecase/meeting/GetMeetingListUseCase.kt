@@ -13,12 +13,14 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.meeting.list.MeetingItem
+import mega.privacy.android.app.usecase.chat.CheckChatDndUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result
 import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -36,6 +38,7 @@ class GetMeetingListUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val getChatChangesUseCase: GetChatChangesUseCase,
+    private val checkChatDndUseCase: CheckChatDndUseCase,
 ) {
 
     fun get(): Flowable<List<MeetingItem>> =
@@ -155,6 +158,7 @@ class GetMeetingListUseCase @Inject constructor(
     private fun MegaChatRoom.toMeetingItem(listener: OptionalMegaRequestListenerInterface): MeetingItem {
         val chatListItem = megaChatApi.getChatListItem(chatId)
         val title = ChatUtil.getTitleChat(this)
+        val isMuted = checkChatDndUseCase.check(chatId).blockingGetOrNull() ?: false
         val formattedDate = TimeUtils.formatDateAndTime(context,
             chatListItem.lastTimestamp,
             TimeUtils.DATE_LONG_FORMAT
@@ -180,11 +184,11 @@ class GetMeetingListUseCase @Inject constructor(
             chatId = chatId,
             title = title,
             lastMessage = chatListItem.lastMessage,
+            isMuted = isMuted,
             firstUser = firstUser,
             lastUser = lastUser,
             timeStamp = chatListItem.lastTimestamp,
-            formattedDate = formattedDate,
-        )
+            formattedTimestamp = formattedDate)
     }
 
     /**

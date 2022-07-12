@@ -14,23 +14,30 @@ class MeetingsViewHolder(
     fun bind(item: MeetingItem) {
         binding.txtTitle.text = item.title
         binding.txtLastMessage.text = item.lastMessage
-        binding.txtTimestamp.text = item.formattedDate
+        binding.txtTimestamp.text = item.formattedTimestamp
 
         val firstUserPlaceholder = item.firstUser.getImagePlaceholder(itemView.context)
         if (item.isSingleMeeting()) {
-            binding.imgThumbnail.hierarchy.setPlaceholderImage(firstUserPlaceholder, ScalingUtils.ScaleType.FIT_CENTER)
+            binding.imgThumbnail.hierarchy.setPlaceholderImage(
+                firstUserPlaceholder,
+                ScalingUtils.ScaleType.FIT_CENTER
+            )
             binding.imgThumbnail.setImageRequestFromUri(item.firstUser.avatar)
-            binding.imgThumbnailGroupFirst.isVisible = false
-            binding.imgThumbnailGroupLast.isVisible = false
+            binding.groupThumbnails.isVisible = false
             binding.imgThumbnail.isVisible = true
         } else {
             val lastUserPlaceholder = item.lastUser!!.getImagePlaceholder(itemView.context)
-            binding.imgThumbnailGroupFirst.hierarchy.setPlaceholderImage(firstUserPlaceholder, ScalingUtils.ScaleType.FIT_CENTER)
-            binding.imgThumbnailGroupLast.hierarchy.setPlaceholderImage(lastUserPlaceholder, ScalingUtils.ScaleType.FIT_CENTER)
+            binding.imgThumbnailGroupFirst.hierarchy.setPlaceholderImage(
+                firstUserPlaceholder,
+                ScalingUtils.ScaleType.FIT_CENTER
+            )
+            binding.imgThumbnailGroupLast.hierarchy.setPlaceholderImage(
+                lastUserPlaceholder,
+                ScalingUtils.ScaleType.FIT_CENTER
+            )
             binding.imgThumbnailGroupFirst.setImageRequestFromUri(item.firstUser.avatar)
             binding.imgThumbnailGroupLast.setImageRequestFromUri(item.lastUser.avatar)
-            binding.imgThumbnailGroupFirst.isVisible = true
-            binding.imgThumbnailGroupLast.isVisible = true
+            binding.groupThumbnails.isVisible = true
             binding.imgThumbnail.isVisible = false
         }
     }

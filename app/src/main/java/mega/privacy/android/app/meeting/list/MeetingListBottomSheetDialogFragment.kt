@@ -13,9 +13,9 @@ import androidx.fragment.app.viewModels
 import com.facebook.drawee.drawable.ScalingUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.internal.ViewUtils.dpToPx
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingDetailBinding
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ChatUtil
@@ -51,7 +51,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         contentView = binding.root
         itemsLayout = binding.itemsLayout
         binding.header.btnMore.isVisible = false
-        binding.header.txtTimestamp.isVisible = false
+        binding.header.txtLastMessage.isVisible = false
         binding.header.root.updateLayoutParams { height = dpToPx(requireContext(), 71).toInt() }
         return binding.root
     }
@@ -61,29 +61,30 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             requireNotNull(meeting) { "Meeting not found" }
 
             binding.header.txtTitle.text = meeting.title
-            binding.header.txtLastMessage.text = meeting.formattedDate
+            binding.header.txtTimestamp.text = meeting.formattedTimestamp
 
             val firstUserPlaceholder = meeting.firstUser.getImagePlaceholder(requireContext())
             if (meeting.isSingleMeeting()) {
                 binding.header.imgThumbnail.hierarchy.setPlaceholderImage(
                     firstUserPlaceholder,
-                    ScalingUtils.ScaleType.FIT_CENTER)
+                    ScalingUtils.ScaleType.FIT_CENTER
+                )
                 binding.header.imgThumbnail.setImageRequestFromUri(meeting.firstUser.avatar)
-                binding.header.imgThumbnailGroupFirst.isVisible = false
-                binding.header.imgThumbnailGroupLast.isVisible = false
+                binding.header.groupThumbnails.isVisible = false
                 binding.header.imgThumbnail.isVisible = true
             } else {
                 val lastUserPlaceholder = meeting.lastUser!!.getImagePlaceholder(requireContext())
                 binding.header.imgThumbnailGroupFirst.hierarchy.setPlaceholderImage(
                     firstUserPlaceholder,
-                    ScalingUtils.ScaleType.FIT_CENTER)
+                    ScalingUtils.ScaleType.FIT_CENTER
+                )
                 binding.header.imgThumbnailGroupLast.hierarchy.setPlaceholderImage(
                     lastUserPlaceholder,
-                    ScalingUtils.ScaleType.FIT_CENTER)
+                    ScalingUtils.ScaleType.FIT_CENTER
+                )
                 binding.header.imgThumbnailGroupFirst.setImageRequestFromUri(meeting.firstUser.avatar)
                 binding.header.imgThumbnailGroupLast.setImageRequestFromUri(meeting.lastUser.avatar)
-                binding.header.imgThumbnailGroupFirst.isVisible = true
-                binding.header.imgThumbnailGroupLast.isVisible = true
+                binding.header.groupThumbnails.isVisible = true
                 binding.header.imgThumbnail.isVisible = false
             }
 
@@ -96,8 +97,23 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 dismissAllowingStateLoss()
             }
 
+            if (meeting.isMuted) {
+                binding.btnMute.text = StringResourcesUtils.getString(R.string.general_unmute)
+                binding.btnMute.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_unmute, 0, 0, 0)
+            } else {
+                binding.btnMute.text = StringResourcesUtils.getString(R.string.general_mute)
+                binding.btnMute.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_mute, 0, 0, 0)
+            }
             binding.btnMute.setOnClickListener {
-                ChatUtil.createMuteNotificationsAlertDialogOfAChat(requireActivity(), chatId)
+                if (meeting.isMuted) {
+                    MegaApplication.getPushNotificationSettingManagement()
+                        .controlMuteNotificationsOfAChat(
+                            requireContext(),
+                            Constants.NOTIFICATIONS_ENABLED,
+                            chatId)
+                } else {
+                    ChatUtil.createMuteNotificationsAlertDialogOfAChat(requireActivity(), chatId)
+                }
                 dismissAllowingStateLoss()
             }
 

@@ -7,10 +7,11 @@ data class MeetingItem constructor(
     val chatId: Long,
     val title: String,
     val lastMessage: String,
+    val isMuted: Boolean,
     val firstUser: ContactGroupUser,
     val lastUser: ContactGroupUser?,
     val timeStamp: Long,
-    val formattedDate: String,
+    val formattedTimestamp: String,
 ) {
 
     fun isSingleMeeting(): Boolean =

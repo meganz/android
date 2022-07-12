@@ -10,29 +10,35 @@
         android:layout_width="@dimen/image_group_size"
         android:layout_height="@dimen/image_group_size"
         android:layout_marginStart="29dp"
-        android:layout_marginTop="37dp"
-        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.60"
         app:roundAsCircle="true"
         app:roundingBorderColor="@color/white_dark_grey"
         app:roundingBorderWidth="@dimen/image_group_border_size"
-        tools:placeholderImage="@android:drawable/ic_menu_camera"
-        tools:visibility="visible" />
+        tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/img_thumbnail_group_first"
         android:layout_width="@dimen/image_group_size"
         android:layout_height="@dimen/image_group_size"
         android:layout_marginStart="17dp"
-        android:layout_marginTop="25dp"
-        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.40"
         app:roundAsCircle="true"
         app:roundingBorderColor="@color/white_dark_grey"
         app:roundingBorderWidth="@dimen/image_group_border_size"
-        tools:placeholderImage="@android:drawable/ic_menu_camera"
+        tools:placeholderImage="@android:drawable/ic_menu_camera" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_thumbnails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="img_thumbnail_group_first, img_thumbnail_group_last"
         tools:visibility="visible" />
 
     <com.facebook.drawee.view.SimpleDraweeView
