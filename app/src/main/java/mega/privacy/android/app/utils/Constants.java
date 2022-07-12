@@ -191,6 +191,9 @@ public class Constants {
     public static final int SECONDS_IN_MONTH_31 = SECONDS_IN_DAY * 31;
     public static final int SECONDS_IN_YEAR = SECONDS_IN_DAY * 365;
 
+    public static final long SECONDS_TO_WAIT_ALONE_ON_THE_CALL = 2 * SECONDS_IN_MINUTE;
+    public static final long SECONDS_TO_WAIT_FOR_OTHERS_PARTICIPANTS = 5 * SECONDS_IN_MINUTE;
+
     public static final int COLOR_STATUS_BAR_ACCENT = 1;
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
     public static final int COLOR_STATUS_BAR_ZERO = 3;
