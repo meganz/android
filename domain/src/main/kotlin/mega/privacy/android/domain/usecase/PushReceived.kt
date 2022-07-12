@@ -1,6 +1,6 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase
 
-import nz.mega.sdk.MegaChatRequest
+import mega.privacy.android.domain.entity.ChatRequest
 
 /**
  * Push received use case.
@@ -13,5 +13,5 @@ fun interface PushReceived {
      * @param beep True if should beep, false otherwise.
      * @return Result of the request. Required for creating the notification.
      */
-    suspend operator fun invoke(beep: Boolean): MegaChatRequest
+    suspend operator fun invoke(beep: Boolean): ChatRequest
 }

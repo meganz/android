@@ -1,6 +1,6 @@
 package mega.privacy.android.app.domain.repository
 
-import nz.mega.sdk.MegaChatRequest
+import mega.privacy.android.domain.entity.ChatRequest
 
 /**
  * Pushes repository.
@@ -36,5 +36,5 @@ interface PushesRepository {
      * @param beep True if should beep, false otherwise.
      * @return Result of the request. Required for creating the notification.
      */
-    suspend fun pushReceived(beep: Boolean): MegaChatRequest
+    suspend fun pushReceived(beep: Boolean): ChatRequest
 }
