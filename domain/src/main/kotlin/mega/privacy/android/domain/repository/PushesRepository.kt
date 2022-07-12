@@ -1,4 +1,4 @@
-package mega.privacy.android.app.domain.repository
+package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.ChatRequest
 

@@ -9,6 +9,9 @@ package mega.privacy.android.domain.entity
  * @property number                Number related to the request.
  * @property numRetry              Number of times that a request has temporarily failed.
  * @property flag                  Flag related to the request.
+ *                                 This value is valid for these requests:
+ *                                 - [ChatRequestType.CreateChatRoom]: Creates a chat for one or more participants.
+ *                                 - [ChatRequestType.LoadPreview]: True if it's a meeting room.
  * @property peersList             List of [ChatPeer] in a chat.
  *                                 This value is valid for [ChatRequestType.CreateChatRoom].
  * @property chatHandle            Handle identifying the chat.
@@ -35,9 +38,9 @@ data class ChatRequest(
     val numRetry: Int,
     val flag: Boolean,
     val peersList: List<ChatPeer>?,
-    val chatHandle: Long,
-    val userHandle: Long,
-    val privilege: Int,
+    val chatHandle: Long?,
+    val userHandle: Long?,
+    val privilege: Int?,
     val text: String?,
     val link: String?,
     val peersListByChatHandle: Map<Long, List<Long>>?,
