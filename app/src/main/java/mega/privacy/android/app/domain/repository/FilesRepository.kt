@@ -68,13 +68,6 @@ interface FilesRepository {
     suspend fun getCameraSortOrder(): Int
 
     /**
-     * Gets Inbox node.
-     *
-     * @return The Inbox node if exists, null otherwise.
-     */
-    suspend fun getInboxNode(): MegaNode?
-
-    /**
      * Checks if Inbox node has children.
      *
      * @return True if Inbox has children, false otherwise.

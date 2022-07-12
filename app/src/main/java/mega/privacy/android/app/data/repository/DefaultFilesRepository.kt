@@ -102,12 +102,8 @@ class DefaultFilesRepository @Inject constructor(
         megaLocalStorageGateway.getCameraSortOrder()
     }
 
-    override suspend fun getInboxNode(): MegaNode? = withContext(ioDispatcher) {
-        megaApiGateway.getInboxNode()
-    }
-
     override suspend fun hasInboxChildren(): Boolean = withContext(ioDispatcher) {
-        getInboxNode()?.let { megaApiGateway.hasChildren(it) } ?: false
+        megaApiGateway.getInboxNode()?.let { megaApiGateway.hasChildren(it) } ?: false
     }
 
     override suspend fun downloadBackgroundFile(node: MegaNode): String =

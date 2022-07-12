@@ -73,6 +73,6 @@ object TestManagerUseCases {
 
     @Provides
     fun provideHasInboxChildren() = mock<HasInboxChildren> {
-        on { runBlocking { invoke() } }.thenReturn(false)
+        onBlocking { invoke() }.thenReturn(false)
     }
 }
