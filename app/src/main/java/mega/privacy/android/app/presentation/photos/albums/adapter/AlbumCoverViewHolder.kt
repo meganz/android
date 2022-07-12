@@ -8,9 +8,9 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemAlbumCoverBinding
-import mega.privacy.android.app.domain.entity.Album
 import mega.privacy.android.app.presentation.photos.model.titleId
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.Album
 
 /**
  *  AlbumCoverViewHolder work with  AlbumCoverAdapter
@@ -18,7 +18,7 @@ import mega.privacy.android.app.utils.Util
 class AlbumCoverViewHolder(
     private val binding: ItemAlbumCoverBinding,
     coverWidth: Int,
-    coverMargin: Int
+    coverMargin: Int,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {
@@ -49,14 +49,15 @@ class AlbumCoverViewHolder(
             listener.onCoverClicked(album)
         }
 
-        if(album.thumbnail == null) {
+        if (album.thumbnail == null) {
             if (Util.isDarkMode(itemView.context)) {
                 binding.cover.setActualImageResource(R.drawable.ic_album_cover_d)
             } else {
                 binding.cover.setActualImageResource(R.drawable.ic_album_cover)
             }
         } else {
-            val request = ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(album.thumbnail)).build()
+            val request =
+                ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(album.thumbnail)).build()
             val controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request)
                 .setOldController(binding.cover.controller)

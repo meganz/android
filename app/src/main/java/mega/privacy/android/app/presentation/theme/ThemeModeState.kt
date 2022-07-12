@@ -10,8 +10,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.entity.ThemeMode
-import mega.privacy.android.app.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.domain.usecase
 
 import android.text.format.DateFormat
+import mega.privacy.android.domain.usecase.GetCurrentTimeString
 import java.util.Calendar
 import java.util.TimeZone
 import javax.inject.Inject

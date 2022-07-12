@@ -290,7 +290,6 @@
                             android:layout_height="wrap_content"
                             android:layout_below="@id/figure_unlocked_storage_text_add_phone"
                             android:text="@string/storage_space"
-                            android:textAllCaps="false"
                             android:textColor="?android:attr/textColorSecondary"
                             android:textSize="11sp" />
 

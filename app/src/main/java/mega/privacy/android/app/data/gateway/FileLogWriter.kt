@@ -1,7 +1,7 @@
 package mega.privacy.android.app.data.gateway
 
 import android.util.Log
-import mega.privacy.android.app.domain.entity.logging.LogEntry
+import mega.privacy.android.domain.entity.logging.LogEntry
 import org.slf4j.Logger
 
 /**

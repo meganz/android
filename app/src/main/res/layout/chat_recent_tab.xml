@@ -71,7 +71,6 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="20dp"
                         android:text="@string/contact_invite"
-                        android:textAllCaps="true"
                         android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor" />
                 </RelativeLayout>
 

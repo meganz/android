@@ -1,8 +1,8 @@
 package mega.privacy.android.app.data.mapper
 
-import mega.privacy.android.app.domain.entity.FavouriteInfo
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 
 /**

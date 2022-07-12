@@ -51,11 +51,11 @@ sealed class MoveRequestResult(
 
         override fun getResultText(): String =
             when {
-                count == 1 && isSuccess -> getString(R.string.context_correctly_moved)
-                count == 1 -> getString(R.string.context_no_moved)
-                isSuccess -> getString(R.string.number_correctly_moved, count)
-                else -> getString(
-                    R.string.number_correctly_moved,
+                count == 1 && !isSuccess -> getString(R.string.context_no_moved)
+                isSuccess -> getQuantityString(R.plurals.number_correctly_moved, count, count)
+                else -> getQuantityString(
+                    R.plurals.number_correctly_moved,
+                    count - errorCount,
                     count - errorCount
                 ) + getString(R.string.number_incorrectly_moved, errorCount)
             }

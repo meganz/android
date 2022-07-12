@@ -8,9 +8,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.gateway.DeviceGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.entity.AppInfo
-import mega.privacy.android.app.domain.entity.DeviceInfo
-import mega.privacy.android.app.domain.repository.EnvironmentRepository
+import mega.privacy.android.domain.entity.AppInfo
+import mega.privacy.android.domain.entity.DeviceInfo
+import mega.privacy.android.domain.repository.EnvironmentRepository
 import javax.inject.Inject
 
 /**

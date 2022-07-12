@@ -18,7 +18,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/settings_passcode_lock"
-            android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium"
             android:visibility="gone" />
 
@@ -185,7 +184,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:text="@string/settings_passcode_forgot_passcode_button"
-                android:textAllCaps="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/logout_button" />

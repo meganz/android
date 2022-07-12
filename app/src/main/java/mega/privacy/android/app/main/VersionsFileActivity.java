@@ -300,7 +300,7 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
         aB = getSupportActionBar();
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
-        aB.setTitle(getString(R.string.title_section_versions).toUpperCase());
+        aB.setTitle(getString(R.string.title_section_versions));
 
         container = (RelativeLayout) findViewById(R.id.versions_main_layout);
 

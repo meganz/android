@@ -68,7 +68,6 @@
                 android:layout_marginStart="15dp"
                 android:onClick="onClick"
                 android:textSize="14sp"
-                android:textAllCaps="true"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/verify_account_not_now_button"
                 android:textColor="@color/teal_300_teal_200" />
@@ -83,7 +82,6 @@
                 android:onClick="onClick"
                 android:text="@string/general_allow"
                 android:textSize="14sp"
-                android:textAllCaps="true"
                 android:fontFamily="sans-serif-medium"
                 android:textColor="@color/teal_300_teal_200" />
         </LinearLayout>

@@ -1963,16 +1963,16 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         if (aB != null) {
             if (contactType == CONTACT_TYPE_MEGA) {
                 if (comesFromChat) {
-                    aB.setTitle(title.toUpperCase());
+                    aB.setTitle(title);
                     if (addedContactsMEGA.size() > 0) {
                         aB.setSubtitle(getResources().getString(R.string.selected_items, addedContactsMEGA.size()));
                     } else {
                         aB.setSubtitle(null);
                     }
                 } else if (!createNewGroup && !createNewChatLink) {
-                    aB.setTitle(getString(R.string.group_chat_start_conversation_label).toUpperCase());
+                    aB.setTitle(getString(R.string.group_chat_start_conversation_label));
                 } else if ((createNewGroup || createNewChatLink) && !onNewGroup) {
-                    aB.setTitle(getString(R.string.title_new_group).toUpperCase());
+                    aB.setTitle(getString(R.string.title_new_group));
                     if (addedContactsMEGA.size() > 0) {
                         aB.setSubtitle(getResources().getString(R.string.selected_items, addedContactsMEGA.size()));
                     } else {
@@ -1980,7 +1980,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     }
                 }
             } else if (contactType == CONTACT_TYPE_DEVICE) {
-                aB.setTitle(getString(R.string.invite_contacts).toUpperCase());
+                aB.setTitle(getString(R.string.invite_contacts));
                 if (addedContactsPhone.size() > 0) {
                     aB.setSubtitle(getQuantityString(R.plurals.general_selection_num_contacts,
                             addedContactsPhone.size(), addedContactsPhone.size()));
@@ -1988,7 +1988,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     aB.setSubtitle(null);
                 }
             } else {
-                aB.setTitle(getString(R.string.share_with).toUpperCase());
+                aB.setTitle(getString(R.string.share_with));
                 if (addedContactsShare.size() > 0) {
                     aB.setSubtitle(getQuantityString(R.plurals.general_selection_num_contacts,
                             addedContactsShare.size(), addedContactsShare.size()));
@@ -3113,7 +3113,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     private void returnToStartConversation() {
         createNewGroup = false;
         createNewChatLink = false;
-        aB.setTitle(getString(R.string.group_chat_start_conversation_label).toUpperCase());
+        aB.setTitle(getString(R.string.group_chat_start_conversation_label));
         aB.setSubtitle(null);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             inviteContactButton.setVisibility(View.VISIBLE);
@@ -3186,9 +3186,9 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         searchExpand = false;
         if (aB != null) {
             if (createNewChatLink) {
-                aB.setTitle(getString(R.string.new_chat_link_label).toUpperCase());
+                aB.setTitle(getString(R.string.new_chat_link_label));
             } else {
-                aB.setTitle(getString(R.string.title_new_group).toUpperCase());
+                aB.setTitle(getString(R.string.title_new_group));
             }
             aB.setSubtitle(getString(R.string.subtitle_new_group));
         }

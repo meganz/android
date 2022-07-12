@@ -56,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_collapseMode="pin"
-            app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps" />
+            app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium" />
 
         <RelativeLayout
             android:id="@+id/layout_title"

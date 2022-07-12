@@ -577,7 +577,7 @@ public class FileBrowserFragment extends RotatableFragment {
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setHasFixedSize(true);
             recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
-            recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
+            recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getResources().getDisplayMetrics()));
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -1427,7 +1427,7 @@ public class FileBrowserFragment extends RotatableFragment {
 
     public MediaDiscoveryFragment showMediaDiscovery(Unit u) {
         MediaDiscoveryFragment f = MediaDiscoveryFragment.getInstance(mediaHandle);
-        ((ManagerActivity) context).skipToMediaDiscoveryFragment(f);
+        ((ManagerActivity) context).skipToMediaDiscoveryFragment(f, mediaHandle);
         return f;
     }
 

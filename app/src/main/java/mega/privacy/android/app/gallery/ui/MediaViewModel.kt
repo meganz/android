@@ -14,7 +14,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
@@ -23,6 +22,7 @@ import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.gallery.repository.MediaItemRepository
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ZoomUtil
+import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import nz.mega.sdk.MegaApiJava
 import javax.inject.Inject
 
@@ -304,7 +304,8 @@ class MediaViewModel @Inject constructor(
      * @return  Node handles as LongArray
      */
     fun getItemsHandle(): LongArray =
-        items.value?.map { it.node?.handle ?: MegaApiJava.INVALID_HANDLE }?.toLongArray() ?: LongArray(0)
+        items.value?.map { it.node?.handle ?: MegaApiJava.INVALID_HANDLE }?.toLongArray()
+            ?: LongArray(0)
 
     /**
      * Make the list adapter to rebind all item views with data since

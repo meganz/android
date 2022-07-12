@@ -15,14 +15,17 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
-import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetInboxNode
-import mega.privacy.android.app.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.HasChildren
+import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import mega.privacy.android.domain.entity.ContactRequest
+import mega.privacy.android.domain.entity.ContactRequestStatus
+import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
 import org.junit.Rule
@@ -44,6 +47,7 @@ class ManagerViewModelTest {
     private val getNumUnreadUserAlerts = mock<GetNumUnreadUserAlerts>()
     private val getInboxNode = mock<GetInboxNode>()
     private val hasChildren = mock<HasChildren>()
+    private val monitorContactRequestUpdates = mock<MonitorContactRequestUpdates>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -53,19 +57,21 @@ class ManagerViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
+
     /**
      * Initialize the view model under test
      */
     private fun setUnderTest() {
         underTest = ManagerViewModel(
-            monitorNodeUpdates,
-            monitorGlobalUpdates,
-            getRubbishBinNodeByHandle,
-            getBrowserNodeByHandle,
-            getRootFolder,
-            getNumUnreadUserAlerts,
-            getInboxNode,
-            hasChildren,
+            monitorNodeUpdates = monitorNodeUpdates,
+            monitorGlobalUpdates = monitorGlobalUpdates,
+            getRubbishBinChildrenNode = getRubbishBinNodeByHandle,
+            getBrowserChildrenNode = getBrowserNodeByHandle,
+            monitorContactRequestUpdates = monitorContactRequestUpdates,
+            getRootFolder = getRootFolder,
+            getNumUnreadUserAlerts = getNumUnreadUserAlerts,
+            getInboxNode = getInboxNode,
+            hasChildren = hasChildren,
         )
     }
 
@@ -78,6 +84,10 @@ class ManagerViewModelTest {
     @Suppress("DEPRECATION")
     private fun triggerRepositoryUpdate(updates: List<GlobalUpdate>, after: () -> Unit) {
         whenever(monitorGlobalUpdates()).thenReturn(updates.asFlow())
+        executeTest(after)
+    }
+
+    private fun executeTest(after: () -> Unit) {
         setUnderTest()
         after()
     }
@@ -235,14 +245,15 @@ class ManagerViewModelTest {
     fun `test that contact request updates live data is not set when no updates triggered from use case`() =
         runTest {
             underTest = ManagerViewModel(
-                monitorNodeUpdates,
-                monitorGlobalUpdates,
-                getRubbishBinNodeByHandle,
-                getBrowserNodeByHandle,
-                getRootFolder,
-                getNumUnreadUserAlerts,
-                getInboxNode,
-                hasChildren,
+                monitorNodeUpdates = monitorNodeUpdates,
+                monitorGlobalUpdates = monitorGlobalUpdates,
+                getRubbishBinChildrenNode = getRubbishBinNodeByHandle,
+                getBrowserChildrenNode = getBrowserNodeByHandle,
+                monitorContactRequestUpdates = monitorContactRequestUpdates,
+                getRootFolder = getRootFolder,
+                getNumUnreadUserAlerts = getNumUnreadUserAlerts,
+                getInboxNode = getInboxNode,
+                hasChildren = hasChildren,
             )
 
             underTest.updateContactsRequests.test().assertNoValue()
@@ -375,7 +386,18 @@ class ManagerViewModelTest {
     @Test
     fun `test that contact request updates live data is set when contact request updates triggered from use case`() =
         runTest {
-            triggerRepositoryUpdate(listOf(GlobalUpdate.OnContactRequestsUpdate(arrayListOf(mock())))) {
+            whenever(monitorContactRequestUpdates()).thenReturn(flowOf(listOf(
+                ContactRequest(
+                    handle = 1L,
+                    sourceEmail = "",
+                    sourceMessage = null,
+                    targetEmail = "",
+                    creationTime = 1L,
+                    modificationTime = 1L,
+                    status = ContactRequestStatus.Unresolved,
+                    isOutgoing = false,
+                    isAutoAccepted = false))))
+            executeTest {
 
                 runCatching {
                     underTest.updateContactsRequests.test().awaitValue(50, TimeUnit.MILLISECONDS)
@@ -388,11 +410,7 @@ class ManagerViewModelTest {
     @Test
     fun `test that contact request updates live data is not set when contact request updates triggered from use case with null`() =
         runTest {
-            triggerRepositoryUpdate(
-                listOf(
-                    GlobalUpdate.OnContactRequestsUpdate(null),
-                )
-            ) {
+            executeTest {
                 underTest.updateContactsRequests.test().assertNoValue()
             }
         }

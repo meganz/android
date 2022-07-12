@@ -5,10 +5,10 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.domain.usecase.DefaultMonitorConnectivity
 import mega.privacy.android.app.domain.usecase.DefaultRootNodeExists
-import mega.privacy.android.app.domain.usecase.MonitorConnectivity
-import mega.privacy.android.app.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.DefaultMonitorConnectivity
+import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.RootNodeExists
 
 /**
  * Initialise use cases module

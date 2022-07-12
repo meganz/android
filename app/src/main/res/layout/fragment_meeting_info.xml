@@ -74,7 +74,6 @@
             android:drawableTop="@drawable/ic_social_share_white"
             android:stateListAnimator="@null"
             android:text="@string/context_get_link"
-            android:textAllCaps="false"
             android:textColor="@color/grey_600_white"
             app:drawableTint="?attr/colorSecondary" />
 
@@ -88,7 +87,6 @@
             android:drawableTop="@drawable/ic_invite_contact"
             android:stateListAnimator="@null"
             android:text="@string/invite_participants"
-            android:textAllCaps="false"
             android:textColor="@color/grey_600_white"
             app:drawableTint="?attr/colorSecondary" />
     </LinearLayout>

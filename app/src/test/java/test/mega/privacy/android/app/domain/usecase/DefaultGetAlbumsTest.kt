@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.entity.Album
-import mega.privacy.android.app.domain.entity.FavouriteInfo
-import mega.privacy.android.app.domain.repository.AlbumsRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetAlbums
-import mega.privacy.android.app.domain.usecase.GetAlbums
-import mega.privacy.android.app.domain.usecase.GetAllFavorites
-import mega.privacy.android.app.domain.usecase.GetThumbnail
+import mega.privacy.android.domain.entity.Album
+import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.repository.AlbumsRepository
+import mega.privacy.android.domain.usecase.GetAlbums
+import mega.privacy.android.domain.usecase.GetAllFavorites
+import mega.privacy.android.domain.usecase.GetThumbnail
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -282,7 +282,6 @@ class DefaultGetAlbumsTest {
     }
 
     private fun createFavouriteItem(
-        node: MegaNode = mock(),
         id: Long = 1L,
         parentId: Long = 2L,
         lastModified: Long = 3L,

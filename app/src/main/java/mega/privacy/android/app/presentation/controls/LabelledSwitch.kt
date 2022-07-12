@@ -20,8 +20,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.ThemeMode
 import mega.privacy.android.app.presentation.theme.AndroidTheme
+import mega.privacy.android.domain.entity.ThemeMode
 
 @Composable
 internal fun LabelledSwitch(

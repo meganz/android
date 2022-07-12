@@ -1841,7 +1841,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             aB.setCustomView(R.layout.chat_action_bar);
             View v = aB.getCustomView();
             actionBarTitle = v.findViewById(R.id.ab_title);
-            setCustomisedActionBarTitle(adjustForLargeFont(getString(R.string.section_chat).toUpperCase()));
+            setCustomisedActionBarTitle(adjustForLargeFont(getString(R.string.section_chat)));
             actionBarSubtitle = v.findViewById(R.id.ab_subtitle);
             actionBarSubtitleArrow = v.findViewById(R.id.ab_subtitle_arrow);
             setStatus();

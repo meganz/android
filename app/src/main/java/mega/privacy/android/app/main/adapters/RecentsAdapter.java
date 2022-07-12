@@ -309,17 +309,12 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         }
 
         if (numImages > 0 && numVideos == 0) {
-            mediaTitle = context.getString(R.string.title_media_bucket_only_images, numImages);
+            mediaTitle = context.getResources().getQuantityString(R.plurals.title_media_bucket_only_images, numImages, numImages);
         } else if (numImages == 0 && numVideos > 0) {
-            mediaTitle = context.getString(R.string.title_media_bucket_only_videos, numVideos);
-        } else if (numImages == 1 && numVideos == 1) {
-            mediaTitle = context.getString(R.string.title_media_bucket_image_and_video);
-        } else if (numImages == 1 && numVideos > 1) {
-            mediaTitle = context.getString(R.string.title_media_bucket_image_and_videos, numVideos);
-        } else if (numImages > 1 && numVideos == 1) {
-            mediaTitle = context.getString(R.string.title_media_bucket_images_and_video, numImages);
+            mediaTitle = context.getResources().getQuantityString(R.plurals.title_media_bucket_only_videos, numVideos, numVideos);
         } else {
-            mediaTitle = context.getString(R.string.title_media_bucket_images_and_videos, numImages, numVideos);
+            mediaTitle = context.getResources().getQuantityString(R.plurals.title_media_bucket_images_and_videos, numImages, numImages) +
+                    context.getResources().getQuantityString(R.plurals.title_media_bucket_images_and_videos_2, numVideos, numVideos);
         }
 
         return mediaTitle;

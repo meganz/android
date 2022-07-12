@@ -183,8 +183,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         if (aB != null) {
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
-            aB.setTitle(StringResourcesUtils.getString(R.string.settings_2fa)
-                    .toUpperCase(Locale.getDefault()));
+            aB.setTitle(StringResourcesUtils.getString(R.string.settings_2fa));
         }
 
         if (savedInstanceState != null) {

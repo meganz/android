@@ -187,8 +187,7 @@
                                 android:layout_gravity="center_vertical"
                                 android:gravity="center_vertical"
                                 android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor"
-                                android:text="@string/call_on_hold"
-                                android:textAllCaps="true"/>
+                                android:text="@string/call_on_hold"/>
                         </LinearLayout>
                     </RelativeLayout>
 

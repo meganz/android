@@ -23,11 +23,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.entity.ThemeMode
 import mega.privacy.android.app.presentation.controls.LabelledSwitch
 import mega.privacy.android.app.presentation.controls.ProgressDialog
 import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueState
 import mega.privacy.android.app.presentation.theme.AndroidTheme
+import mega.privacy.android.domain.entity.ThemeMode
 
 @Composable
 fun ReportIssueView(
