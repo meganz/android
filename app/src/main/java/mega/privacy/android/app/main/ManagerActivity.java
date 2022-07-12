@@ -7595,7 +7595,9 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private void refreshSharesPageAdapter() {
         if (sharesPageAdapter != null) {
-            sharesPageAdapter.notifyDataSetChanged();
+            sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
+            sharesPageAdapter.refreshFragment(SharesTab.OUTGOING_TAB.getPosition());
+            sharesPageAdapter.refreshFragment(SharesTab.LINKS_TAB.getPosition());
         }
     }
 
@@ -10968,9 +10970,7 @@ public class ManagerActivity extends TransfersManagementActivity
             viewModel.setSharesTab(SharesTab.INCOMING_TAB);
             if (viewPagerShares != null) {
                 viewPagerShares.setCurrentItem(viewModel.getState().getValue().getSharesTab().getPosition());
-                if (sharesPageAdapter != null) {
-                    sharesPageAdapter.notifyDataSetChanged();
-                }
+                refreshSharesPageAdapter();
             }
             selectDrawerItem(DrawerItem.SHARED_ITEMS);
         }

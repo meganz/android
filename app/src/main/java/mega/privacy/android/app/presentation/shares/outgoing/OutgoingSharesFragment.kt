@@ -70,7 +70,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 ?.let { megaApi.getNodeByHandle(managerState().outgoingParentHandle) }
                 ?.let { megaApi.getChildren(it, sortOrderManagement.getOrderCloud()) }
                 ?: run {
-                    megaApi.getOutShares(sortOrderManagement.getOrderOthers())
+                    megaApi.getOutShares(sortOrderManagement.getOrderCloud())
                         .filter { it.user != null }
                         .map { megaApi.getNodeByHandle(it.nodeHandle) }
                         .distinctBy { it.handle }
