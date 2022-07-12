@@ -5343,7 +5343,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     break;
 
                 case INBOX:
-                    moreMenuItem.setVisible(!isFirstNavigationLevel());
+                    moreMenuItem.setVisible(false);
 
                     if (getInboxFragment() != null && inboxFragment.getItemCount() > 0) {
                         searchMenuItem.setVisible(true);
