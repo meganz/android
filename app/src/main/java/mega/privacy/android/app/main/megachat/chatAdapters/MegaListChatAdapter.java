@@ -27,6 +27,7 @@ import static mega.privacy.android.app.utils.TimeUtils.formatDate;
 import static mega.privacy.android.app.utils.TimeUtils.formatDateAndTime;
 import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
 import static mega.privacy.android.app.utils.Util.toCDATA;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_JOINING;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION;
@@ -87,6 +88,7 @@ import mega.privacy.android.app.main.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MeetingUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -1337,184 +1339,8 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                 }
                 ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
             } else if (messageType == MegaChatMessage.TYPE_PRIV_CHANGE) {
-                Timber.d("PRIVILEGE CHANGE message");
-
-                int privilege = chat.getLastMessagePriv();
-                Timber.d("Privilege of the user: %s", privilege);
-
-                String privilegeString = "";
-                if (privilege == MegaChatRoom.PRIV_MODERATOR) {
-                    privilegeString = context.getString(R.string.administrator_permission_label_participants_panel);
-                } else if (privilege == MegaChatRoom.PRIV_STANDARD) {
-                    privilegeString = context.getString(R.string.standard_permission_label_participants_panel);
-                } else if (privilege == MegaChatRoom.PRIV_RO) {
-                    privilegeString = context.getString(R.string.observer_permission_label_participants_panel);
-                } else {
-                    Timber.d("Change to other");
-                    privilegeString = "Unknow";
-                }
-
-                String textToShow = "";
-
-                if (chat.getLastMessageHandle() == megaChatApi.getMyUserHandle()) {
-                    Timber.d("A moderator change my privilege");
-
-                    if (chat.getLastMessageSender() == megaChatApi.getMyUserHandle()) {
-                        Timber.d("I changed my Own permission");
-                        String myFullName = megaChatApi.getMyFullname();
-                        if (myFullName == null) {
-                            myFullName = "";
-                        }
-                        if (myFullName.trim().length() <= 0) {
-                            myFullName = megaChatApi.getMyEmail();
-                        }
-                        textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(myFullName), toCDATA(privilegeString), toCDATA(myFullName));
-                        try {
-                            textToShow = textToShow.replace("[A]", "");
-                            textToShow = textToShow.replace("[/A]", "");
-                            textToShow = textToShow.replace("[B]", "");
-                            textToShow = textToShow.replace("[/B]", "");
-                            textToShow = textToShow.replace("[C]", "");
-                            textToShow = textToShow.replace("[/C]", "");
-                            textToShow = textToShow.replace("[D]", "");
-                            textToShow = textToShow.replace("[/D]", "");
-                            textToShow = textToShow.replace("[E]", "");
-                            textToShow = textToShow.replace("[/E]", "");
-                        } catch (Exception e) {
-                        }
-                    } else {
-                        Timber.d("I was change by someone");
-                        String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
-
-                        if (isTextEmpty(fullNameAction)) {
-                            if (!(((ViewHolderNormalChatList) holder).nameRequestedAction)) {
-                                Timber.d("Call for nonContactHandle: %s", chat.getLastMessageSender());
-                                fullNameAction = context.getString(R.string.unknown_name_label);
-                                ((ViewHolderNormalChatList) holder).nameRequestedAction = true;
-                                ((ViewHolderNormalChatList) holder).userHandle = chat.getLastMessageSender();
-
-                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
-                                megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-                                megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-                                megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
-                            } else {
-                                Timber.d("Name already asked and no name received: handle%s", chat.getLastMessageSender());
-                            }
-                        }
-                        String myFullName = megaChatApi.getMyFullname();
-                        if (myFullName == null) {
-                            myFullName = "";
-                        }
-                        if (myFullName.trim().length() <= 0) {
-                            myFullName = megaChatApi.getMyEmail();
-                        }
-
-                        textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(myFullName), toCDATA(privilegeString), toCDATA(fullNameAction));
-                        try {
-                            textToShow = textToShow.replace("[A]", "");
-                            textToShow = textToShow.replace("[/A]", "");
-                            textToShow = textToShow.replace("[B]", "");
-                            textToShow = textToShow.replace("[/B]", "");
-                            textToShow = textToShow.replace("[C]", "");
-                            textToShow = textToShow.replace("[/C]", "");
-                            textToShow = textToShow.replace("[D]", "");
-                            textToShow = textToShow.replace("[/D]", "");
-                            textToShow = textToShow.replace("[E]", "");
-                            textToShow = textToShow.replace("[/E]", "");
-                        } catch (Exception e) {
-                        }
-                    }
-                } else {
-                    Timber.d("Participant privilege change!");
-                    String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageHandle());
-
-                    if (isTextEmpty(fullNameTitle)) {
-                        if (!(((ViewHolderNormalChatList) holder).nameRequestedAction)) {
-                            Timber.d("Call for nonContactHandle: %s", chat.getLastMessageHandle());
-                            fullNameTitle = context.getString(R.string.unknown_name_label);
-                            ((ViewHolderNormalChatList) holder).nameRequestedAction = true;
-                            ((ViewHolderNormalChatList) holder).userHandle = chat.getLastMessageHandle();
-
-                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageHandle(), chat.isPreview());
-
-                            megaChatApi.getUserFirstname(chat.getLastMessageHandle(), chatRoom.getAuthorizationToken(), listener);
-                            megaChatApi.getUserLastname(chat.getLastMessageHandle(), chatRoom.getAuthorizationToken(), listener);
-                            megaChatApi.getUserEmail(chat.getLastMessageHandle(), listener);
-                        } else {
-                            Timber.d("Name already asked and no name received: handle %s", chat.getLastMessageHandle());
-                        }
-                    }
-
-                    if (chat.getLastMessageSender() == megaChatApi.getMyUserHandle()) {
-                        Timber.d("The privilege was change by me");
-                        String myFullName = megaChatApi.getMyFullname();
-                        if (myFullName == null) {
-                            myFullName = "";
-                        }
-                        if (myFullName.trim().length() <= 0) {
-                            myFullName = megaChatApi.getMyEmail();
-                        }
-                        textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(fullNameTitle), toCDATA(privilegeString), toCDATA(myFullName));
-                        try {
-                            textToShow = textToShow.replace("[A]", "");
-                            textToShow = textToShow.replace("[/A]", "");
-                            textToShow = textToShow.replace("[B]", "");
-                            textToShow = textToShow.replace("[/B]", "");
-                            textToShow = textToShow.replace("[C]", "");
-                            textToShow = textToShow.replace("[/C]", "");
-                            textToShow = textToShow.replace("[D]", "");
-                            textToShow = textToShow.replace("[/D]", "");
-                            textToShow = textToShow.replace("[E]", "");
-                            textToShow = textToShow.replace("[/E]", "");
-                        } catch (Exception e) {
-                        }
-
-                    } else {
-                        Timber.d("By other");
-                        String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
-                        if (isTextEmpty(fullNameAction)) {
-                            if (!(((ViewHolderNormalChatList) holder).nameRequestedAction)) {
-                                Timber.d("Call for nonContactHandle: %s", chat.getLastMessageSender());
-                                fullNameAction = context.getString(R.string.unknown_name_label);
-                                ((ViewHolderNormalChatList) holder).nameRequestedAction = true;
-                                ((ViewHolderNormalChatList) holder).userHandle = chat.getLastMessageSender();
-
-                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
-
-                                megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-                                megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
-                                megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
-                            } else {
-                                Timber.d("Name already asked and no name received: handle %s", chat.getLastMessageSender());
-                            }
-                        }
-
-                        textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(fullNameTitle), toCDATA(privilegeString), toCDATA(fullNameAction));
-                        try {
-                            textToShow = textToShow.replace("[A]", "");
-                            textToShow = textToShow.replace("[/A]", "");
-                            textToShow = textToShow.replace("[B]", "");
-                            textToShow = textToShow.replace("[/B]", "");
-                            textToShow = textToShow.replace("[C]", "");
-                            textToShow = textToShow.replace("[/C]", "");
-                            textToShow = textToShow.replace("[D]", "");
-                            textToShow = textToShow.replace("[/D]", "");
-                            textToShow = textToShow.replace("[E]", "");
-                            textToShow = textToShow.replace("[/E]", "");
-                        } catch (Exception e) {
-                        }
-                    }
-                }
-
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
-
-                ((ViewHolderNormalChatList) holder).textViewContent.setText(result);
-
+                String textToShow = cC.createManagementString(lastMessage, megaChatApi.getChatRoom(chat.getChatId()));
+                ((ViewHolderNormalChatList) holder).textViewContent.setText(textToShow);
                 ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
             } else if (messageType == MegaChatMessage.TYPE_TRUNCATE) {
                 Timber.d("Message type TRUNCATE");

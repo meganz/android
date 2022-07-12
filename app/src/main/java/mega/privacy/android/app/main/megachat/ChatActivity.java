@@ -1832,21 +1832,16 @@ public class ChatActivity extends PasscodeActivity
             }
         });
 
-        textChat.setOnTouchListener((v, event) -> {
-            showLetterKB();
-            return false;
-        });
-
         textChat.setOnLongClickListener(v -> {
             showLetterKB();
-            return true;
+            return false;
         });
 
         textChat.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 showLetterKB();
             }
-            return true;
+            return false;
         });
 
         textChat.setMediaListener(path -> uploadPictureOrVoiceClip(path));

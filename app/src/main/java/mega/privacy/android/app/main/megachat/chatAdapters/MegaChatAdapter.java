@@ -182,6 +182,8 @@ import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MeetingUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -2392,6 +2394,37 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    /**
+     * Get permissions change management message
+     *
+     * @param message  The MegaChatMessage
+     * @param position Position in adapter
+     * @param holder   ViewHolderMessageChat
+     * @return The formatted text
+     */
+    private Spanned getPrivilegesChangeMessage(MegaChatMessage message, int position, ViewHolderMessageChat holder) {
+        int privilege = message.getPrivilege();
+        Timber.d("Privilege of the user: %s", privilege);
+
+        String participantsNameWhosePermissionsWereChanged = toCDATA(message.getHandleOfAction() == myUserHandle ? megaChatApi.getMyFullname() : getContactMessageName(position, holder, message.getHandleOfAction()));
+        String participantsNameWhoMadeTheAction = toCDATA(message.getUserHandle() == myUserHandle ? megaChatApi.getMyFullname() : getContactMessageName(position, holder, message.getUserHandle()));
+
+        String textToShow = "";
+        switch (privilege) {
+            case MegaChatRoom.PRIV_MODERATOR:
+                textToShow = StringResourcesUtils.getString(R.string.chat_chat_room_message_permissions_changed_to_host, participantsNameWhosePermissionsWereChanged, participantsNameWhoMadeTheAction);
+                break;
+            case MegaChatRoom.PRIV_STANDARD:
+                textToShow = StringResourcesUtils.getString(R.string.chat_chat_room_message_permissions_changed_to_standard, participantsNameWhosePermissionsWereChanged, participantsNameWhoMadeTheAction);
+                break;
+            case MegaChatRoom.PRIV_RO:
+                textToShow = StringResourcesUtils.getString(R.string.chat_chat_room_message_permissions_changed_to_read_only, participantsNameWhosePermissionsWereChanged, participantsNameWhoMadeTheAction);
+                break;
+        }
+
+        return TextUtil.replaceFormatChatMessages(context, textToShow, true);
+    }
+
     public void bindPrivChangeMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         Timber.d("bindPrivChangeMessage");
         ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.GONE);
@@ -2420,82 +2453,6 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).contactMessageLayout.setVisibility(View.GONE);
 
-            String privilegeString = "";
-            if (privilege == MegaChatRoom.PRIV_MODERATOR) {
-                privilegeString = context.getString(R.string.administrator_permission_label_participants_panel);
-            } else if (privilege == MegaChatRoom.PRIV_STANDARD) {
-                privilegeString = context.getString(R.string.standard_permission_label_participants_panel);
-            } else if (privilege == MegaChatRoom.PRIV_RO) {
-                privilegeString = context.getString(R.string.observer_permission_label_participants_panel);
-            } else {
-                Timber.d("Change to other");
-                privilegeString = "Unknow";
-            }
-
-            String textToShow = "";
-
-            if (message.getUserHandle() == myUserHandle) {
-                Timber.d("I changed my Own permission");
-                textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(megaChatApi.getMyFullname()), toCDATA(privilegeString), toCDATA(megaChatApi.getMyFullname()));
-                try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/B]", "</font>");
-                    textToShow = textToShow.replace("[C]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/C]", "</font>");
-                    textToShow = textToShow.replace("[D]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/D]", "</font>");
-                    textToShow = textToShow.replace("[E]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/E]", "</font>");
-                } catch (Exception e) {
-                }
-            } else {
-                Timber.d("I was change by someone");
-                String fullNameAction = getContactMessageName(position, holder, message.getUserHandle());
-
-                textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(megaChatApi.getMyFullname()), toCDATA(privilegeString), toCDATA(fullNameAction));
-                try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/B]", "</font>");
-                    textToShow = textToShow.replace("[C]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/C]", "</font>");
-                    textToShow = textToShow.replace("[D]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/D]", "</font>");
-                    textToShow = textToShow.replace("[E]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/E]", "</font>");
-                } catch (Exception e) {
-                }
-            }
-
-            Spanned result = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                result = Html.fromHtml(textToShow);
-            }
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.GONE);
@@ -2506,8 +2463,8 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 paramsOwnManagement.leftMargin = scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
             }
             holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
-            ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
 
+            ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(getPrivilegesChangeMessage(message, position, holder));
 
             Timber.d("Visible own management message!");
 
@@ -2543,84 +2500,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             setContactMessageName(position, holder, message.getHandleOfAction(), false);
 
-            int privilege = message.getPrivilege();
-            String privilegeString = "";
-            if (privilege == MegaChatRoom.PRIV_MODERATOR) {
-                privilegeString = context.getString(R.string.administrator_permission_label_participants_panel);
-            } else if (privilege == MegaChatRoom.PRIV_STANDARD) {
-                privilegeString = context.getString(R.string.standard_permission_label_participants_panel);
-            } else if (privilege == MegaChatRoom.PRIV_RO) {
-                privilegeString = context.getString(R.string.observer_permission_label_participants_panel);
-            } else {
-                Timber.d("Change to other");
-                privilegeString = "Unknow";
-            }
-
-            String textToShow = "";
-            if (message.getUserHandle() == myUserHandle) {
-                Timber.d("The privilege was change by me");
-                textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(holder.fullNameTitle), toCDATA(privilegeString), toCDATA(megaChatApi.getMyFullname()));
-                try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/B]", "</font>");
-                    textToShow = textToShow.replace("[C]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/C]", "</font>");
-                    textToShow = textToShow.replace("[D]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/D]", "</font>");
-                    textToShow = textToShow.replace("[E]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/E]", "</font>");
-                } catch (Exception e) {
-                }
-
-            } else {
-                Timber.d("By other");
-                String fullNameAction = getContactMessageName(position, holder, message.getUserHandle());
-
-                textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(holder.fullNameTitle), toCDATA(privilegeString), toCDATA(fullNameAction));
-                try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/B]", "</font>");
-                    textToShow = textToShow.replace("[C]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/C]", "</font>");
-                    textToShow = textToShow.replace("[D]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/D]", "</font>");
-                    textToShow = textToShow.replace("[E]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                            + "\'>");
-                    textToShow = textToShow.replace("[/E]", "</font>");
-                } catch (Exception e) {
-                }
-            }
-            Spanned result = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                result = Html.fromHtml(textToShow);
-            }
-
-            ((ViewHolderMessageChat) holder).contactManagementMessageText.setText(result);
+            ((ViewHolderMessageChat) holder).contactManagementMessageText.setText(getPrivilegesChangeMessage(message, position, holder));
         }
     }
 
