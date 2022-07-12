@@ -62,7 +62,7 @@ else:
     rate = "{0:.2%}".format((total_cases - total_failures - total_errors)/total_cases)
 
 # print final results
-print("Unit Test Summary: Success Rate(%s), Total(%s), Skipped(%s), Failure(%s), Errors(%s), Duration(%ss)" %
+print("Success Rate(%s), Total(%s), Skipped(%s), Failure(%s), Errors(%s), Duration(%ss)" %
     (rate, str(total_cases), str(total_skipped), str(total_failures), str(total_errors), '{0:.3g}'.format(total_duration)))
 
 

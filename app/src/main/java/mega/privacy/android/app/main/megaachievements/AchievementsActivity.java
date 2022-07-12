@@ -119,8 +119,7 @@ public class AchievementsActivity extends PasscodeActivity {
         switch (fragmentName) {
             case ACHIEVEMENTS_FRAGMENT:
                 hideKeyboard(this, InputMethodManager.HIDE_NOT_ALWAYS);
-                aB.setTitle(StringResourcesUtils.getString(R.string.achievements_title)
-                        .toUpperCase(Locale.getDefault()));
+                aB.setTitle(StringResourcesUtils.getString(R.string.achievements_title));
 
                 fragment = new AchievementsFragment();
                 tag = "achievementsFragment";

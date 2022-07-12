@@ -394,75 +394,29 @@ public class ChatController {
 
             } //END CONTACT MANAGEMENT MESSAGE
         } else if (message.getType() == MegaChatMessage.TYPE_PRIV_CHANGE) {
-            Timber.d("PRIVILEGE CHANGE message");
-            if (message.getHandleOfAction() == megaApi.getMyUser().getHandle()) {
-                Timber.d("A moderator change my privilege");
-                int privilege = message.getPrivilege();
-                Timber.d("Privilege of the user: %s", privilege);
+            int privilege = message.getPrivilege();
+            Timber.d("Privilege of the user: %s", privilege);
 
-                StringBuilder builder = new StringBuilder();
-                builder.append(megaChatApi.getMyFullname()).append(": ");
+            StringBuilder builder = new StringBuilder();
+            String participantsNameWhoMadeTheAction = message.getHandleOfAction() == megaApi.getMyUser().getHandle() ? megaChatApi.getMyFullname() : getParticipantFullName(message.getHandleOfAction());
+            String participantsNameWhosePermissionsWereChanged = message.getUserHandle() == megaApi.getMyUser().getHandle() ? megaChatApi.getMyFullname() : getParticipantFullName(message.getUserHandle());
+            builder.append(participantsNameWhoMadeTheAction).append(": ");
 
-                String privilegeString = "";
-                if (privilege == MegaChatRoom.PRIV_MODERATOR) {
-                    privilegeString = context.getString(R.string.administrator_permission_label_participants_panel);
-                } else if (privilege == MegaChatRoom.PRIV_STANDARD) {
-                    privilegeString = context.getString(R.string.standard_permission_label_participants_panel);
-                } else if (privilege == MegaChatRoom.PRIV_RO) {
-                    privilegeString = context.getString(R.string.observer_permission_label_participants_panel);
-                } else {
-                    Timber.d("Change to other");
-                    privilegeString = "Unknow";
-                }
-
-                String textToShow;
-
-                if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
-                    Timber.d("I changed my own permission");
-                    textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), megaChatApi.getMyFullname(), privilegeString, megaChatApi.getMyFullname());
-                } else {
-                    Timber.d("My permission was changed by someone");
-                    String fullNameAction = getParticipantFullName(message.getUserHandle());
-                    textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), megaChatApi.getMyFullname(), privilegeString, fullNameAction);
-                }
-
-                builder.append(textToShow);
-                return builder.toString();
-            } else {
-                Timber.d("Participant privilege change!");
-                Timber.d("Message type PRIVILEGE CHANGE - Message ID: %s", message.getMsgId());
-
-                String fullNameTitle = getParticipantFullName(message.getHandleOfAction());
-                StringBuilder builder = new StringBuilder();
-                builder.append(fullNameTitle).append(": ");
-
-                int privilege = message.getPrivilege();
-                String privilegeString = "";
-                if (privilege == MegaChatRoom.PRIV_MODERATOR) {
-                    privilegeString = context.getString(R.string.administrator_permission_label_participants_panel);
-                } else if (privilege == MegaChatRoom.PRIV_STANDARD) {
-                    privilegeString = context.getString(R.string.standard_permission_label_participants_panel);
-                } else if (privilege == MegaChatRoom.PRIV_RO) {
-                    privilegeString = context.getString(R.string.observer_permission_label_participants_panel);
-                } else {
-                    Timber.d("Change to other");
-                    privilegeString = "Unknow";
-                }
-
-                String textToShow;
-                if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
-                    Timber.d("The privilege was change by me");
-                    textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), fullNameTitle, privilegeString, megaChatApi.getMyFullname());
-
-                } else {
-                    Timber.d("By other");
-                    String fullNameAction = getParticipantFullName(message.getUserHandle());
-                    textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), fullNameTitle, privilegeString, fullNameAction);
-                }
-
-                builder.append(textToShow);
-                return builder.toString();
+            String textToShow = "";
+            switch (privilege) {
+                case MegaChatRoom.PRIV_MODERATOR:
+                    textToShow = StringResourcesUtils.getString(R.string.chat_chats_list_last_message_permissions_changed_to_host, participantsNameWhoMadeTheAction, participantsNameWhosePermissionsWereChanged);
+                    break;
+                case MegaChatRoom.PRIV_STANDARD:
+                    textToShow = StringResourcesUtils.getString(R.string.chat_chats_list_last_message_permissions_changed_to_standard, participantsNameWhoMadeTheAction, participantsNameWhosePermissionsWereChanged);
+                    break;
+                case MegaChatRoom.PRIV_RO:
+                    textToShow = StringResourcesUtils.getString(R.string.chat_chats_list_last_message_permissions_changed_to_read_only, participantsNameWhoMadeTheAction, participantsNameWhosePermissionsWereChanged);
+                    break;
             }
+
+            builder.append(textToShow);
+            return builder.toString();
         } else {
             Timber.d("Other type of messages");
             //OTHER TYPE OF MESSAGES

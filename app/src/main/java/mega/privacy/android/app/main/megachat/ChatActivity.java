@@ -1864,21 +1864,16 @@ public class ChatActivity extends PasscodeActivity
             }
         });
 
-        textChat.setOnTouchListener((v, event) -> {
-            showLetterKB();
-            return false;
-        });
-
         textChat.setOnLongClickListener(v -> {
             showLetterKB();
-            return true;
+            return false;
         });
 
         textChat.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 showLetterKB();
             }
-            return true;
+            return false;
         });
 
         textChat.setMediaListener(path -> uploadPictureOrVoiceClip(path));
@@ -4281,8 +4276,8 @@ public class ChatActivity extends PasscodeActivity
         firstButton.setVisibility(View.VISIBLE);
         secondButton.setVisibility(View.VISIBLE);
 
-        firstButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call).toUpperCase(Locale.ROOT));
-        secondButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call).toUpperCase(Locale.ROOT));
+        firstButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call));
+        secondButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call));
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setView(dialogLayout);
@@ -5386,7 +5381,7 @@ public class ChatActivity extends PasscodeActivity
         try {
             if (actionMode != null) {
                 if (adapter.getSelectedItemCount() == 0) {
-                    actionMode.setTitle(getString(R.string.select_message_title).toUpperCase());
+                    actionMode.setTitle(getString(R.string.select_message_title));
                 } else {
                     actionMode.setTitle(adapter.getSelectedItemCount() + "");
                 }

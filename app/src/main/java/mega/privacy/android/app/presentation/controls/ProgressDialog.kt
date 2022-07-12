@@ -32,7 +32,7 @@ fun ProgressDialog(
     progress: Float,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
-    cancelButtonText: String = stringResource(id = R.string.general_cancel).uppercase(),
+    cancelButtonText: String = stringResource(id = R.string.general_cancel),
 ) {
     Dialog(
         onDismissRequest = {},

@@ -32,7 +32,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="17dp"
                     android:text="@string/login_to_mega"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -111,7 +111,7 @@
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="10dp"
                     android:elevation="8dp"
-                    tools:text="LOGIN" />
+                    tools:text="@string/login_text" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -145,7 +145,6 @@
                     android:id="@+id/button_forgot_pass"
                     style="?attr/borderlessButtonStyle"
                     android:paddingLeft="3dp"
-                    android:textAllCaps="false"
                     android:layout_marginBottom="18dp"
                     android:text="@string/forgot_pass" />
 
@@ -169,7 +168,6 @@
                 <TextView
                     android:id="@+id/button_create_account_login"
                     style="?attr/borderlessButtonStyle"
-                    android:textAllCaps="false"
                     android:layout_marginBottom="24dp"
                     android:text="@string/create_account" />
 

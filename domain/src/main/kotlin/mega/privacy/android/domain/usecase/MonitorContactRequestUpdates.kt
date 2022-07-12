@@ -1,7 +1,7 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.flow.Flow
-import nz.mega.sdk.MegaContactRequest
+import mega.privacy.android.domain.entity.ContactRequest
 
 /**
  * Monitor global contact request updates for the current logged in user
@@ -12,5 +12,5 @@ fun interface MonitorContactRequestUpdates {
      *
      * @return a flow of changes
      */
-    operator fun invoke(): Flow<List<MegaContactRequest>>
+    operator fun invoke(): Flow<List<ContactRequest>>
 }

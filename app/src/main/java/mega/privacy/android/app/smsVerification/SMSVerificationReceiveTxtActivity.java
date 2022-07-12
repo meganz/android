@@ -77,7 +77,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(getResources().getString(R.string.verify_account_enter_code_title).toUpperCase());
+        actionBar.setTitle(getResources().getString(R.string.verify_account_enter_code_title));
 
         //labels
         Intent intent = getIntent();

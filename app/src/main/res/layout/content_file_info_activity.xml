@@ -189,7 +189,7 @@
                 android:layout_centerVertical="true"
                 android:layout_gravity="left|center_vertical"
                 android:text="@string/file_properties_shared_folder_select_contact"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps" />
 
             <Button
                 android:id="@+id/file_properties_shared_info_button"
@@ -263,7 +263,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/file_properties_info_size"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_size"
@@ -293,7 +293,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/file_properties_info_content"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_content"
@@ -325,7 +325,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="8dp"
                     android:text="@string/title_section_versions"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_folder_versions"
@@ -357,7 +357,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="8dp"
                     android:text="@string/file_properties_folder_current_versions"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_folder_current_versions"
@@ -389,7 +389,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="8dp"
                     android:text="@string/file_properties_folder_previous_versions"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_folder_previous_versions"
@@ -423,7 +423,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="8dp"
                     android:text="@string/file_properties_info_location"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_location"
@@ -458,7 +458,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="8dp"
                     android:text="@string/file_properties_info_added"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_added"
@@ -491,7 +491,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="8dp"
                     android:text="@string/file_properties_info_last_modified"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_created"
@@ -526,7 +526,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/file_properties_shared_folder_public_link_name"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps" />
 
             <TextView
                 android:id="@+id/file_properties_link_text"
