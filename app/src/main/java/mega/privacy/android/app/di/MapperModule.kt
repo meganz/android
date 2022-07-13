@@ -9,8 +9,10 @@ import mega.privacy.android.app.data.mapper.ContactRequestMapper
 import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.app.data.mapper.FeatureFlagMapper
+import mega.privacy.android.app.data.mapper.MimeTypeMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
+import mega.privacy.android.app.data.mapper.getMimeType
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.app.data.mapper.toChatRequest
 import mega.privacy.android.app.data.mapper.toContactRequest
@@ -48,6 +50,9 @@ class MapperModule {
 
     @Provides
     fun provideContactRequestMapper(): ContactRequestMapper = ::toContactRequest
+
+    @Provides
+    fun provideMimeTypeMapper(): MimeTypeMapper = ::getMimeType
 
     @Provides
     fun provideChatRequestMapper(): ChatRequestMapper = ::toChatRequest
