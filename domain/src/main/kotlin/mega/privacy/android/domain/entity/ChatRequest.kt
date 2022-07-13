@@ -29,10 +29,15 @@ package mega.privacy.android.domain.entity
  *                                 - [ChatRequestType.PushReceived]: List of chat handles with unread messages.
  *                                 - [ChatRequestType.LoadPreview] : List with one call identifier, if call doesn't exit it will be NULL.
  * @property paramType             Type of parameter related to the request.
+ *                                 This value is valid for these requests:
+ *                                 - [ChatRequestType.DisableAudioVideoCall]: ChatRequestParamType.Audio if audio request, ChatRequestParamType.Video if video request.
+ *                                 - [ChatRequestType.AttachNodeMessage]: One for voice clips, zero for other nodes.
+ *                                 - [ChatRequestType.RetryPendingConnections]: One for refreshUrl
+ *                                 - [ChatRequestType.PushReceived]: Zero
  */
 data class ChatRequest(
     val type: ChatRequestType,
-    val requestString: String,
+    val requestString: String?,
     val tag: Int,
     val number: Long,
     val numRetry: Int,

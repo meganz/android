@@ -4,8 +4,10 @@ import mega.privacy.android.domain.entity.ChatPeer
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.ChatRequestType
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaHandleList
 
 /**
@@ -99,9 +101,17 @@ private fun mapChatRequestParamType(chatRequestParamType: Int?): ChatRequestPara
 private fun mapChatRequestPeersList(chatRequestPeersList: MegaChatPeerList?): List<ChatPeer>? =
     chatRequestPeersList?.let { peersList ->
         (0 until peersList.size()).map {
-            ChatPeer(peersList.getPeerHandle(it), peersList.getPeerPrivilege(it))
+            ChatPeer(peersList.getPeerHandle(it), mapPeerPrivilege(peersList.getPeerPrivilege(it)))
         }
     }
+
+private fun mapPeerPrivilege(privilege: Int): ChatRoomPermission = when (privilege) {
+    MegaChatRoom.PRIV_RM -> ChatRoomPermission.Removed
+    MegaChatRoom.PRIV_RO -> ChatRoomPermission.ReadOnly
+    MegaChatRoom.PRIV_STANDARD -> ChatRoomPermission.Standard
+    MegaChatRoom.PRIV_MODERATOR -> ChatRoomPermission.Moderator
+    else -> ChatRoomPermission.Unknown
+}
 
 private fun mapChatRequestPeersListByChatHandle(megaChatRequest: MegaChatRequest): Map<Long, List<Long>>? =
     megaChatRequest.megaHandleList?.let { handleList ->
