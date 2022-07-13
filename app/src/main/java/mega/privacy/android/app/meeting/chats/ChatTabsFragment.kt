@@ -5,14 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.ContactRequestsFragment
 import mega.privacy.android.app.databinding.FragmentChatTabsBinding
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.RecentChatsFragment
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter.Tabs.CHAT
+import mega.privacy.android.app.meeting.list.MeetingListFragment
 import mega.privacy.android.app.utils.StringResourcesUtils
 
 @AndroidEntryPoint
@@ -29,6 +32,15 @@ class ChatTabsFragment : Fragment() {
     private lateinit var binding: FragmentChatTabsBinding
 
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
+    private val pageChangeCallback by lazy {
+        object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                showElevation(false)
+                (activity as? ManagerActivity?)?.changeAppBarElevation(false)
+                (activity as? ManagerActivity?)?.closeSearchView()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,6 +64,11 @@ class ChatTabsFragment : Fragment() {
         outState.putInt(STATE_PAGER_POSITION, binding.pager.currentItem)
     }
 
+    override fun onDestroyView() {
+        binding.pager.unregisterOnPageChangeCallback(pageChangeCallback)
+        super.onDestroyView()
+    }
+
     private fun setupView() {
         binding.pager.apply {
             adapter = ChatTabsPageAdapter(this@ChatTabsFragment)
@@ -63,6 +80,17 @@ class ChatTabsFragment : Fragment() {
                     StringResourcesUtils.getString(R.string.context_meeting)
                 }
             }.attach()
+
+            registerOnPageChangeCallback(pageChangeCallback)
+        }
+    }
+
+    fun onSearchQuery(query: String) {
+        childFragmentManager.fragments.firstOrNull { it.isResumed }?.let { fragment ->
+            when (fragment) {
+                is RecentChatsFragment -> fragment.filterChats(query, false)
+                is MeetingListFragment -> fragment.onSearchQuery(query)
+            }
         }
     }
 
@@ -76,7 +104,7 @@ class ChatTabsFragment : Fragment() {
     }
 
     fun getRecentChatsFragment(): RecentChatsFragment? =
-        childFragmentManager.fragments.find { it is RecentChatsFragment } as? RecentChatsFragment
+        childFragmentManager.fragments.find { it is RecentChatsFragment } as? RecentChatsFragment?
 
     /**
      * Update ViewPager current position

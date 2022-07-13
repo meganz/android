@@ -5149,12 +5149,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 Timber.d("onQueryTextChange");
                 if (drawerItem == DrawerItem.CHAT) {
                     searchViewModel.setSearchQuery(newText);
-                    getChatsFragment();
-//                    if (getChatsFragment() != null) {
-//                        getChatsFragment().onSearchQuery(newText);
-//                    }
-                    if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
-                        getRecentChatsFragment().filterChats(newText, false);
+                    if (getChatsFragment() != null) {
+                        getChatsFragment().onSearchQuery(newText);
                     }
                 } else if (drawerItem == DrawerItem.HOMEPAGE) {
                     if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
