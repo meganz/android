@@ -190,6 +190,10 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * @param transferType  Type of the transfer.
      */
     protected fun updateTransfersWidget(transferType: Int) {
+        if (transfersManagement.isProcessingTransfers || transfersManagement.isProcessingFolders) {
+            return
+        }
+
         transfersViewModel.checkTransfersInfo(transferType)
     }
 

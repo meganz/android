@@ -15,10 +15,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
-import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
-import mega.privacy.android.app.domain.usecase.HasChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
@@ -26,6 +24,7 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.domain.entity.ContactRequest
 import mega.privacy.android.domain.entity.ContactRequestStatus
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.HasInboxChildren
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
 import org.junit.Rule
@@ -45,8 +44,7 @@ class ManagerViewModelTest {
     private val getBrowserNodeByHandle = mock<GetBrowserChildrenNode>()
     private val getRootFolder = mock<GetRootFolder>()
     private val getNumUnreadUserAlerts = mock<GetNumUnreadUserAlerts>()
-    private val getInboxNode = mock<GetInboxNode>()
-    private val hasChildren = mock<HasChildren>()
+    private val hasInboxChildren = mock<HasInboxChildren>()
     private val monitorContactRequestUpdates = mock<MonitorContactRequestUpdates>()
 
     @get:Rule
@@ -70,8 +68,7 @@ class ManagerViewModelTest {
             monitorContactRequestUpdates = monitorContactRequestUpdates,
             getRootFolder = getRootFolder,
             getNumUnreadUserAlerts = getNumUnreadUserAlerts,
-            getInboxNode = getInboxNode,
-            hasChildren = hasChildren,
+            hasInboxChildren = hasInboxChildren,
         )
     }
 
@@ -244,17 +241,7 @@ class ManagerViewModelTest {
     @Test
     fun `test that contact request updates live data is not set when no updates triggered from use case`() =
         runTest {
-            underTest = ManagerViewModel(
-                monitorNodeUpdates = monitorNodeUpdates,
-                monitorGlobalUpdates = monitorGlobalUpdates,
-                getRubbishBinChildrenNode = getRubbishBinNodeByHandle,
-                getBrowserChildrenNode = getBrowserNodeByHandle,
-                monitorContactRequestUpdates = monitorContactRequestUpdates,
-                getRootFolder = getRootFolder,
-                getNumUnreadUserAlerts = getNumUnreadUserAlerts,
-                getInboxNode = getInboxNode,
-                hasChildren = hasChildren,
-            )
+            setUnderTest()
 
             underTest.updateContactsRequests.test().assertNoValue()
         }
