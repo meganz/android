@@ -426,16 +426,17 @@
     <string name="context_no_renamed">Eroare. Nu a fost redenumit</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">Copiat cu succes</string>
-    <!-- error message when sending a node to Inbox -->
-    <string name="context_no_sent_node">Eroare. Nu a fost trimis în Conținut media primit</string>
     <!-- error message -->
     <string name="context_no_copied">Eroare. Nu a fost copiat</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Te rugăm să selectezi un folder de destinație</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Mutat cu succes</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved">%d elemente mutate cu succes.</string>
+    <!-- success message when moving a node (file/folder) -->
+    <plurals name="number_correctly_moved">
+        <item quantity="one">Moved %d item</item>
+        <item quantity="other">Moved %d items</item>
+    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d elemente nu au fost mutate cu succes</string>
     <!-- success message when moving a node -->
@@ -478,8 +479,6 @@
     <string name="number_contact_removed">%d contacte eliminate cu succes</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">%d contacte nu au fost eliminate</string>
-    <!-- success message when sending a file to a contact -->
-    <string name="context_correctly_copied_contact">Trimis cu succes către:</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Coșul de gunoi golit cu succes</string>
     <!-- error message when emptying the RB -->
@@ -971,8 +970,6 @@
     <string name="file_link_unavaible_delete_account">Contul de utilizator asociat a fost desființat din cauza încălcărilor multiple ale Termenilor noastre de utilizare a serviciului.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">Cheia de decriptare furnizată pentru linkul folderului este nevalidă.</string>
-    <!-- Word to indicate the limited bandwidth of the free accounts -->
-    <string name="limited_bandwith">Limitat</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Chat</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -988,15 +985,21 @@
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
     <string name="remove_contact_shared_folder">Contactul %s va fi eliminat din folderul partajat.</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
-    <string name="remove_multiple_contacts_shared_folder">%d contacte vor fi eliminate din folderul partajat.</string>
+    <plurals name="remove_multiple_contacts_shared_folder">
+        <item quantity="one">%d contact will be removed from the shared folder.</item>
+        <item quantity="other">%d contacts will be removed from the shared folder.</item>
+    </plurals>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">Eșec la actualizarea permisiunilor pentru %d contacte</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Se încarcă contactele de pe telefon&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d cereri trimise deja.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">%d cereri de invitație trimise cu succes.</string>
+    <!-- success message when inviting multiple contacts -->
+    <plurals name="number_correctly_invite_contact_request">
+        <item quantity="one">%d invite sent</item>
+        <item quantity="other">%d invites sent</item>
+    </plurals>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d cereri de invitație trimise cu succes, însă %2$d cereri nu au fost trimise.</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -1215,10 +1218,6 @@
     <string name="more_users_typing">%1$s [A]și mai mulți tastează&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Mai multe</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="label_storage_upgrade_account">Spațiu de stocare</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_upgrade_account">Cotă de transfer</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">Spațiu de stocare</string>
     <!-- Confirmation message before removing something from the Offline section. -->
@@ -1621,12 +1620,11 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caractere nevalide</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Următoarele caractere nu sunt permise: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">Numele fișierului nu poate fi gol.</item>
-        <item quantity="few">Numele fișierelor nu pot fi goale.</item>
-        <item quantity="other">Numele fișierelor nu pot fi goale.</item>
+        <item quantity="one">File name cannot be empty.</item>
+        <item quantity="other">File names cannot be empty.</item>
     </plurals>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">Eroare. Fișierul PDF este corupt sau nu există.</string>
@@ -1788,8 +1786,6 @@
     <string name="account_suspended_breache_ToS">Contul tău a fost desființat din cauza unei încălcări a Termenilor de utilizare a serviciului MEGA, inclusiv, dar fără a se limita la, clauza 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Se încarcă fișierele</string>
-    <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
-    <string name="file_storage_empty_folder">Niciun fișier</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1929,10 +1925,6 @@
     <string name="recovery_key_bottom_sheet">Cheie de recuperare</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Salvează în sistemul de fișiere</string>
-    <!-- text of the label to show that you have messages unread in the chat conversation -->
-    <string name="message_jump_latest">Sari la ultimul element</string>
-    <!-- text of the label to show that you have new messages in the chat conversation -->
-    <string name="message_new_messages">Mesaje noi</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Apel de intrare</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
@@ -2082,7 +2074,7 @@
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Previzualizează conținutul</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">Nicio conexiune la rețea. Fișierul nu a fost descărcat și nu poate fi redat în flux.</string>
+    <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Nu se poate deschide fișierul.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2493,11 +2485,10 @@
         <item quantity="few">%d foldere</item>
         <item quantity="other">%d de foldere</item>
     </plurals>
-    <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d foldere · 1 fișier</item>
-        <item quantity="few">%1$d foldere · %2$d fișiere</item>
-        <item quantity="other">%1$d foldere · %2$d de fișiere</item>
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] a adăugat %2$s și %3$s[/B]</string>
@@ -2795,8 +2786,6 @@
     <string name="alert_enter_group_name">Pentru a creat un link de chat trebuie să denumești grupul.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Invită contacte și începe să chatuiești în siguranță cu chatul criptat MEGA.</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="recent_chat_empty_text">Începe să chatuiești în siguranță cu contactele tale folosind criptarea capăt-la-capăt</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
     <string name="invite_contacts_to_start_chat_text_message">Bună. Conversează securizat pe MEGA cu mine și obține 20&#160;GB spațiu de stocare în cloud gratuit. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
@@ -2840,11 +2829,20 @@
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s și încă %2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
-    <string name="title_media_bucket_only_images">%d imagini</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="one">%d image</item>
+        <item quantity="other">%d images</item>
+    </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
-    <string name="title_media_bucket_only_videos">%d videoclipuri</string>
-    <!-- Title of a media recents bucket that contains some images and some videos -->
-    <string name="title_media_bucket_images_and_videos">%1$d imagini și %2$d videoclipuri</string>
+    <plurals name="title_media_bucket_only_videos">
+        <item quantity="one">%d video</item>
+        <item quantity="other">%d videos</item>
+    </plurals>
+    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos">
+        <item quantity="one">%1$d image&#160;</item>
+        <item quantity="other">%1$d images&#160;</item>
+    </plurals>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">%d imagini și 1 videoclip</string>
     <!-- Title of a media recents bucket that contains an image and some videos -->
@@ -2970,7 +2968,10 @@
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">în data de %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <string name="alert_remove_several_shares">Sigur vrei să oprești partajarea acestor %1$d foldere?</string>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Unshare this folder?</item>
+        <item quantity="other">Unshare these %1$d folders?</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">Locație de descărcare</string>
     <!-- Text asking confirmation for download location -->
@@ -3194,7 +3195,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Selectează transferurile</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Nu se poate schimba prioritatea transferului „%1$s”</string>
+    <string name="change_of_transfer_priority_failed">Unable to change priority of the transfer “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Trimite separat cheia de decriptare</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3503,8 +3504,6 @@
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Ștergi toate fișierele offline?</string>
-    <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">Ești singura persoană de aici</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Întâlnire</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3555,24 +3554,12 @@
     <string name="pin_to_speaker">Afișează în vizualizarea principală</string>
     <!-- Make the participant as moderator in the meeting-->
     <string name="make_moderator">Make host</string>
-    <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">Părăsești întâlnirea acum?</string>
-    <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">No host</string>
-    <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
     <!-- assign moderator option when the moderator leave meeting-->
     <string name="assign_moderator">Make host</string>
-    <!-- leave anyway option when the moderator leave meeting-->
-    <string name="leave_anyway">Părăsește oricum</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
     <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">Modifică numele întâlnirii</string>
-    <!-- The number of participants in the meeting on meeting info page-->
-    <string name="info_participants_number">Participanți: %d</string>
-    <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Linkul întâlnirii</string>
     <!-- Subtitle of the meeting screen-->
@@ -3583,8 +3570,6 @@
     <string name="paste_meeting_link_guest_dialog_title">Ești invitat la o întâlnire.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Atinge linkul întâlnirii care ți-a fost trimis sau lipește-l aici</string>
-    <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">Calitate slabă a conexiunii</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Întâlnirea s-a încheiat</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -3606,7 +3591,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">Configurează rapid o întâlnire MEGA cu noua noastră funcție de întâlniri criptată</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">You are the new host.</string>
+    <string name="be_new_moderator">You are the new host</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Linkul întâlnirii copiat.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3773,8 +3758,6 @@
     <string name="upload_files">Upload files</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Încarcă un folder</string>
-    <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Cancel upload?</string>
     <!-- Title of the Payments screen -->
     <string name="payment">Plată</string>
     <!-- Label indicating payment methods -->
@@ -3799,12 +3782,8 @@
     <string name="pro_iii_monthly">Pro III monthly</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III yearly</string>
-    <!-- Action button which will cancel uploads. -->
-    <string name="action_cancel_upload">Anulează încărcarea</string>
-    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
-    <string name="action_do_not_cancel">Don’t cancel</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Remove host</string>
+    <string name="remove_moderator">Remove as host</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Buy new subscription?</string>
     <!-- Text of buy new subscription button -->
@@ -3990,7 +3969,7 @@
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
     <string name="skip_folder">Omite acest folder</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
-    <string name="folder_already_exists_in_location">The folder named [B]%1$s[/B] already exists at this destination.</string>
+    <string name="folder_already_exists_in_location">A folder named [B]%1$s[/B] already exists at this destination.</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">Bad connection</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
@@ -4091,4 +4070,48 @@
     <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
     <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">You’re the only host on the call. Do you want to assign another one before leaving?</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Da</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">Nu</string>
+    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos_2">
+        <item quantity="one">and %1$d video</item>
+        <item quantity="other">and %1$d videos</item>
+    </plurals>
+    <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
+    <plurals name="num_folders_num_files_2">
+        <item quantity="one">1 file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
+    <string name="account_upgrade_storage_label">[A]%1$s[/A] storage</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] transfer quota</string>
+    <!-- Label of storage in My account section. -->
+    <string name="account_storage_label">Spațiu de stocare</string>
+    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
+    <string name="account_choose_free_limited_transfer_quota">[A]Limited[/A] transfer quota</string>
+    <!-- Name of hots or hosts in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
+        <item quantity="one">Host: %s</item>
+        <item quantity="other">Hosts: %s</item>
+    </plurals>
+    <!-- Number of participants in the call in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
+        <item quantity="one">Participant: %s</item>
+        <item quantity="other">Participants: %s</item>
+    </plurals>
+    <!-- Chat log message when the permissions for a user has been changed to read-onl -->
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] was changed to read-only by [/B][A]%2$s[/A]</string>
+    <!-- Chat log message when the permissions for a user has been changed to standard -->
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to standard role by [/B][A]%2$s[/A]</string>
+    <!-- Chat log message when the permissions for a user has been changed to host -->
+    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] was changed to host role by [/B][A]%2$s[/A]</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s was changed to read-only by %2$s</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to standard role by %2$s</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s was changed to host role by %2$s</string>
 </resources>

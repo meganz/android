@@ -408,16 +408,16 @@
     <string name="context_no_renamed">錯誤。未重新命名</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">複製成功</string>
-    <!-- error message when sending a node to Inbox -->
-    <string name="context_no_sent_node">發生錯誤。未發送至收件匣</string>
     <!-- error message -->
     <string name="context_no_copied">錯誤。未複製</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">請選擇目的地資料夾</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">移動成功</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved">已成功移動%d個項目。</string>
+    <!-- success message when moving a node (file/folder) -->
+    <plurals name="number_correctly_moved">
+        <item quantity="other">移動了%d個項目</item>
+    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">未成功移動%d個項目至垃圾筒</string>
     <!-- success message when moving a node -->
@@ -460,8 +460,6 @@
     <string name="number_contact_removed">已成功移除%d個聯絡人</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">未能移除%d個聯絡人</string>
-    <!-- success message when sending a file to a contact -->
-    <string name="context_correctly_copied_contact">已發送至：</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">已成功清空垃圾筒</string>
     <!-- error message when emptying the RB -->
@@ -575,7 +573,7 @@
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">影片壓縮會用掉相當多的電力。如果要壓縮的影片大小超過%s，請將您的裝置接上電源進行充電。</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">啟用後，您的位置資訊將包含在您的照片中。分享此資訊時請小心。</string>
+    <string name="settings_camera_upload_include_gps_helper_label">啟用後，您的位置資訊將包含在您的照片中。共享此資訊時請小心。</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">進階</string>
     <!-- Settings preference title for cache -->
@@ -945,8 +943,6 @@
     <string name="file_link_unavaible_delete_account">由於多次違反我們的服務條款，相關的用戶帳戶已被終止使用權。</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">您提供的資料夾連結解密密鑰無效。</string>
-    <!-- Word to indicate the limited bandwidth of the free accounts -->
-    <string name="limited_bandwith">有限制的</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">對話</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -962,15 +958,19 @@
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
     <string name="remove_contact_shared_folder">將移除聯絡人%s共享資料夾的權限。</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
-    <string name="remove_multiple_contacts_shared_folder">將移除%d位聯絡人共享資料夾的權限。</string>
+    <plurals name="remove_multiple_contacts_shared_folder">
+        <item quantity="other">將從共享資料夾中移除%d個聯絡人。</item>
+    </plurals>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">無法更新%d個聯絡人權限</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">從手機載入聯絡人資料中&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d個請求已發送過。</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">成功發送%d個聯絡人邀請。</string>
+    <!-- success message when inviting multiple contacts -->
+    <plurals name="number_correctly_invite_contact_request">
+        <item quantity="other">已發送%d個邀請</item>
+    </plurals>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">成功發送%1$d個聯絡人邀請，但有%2$d個聯絡人邀請未被發出。</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -1084,7 +1084,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">標準模式</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">Host</string>
+    <string name="administrator_permission_label_participants_panel">主持人</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">（已編輯）</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -1175,10 +1175,6 @@
     <string name="more_users_typing">%1$s [A]和其他人正在打字&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">更多</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="label_storage_upgrade_account">儲存空間</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_upgrade_account">傳輸配額</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">儲存空間</string>
     <!-- Confirmation message before removing something from the Offline section. -->
@@ -1633,7 +1629,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">邀請沒有送出。%s已經在您的聯絡人列表。</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">發生錯誤，邀請尚未發送。</string>
+    <string name="invite_not_sent_text_error">發生錯誤，尚未發送邀請。</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">正在生成二維條碼&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -1720,8 +1716,6 @@
     <string name="account_suspended_breache_ToS">您的帳戶因違反MEGA服務條款，包括但不限於第15條而被終止。</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">檔案載入中</string>
-    <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
-    <string name="file_storage_empty_folder">沒有檔案</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1847,10 +1841,6 @@
     <string name="recovery_key_bottom_sheet">還原金鑰</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">儲存在檔案系統</string>
-    <!-- text of the label to show that you have messages unread in the chat conversation -->
-    <string name="message_jump_latest">跳至最新</string>
-    <!-- text of the label to show that you have new messages in the chat conversation -->
-    <string name="message_new_messages">新的訊息</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">來電</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
@@ -1994,7 +1984,7 @@
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">預覽內容</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">沒有網路連線。檔案尚未下載而且無法串流傳輸。</string>
+    <string name="no_network_connection_on_play_file">沒有網路連線。檔案尚未下載而且無法進行串流傳輸。</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">無法開啟檔案。</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2393,9 +2383,9 @@
     <plurals name="num_folders_with_parameter">
         <item quantity="other">%d 個資料夾</item>
     </plurals>
-    <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="other">%1$d個資料夾 · %2$d個檔案</item>
+        <item quantity="other">%1$d個資料夾&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B]已新增 %2$s 和 %3$s[/B]</string>
@@ -2665,8 +2655,6 @@
     <string name="alert_enter_group_name">您必須為該群組命名，才能建立對話連結。</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">邀請聯絡人並開始在MEGA上使用加密對話功能。</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="recent_chat_empty_text">使用點對點加密安全地與您的聯絡人對話</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
     <string name="invite_contacts_to_start_chat_text_message">嗨。在MEGA上與我安全的進行對談並且可獲得20&#160;GB免費雲端空間。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
@@ -2706,11 +2694,17 @@
     <!-- Title of a recents bucket -->
     <string name="title_bucket">還有%1$s和%2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
-    <string name="title_media_bucket_only_images">%d張圖片</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="other">%d張圖片</item>
+    </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
-    <string name="title_media_bucket_only_videos">%d個影片</string>
-    <!-- Title of a media recents bucket that contains some images and some videos -->
-    <string name="title_media_bucket_images_and_videos">%1$d張圖片與%2$d個影片</string>
+    <plurals name="title_media_bucket_only_videos">
+        <item quantity="other">%d個影片</item>
+    </plurals>
+    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos">
+        <item quantity="other">%1$d張圖片&#160;</item>
+    </plurals>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">%d張圖片與1個影片</string>
     <!-- Title of a media recents bucket that contains an image and some videos -->
@@ -2836,7 +2830,9 @@
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">於%1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <string name="alert_remove_several_shares">您確定要終止這%1$d個資料夾的共享嗎？</string>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">是否取消共享這些%1$d資料夾？</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">下載位址</string>
     <!-- Text asking confirmation for download location -->
@@ -3042,7 +3038,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">選擇傳輸</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">無法更改傳輸”%1$s”的優先順序</string>
+    <string name="change_of_transfer_priority_failed">無法更改傳輸「%1$s」的優先順序</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">各別發送解密金鑰</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3321,8 +3317,6 @@
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">清除所有離線存取檔案？</string>
-    <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">這裡只有你一人</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">會議</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3372,25 +3366,13 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">在主視窗顯示</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Make host</string>
-    <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">現在離開會議嗎？</string>
-    <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">No host</string>
-    <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
+    <string name="make_moderator">設為主持人</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Make host</string>
-    <!-- leave anyway option when the moderator leave meeting-->
-    <string name="leave_anyway">無論如何還是離開</string>
+    <string name="assign_moderator">設為主持人</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
+    <string name="pick_new_moderator_message">請指定一位或多位新的主持人。</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">更改會議名稱</string>
-    <!-- The number of participants in the meeting on meeting info page-->
-    <string name="info_participants_number">與會者：%d</string>
-    <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">會議連結</string>
     <!-- Subtitle of the meeting screen-->
@@ -3401,8 +3383,6 @@
     <string name="paste_meeting_link_guest_dialog_title">您受邀參加會議。</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">點擊發送給您的會議連結或將它貼上此處</string>
-    <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">連線品質不良</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">會議結束</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -3424,7 +3404,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">使用我們新的加密會議功能快速發起MEGA會議</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">You are the new host.</string>
+    <string name="be_new_moderator">您是新的主持人</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">複製會議連結。</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3589,8 +3569,6 @@
     <string name="upload_files">上傳檔案</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">上傳資料夾</string>
-    <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">取消上傳？</string>
     <!-- Title of the Payments screen -->
     <string name="payment">付款</string>
     <!-- Label indicating payment methods -->
@@ -3615,12 +3593,8 @@
     <string name="pro_iii_monthly">Pro III 月方案</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III 年方案</string>
-    <!-- Action button which will cancel uploads. -->
-    <string name="action_cancel_upload">取消上傳</string>
-    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
-    <string name="action_do_not_cancel">不要取消</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Remove host</string>
+    <string name="remove_moderator">移除主持人權限</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">購買新的訂閱？</string>
     <!-- Text of buy new subscription button -->
@@ -3892,7 +3866,7 @@
     <!-- Title of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_title_end_call_for_all">是否結束所有人的通話？</string>
     <!-- Description of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen. Allows to end call for all participants -->
-    <string name="meetings_chat_screen_dialog_description_end_call_for_all">這將結束所有參與者的通話。</string>
+    <string name="meetings_chat_screen_dialog_description_end_call_for_all">這將結束所有與會者的通話。</string>
     <!-- Positive button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">是</string>
     <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
@@ -3902,7 +3876,47 @@
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">結束所有人通話</string>
     <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">設為主持人</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
     <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">您是通話中唯一的主持人。你想在離開前再指派另一個人為主持人嗎？</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">是</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">否</string>
+    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos_2">
+        <item quantity="other">和%1$d個影片</item>
+    </plurals>
+    <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
+    <plurals name="num_folders_num_files_2">
+        <item quantity="other">%1$d個檔案</item>
+    </plurals>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
+    <string name="account_upgrade_storage_label">[A]%1$s[/A]儲存空間</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A]傳輸配額</string>
+    <!-- Label of storage in My account section. -->
+    <string name="account_storage_label">儲存空間</string>
+    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
+    <string name="account_choose_free_limited_transfer_quota">[A]有限制的[/A]傳輸配額</string>
+    <!-- Name of hots or hosts in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
+        <item quantity="other">主持人：%s</item>
+    </plurals>
+    <!-- Number of participants in the call in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
+        <item quantity="other">與會者：%s</item>
+    </plurals>
+    <!-- Chat log message when the permissions for a user has been changed to read-onl -->
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[/B][A]%2$s[/A]將[A]%1$s[/A][B]的權限更改為唯讀</string>
+    <!-- Chat log message when the permissions for a user has been changed to standard -->
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[/B][A]%2$s[/A]將[A]%1$s[/A][B]的權限更改為標準角色</string>
+    <!-- Chat log message when the permissions for a user has been changed to host -->
+    <string name="chat_chat_room_message_permissions_changed_to_host">[/B][A]%2$s[/A]將[A]%1$s[/A][B]的權限更改為主持人</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s將%1$s的權限更改為唯讀</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s將%1$s的權限更改為標準角色</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s將%1$s的權限更改為主持人</string>
 </resources>

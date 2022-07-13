@@ -285,7 +285,7 @@
     <!-- Alert Dialog to get link -->
     <string name="option_decryption_key">복호화 키</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
-    <string name="download_preparing_files">파일 준비중</string>
+    <string name="download_preparing_files">파일 준비 중</string>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_began">
         <item quantity="other">다운로드 %1$d개 시작</item>
@@ -408,16 +408,16 @@
     <string name="context_no_renamed">오류. 이름이 바뀌지 않았습니다</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">성공적으로 복사되었습니다</string>
-    <!-- error message when sending a node to Inbox -->
-    <string name="context_no_sent_node">오류. 수신함으로 보내지 못 했습니다</string>
     <!-- error message -->
     <string name="context_no_copied">오류. 복사되지 않았습니다</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">대상 폴더를 선택하세요</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">성공적으로 이동되었습니다</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved">%d개의 항목이 성공적으로 이동되었습니다.</string>
+    <!-- success message when moving a node (file/folder) -->
+    <plurals name="number_correctly_moved">
+        <item quantity="other">%d개 항목 이동함</item>
+    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d개의 항목이 성공적으로 이동되지 않았습니다</string>
     <!-- success message when moving a node -->
@@ -460,8 +460,6 @@
     <string name="number_contact_removed">%d개의 연락처가 잘 제거되었습니다</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">%d개의 연락처가 제거되지 않았습니다</string>
-    <!-- success message when sending a file to a contact -->
-    <string name="context_correctly_copied_contact">올바르게 전송되었습니다:</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">휴지통이 성공적으로 비워졌습니다</string>
     <!-- error message when emptying the RB -->
@@ -945,8 +943,6 @@
     <string name="file_link_unavaible_delete_account">관련된 이용자 계정이 여러 번의 이용 약관 위반으로 제거되었습니다.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">입력한 폴더 링크의 복호화 키가 잘못되었습니다.</string>
-    <!-- Word to indicate the limited bandwidth of the free accounts -->
-    <string name="limited_bandwith">제한됨</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">대화</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -962,15 +958,19 @@
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
     <string name="remove_contact_shared_folder">연락처 %s님이 공유된 폴더에서 제거됩니다.</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
-    <string name="remove_multiple_contacts_shared_folder">%d개의 연락처가 공유된 폴더에서 제거됩니다.</string>
+    <plurals name="remove_multiple_contacts_shared_folder">
+        <item quantity="other">%d개의 연락처가 공유된 폴더에서 제거됩니다.</item>
+    </plurals>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">%d개의 연락처에 대한 권한 업데이트 실패</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">전화에서 연락처를 불러오는 중&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d개의 요청이 이미 발송되었습니다.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">%d개의 초대 요청이 성공적으로 발송되었습니다.</string>
+    <!-- success message when inviting multiple contacts -->
+    <plurals name="number_correctly_invite_contact_request">
+        <item quantity="other">%d개의 초대장이 발송되었습니다</item>
+    </plurals>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d개의 초대 요청이 성공적으로 발송되었지만 %2$d개는 발송되지 않았습니다.</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -1028,9 +1028,9 @@
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
     <string name="clear_history_error">오류가 발생하였습니다. 대화 기록이 삭제되지 않았습니다.</string>
     <!-- Menu item to add participants to a chat -->
-    <string name="add_participants_menu_item">참가자 추가</string>
+    <string name="add_participants_menu_item">참여자 추가</string>
     <!-- Menu item to remove a participants from a chat -->
-    <string name="remove_participant_menu_item">참가자 제거</string>
+    <string name="remove_participant_menu_item">참여자 제거</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_info_empty_screen">당신의 대화를 필수적인 안전 보증을 제공하는 종단간 (이용자 제어) 암호화로 보호하세요:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1084,7 +1084,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">기본</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">Host</string>
+    <string name="administrator_permission_label_participants_panel">주최자</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">수정됨</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -1094,7 +1094,7 @@
     <!-- title confirmation message before leaving a group chat -->
     <string name="title_confirmation_leave_group_chat">단체 대화를 떠날까요?</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
-    <string name="add_participant_error_already_exists">참가자가 이미 이 그룹 대화에 존재합니다</string>
+    <string name="add_participant_error_already_exists">참여자가 이미 이 그룹 대화에 존재합니다</string>
     <!-- success message when inviting multiple contacts to a group chat -->
     <string name="number_correctly_add_participant">%d명의 참여자가 올바르게 초대되었습니다</string>
     <!-- error message when inviting multiple contacts to a group chat -->
@@ -1130,7 +1130,7 @@
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">%1$s님에 의해 기록이 삭제되었습니다</string>
     <!-- chat message when the permissions for a user has been changed -->
-    <string name="non_format_message_permissions_changed">%1$s님이 %3$s님에 의해 %2$s(으)로 변경되었습니다</string>
+    <string name="non_format_message_permissions_changed">%1$s was changed to %2$s by %3$s</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="non_format_message_add_participant">%1$s님이 %2$s님의 초대에 의해 이 그룹 대화에 추가되었습니다</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1175,10 +1175,6 @@
     <string name="more_users_typing">%1$s님 외 다수가 [A]입력중&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">더 보기</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="label_storage_upgrade_account">저장소</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_upgrade_account">전송 할당량</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">저장소 공간</string>
     <!-- Confirmation message before removing something from the Offline section. -->
@@ -1369,11 +1365,11 @@
     <!-- Message when an user attribute has been changed successfully -->
     <string name="success_changing_user_attributes">당신의 이름이 올바르게 수정되었습니다</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
-    <string name="add_participant_success">참가자 추가됨</string>
+    <string name="add_participant_success">참여자 추가됨</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
-    <string name="add_participant_error">오류. 참가자가 추가되지 않음</string>
+    <string name="add_participant_error">오류. 참여자가 추가되지 않음</string>
     <!-- Message show when a participant has been successfully removed from a group chat -->
-    <string name="remove_participant_success">참가자 제거됨</string>
+    <string name="remove_participant_success">참여자 제거됨</string>
     <!-- Message show when a participant hasn’t been successfully removed from a group chat -->
     <string name="remove_participant_error">오류. 참여자가 제거되지 않았습니다</string>
     <!--  -->
@@ -1555,7 +1551,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">잘못된 글자</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">다음의 글자는 허용되지 않습니다: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">다음의 문자는 허용되지 않습니다: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">파일 이름은 비워둘 수 없습니다.</item>
@@ -1720,8 +1716,6 @@
     <string name="account_suspended_breache_ToS">당신의 계정은 MEGA 이용 약관 제15조를 포함한 위반 행위로 인하여 제거되었습니다.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">파일 불러오는 중</string>
-    <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
-    <string name="file_storage_empty_folder">파일 없음</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1847,10 +1841,6 @@
     <string name="recovery_key_bottom_sheet">복구 키</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">파일 시스템에 저장</string>
-    <!-- text of the label to show that you have messages unread in the chat conversation -->
-    <string name="message_jump_latest">최근으로 이동</string>
-    <!-- text of the label to show that you have new messages in the chat conversation -->
-    <string name="message_new_messages">새 메시지</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">전화 수신중</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
@@ -2098,7 +2088,7 @@
     <!-- Title of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_title">파일 버전 관리</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
-    <string name="settings_enable_file_versioning_subtitle">계정 전체에 대한 파일 버전 관리를 활성화하거나 비활성화합니다.\n파일 버전 관리를 해제하는 것이 지인이 공유된 폴더에 새로운 버전을 만드는 것을 막을 수 없습니다.</string>
+    <string name="settings_enable_file_versioning_subtitle">계정 전체에 대한 파일 버전 관리를 활성화하거나 비활성화 합니다.\n파일 버전 관리를 해제하는 것이 연락처가 공유된 폴더에 새로운 버전을 만드는 것을 막을 수 없습니다.</string>
     <!-- Hint shown to guide user on activity add contacts -->
     <string name="type_mail">탭하고, 이름 또는 이메일을 입력하세요</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
@@ -2230,7 +2220,7 @@
     <!-- Title of the dialog to confirm after closing all other sessions -->
     <string name="confirmation_close_sessions_title">모든 다른 세션을 닫으시겠습니까?</string>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
-    <string name="number_of_participants">참가자 %d명</string>
+    <string name="number_of_participants">참여자 %d명</string>
     <!-- Label of the button to join a chat by a chat link -->
     <string name="action_join">참여</string>
     <!-- Label for observers of a group chat -->
@@ -2393,9 +2383,9 @@
     <plurals name="num_folders_with_parameter">
         <item quantity="other">%d개의 폴더</item>
     </plurals>
-    <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="other">%1$d개의 폴더 · %2$d개의 파일</item>
+        <item quantity="other">폴더 %1$d개&#160;.&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s님이[/A][B] %2$s와/과 %3$s을/를 추가하였습니다[/B]</string>
@@ -2413,7 +2403,7 @@
     </plurals>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <plurals name="subtitle_of_group_chat">
-        <item quantity="other">참가자 %d명</item>
+        <item quantity="other">참여자 %d명</item>
     </plurals>
     <!--  -->
     <string name="custom_subtitle_of_group_chat">%1$s 그리고 %2$d개 더</string>
@@ -2494,7 +2484,7 @@
     <!-- Text of the empty screen for the chat shared files -->
     <string name="context_empty_shared_files">[A]공유된 파일[/A][B] 없음[/B]</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">최대 참가자 수가 초과하여 통화에 참가할 수 없습니다.</string>
+    <string name="call_error_too_many_participants">최대 참여자 수가 초과하여 통화에 참가할 수 없습니다.</string>
     <!-- Message show when a user cannot put the call on hold -->
     <string name="call_error_call_on_hold">통화를 보류할 수 없습니다.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
@@ -2665,8 +2655,6 @@
     <string name="alert_enter_group_name">대화 링크를 생성하려면 그룹 이름을 지어야합니다.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">지인을 초대하고 MEGA의 암호화된 대화로 안전하게 대화를 시작하세요.</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="recent_chat_empty_text">종단간 암호화를 통하여 당신의 연락처와 안전하게 대화를 시작하세요</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
     <string name="invite_contacts_to_start_chat_text_message">안녕하세요. 저와 MEGA에서 안전하게 대화하고 20&#160;GB의 무료 저장소를 받으세요. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
@@ -2706,11 +2694,17 @@
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s 그리고 %2$d개 더</string>
     <!-- Title of a media recents bucket that only contains some images -->
-    <string name="title_media_bucket_only_images">이미지 %d개</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="other">이미지 %d개</item>
+    </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
-    <string name="title_media_bucket_only_videos">동영상 %d개</string>
-    <!-- Title of a media recents bucket that contains some images and some videos -->
-    <string name="title_media_bucket_images_and_videos">이미지 %1$d개와 동영상 %2$d개</string>
+    <plurals name="title_media_bucket_only_videos">
+        <item quantity="other">동영상 %d개</item>
+    </plurals>
+    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos">
+        <item quantity="other">이미지 %1$d개&#160;</item>
+    </plurals>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">이미지 %d개와 동영상 1개</string>
     <!-- Title of a media recents bucket that contains an image and some videos -->
@@ -2836,7 +2830,9 @@
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">%1$s에</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <string name="alert_remove_several_shares">이 %1$d개의 폴더에서 공유를 중단하시겠습니까?</string>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">이 %1$d개의 폴더를 공유 해제할까요?</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">다운로드 위치</string>
     <!-- Text asking confirmation for download location -->
@@ -3321,8 +3317,6 @@
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">모든 오프라인 파일을 삭제할까요?</string>
-    <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">현재 혼자 뿐입니다</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">회의</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3366,31 +3360,19 @@
     <!-- Label for end meeting-->
     <string name="meeting_end">종료</string>
     <!-- Invite contacts as participants of the meeting-->
-    <string name="invite_participants">참가자 초대</string>
+    <string name="invite_participants">참여자 초대</string>
     <!-- The number of participants in the meeting-->
-    <string name="participants_number">참가자 (%d)</string>
+    <string name="participants_number">참여자 (%d)</string>
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">메인 보기에 표시</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Make host</string>
-    <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">회의를 떠날까요?</string>
-    <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">No host</string>
-    <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
+    <string name="make_moderator">주최자로 임명</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Make host</string>
-    <!-- leave anyway option when the moderator leave meeting-->
-    <string name="leave_anyway">어쨌든 떠나기</string>
+    <string name="assign_moderator">주최자로 임명</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
+    <string name="pick_new_moderator_message">한 명 이상의 주최자를 할당하세요.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">회의 이름 변경</string>
-    <!-- The number of participants in the meeting on meeting info page-->
-    <string name="info_participants_number">참가자: %d</string>
-    <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">회의 링크</string>
     <!-- Subtitle of the meeting screen-->
@@ -3401,8 +3383,6 @@
     <string name="paste_meeting_link_guest_dialog_title">회의에 초대 되었습니다.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">받은 회의 링크를 탭하거나 여기에 붙여넣으세요</string>
-    <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">안 좋은 연결 품질</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">회의가 종료되었습니다</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -3418,13 +3398,13 @@
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">회의 대화 보기</string>
     <!-- the content of tips when the user uses the meeting first time-->
-    <string name="tip_invite_more_participants">회의에 더 많은 참가자를 초대합니다. 초대하려면 위로 올리세요.</string>
+    <string name="tip_invite_more_participants">회의에 더 많은 참여자를 초대합니다. 초대하려면 위로 올리세요.</string>
     <!-- the content of tips when the user enters recent chat page first time-->
     <string name="tip_create_meeting">새 회의를 만들려면 탭하세요</string>
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">우리의 새 암호화 회의 기능으로 MEGA 회의를 빠르게 설정하세요</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">You are the new host.</string>
+    <string name="be_new_moderator">당신은 새로운 주최자입니다.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">회의 링크 복사됨.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3589,8 +3569,6 @@
     <string name="upload_files">파일 업로드</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">폴더 업로드</string>
-    <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">업로드를 취소할까요?</string>
     <!-- Title of the Payments screen -->
     <string name="payment">결제</string>
     <!-- Label indicating payment methods -->
@@ -3615,12 +3593,8 @@
     <string name="pro_iii_monthly">Pro III 월간</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III 연간</string>
-    <!-- Action button which will cancel uploads. -->
-    <string name="action_cancel_upload">업로드 취소</string>
-    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
-    <string name="action_do_not_cancel">취소하지 마세요</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Remove host</string>
+    <string name="remove_moderator">주최자에서 해임</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">새 구독을 구매할까요?</string>
     <!-- Text of buy new subscription button -->
@@ -3746,7 +3720,7 @@
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
     <string name="title_duplicated_items">중복된 항목</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
-    <string name="file_already_exists_in_location">A file named [B]%1$s[/B] already exists at this destination.</string>
+    <string name="file_already_exists_in_location">대상 위치에 이름이 [B]%1$s[/B]인 파일이 이미 존재합니다.</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
     <string name="choose_file">유지할 파일을 선택하세요</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose. -->
@@ -3804,7 +3778,7 @@
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
     <string name="skip_folder">이 폴더 건너뛰기</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
-    <string name="folder_already_exists_in_location">The folder named [B]%1$s[/B] already exists at this destination.</string>
+    <string name="folder_already_exists_in_location">대상 위치에 이름이 [B]%1$s[/B]인 폴더가 이미 존재합니다.</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">연결 상태 나쁨</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
@@ -3874,13 +3848,13 @@
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">필터</string>
     <!-- Filter option to show all photos -->
-    <string name="photos_filter_all_photos">All photos</string>
+    <string name="photos_filter_all_photos"></string>
     <!-- Filter option to show only photos from Cloud Drive -->
-    <string name="photos_filter_cloud_drive">From Cloud Drive</string>
+    <string name="photos_filter_cloud_drive"></string>
     <!-- Filter option to show only photos and videos from Camera Uploads folder -->
-    <string name="photos_filter_camera_uploads">Camera uploads</string>
+    <string name="photos_filter_camera_uploads"></string>
     <!-- Filter option to show only videos from Camera Uploads -->
-    <string name="photos_filter_videos_only">Videos only</string>
+    <string name="photos_filter_videos_only"></string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
     <string name="dialog_cannot_open_file_title">파일을 열 수 없습니다</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
@@ -3900,9 +3874,49 @@
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_leave_call_option">떠나기</string>
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
-    <string name="calls_call_screen_bottom_panel_end_call_for_all_option">End for all</string>
+    <string name="calls_call_screen_bottom_panel_end_call_for_all_option">모두 통화 종료</string>
     <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">주최자로 임명</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">당신은 이 통화의 유일한 호스트입니다. 떠나기 전에 다른 호스트를 할당하시겠습니까?</string>
+    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">당신은 이 통화의 유일한 주최자입니다. 떠나기 전에 다른 주최자를 할당하시겠습니까?</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">예</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">아니오</string>
+    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos_2">
+        <item quantity="other">그리고 동영상 %1$d개</item>
+    </plurals>
+    <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
+    <plurals name="num_folders_num_files_2">
+        <item quantity="other">파일 %1$d개</item>
+    </plurals>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
+    <string name="account_upgrade_storage_label">[A]%1$s[/A] 저장소</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] 전송 할당량</string>
+    <!-- Label of storage in My account section. -->
+    <string name="account_storage_label">저장소</string>
+    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
+    <string name="account_choose_free_limited_transfer_quota">[A]제한된[/A] 전송 할당량</string>
+    <!-- Name of hots or hosts in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
+        <item quantity="other">주최자: %s</item>
+    </plurals>
+    <!-- Number of participants in the call in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
+        <item quantity="other">참여자: %d</item>
+    </plurals>
+    <!-- Chat log message when the permissions for a user has been changed to read-onl -->
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A]님이 [A]%2$s[/A]님에 의해 [B]읽기만 가능하게 변경되었습니다[/B]</string>
+    <!-- Chat log message when the permissions for a user has been changed to standard -->
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A]님이 [A]%2$s[/A]님에 의해 [B]일반 역할로 변경되었습니다[/B]</string>
+    <!-- Chat log message when the permissions for a user has been changed to host -->
+    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A]님이 [A]%2$s[/A]님에 의해 [B]주최자 역할로 변경되었습니다[/B]</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s님이 %2$s님에 의해 읽기만 가능하게 변경되었습니다</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s님이 %2$s님에 의해 일반 역할로 변경되었습니다</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s님이 %2$s님에 의해 주최자 역할로 변경되었습니다</string>
 </resources>
