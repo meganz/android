@@ -135,7 +135,7 @@ class LinksFragment : MegaNodeBaseFragment() {
                     recyclerView.visibility = View.VISIBLE
                     emptyImageView.visibility = View.GONE
                     emptyLinearLayout.visibility = View.GONE
-                    managerViewModel.setIncomingParentHandle(parentNode.handle)
+                    managerViewModel.setLinksParentHandle(parentNode.handle)
 
                     refresh()
 
