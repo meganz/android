@@ -5,18 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.requests.ContactRequestsFragment
 import mega.privacy.android.app.databinding.FragmentChatTabsBinding
 import mega.privacy.android.app.main.megachat.RecentChatsFragment
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter.Tabs.CHAT
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
 
 @AndroidEntryPoint
 class ChatTabsFragment : Fragment() {
@@ -76,9 +73,6 @@ class ChatTabsFragment : Fragment() {
      */
     fun showElevation(show: Boolean) {
         binding.tabs.elevation = if (show) toolbarElevation else 0F
-        if (Util.isDarkMode(requireContext())) {
-            (activity as ContactsActivity?)?.showElevation(show)
-        }
     }
 
     fun getRecentChatsFragment(): RecentChatsFragment? =

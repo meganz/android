@@ -106,6 +106,7 @@ import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatAdapter;
+import mega.privacy.android.app.meeting.chats.ChatTabsFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.usecase.chat.SearchChatsUseCase;
@@ -372,19 +373,25 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         if (context instanceof ManagerActivity) {
             if (bannerContainer.getVisibility() == View.GONE) {
-                ((ManagerActivity) context).changeAppBarElevation(
-                        listView.canScrollVertically(-1)
-                                || (adapterList != null && adapterList.isMultipleSelect()));
+                boolean showElevation = listView.canScrollVertically(-1)
+                        || (adapterList != null && adapterList.isMultipleSelect());
+                ((ManagerActivity) context).changeAppBarElevation(showElevation);
+                if (getParentFragment() instanceof ChatTabsFragment)
+                    ((ChatTabsFragment) getParentFragment()).showElevation(showElevation);
             } else if (listView.canScrollVertically(-1)
                     || (adapterList != null && adapterList.isMultipleSelect())
                     || contactsListLayout.getVisibility() == View.VISIBLE) {
                 appBarLayout.setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
 
                 ((ManagerActivity) context).changeAppBarElevation(isDarkMode(context));
+                if (getParentFragment() instanceof ChatTabsFragment)
+                    ((ChatTabsFragment) getParentFragment()).showElevation(isDarkMode(context));
             } else {
                 appBarLayout.setElevation(0);
                 // Reset the AppBar elevation whatever in the light and dark mode
                 ((ManagerActivity) context).changeAppBarElevation(false);
+                if (getParentFragment() instanceof ChatTabsFragment)
+                    ((ChatTabsFragment) getParentFragment()).showElevation(false);
             }
         } else if (context instanceof ArchivedChatsActivity) {
             boolean withElevation = listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect());

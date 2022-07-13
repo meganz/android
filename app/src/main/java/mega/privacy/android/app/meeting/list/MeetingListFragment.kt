@@ -13,6 +13,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMeetingListBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.meeting.chats.ChatTabsFragment
 import mega.privacy.android.app.meeting.list.adapter.MeetingsAdapter
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
@@ -58,11 +59,12 @@ class MeetingListFragment : Fragment() {
         binding.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-
                 if (recyclerView.canScrollVertically(RecyclerView.NO_POSITION)) {
-                    (activity as? ManagerActivity)?.changeAppBarElevation(Util.isDarkMode(context))
+                    (activity as? ManagerActivity?)?.changeAppBarElevation(Util.isDarkMode(context))
+                    (parentFragment as? ChatTabsFragment?)?.showElevation(Util.isDarkMode(context))
                 } else {
-                    (activity as? ManagerActivity)?.changeAppBarElevation(false)
+                    (activity as? ManagerActivity?)?.changeAppBarElevation(false)
+                    (parentFragment as? ChatTabsFragment?)?.showElevation(false)
                 }
             }
         })
