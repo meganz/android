@@ -25,6 +25,7 @@ import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.megachat.ChatActivity;
+import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.utils.Constants;
 
 public class SnackbarNavigateOption implements View.OnClickListener {
@@ -101,7 +102,7 @@ public class SnackbarNavigateOption implements View.OnClickListener {
             intent.setAction(ACTION_SHOW_TRANSFERS);
             intent.putExtra(OPENED_FROM_IMAGE_VIEWER, true);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            intent.putExtra(ManagerActivity.TRANSFERS_TAB, ManagerActivity.PENDING_TAB);
+            intent.putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB);
         } else {
             intent.setAction(Constants.ACTION_SHOW_SETTINGS_STORAGE);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

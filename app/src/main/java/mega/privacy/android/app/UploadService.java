@@ -7,11 +7,10 @@ import static mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEX
 import static mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.UPLOAD_TRANSFER;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT_TIME_BEFORE_UPDATE;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
-import static mega.privacy.android.app.main.ManagerActivity.COMPLETED_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
 import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
 import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
@@ -97,6 +96,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase;
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase.Result;
@@ -111,8 +111,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import timber.log.Timber;
-
-import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
 
 /*
  * Service to Upload files
@@ -493,7 +491,7 @@ public class UploadService extends Service {
         Intent intent = new Intent(UploadService.this, ManagerActivity.class);
         intent.setAction(ACTION_SHOW_TRANSFERS);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
+        intent.putExtra(TRANSFERS_TAB, TransfersTab.COMPLETED_TAB);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT);
@@ -590,7 +588,7 @@ public class UploadService extends Service {
             case NOT_OVERQUOTA_STATE:
             default:
                 intent.setAction(ACTION_SHOW_TRANSFERS);
-                intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
+                intent.putExtra(TRANSFERS_TAB, TransfersTab.PENDING_TAB);
                 break;
         }
 
