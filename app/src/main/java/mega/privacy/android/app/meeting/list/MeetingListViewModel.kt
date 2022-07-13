@@ -36,6 +36,20 @@ class MeetingListViewModel @Inject constructor(
         retrieveMeetings()
     }
 
+    private fun retrieveMeetings() {
+        getMeetingListUseCase.get()
+            .debounceImmediate(REQUEST_TIMEOUT_IN_MS, TimeUnit.MILLISECONDS)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { items ->
+                    meetings.value = items.toList()
+                },
+                onError = Timber::e
+            )
+            .addTo(composite)
+    }
+
     fun getMeetings(): LiveData<List<MeetingItem>> =
         meetings.map { items ->
             if (!queryString.isNullOrBlank()) {
@@ -58,20 +72,6 @@ class MeetingListViewModel @Inject constructor(
     fun setSearchQuery(query: String?) {
         queryString = query
         meetings.notifyObserver()
-    }
-
-    private fun retrieveMeetings() {
-        getMeetingListUseCase.get()
-            .debounceImmediate(REQUEST_TIMEOUT_IN_MS, TimeUnit.MILLISECONDS)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { items ->
-                    meetings.value = items.toList()
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
     }
 
     fun archiveChat(chatId: Long) {
