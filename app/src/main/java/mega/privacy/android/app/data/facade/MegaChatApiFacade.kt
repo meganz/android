@@ -42,4 +42,8 @@ class MegaChatApiFacade @Inject constructor(
 
     override fun retryPendingConnections(disconnect: Boolean) =
         chatApi.retryPendingConnections(disconnect, null)
+
+    companion object {
+        const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
+    }
 }

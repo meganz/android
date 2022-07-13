@@ -5,6 +5,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
+import mega.privacy.android.app.data.facade.MegaChatApiFacade.Companion.CHAT_INVALID_HANDLE
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.di.IoDispatcher
@@ -73,7 +74,7 @@ class DefaultPushesRepository @Inject constructor(
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 megaChatApi.pushReceived(beep,
-                    if (chatId != null) megaApi.base64ToHandle(chatId) else -1,
+                    if (chatId != null) megaApi.base64ToHandle(chatId) else CHAT_INVALID_HANDLE,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = onRequestPushReceivedCompleted(continuation)
                     )
