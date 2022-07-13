@@ -86,7 +86,7 @@ private fun mapChatRequestType(chatRequestType: Int): ChatRequestType = when (ch
     MegaChatRequest.TYPE_REQUEST_HIRES_QUALITY -> ChatRequestType.RequestHiresQuality
     MegaChatRequest.TYPE_DEL_SPEAKER -> ChatRequestType.DeleteSpeaker
     MegaChatRequest.TYPE_REQUEST_SVC_LAYERS -> ChatRequestType.RequestSVCLayers
-    else -> ChatRequestType.TotalRequest
+    else -> ChatRequestType.InvalidRequest
 }
 
 private fun mapChatRequestParamType(chatRequestParamType: Int?): ChatRequestParamType? =
@@ -97,44 +97,26 @@ private fun mapChatRequestParamType(chatRequestParamType: Int?): ChatRequestPara
     }
 
 private fun mapChatRequestPeersList(chatRequestPeersList: MegaChatPeerList?): List<ChatPeer>? =
-    if (chatRequestPeersList == null) {
-        null
-    } else {
-        mutableListOf<ChatPeer>().apply {
-            for (i in 0 until chatRequestPeersList.size()) {
-                add(ChatPeer(chatRequestPeersList.getPeerHandle(i),
-                    chatRequestPeersList.getPeerPrivilege(i)))
-            }
+    chatRequestPeersList?.let { peersList ->
+        (0 until peersList.size()).map {
+            ChatPeer(peersList.getPeerHandle(it), peersList.getPeerPrivilege(it))
         }
     }
 
-private fun mapChatRequestPeersListByChatHandle(megaChatRequest: MegaChatRequest): Map<Long, List<Long>>? {
-    val chatRequestHandleList = megaChatRequest.megaHandleList
-
-    return if (chatRequestHandleList == null) {
-        null
-    } else {
-        mutableMapOf<Long, List<Long>>().apply {
-            for (i in 0 until chatRequestHandleList.size()) {
-                val chatId = chatRequestHandleList[i]
-                val peerList =
-                    mapChatRequestHandleList(megaChatRequest.getMegaHandleListByChat(chatId))
-
-                if (peerList != null) {
-                    put(chatId, peerList)
+private fun mapChatRequestPeersListByChatHandle(megaChatRequest: MegaChatRequest): Map<Long, List<Long>>? =
+    megaChatRequest.megaHandleList?.let { handleList ->
+        (0 until handleList.size())
+            .map { handleList[it] }
+            .mapNotNull {
+                mapChatRequestHandleList(megaChatRequest.getMegaHandleListByChat(it))?.let { list ->
+                    Pair(it, list)
                 }
-            }
-        }
+            }.toMap()
     }
-}
 
 private fun mapChatRequestHandleList(chatRequestHandleList: MegaHandleList?): List<Long>? =
-    if (chatRequestHandleList == null) {
-        null
-    } else {
-        mutableListOf<Long>().apply {
-            for (i in 0 until chatRequestHandleList.size()) {
-                add(chatRequestHandleList[i])
-            }
+    chatRequestHandleList?.let { handleList ->
+        (0 until handleList.size()).map {
+            handleList[it]
         }
     }

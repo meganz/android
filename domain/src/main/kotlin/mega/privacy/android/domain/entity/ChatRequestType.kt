@@ -270,7 +270,7 @@ enum class ChatRequestType {
     RequestSVCLayers,
 
     /**
-     * Total of requests
+     * Invalid request
      */
-    TotalRequest,
+    InvalidRequest,
 }
