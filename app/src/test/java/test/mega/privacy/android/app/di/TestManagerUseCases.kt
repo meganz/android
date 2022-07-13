@@ -9,12 +9,11 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.manager.ManagerUseCases
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
-import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
-import mega.privacy.android.app.domain.usecase.HasChildren
+import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
@@ -73,12 +72,7 @@ object TestManagerUseCases {
     }
 
     @Provides
-    fun provideGetInboxNode() = mock<GetInboxNode> {
-        on { runBlocking { invoke() } }.thenReturn(MegaNode())
-    }
-
-    @Provides
-    fun provideHasChildren() = mock<HasChildren> {
-        on { runBlocking { invoke(any()) } }.thenReturn(false)
+    fun provideHasInboxChildren() = mock<HasInboxChildren> {
+        onBlocking { invoke() }.thenReturn(false)
     }
 }

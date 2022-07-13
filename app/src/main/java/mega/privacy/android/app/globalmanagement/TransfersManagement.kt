@@ -184,7 +184,7 @@ class TransfersManagement @Inject constructor(
 
     private val scanningTransfers = ArrayList<ScanningTransferData>()
     private var scanningTransfersToken: MegaCancelToken? = null
-    private var isProcessingFolders = false
+    var isProcessingFolders = false
     var isProcessingTransfers = false
     private var shouldBreakTransfersProcessing = false
 

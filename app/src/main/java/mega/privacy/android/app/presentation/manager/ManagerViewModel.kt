@@ -19,10 +19,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
-import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
-import mega.privacy.android.app.domain.usecase.HasChildren
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
@@ -32,6 +30,7 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.ContactRequest
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -63,8 +62,7 @@ class ManagerViewModel @Inject constructor(
     monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val getRootFolder: GetRootFolder,
     private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
-    private val getInboxNode: GetInboxNode,
-    private val hasChildren: HasChildren,
+    private val hasInboxChildren: HasInboxChildren,
 ) : ViewModel() {
 
     /**
@@ -356,8 +354,7 @@ class ManagerViewModel @Inject constructor(
      */
     fun checkInboxSectionVisibility() {
         viewModelScope.launch {
-            val inboxNode = getInboxNode()
-            inboxSectionVisible.value = if (inboxNode == null) false else hasChildren(inboxNode)
+            inboxSectionVisible.value = hasInboxChildren()
         }
     }
 
