@@ -1,14 +1,11 @@
-package mega.privacy.android.app.fragments;
+package mega.privacy.android.app.presentation.shares;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
-import static mega.privacy.android.app.main.ManagerActivity.ERROR_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.INCOMING_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.OUTGOING_TAB;
 import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID;
 import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
+import static mega.privacy.android.app.presentation.shares.MegaNodeBaseFragmentExtensionsKt.managerState;
+import static mega.privacy.android.app.presentation.shares.links.LinksFragment.getLinksOrderCloud;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
@@ -81,7 +78,6 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
-import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -90,9 +86,13 @@ import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
-import mega.privacy.android.app.main.managerSections.IncomingSharesFragment;
-import mega.privacy.android.app.main.managerSections.OutgoingSharesFragment;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
+import mega.privacy.android.app.presentation.manager.ManagerViewModel;
+import mega.privacy.android.app.presentation.manager.model.SharesTab;
+import mega.privacy.android.app.presentation.manager.model.Tab;
+import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
+import mega.privacy.android.app.presentation.shares.links.LinksFragment;
+import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -114,7 +114,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     protected ActionMode actionMode;
 
-    protected ArrayList<MegaNode> nodes = new ArrayList<>();
+    protected List<MegaNode> nodes = new ArrayList<>();
     protected MegaNodeAdapter adapter;
 
     protected Stack<Integer> lastPositionStack = new Stack<>();
@@ -129,27 +129,33 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected TextView emptyTextViewFirst;
 
     protected SortByHeaderViewModel sortByHeaderViewModel;
+    public ManagerViewModel managerViewModel;
 
-    protected abstract void setNodes(ArrayList<MegaNode> nodes);
+    public abstract void setNodes(List<MegaNode> nodes);
 
-    protected abstract void setEmptyView();
+    public abstract void setEmptyView();
 
-    protected abstract int onBackPressed();
+    public abstract int onBackPressed();
 
-    protected abstract void itemClick(int position);
+    public abstract void itemClick(int position);
 
     /**
      * Navigates to a new child folder.
      *
      * @param node The folder node.
      */
-    protected abstract void navigateToFolder(MegaNode node);
+    public abstract void navigateToFolder(MegaNode node);
 
-    protected abstract void refresh();
+    public abstract void refresh();
+
+    public abstract void updateContact(long contactHandle);
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
+
         sortByHeaderViewModel = new ViewModelProvider(this).get(SortByHeaderViewModel.class);
 
         sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
@@ -161,9 +167,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected abstract class BaseActionBarCallBack implements ActionMode.Callback {
 
         protected List<MegaNode> selected;
-        private int currentTab;
+        private final Tab currentTab;
 
-        public BaseActionBarCallBack(int currentTab) {
+        public BaseActionBarCallBack(Tab currentTab) {
             this.currentTab = currentTab;
         }
 
@@ -390,7 +396,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
      * @return Null.
      */
     protected Unit showSortByPanel(Unit unit) {
-        managerActivity.showNewSortByPanel(getCurrentSharesTab() == INCOMING_TAB
+        managerActivity.showNewSortByPanel(getCurrentSharesTab() == SharesTab.INCOMING_TAB
                 ? ORDER_OTHERS
                 : ORDER_CLOUD);
 
@@ -642,11 +648,11 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         switch (fragmentAdapter) {
             case LINKS_ADAPTER:
                 return getLinksOrderCloud(sortOrderManagement.getOrderCloud(),
-                        managerActivity.isFirstNavigationLevel());
+                        managerState(this).isFirstNavigationLevel());
 
             case INCOMING_SHARES_ADAPTER:
             case OUTGOING_SHARES_ADAPTER:
-                if (managerActivity.isFirstNavigationLevel()) {
+                if (managerState(this).isFirstNavigationLevel()) {
                     return sortOrderManagement.getOrderOthers();
                 }
 
@@ -702,15 +708,15 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
      *
      * @return The current shares tab.
      */
-    private int getCurrentSharesTab() {
-        int tab = ERROR_TAB;
+    private SharesTab getCurrentSharesTab() {
+        SharesTab tab = SharesTab.NONE;
 
         if (MegaNodeBaseFragment.this instanceof IncomingSharesFragment) {
-            tab = INCOMING_TAB;
+            tab = SharesTab.INCOMING_TAB;
         } else if (MegaNodeBaseFragment.this instanceof OutgoingSharesFragment) {
-            tab = OUTGOING_TAB;
+            tab = SharesTab.OUTGOING_TAB;
         } else if (MegaNodeBaseFragment.this instanceof LinksFragment) {
-            tab = LINKS_TAB;
+            tab = SharesTab.LINKS_TAB;
         }
 
         return tab;
@@ -724,7 +730,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                int tab = getCurrentSharesTab();
+                SharesTab tab = getCurrentSharesTab();
 
                 if (managerActivity.getTabItemShares() == tab) {
                     checkScroll();
@@ -769,14 +775,13 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private long getParentHandle(int fragmentAdapter) {
         switch (fragmentAdapter) {
             case INCOMING_SHARES_ADAPTER:
-                return managerActivity.getParentHandleIncoming();
+                return managerState(this).getIncomingParentHandle();
 
             case OUTGOING_SHARES_ADAPTER:
-                return managerActivity.getParentHandleOutgoing();
+                return managerState(this).getOutgoingParentHandle();
 
             case LINKS_ADAPTER:
-                return managerActivity.getParentHandleLinks();
-
+                return managerState(this).getLinksParentHandle();
             default:
                 return INVALID_HANDLE;
         }

@@ -21,15 +21,17 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
-import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.presentation.manager.model.ManagerState
+import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.ContactRequest
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
@@ -229,6 +231,97 @@ class ManagerViewModel @Inject constructor(
     fun setIsFirstNavigationLevel(isFirstNavigationLevel: Boolean) = viewModelScope.launch {
         _state.update { it.copy(isFirstNavigationLevel = isFirstNavigationLevel) }
     }
+
+    /**
+     * Decrease by 1 the incoming tree depth
+     */
+    fun decreaseIncomingTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(incomingTreeDepth = it.incomingTreeDepth - 1) }
+    }
+
+    /**
+     * Increase by 1 the incoming tree depth
+     */
+    fun increaseIncomingTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(incomingTreeDepth = it.incomingTreeDepth + 1) }
+    }
+
+    /**
+     * Reset incoming tree depth to initial value
+     */
+    fun resetIncomingTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(incomingTreeDepth = 0) }
+    }
+
+    /**
+     * Set incoming tree depth with given value
+     *
+     * @param depth the tree depth value to set
+     */
+    fun setIncomingTreeDepth(depth: Int) = viewModelScope.launch {
+        _state.update { it.copy(incomingTreeDepth = depth) }
+    }
+
+    /**
+     * Decrease by 1 the outgoing tree depth
+     */
+    fun decreaseOutgoingTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(outgoingTreeDepth = it.outgoingTreeDepth - 1) }
+    }
+
+    /**
+     * Increase by 1 the outgoing tree depth
+     */
+    fun increaseOutgoingTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(outgoingTreeDepth = it.outgoingTreeDepth + 1) }
+    }
+
+    /**
+     * Reset outgoing tree depth to initial value
+     */
+    fun resetOutgoingTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(outgoingTreeDepth = 0) }
+    }
+
+    /**
+     * Decrease by 1 the links tree depth
+     */
+    fun decreaseLinksTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(linksTreeDepth = it.linksTreeDepth - 1) }
+    }
+
+    /**
+     * Increase by 1 the links tree depth
+     */
+    fun increaseLinksTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(linksTreeDepth = it.linksTreeDepth + 1) }
+    }
+
+    /**
+     * Reset links tree depth to initial value
+     */
+    fun resetLinksTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(linksTreeDepth = 0) }
+    }
+
+    /**
+     * Set the current shares tab to the UI state
+     *
+     * @param tab shares tab to set
+     */
+    fun setSharesTab(tab: SharesTab) = viewModelScope.launch {
+        _state.update { it.copy(sharesTab = tab) }
+    }
+
+    /**
+     * Set the current transfers tab to the UI state
+     *
+     * @param tab transfer tab to set
+     */
+    fun setTransfersTab(tab: TransfersTab) = viewModelScope.launch {
+        _state.update { it.copy(transfersTab = tab) }
+    }
+
 
     private val numUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
 

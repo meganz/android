@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.managerSections;
+package mega.privacy.android.app.presentation.rubbishbin;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;

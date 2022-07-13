@@ -1,6 +1,14 @@
 package mega.privacy.android.app.notifications;
 
 
+import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
+import static mega.privacy.android.app.utils.Constants.ACTION_LOG_IN;
+import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS;
+import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_DOWNLOAD_FINAL;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.content.Intent;
@@ -9,10 +17,7 @@ import androidx.annotation.Nullable;
 
 import mega.privacy.android.app.main.LoginActivity;
 import mega.privacy.android.app.main.ManagerActivity;
-
-import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
-import static mega.privacy.android.app.utils.Constants.*;
+import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 
 public class DownloadNotificationIntentService extends IntentService {
 
@@ -43,7 +48,7 @@ public class DownloadNotificationIntentService extends IntentService {
             } else if (intent.getAction().equals(ACTION_SHOW_TRANSFERS)) {
                 pendingIntent = new Intent(DownloadNotificationIntentService.this, ManagerActivity.class);
                 pendingIntent.setAction(ACTION_SHOW_TRANSFERS);
-                pendingIntent.putExtra(TRANSFERS_TAB, PENDING_TAB);
+                pendingIntent.putExtra(TRANSFERS_TAB, TransfersTab.PENDING_TAB);
             }
 
             if (pendingIntent != null) {
