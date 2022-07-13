@@ -194,6 +194,9 @@ class MegaApiFacade @Inject constructor(
 
     override fun handleToBase64(handle: Long): String = MegaApiAndroid.handleToBase64(handle)
 
+    override fun base64ToHandle(base64Handle: String): Long =
+        MegaApiAndroid.base64ToHandle(base64Handle)
+
     override fun cancelTransfer(transfer: MegaTransfer) {
         megaApi.cancelTransfer(transfer)
     }

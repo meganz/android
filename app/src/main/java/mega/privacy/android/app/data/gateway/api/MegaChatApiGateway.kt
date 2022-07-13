@@ -60,9 +60,10 @@ interface MegaChatApiGateway {
      * Notifies a push has been received.
      *
      * @param beep      True if should beep, false otherwise.
+     * @param chatId    Chat identifier.
      * @param listener  Listener.
      */
-    fun pushReceived(beep: Boolean, listener: MegaChatRequestListenerInterface)
+    fun pushReceived(beep: Boolean, chatId: Long, listener: MegaChatRequestListenerInterface?)
 
     /**
      * Refreshes DNS servers and retries pending connections.
