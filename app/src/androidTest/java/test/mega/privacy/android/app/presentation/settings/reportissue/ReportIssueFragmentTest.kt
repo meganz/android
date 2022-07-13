@@ -24,8 +24,8 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.HiltTestActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.settings.ReportIssueUseCases
-import mega.privacy.android.app.domain.entity.Progress
-import mega.privacy.android.app.domain.usecase.SubmitIssue
+import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.usecase.SubmitIssue
 import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueFragment
 import org.hamcrest.CoreMatchers.not
 import org.junit.After

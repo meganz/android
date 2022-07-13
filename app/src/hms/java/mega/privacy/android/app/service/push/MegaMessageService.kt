@@ -1,20 +1,27 @@
 package mega.privacy.android.app.service.push
 
 import android.content.Context
-import androidx.work.*
+import androidx.work.WorkManager
 import com.huawei.agconnect.AGConnectOptionsBuilder
-import com.huawei.hms.push.HmsMessageService
-import com.huawei.hms.push.RemoteMessage
 import com.huawei.hms.aaid.HmsInstanceId
 import com.huawei.hms.common.ApiException
+import com.huawei.hms.push.HmsMessageService
+import com.huawei.hms.push.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.data.extensions.enqueuePushMessage
 import mega.privacy.android.app.data.extensions.enqueueUniqueWorkNewToken
-import mega.privacy.android.app.domain.entity.pushes.MegaRemoteMessage
+import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.utils.Constants.DEVICE_HUAWEI
+import mega.privacy.android.domain.entity.pushes.MegaRemoteMessage
 import timber.log.Timber
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MegaMessageService : HmsMessageService() {
+
+    @Inject
+    lateinit var dataMapper: DataMapper
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         val megaRemoteMessage = MegaRemoteMessage(
@@ -27,7 +34,7 @@ class MegaMessageService : HmsMessageService() {
         Timber.d("$megaRemoteMessage")
 
         WorkManager.getInstance(this)
-            .enqueuePushMessage(megaRemoteMessage.pushMessage.toData())
+            .enqueuePushMessage(dataMapper(megaRemoteMessage.pushMessage))
     }
 
     override fun onNewToken(s: String) {

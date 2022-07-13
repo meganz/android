@@ -6,8 +6,6 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.domain.exception.EmptyFolderException
-import mega.privacy.android.app.domain.exception.EmptySearchException
 import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
@@ -17,6 +15,8 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.domain.exception.EmptyFolderException
+import mega.privacy.android.domain.exception.EmptySearchException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
@@ -278,6 +278,15 @@ class GetFolderContentUseCase @Inject constructor(
                                 break
                             }
                         }
+                    } else {
+                        getContentToUpload(
+                            context = context,
+                            parentNode = parentNode,
+                            folderItem = upload
+                        ).blockingSubscribeBy(
+                            onError = { error -> Timber.w(error, "Ignored error") },
+                            onSuccess = { result -> uploadResults.addAll(result) }
+                        )
                     }
                 }
             }
@@ -285,7 +294,7 @@ class GetFolderContentUseCase @Inject constructor(
 
             when {
                 emitter.isDisposed -> return@create
-                uploadResults.isEmpty() -> emitter.onError(EmptyFolderException())
+                uploadResults.isEmpty() -> emitter.onSuccess(0)
                 else -> {
                     for (result in uploadResults) {
                         uploadUseCase.upload(context, result).blockingSubscribeBy(

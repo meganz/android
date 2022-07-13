@@ -1,7 +1,7 @@
 package mega.privacy.android.app.data.mapper
 
 import androidx.datastore.preferences.core.Preferences
-import mega.privacy.android.app.domain.entity.FeatureFlag
+import mega.privacy.android.domain.entity.FeatureFlag
 
 /**
  * Type alias to make map output readable

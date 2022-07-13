@@ -17,10 +17,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.entity.FavouriteInfo
-import mega.privacy.android.app.domain.usecase.GetAllFavorites
-import mega.privacy.android.app.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.app.domain.usecase.RemoveFavourites
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
@@ -35,6 +31,11 @@ import mega.privacy.android.app.presentation.favourites.model.FavouritePlacehold
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
+import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.usecase.GetAllFavorites
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.RemoveFavourites
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -58,7 +59,8 @@ class FavouritesViewModel @Inject constructor(
     private val stringUtilWrapper: StringUtilWrapper,
     private val removeFavourites: RemoveFavourites,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val megaUtilWrapper: MegaUtilWrapper
+    private val megaUtilWrapper: MegaUtilWrapper,
+    private val fetchNode: FetchNodeWrapper,
 ) :
     ViewModel() {
     private val _favouritesState =
@@ -306,7 +308,7 @@ class FavouritesViewModel @Inject constructor(
         isList: Boolean,
         forceUpdate: Boolean = false,
         headerForceUpdate: Boolean = false,
-        order: Int? = null
+        order: Int? = null,
     ): List<FavouriteItem> {
         val favouriteItemList = mutableListOf<FavouriteItem>()
         favouriteItemList.add(
@@ -405,7 +407,7 @@ class FavouritesViewModel @Inject constructor(
      */
     private fun reorganizeFavouritesByConditions(
         order: Int? = null,
-        query: String? = null
+        query: String? = null,
     ): List<Favourite> {
         if (favouriteList.isNotEmpty()) {
             favouriteList.clear()
@@ -434,25 +436,24 @@ class FavouritesViewModel @Inject constructor(
      * Build favourite source list
      * @param list List<FavouriteInfo>
      */
-    private fun buildFavouriteSourceList(list: List<FavouriteInfo>) {
+    private suspend fun buildFavouriteSourceList(list: List<FavouriteInfo>) {
         if (favouriteSourceList.isNotEmpty()) {
             favouriteSourceList.clear()
         }
         favouriteSourceList.addAll(
-            list.map { favouriteInfo ->
+            list.mapNotNull { favouriteInfo ->
+                val node = fetchNode(favouriteInfo.id) ?: return@mapNotNull null
                 favouriteMapper(
+                    node,
                     favouriteInfo,
-                    { node ->
-                        megaUtilWrapper.availableOffline(
-                            context,
-                            node
-                        )
-                    },
-                    stringUtilWrapper,
-                    { name ->
-                        MimeTypeList.typeForName(name).iconResourceId
-                    }
-                )
+                    megaUtilWrapper.availableOffline(
+                        context,
+                        favouriteInfo.id
+                    ),
+                    stringUtilWrapper
+                ) { name ->
+                    MimeTypeList.typeForName(name).iconResourceId
+                }
             }
         )
     }
@@ -511,7 +512,7 @@ class FavouritesViewModel @Inject constructor(
      */
     private fun getFavouritesByQuery(
         list: List<Favourite>,
-        query: String
+        query: String,
     ): List<Favourite> =
         mutableListOf<Favourite>().apply {
             if (query.isNotEmpty()) {
@@ -534,7 +535,7 @@ class FavouritesViewModel @Inject constructor(
     private fun sortOrderByType(
         sortByType: () -> Int,
         item1: Favourite,
-        item2: Favourite
+        item2: Favourite,
     ): Int {
         return if (item1.isFolder != item2.isFolder) {
             item2.isFolder.compareTo(item1.isFolder)

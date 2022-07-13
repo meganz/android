@@ -270,13 +270,13 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
         if (chosenNode == null) {
             parentHandle = megaApi.getRootNode().getHandle();
             nodes = megaApi.getChildren(megaApi.getRootNode());
-            changeActionBarTitle(context.getString(R.string.file_provider_title).toUpperCase());
+            changeActionBarTitle(context.getString(R.string.file_provider_title));
         } else {
             nodes = megaApi.getChildren(chosenNode);
             if (chosenNode.getType() != MegaNode.TYPE_ROOT) {
                 changeActionBarTitle(chosenNode.getName());
             } else {
-                changeActionBarTitle(context.getString(R.string.file_provider_title).toUpperCase());
+                changeActionBarTitle(context.getString(R.string.file_provider_title));
             }
         }
 
@@ -386,7 +386,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
             if (parentNode.getType() == MegaNode.TYPE_ROOT) {
                 parentHandle = INVALID_HANDLE;
                 parentIsRoot = true;
-                changeActionBarTitle(context.getString(R.string.file_provider_title).toUpperCase());
+                changeActionBarTitle(context.getString(R.string.file_provider_title));
             } else {
                 String path = parentNode.getName();
                 String[] temp;

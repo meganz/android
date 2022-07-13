@@ -218,6 +218,15 @@ class InMeetingRepository @Inject constructor(
     }
 
     /**
+     * Get my name as participant
+     *
+     * @return My name
+     */
+    fun getMyName(): String {
+        return megaChatApi.myFullname
+    }
+
+    /**
      * Create a participant with my data
      *
      * @param chat The chat room of a meeting

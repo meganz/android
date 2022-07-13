@@ -144,7 +144,7 @@ class NameCollisionActivity : PasscodeActivity() {
     private fun setupView() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
-            title = StringResourcesUtils.getString(R.string.title_duplicated_items).uppercase()
+            title = StringResourcesUtils.getString(R.string.title_duplicated_items)
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
         }
@@ -190,6 +190,7 @@ class NameCollisionActivity : PasscodeActivity() {
 
             if (result.shouldFinish) {
                 setResult(RESULT_OK, Intent().putExtra(MESSAGE_RESULT, result.message))
+                finish()
             }
         }
         viewModel.onExceptionThrown().observe(this) { error ->
@@ -247,7 +248,7 @@ class NameCollisionActivity : PasscodeActivity() {
                     )
 
                     if (isFile && collisionResult.nameCollision is NameCollision.Upload) {
-                        requestFileThumbnail(File(collisionResult.nameCollision.absolutePath!!))
+                        requestFileThumbnail(collisionResult.nameCollision.absolutePath)
                     }
                 }
             }
@@ -342,7 +343,7 @@ class NameCollisionActivity : PasscodeActivity() {
                         thumbnailIcon.setImageResource(MimeTypeList.typeForName(name).iconResourceId)
 
                         if (collisionResult.nameCollision is NameCollision.Upload) {
-                            requestFileThumbnail(File(collisionResult.nameCollision.absolutePath!!))
+                            requestFileThumbnail(collisionResult.nameCollision.absolutePath)
                         }
                     }
                 }
@@ -384,13 +385,16 @@ class NameCollisionActivity : PasscodeActivity() {
     /**
      * Requests the thumbnail of a file through Fresco controller and updates the UI if get.
      *
-     * @param file  The file from which the thumbnail will be requested.
+     * @param absolutePath The path from which the thumbnail will be requested.
      */
-    private fun ViewNameCollisionOptionBinding.requestFileThumbnail(file: File) {
+    private fun ViewNameCollisionOptionBinding.requestFileThumbnail(absolutePath: String) {
         with(thumbnail) {
             isVisible = true
             controller = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(ImageRequestBuilder.fromRequest(ImageRequest.fromFile(file))
+                .setImageRequest(ImageRequestBuilder.fromRequest(
+                    if (viewModel.isFolderUploadContext) ImageRequest.fromUri(absolutePath.toUri())
+                    else ImageRequest.fromFile(File(absolutePath))
+                )
                     .setLocalThumbnailPreviewsEnabled(true)
                     .setRequestListener(OptionalRequestListener(
                         onRequestSuccess = { _, _, _ -> finishThumbnailRequest(true) },
@@ -400,7 +404,7 @@ class NameCollisionActivity : PasscodeActivity() {
                     override fun onFinalImageSet(
                         id: String,
                         imageInfo: ImageInfo?,
-                        animatable: Animatable?
+                        animatable: Animatable?,
                     ) {
                         finishThumbnailRequest(true)
                     }
@@ -415,30 +419,32 @@ class NameCollisionActivity : PasscodeActivity() {
      */
     private fun ViewNameCollisionOptionBinding.finishThumbnailRequest(success: Boolean) {
         runOnUiThread {
-            if (success) {
+            val thumbnailView = if (success) {
                 thumbnailIcon.isVisible = false
+                thumbnail.id
             } else {
                 thumbnail.isVisible = false
+                thumbnailIcon.id
             }
 
-            val thumbnailView = if (success) R.id.thumbnail else R.id.thumbnail_icon
+            root.post {
+                ConstraintSet().apply {
+                    clone(root)
 
-            ConstraintSet().apply {
-                clone(root)
+                    if (root.id == R.id.rename_view) {
+                        connect(
+                            thumbnailView,
+                            ConstraintSet.BOTTOM,
+                            root.id,
+                            ConstraintSet.BOTTOM
+                        )
+                        centerVertically(R.id.name, thumbnailView)
+                    } else {
+                        connect(R.id.name, ConstraintSet.TOP, thumbnailView, ConstraintSet.TOP)
+                    }
 
-                if (root.id == R.id.rename_view) {
-                    connect(
-                        thumbnailView,
-                        ConstraintSet.BOTTOM,
-                        root.id,
-                        ConstraintSet.BOTTOM
-                    )
-                    centerVertically(R.id.name, thumbnailView)
-                } else {
-                    connect(R.id.name, ConstraintSet.TOP, thumbnailView, ConstraintSet.TOP)
+                    applyTo(root)
                 }
-
-                applyTo(root)
             }
         }
     }
@@ -502,7 +508,7 @@ class NameCollisionActivity : PasscodeActivity() {
     private fun manageCollisionsResolution(collisionsResolution: ArrayList<NameCollisionResult>) {
         setResult(
             Activity.RESULT_OK,
-            Intent().putExtra(INTENT_EXTRA_COLLISION_RESULTS, collisionsResolution)
+            Intent().putParcelableArrayListExtra(INTENT_EXTRA_COLLISION_RESULTS, collisionsResolution)
         )
         finish()
     }

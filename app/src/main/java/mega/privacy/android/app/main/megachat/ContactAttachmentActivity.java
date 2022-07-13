@@ -159,8 +159,7 @@ public class ContactAttachmentActivity extends PasscodeActivity implements MegaR
         aB = getSupportActionBar();
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
-        aB.setTitle(StringResourcesUtils.getString(R.string.activity_title_contacts_attached)
-                .toUpperCase(Locale.getDefault()));
+        aB.setTitle(StringResourcesUtils.getString(R.string.activity_title_contacts_attached));
 
         aB.setSubtitle(message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle() ? megaChatApi.getMyFullname()
                 : cC.getParticipantFullName(message.getMessage().getUserHandle()));

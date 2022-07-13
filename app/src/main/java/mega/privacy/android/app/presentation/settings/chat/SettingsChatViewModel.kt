@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.usecase.GetChatImageQuality
 import mega.privacy.android.app.presentation.settings.chat.model.SettingsChatState
+import mega.privacy.android.domain.usecase.GetChatImageQuality
 import javax.inject.Inject
 
 /**
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsChatViewModel @Inject constructor(
     private val getChatImageQuality: GetChatImageQuality,
-    @IoDispatcher ioDispatcher: CoroutineDispatcher
+    @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsChatState())

@@ -242,9 +242,15 @@ class NameCollisionViewModel @Inject constructor(
     private fun cancelAll() {
         when {
             isFolderUploadContext -> {
-                while (pendingCollisions.isNotEmpty()) {
-                    continueWithNext(NameCollisionChoice.CANCEL)
+                getAllPendingCollisions().forEach { pendingCollision ->
+                    resolvedCollisions.add(pendingCollision.apply {
+                        this.choice = NameCollisionChoice.CANCEL
+                    })
                 }
+
+                collisionsResolution.value =
+                    arrayListOf<NameCollisionResult>().apply { addAll(resolvedCollisions) }
+
             }
             else -> currentCollision.value = null
         }
@@ -257,12 +263,13 @@ class NameCollisionViewModel @Inject constructor(
      */
     private fun continueWithNext(choice: NameCollisionChoice) {
         if (isFolderUploadContext) {
-            resolvedCollisions.add(currentCollision.value!!.apply { this.choice = choice })
+            resolvedCollisions.add((currentCollision.value ?: return).apply {
+                this.choice = choice
+            })
 
             if (pendingCollisions.isEmpty()) {
-                collisionsResolution.apply {
-                    value = arrayListOf<NameCollisionResult>().apply { addAll(resolvedCollisions) }
-                }
+                collisionsResolution.value =
+                    arrayListOf<NameCollisionResult>().apply { addAll(resolvedCollisions) }
 
                 return
             }
@@ -281,6 +288,7 @@ class NameCollisionViewModel @Inject constructor(
             pendingFolderCollisions--
         }
         currentCollision.value = nextCollision
+        updateFileVersioningInfo()
     }
 
     /**
@@ -435,6 +443,19 @@ class NameCollisionViewModel @Inject constructor(
         rename: Boolean,
     ) {
         if (isFolderUploadContext) {
+            list.forEach { item ->
+                resolvedCollisions.add(item.apply {
+                    choice =
+                        if (rename) NameCollisionChoice.RENAME
+                        else NameCollisionChoice.REPLACE_UPDATE_MERGE
+                })
+
+            }
+
+            if (pendingCollisions.isEmpty()) {
+                collisionsResolution.value =
+                    arrayListOf<NameCollisionResult>().apply { addAll(resolvedCollisions) }
+            }
             return
         }
 

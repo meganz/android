@@ -322,39 +322,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
-import mega.privacy.android.app.domain.usecase.GetPushToken;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.imageviewer.ImageViewerActivity;
-import mega.privacy.android.app.components.ChatManagement;
-import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
-import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActionListener;
-import mega.privacy.android.app.main.FileExplorerActivity;
-import mega.privacy.android.app.main.FileLinkActivity;
-import mega.privacy.android.app.main.FolderLinkActivity;
-import mega.privacy.android.app.main.megachat.data.FileGalleryItem;
-import mega.privacy.android.app.namecollision.data.NameCollision;
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
-import mega.privacy.android.app.usecase.CopyNodeUseCase;
-import mega.privacy.android.app.usecase.GetAvatarUseCase;
-import mega.privacy.android.app.usecase.GetNodeUseCase;
-import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
-import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
-import mega.privacy.android.app.usecase.call.AnswerCallUseCase;
-import mega.privacy.android.app.usecase.call.EndCallUseCase;
-import mega.privacy.android.app.usecase.call.GetCallUseCase;
-import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase;
-import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase;
-import mega.privacy.android.app.usecase.call.StartCallUseCase;
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
-import mega.privacy.android.app.utils.AlertDialogUtil;
-import mega.privacy.android.app.utils.MegaProgressDialogUtil;
-import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
-import mega.privacy.android.app.listeners.CreateChatListener;
-import mega.privacy.android.app.listeners.LoadPreviewListener;
-import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
-import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
-import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.MarqueeTextView;
@@ -401,9 +369,6 @@ import mega.privacy.android.app.main.listeners.AudioFocusListener;
 import mega.privacy.android.app.main.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatRoomToolbarBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
@@ -426,10 +391,13 @@ import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
 import mega.privacy.android.app.usecase.call.AnswerCallUseCase;
+import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase;
+import mega.privacy.android.app.usecase.call.GetCallUseCase;
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase;
 import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -441,6 +409,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.domain.usecase.GetPushToken;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1468,8 +1437,8 @@ public class ChatActivity extends PasscodeActivity
             AndroidMegaChatMessage androidM = messages.get(position);
             StringBuilder messageToShow = new StringBuilder("");
             String token = getPushToken.invoke();
-            if(token!=null){
-                messageToShow.append("FCM TOKEN: " +token);
+            if (token != null) {
+                messageToShow.append("FCM TOKEN: " + token);
             }
             messageToShow.append("\nCHAT ID: " + MegaApiJava.userHandleToBase64(idChat));
             messageToShow.append("\nMY USER HANDLE: " + MegaApiJava.userHandleToBase64(megaChatApi.getMyUserHandle()));
@@ -1863,21 +1832,16 @@ public class ChatActivity extends PasscodeActivity
             }
         });
 
-        textChat.setOnTouchListener((v, event) -> {
-            showLetterKB();
-            return false;
-        });
-
         textChat.setOnLongClickListener(v -> {
             showLetterKB();
-            return true;
+            return false;
         });
 
         textChat.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 showLetterKB();
             }
-            return true;
+            return false;
         });
 
         textChat.setMediaListener(path -> uploadPictureOrVoiceClip(path));
@@ -3209,8 +3173,8 @@ public class ChatActivity extends PasscodeActivity
                 showEndCallForAllDialog();
                 break;
 
-            case R.id.cab_menu_archive_chat:{
-                if(recordView.isRecordingNow()) break;
+            case R.id.cab_menu_archive_chat: {
+                if (recordView.isRecordingNow()) break;
 
                 Timber.d("Archive/unarchive selected!");
                 ChatController chatC = new ChatController(chatActivity);
@@ -4285,14 +4249,15 @@ public class ChatActivity extends PasscodeActivity
         firstButton.setVisibility(View.VISIBLE);
         secondButton.setVisibility(View.VISIBLE);
 
-        firstButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call).toUpperCase(Locale.ROOT));
-        secondButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call).toUpperCase(Locale.ROOT));
+        firstButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call));
+        secondButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call));
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setView(dialogLayout);
         dialogOnlyMeInCall = builder.create();
         dialogOnlyMeInCall.setTitle(StringResourcesUtils.getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call));
         dialogOnlyMeInCall.setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call));
+        dialogOnlyMeInCall.setCancelable(false);
         dialogOnlyMeInCall.show();
 
         dialogOnlyMeInCall.setOnDismissListener(dialog -> {
@@ -5380,7 +5345,7 @@ public class ChatActivity extends PasscodeActivity
         try {
             if (actionMode != null) {
                 if (adapter.getSelectedItemCount() == 0) {
-                    actionMode.setTitle(getString(R.string.select_message_title).toUpperCase());
+                    actionMode.setTitle(getString(R.string.select_message_title));
                 } else {
                     actionMode.setTitle(adapter.getSelectedItemCount() + "");
                 }
@@ -8439,7 +8404,7 @@ public class ChatActivity extends PasscodeActivity
     }
 
     @Override
-    protected void onNewIntent(Intent intent){
+    protected void onNewIntent(Intent intent) {
         hideKeyboard();
         if (intent != null) {
             if (intent.getAction() != null) {

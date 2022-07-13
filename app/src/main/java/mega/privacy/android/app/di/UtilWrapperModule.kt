@@ -14,10 +14,10 @@ import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrappe
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
+import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnlineWrapper
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
-import java.io.File
 
 /**
  * Util wrapper module
@@ -55,15 +55,17 @@ class UtilWrapperModule {
         object : PermissionUtilWrapper {}
 
     @Provides
+    fun provideFetchNodeWrapper(megaApiGateway: MegaApiGateway): FetchNodeWrapper =
+        FetchNodeWrapper(megaApiGateway::getMegaNodeByHandle)
+
+    @Provides
     fun provideGetOfflineThumbnailFileWrapper(megaApiGateway: MegaApiGateway): GetOfflineThumbnailFileWrapper {
         return object : GetOfflineThumbnailFileWrapper {
-            override fun getThumbnailFile(context: Context, node: MegaOffline): File {
-                return OfflineUtils.getThumbnailFile(context, node, megaApiGateway)
-            }
+            override fun getThumbnailFile(context: Context, node: MegaOffline) =
+                OfflineUtils.getThumbnailFile(context, node, megaApiGateway)
 
-            override fun getThumbnailFile(context: Context, handle: String): File {
-                return OfflineUtils.getThumbnailFile(context, handle, megaApiGateway)
-            }
+            override fun getThumbnailFile(context: Context, handle: String) =
+                OfflineUtils.getThumbnailFile(context, handle, megaApiGateway)
         }
     }
 }

@@ -18,9 +18,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.usecase.KEY_APPEARANCE_COLOR_THEME
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.IOException
 import javax.inject.Inject
@@ -32,7 +32,7 @@ private val Context.appPreferencesDatastore: DataStore<Preferences> by preferenc
         listOf(
             SharedPreferencesMigration(
                 produceSharedPreferences = it::defaultSharedPreferences,
-                keysToMigrate = setOf(SettingsConstants.KEY_APPEARANCE_COLOR_THEME)
+                keysToMigrate = setOf(KEY_APPEARANCE_COLOR_THEME)
             )
         )
     })

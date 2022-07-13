@@ -209,7 +209,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        aB.setTitle(getString(R.string.remember_pwd_dialog_button_test).toUpperCase());
+        aB.setTitle(getString(R.string.remember_pwd_dialog_button_test));
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
         passwordReminderLayout.setVisibility(View.GONE);

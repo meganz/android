@@ -3,6 +3,8 @@ package test.mega.privacy.android.app.data.mapper
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.mapper.toFavouriteInfo
+import mega.privacy.android.app.utils.MegaNodeUtil.isImage
+import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -28,6 +30,7 @@ class FavouriteInfoMapperTest {
             on { parentHandle }.thenReturn(expectedParentId)
             on { base64Handle }.thenReturn(expectedBase64Id)
             on { modificationTime }.thenReturn(expectedModificationTime)
+            on { isFile }.thenReturn(false)
         }
         val expectedHasVersion = true
         val expectedNumChildFolders = 2
@@ -44,7 +47,6 @@ class FavouriteInfoMapperTest {
             gateway.getNumChildFolders(node),
             gateway.getNumChildFiles(node))
 
-        assertThat(actual.node).isSameInstanceAs(node)
         assertThat(actual.name).isEqualTo(expectedName)
         assertThat(actual.size).isEqualTo(expectedSize)
         assertThat(actual.label).isEqualTo(expectedLabel)
@@ -55,5 +57,11 @@ class FavouriteInfoMapperTest {
         assertThat(actual.parentId).isEqualTo(expectedParentId)
         assertThat(actual.base64Id).isEqualTo(expectedBase64Id)
         assertThat(actual.modificationTime).isEqualTo(expectedModificationTime)
+        assertThat(actual.isImage).isEqualTo(node.isImage())
+        assertThat(actual.isVideo).isEqualTo(node.isVideo())
+        assertThat(actual.isFolder).isEqualTo(node.isFolder)
+        assertThat(actual.isFavourite).isEqualTo(node.isFavourite)
+        assertThat(actual.isExported).isEqualTo(node.isExported)
+        assertThat(actual.isTakenDown).isEqualTo(node.isTakenDown)
     }
 }

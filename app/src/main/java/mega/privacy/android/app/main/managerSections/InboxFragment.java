@@ -86,6 +86,7 @@ import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.presentation.inbox.InboxViewModel;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -125,6 +126,8 @@ public class InboxFragment extends RotatableFragment {
 
     DatabaseHandler dbH;
     MegaPreferences prefs;
+
+    private InboxViewModel viewModel;
 
     @Override
     protected RotatableAdapter getAdapter() {
@@ -408,6 +411,15 @@ public class InboxFragment extends RotatableFragment {
         sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
                 new EventObserver<>(this::showSortByPanel));
 
+        viewModel = new ViewModelProvider(this).get(InboxViewModel.class);
+        viewModel.getUpdateNodes().observe(getViewLifecycleOwner(),
+                new EventObserver<>(updatedNodes -> {
+                    hideMultipleSelect();
+                    refresh();
+                    return null;
+                })
+        );
+
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -444,7 +456,7 @@ public class InboxFragment extends RotatableFragment {
             recyclerView.setClipToPadding(false);
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
-            recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
+            recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getResources().getDisplayMetrics()));
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

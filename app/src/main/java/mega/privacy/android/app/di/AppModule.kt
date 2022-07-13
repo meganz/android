@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Process
-import android.os.Vibrator
 import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
@@ -16,9 +15,9 @@ import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.utils.ShakeDetector
-import mega.privacy.android.app.domain.usecase.DefaultGetThemeMode
-import mega.privacy.android.app.domain.usecase.GetThemeMode
 import mega.privacy.android.app.utils.threadpool.MegaThreadFactory
+import mega.privacy.android.domain.usecase.DefaultGetThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import java.util.concurrent.LinkedBlockingQueue

@@ -2479,7 +2479,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         int fullSize = fullListContacts.size();
         if (fullSize > MAX_NUMBER_OF_CONTACTS_IN_LIST) {
             moreButton.setVisibility(View.VISIBLE);
-            moreButton.setText((fullSize - MAX_NUMBER_OF_CONTACTS_IN_LIST) + " " + getResources().getString(R.string.label_more).toUpperCase());
+            moreButton.setText((fullSize - MAX_NUMBER_OF_CONTACTS_IN_LIST) + " " + getResources().getString(R.string.label_more));
         } else {
             moreButton.setVisibility(View.GONE);
         }
@@ -2487,7 +2487,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
     public void showConfirmationRemoveMultipleContactFromShare(final ArrayList<MegaShare> contacts) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        String message = getResources().getString(R.string.remove_multiple_contacts_shared_folder, contacts.size());
+        String message = getResources().getQuantityString(R.plurals.remove_multiple_contacts_shared_folder, contacts.size(), contacts.size());
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> removeMultipleShares(contacts))
                 .setNegativeButton(R.string.general_cancel, (dialog, which) -> {

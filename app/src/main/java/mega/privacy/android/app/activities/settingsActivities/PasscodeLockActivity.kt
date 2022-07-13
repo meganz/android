@@ -158,7 +158,7 @@ class PasscodeLockActivity : BaseActivity() {
                 StringResourcesUtils.getString(
                     if (mode == SET_MODE) R.string.settings_passcode_lock
                     else R.string.title_change_passcode
-                ).uppercase(Locale.ROOT)
+                )
         }
 
         initPasscodeScreen()

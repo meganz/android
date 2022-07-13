@@ -282,7 +282,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
                 setNodes(nodes);
                 parentHandle = -1;
                 adapter.setParentHandle(-1);
-                changeActionBarTitle(getString(R.string.file_provider_title).toUpperCase());
+                changeActionBarTitle(getString(R.string.file_provider_title));
                 if (context instanceof FileProviderActivity) {
                     ((FileProviderActivity) context).setParentHandle(parentHandle);
                     Timber.d("ParentHandle change to: %s", parentHandle);
@@ -314,7 +314,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
             }
         }
 
-        changeActionBarTitle(getString(R.string.file_provider_title).toUpperCase());
+        changeActionBarTitle(getString(R.string.file_provider_title));
     }
 
     @Override
@@ -416,7 +416,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
                 Timber.d("The parent handle change to: %s", parentHandle);
             }
 
-            changeActionBarTitle(getString(R.string.file_provider_title).toUpperCase());
+            changeActionBarTitle(getString(R.string.file_provider_title));
             findNodes();
 
             setNodes(nodes);

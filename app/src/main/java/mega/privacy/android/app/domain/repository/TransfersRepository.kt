@@ -48,4 +48,33 @@ interface TransfersRepository {
      * @return True if the completed transfers is empty, false otherwise.
      */
     suspend fun isCompletedTransfersEmpty(): Boolean
+
+    /**
+     * Are transfers paused (downloads and uploads)
+     *
+     * @return true if downloads and uploads are paused
+     */
+    suspend fun areTransfersPaused(): Boolean
+
+    /**
+     * Gets the number of pending and paused uploads.
+     *
+     * @return Number of pending and paused uploads.
+     */
+    suspend fun getNumPendingPausedUploads(): Int
+
+    /**
+     * Gets the number of pending, non-background and paused downloads.
+     *
+     * @return Number of pending, non-background and paused downloads.
+     */
+    suspend fun getNumPendingNonBackgroundPausedUploads(): Int
+
+    /**
+     * Checks if the queue of transfers is paused or if all in progress transfers are individually paused.
+     *
+     * @return True if the queue of transfers is paused or if all in progress transfers are
+     * individually paused, false otherwise.
+     */
+    suspend fun areAllTransfersPaused(): Boolean
 }

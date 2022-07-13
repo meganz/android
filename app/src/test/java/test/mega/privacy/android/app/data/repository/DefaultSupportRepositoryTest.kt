@@ -6,15 +6,19 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.repository.DefaultSupportRepository
-import mega.privacy.android.app.domain.exception.MegaException
-import mega.privacy.android.app.domain.repository.SupportRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.repository.SupportRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaTransfer
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.io.File
 
 @ExperimentalCoroutinesApi

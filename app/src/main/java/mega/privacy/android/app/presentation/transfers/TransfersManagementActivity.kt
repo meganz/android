@@ -1,9 +1,7 @@
 package mega.privacy.android.app.presentation.transfers
 
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import android.widget.RelativeLayout
@@ -100,19 +98,30 @@ open class TransfersManagementActivity : PasscodeActivity() {
             .observe(this, ::updateTransfersWidget)
 
         LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
-            .observe(this) { show ->
-                when {
-                    show && transfersManagement.shouldShowScanningTransfersDialog() -> {
-                        showScanningTransfersDialog()
-                    }
-                    !show && !transfersManagement.shouldShowScanningTransfersDialog() -> {
-                        scanningTransfersDialog?.dismiss()
-                    }
-                }
-            }
+            .observeForever(::onShowScanningTransfersDialog)
 
         transfersViewModel.onTransfersInfoUpdate().observe(this) { (transferType, transfersInfo) ->
             transfersWidget?.update(transferType = transferType, transfersInfo = transfersInfo)
+        }
+
+        transfersViewModel.onGetTransfersState().observe(this) { areAllTransfersPaused ->
+            transfersWidget?.updateState(areAllTransfersPaused)
+        }
+    }
+
+    /**
+     * Shows or hides the scanning dialog.
+     *
+     * @param show  True if should show the dialog, false if should hide it.
+     */
+    private fun onShowScanningTransfersDialog(show: Boolean) {
+        when {
+            show && transfersManagement.shouldShowScanningTransfersDialog() -> {
+                showScanningTransfersDialog()
+            }
+            !show && !transfersManagement.shouldShowScanningTransfersDialog() -> {
+                scanningTransfersDialog?.dismiss()
+            }
         }
     }
 
@@ -228,13 +237,24 @@ open class TransfersManagementActivity : PasscodeActivity() {
                     StringResourcesUtils.getString(R.string.transfers_cancelled)
                 )
             }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null)
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss)) { _, _ ->
+                if (transfersManagement.shouldShowScanningTransfersDialog()) {
+                    showScanningTransfersDialog()
+                }
+            }
             .create()
             .apply {
                 setCancelable(false)
                 setCanceledOnTouchOutside(false)
                 show()
             }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
+            .removeObserver(::onShowScanningTransfersDialog)
     }
 
     override fun onResume() {
@@ -245,6 +265,13 @@ open class TransfersManagementActivity : PasscodeActivity() {
         }
 
         updateTransfersWidget()
+    }
+
+    override fun onPostResume() {
+        super.onPostResume()
+
+        LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
+            .observeForever(::onShowScanningTransfersDialog)
     }
 
     override fun onDestroy() {
@@ -265,7 +292,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Updates the state of the transfers widget.
      */
     fun updateTransfersWidgetState() {
-        transfersWidget?.updateState()
+        transfersViewModel.checkTransfersState()
     }
 
     /**

@@ -10,7 +10,6 @@
 		android:gravity="left"
 		android:textSize="18sp"
 		android:textColor="?android:attr/textColorPrimary"
-		android:textAllCaps="true"
 		android:fontFamily="sans-serif-light"
 		android:textStyle="bold"
 		android:text="@string/action_cancel_subscriptions"/>

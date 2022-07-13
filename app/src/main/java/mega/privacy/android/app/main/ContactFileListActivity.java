@@ -276,7 +276,8 @@ public class ContactFileListActivity extends PasscodeActivity
 
     @Override
     public void showNewFolderDialog(String typedText) {
-        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, typedText);
+        newFolderDialog = MegaNodeDialogUtil
+                .showNewFolderDialog(this, this, megaApi.getNodeByHandle(parentHandle), typedText);
     }
 
     @Override
@@ -1106,8 +1107,7 @@ public class ContactFileListActivity extends PasscodeActivity
         if (aB != null) {
             if (title == null) {
                 Timber.d("Reset title and subtitle");
-                aB.setTitle(StringResourcesUtils.getString(R.string.title_incoming_shares_with_explorer)
-                        .toUpperCase(Locale.getDefault()));
+                aB.setTitle(StringResourcesUtils.getString(R.string.title_incoming_shares_with_explorer));
                 aB.setSubtitle(fullName);
 
             } else {

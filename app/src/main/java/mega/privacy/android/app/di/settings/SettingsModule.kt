@@ -5,14 +5,14 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
-import mega.privacy.android.app.domain.repository.LoggingRepository
-import mega.privacy.android.app.domain.repository.SupportRepository
-import mega.privacy.android.app.domain.usecase.AreChatLogsEnabled
-import mega.privacy.android.app.domain.usecase.AreSdkLogsEnabled
-import mega.privacy.android.app.domain.usecase.GetSupportEmail
-import mega.privacy.android.app.domain.usecase.SetChatLogsEnabled
-import mega.privacy.android.app.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
+import mega.privacy.android.domain.repository.LoggingRepository
+import mega.privacy.android.domain.repository.SupportRepository
+import mega.privacy.android.domain.usecase.AreChatLogsEnabled
+import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
+import mega.privacy.android.domain.usecase.GetSupportEmail
+import mega.privacy.android.domain.usecase.SetChatLogsEnabled
+import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 
 /**
  * Settings module
