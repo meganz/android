@@ -7,6 +7,7 @@ import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -57,7 +58,10 @@ class EndCallUseCase @Inject constructor(
                     onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
                         when {
                             emitter.isDisposed -> return@OptionalMegaChatRequestListenerInterface
-                            error.errorCode == MegaError.API_OK -> emitter.onComplete()
+                            error.errorCode == MegaError.API_OK -> {
+                                Timber.d("Call successfully hung up")
+                                emitter.onComplete()
+                            }
                             else -> emitter.onError(error.toMegaException())
                         }
                     })

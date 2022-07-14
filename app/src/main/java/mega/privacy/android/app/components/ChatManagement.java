@@ -9,6 +9,7 @@ import static mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotificat
 import static mega.privacy.android.app.utils.CallUtil.existsAnOngoingOrIncomingCall;
 import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
 import static mega.privacy.android.app.utils.Constants.KEY_IS_SHOWED_WARNING_MESSAGE;
+import static mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_ALONE_ON_THE_CALL;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
@@ -42,7 +43,10 @@ public class ChatManagement {
     private final ChatRoomListener chatRoomListener;
     private final MegaApplication app;
     private CountDownTimer countDownTimerToEndCall = null;
-    public long millisecondsUntilEndCall = 0;
+    public long millisecondsOnlyMeInCallDialog = 0;
+    private CountDownTimer countDownTimerWaitingForOthers = null;
+    public long millisecondsWaitingForOthersCallDialog = 0;
+
     // Boolean indicating whether the end call dialog was ignored.
     public Boolean hasEndCallDialogBeenIgnored = false;
 
@@ -327,22 +331,48 @@ public class ChatManagement {
     }
 
     /**
-     * Method to start a timer to end the call
+     * Method to start a timer to wait for other participants to join
      *
      * @param chatId     Chat ID of the call
      * @param timeToWait seconds to wait
      */
-    public void startCounterToFinishCall(long chatId, long timeToWait) {
-        stopCounterToFinishCall();
-        hasEndCallDialogBeenIgnored = false;
-        millisecondsUntilEndCall = TimeUnit.SECONDS.toMillis(timeToWait);
+    public void startCounterWaitingCall(long chatId, long timeToWait) {
+        stopCounterWaitingForOthers();
+        millisecondsWaitingForOthersCallDialog = TimeUnit.SECONDS.toMillis(timeToWait);
 
-        if (countDownTimerToEndCall == null) {
-            countDownTimerToEndCall = new CountDownTimer(TimeUnit.SECONDS.toMillis(timeToWait), TimeUnit.SECONDS.toMillis(1)) {
+        if (countDownTimerWaitingForOthers == null) {
+            countDownTimerWaitingForOthers = new CountDownTimer(TimeUnit.SECONDS.toMillis(timeToWait), TimeUnit.SECONDS.toMillis(1)) {
 
                 @Override
                 public void onTick(long millisUntilFinished) {
-                    millisecondsUntilEndCall = millisUntilFinished;
+                    millisecondsWaitingForOthersCallDialog = millisUntilFinished;
+                }
+
+                @Override
+                public void onFinish() {
+                    startCounterToFinishCall(chatId, SECONDS_TO_WAIT_ALONE_ON_THE_CALL);
+                }
+            }.start();
+        }
+    }
+
+    /**
+     * Method to start a timer to end the call
+     *
+     * @param chatId        Chat ID of the call
+     * @param secondsToWait seconds to wait
+     */
+    public void startCounterToFinishCall(long chatId, long secondsToWait) {
+        stopCounterToFinishCall();
+        hasEndCallDialogBeenIgnored = false;
+        millisecondsOnlyMeInCallDialog = TimeUnit.SECONDS.toMillis(secondsToWait);
+
+        if (countDownTimerToEndCall == null) {
+            countDownTimerToEndCall = new CountDownTimer(TimeUnit.SECONDS.toMillis(secondsToWait), TimeUnit.SECONDS.toMillis(1)) {
+
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    millisecondsOnlyMeInCallDialog = millisUntilFinished;
                 }
 
                 @Override
@@ -359,8 +389,19 @@ public class ChatManagement {
     /**
      * Method to stop the counter to end the call
      */
+    public void stopCounterWaitingForOthers() {
+        millisecondsWaitingForOthersCallDialog = 0;
+        if (countDownTimerWaitingForOthers != null) {
+            countDownTimerWaitingForOthers.cancel();
+            countDownTimerWaitingForOthers = null;
+        }
+    }
+
+    /**
+     * Method to stop the counter to end the call
+     */
     public void stopCounterToFinishCall() {
-        millisecondsUntilEndCall = 0;
+        millisecondsOnlyMeInCallDialog = 0;
         if (countDownTimerToEndCall != null) {
             countDownTimerToEndCall.cancel();
             countDownTimerToEndCall = null;

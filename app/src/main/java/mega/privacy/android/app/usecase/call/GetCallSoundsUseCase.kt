@@ -15,7 +15,8 @@ import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.meeting.CallSoundType
-import mega.privacy.android.app.utils.Constants.SECONDS_IN_MINUTE
+import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_ALONE_ON_THE_CALL
+import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_FOR_OTHERS_PARTICIPANTS
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -41,7 +42,6 @@ class GetCallSoundsUseCase @Inject constructor(
 
     companion object {
         const val SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION: Long = 10
-        const val SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT: Long = 2 * SECONDS_IN_MINUTE
         const val ONE_PARTICIPANT: Int = 1
     }
 
@@ -145,25 +145,31 @@ class GetCallSoundsUseCase @Inject constructor(
                 )
                 .addTo(disposable)
 
-            getParticipantsChangesUseCase.checkIfIAmAloneOnACall()
+            getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onNext = { (chatId, onlyMeInTheCall) ->
+                    onNext = { (chatId, onlyMeInTheCall, waitingForOthers) ->
+                        MegaApplication.getChatManagement().stopCounterToFinishCall()
+                        MegaApplication.getChatManagement().stopCounterWaitingForOthers()
+
                         if (onlyMeInTheCall) {
-                            megaChatApi.getChatCall(chatId)?.let { call ->
-                                if (call.hasLocalAudio()) {
-                                    Timber.d("I am the only participant in the group call/meeting, muted micro")
-                                    megaChatApi.disableAudio(call.chatid, null)
+                            if (!waitingForOthers) {
+                                megaChatApi.getChatCall(chatId)?.let { call ->
+                                    if (call.hasLocalAudio()) {
+                                        Timber.d("I am the only participant in the group call/meeting, muted micro")
+                                        megaChatApi.disableAudio(call.chatid, null)
+                                    }
                                 }
+                                Timber.d("I am the only participant in the group call/meeting, wait 2 minutes to hang up")
+                                MegaApplication.getChatManagement().startCounterToFinishCall(chatId,
+                                    SECONDS_TO_WAIT_ALONE_ON_THE_CALL)
+
+                            } else {
+                                Timber.d("I am waiting for other to join in the group call/meeting, wait 5 minutes")
+                                MegaApplication.getChatManagement().startCounterWaitingCall(chatId,
+                                    SECONDS_TO_WAIT_FOR_OTHERS_PARTICIPANTS)
                             }
-
-                            Timber.d("I am the only participant in the group call/meeting, wait 2 minutes to hang up")
-                            MegaApplication.getChatManagement().startCounterToFinishCall(chatId,
-                                SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT)
-
-                        } else {
-                            MegaApplication.getChatManagement().stopCounterToFinishCall()
                         }
                     },
                     onError = { error ->

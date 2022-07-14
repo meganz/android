@@ -180,7 +180,7 @@ class GetCallUseCase @Inject constructor(
      *
      * @return List of ongoing calls
      */
-    private fun getCallsInProgressAndOnHold(): ArrayList<MegaChatCall> {
+    fun getCallsInProgressAndOnHold(): ArrayList<MegaChatCall> {
         val listCalls = ArrayList<MegaChatCall>()
 
         megaChatApi.chatCalls?.let {
