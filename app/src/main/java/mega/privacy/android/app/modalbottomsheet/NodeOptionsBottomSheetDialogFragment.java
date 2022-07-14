@@ -1,6 +1,5 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import static mega.privacy.android.app.constants.EventConstants.EVENT_VAULT_ACTION;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog;
