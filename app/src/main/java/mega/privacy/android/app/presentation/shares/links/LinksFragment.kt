@@ -102,7 +102,7 @@ class LinksFragment : MegaNodeBaseFragment() {
 
         managerViewModel.decreaseLinksTreeDepth()
 
-        when {
+        return when {
             managerState().linksTreeDepth == 0 -> {
                 //In the beginning of the navigation
                 Timber.d("deepBrowserTree==0")
@@ -122,6 +122,8 @@ class LinksFragment : MegaNodeBaseFragment() {
                     else
                         gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
                 }
+
+                3
             }
 
             managerState().linksTreeDepth > 0 -> {
@@ -152,15 +154,17 @@ class LinksFragment : MegaNodeBaseFragment() {
                     }
                 }
 
+                2
             }
             else -> {
                 managerViewModel.resetLinksTreeDepth()
+                
+                0
             }
 
 
         }
 
-        return 1
     }
 
     override fun itemClick(position: Int) {
