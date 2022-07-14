@@ -33,6 +33,15 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * Get meeting list use case
+ *
+ * @property context                Android context
+ * @property megaApi                MegaApi
+ * @property megaChatApi            MegaChatApi
+ * @property getChatChangesUseCase  Use case needed to get latest changes from Mega Api
+ * @property checkChatDndUseCase    Use case needed to check DND chats
+ */
 class GetMeetingListUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
@@ -41,6 +50,11 @@ class GetMeetingListUseCase @Inject constructor(
     private val checkChatDndUseCase: CheckChatDndUseCase,
 ) {
 
+    /**
+     * Get a list of updated MeetingItems
+     *
+     * @return  Flowable
+     */
     fun get(): Flowable<List<MeetingItem>> =
         Flowable.create({ emitter ->
             val changesSubscription = CompositeDisposable()

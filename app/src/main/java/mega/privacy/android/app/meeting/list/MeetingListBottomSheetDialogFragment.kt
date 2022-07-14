@@ -24,6 +24,9 @@ import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.setImageRequestFromUri
 
+/**
+ * Meeting list bottom sheet dialog fragment that displays meeting options
+ */
 class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     companion object {
@@ -130,6 +133,9 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
     }
 
+    /**
+     * Show leave chat dialog
+     */
     private fun showLeaveChatDialog() {
         MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))

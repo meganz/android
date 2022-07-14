@@ -18,6 +18,13 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+/**
+ * Meeting list view model
+ *
+ * @property getMeetingListUseCase  Use case to retrieve meeting list
+ * @property archiveChatUseCase     Use case to archive chats
+ * @property leaveChatUseCase       Use case to leave chats
+ */
 @HiltViewModel
 class MeetingListViewModel @Inject constructor(
     private val getMeetingListUseCase: GetMeetingListUseCase,
@@ -50,6 +57,11 @@ class MeetingListViewModel @Inject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Get meetings
+     *
+     * @return  LiveData with a list of MeetingItem
+     */
     fun getMeetings(): LiveData<List<MeetingItem>> =
         meetings.map { items ->
             if (!queryString.isNullOrBlank()) {
@@ -66,14 +78,30 @@ class MeetingListViewModel @Inject constructor(
             }
         }
 
+    /**
+     * Get specific meeting given its chat id
+     *
+     * @param chatId    Chat id to identify chat
+     * @return          LiveData with MeetingItem
+     */
     fun getMeeting(chatId: Long): LiveData<MeetingItem?> =
         meetings.map { meeting -> meeting.find { it.chatId == chatId } }
 
+    /**
+     * Set search query string
+     *
+     * @param query Search query
+     */
     fun setSearchQuery(query: String?) {
         queryString = query
         meetings.notifyObserver()
     }
 
+    /**
+     * Archive chat
+     *
+     * @param chatId    Chat id to be archived
+     */
     fun archiveChat(chatId: Long) {
         archiveChatUseCase.archive(chatId, true)
             .subscribeOn(Schedulers.io())
@@ -81,6 +109,11 @@ class MeetingListViewModel @Inject constructor(
             .subscribeBy(onError = Timber::e)
     }
 
+    /**
+     * Leave chat
+     *
+     * @param chatId    Chat id to leave
+     */
     fun leaveChat(chatId: Long) {
         leaveChatUseCase.leave(chatId)
             .subscribeOn(Schedulers.io())

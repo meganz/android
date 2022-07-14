@@ -18,6 +18,9 @@ import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter.Tabs.C
 import mega.privacy.android.app.meeting.list.MeetingListFragment
 import mega.privacy.android.app.utils.StringResourcesUtils
 
+/**
+ * Chat tabs fragment containing Chat and Meeting fragment
+ */
 @AndroidEntryPoint
 class ChatTabsFragment : Fragment() {
 
@@ -85,11 +88,16 @@ class ChatTabsFragment : Fragment() {
         }
     }
 
-    fun onSearchQuery(query: String) {
+    /**
+     * Set search query
+     *
+     * @param query Search query string
+     */
+    fun setSearchQuery(query: String) {
         childFragmentManager.fragments.firstOrNull { it.isResumed }?.let { fragment ->
             when (fragment) {
                 is RecentChatsFragment -> fragment.filterChats(query, false)
-                is MeetingListFragment -> fragment.onSearchQuery(query)
+                is MeetingListFragment -> fragment.setSearchQuery(query)
             }
         }
     }
@@ -103,6 +111,11 @@ class ChatTabsFragment : Fragment() {
         binding.tabs.elevation = if (show) toolbarElevation else 0F
     }
 
+    /**
+     * Get existing RecentChatsFragment
+     *
+     * @return  RecentChatsFragment
+     */
     fun getRecentChatsFragment(): RecentChatsFragment? =
         childFragmentManager.fragments.find { it is RecentChatsFragment } as? RecentChatsFragment?
 

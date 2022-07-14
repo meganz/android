@@ -375,7 +375,6 @@ import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
-import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaViewHolder;
@@ -5149,7 +5148,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (drawerItem == DrawerItem.CHAT) {
                     searchViewModel.setSearchQuery(newText);
                     if (getChatsFragment() != null) {
-                        getChatsFragment().onSearchQuery(newText);
+                        getChatsFragment().setSearchQuery(newText);
                     }
                 } else if (drawerItem == DrawerItem.HOMEPAGE) {
                     if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {

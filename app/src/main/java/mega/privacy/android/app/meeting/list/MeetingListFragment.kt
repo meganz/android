@@ -82,7 +82,12 @@ class MeetingListFragment : Fragment() {
         }
     }
 
-    fun onSearchQuery(query: String?) {
+    /**
+     * Set search query
+     *
+     * @param query Search query string
+     */
+    fun setSearchQuery(query: String?) {
         viewModel.setSearchQuery(query)
     }
 
