@@ -403,7 +403,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
         // Root of outgoing shares tab, display sort options OTHERS
         else if (getCurrentSharesTab() == SharesTab.OUTGOING_TAB
-                && managerState(this).getIncomingTreeDepth() == 0) {
+                && managerState(this).getOutgoingTreeDepth() == 0) {
             orderType = ORDER_OTHERS;
         }
 
