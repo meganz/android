@@ -3879,7 +3879,7 @@
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
     <string name="skip_folder">Skip this folder</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
-    <string name="folder_already_exists_in_location">The folder named [B]%1$s[/B] already exists at this destination.</string>
+    <string name="folder_already_exists_in_location">A folder named [B]%1$s[/B] already exists at this destination.</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">Bad connection</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
@@ -3980,16 +3980,8 @@
     <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
     <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">You’re the only host on the call. Do you want to assign another one before leaving?</string>
-    <!-- Name of hots or hosts in the meeting info bottom panel -->
-    <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
-        <item quantity="one">Host: %s</item>
-        <item quantity="other">Hosts: %s</item>
-    </plurals>
-    <!-- Number of participants in the call in the meeting info bottom panel -->
-    <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
-        <item quantity="one">Participant: %s</item>
-        <item quantity="other">Participants: %s</item>
-    </plurals>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">Waiting for others to join</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Yes</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -4005,11 +3997,33 @@
         <item quantity="other">%1$d files</item>
     </plurals>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
-    <string name="account_upgrade_storage_label">[A]%1$s[/A] Storage</string>
+    <string name="account_upgrade_storage_label">[A]%1$s[/A] storage</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] Transfer quota</string>
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] transfer quota</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">Storage</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
-    <string name="account_choose_free_limited_transfer_quota">[A]Limited[/A] Transfer quota</string>
+    <string name="account_choose_free_limited_transfer_quota">[A]Limited[/A] transfer quota</string>
+    <!-- Name of hots or hosts in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
+        <item quantity="one">Host: %s</item>
+        <item quantity="other">Hosts: %s</item>
+    </plurals>
+    <!-- Number of participants in the call in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
+        <item quantity="one">Participant: %s</item>
+        <item quantity="other">Participants: %s</item>
+    </plurals>
+    <!-- Chat log message when the permissions for a user has been changed to read-onl -->
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] was changed to read-only by [/B][A]%2$s[/A]</string>
+    <!-- Chat log message when the permissions for a user has been changed to standard -->
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to standard role by [/B][A]%2$s[/A]</string>
+    <!-- Chat log message when the permissions for a user has been changed to host -->
+    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] was changed to host role by [/B][A]%2$s[/A]</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s was changed to read-only by %2$s</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to standard role by %2$s</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s was changed to host role by %2$s</string>
 </resources>

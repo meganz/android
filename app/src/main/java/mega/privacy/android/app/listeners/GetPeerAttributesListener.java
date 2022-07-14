@@ -13,6 +13,7 @@ import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.MegaChatParticipant;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
+import mega.privacy.android.domain.entity.ChatRequest;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -28,7 +29,7 @@ public class GetPeerAttributesListener extends ChatBaseListener {
     private MegaChatAdapter.ViewHolderMessageChat holder;
     private MegaChatAdapter adapter;
 
-    private MegaChatRequest request;
+    private ChatRequest request;
 
     public GetPeerAttributesListener(Context context) {
         super(context);
@@ -66,9 +67,9 @@ public class GetPeerAttributesListener extends ChatBaseListener {
      * Constructor used to request for participant's attributes from a chat message notification.
      *
      * @param context current Context
-     * @param request MegaChatRequest which contains the push notification to update
+     * @param request ChatRequest which contains the push notification to update
      */
-    public GetPeerAttributesListener(Context context, MegaChatRequest request) {
+    public GetPeerAttributesListener(Context context, ChatRequest request) {
         super(context);
 
         this.request = request;

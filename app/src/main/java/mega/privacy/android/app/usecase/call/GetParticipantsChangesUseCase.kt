@@ -20,6 +20,7 @@ import javax.inject.Inject
  */
 class GetParticipantsChangesUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
+    private val getCallUseCase: GetCallUseCase,
 ) {
 
     companion object {
@@ -56,28 +57,34 @@ class GetParticipantsChangesUseCase @Inject constructor(
      *
      * @property chatId        Chat ID of the call
      * @property onlyMeInTheCall    True, if I'm the only one in the call. False, if there are more participants.
+     * @property waitingForOthers True, if I'm waiting for others participants. False, otherwise.
      */
     data class NumParticipantsChangesResult(
         val chatId: Long,
         val onlyMeInTheCall: Boolean,
+        val waitingForOthers: Boolean,
     )
 
     /**
-     * Method to check if I am alone in the meeting o group call
+     * Method to check if I am alone on any call and whether it is because I am waiting for others or because everyone has dropped out of the call.
      */
-    fun checkIfIAmAloneOnACall(): Flowable<NumParticipantsChangesResult> =
+    fun checkIfIAmAloneOnAnyCall(): Flowable<NumParticipantsChangesResult> =
         Flowable.create({ emitter ->
+            getCallUseCase.getCallsInProgressAndOnHold().let { calls ->
+                for (call in calls) {
+                    emitter.onNext(checkIfIAmAloneOnSpecificCall(call))
+                }
+            }
+
             val callCompositionObserver = Observer<MegaChatCall> { call ->
-                megaChatApi.getChatRoom(call.chatid)?.let { chat ->
-                    val isRequestSent =
-                        MegaApplication.getChatManagement().isRequestSent(call.callId)
-                    val isOneToOneCall = !chat.isGroup && !chat.isMeeting
-                    if (!isRequestSent && !isOneToOneCall) {
-                        call.peeridParticipants?.let { list ->
-                            val onlyMeInTheCall =
-                                list.size().toInt() == 1 && list.get(0) == megaChatApi.myUserHandle
-                            emitter.onNext(NumParticipantsChangesResult(call.chatid,
-                                onlyMeInTheCall))
+                call?.apply {
+                    if (status == MegaChatCall.CALL_STATUS_IN_PROGRESS || status == MegaChatCall.CALL_STATUS_JOINING) {
+                        emitter.onNext(checkIfIAmAloneOnSpecificCall(this))
+                    } else {
+                        if (status != MegaChatCall.CALL_STATUS_DESTROYED) {
+                            emitter.onNext(NumParticipantsChangesResult(chatid,
+                                onlyMeInTheCall = false,
+                                waitingForOthers = false))
                         }
                     }
                 }
@@ -87,7 +94,6 @@ class GetParticipantsChangesUseCase @Inject constructor(
                 .observeForever(callCompositionObserver)
 
             emitter.setCancellable {
-                removeCountDown()
                 LiveEventBus.get(
                     EventConstants.EVENT_CALL_COMPOSITION_CHANGE,
                     MegaChatCall::class.java
@@ -95,6 +101,35 @@ class GetParticipantsChangesUseCase @Inject constructor(
                     .removeObserver(callCompositionObserver)
             }
         }, BackpressureStrategy.LATEST)
+
+    /**
+     * Method to check if I am alone on a specific call and whether it is because I am waiting for others or because everyone has dropped out of the call
+     *
+     * @param call MegaChatCall
+     * @return NumParticipantsChangesResult
+     */
+    fun checkIfIAmAloneOnSpecificCall(call: MegaChatCall): NumParticipantsChangesResult {
+        megaChatApi.getChatRoom(call.chatid)?.let { chat ->
+            val isOneToOneCall = !chat.isGroup && !chat.isMeeting
+            if (!isOneToOneCall) {
+                call.peeridParticipants?.let { list ->
+                    val onlyMeInTheCall =
+                        list.size().toInt() == 1 && list.get(0) == megaChatApi.myUserHandle
+
+                    val waitingForOthers =
+                        MegaApplication.getChatManagement().isRequestSent(call.callId)
+
+                    return NumParticipantsChangesResult(call.chatid,
+                        onlyMeInTheCall,
+                        waitingForOthers)
+                }
+            }
+        }
+
+        return NumParticipantsChangesResult(call.chatid,
+            onlyMeInTheCall = false,
+            waitingForOthers = false)
+    }
 
     /**
      * Method to get local audio changes

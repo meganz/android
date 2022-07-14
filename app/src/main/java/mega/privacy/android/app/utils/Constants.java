@@ -191,6 +191,9 @@ public class Constants {
     public static final int SECONDS_IN_MONTH_31 = SECONDS_IN_DAY * 31;
     public static final int SECONDS_IN_YEAR = SECONDS_IN_DAY * 365;
 
+    public static final long SECONDS_TO_WAIT_ALONE_ON_THE_CALL = 2 * SECONDS_IN_MINUTE;
+    public static final long SECONDS_TO_WAIT_FOR_OTHERS_PARTICIPANTS = 5 * SECONDS_IN_MINUTE;
+
     public static final int COLOR_STATUS_BAR_ACCENT = 1;
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
     public static final int COLOR_STATUS_BAR_ZERO = 3;
@@ -944,4 +947,8 @@ public class Constants {
     public static final long LONG_SNACKBAR_DURATION = 2750;
 
     public static final String CANNOT_OPEN_FILE_SHOWN = "CANNOT_OPEN_FILE_SHOWN";
+
+    public static final int STATS_MD_CLICK = 99200;
+    public static final int STATS_MD_CLICK_MORE_THAN_3 = 99201;
+    public static final int STATS_MD_CLICK_MORE_THAN_3_SAME_FOLDER = 99202;
 }

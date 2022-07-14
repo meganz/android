@@ -257,6 +257,14 @@ interface MegaApiGateway {
     fun handleToBase64(handle: Long): String
 
     /**
+     * Converts a Base64-encoded node handle to a handle.
+     *
+     * @param base64Handle Base64-encoded node handle.
+     * @return Node handle.
+     */
+    fun base64ToHandle(base64Handle: String): Long
+
+    /**
      * Cancel transfer
      *
      * @param transfer to be cancelled

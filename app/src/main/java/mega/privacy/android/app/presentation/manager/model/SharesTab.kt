@@ -1,11 +1,9 @@
 package mega.privacy.android.app.presentation.manager.model
 
 /**
- * Define the different values for the shares screen
- *
- * @param position the position of the tab in the adapter
+ * Define the different tab values for the shares screen
  */
-enum class SharesTab(val position: Int) {
+enum class SharesTab(override val position: Int) : Tab {
     /**
      * Default value
      */

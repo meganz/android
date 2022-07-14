@@ -14,6 +14,7 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
@@ -22,15 +23,15 @@ import timber.log.Timber;
 
 public class SortUtil {
 
-    public static void sortByNameDescending(ArrayList<MegaNode> nodes) {
+    public static void sortByNameDescending(List<MegaNode> nodes) {
         sort(nodes, true);
     }
 
-    public static void sortByNameAscending(ArrayList<MegaNode> nodes) {
+    public static void sortByNameAscending(List<MegaNode> nodes) {
         sort(nodes, false);
     }
 
-    private static void sort(ArrayList<MegaNode> nodes, boolean reverse) {
+    private static void sort(List<MegaNode> nodes, boolean reverse) {
         ArrayList<String> foldersOrder = new ArrayList<>();
         ArrayList<String> filesOrder = new ArrayList<>();
         ArrayList<MegaNode> tempNodes = new ArrayList<>();

@@ -1,8 +1,5 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import static mega.privacy.android.app.main.ManagerActivity.INCOMING_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
-import static mega.privacy.android.app.main.ManagerActivity.OUTGOING_TAB;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog;
@@ -93,6 +90,7 @@ import mega.privacy.android.app.main.FileInfoActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.VersionsFileActivity;
 import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
@@ -541,8 +539,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case SHARED_ITEMS_MODE:
-                int tabSelected = ((ManagerActivity) requireActivity()).getTabItemShares();
-                if (tabSelected == 0 || nC.nodeComesFromIncoming(node)) {
+                SharesTab tabSelected = ((ManagerActivity) requireActivity()).getTabItemShares();
+                if (tabSelected == SharesTab.INCOMING_TAB || nC.nodeComesFromIncoming(node)) {
                     Timber.d("showOptionsPanelIncoming");
 
                     optionRemove.setVisibility(View.GONE);
@@ -628,7 +626,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             optionRubbishBin.setVisibility(View.GONE);
                             break;
                     }
-                } else if (tabSelected == 1) {
+                } else if (tabSelected == SharesTab.OUTGOING_TAB) {
                     Timber.d("showOptionsPanelOutgoing");
 
                     if (!isTakenDown && ((ManagerActivity) requireActivity()).getDeepBrowserTreeOutgoing() == FIRST_NAVIGATION_LEVEL
@@ -650,7 +648,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionMove.setVisibility(View.GONE);
                     optionRemove.setVisibility(View.GONE);
                     optionLeaveShares.setVisibility(View.GONE);
-                } else if (tabSelected == 2) {
+                } else if (tabSelected == SharesTab.LINKS_TAB) {
                     if (!isTakenDown && node.isShared()) {
                         optionClearShares.setVisibility(View.VISIBLE);
                     } else if (ViewUtils.isVisible(optionClearShares)) {
@@ -818,15 +816,15 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 i.putExtra(HANDLE, node.getHandle());
 
                 if (drawerItem == DrawerItem.SHARED_ITEMS) {
-                    if (((ManagerActivity) requireActivity()).getTabItemShares() == 0) {
+                    if (((ManagerActivity) requireActivity()).getTabItemShares() == SharesTab.INCOMING_TAB) {
                         i.putExtra("from", FROM_INCOMING_SHARES);
                         i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL,
                                 ((ManagerActivity) requireActivity()).getDeepBrowserTreeIncoming() <= FIRST_NAVIGATION_LEVEL);
-                    } else if (((ManagerActivity) requireActivity()).getTabItemShares() == 1) {
+                    } else if (((ManagerActivity) requireActivity()).getTabItemShares() == SharesTab.OUTGOING_TAB) {
                         i.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
                     }
                 } else if (drawerItem == DrawerItem.INBOX) {
-                    if (((ManagerActivity) requireActivity()).getTabItemShares() == 0) {
+                    if (((ManagerActivity) requireActivity()).getTabItemShares() == SharesTab.INCOMING_TAB) {
                         i.putExtra("from", FROM_INBOX);
                     }
                 } else if (drawerItem == DrawerItem.SEARCH) {
@@ -984,7 +982,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case SHARED_ITEMS:
-                if (((ManagerActivity) requireActivity()).getTabItemShares() == 0) {
+                if (((ManagerActivity) requireActivity()).getTabItemShares() == SharesTab.INCOMING_TAB) {
                     adapterType = FROM_INCOMING_SHARES;
                     break;
                 }
