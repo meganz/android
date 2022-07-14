@@ -682,7 +682,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 case COMPLETED_TRANSFERS:
                     return "android:switcher:" + R.id.transfers_tabs_pager + ":" + 1;
                 case RECENT_CHAT:
-                    return "recentChatsFragment";
+                    return "chatTabsFragment";
                 case NOTIFICATIONS:
                     return "notificationsFragment";
                 case TURN_ON_NOTIFICATIONS:
@@ -779,7 +779,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private SearchFragment searchFragment;
     private PhotosFragment photosFragment;
     private AlbumContentFragment albumContentFragment;
-//    private RecentChatsFragment recentChatsFragment;
     private ChatTabsFragment chatTabsFragment;
     private NotificationsFragment notificationsFragment;
     private TurnOnNotificationsFragment turnOnNotificationsFragment;
@@ -4252,7 +4251,7 @@ public class ManagerActivity extends TransfersManagementActivity
             refreshFragment(FragmentTag.RECENT_CHAT.getTag());
         }
 
-        replaceFragment(new ChatTabsFragment(), FragmentTag.RECENT_CHAT.getTag());
+        replaceFragment(ChatTabsFragment.newInstance(), FragmentTag.RECENT_CHAT.getTag());
 
         drawerLayout.closeDrawer(Gravity.LEFT);
     }
@@ -7002,12 +7001,12 @@ public class ManagerActivity extends TransfersManagementActivity
 
         fabMaskLayout.findViewById(R.id.fab_meeting).setOnClickListener(l -> {
             fabMainClickCallback();
-            handler.postDelayed(this::showMeetingOptionsPanel, FAB_MASK_OUT_DELAY);
+            handler.postDelayed(() -> showMeetingOptionsPanel(false), FAB_MASK_OUT_DELAY);
         });
 
         fabMaskLayout.findViewById(R.id.text_meeting).setOnClickListener(l -> {
             fabMainClickCallback();
-            handler.postDelayed(this::showMeetingOptionsPanel, FAB_MASK_OUT_DELAY);
+            handler.postDelayed(() -> showMeetingOptionsPanel(false), FAB_MASK_OUT_DELAY);
         });
 
         if (isFabExpanded) {
@@ -7441,11 +7440,11 @@ public class ManagerActivity extends TransfersManagementActivity
         startActivity(intent);
     }
 
-    public void showMeetingOptionsPanel() {
+    public void showMeetingOptionsPanel(boolean showSimpleList) {
         if (CallUtil.participatingInACall()) {
             showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
         } else {
-            bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
+            bottomSheetDialogFragment = MeetingBottomSheetDialogFragment.newInstance(showSimpleList);
             bottomSheetDialogFragment.show(getSupportFragmentManager(), MeetingBottomSheetDialogFragment.TAG);
         }
     }
@@ -8277,7 +8276,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             boolean isMeeting = intent.getBooleanExtra(AddContactActivity.EXTRA_MEETING, false);
             if (isMeeting) {
-                handler.post(() -> showMeetingOptionsPanel());
+                handler.post(() -> showMeetingOptionsPanel(false));
                 return;
             }
             final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS);
@@ -11175,6 +11174,11 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             return null;
         }
+    }
+
+    public boolean isMeetingTabShown() {
+        return !(getChatsFragment().getRecentChatsFragment() != null
+                && getChatsFragment().getRecentChatsFragment().isVisible());
     }
 
     private PermissionsFragment getPermissionsFragment() {
