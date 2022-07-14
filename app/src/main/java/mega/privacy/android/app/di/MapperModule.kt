@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.data.mapper.ChatRequestMapper
 import mega.privacy.android.app.data.mapper.ContactRequestMapper
 import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
@@ -14,6 +15,7 @@ import mega.privacy.android.app.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.mapper.getMimeType
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
+import mega.privacy.android.app.data.mapper.toChatRequest
 import mega.privacy.android.app.data.mapper.toContactRequest
 import mega.privacy.android.app.data.mapper.toData
 import mega.privacy.android.app.data.mapper.toFavouriteInfo
@@ -56,4 +58,7 @@ class MapperModule {
 
     @Provides
     fun provideUserAlertMapper(): UserAlertMapper = ::toUserAlert
+
+    @Provides
+    fun provideChatRequestMapper(): ChatRequestMapper = ::toChatRequest
 }
