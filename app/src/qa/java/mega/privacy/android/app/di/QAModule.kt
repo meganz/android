@@ -1,19 +1,32 @@
 package mega.privacy.android.app.di
 
+import android.content.Context
+import android.hardware.SensorManager
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.gateway.DistributionGateway
 import mega.privacy.android.app.data.gateway.FirebaseDistributionGateway
+import mega.privacy.android.app.data.gateway.MotionSensorFacade
+import mega.privacy.android.app.data.gateway.MotionSensorGateway
 import mega.privacy.android.app.data.repository.DefaultQARepository
+import mega.privacy.android.app.domain.repository.DefaultShakeDetectorRepository
 import mega.privacy.android.app.domain.repository.QARepository
+import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
+import mega.privacy.android.app.domain.usecase.DefaultGetVibrateCountUseCase
+import mega.privacy.android.app.domain.usecase.DefaultShakeDetectorUseCase
+import mega.privacy.android.app.domain.usecase.GetVibrateCountUseCase
+import mega.privacy.android.app.domain.usecase.ShakeDetectorUseCase
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import mega.privacy.android.app.domain.usecase.UpdateApp
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
+import mega.privacy.android.app.domain.usecase.VibrateDeviceUseCase
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 
 /**
@@ -67,4 +80,24 @@ class QAModule {
     @Provides
     fun provideUpdateApp(qaRepository: QARepository): UpdateApp =
         UpdateApp(qaRepository::updateApp)
+
+    @Provides
+    fun provideShakeDetectorRepository(repository: DefaultShakeDetectorRepository): ShakeDetectorRepository =
+        repository
+
+    @Provides
+    fun provideGetVibrateCountUseCase(repository: DefaultShakeDetectorRepository): GetVibrateCountUseCase =
+        DefaultGetVibrateCountUseCase(repository)
+
+    @Provides
+    fun provideShakeDetectorUseCase(repository: DefaultShakeDetectorRepository): ShakeDetectorUseCase =
+        DefaultShakeDetectorUseCase(repository)
+
+    @Provides
+    fun provideVibrateDeviceUseCase(repository: DefaultShakeDetectorRepository): VibrateDeviceUseCase =
+        VibrateDeviceUseCase(repository::vibrateDevice)
+
+    @Provides
+    fun provideMotionSensorGateway(@ApplicationContext context: Context): MotionSensorGateway =
+        MotionSensorFacade(context)
 }
