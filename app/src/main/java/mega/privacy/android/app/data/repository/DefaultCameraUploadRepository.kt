@@ -6,16 +6,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
-import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.repository.CameraUploadRepository
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.domain.entity.SyncRecord
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaTransfer
 import java.util.concurrent.ThreadPoolExecutor
 import javax.inject.Inject
@@ -25,7 +21,6 @@ import javax.inject.Inject
  *
  * @property databaseHandler DatabaseHandler
  * @property context Context
- * @property megaApiGateway MegaApiGateway
  * @property threadPoolExecutor ThreadPoolExecutor
  * @property ioDispatcher CoroutineDispatcher
  * @property megaLocalStorageFacade MegaLocalStorageGateway
@@ -33,7 +28,6 @@ import javax.inject.Inject
 class DefaultCameraUploadRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
-    private val megaApiGateway: MegaApiGateway,
     private val threadPoolExecutor: ThreadPoolExecutor,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageFacade: MegaLocalStorageGateway,
@@ -73,18 +67,10 @@ class DefaultCameraUploadRepository @Inject constructor(
     override fun getPendingSyncRecords(): List<SyncRecord> =
         databaseHandler.findAllPendingSyncRecords()
 
-    override fun manageSyncFileUpload(
-        handlePreference: (preference: Int) -> Unit,
-        noPreference: () -> Unit,
-    ) {
-        val fileUpload = databaseHandler.preferences.camSyncFileUpload
-        if (fileUpload != null && fileUpload.toIntOrNull() != null) {
-            handlePreference(fileUpload.toInt())
-        } else {
-            databaseHandler.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS)
-            noPreference()
-        }
-    }
+    override fun setPhotosSyncFileUpload() =
+        databaseHandler.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS)
+
+    override fun getSyncFileUpload(): String? = databaseHandler.preferences.camSyncFileUpload
 
     override fun getVideoQuality(): String = databaseHandler.preferences.uploadVideoQuality
 
@@ -180,13 +166,7 @@ class DefaultCameraUploadRepository @Inject constructor(
     override fun getRemoveGpsDefault() =
         databaseHandler.preferences.removeGPS?.toBoolean() ?: true
 
-    override fun initializeMegaChat() =
-        ChatUtil.initMegaChatApi(databaseHandler.credentials.session)
-
-    override fun shouldCompressVideo(): Boolean {
-        val qualitySetting = databaseHandler.preferences.uploadVideoQuality
-        return qualitySetting != null && qualitySetting.toInt() != SettingsConstants.VIDEO_QUALITY_ORIGINAL
-    }
+    override fun getUploadVideoQuality(): String? = databaseHandler.preferences.uploadVideoQuality
 
     override fun getKeepFileNames() = databaseHandler.preferences.keepFileNames.toBoolean()
 
@@ -203,10 +183,6 @@ class DefaultCameraUploadRepository @Inject constructor(
     override fun getUriMediaFolderExternalSd(): String = databaseHandler.uriMediaExternalSdCard
 
     override fun shouldClearSyncRecords() = databaseHandler.shouldClearCamsyncRecords()
-
-    override fun addCompletedTransfer(transfer: MegaTransfer, error: MegaError) =
-        TransfersManagement.addCompletedTransfer(AndroidCompletedTransfer(transfer, error),
-            databaseHandler)
 
     override fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long =
         databaseHandler.findMaxTimestamp(isSecondary, syncRecordType) ?: 0
@@ -227,8 +203,8 @@ class DefaultCameraUploadRepository @Inject constructor(
         isSecondary: Boolean,
     ) = databaseHandler.updateSyncRecordStatusByLocalPath(syncStatusType, localPath, isSecondary)
 
-    // TODO SUSPEND AND CONTINUATION INSTEAD OF CALLBACK LISTENER
-    override fun fastLogin(listener: MegaRequestListenerInterface) {
-        databaseHandler.credentials.session?.let { megaApiGateway.fastLogin(it, listener) }
-    }
+    override fun addCompletedTransfer(transfer: MegaTransfer, error: MegaError) =
+        TransfersManagement.addCompletedTransfer(AndroidCompletedTransfer(transfer, error),
+            databaseHandler)
+
 }

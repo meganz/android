@@ -3,7 +3,6 @@ package mega.privacy.android.app.domain.repository
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.domain.entity.SyncRecord
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaTransfer
 
 /**
@@ -41,14 +40,18 @@ interface CameraUploadRepository {
     fun setSyncTimeStamp(timestamp: Long, type: DefaultCameraUploadRepository.SyncTimeStamp)
 
     /**
-     * Manage the sync file upload preference
+     * Get sync file upload
+     *
+     * @return sync file upload type
+     */
+    fun getSyncFileUpload(): String?
+
+    /**
+     * Set photos sync file upload
      *
      * @return
      */
-    fun manageSyncFileUpload(
-        handlePreference: (preference: Int) -> Unit,
-        noPreference: () -> Unit,
-    )
+    fun setPhotosSyncFileUpload()
 
     /**
      * Get all pending sync records to prepare for upload
@@ -203,25 +206,11 @@ interface CameraUploadRepository {
     fun getRemoveGpsDefault(): Boolean
 
     /**
-     * Execute a fast login
+     * Get upload video quality
      *
-     * @return
+     * @return upload video quality
      */
-    fun fastLogin(listener: MegaRequestListenerInterface) // TODO SUSPEND
-
-    /**
-     * Initialize Mega Chat API
-     *
-     * @return
-     */
-    fun initializeMegaChat()
-
-    /**
-     * Should compress video
-     *
-     * @return
-     */
-    fun shouldCompressVideo(): Boolean
+    fun getUploadVideoQuality(): String?
 
     /**
      * Get keep file names preference
@@ -271,13 +260,6 @@ interface CameraUploadRepository {
      * @return true if camera upload sync records should be cleared
      */
     fun shouldClearSyncRecords(): Boolean
-
-    /**
-     * Add completed transfer
-     *
-     * @return
-     */
-    fun addCompletedTransfer(transfer: MegaTransfer, error: MegaError)
 
     /**
      * Get maximum timestamp or null
@@ -331,4 +313,11 @@ interface CameraUploadRepository {
         localPath: String?,
         isSecondary: Boolean,
     )
+
+    /**
+     * Add completed transfer
+     *
+     * @return
+     */
+    fun addCompletedTransfer(transfer: MegaTransfer, error: MegaError)
 }

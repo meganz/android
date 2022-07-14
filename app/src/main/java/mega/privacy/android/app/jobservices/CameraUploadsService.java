@@ -97,9 +97,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import kotlin.Unit;
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoCompressor;
@@ -111,6 +110,7 @@ import mega.privacy.android.app.domain.usecase.DeleteSyncRecordByLocalPath;
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath;
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary;
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery;
+import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris;
 import mega.privacy.android.app.domain.usecase.HasCredentials;
 import mega.privacy.android.app.domain.usecase.HasPreferences;
 import mega.privacy.android.app.domain.usecase.IsCameraUploadSyncEnabled;
@@ -119,6 +119,8 @@ import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet;
 import mega.privacy.android.app.domain.usecase.IsSecondaryFolderEnabled;
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied;
 import mega.privacy.android.app.domain.usecase.SetSecondaryFolderPath;
+import mega.privacy.android.app.domain.usecase.SetSyncLocalPath;
+import mega.privacy.android.app.domain.usecase.ShouldCompressVideo;
 import mega.privacy.android.app.domain.usecase.UpdateCameraUploadTimeStamp;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
@@ -126,6 +128,7 @@ import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import mega.privacy.android.domain.entity.SyncRecord;
@@ -188,6 +191,15 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     DeleteSyncRecordByFingerprint deleteSyncRecordByFingerprint;
 
     @Inject
+    SetSyncLocalPath setSyncLocalPath;
+
+    @Inject
+    GetSyncFileUploadUris getSyncFileUploadUris;
+
+    @Inject
+    ShouldCompressVideo shouldCompressVideo;
+
+    @Inject
     SetSecondaryFolderPath setSecondaryFolderPath;
 
     @Inject
@@ -195,6 +207,9 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
 
     @Inject
     ThreadPoolExecutor megaThreadPoolExecutor;
+
+    @Inject
+    DatabaseHandler tempDbHandler;
 
     private static final int LOCAL_FOLDER_REMINDER_PRIMARY = 1908;
     private static final int LOCAL_FOLDER_REMINDER_SECONDARY = 1909;
@@ -605,38 +620,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             secondaryUploadNode = megaApi.getNodeByHandle(secondaryUploadHandle);
         }
 
-        ArrayList<Uri> uris = new ArrayList<>();
-        cameraUploadRepository.manageSyncFileUpload(preference -> {
-            switch (preference) {
-                case MegaPreferences.ONLY_PHOTOS: {
-                    Timber.d("Only upload photo.");
-                    uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                    break;
-                }
-                case MegaPreferences.ONLY_VIDEOS: {
-                    Timber.d("Only upload video.");
-                    uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-                    uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
-                    break;
-                }
-                case MegaPreferences.PHOTOS_AND_VIDEOS: {
-                    Timber.d("Upload photo and video.");
-                    uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                    uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-                    uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
-                    break;
-                }
-            }
-            return Unit.INSTANCE;
-        }, () -> {
-            Timber.d("What to upload setting is NULL, only upload photo.");
-            uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-            return Unit.INSTANCE;
-        });
-
+        List<Uri> uris = getSyncFileUploadUris.invoke();
         String cameraLocalPath = localPath.invoke();
         for (int i = 0; i < uris.size(); i++) {
             Uri uri = uris.get(i);
@@ -834,7 +818,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             }
 
             String path;
-            if (isCompressedVideo || file.getType() == SyncRecordType.TYPE_PHOTO.getValue() || (file.getType() == SyncRecordType.TYPE_VIDEO.getValue() && cameraUploadRepository.shouldCompressVideo())) {
+            if (isCompressedVideo || file.getType() == SyncRecordType.TYPE_PHOTO.getValue() || (file.getType() == SyncRecordType.TYPE_VIDEO.getValue() && shouldCompressVideo.invoke())) {
                 path = file.getNewPath();
                 File temp = new File(path);
                 if (!temp.exists()) {
@@ -1026,7 +1010,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                         sourceFile.getName(),
                         gpsData[1],
                         gpsData[0],
-                        cameraUploadRepository.shouldCompressVideo() && type == SyncRecordType.TYPE_VIDEO.getValue() ? SyncStatus.STATUS_TO_COMPRESS.getValue() : SyncStatus.STATUS_PENDING.getValue(),
+                        shouldCompressVideo.invoke() && type == SyncRecordType.TYPE_VIDEO.getValue() ? SyncStatus.STATUS_TO_COMPRESS.getValue() : SyncStatus.STATUS_PENDING.getValue(),
                         type,
                         null,
                         false,
@@ -1074,7 +1058,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
         if (!isLocalPrimaryFolderSet.invoke()) {
             localFolderUnavailableNotification(R.string.camera_notif_primary_local_unavailable, LOCAL_FOLDER_REMINDER_PRIMARY);
             disableCameraUploadSettingProcess();
-            cameraUploadRepository.setSyncLocalPath(INVALID_NON_NULL_VALUE);
+            setSyncLocalPath.invoke(INVALID_NON_NULL_VALUE);
             setSecondaryFolderPath.invoke(INVALID_NON_NULL_VALUE);
             //refresh settings fragment UI
             sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING));
@@ -1098,8 +1082,11 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             Timber.w("RootNode = null");
             running = true;
             MegaApplication.setLoggingIn(true);
-            cameraUploadRepository.fastLogin(this);
-            cameraUploadRepository.initializeMegaChat();
+            // Remove DbHandler and Refactor in MegaApi dependency removal with use cases:
+            // GetSession, FastLogin, InitMegaChat (already provided)
+            megaApi.fastLogin(tempDbHandler.getCredentials().getSession(), this);
+            ChatUtil.initMegaChatApi(tempDbHandler.getCredentials().getSession());
+
             return LOGIN_IN;
         }
 

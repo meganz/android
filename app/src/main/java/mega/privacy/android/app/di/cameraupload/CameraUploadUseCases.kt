@@ -12,11 +12,14 @@ import mega.privacy.android.app.domain.usecase.DefaultDeleteSyncRecordByLocalPat
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
+import mega.privacy.android.app.domain.usecase.DefaultGetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsSecondaryFolderEnabled
 import mega.privacy.android.app.domain.usecase.DefaultIsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.DefaultSetSecondaryFolderPath
+import mega.privacy.android.app.domain.usecase.DefaultSetSyncLocalPath
+import mega.privacy.android.app.domain.usecase.DefaultShouldCompressVideo
 import mega.privacy.android.app.domain.usecase.DefaultUpdateCameraUploadTimeStamp
 import mega.privacy.android.app.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.app.domain.usecase.DeleteSyncRecordByFingerprint
@@ -24,6 +27,7 @@ import mega.privacy.android.app.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
+import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.HasCredentials
 import mega.privacy.android.app.domain.usecase.HasPreferences
 import mega.privacy.android.app.domain.usecase.IsCameraUploadSyncEnabled
@@ -32,6 +36,8 @@ import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.SetSecondaryFolderPath
+import mega.privacy.android.app.domain.usecase.SetSyncLocalPath
+import mega.privacy.android.app.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.app.domain.usecase.UpdateCameraUploadTimeStamp
 
 /**
@@ -136,4 +142,23 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindSetSecondaryFolderPath(setSecondaryFolderPath: DefaultSetSecondaryFolderPath): SetSecondaryFolderPath
+
+    /**
+     * Provide the SetSyncLocalPath implementation
+     */
+    @Binds
+    abstract fun bindSetSyncLocalPath(setSyncLocalPath: DefaultSetSyncLocalPath): SetSyncLocalPath
+
+
+    /**
+     * Provide the GetSyncFileUploadUris implementation
+     */
+    @Binds
+    abstract fun bindGetSyncFileUploadUris(getSyncFileUploadUris: DefaultGetSyncFileUploadUris): GetSyncFileUploadUris
+
+    /**
+     * Provide the ShouldCompressVideo implementation
+     */
+    @Binds
+    abstract fun bindShouldCompressVideo(shouldCompressVideo: DefaultShouldCompressVideo): ShouldCompressVideo
 }
