@@ -68,6 +68,12 @@ interface FilesRepository {
     suspend fun getCameraSortOrder(): Int
 
     /**
+     * Get others sort order
+     * @return others sort order
+     */
+    suspend fun getOthersSortOrder(): Int
+
+    /**
      * Checks if Inbox node has children.
      *
      * @return True if Inbox has children, false otherwise.

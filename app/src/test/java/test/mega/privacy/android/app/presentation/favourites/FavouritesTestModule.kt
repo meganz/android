@@ -16,8 +16,6 @@ import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.domain.usecase.GetAlbums
 import mega.privacy.android.domain.usecase.GetAllFavorites
-import mega.privacy.android.domain.usecase.GetCameraSortOrder
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.RemoveFavourites
@@ -33,8 +31,6 @@ object FavouritesTestModule {
     val getAllFavourites = mock<GetAllFavorites>()
     val getFavouriteFolderInfo = mock<GetFavouriteFolderInfo>()
     val stringUtilWrapper = mock<StringUtilWrapper>()
-    val getCloudSortOrder = mock<GetCloudSortOrder>()
-    private val getCameraSortOrder = mock<GetCameraSortOrder>()
     val favouriteMapper = mock<FavouriteMapper>()
     val getThumbnail = mock<GetThumbnail>()
     val megaUtilWrapper = mock<MegaUtilWrapper>()
@@ -48,7 +44,6 @@ object FavouritesTestModule {
     @Provides
     fun provideGetFavouriteFolderInfo(): GetFavouriteFolderInfo = getFavouriteFolderInfo
 
-
     @Provides
     fun provideMegaUtilWrapper(): MegaUtilWrapper = megaUtilWrapper
 
@@ -57,12 +52,6 @@ object FavouritesTestModule {
 
     @Provides
     fun provideRemoveFavourites(): RemoveFavourites = mock()
-
-    @Provides
-    fun provideGetCloudSortOrder(): GetCloudSortOrder = getCloudSortOrder
-
-    @Provides
-    fun provideGetCameraSortOrder(): GetCameraSortOrder = getCameraSortOrder
 
     @Provides
     fun provideFavouriteMapper(): FavouriteMapper = favouriteMapper
