@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.managerSections;
 
-import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Util.dp2px;
@@ -37,6 +36,7 @@ import mega.privacy.android.app.interfaces.MoveTransferInterface;
 import mega.privacy.android.app.listeners.MoveTransferListener;
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
+import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -469,7 +469,7 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
 
     @Override
     public void hideTabs(boolean hide) {
-        managerActivity.hideTabs(hide, PENDING_TAB);
+        managerActivity.hideTabs(hide, TransfersTab.PENDING_TAB);
     }
 
     @Override

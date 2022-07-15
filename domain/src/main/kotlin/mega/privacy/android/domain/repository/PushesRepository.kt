@@ -1,6 +1,6 @@
-package mega.privacy.android.app.domain.repository
+package mega.privacy.android.domain.repository
 
-import nz.mega.sdk.MegaChatRequest
+import mega.privacy.android.domain.entity.ChatRequest
 
 /**
  * Pushes repository.
@@ -37,5 +37,5 @@ interface PushesRepository {
      * @param chatId Base64-encoded chat identifier.
      * @return Result of the request. Required for creating the notification.
      */
-    suspend fun pushReceived(beep: Boolean, chatId: String?): MegaChatRequest
+    suspend fun pushReceived(beep: Boolean, chatId: String?): ChatRequest
 }

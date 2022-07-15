@@ -40,7 +40,7 @@ object ModalBottomSheetUtil {
      */
     @JvmStatic
     fun openWith(context: Context, node: MegaNode?) {
-        openWith(context, node)
+        (null).openWith(context, node, null)
     }
 
     /**

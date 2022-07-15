@@ -148,7 +148,7 @@ public abstract class RotatableFragment extends Fragment {
         this.waitingForSearchedNodes = waitingForSearchedNodes;
     }
 
-    void resetSelectedItems() {
+    protected void resetSelectedItems() {
         selectedItems = null;
     }
 }

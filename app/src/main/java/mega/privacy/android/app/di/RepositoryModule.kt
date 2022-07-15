@@ -24,7 +24,7 @@ import mega.privacy.android.app.data.repository.TimberLoggingRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.repository.GlobalStatesRepository
-import mega.privacy.android.app.domain.repository.PushesRepository
+import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
