@@ -11,6 +11,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.app.usecase.chat.LeaveChatUseCase
+import mega.privacy.android.app.usecase.chat.SignalChatPresenceUseCase
 import mega.privacy.android.app.usecase.meeting.GetMeetingListUseCase
 import mega.privacy.android.app.utils.RxUtil.debounceImmediate
 import mega.privacy.android.app.utils.notifyObserver
@@ -21,15 +22,17 @@ import javax.inject.Inject
 /**
  * Meeting list view model
  *
- * @property getMeetingListUseCase  Use case to retrieve meeting list
- * @property archiveChatUseCase     Use case to archive chats
- * @property leaveChatUseCase       Use case to leave chats
+ * @property getMeetingListUseCase      Use case to retrieve meeting list
+ * @property archiveChatUseCase         Use case to archive chats
+ * @property leaveChatUseCase           Use case to leave chats
+ * @property signalChatPresenceUseCase  Use case to signal chat presence
  */
 @HiltViewModel
 class MeetingListViewModel @Inject constructor(
     private val getMeetingListUseCase: GetMeetingListUseCase,
     private val archiveChatUseCase: ArchiveChatUseCase,
     private val leaveChatUseCase: LeaveChatUseCase,
+    private val signalChatPresenceUseCase: SignalChatPresenceUseCase,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -41,6 +44,7 @@ class MeetingListViewModel @Inject constructor(
 
     init {
         retrieveMeetings()
+        signalChatPresence()
     }
 
     private fun retrieveMeetings() {
@@ -119,5 +123,16 @@ class MeetingListViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onError = Timber::e)
+    }
+
+    /**
+     * Signal chat presence
+     */
+    fun signalChatPresence() {
+        signalChatPresenceUseCase.signal()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onError = Timber::e)
+            .addTo(composite)
     }
 }

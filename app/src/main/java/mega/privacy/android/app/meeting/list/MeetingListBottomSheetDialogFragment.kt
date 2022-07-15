@@ -60,6 +60,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewModel.signalChatPresence()
         viewModel.getMeeting(chatId).observe(viewLifecycleOwner) { meeting ->
             requireNotNull(meeting) { "Meeting not found" }
 

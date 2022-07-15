@@ -27,8 +27,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/context_empty_contacts"
+        android:text="@string/btn_start_meeting"
+        android:textAllCaps="false"
+        android:textAppearance="@style/TextAppearance.Mega.Body1"
         android:visibility="gone"
-        app:drawableTopCompat="@drawable/ic_zero_contacts"
+        app:drawableTopCompat="@drawable/ic_zero_meeting"
         tools:visibility="visible" />
 </FrameLayout>

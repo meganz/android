@@ -9,7 +9,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.contacts.requests.ContactRequestsFragment
 import mega.privacy.android.app.databinding.FragmentChatTabsBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.RecentChatsFragment
@@ -57,8 +56,9 @@ class ChatTabsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
 
-        if (savedInstanceState?.containsKey(ContactRequestsFragment.STATE_PAGER_POSITION) == true) {
-            setViewPagerPosition(savedInstanceState.getInt(ContactRequestsFragment.STATE_PAGER_POSITION))
+        if (savedInstanceState?.containsKey(STATE_PAGER_POSITION) == true) {
+            val position = savedInstanceState.getInt(STATE_PAGER_POSITION)
+            binding.pager.post { binding.pager.currentItem = position }
         }
     }
 
@@ -118,13 +118,4 @@ class ChatTabsFragment : Fragment() {
      */
     fun getRecentChatsFragment(): RecentChatsFragment? =
         childFragmentManager.fragments.find { it is RecentChatsFragment } as? RecentChatsFragment?
-
-    /**
-     * Update ViewPager current position
-     *
-     * @param pagerPosition     Position to be shown
-     */
-    private fun setViewPagerPosition(pagerPosition: Int) {
-        binding.pager.post { binding.pager.currentItem = pagerPosition }
-    }
 }

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
@@ -69,16 +70,12 @@ class MeetingListFragment : Fragment() {
             }
         })
         binding.listScroller.setRecyclerView(binding.list)
-
-        binding.viewEmpty.text = binding.viewEmpty.text.toString()
-            .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
-            .formatColorTag(requireContext(), 'B', R.color.grey_300_grey_600)
-            .toSpannedHtmlText()
     }
 
     private fun setupObservers() {
         viewModel.getMeetings().observe(viewLifecycleOwner) { items ->
             adapter.submitList(items)
+            binding.viewEmpty.isVisible = items.isNullOrEmpty()
         }
     }
 
@@ -89,9 +86,11 @@ class MeetingListFragment : Fragment() {
      */
     fun setSearchQuery(query: String?) {
         viewModel.setSearchQuery(query)
+        viewModel.signalChatPresence()
     }
 
     private fun onItemClick(chatId: Long) {
+        viewModel.signalChatPresence()
         val intent = Intent(context, ChatActivity::class.java).apply {
             action = Constants.ACTION_CHAT_SHOW_MESSAGES
             putExtra(Constants.CHAT_ID, chatId)
