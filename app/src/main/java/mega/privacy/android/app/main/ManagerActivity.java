@@ -7401,10 +7401,6 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
 
-        if (orderType == ORDER_OTHERS && viewModel.getState().getValue().getIncomingTreeDepth() > 0) {
-            orderType = ORDER_CLOUD;
-        }
-
         bottomSheetDialogFragment = SortByBottomSheetDialogFragment.newInstance(orderType);
 
         bottomSheetDialogFragment.show(getSupportFragmentManager(),
