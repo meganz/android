@@ -17,7 +17,6 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
-import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
@@ -27,6 +26,7 @@ import mega.privacy.android.domain.entity.ContactRequest
 import mega.privacy.android.domain.entity.ContactRequestStatus
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
 import org.junit.Rule
@@ -98,12 +98,10 @@ class ManagerViewModelTest {
             val initial = awaitItem()
             assertThat(initial.browserParentHandle).isEqualTo(-1L)
             assertThat(initial.rubbishBinParentHandle).isEqualTo(-1L)
-            assertThat(initial.incomingParentHandle).isEqualTo(-1L)
             assertThat(initial.outgoingParentHandle).isEqualTo(-1L)
             assertThat(initial.linksParentHandle).isEqualTo(-1L)
             assertThat(initial.inboxParentHandle).isEqualTo(-1L)
             assertThat(initial.isFirstNavigationLevel).isTrue()
-            assertThat(initial.incomingTreeDepth).isEqualTo(0)
             assertThat(initial.outgoingTreeDepth).isEqualTo(0)
             assertThat(initial.linksTreeDepth).isEqualTo(0)
             assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
@@ -137,18 +135,6 @@ class ManagerViewModelTest {
             }
     }
 
-    @Test
-    fun `test that incoming parent handle is updated if new value provided`() = runTest {
-        setUnderTest()
-
-        underTest.state.map { it.incomingParentHandle }.distinctUntilChanged()
-            .test {
-                val newValue = 123456789L
-                assertThat(awaitItem()).isEqualTo(-1L)
-                underTest.setIncomingParentHandle(newValue)
-                assertThat(awaitItem()).isEqualTo(newValue)
-            }
-    }
 
     @Test
     fun `test that outgoing parent handle is updated if new value provided`() = runTest {
@@ -201,60 +187,6 @@ class ManagerViewModelTest {
                 assertThat(awaitItem()).isEqualTo(newValue)
             }
     }
-
-    @Test
-    fun `test that incoming tree depth is increased when calling increaseIncomingTreeDepth`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.incomingTreeDepth }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isEqualTo(0)
-                    underTest.increaseIncomingTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(1)
-                }
-        }
-
-    @Test
-    fun `test that incoming tree depth is decreased when calling decreaseIncomingTreeDepth`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.incomingTreeDepth }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isEqualTo(0)
-                    underTest.setIncomingTreeDepth(3)
-                    assertThat(awaitItem()).isEqualTo(3)
-                    underTest.decreaseIncomingTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(2)
-                }
-        }
-
-    @Test
-    fun `test that incoming tree depth is updated if new value provided`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.incomingTreeDepth }.distinctUntilChanged()
-                .test {
-                    val newValue = 1
-                    assertThat(awaitItem()).isEqualTo(0)
-                    underTest.setIncomingTreeDepth(newValue)
-                    assertThat(awaitItem()).isEqualTo(newValue)
-                }
-        }
-
-    @Test
-    fun `test that incoming tree depth equals 0 if resetIncomingTreeDepth`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.incomingTreeDepth }.distinctUntilChanged()
-                .test {
-                    underTest.resetIncomingTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(0)
-                }
-        }
 
     @Test
     fun `test that outgoing tree depth is increased when calling increaseOutgoingTreeDepth`() =

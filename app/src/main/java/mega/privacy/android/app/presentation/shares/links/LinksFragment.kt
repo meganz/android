@@ -20,6 +20,7 @@ import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
@@ -269,7 +270,14 @@ class LinksFragment : MegaNodeBaseFragment() {
 
     override fun updateContact(contactHandle: Long) {}
 
+    override fun showSortByPanel() {
+
+        managerActivity.showNewSortByPanel(ORDER_CLOUD)
+    }
+
     override fun viewerFrom(): Int = Constants.VIEWER_FROM_LINKS
+
+    override fun getParentHandle(): Long = managerState().linksParentHandle
 
     private inner class ActionBarCallBack(currentTab: Tab?) : BaseActionBarCallBack(currentTab) {
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {

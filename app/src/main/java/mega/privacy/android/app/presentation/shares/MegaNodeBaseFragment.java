@@ -393,22 +393,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     /**
      * Shows the Sort by panel.
      */
-    protected void showSortByPanel() {
-        int orderType = ORDER_CLOUD;
-
-        // Root of incoming shares tab, display sort options OTHERS
-        if (getCurrentSharesTab() == SharesTab.INCOMING_TAB
-                && managerState(this).getIncomingTreeDepth() == 0) {
-            orderType = ORDER_OTHERS;
-        }
-        // Root of outgoing shares tab, display sort options OTHERS
-        else if (getCurrentSharesTab() == SharesTab.OUTGOING_TAB
-                && managerState(this).getOutgoingTreeDepth() == 0) {
-            orderType = ORDER_OTHERS;
-        }
-
-        managerActivity.showNewSortByPanel(orderType);
-    }
+    protected abstract void showSortByPanel();
 
     public ActionMode getActionMode() {
         return actionMode;
@@ -495,7 +480,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         if (mimeType.isImage()) {
             intent = ImageViewerActivity.getIntentForParentNode(
                     requireContext(),
-                    getParentHandle(fragmentAdapter),
+                    getParentHandle(),
                     getIntentOrder(fragmentAdapter),
                     node.getHandle()
             );
@@ -515,7 +500,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
             intent.putExtra("position", position);
             intent.putExtra("placeholder", adapter.getPlaceholderCount());
-            intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
+            intent.putExtra("parentNodeHandle", getParentHandle());
             intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("HANDLE", node.getHandle());
@@ -779,21 +764,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         checkEmptyView();
     }
 
-    private long getParentHandle(int fragmentAdapter) {
-        switch (fragmentAdapter) {
-            case INCOMING_SHARES_ADAPTER:
-                return managerState(this).getIncomingParentHandle();
-
-            case OUTGOING_SHARES_ADAPTER:
-                return managerState(this).getOutgoingParentHandle();
-
-            case LINKS_ADAPTER:
-                return managerState(this).getLinksParentHandle();
-            default:
-                return INVALID_HANDLE;
-        }
-
-    }
+    protected abstract long getParentHandle();
 
     protected void hideActionMode() {
         clearSelections();
