@@ -55,6 +55,24 @@ interface FilesRepository {
      */
     suspend fun getNodeByHandle(handle: Long): MegaNode?
 
+
+    /**
+     * Get a list of all incoming shares
+     *
+     * @param order sort order, if null the default order is applied
+     * @return List of MegaNode that other users are sharing with this account
+     */
+    suspend fun getIncomingSharesNode(order: Int? = null): List<MegaNode>
+
+    /**
+     * Authorize and return a MegaNode can be downloaded with any instance of MegaApi
+     *
+     * @param handle the handle of the node to authorize
+     * @return a MegaNode that can be downloaded with any instance of MegaApi,
+     *         null if can't be authorized
+     */
+    suspend fun authorizeNode(handle: Long): MegaNode?
+
     /**
      * Get cloud sort order
      * @return cloud sort order

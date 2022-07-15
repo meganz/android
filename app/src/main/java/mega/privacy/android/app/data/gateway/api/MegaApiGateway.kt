@@ -149,6 +149,14 @@ interface MegaApiGateway {
     suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): ArrayList<MegaNode>
 
     /**
+     * Get a list of all incoming shares
+     *
+     * @param order sort order, if null the default order is applied
+     * @return List of MegaNode that other users are sharing with this account
+     */
+    suspend fun getIncomingSharesNode(order: Int?): List<MegaNode>
+
+    /**
      * Get child folder number of current folder
      * @param node current folder node
      * @return child folder number

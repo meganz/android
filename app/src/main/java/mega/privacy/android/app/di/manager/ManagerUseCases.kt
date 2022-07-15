@@ -6,11 +6,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.repository.FilesRepository
+import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.DefaultGetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
+import mega.privacy.android.app.domain.usecase.GetIncomingSharesNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
@@ -73,5 +75,13 @@ abstract class ManagerUseCases {
         @Provides
         fun provideMonitorUserUpdates(notificationsRepository: NotificationsRepository): MonitorUserAlerts =
             MonitorUserAlerts(notificationsRepository::monitorUserAlerts)
+
+        @Provides
+        fun provideGetIncomingSharesNode(filesRepository: FilesRepository): GetIncomingSharesNode =
+            GetIncomingSharesNode(filesRepository::getIncomingSharesNode)
+
+        @Provides
+        fun provideAuthorizeNode(filesRepository: FilesRepository): AuthorizeNode =
+            AuthorizeNode(filesRepository::authorizeNode)
     }
 }
