@@ -86,6 +86,11 @@ class ChatTabsFragment : Fragment() {
 
             registerOnPageChangeCallback(pageChangeCallback)
         }
+
+        binding.root.post {
+            (activity as? ManagerActivity?)?.showHideBottomNavigationView(false)
+            (activity as? ManagerActivity?)?.showFabButton()
+        }
     }
 
     /**
