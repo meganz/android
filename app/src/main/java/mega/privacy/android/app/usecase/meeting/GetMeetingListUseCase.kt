@@ -9,9 +9,11 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.usecase.chat.CheckChatDndUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
@@ -21,6 +23,7 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -49,6 +52,8 @@ class GetMeetingListUseCase @Inject constructor(
     private val getChatChangesUseCase: GetChatChangesUseCase,
     private val checkChatDndUseCase: CheckChatDndUseCase,
 ) {
+
+    private val chatController: ChatController by lazy { ChatController(context) }
 
     /**
      * Get a list of updated MeetingItems
@@ -116,11 +121,11 @@ class GetMeetingListUseCase @Inject constructor(
                             emitter.onNext(meetings.sortedByDescending { it.timeStamp })
                         }
                     } else {
-                        Timber.e(error.toMegaException())
+                        Timber.w(error.toMegaException())
                     }
                 },
                 onRequestTemporaryError = { _, error ->
-                    Timber.e(error.toMegaException())
+                    Timber.w(error.toMegaException())
                 }
             )
 
@@ -173,10 +178,16 @@ class GetMeetingListUseCase @Inject constructor(
         val chatListItem = megaChatApi.getChatListItem(chatId)
         val title = ChatUtil.getTitleChat(this)
         val isMuted = checkChatDndUseCase.check(chatId).blockingGetOrNull() ?: false
-        val formattedDate = TimeUtils.formatDateAndTime(context,
+        val formattedDate = TimeUtils.formatDateAndTime(
+            context,
             chatListItem.lastTimestamp,
-            TimeUtils.DATE_LONG_FORMAT
-        )
+            TimeUtils.DATE_LONG_FORMAT)
+        val lastMessage = megaChatApi.getMessage(chatId, chatListItem.lastMessageId)
+        val lastMessageFormatted = if (lastMessage != null) {
+            chatController.createManagementString(lastMessage, this)
+        } else {
+            StringResourcesUtils.getString(R.string.no_conversation_history)
+        }
         val firstUser: ContactGroupUser
         var lastUser: ContactGroupUser? = null
 
@@ -197,7 +208,7 @@ class GetMeetingListUseCase @Inject constructor(
         return MeetingItem(
             chatId = chatId,
             title = title,
-            lastMessage = chatListItem.lastMessage,
+            lastMessage = lastMessageFormatted,
             isMuted = isMuted,
             firstUser = firstUser,
             lastUser = lastUser,

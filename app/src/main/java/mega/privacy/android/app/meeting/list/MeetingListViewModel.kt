@@ -71,7 +71,7 @@ class MeetingListViewModel @Inject constructor(
             if (!queryString.isNullOrBlank()) {
                 items.filter { (_, title, lastMessage, _, firstUser, lastUser, _, _) ->
                     title.contains(queryString!!, true)
-                            || lastMessage.contains(queryString!!, true)
+                            || lastMessage?.contains(queryString!!, true) == true
                             || firstUser.firstName?.contains(queryString!!, true) == true
                             || lastUser?.firstName?.contains(queryString!!, true) == true
                             || firstUser.email?.contains(queryString!!, true) == true

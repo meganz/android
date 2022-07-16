@@ -13,8 +13,9 @@ class MeetingsViewHolder(
 
     fun bind(item: MeetingItem) {
         binding.txtTitle.text = item.title
-        binding.txtLastMessage.text = item.lastMessage
         binding.txtTimestamp.text = item.formattedTimestamp
+        binding.txtLastMessage.text = item.lastMessage
+        binding.txtLastMessage.isVisible = !item.lastMessage.isNullOrBlank()
 
         val firstUserPlaceholder = item.firstUser.getImagePlaceholder(itemView.context)
         if (item.isSingleMeeting()) {

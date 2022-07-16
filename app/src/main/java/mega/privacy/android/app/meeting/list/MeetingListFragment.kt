@@ -10,15 +10,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMeetingListBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.chats.ChatTabsFragment
 import mega.privacy.android.app.meeting.list.adapter.MeetingsAdapter
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringUtils.formatColorTag
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
 
 @AndroidEntryPoint
