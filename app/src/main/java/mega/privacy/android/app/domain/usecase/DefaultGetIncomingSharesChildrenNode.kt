@@ -8,7 +8,7 @@ import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
- * Get children nodes of the incoming shares parent handle or root list of incoming shares node
+ * Default Get children nodes of the incoming shares parent handle or root list of incoming shares node
  */
 class DefaultGetIncomingSharesChildrenNode @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
@@ -18,20 +18,13 @@ class DefaultGetIncomingSharesChildrenNode @Inject constructor(
     private val filesRepository: FilesRepository,
 ) : GetIncomingSharesChildrenNode {
 
-    /**
-     * Get a list of all incoming shares or children nodes of the parent handle
-     *
-     * @param parentHandle
-     * @return Children nodes of the parent handle, root list of incoming shares if parent handle is invalid
-     */
-    @Throws(Exception::class)
-    override suspend fun invoke(parentHandle: Long): List<MegaNode> {
+    override suspend fun invoke(parentHandle: Long): List<MegaNode>? {
         return if (parentHandle == -1L || parentHandle == MegaApiJava.INVALID_HANDLE) {
             filesRepository.getIncomingSharesNode(getOthersSortOrder())
         } else {
             getNodeByHandle(parentHandle)
                 ?.let { getChildrenNode(it, getCloudSortOrder()) }
-                ?: run { throw Exception("Node cannot be retrieved") }
+                ?: run { null }
         }
     }
 }

@@ -10,7 +10,9 @@ fun interface GetIncomingSharesChildrenNode {
      * Get a list of all incoming shares
      *
      * @param parentHandle
-     * @return Children nodes of the parent handle, root list of incoming shares if parent handle is invalid
+     * @return Children nodes of the parent handle
+     *         Root list of incoming shares if parent handle is invalid
+     *         null if parent node cannot be retrieved
      */
-    suspend operator fun invoke(parentHandle: Long): List<MegaNode>
+    suspend operator fun invoke(parentHandle: Long): List<MegaNode>?
 }

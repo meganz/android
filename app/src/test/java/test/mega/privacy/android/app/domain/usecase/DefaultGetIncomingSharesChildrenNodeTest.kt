@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.domain.usecase
 
+import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.repository.FilesRepository
@@ -13,6 +14,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -60,16 +62,15 @@ class DefaultGetIncomingSharesChildrenNodeTest {
         }
 
     @Test
-    fun `test that invoke with valid parent handle executes getNodeByHandle`() =
+    fun `test that invoke with valid parent handle, retrieve parent node`() =
         runTest {
             val parentHandle = 123456789L
             underTest(parentHandle)
-
-            verify(getNodeByHandle).invoke(parentHandle)
+            verify(getNodeByHandle).invoke(any())
         }
 
     @Test
-    fun `test that if getNodeByHandle is not null, executes getChildrenNode with getCloudSortOrder`() =
+    fun `test that if parent node can be retrieved, executes getChildrenNode with getCloudSortOrder`() =
         runTest {
             val parentHandle = 123456789L
             val result = mock<MegaNode> {}
@@ -79,11 +80,12 @@ class DefaultGetIncomingSharesChildrenNodeTest {
             verify(getChildrenNode).invoke(result, getCloudSortOrder())
         }
 
-    @Test(expected = Exception::class)
-    fun `test that if getNodeByHandle is null, throws an exception`() =
+    @Test
+    fun `test that if parent node cannot be retrieved, return null`() =
         runTest {
             val parentHandle = 123456789L
             whenever(getNodeByHandle(parentHandle)).thenReturn(null)
-            underTest(parentHandle)
+
+            Truth.assertThat(underTest(parentHandle)).isEqualTo(null)
         }
 }
