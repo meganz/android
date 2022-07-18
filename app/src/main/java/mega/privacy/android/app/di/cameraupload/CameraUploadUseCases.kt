@@ -6,37 +6,68 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.repository.CameraUploadRepository
+import mega.privacy.android.app.domain.usecase.ClearSyncRecords
+import mega.privacy.android.app.domain.usecase.CompressedVideoPending
+import mega.privacy.android.app.domain.usecase.DefaultClearSyncRecords
+import mega.privacy.android.app.domain.usecase.DefaultCompressedVideoPending
 import mega.privacy.android.app.domain.usecase.DefaultDeleteSyncRecord
 import mega.privacy.android.app.domain.usecase.DefaultDeleteSyncRecordByFingerprint
 import mega.privacy.android.app.domain.usecase.DefaultDeleteSyncRecordByLocalPath
+import mega.privacy.android.app.domain.usecase.DefaultFileNameExists
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
+import mega.privacy.android.app.domain.usecase.DefaultGetChargingOnSizeString
+import mega.privacy.android.app.domain.usecase.DefaultGetPendingSyncRecords
+import mega.privacy.android.app.domain.usecase.DefaultGetRemoveGps
 import mega.privacy.android.app.domain.usecase.DefaultGetSyncFileUploadUris
+import mega.privacy.android.app.domain.usecase.DefaultGetSyncRecordByFingerprint
+import mega.privacy.android.app.domain.usecase.DefaultGetSyncRecordByPath
+import mega.privacy.android.app.domain.usecase.DefaultGetVideoQuality
+import mega.privacy.android.app.domain.usecase.DefaultGetVideoSyncRecordsByStatus
+import mega.privacy.android.app.domain.usecase.DefaultIsChargingRequired
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsSecondaryFolderEnabled
 import mega.privacy.android.app.domain.usecase.DefaultIsWifiNotSatisfied
+import mega.privacy.android.app.domain.usecase.DefaultKeepFileNames
+import mega.privacy.android.app.domain.usecase.DefaultMediaLocalPathExists
+import mega.privacy.android.app.domain.usecase.DefaultSaveSyncRecord
 import mega.privacy.android.app.domain.usecase.DefaultSetSecondaryFolderPath
 import mega.privacy.android.app.domain.usecase.DefaultSetSyncLocalPath
+import mega.privacy.android.app.domain.usecase.DefaultSetSyncRecordPendingByPath
 import mega.privacy.android.app.domain.usecase.DefaultShouldCompressVideo
 import mega.privacy.android.app.domain.usecase.DefaultUpdateCameraUploadTimeStamp
 import mega.privacy.android.app.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.app.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.app.domain.usecase.DeleteSyncRecordByLocalPath
+import mega.privacy.android.app.domain.usecase.FileNameExists
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
+import mega.privacy.android.app.domain.usecase.GetChargingOnSizeString
+import mega.privacy.android.app.domain.usecase.GetPendingSyncRecords
+import mega.privacy.android.app.domain.usecase.GetRemoveGps
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
+import mega.privacy.android.app.domain.usecase.GetSyncRecordByFingerprint
+import mega.privacy.android.app.domain.usecase.GetSyncRecordByPath
+import mega.privacy.android.app.domain.usecase.GetVideoQuality
+import mega.privacy.android.app.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.app.domain.usecase.HasCredentials
 import mega.privacy.android.app.domain.usecase.HasPreferences
+import mega.privacy.android.app.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.app.domain.usecase.IsCameraUploadSyncEnabled
+import mega.privacy.android.app.domain.usecase.IsChargingRequired
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
+import mega.privacy.android.app.domain.usecase.KeepFileNames
+import mega.privacy.android.app.domain.usecase.MediaLocalPathExists
+import mega.privacy.android.app.domain.usecase.SaveSyncRecord
 import mega.privacy.android.app.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.app.domain.usecase.SetSyncLocalPath
+import mega.privacy.android.app.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.app.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.app.domain.usecase.UpdateCameraUploadTimeStamp
 
@@ -69,6 +100,13 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideIsCameraUploadSyncEnabled(cameraUploadRepository: CameraUploadRepository): IsCameraUploadSyncEnabled =
             IsCameraUploadSyncEnabled(cameraUploadRepository::isSyncEnabled)
+
+        /**
+         * Provide the IsCameraUploadByWifi implementation
+         */
+        @Provides
+        fun provideIsCameraUploadByWifi(cameraUploadRepository: CameraUploadRepository): IsCameraUploadByWifi =
+            IsCameraUploadByWifi(cameraUploadRepository::isSyncByWifi)
     }
 
     /**
@@ -161,4 +199,94 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindShouldCompressVideo(shouldCompressVideo: DefaultShouldCompressVideo): ShouldCompressVideo
+
+    /**
+     * Provide the GetSyncRecordByPath implementation
+     */
+    @Binds
+    abstract fun bindGetSyncRecordByPath(getSyncRecordByPath: DefaultGetSyncRecordByPath): GetSyncRecordByPath
+
+    /**
+     * Provide the ClearSyncRecords implementation
+     */
+    @Binds
+    abstract fun bindClearSyncRecords(clearSyncRecords: DefaultClearSyncRecords): ClearSyncRecords
+
+    /**
+     * Provide the GetRemoveGps implementation
+     */
+    @Binds
+    abstract fun bindGetRemoveGps(getRemoveGps: DefaultGetRemoveGps): GetRemoveGps
+
+    /**
+     * Provide the FileNameExists implementation
+     */
+    @Binds
+    abstract fun bindFileNameExists(fileNameExists: DefaultFileNameExists): FileNameExists
+
+    /**
+     * Provide the KeepFileNames implementation
+     */
+    @Binds
+    abstract fun bindKeepFileNames(keepFileNames: DefaultKeepFileNames): KeepFileNames
+
+    /**
+     * Provide the GetPendingSyncRecords implementation
+     */
+    @Binds
+    abstract fun bindGetPendingSyncRecords(getPendingSyncRecords: DefaultGetPendingSyncRecords): GetPendingSyncRecords
+
+    /**
+     * Provide the CompressedVideoPending implementation
+     */
+    @Binds
+    abstract fun bindCompressedVideoPending(compressedVideoPending: DefaultCompressedVideoPending): CompressedVideoPending
+
+    /**
+     * Provide the GetSyncRecordByFingerprint implementation
+     */
+    @Binds
+    abstract fun bindGetSyncRecordByFingerprint(getSyncRecordByFingerprint: DefaultGetSyncRecordByFingerprint): GetSyncRecordByFingerprint
+
+    /**
+     * Provide the SaveSyncRecord implementation
+     */
+    @Binds
+    abstract fun bindSaveSyncRecord(saveSyncRecord: DefaultSaveSyncRecord): SaveSyncRecord
+
+    /**
+     * Provide the SetSyncRecordPendingByPath implementation
+     */
+    @Binds
+    abstract fun bindSetSyncRecordPendingByPath(setSyncRecordPendingByPath: DefaultSetSyncRecordPendingByPath): SetSyncRecordPendingByPath
+
+    /**
+     * Provide the GetVideoSyncRecordsByStatus implementation
+     */
+    @Binds
+    abstract fun bindGetVideoSyncRecordsByStatus(getVideoSyncRecordsByStatus: DefaultGetVideoSyncRecordsByStatus): GetVideoSyncRecordsByStatus
+
+    /**
+     * Provide the GetVideoQuality implementation
+     */
+    @Binds
+    abstract fun bindGetVideoQuality(getVideoQuality: DefaultGetVideoQuality): GetVideoQuality
+
+    /**
+     * Provide the GetChargingOnSizeString implementation
+     */
+    @Binds
+    abstract fun bindGetChargingOnSizeString(getChargingOnSize: DefaultGetChargingOnSizeString): GetChargingOnSizeString
+
+    /**
+     * Provide the IsChargingRequired implementation
+     */
+    @Binds
+    abstract fun bindIsChargingRequired(isChargingRequired: DefaultIsChargingRequired): IsChargingRequired
+
+    /**
+     * Provide the MediaLocalPathExists implementation
+     */
+    @Binds
+    abstract fun bindMediaLocalPathExists(mediaLocalPathExists: DefaultMediaLocalPathExists): MediaLocalPathExists
 }

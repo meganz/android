@@ -2,8 +2,6 @@ package mega.privacy.android.app.domain.repository
 
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.domain.entity.SyncRecord
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaTransfer
 
 /**
  * Camera Upload Repository
@@ -126,6 +124,13 @@ interface CameraUploadRepository {
      * @return
      */
     fun shouldClearSyncRecords(clearSyncRecords: Boolean)
+
+    /**
+     * Should clear camera upload sync records
+     *
+     * @return true if camera upload sync records should be cleared
+     */
+    fun shouldClearSyncRecords(): Boolean
 
     /**
      * Does file name exist in database
@@ -255,13 +260,6 @@ interface CameraUploadRepository {
     fun getUriMediaFolderExternalSd(): String
 
     /**
-     * Should clear camera upload sync records
-     *
-     * @return true if camera upload sync records should be cleared
-     */
-    fun shouldClearSyncRecords(): Boolean
-
-    /**
      * Get maximum timestamp or null
      *
      * @return maximum timestamp
@@ -314,10 +312,4 @@ interface CameraUploadRepository {
         isSecondary: Boolean,
     )
 
-    /**
-     * Add completed transfer
-     *
-     * @return
-     */
-    fun addCompletedTransfer(transfer: MegaTransfer, error: MegaError)
 }

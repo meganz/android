@@ -3,16 +3,12 @@ package mega.privacy.android.app.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.repository.CameraUploadRepository
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.domain.entity.SyncRecord
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaTransfer
 import java.util.concurrent.ThreadPoolExecutor
 import javax.inject.Inject
 
@@ -202,9 +198,5 @@ class DefaultCameraUploadRepository @Inject constructor(
         localPath: String?,
         isSecondary: Boolean,
     ) = databaseHandler.updateSyncRecordStatusByLocalPath(syncStatusType, localPath, isSecondary)
-
-    override fun addCompletedTransfer(transfer: MegaTransfer, error: MegaError) =
-        TransfersManagement.addCompletedTransfer(AndroidCompletedTransfer(transfer, error),
-            databaseHandler)
 
 }

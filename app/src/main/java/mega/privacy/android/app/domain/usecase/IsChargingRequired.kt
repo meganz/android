@@ -1,0 +1,15 @@
+package mega.privacy.android.app.domain.usecase
+
+/**
+ * Get is charging required
+ *
+ */
+interface IsChargingRequired {
+
+    /**
+     * Invoke
+     *
+     * @return is charging required
+     */
+    operator fun invoke(queueSize: Long): Boolean
+}

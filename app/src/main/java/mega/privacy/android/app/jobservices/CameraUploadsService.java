@@ -11,7 +11,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_TRAN
 import static mega.privacy.android.app.constants.BroadcastConstants.PROGRESS;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.constants.SettingsConstants.INVALID_PATH;
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CAMERA_UPLOAD;
 import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
@@ -96,31 +95,48 @@ import java.util.concurrent.ThreadPoolExecutor;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository.SyncTimeStamp;
-import mega.privacy.android.app.domain.repository.CameraUploadRepository;
+import mega.privacy.android.app.domain.usecase.ClearSyncRecords;
+import mega.privacy.android.app.domain.usecase.CompressedVideoPending;
 import mega.privacy.android.app.domain.usecase.DeleteSyncRecord;
 import mega.privacy.android.app.domain.usecase.DeleteSyncRecordByFingerprint;
 import mega.privacy.android.app.domain.usecase.DeleteSyncRecordByLocalPath;
+import mega.privacy.android.app.domain.usecase.FileNameExists;
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath;
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary;
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery;
+import mega.privacy.android.app.domain.usecase.GetChargingOnSizeString;
+import mega.privacy.android.app.domain.usecase.GetPendingSyncRecords;
+import mega.privacy.android.app.domain.usecase.GetRemoveGps;
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris;
+import mega.privacy.android.app.domain.usecase.GetSyncRecordByFingerprint;
+import mega.privacy.android.app.domain.usecase.GetSyncRecordByPath;
+import mega.privacy.android.app.domain.usecase.GetVideoQuality;
+import mega.privacy.android.app.domain.usecase.GetVideoSyncRecordsByStatus;
 import mega.privacy.android.app.domain.usecase.HasCredentials;
 import mega.privacy.android.app.domain.usecase.HasPreferences;
+import mega.privacy.android.app.domain.usecase.IsCameraUploadByWifi;
 import mega.privacy.android.app.domain.usecase.IsCameraUploadSyncEnabled;
+import mega.privacy.android.app.domain.usecase.IsChargingRequired;
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet;
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet;
 import mega.privacy.android.app.domain.usecase.IsSecondaryFolderEnabled;
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied;
+import mega.privacy.android.app.domain.usecase.KeepFileNames;
+import mega.privacy.android.app.domain.usecase.MediaLocalPathExists;
+import mega.privacy.android.app.domain.usecase.SaveSyncRecord;
 import mega.privacy.android.app.domain.usecase.SetSecondaryFolderPath;
 import mega.privacy.android.app.domain.usecase.SetSyncLocalPath;
+import mega.privacy.android.app.domain.usecase.SetSyncRecordPendingByPath;
 import mega.privacy.android.app.domain.usecase.ShouldCompressVideo;
 import mega.privacy.android.app.domain.usecase.UpdateCameraUploadTimeStamp;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
@@ -179,6 +195,9 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     IsCameraUploadSyncEnabled isCameraUploadSyncEnabled;
 
     @Inject
+    IsCameraUploadByWifi isCameraUploadByWifi;
+
+    @Inject
     IsWifiNotSatisfied isWifiNotSatisfied;
 
     @Inject
@@ -203,7 +222,49 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     SetSecondaryFolderPath setSecondaryFolderPath;
 
     @Inject
-    CameraUploadRepository cameraUploadRepository;
+    ClearSyncRecords clearSyncRecords;
+
+    @Inject
+    GetRemoveGps getRemoveGps;
+
+    @Inject
+    GetSyncRecordByPath getSyncRecordByPath;
+
+    @Inject
+    SaveSyncRecord saveSyncRecord;
+
+    @Inject
+    FileNameExists fileNameExists;
+
+    @Inject
+    KeepFileNames keepFileNames;
+
+    @Inject
+    GetPendingSyncRecords getPendingSyncRecords;
+
+    @Inject
+    CompressedVideoPending compressedVideoPending;
+
+    @Inject
+    GetSyncRecordByFingerprint getSyncRecordByFingerprint;
+
+    @Inject
+    GetVideoSyncRecordsByStatus getVideoSyncRecordsByStatus;
+
+    @Inject
+    SetSyncRecordPendingByPath setSyncRecordPendingByPath;
+
+    @Inject
+    GetVideoQuality getVideoQuality;
+
+    @Inject
+    MediaLocalPathExists mediaLocalPathExists;
+
+    @Inject
+    GetChargingOnSizeString getChargingOnSizeString;
+
+    @Inject
+    IsChargingRequired isChargingRequired;
 
     @Inject
     ThreadPoolExecutor megaThreadPoolExecutor;
@@ -303,7 +364,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (mVideoCompressor != null && isChargingRequired(mVideoCompressor.getTotalInputSize() / (1024 * 1024))) {
+            if (mVideoCompressor != null && isChargingRequired.invoke(mVideoCompressor.getTotalInputSize() / (1024 * 1024))) {
                 Timber.d("Detected device stops charging.");
                 mVideoCompressor.stop();
             }
@@ -382,7 +443,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     public void onTypeChanges(int type) {
         Timber.d("Network type change to: %s", type);
         megaThreadPoolExecutor.execute(() -> {
-            stopByNetworkStateChange = type == MOBILE && cameraUploadRepository.isSyncByWifi();
+            stopByNetworkStateChange = type == MOBILE && isCameraUploadByWifi.invoke();
             if (stopByNetworkStateChange) {
                 for (MegaTransfer transfer : cuTransfers) {
                     megaApi.cancelTransfer(transfer, this);
@@ -737,14 +798,14 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
         updateTimeStamp.invoke(null, SyncTimeStamp.SECONDARY_PHOTO);
         updateTimeStamp.invoke(null, SyncTimeStamp.SECONDARY_VIDEO);
 
-        List<SyncRecord> finalList = cameraUploadRepository.getPendingSyncRecords();
+        List<SyncRecord> finalList = getPendingSyncRecords.invoke();
 
         // Reset backup state as active.
         CameraUploadSyncManager.INSTANCE.updatePrimaryBackupState(CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE);
         CameraUploadSyncManager.INSTANCE.updateSecondaryBackupState(CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE);
 
         if (finalList.size() == 0) {
-            if (isCompressedVideoPending()) {
+            if (compressedVideoPending.invoke()) {
                 Timber.d("Pending upload list is empty, now check view compression status.");
                 startVideoCompression();
             } else {
@@ -767,19 +828,14 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
 
     private void startParallelUpload(List<SyncRecord> finalList, boolean isCompressedVideo) {
         CameraUploadSyncManager.INSTANCE.startActiveHeartbeat(finalList);
-        boolean removeGPS = cameraUploadRepository.getRemoveGpsDefault();
-
         for (SyncRecord file : finalList) {
             if (!running) break;
-
             boolean isSec = file.isSecondary();
             MegaNode parent = isSec ? secondaryUploadNode : cameraUploadNode;
-
             if (parent == null) continue;
 
-
             if (file.getType() == SyncRecordType.TYPE_PHOTO.getValue() && !file.isCopyOnly()) {
-                if (removeGPS) {
+                if (getRemoveGps.invoke()) {
                     String newPath = createTempFile(file);
                     //IOException occurs.
                     if (ERROR_CREATE_FILE_IO_ERROR.equals(newPath)) continue;
@@ -853,7 +909,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             }
         }
         if (totalToUpload == totalUploaded) {
-            if (isCompressedVideoPending() && !canceled && isCompressorAvailable()) {
+            if (compressedVideoPending.invoke() && !canceled && isCompressorAvailable()) {
                 Timber.d("Got pending videos, will start compress.");
                 startVideoCompression();
             } else {
@@ -883,7 +939,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             Timber.d("Handle with local file which timestamp is: %s", file.getTimestamp());
             if (stopped) return;
 
-            SyncRecord exist = cameraUploadRepository.getSyncRecordByFingerprint(file.getOriginFingerprint(), file.isSecondary(), file.isCopyOnly());
+            SyncRecord exist = getSyncRecordByFingerprint.invoke(file.getOriginFingerprint(), file.isSecondary(), file.isCopyOnly());
             if (exist != null) {
                 if (exist.getTimestamp() < file.getTimestamp()) {
                     Timber.d("Got newer time stamp.");
@@ -911,7 +967,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             boolean inDatabase;
             int photoIndex = 0;
 
-            if (cameraUploadRepository.getKeepFileNames()) {
+            if (keepFileNames.invoke()) {
                 //Keep the file names as device but need to handle same file name in different location
                 String tempFileName = file.getFileName();
 
@@ -923,7 +979,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                     photoIndex++;
 
                     inCloud = megaApi.getChildNode(parent, fileName) != null;
-                    inDatabase = cameraUploadRepository.doesFileNameExist(fileName, isSec, SyncRecordType.TYPE_ANY.getValue());
+                    inDatabase = fileNameExists.invoke(fileName, isSec);
                 } while ((inCloud || inDatabase));
             } else {
                 do {
@@ -934,7 +990,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                     photoIndex++;
 
                     inCloud = megaApi.getChildNode(parent, fileName) != null;
-                    inDatabase = cameraUploadRepository.doesFileNameExist(fileName, isSec, SyncRecordType.TYPE_ANY.getValue());
+                    inDatabase = fileNameExists.invoke(fileName, isSec);
                 } while ((inCloud || inDatabase));
             }
 
@@ -948,7 +1004,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             String newPath = tempRoot + System.nanoTime() + "." + extension;
             file.setNewPath(newPath);
             Timber.d("Save file to database, new path is: %s", newPath);
-            cameraUploadRepository.saveSyncRecord(file);
+            saveSyncRecord.invoke(file);
         }
     }
 
@@ -982,7 +1038,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             Media media = mediaList.poll();
             if (media == null) continue;
 
-            if (cameraUploadRepository.doesLocalPathExist(media.filePath, isSecondary, SyncRecordType.TYPE_ANY.getValue())) {
+            if (mediaLocalPathExists.invoke(media.filePath, isSecondary)) {
                 Timber.d("Skip media with timestamp: %s", media.timestamp);
                 continue;
             }
@@ -1082,7 +1138,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             Timber.w("RootNode = null");
             running = true;
             MegaApplication.setLoggingIn(true);
-            // Remove DbHandler and Refactor in MegaApi dependency removal with use cases:
+            // TODO Remove DbHandler and Refactor in MegaApi dependency removal with use cases:
             // GetSession, FastLogin, InitMegaChat (already provided)
             megaApi.fastLogin(tempDbHandler.getCredentials().getSession(), this);
             ChatUtil.initMegaChatApi(tempDbHandler.getCredentials().getSession());
@@ -1266,11 +1322,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             if (!root.exists()) {
                 root.mkdirs();
             }
-
-            if (cameraUploadRepository.shouldClearSyncRecords()) {
-                cameraUploadRepository.deleteAllSyncRecords(SyncRecordType.TYPE_ANY.getValue());
-                cameraUploadRepository.shouldClearSyncRecords(false);
-            }
+            clearSyncRecords.invoke();
         });
     }
 
@@ -1518,17 +1570,16 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
         }
 
         if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
-            cameraUploadRepository.addCompletedTransfer(transfer, e);
+            // TODO Remove in MegaApi refactoring (remove MegaTransferListenerInterface)
+            TransfersManagement.addCompletedTransfer(new AndroidCompletedTransfer(transfer, e),
+                    tempDbHandler);
         }
 
         if (e.getErrorCode() == MegaError.API_OK) {
             Timber.d("Image Sync API_OK");
             MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
             boolean isSecondary = (node.getParentHandle() == secondaryUploadHandle);
-            SyncRecord record = cameraUploadRepository.getSyncRecordByNewPath(path);
-            if (record == null) {
-                record = cameraUploadRepository.getSyncRecordByLocalPath(path, isSecondary);
-            }
+            SyncRecord record = getSyncRecordByPath.invoke(path, isSecondary);
             if (record != null) {
                 CameraUploadSyncManager.INSTANCE.onUploadSuccess(node, record.isSecondary());
 
@@ -1594,7 +1645,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
         Timber.d("Total to upload is %d totalUploaded %d pendings are %d", totalToUpload, totalUploaded, megaApi.getNumPendingUploads());
         if (totalToUpload == totalUploaded) {
             Timber.d("Photo upload finished, now checking videos");
-            if (isCompressedVideoPending() && !canceled && isCompressorAvailable()) {
+            if (compressedVideoPending.invoke() && !canceled && isCompressorAvailable()) {
                 Timber.d("Got pending videos, will start compress");
                 startVideoCompression();
             } else {
@@ -1612,10 +1663,6 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
         return true;
     }
 
-    private boolean isCompressedVideoPending() {
-        return cameraUploadRepository.getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS.getValue()).size() > 0 && !String.valueOf(VIDEO_QUALITY_ORIGINAL).equals(cameraUploadRepository.getVideoQuality());
-    }
-
     private boolean isCompressorAvailable() {
         if (mVideoCompressor == null) {
             return true;
@@ -1625,14 +1672,14 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     }
 
     private void startVideoCompression() {
-        List<SyncRecord> fullList = cameraUploadRepository.getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS.getValue());
+        List<SyncRecord> fullList = getVideoSyncRecordsByStatus.invoke(SyncStatus.STATUS_TO_COMPRESS);
         if (megaApi.getNumPendingUploads() <= 0) {
             megaApi.resetTotalUploads();
         }
         totalUploaded = 0;
         totalToUpload = 0;
 
-        mVideoCompressor = new VideoCompressor(this, this, Integer.parseInt(cameraUploadRepository.getVideoQuality()));
+        mVideoCompressor = new VideoCompressor(this, this, getVideoQuality.invoke());
         mVideoCompressor.setPendingList(fullList);
         mVideoCompressor.setOutputRoot(tempRoot);
         long totalPendingSizeInMB = mVideoCompressor.getTotalInputSize() / (1024 * 1024);
@@ -1651,7 +1698,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
             intent.setAction(ACTION_SHOW_SETTINGS);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
             String title = getString(R.string.title_compression_size_over_limit);
-            String size = cameraUploadRepository.getChargingOnSizeString();
+            String size = getChargingOnSizeString.invoke();
             String message = getString(R.string.message_compression_size_over_limit,
                     getString(R.string.label_file_size_mega_byte, size));
             showNotification(title, message, pendingIntent, true);
@@ -1659,7 +1706,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     }
 
     private boolean shouldStartVideoCompression(long queueSize) {
-        if (isChargingRequired(queueSize) && !isCharging(this)) {
+        if (isChargingRequired.invoke(queueSize) && !isCharging(this)) {
             Timber.d("Should not start video compression.");
             return false;
         }
@@ -1687,7 +1734,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
 
     public synchronized void onCompressSuccessful(SyncRecord record) {
         Timber.d("Compression successfully for file with timestamp: %s", record.getTimestamp());
-        cameraUploadRepository.updateSyncRecordStatusByLocalPath(SyncStatus.STATUS_PENDING.getValue(), record.getLocalPath(), record.isSecondary());
+        setSyncRecordPendingByPath.invoke(record.getLocalPath(), record.isSecondary());
     }
 
     public synchronized void onCompressNotSupported(SyncRecord record) {
@@ -1708,7 +1755,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                     Timber.d("Can not compress but got enough disk space, so should be un-supported format issue");
                     String newPath = record.getNewPath();
                     File temp = new File(newPath);
-                    cameraUploadRepository.updateSyncRecordStatusByLocalPath(SyncStatus.STATUS_PENDING.getValue(), localPath, isSecondary);
+                    setSyncRecordPendingByPath.invoke(localPath, isSecondary);
                     if (newPath.startsWith(tempRoot) && temp.exists()) {
                         temp.delete();
                     }
@@ -1727,7 +1774,7 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
     public void onCompressFinished(String currentIndexString) {
         if (!canceled) {
             Timber.d("Preparing to upload compressed video.");
-            ArrayList<SyncRecord> compressedList = new ArrayList<>(cameraUploadRepository.getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING.getValue()));
+            List<SyncRecord> compressedList = getVideoSyncRecordsByStatus.invoke(SyncStatus.STATUS_PENDING);
             if (compressedList.size() > 0) {
                 Timber.d("Start to upload %d compressed videos.", compressedList.size());
                 startParallelUpload(compressedList, true);
@@ -2056,18 +2103,6 @@ public class CameraUploadsService extends LifecycleService implements NetworkTyp
                 ex.printStackTrace();
             }
         }
-    }
-
-    private boolean isChargingRequired(long queueSize) {
-        if (cameraUploadRepository.convertOnCharging()) {
-            int queueSizeLimit = cameraUploadRepository.getChargingOnSize();
-            if (queueSize > queueSizeLimit) {
-                Timber.d("isChargingRequired %s, queue size is %d, limit size is %d", true, queueSize, queueSizeLimit);
-                return true;
-            }
-        }
-        Timber.d("isChargingRequired %s", false);
-        return false;
     }
 
     private boolean isDeviceLowOnBattery(Intent intent) {
