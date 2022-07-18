@@ -69,7 +69,6 @@ import java.util.Stack;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import kotlin.Unit;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
@@ -159,8 +158,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         sortByHeaderViewModel = new ViewModelProvider(this).get(SortByHeaderViewModel.class);
 
         sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
-                new EventObserver<>(this::showSortByPanel));
-
+                new EventObserver<>(event -> {
+                    showSortByPanel();
+                    return null;
+                }));
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -391,16 +392,22 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     /**
      * Shows the Sort by panel.
-     *
-     * @param unit Unit event.
-     * @return Null.
      */
-    protected Unit showSortByPanel(Unit unit) {
-        managerActivity.showNewSortByPanel(getCurrentSharesTab() == SharesTab.INCOMING_TAB
-                ? ORDER_OTHERS
-                : ORDER_CLOUD);
+    protected void showSortByPanel() {
+        int orderType = ORDER_CLOUD;
 
-        return null;
+        // Root of incoming shares tab, display sort options OTHERS
+        if (getCurrentSharesTab() == SharesTab.INCOMING_TAB
+                && managerState(this).getIncomingTreeDepth() == 0) {
+            orderType = ORDER_OTHERS;
+        }
+        // Root of outgoing shares tab, display sort options OTHERS
+        else if (getCurrentSharesTab() == SharesTab.OUTGOING_TAB
+                && managerState(this).getOutgoingTreeDepth() == 0) {
+            orderType = ORDER_OTHERS;
+        }
+
+        managerActivity.showNewSortByPanel(orderType);
     }
 
     public ActionMode getActionMode() {

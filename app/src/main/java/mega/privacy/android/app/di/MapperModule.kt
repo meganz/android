@@ -1,5 +1,6 @@
 package mega.privacy.android.app.di
 
+import android.webkit.MimeTypeMap
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,10 +10,12 @@ import mega.privacy.android.app.data.mapper.ContactRequestMapper
 import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.app.data.mapper.FeatureFlagMapper
+import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.app.data.mapper.MimeTypeMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
+import mega.privacy.android.app.data.mapper.getFileTypeInfo
 import mega.privacy.android.app.data.mapper.getMimeType
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.app.data.mapper.toChatRequest
@@ -54,11 +57,20 @@ class MapperModule {
     fun provideContactRequestMapper(): ContactRequestMapper = ::toContactRequest
 
     @Provides
-    fun provideMimeTypeMapper(): MimeTypeMapper = ::getMimeType
+    fun provideMimeTypeMapper(): MimeTypeMapper = { extension ->
+        getMimeType(extension,
+            MimeTypeMap.getSingleton()
+            ::getMimeTypeFromExtension)
+    }
 
     @Provides
     fun provideUserAlertMapper(): UserAlertMapper = ::toUserAlert
 
     @Provides
     fun provideChatRequestMapper(): ChatRequestMapper = ::toChatRequest
+
+    @Provides
+    fun provideFileTypeInfoMapper(mimeTypeMapper: MimeTypeMapper): FileTypeInfoMapper = { node ->
+        getFileTypeInfo(node, mimeTypeMapper)
+    }
 }
