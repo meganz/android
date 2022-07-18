@@ -915,6 +915,8 @@ public class ManagerActivity extends TransfersManagementActivity
     private int versionsRemoved = 0;
     private int errorVersionRemove = 0;
 
+    public MegaNode viewInFolderNode;
+
     /**
      * Broadcast to update the completed transfers tab.
      */
@@ -10951,6 +10953,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void viewNodeInFolder(MegaNode node) {
         MegaNode parentNode = MegaNodeUtil.getRootParentNode(megaApi, node);
+        viewInFolderNode = node;
         if (parentNode.getHandle() == megaApi.getRootNode().getHandle()) {
             viewModel.setBrowserParentHandle(node.getParentHandle());
             refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
