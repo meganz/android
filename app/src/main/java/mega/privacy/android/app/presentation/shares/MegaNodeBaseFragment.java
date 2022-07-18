@@ -14,8 +14,6 @@ import static mega.privacy.android.app.utils.Constants.LINKS_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
-import static mega.privacy.android.app.utils.Constants.ORDER_CLOUD;
-import static mega.privacy.android.app.utils.Constants.ORDER_OTHERS;
 import static mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;

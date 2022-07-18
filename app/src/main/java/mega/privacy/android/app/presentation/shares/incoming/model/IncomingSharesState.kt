@@ -1,14 +1,18 @@
 package mega.privacy.android.app.presentation.shares.incoming.model
 
+import nz.mega.sdk.MegaNode
+
 /**
  * Incoming shares UI state
  *
  * @param incomingParentHandle current incoming shares parent handle
  * @param incomingTreeDepth current incoming tree depth
+ * @param nodes current list of nodes
  */
 data class IncomingSharesState(
     val incomingParentHandle: Long = -1L,
     val incomingTreeDepth: Int = 0,
+    val nodes: List<MegaNode> = emptyList(),
 ) {
 
     /**

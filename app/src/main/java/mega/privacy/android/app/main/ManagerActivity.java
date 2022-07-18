@@ -2275,9 +2275,8 @@ public class ManagerActivity extends TransfersManagementActivity
                                     viewModel.setSharesTab(SharesTab.INCOMING_TAB);
                                     MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
                                     if (parentIntentN != null) {
-                                        incomingSharesViewModel.setIncomingTreeDepth(calculateDeepBrowserTreeIncoming(parentIntentN, this));
+                                        incomingSharesViewModel.setIncomingTreeDepth(calculateDeepBrowserTreeIncoming(parentIntentN, this), handleIntent);
                                     }
-                                    incomingSharesViewModel.setIncomingParentHandle(handleIntent);
                                     selectDrawerItem(drawerItem);
                                     selectDrawerItemPending = false;
                                 }
@@ -3066,8 +3065,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case MegaShare.ACCESS_READ:
             case MegaShare.ACCESS_READWRITE:
             case MegaShare.ACCESS_FULL:
-                incomingSharesViewModel.setIncomingParentHandle(handleIntent);
-                incomingSharesViewModel.setIncomingTreeDepth(calculateDeepBrowserTreeIncoming(parentIntentN, this));
+                incomingSharesViewModel.setIncomingTreeDepth(calculateDeepBrowserTreeIncoming(parentIntentN, this), handleIntent);
                 drawerItem = DrawerItem.SHARED_ITEMS;
                 break;
 
@@ -6132,7 +6130,6 @@ public class ManagerActivity extends TransfersManagementActivity
             case R.id.bottom_navigation_item_shared_items: {
                 if (drawerItem == DrawerItem.SHARED_ITEMS) {
                     if (getTabItemShares() == SharesTab.INCOMING_TAB && incomingSharesState(this).getIncomingParentHandle() != INVALID_HANDLE) {
-                        incomingSharesViewModel.setIncomingParentHandle(INVALID_HANDLE);
                         incomingSharesViewModel.resetIncomingTreeDepth();
                         refreshIncomingShares();
                     } else if (getTabItemShares() == SharesTab.OUTGOING_TAB && viewModel.getState().getValue().getOutgoingParentHandle() != INVALID_HANDLE) {
@@ -6403,8 +6400,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 case SHARED_ITEMS:
                     switch (getTabItemShares()) {
                         case INCOMING_TAB:
-                            incomingSharesViewModel.decreaseIncomingTreeDepth();
-                            incomingSharesViewModel.setIncomingParentHandle(
+                            incomingSharesViewModel.decreaseIncomingTreeDepth(
                                     incomingSharesState(this).getIncomingTreeDepth() == 0 ? INVALID_HANDLE : result.getOldParentHandle());
                             refreshIncomingShares();
                             break;
@@ -7624,6 +7620,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void refreshOthersOrder() {
+        refreshIncomingShares();
         refreshSharesPageAdapter();
         refreshSearch();
     }
@@ -7652,11 +7649,6 @@ public class ManagerActivity extends TransfersManagementActivity
     public void setParentHandleRubbish(long parentHandleRubbish) {
         Timber.d("setParentHandleRubbish");
         viewModel.setRubbishBinParentHandle(parentHandleRubbish);
-    }
-
-    public void setParentHandleIncoming(long parentHandleIncoming) {
-        Timber.d("setParentHandleIncoming: %s", parentHandleIncoming);
-        incomingSharesViewModel.setIncomingParentHandle(parentHandleIncoming);
     }
 
     public void setParentHandleInbox(long parentHandleInbox) {
@@ -9702,11 +9694,10 @@ public class ManagerActivity extends TransfersManagementActivity
             comesFromNotificationHandleSaved = incomingSharesState(this).getIncomingParentHandle();
             if (parent != null) {
                 int depth = calculateDeepBrowserTreeIncoming(node, this);
-                incomingSharesViewModel.setIncomingTreeDepth(depth);
+                incomingSharesViewModel.setIncomingTreeDepth(depth, nodeHandle);
                 comesFromNotificationsLevel = depth;
             }
             openFolderRefresh = true;
-            incomingSharesViewModel.setIncomingParentHandle(nodeHandle);
             selectDrawerItem(drawerItem);
         }
     }
@@ -9781,10 +9772,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void refreshIncomingShares() {
-        if (!isIncomingAdded()) return;
-
-        incomingSharesFragment.hideMultipleSelect();
-        incomingSharesFragment.refresh();
+        incomingSharesViewModel.refreshIncomingSharesNode();
     }
 
     private void refreshOutgoingShares() {
@@ -9837,8 +9825,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe((result, throwable) -> {
                                     if (throwable != null) {
-                                        incomingSharesViewModel.decreaseIncomingTreeDepth();
-                                        incomingSharesViewModel.setIncomingParentHandle(INVALID_HANDLE);
+                                        incomingSharesViewModel.decreaseIncomingTreeDepth(INVALID_HANDLE);
                                         hideTabs(false, SharesTab.INCOMING_TAB);
                                         refreshIncomingShares();
                                     }
@@ -10150,8 +10137,8 @@ public class ManagerActivity extends TransfersManagementActivity
         return incomingSharesState(this).getIncomingTreeDepth();
     }
 
-    public void setDeepBrowserTreeIncoming(int deep) {
-        incomingSharesViewModel.setIncomingTreeDepth(deep);
+    public void setDeepBrowserTreeIncoming(int deep, Long parentHandle) {
+        incomingSharesViewModel.setIncomingTreeDepth(deep, parentHandle);
     }
 
     public int getDeepBrowserTreeOutgoing() {
@@ -10752,8 +10739,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (viewPagerShares == null || sharesPageAdapter == null) break;
 
                 if (getTabItemShares() == SharesTab.INCOMING_TAB) {
-                    incomingSharesViewModel.setIncomingParentHandle(node.getHandle());
-                    incomingSharesViewModel.increaseIncomingTreeDepth();
+                    incomingSharesViewModel.increaseIncomingTreeDepth(node.getHandle());
                 } else if (getTabItemShares() == SharesTab.OUTGOING_TAB) {
                     viewModel.setOutgoingParentHandle(node.getHandle());
                     viewModel.increaseOutgoingTreeDepth();
@@ -10966,8 +10952,7 @@ public class ManagerActivity extends TransfersManagementActivity
             refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
             selectDrawerItem(DrawerItem.RUBBISH_BIN);
         } else if (parentNode.isInShare()) {
-            incomingSharesViewModel.setIncomingParentHandle(node.getParentHandle());
-            incomingSharesViewModel.setIncomingTreeDepth(calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node), this));
+            incomingSharesViewModel.setIncomingTreeDepth(calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node), this), node.getParentHandle());
             sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
             viewModel.setSharesTab(SharesTab.INCOMING_TAB);
             if (viewPagerShares != null) {
@@ -11387,9 +11372,8 @@ public class ManagerActivity extends TransfersManagementActivity
         viewModel.setSharesTab(comesFromNotificationSharedIndex);
         updateSharesTab();
         comesFromNotificationSharedIndex = SharesTab.NONE;
-        setDeepBrowserTreeIncoming(comesFromNotificationDeepBrowserTreeIncoming);
+        setDeepBrowserTreeIncoming(comesFromNotificationDeepBrowserTreeIncoming, comesFromNotificationHandleSaved);
         comesFromNotificationDeepBrowserTreeIncoming = INVALID_VALUE;
-        setParentHandleIncoming(comesFromNotificationHandleSaved);
         comesFromNotificationHandleSaved = INVALID_VALUE;
         refreshIncomingShares();
     }

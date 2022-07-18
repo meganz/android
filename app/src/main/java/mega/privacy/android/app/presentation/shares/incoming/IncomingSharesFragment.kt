@@ -9,14 +9,17 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment
-import mega.privacy.android.app.presentation.shares.managerState
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
@@ -59,7 +62,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             else getGridView(inflater, container)
 
         initAdapter()
-        refresh()
+        observe()
         selectNewlyAddedNodes()
 
         return view
@@ -75,27 +78,11 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             )
     }
 
-    override fun refresh() {
-        nodes =
-            (state().incomingParentHandle.takeUnless { it == -1L || it == INVALID_HANDLE }
-                ?.let { megaApi.getNodeByHandle(state().incomingParentHandle) }
-                ?.let { megaApi.getChildren(it, sortOrderManagement.getOrderCloud()) }
-                ?: run {
-                    megaApi.getInShares(sortOrderManagement.getOrderOthers())
-                })
-
-        adapter.setNodes(nodes)
-
-        managerActivity.showFabButton()
-        managerActivity.invalidateOptionsMenu()
-        managerActivity.setToolbarTitle()
-
-        visibilityFastScroller()
-        hideActionMode()
-        setEmptyView()
-    }
+    override fun refresh() {}
 
     override fun itemClick(position: Int) {
+        val actualPosition = position - adapter.placeholderCount
+
         when {
             // select mode
             adapter.isMultipleSelect -> {
@@ -106,18 +93,20 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             }
 
             // click on a folder
-            nodes[position].isFolder ->
-                navigateToFolder(nodes[position])
+            state().nodes[actualPosition].isFolder ->
+                navigateToFolder(state().nodes[actualPosition])
 
             // click on a file
             else ->
-                openFile(nodes[position], Constants.INCOMING_SHARES_ADAPTER, position)
+                openFile(
+                    state().nodes[actualPosition],
+                    Constants.INCOMING_SHARES_ADAPTER,
+                    actualPosition
+                )
         }
     }
 
     override fun navigateToFolder(node: MegaNode) {
-        managerActivity.hideTabs(true, SharesTab.INCOMING_TAB)
-        viewModel.increaseIncomingTreeDepth()
         Timber.d("Is folder deep: %s", state().incomingTreeDepth)
 
         val lastFirstVisiblePosition: Int = when {
@@ -132,16 +121,12 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         }
 
         lastPositionStack.push(lastFirstVisiblePosition)
-        viewModel.setIncomingParentHandle(node.handle)
-
-        refresh()
-
+        viewModel.increaseIncomingTreeDepth(node.handle)
         recyclerView.scrollToPosition(0)
         checkScroll()
     }
 
     override fun onBackPressed(): Int {
-        Timber.d("deepBrowserTree:%s", state().incomingTreeDepth)
 
         if (adapter == null)
             return 0
@@ -151,17 +136,13 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             return 4
         }
 
-        viewModel.decreaseIncomingTreeDepth()
         managerActivity.invalidateOptionsMenu()
 
         return when {
-            state().incomingTreeDepth == 0 -> {
+            state().incomingTreeDepth == 1 -> {
                 //In the beginning of the navigation
-                Timber.d("deepBrowserTree==0")
-                viewModel.setIncomingParentHandle(INVALID_HANDLE)
-                managerActivity.hideTabs(false, SharesTab.INCOMING_TAB)
-
-                refresh()
+                Timber.d("deepBrowserTree==1")
+                viewModel.resetIncomingTreeDepth()
 
                 val lastVisiblePosition =
                     if (lastPositionStack.isNotEmpty())
@@ -181,8 +162,8 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 3
             }
 
-            state().incomingTreeDepth > 0 -> {
-                Timber.d("deepTree>0")
+            state().incomingTreeDepth > 1 -> {
+                Timber.d("deepTree>1")
                 val parentNode =
                     megaApi.getParentNode(
                         megaApi.getNodeByHandle(state().incomingParentHandle)
@@ -192,9 +173,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                     recyclerView.visibility = View.VISIBLE
                     emptyImageView.visibility = View.GONE
                     emptyLinearLayout.visibility = View.GONE
-                    viewModel.setIncomingParentHandle(parentNode.handle)
-
-                    refresh()
+                    viewModel.decreaseIncomingTreeDepth(parentNode.handle)
 
                     val lastVisiblePosition =
                         if (lastPositionStack.isNotEmpty())
@@ -259,6 +238,39 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     override fun getParentHandle(): Long = state().incomingParentHandle
 
     /**
+     * Observe viewModel
+     */
+    private fun observe() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    updateNodes(it.nodes)
+                    hideTabs(!it.isFirstNavigationLevel())
+
+                    managerActivity.showFabButton()
+                    managerActivity.invalidateOptionsMenu()
+                    managerActivity.setToolbarTitle()
+
+                    visibilityFastScroller()
+                    hideActionMode()
+                    setEmptyView()
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Update displayed nodes
+     *
+     * @param nodes the list of nodes to display
+     */
+    private fun updateNodes(nodes: List<MegaNode>) {
+        val mutableListNodes = ArrayList(nodes)
+        adapter.setNodes(mutableListNodes)
+    }
+
+    /**
      * Initialize the adapter
      */
     private fun initAdapter() {
@@ -266,7 +278,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             adapter = MegaNodeAdapter(
                 requireActivity(),
                 this,
-                nodes,
+                state().nodes,
                 state().incomingParentHandle,
                 recyclerView,
                 Constants.INCOMING_SHARES_ADAPTER,
@@ -288,6 +300,15 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     }
 
     /**
+     * Hide/Show shares tab
+     *
+     * @param hide true if needs to hide shares tabs
+     */
+    private fun hideTabs(hide: Boolean) {
+        managerActivity.hideTabs(hide, SharesTab.INCOMING_TAB)
+    }
+
+    /**
      * Check if the parent handle is valid
      *
      * @return true if the parent handle is valid
@@ -301,7 +322,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
      * If user navigates from notification about new nodes added to shared folder select all nodes and scroll to the first node in the list
      */
     private fun selectNewlyAddedNodes() {
-        val positions = managerActivity.getPositionsList(nodes)
+        val positions = managerActivity.getPositionsList(state().nodes)
         if (positions.isNotEmpty()) {
             val firstPosition = Collections.min(positions)
             activateActionMode()
