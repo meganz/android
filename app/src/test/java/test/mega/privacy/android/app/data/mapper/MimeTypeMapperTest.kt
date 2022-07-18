@@ -1,12 +1,16 @@
 package test.mega.privacy.android.app.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.data.mapper.MimeTypeMapper
 import mega.privacy.android.app.data.mapper.getMimeType
 import org.junit.Test
 
+/**
+ * Mime type mapper test
+ *
+ * An official list of mapped mime types can be found [here](https://www.iana.org/assignments/media-types/media-types.xhtml)
+ */
 class MimeTypeMapperTest {
-    private val underTest: MimeTypeMapper = ::getMimeType
+    private val underTest = ::getMimeType
 
     @Test
     fun `test that extensions handled by default mapper are returned`() {
@@ -14,17 +18,6 @@ class MimeTypeMapperTest {
         assertThat(underTest("extension") { expectedType }).isEqualTo(expectedType)
     }
 
-    @Test
-    fun `test that mkv extension is mapped to video x matroska`() {
-        val expectedType = "video/x-matroska"
-        assertThat(underTest("mkv") { null }).isEqualTo(expectedType)
-    }
-
-    @Test
-    fun `test that heic extension is mapped to image heic`() {
-        val expectedType = "image/heic"
-        assertThat(underTest("heic") { null }).isEqualTo(expectedType)
-    }
 
     @Test
     fun `test that url extension is mapped to web url`() {
@@ -32,11 +25,6 @@ class MimeTypeMapperTest {
         assertThat(underTest("url") { null }).isEqualTo(expectedType)
     }
 
-    @Test
-    fun `test that webp extension is mapped to image webp`() {
-        val expectedType = "image/webp"
-        assertThat(underTest("webp") { null }).isEqualTo(expectedType)
-    }
 
     @Test
     fun `test that unknown extension is mapped to application octet-stream`() {
