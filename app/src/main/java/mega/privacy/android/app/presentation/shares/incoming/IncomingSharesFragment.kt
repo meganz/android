@@ -120,7 +120,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
         }
 
-        lastPositionStack.push(lastFirstVisiblePosition)
+        viewModel.pushToLastPositionState(lastFirstVisiblePosition)
         viewModel.increaseIncomingTreeDepth(node.handle)
         recyclerView.scrollToPosition(0)
         checkScroll()
@@ -145,8 +145,8 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 viewModel.resetIncomingTreeDepth()
 
                 val lastVisiblePosition =
-                    if (lastPositionStack.isNotEmpty())
-                        lastPositionStack.pop()
+                    if (state().lastPositionStack.isNotEmpty())
+                        viewModel.popLastPositionStack()
                     else 0
 
                 if (lastVisiblePosition >= 0) {
@@ -176,8 +176,8 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                     viewModel.decreaseIncomingTreeDepth(parentNode.handle)
 
                     val lastVisiblePosition =
-                        if (lastPositionStack.isNotEmpty())
-                            lastPositionStack.pop()
+                        if (state().lastPositionStack.isNotEmpty())
+                            viewModel.popLastPositionStack()
                         else 0
 
                     if (lastVisiblePosition >= 0) {

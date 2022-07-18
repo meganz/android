@@ -91,6 +91,21 @@ class IncomingSharesViewModel @Inject constructor(
     }
 
     /**
+     * Pop scroll position for previous depth
+     *
+     * @return last position saved
+     */
+    fun popLastPositionStack(): Int = _state.value.lastPositionStack.pop()
+
+    /**
+     * Push scroll position for current depth
+     *
+     * @param position the scroll position of the recyclerView for the current depth
+     * @return the position saved
+     */
+    fun pushToLastPositionState(position: Int): Int = _state.value.lastPositionStack.push(position)
+
+    /**
      * Set the current nodes displayed
      *
      * @param nodes the list of nodes to set
