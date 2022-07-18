@@ -1,6 +1,7 @@
 package mega.privacy.android.app.data.gateway.api
 
 import mega.privacy.android.app.data.model.UserCredentials
+import mega.privacy.android.app.main.megachat.NonContactInfo
 
 /**
  * MegaDBHandlerGateway gateway
@@ -37,4 +38,20 @@ interface MegaLocalStorageGateway {
      * @return user credentials or null
      */
     suspend fun getUserCredentials(): UserCredentials?
+
+
+    /**
+     * Get non contact by handle
+     *
+     * @param userHandle
+     */
+    suspend fun getNonContactByHandle(userHandle: Long): NonContactInfo?
+
+    /**
+     * Set non contact email
+     *
+     * @param userHandle
+     * @param email
+     */
+    suspend fun setNonContactEmail(userHandle: Long, email: String)
 }

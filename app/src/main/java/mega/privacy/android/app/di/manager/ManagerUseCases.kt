@@ -18,8 +18,10 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorUserAlerts
 
 /**
  * Manager module
@@ -67,5 +69,9 @@ abstract class ManagerUseCases {
         @Provides
         fun provideHasInboxChildren(filesRepository: FilesRepository): HasInboxChildren =
             HasInboxChildren(filesRepository::hasInboxChildren)
+
+        @Provides
+        fun provideMonitorUserUpdates(notificationsRepository: NotificationsRepository): MonitorUserAlerts =
+            MonitorUserAlerts(notificationsRepository::monitorUserAlerts)
     }
 }
