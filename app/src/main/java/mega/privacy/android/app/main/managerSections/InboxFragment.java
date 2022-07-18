@@ -21,7 +21,6 @@ import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_INBOX;
 import static mega.privacy.android.app.utils.FileUtil.getDownloadLocation;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
-import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
@@ -165,23 +164,12 @@ public class InboxFragment extends RotatableFragment {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
-            List<MegaNode> documents = adapter.getSelectedNodes();
+            List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 
             switch (item.getItemId()) {
                 case R.id.cab_menu_download: {
                     ((ManagerActivity) context).saveNodesToDevice(
-                            documents, false, false, false, false);
-
-                    clearSelections();
-                    hideMultipleSelect();
-                    break;
-                }
-                case R.id.cab_menu_rename: {
-
-                    if (documents.size() == 1) {
-                        ((ManagerActivity) context).showRenameDialog(documents.get(0));
-                    }
+                            selectedNodes, false, false, false, false);
 
                     clearSelections();
                     hideMultipleSelect();
@@ -189,44 +177,12 @@ public class InboxFragment extends RotatableFragment {
                 }
                 case R.id.cab_menu_copy: {
                     ArrayList<Long> handleList = new ArrayList<Long>();
-                    for (int i = 0; i < documents.size(); i++) {
-                        handleList.add(documents.get(i).getHandle());
+                    for (int i = 0; i < selectedNodes.size(); i++) {
+                        handleList.add(selectedNodes.get(i).getHandle());
                     }
 
                     NodeController nC = new NodeController(context);
                     nC.chooseLocationToCopyNodes(handleList);
-
-                    clearSelections();
-                    hideMultipleSelect();
-                    break;
-                }
-                case R.id.cab_menu_move: {
-                    ArrayList<Long> handleList = new ArrayList<Long>();
-                    for (int i = 0; i < documents.size(); i++) {
-                        handleList.add(documents.get(i).getHandle());
-                    }
-
-                    NodeController nC = new NodeController(context);
-                    nC.chooseLocationToMoveNodes(handleList);
-
-                    clearSelections();
-                    hideMultipleSelect();
-                    break;
-                }
-                case R.id.cab_menu_send_to_chat: {
-                    Timber.d("Send files to chat");
-                    ((ManagerActivity) context).attachNodesToChats(adapter.getArrayListSelectedNodes());
-                    clearSelections();
-                    hideMultipleSelect();
-                    break;
-                }
-                case R.id.cab_menu_trash: {
-                    ArrayList<Long> handleList = new ArrayList<Long>();
-                    for (int i = 0; i < documents.size(); i++) {
-                        handleList.add(documents.get(i).getHandle());
-                    }
-
-                    ((ManagerActivity) context).askConfirmationMoveToRubbish(handleList);
 
                     clearSelections();
                     hideMultipleSelect();
@@ -241,6 +197,18 @@ public class InboxFragment extends RotatableFragment {
                     hideMultipleSelect();
                     break;
                 }
+                case R.id.cab_menu_share_link: {
+                    ((ManagerActivity) context).showGetLinkActivity(selectedNodes);
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+                }
+                case R.id.cab_menu_share_out: {
+                    MegaNodeUtil.shareNodes(context, selectedNodes);
+                    clearSelections();
+                    hideMultipleSelect();
+                    break;
+                }
             }
             return false;
         }
@@ -248,7 +216,7 @@ public class InboxFragment extends RotatableFragment {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.file_browser_action, menu);
+            inflater.inflate(R.menu.inbox_action, menu);
             checkScroll();
             return true;
         }
@@ -263,78 +231,38 @@ public class InboxFragment extends RotatableFragment {
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            List<MegaNode> selected = adapter.getSelectedNodes();
+            List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 
-            menu.findItem(R.id.cab_menu_share_link)
-                    .setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
-
-            boolean areAllNotTakenDown = MegaNodeUtil.areAllNotTakenDown(selected);
+            boolean areAllNotTakenDown = MegaNodeUtil.areAllNotTakenDown(selectedNodes);
             boolean showDownload = false;
-            boolean showSendToChat = false;
-            boolean showRename = false;
             boolean showCopy = false;
-            boolean showMove = false;
-            boolean showLink = false;
-            boolean showTrash = false;
 
-            MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+            MenuItem selectAll = menu.findItem(R.id.cab_menu_select_all);
+            MenuItem unselectAll = menu.findItem(R.id.cab_menu_unselect_all);
+            MenuItem download = menu.findItem(R.id.cab_menu_download);
+            MenuItem copy = menu.findItem(R.id.cab_menu_copy);
 
-            if (selected.size() != 0) {
-
-                if (selected.size() == adapter.getItemCount()) {
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-                    unselect.setTitle(getString(R.string.action_unselect_all));
-                    unselect.setVisible(true);
-                } else if (selected.size() == 1) {
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-                    unselect.setTitle(getString(R.string.action_unselect_all));
-                    unselect.setVisible(true);
-                } else {
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-                    unselect.setTitle(getString(R.string.action_unselect_all));
-                    unselect.setVisible(true);
-                }
+            if (!selectedNodes.isEmpty()) {
+                selectAll.setVisible(selectedNodes.size() != adapter.getItemCount());
+                unselectAll.setTitle(getString(R.string.action_unselect_all));
+                unselectAll.setVisible(true);
 
 				showDownload = areAllNotTakenDown;
 				showCopy = areAllNotTakenDown;
-
-				//showSendToChat
-				showSendToChat = areAllFileNodesAndNotTakenDown(selected);
-			}
-			else{
-				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+			} else {
+				selectAll.setVisible(true);
+                unselectAll.setVisible(false);
 			}
 
-            menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+            download.setVisible(showDownload);
             if (showDownload) {
-                menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                download.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
 
-			menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
-			if (showSendToChat) {
-				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
-
-			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-
-            menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+            copy.setVisible(showCopy);
             if (showCopy) {
-                menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                copy.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
-
-            menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-            if (showMove) {
-                menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
-
-            menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-            if (showTrash) {
-                menu.findItem(R.id.cab_menu_trash).setTitle(context.getString(R.string.context_move_to_trash));
-            }
-
-            menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
-            menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 
             return false;
         }

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/cab_menu_select_all"
+        android:orderInCategory="1"
+        android:title="@string/action_select_all"
+        android:visible="false"
+        app:showAsAction="never"
+        tools:visible="true" />
+
+    <item
+        android:id="@+id/cab_menu_unselect_all"
+        android:orderInCategory="2"
+        android:title="@string/action_unselect_all"
+        android:visible="false"
+        app:showAsAction="never"
+        tools:visible="true" />
+
+    <item
+        android:id="@+id/cab_menu_download"
+        android:icon="@drawable/ic_download_white"
+        android:orderInCategory="3"
+        android:title="@string/general_save_to_device"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true"
+        tools:showAsAction="always" />
+
+    <item
+        android:id="@+id/cab_menu_share_link"
+        android:icon="@drawable/ic_link_white"
+        android:orderInCategory="4"
+        android:title="@{@plurals/get_links(one)}"
+        android:visible="true"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/cab_menu_share_out"
+        android:icon="@drawable/ic_social_share_white"
+        android:orderInCategory="5"
+        android:title="@string/general_share"
+        android:visible="true"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/cab_menu_copy"
+        android:icon="@drawable/ic_copy_white"
+        android:orderInCategory="6"
+        android:title="@string/context_copy"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true"
+        tools:showAsAction="always"/>
+
+</menu>
