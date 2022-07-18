@@ -1587,7 +1587,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Ungültige Zeichen</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Die folgenden Zeichen sind nicht zulässig: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">Die folgenden Zeichen sind nicht zulässig: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Der Dateiname darf nicht leer sein.</item>

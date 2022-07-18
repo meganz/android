@@ -1551,7 +1551,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">無效字元</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">不允許使用以下字元：” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">不允許使用以下字元：” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">檔案名稱不能空白。</item>
@@ -1727,7 +1727,7 @@
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s B/秒</string>
+    <string name="label_file_speed_byte">%s&#160;B/秒</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_kilo_byte">%s&#160;KB/秒</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->

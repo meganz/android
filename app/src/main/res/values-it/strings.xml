@@ -131,7 +131,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Sei sicuro di voler annullare il processo di login corrente?</string>
     <!-- Login button -->
-    <string name="login_text">Login</string>
+    <string name="login_text">Entra</string>
     <!-- email label -->
     <string name="email_text">Email</string>
     <!-- password label -->
@@ -1623,7 +1623,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caratteri non ammessi</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">I seguenti caratteri non sono ammessi: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">I seguenti caratteri non sono ammessi: ” * / : &lt; &gt; ?? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Il nome del file non può essere vuoto.</item>

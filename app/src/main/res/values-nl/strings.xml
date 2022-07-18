@@ -1587,7 +1587,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Ongeldige tekens</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">De volgende tekens zijn niet toegestaan: ” * / : &lt; &gt; ? ​\ |</string>
+    <string name="invalid_characters_defined">De volgende tekens zijn niet toegestaan: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Bestandnaam kan niet leeg zijn.</item>
@@ -1764,7 +1764,7 @@
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s B/s</string>
+    <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->

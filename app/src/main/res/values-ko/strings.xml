@@ -1551,7 +1551,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">잘못된 글자</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">다음의 문자는 허용되지 않습니다: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">다음의 문자는 허용되지 않습니다: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">파일 이름은 비워둘 수 없습니다.</item>

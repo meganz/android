@@ -179,7 +179,7 @@
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">رابط التأكيد خاصتك لم يعد صالحاً. قد يكون حسابك مفعلاً مسبقاً أو قد تكون قد ألغيت تسجيل حسابك.</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">سجل الآن واحصل على 20 غيغابايت من مساحة التخزين المجانية</string>
+    <string name="tour_space_text">سجل الآن واحصل على 20&#160;غيغابايت من مساحة التخزين المجانية</string>
     <!-- category in sort by action -->
     <string name="name_text">الاسم</string>
     <!-- First Name of the user -->
@@ -351,7 +351,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">عرض عمليات تراسل المعطيات</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">لا يمكن لمعظم الأجهزة تنزيل ملفات أكبر من 4 غيغابايت. تنزيلك ربما يفشل</string>
+    <string name="error_file_size_greater_than_4gb">لا يمكن لمعظم الأجهزة تنزيل ملفات أكبر من 4&#160;غيغابايت. تنزيلك ربما يفشل</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">ليس هناك أي التطبيق متاح لتنفيذ هذا الملف على جهازك</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1731,7 +1731,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">محارف غير صالحة</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">الأحرف التالية غير مسموح بها: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">المحارف التالية غير مسموح بها: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">File name cannot be empty.</item>
@@ -1900,23 +1900,23 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s بايت</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s كيلوبايت</string>
+    <string name="label_file_size_kilo_byte">%s&#160;كيلوبايت</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s ميغابايت</string>
+    <string name="label_file_size_mega_byte">%s&#160;ميغابايت</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s غيغابايت</string>
+    <string name="label_file_size_giga_byte">%s&#160;غيغابايت</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s تيرابايت</string>
+    <string name="label_file_size_tera_byte">%s&#160;تيرابايت</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s بايت بالثانية</string>
+    <string name="label_file_speed_byte">%s&#160;بايت بالثانية</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s كيلو بايت بالثانية</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;1كيلو بايت بالثانية</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s ميغا بايت بالثانية</string>
+    <string name="label_file_speed_mega_byte">%s&#160;ميغا بايت بالثانية</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s غيغا بايت بالثانية</string>
+    <string name="label_file_speed_giga_byte">%s&#160;غيغا بايت بالثانية</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s تيرا بايت بالثانية</string>
+    <string name="label_file_speed_tera_byte">%s&#160;تيرا بايت بالثانية</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">ميغابايب</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -2988,7 +2988,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">ادع جهات الاتصال وابدأ المحادثة بأمان باستخدام المحادثة المشفرة من ميغا MEGA.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">أهلا. قم بإجراء محادثات آمنة على ميغا MEGA معي واحصل على 20 غيغابايت من التخزين السحابي المجاني.%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">أهلا. قم بإجراء محادثات آمنة على ميغا MEGA معي واحصل على 20&#160;غيغابايت من التخزين السحابي المجاني.%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">لا يوجد رابط محادثة متاح.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3726,9 +3726,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s بيتابايت PB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;بيتابايت</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s اكسابايت EB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;اكسابايت</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">اضف رقم هاتفك</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -3900,7 +3900,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">انضم إلى أكبر منصة تخزين وتعاون سحابية آمنة في العالم.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">احصل على 20 جيجابايت مجاناً</string>
+    <string name="left_meeting_bonus_title">احصل على 20&#160;جيجابايت مجاناً</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">اشترك الآن واستمتع بميزات التعاون المتقدمة مجانًا.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->

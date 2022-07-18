@@ -131,7 +131,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Sigur vrei să anulezi procesul actual de autentificare?</string>
     <!-- Login button -->
-    <string name="login_text">Autentifică-te</string>
+    <string name="login_text">Autentificare</string>
     <!-- email label -->
     <string name="email_text">E-mail</string>
     <!-- password label -->
@@ -327,7 +327,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Vezi transferurile</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Majoritatea dispozitivelor nu pot descărca fișiere mai mari de 4&#160;GB. Descărcarea ta probabil va eșua</string>
+    <string name="error_file_size_greater_than_4gb">Majoritatea dispozitivelor nu pot descărca fișiere mai mari de 4&#160;GB. Descărcarea ta probabil va eșua1</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Nu există nicio aplicație disponibilă pentru a executa acest fișier pe dispozitiv</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1620,7 +1620,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caractere nevalide</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">Următoarele caractere nu sunt permise: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">File name cannot be empty.</item>

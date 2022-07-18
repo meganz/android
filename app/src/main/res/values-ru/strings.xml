@@ -1659,11 +1659,13 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Недопустимые символы</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Следующие символы не допускаются: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">Следующие символы не допускаются: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">File name cannot be empty.</item>
-        <item quantity="other">File names cannot be empty.</item>
+        <item quantity="one">Название файла не может быть пустым.</item>
+        <item quantity="few">Названия файлов не могут быть пустыми.</item>
+        <item quantity="many">Названия файлов не могут быть пустыми.</item>
+        <item quantity="other">Названия файлов не могут быть пустыми.</item>
     </plurals>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">Ошибка. Файл pdf повреждён или не существует.</string>
@@ -1738,7 +1740,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Приглашение не отправлено. %s уже в вашем списке контактов.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
+    <string name="invite_not_sent_text_error">Произошла ошибка, и приглашение не было отправлено.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Создание QR-кода&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -1828,23 +1830,23 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s Б</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s КБ</string>
+    <string name="label_file_size_kilo_byte">%s&#160;КБ</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s МБ</string>
+    <string name="label_file_size_mega_byte">%s&#160;МБ</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_giga_byte">%s&#160;ГБ</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s ТБ</string>
+    <string name="label_file_size_tera_byte">%s&#160;ТБ</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s Б/с</string>
+    <string name="label_file_speed_byte">%s&#160;Б/с</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s КБ/с</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KБ/с</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s МБ/с</string>
+    <string name="label_file_speed_mega_byte">%s&#160;МБ/с</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_giga_byte">%s&#160;ГБ/с</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s ТБ/с</string>
+    <string name="label_file_speed_tera_byte">%s&#160;ТБ/с</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">МБ</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -2123,7 +2125,7 @@
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Предварительный просмотр</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
+    <string name="no_network_connection_on_play_file">Нет подключения к сети. Файл не был загружен и не может быть воспроизведён в потоковом режиме.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Невозможно открыть файл.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2542,8 +2544,10 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="one">%1$d папка&#160;·&#160;</item>
+        <item quantity="few">%1$d папки&#160;·&#160;</item>
+        <item quantity="many">%1$d папок&#160;·&#160;</item>
+        <item quantity="other">%1$d папки&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] добавил %2$s и %3$s[/B]</string>
@@ -2915,8 +2919,10 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="one">%1$d изображение&#160;</item>
+        <item quantity="few">%1$d изображения&#160;</item>
+        <item quantity="many">%1$d изображений&#160;</item>
+        <item quantity="other">%1$d изображения&#160;</item>
     </plurals>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">Изображения (%d) и 1 видео</string>
@@ -3281,7 +3287,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Выбрать передачи</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Unable to change priority of the transfer “%1$s”</string>
+    <string name="change_of_transfer_priority_failed">Невозможно изменить приоритет передачи «%1$s»</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Отправить ключ дешифрования отдельно</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3544,9 +3550,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s ПБ</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;ПБ</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s ЭБ</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;ЭБ</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Добавить номер телефона</string>
     <!-- Text of the option Backup Recovery Key in My account section -->

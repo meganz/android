@@ -1551,11 +1551,10 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">ไม่ได้อนุญาตให้ใช้อักขระนี้</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">ไม่อนุญาตให้ใช้อักขระต่อไปนี้: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">File name cannot be empty.</item>
-        <item quantity="other">File names cannot be empty.</item>
+        <item quantity="other">ชื่อไฟล์ต้องไม่ว่างเปล่า</item>
     </plurals>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">ผิดพลาด ไฟล์ PDF เสียหายหรือไม่มีอยู่</string>
@@ -1630,7 +1629,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">ยังไม่ได้ส่งคำเชิญ %s อยู่ในรายชื่อติดต่อของคุณแล้ว</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
+    <string name="invite_not_sent_text_error">เกิดข้อผิดพลาดและยังไม่ได้ส่งคำเชิญ</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">กำลังสร้างคิวอาร์โค้ด&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -1720,23 +1719,23 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s KB</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s MB</string>
+    <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s TB</string>
+    <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s B/s</string>
+    <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s KB/s</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s MB/s</string>
+    <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s TB/s</string>
+    <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -1985,7 +1984,7 @@
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">ดูตัวอย่างเนื้อหา</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
+    <string name="no_network_connection_on_play_file">ไม่มีการเชื่อมต่อกับเครือข่าย ไฟล์ยังไม่ได้ดาวน์โหลดและไม่สามารถสตรีมได้</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">ไม่สามารถอ่านไฟล์ได้</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2386,8 +2385,7 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="other">%1$d โฟลเดอร์&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] ได้เพิ่ม %2$s และ%3$s[/B]</string>
@@ -3040,7 +3038,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">เลือกการถ่ายโอน</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Unable to change priority of the transfer “%1$s”</string>
+    <string name="change_of_transfer_priority_failed">ไม่สามารถเปลี่ยนลำดับความสำคัญการถ่ายโอน “%1$s” ได้</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">ส่งคีย์ถอดรหัสลับแยกต่างหาก</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3270,9 +3268,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">เพิ่มหมายเลขโทรศัพท์ของคุณ</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -3722,11 +3720,11 @@
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
     <string name="title_duplicated_items">รายการที่ซ้ำกัน</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
-    <string name="file_already_exists_in_location">ไฟล์ชื่อ [B]%1$s[/B] มีอยู่แล้วในปลายทางนี้</string>
+    <string name="file_already_exists_in_location">ปลายทางมีไฟล์ชื่อ [B]%1$s[/B] อยู่แล้ว</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
     <string name="choose_file">เลือกไฟล์ที่คุณต้องการเก็บ</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose. -->
-    <string name="choose_folder">เลือกว่าคุณต้องการผสานโฟลเดอร์หรือไม่</string>
+    <string name="choose_folder">เลือกว่าคุณต้องการรวมโฟลเดอร์หรือไม่</string>
     <!-- Informs about what is expected after choose the option upload and replace for a name collision if file versioning is disabled. -->
     <string name="warning_upload_and_replace">ไฟล์เวอร์ชันปัจจุบันจะถูกแทนที่ด้วยไฟล์ที่คุณกำลังอัปโหลด</string>
     <!-- Upload and replace action button for a name collision. -->
@@ -3742,7 +3740,7 @@
     <!-- Upload and rename action button for a name collision. -->
     <string name="upload_and_rename">อัปโหลดและเปลี่ยนชื่อ</string>
     <!-- Informs about what is expected after choose the option move and replace for a name collision if file versioning is disabled. -->
-    <string name="warning_move_and_replace">แทนที่ไฟล์ในโฟลเดอร์ปลายทางด้วยไฟล์ที่คุณกำลังย้าย.</string>
+    <string name="warning_move_and_replace">แทนที่ไฟล์ในโฟลเดอร์ปลายทางด้วยไฟล์ที่คุณกำลังย้าย</string>
     <!-- Move and replace action button for a name collision. -->
     <string name="move_and_replace">ย้ายและแทนที่</string>
     <!-- Don’t move action button for a name collision. -->
@@ -3752,7 +3750,7 @@
     <!-- Move and rename action button for a name collision. -->
     <string name="move_and_rename">ย้ายและเปลี่ยนชื่อ</string>
     <!-- Informs about what is expected after choose the option copy and replace for a name collision if file versioning is disabled. -->
-    <string name="warning_copy_and_replace">แทนที่ไฟล์ในโฟลเดอร์ปลายทางด้วยไฟล์ที่คุณกำลังคัดลอก.</string>
+    <string name="warning_copy_and_replace">แทนที่ไฟล์ในโฟลเดอร์ปลายทางด้วยไฟล์ที่คุณกำลังคัดลอก</string>
     <!-- Copy and replace action button for a name collision. -->
     <string name="copy_and_replace">คัดลอกและวาง</string>
     <!-- Don’t copy action button for a name collision. -->
@@ -3764,7 +3762,7 @@
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
     <string name="file_apply_for_all">ใช้ตัวเลือกนี้กับ %1$d ข้อขัดแย้งต่อไป</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
-    <string name="warning_copy_and_merge">ผสานโฟลเดอร์ที่ปลายทางกับโฟลเดอร์ที่คุณกำลังคัดลอกไว้.</string>
+    <string name="warning_copy_and_merge">รวมโฟลเดอร์ที่ปลายทางกับโฟลเดอร์ที่คุณกำลังคัดลอก</string>
     <!-- Copy and merge action button for a name collision. -->
     <string name="copy_and_merge">คัดลอกและผสาน</string>
     <!-- Informs about what is expected after choose the option move and merge for a name collision. -->

@@ -1623,7 +1623,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Certains caractères sont invalides</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Les caractères suivants ne sont pas autorisés&#160;: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">Les caractères suivants ne sont pas autorisés&#160;: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Le nom de fichier ne peut pas être vide.</item>
@@ -1793,7 +1793,7 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s o</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s&#160;ko</string>
+    <string name="label_file_size_kilo_byte">%s&#160;Ko</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s&#160;Mo</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1803,7 +1803,7 @@
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_byte">%s&#160;o/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s&#160;ko/s</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;Ko/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s&#160;Mo/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->

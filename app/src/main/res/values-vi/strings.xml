@@ -127,7 +127,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Có chắc muốn hủy bỏ quá trình đăng nhập hiện tại không?</string>
     <!-- Login button -->
-    <string name="login_text">Đăng nhập</string>
+    <string name="login_text">Đăng&#160;nhập</string>
     <!-- email label -->
     <string name="email_text">Email</string>
     <!-- password label -->
@@ -1551,7 +1551,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Ký tự không hợp lệ</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Các ký tự không được phép sử dụng: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">Các ký tự không được phép sử dụng: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">File name cannot be empty.</item>
@@ -1720,23 +1720,23 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s KB</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s MB</string>
+    <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s TB</string>
+    <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s B/giây</string>
+    <string name="label_file_speed_byte">%s&#160;B/giây</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s KB/giây</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KB/giây</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s MB/giây</string>
+    <string name="label_file_speed_mega_byte">%s&#160;MB/giây</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_giga_byte">%s&#160;GB/giây</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s TB/giây</string>
+    <string name="label_file_speed_tera_byte">%s&#160;TB/giây</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -3270,9 +3270,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Thêm số điện thoại</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
