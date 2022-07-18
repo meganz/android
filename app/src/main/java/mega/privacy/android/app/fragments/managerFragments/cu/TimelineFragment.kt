@@ -265,7 +265,7 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
      * handle Storage Permission when got refused
      */
     fun onStoragePermissionRefused() {
-        Util.showSnackbar(context, getString(R.string.on_refuse_storage_permission))
+        Util.showSnackbar(requireActivity(), getString(R.string.on_refuse_storage_permission))
         skipCUSetup()
     }
 
@@ -349,7 +349,7 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
             MegaApplication.getInstance().sendSignalPresenceActivity()
             val permissions =
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
-            if (hasPermissions(context, *permissions)) {
+            if (hasPermissions(requireContext(), *permissions)) {
                 mManagerActivity.checkIfShouldShowBusinessCUAlert()
             } else {
                 requestCameraUploadPermission(
@@ -415,7 +415,7 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
     private fun setEmptyState() {
         binding.emptyHintText.text = HtmlCompat.fromHtml(
             TextUtil.formatEmptyScreenText(
-                context,
+                requireContext(),
                 StringResourcesUtils.getString(when (getCurrentFilter()) {
                     FILTER_CAMERA_UPLOADS -> R.string.photos_empty
                     FILTER_CLOUD_DRIVE -> R.string.homepage_empty_hint_photos
@@ -440,9 +440,9 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
      * handle enable Camera Upload click UI and logic
      */
     fun enableCameraUploadClick() {
-        ((context as Activity).application as MegaApplication).sendSignalPresenceActivity()
+        ((requireActivity() as Activity).application as MegaApplication).sendSignalPresenceActivity()
         val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
-        if (hasPermissions(context, *permissions)) {
+        if (hasPermissions(requireContext(), *permissions)) {
             viewModel.setEnableCUShown(true)
             mManagerActivity.refreshTimelineFragment()
         } else {
@@ -875,7 +875,7 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
 
         val params = listView.layoutParams as ViewGroup.MarginLayoutParams
 
-        layoutManager = GridLayoutManager(context, spanCount)
+        layoutManager = GridLayoutManager(requireContext(), spanCount)
         listView.layoutManager = layoutManager
 
         if (selectedView == ALL_VIEW) {
@@ -1105,7 +1105,7 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
                         visibility = View.VISIBLE
 
                         val animator =
-                            AnimatorInflater.loadAnimator(context, R.animator.icon_select)
+                            AnimatorInflater.loadAnimator(requireContext(), R.animator.icon_select)
                         animator.setTarget(this)
                         animatorList.add(animator)
                     }
@@ -1132,7 +1132,7 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
         })
 
     fun doIfOnline(operation: () -> Unit) {
-        if (Util.isOnline(context)) {
+        if (Util.isOnline(requireContext())) {
             operation()
         } else {
             val activity = activity as ManagerActivity
