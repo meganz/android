@@ -281,7 +281,8 @@ pipeline {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
-                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}"
+                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}",
+                                "TESTER_GROUP_FOR_CD=${parseDeliverQaParams()["tester-group"]}"
                         ]) {
                             println("Upload GMS APK, TESTERS_FOR_CD = ${env.TESTERS_FOR_CD}")
                             println("Upload GMS APK, RELEASE_NOTES_FOR_CD = ${env.RELEASE_NOTES_FOR_CD}")
@@ -341,7 +342,8 @@ pipeline {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
-                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}"
+                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}",
+                                "TESTER_GROUP_FOR_CD=${parseDeliverQaParams()["tester-group"]}"
                         ]) {
                             sh './gradlew appDistributionUploadHmsRelease'
                         }
@@ -374,7 +376,8 @@ pipeline {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
-                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}"
+                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}",
+                                "TESTER_GROUP_FOR_CD=${parseDeliverQaParams()["tester-group"]}"
                         ]) {
                             sh './gradlew appDistributionUploadGmsQa'
                         }
@@ -395,8 +398,9 @@ pipeline {
                     echo "workspace size before clean: "
                     du -sh
 
-                    #cd ${WORKSPACE}/app/src/main/jni
-                    #bash build.sh clean
+                    cd ${WORKSPACE}/app/src/main/jni
+                    bash build.sh clean
+                    
                     cd ${WORKSPACE}
                     ./gradlew clean
                     
@@ -590,62 +594,71 @@ private String getTriggerReason() {
     }
 }
 
-
 /**
  *
  * @return a map of the parameters and values. Below parameters should be included.
  *     key "tester" - list of tester emails, separated by comma
- *     key "notes - developer specified release notes.
+ *     key "notes" - developer specified release notes.
+ *     key "tester-group" - developer specified tester group, separated by comma
  *     If deliver_qa command is issued without parameters, then values of above keys are empty.
  */
 def parseDeliverQaParams() {
-    String command = env.gitlabTriggerPhrase
-
-    // parameter name in deliver_qa command
+    // parameters in deliver_qa command
     final PARAM_TESTER = "--tester"
     final PARAM_NOTES = "--notes"
+    final PARAM_TESTER_GROUP = "--tester-group"
 
     // key in the result dictionary
-    final KEY_TESTER = "tester"
-    final KEY_NOTES = "notes"
+    def KEY_TESTER = "tester"
+    def KEY_NOTES = "notes"
+    def KEY_TESTER_GROUP = "tester-group"
 
     def result = [:]
     result[KEY_TESTER] = ""
     result[KEY_NOTES] = ""
+    result[KEY_TESTER_GROUP] = ""
 
+    String command = env.gitlabTriggerPhrase
+    println("[DEBUG] parsing deliver_qa command parameters. \nuser input: $command")
     if (command == null || !command.startsWith("deliver_qa")) {
         return result
     }
-
     String params = command.substring("deliver_qa".length()).trim()
-    int testerPos = params.indexOf(PARAM_TESTER)
-    int notesPos = params.indexOf(PARAM_NOTES)
-
-    // If no tester or notes parameter is explicitly specified, take the contents
-    // after deliver_qa as tester.
-    // This is for backward compatibility for previous command format
-    if (testerPos < 0 && notesPos < 0) {
-        result[KEY_TESTER] = params
-        return result
-    }
 
     // get release notes from parameter.
-    String notes = ""
+    int notesPos = params.indexOf(PARAM_NOTES)
     if (notesPos >= 0) {
-        notes = params.substring(notesPos + PARAM_NOTES.length()).trim()
+        String notes = params.substring(notesPos + PARAM_NOTES.length()).trim()
+        result[KEY_NOTES] = notes
     }
-    result[KEY_NOTES] = notes
 
-    // get tester list from parameter
-    String tester = ""
-    if (testerPos >= 0) {
-        if (notesPos > 0) {
-            tester = params.substring(testerPos + PARAM_TESTER.length(), notesPos).trim()
-        } else {
-            tester = params.substring(testerPos + PARAM_TESTER.length()).trim()
-        }
+    String otherParams
+    if (notesPos >= 0) {
+        otherParams = params.substring(0, notesPos).trim()
+    } else {
+        otherParams = params
     }
-    result[KEY_TESTER] = tester
+
+    String[] paramList = otherParams.split(" +")
+    def counter = 0
+    while (counter < paramList.length) {
+        String word = paramList[counter]
+        switch (word) {
+            case PARAM_TESTER:
+                result[KEY_TESTER] = paramList[++counter]
+                break
+            case PARAM_TESTER_GROUP:
+                result[KEY_TESTER_GROUP] = paramList[++counter]
+                break;
+            default:
+                println("[ERROR] invalid parameter of deliver_qa command!")
+                println("[ERROR] actual parameter: $params")
+                println("[ERROR] parsed parameters: $result")
+                println("[ERROR] parameter \"$word\" is unknown!")
+                break;
+        }
+        counter++
+    }
 
     println("[DEBUG] deliverQa params = $result")
     return result
