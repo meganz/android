@@ -53,6 +53,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -686,8 +688,15 @@ public class FileBrowserFragment extends RotatableFragment {
 
         selectNewlyAddedNodes();
 
+        // adding feature flag (isVisibleAnimation) for designers review and user test
+        if (((ManagerActivity) context).viewInFolderNode != null && isVisibleAnimation) {
+            animateNode(nodes);
+        }
+
         return v;
     }
+    // boolean variable to add feature flag for new function animateNode()
+    private boolean isVisibleAnimation = false;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -1451,5 +1460,33 @@ public class FileBrowserFragment extends RotatableFragment {
             }
             recyclerView.scrollToPosition(firstPosition);
         }
+    }
+
+    private final static int DURATION_ANIMATION = 1000;
+    private final static int DELAY_RECYCLERVIEW_POST = 500;
+    private int nodePosition = 0;
+
+    /**
+     * When user tap View in Folder option from Recents tab, animate the node once view is loaded
+     */
+    void animateNode(List<MegaNode> nodes) {
+        MegaNode node = ((ManagerActivity) context).viewInFolderNode;
+        for (int i = 1; i < nodes.size(); i++) {
+            MegaNode currentNode = nodes.get(i);
+            if (currentNode != null && currentNode.getHandle() == node.getHandle()) {
+                nodePosition = i;
+            }
+        }
+        //Scroll the position to the 3td position before of the target position.
+        recyclerView.scrollToPosition(nodePosition - 3);
+
+        recyclerView.postDelayed(() -> {
+            RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(nodePosition);
+            if (null != holder) {
+                Animation animFadeIn = AnimationUtils.loadAnimation(context.getApplicationContext(), R.anim.fade_in);
+                animFadeIn.setDuration(DURATION_ANIMATION);
+                holder.itemView.startAnimation(animFadeIn);
+            }
+        }, DELAY_RECYCLERVIEW_POST);
     }
 }
