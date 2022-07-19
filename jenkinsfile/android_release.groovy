@@ -111,18 +111,19 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Fetch SDK Submodules'
+                    cleanOldSdkOutput()
                 }
                 withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
                     script {
                         sh '''
                             cd ${WORKSPACE}
-                            git config --file=.gitmodules submodule.\"app/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
-                            git config --file=.gitmodules submodule.\"app/src/main/jni/mega/sdk\".branch develop
-                            git config --file=.gitmodules submodule.\"app/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
-                            git config --file=.gitmodules submodule.\"app/src/main/jni/megachat/sdk\".branch develop
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
                             git submodule sync
                             git submodule update --init --recursive --remote 
-                            cd app/src/main/jni/mega/sdk
+                            cd sdk/src/main/jni/mega/sdk
                             git fetch
                             cd ../../megachat/sdk
                             git fetch
@@ -192,7 +193,7 @@ pipeline {
                     BUILD_STEP = 'Build SDK'
 
                     sh """
-                        cd ${WORKSPACE}/app/src/main/jni
+                        cd ${WORKSPACE}/sdk/src/main/jni
                         echo "=== CLEAN SDK ===="
                         bash build.sh clean
                         echo "=== START SDK BUILD===="
@@ -376,20 +377,20 @@ pipeline {
                     BUILD_STEP = 'Collect native symbol files'
 
                     deleteAllFilesExcept(
-                            "${WORKSPACE}/app/src/main/obj/local/arm64-v8a",
+                            "${WORKSPACE}/sdk/src/main/obj/local/arm64-v8a",
                             "libmega.so")
                     deleteAllFilesExcept(
-                            "${WORKSPACE}/app/src/main/obj/local/armeabi-v7a/",
+                            "${WORKSPACE}/sdk/src/main/obj/local/armeabi-v7a/",
                             "libmega.so")
                     deleteAllFilesExcept(
-                            "${WORKSPACE}/app/src/main/obj/local/x86",
+                            "${WORKSPACE}/sdk/src/main/obj/local/x86",
                             "libmega.so")
                     deleteAllFilesExcept(
-                            "${WORKSPACE}/app/src/main/obj/local/x86_64",
+                            "${WORKSPACE}/sdk/src/main/obj/local/x86_64",
                             "libmega.so")
 
                     sh """
-                        cd ${WORKSPACE}/app/src/main/obj/local
+                        cd ${WORKSPACE}/sdk/src/main/obj/local
                         rm -fv */.DS_Store
                         rm -fv .DS_Store
                         zip -r ${NATIVE_SYMBOL_FILE} .
@@ -540,8 +541,8 @@ static boolean isDefined(String value) {
 private void checkoutSdkByBranch(String sdkBranch) {
     sh "echo checkoutSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"app/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git'
-    sh "git config --file=.gitmodules submodule.\"app/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
+    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
 }
@@ -553,8 +554,8 @@ private void checkoutSdkByBranch(String sdkBranch) {
 private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
     sh "echo checkoutMegaChatSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"app/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-    sh "git config --file=.gitmodules submodule.\"app/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
+    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
 }
@@ -602,7 +603,7 @@ private String successMessage(String lineBreak) {
 private String sdkCommitId() {
     String commitId = sh(
             script: """
-                cd ${WORKSPACE}/app/src/main/jni/mega/sdk
+                cd ${WORKSPACE}/sdk/src/main/jni/mega/sdk
                 git rev-parse HEAD
                 """,
             returnStdout: true).trim()
@@ -625,7 +626,7 @@ private String appCommitId() {
 private String megaChatSdkCommitId() {
     String commitId = sh(
             script: """
-                cd ${WORKSPACE}/app/src/main/jni/megachat/sdk
+                cd ${WORKSPACE}/sdk/src/main/jni/megachat/sdk
                 git rev-parse HEAD
                 """,
             returnStdout: true).trim()
@@ -793,6 +794,21 @@ private String artifactoryUploadPath() {
     return "v${versionName}/${versionCode}"
 }
 
-
+// TODO this method is to migrate to new SDK module.
+// TODO: it should deleted after all existing MRs have merged new SDK module
+private void cleanOldSdkOutput() {
+    println("cleanOldSdkOutput")
+    sh """
+    cd $WORKSPACE
+    git checkout -- .gitmodules
+    rm -fr app/src/main/java/nz/mega/sdk/*.java  || true
+    rm -fr app/src/main/jni || true
+    rm -fr app/src/main/obj/*  || true
+    rm -fr app/src/main/libs/arm64-v8a || true
+    rm -fr app/src/main/libs/armeabi-v7a || true
+    rm -fr app/src/main/libs/x86 || true
+    rm -fr app/src/main/libs/x86_64 || true
+    """
+}
 
 

@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.transfers
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.View
 import android.widget.RelativeLayout
 import androidx.activity.viewModels
@@ -23,8 +24,8 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRA
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.ManagerActivity.PENDING_TAB
 import mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB
+import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.usecase.GetNetworkConnectionUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
@@ -40,7 +41,9 @@ import javax.inject.Inject
 open class TransfersManagementActivity : PasscodeActivity() {
 
     companion object {
-        const val IS_CANCEL_TRANSFERS_SHOWN = "IS_CANCEL_TRANSFERS_SHOWN"
+        private const val IS_CANCEL_TRANSFERS_SHOWN = "IS_CANCEL_TRANSFERS_SHOWN"
+        private const val SHOW_SCANNING_DIALOG_TIMER = 800L
+        private const val HIDE_SCANNING_DIALOG_TIMER = 1200L
     }
 
     @Inject
@@ -52,6 +55,8 @@ open class TransfersManagementActivity : PasscodeActivity() {
     private var cancelTransfersDialog: AlertDialog? = null
 
     val transfersViewModel: TransfersManagementViewModel by viewModels()
+
+    private var scanningDialogTimer: CountDownTimer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,9 +102,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
         LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java)
             .observe(this, ::updateTransfersWidget)
 
-        LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
-            .observeForever(::onShowScanningTransfersDialog)
-
         transfersViewModel.onTransfersInfoUpdate().observe(this) { (transferType, transfersInfo) ->
             transfersWidget?.update(transferType = transferType, transfersInfo = transfersInfo)
         }
@@ -117,12 +119,53 @@ open class TransfersManagementActivity : PasscodeActivity() {
     private fun onShowScanningTransfersDialog(show: Boolean) {
         when {
             show && transfersManagement.shouldShowScanningTransfersDialog() -> {
-                showScanningTransfersDialog()
+                startShowScanningDialogTimer()
             }
             !show && !transfersManagement.shouldShowScanningTransfersDialog() -> {
-                scanningTransfersDialog?.dismiss()
+                if (scanningDialogTimer == null) {
+                    scanningTransfersDialog?.dismiss()
+                }
             }
         }
+    }
+
+    /**
+     * Starts a [CountDownTimer] in order to show the scanning dialog only if the processing time
+     * exceeds [SHOW_SCANNING_DIALOG_TIMER].
+     */
+    private fun startShowScanningDialogTimer() {
+        if (scanningDialogTimer == null) {
+            scanningDialogTimer =
+                object : CountDownTimer(SHOW_SCANNING_DIALOG_TIMER, SHOW_SCANNING_DIALOG_TIMER) {
+                    override fun onTick(millisUntilFinished: Long) {}
+
+                    override fun onFinish() {
+                        scanningDialogTimer = null
+                        if (transfersManagement.shouldShowScanningTransfersDialog()) {
+                            showScanningTransfersDialog()
+                            startHideScanningDialogTimer()
+                        }
+                    }
+                }.start()
+        }
+    }
+
+    /**
+     * Starts a [CountDownTimer] in order to show the scanning dialog at least
+     * [HIDE_SCANNING_DIALOG_TIMER].
+     */
+    private fun startHideScanningDialogTimer() {
+        scanningDialogTimer =
+            object : CountDownTimer(HIDE_SCANNING_DIALOG_TIMER, HIDE_SCANNING_DIALOG_TIMER) {
+                override fun onTick(millisUntilFinished: Long) {}
+
+                override fun onFinish() {
+                    scanningDialogTimer = null
+                    if (!transfersManagement.shouldShowScanningTransfersDialog()) {
+                        scanningTransfersDialog?.dismiss()
+                    }
+                }
+            }.start()
     }
 
     /**
@@ -176,7 +219,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
         startActivity(
             Intent(this, ManagerActivity::class.java)
                 .setAction(ACTION_SHOW_TRANSFERS)
-                .putExtra(TRANSFERS_TAB, PENDING_TAB)
+                .putExtra(TRANSFERS_TAB, TransfersTab.PENDING_TAB)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         )
@@ -190,6 +233,10 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * @param transferType  Type of the transfer.
      */
     protected fun updateTransfersWidget(transferType: Int) {
+        if (transfersManagement.isProcessingTransfers || transfersManagement.isProcessingFolders) {
+            return
+        }
+
         transfersViewModel.checkTransfersInfo(transferType)
     }
 
@@ -206,7 +253,9 @@ open class TransfersManagementActivity : PasscodeActivity() {
             .setPositiveButton(
                 StringResourcesUtils.getString(R.string.cancel_transfers)
             ) { _, _ ->
-                showCancelTransfersDialog()
+                if (transfersManagement.shouldShowScanningTransfersDialog()) {
+                    showCancelTransfersDialog()
+                }
             }
             .create()
             .apply {
@@ -279,6 +328,8 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
         scanningTransfersDialog?.dismiss()
         cancelTransfersDialog?.dismiss()
+        LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
+            .removeObserver(::onShowScanningTransfersDialog)
     }
 
     /**

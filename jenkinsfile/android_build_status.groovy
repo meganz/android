@@ -261,14 +261,15 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Fetch SDK Submodules"
+                    cleanOldSdkOutput()
                 }
 
                 gitlabCommitStatus(name: 'Fetch SDK Submodules') {
                     withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                        sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
-                        sh "git config --file=.gitmodules submodule.\"app/src/main/jni/mega/sdk\".branch ${SDK_BRANCH}"
-                        sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-                        sh "git config --file=.gitmodules submodule.\"app/src/main/jni/megachat/sdk\".branch ${MEGACHAT_BRANCH}"
+                        sh 'git config --file=.gitmodules submodule."sdk/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
+                        sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch ${SDK_BRANCH}"
+                        sh 'git config --file=.gitmodules submodule."sdk/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+                        sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch ${MEGACHAT_BRANCH}"
                         sh "git submodule sync"
                         sh "git submodule update --init --recursive --remote"
                     }
@@ -332,7 +333,7 @@ pipeline {
                 gitlabCommitStatus(name: 'Build SDK') {
                     sh """
                     rm -f ${LOG_FILE}
-                    cd ${WORKSPACE}/app/src/main/jni
+                    cd ${WORKSPACE}/sdk/src/main/jni
                     echo "=== START SDK BUILD===="
                     bash build.sh all
                     """
@@ -415,7 +416,7 @@ pipeline {
                     cd ${WORKSPACE}
                     echo "workspace size before clean: "
                     du -sh
-                    cd ${WORKSPACE}/app/src/main/jni
+                    cd ${WORKSPACE}/sdk/src/main/jni
                     bash build.sh clean
                     cd ${WORKSPACE}
                     ./gradlew clean
@@ -526,4 +527,21 @@ def unitTestSummaryWithArchiveLink(String testResultPath, String reportPath, Str
         }
         return unitTestResult
     }
+}
+
+// TODO this method is to migrate to new SDK module.
+// TODO: it should deleted after all existing MRs have merged new SDK module
+private void cleanOldSdkOutput() {
+    println("cleanOldSdkOutput")
+    sh """
+    cd $WORKSPACE
+    git checkout -- .gitmodules
+    rm -fr app/src/main/java/nz/mega/sdk/*.java  || true
+    rm -fr app/src/main/jni || true
+    rm -fr app/src/main/obj/*  || true
+    rm -fr app/src/main/libs/arm64-v8a || true
+    rm -fr app/src/main/libs/armeabi-v7a || true
+    rm -fr app/src/main/libs/x86 || true
+    rm -fr app/src/main/libs/x86_64 || true
+    """
 }

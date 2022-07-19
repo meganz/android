@@ -93,11 +93,4 @@ class AppModule {
     @Provides
     fun provideGetThemeModePreference(useCase: DefaultGetThemeMode): GetThemeMode =
         useCase
-
-    /**
-     * Provides @ShakeDetector instance
-     */
-    @Singleton
-    @Provides
-    fun provideShakeDetector(): ShakeDetector = ShakeDetector()
 }

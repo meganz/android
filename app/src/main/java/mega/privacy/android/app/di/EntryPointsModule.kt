@@ -12,8 +12,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.facade.CacheFolderFacade
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
-import mega.privacy.android.app.data.gateway.VibratorFacade
-import mega.privacy.android.app.data.gateway.VibratorGateway
 import java.util.concurrent.ThreadPoolExecutor
 
 @Module
@@ -76,13 +74,4 @@ class EntryPointsModule {
          */
         val megaThreadPoolExecutor: ThreadPoolExecutor
     }
-
-    /**
-     * Provides @VibratorGateway
-     *
-     * @param vibratorFacade: @VibratorFacade
-     * @return VibratorGateway: @VibratorGateway
-     */
-    @Provides
-    fun provideVibratorGateway(vibratorFacade: VibratorFacade): VibratorGateway = vibratorFacade
 }

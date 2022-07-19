@@ -194,6 +194,9 @@ class MegaApiFacade @Inject constructor(
 
     override fun handleToBase64(handle: Long): String = MegaApiAndroid.handleToBase64(handle)
 
+    override fun base64ToHandle(base64Handle: String): Long =
+        MegaApiAndroid.base64ToHandle(base64Handle)
+
     override fun cancelTransfer(transfer: MegaTransfer) {
         megaApi.cancelTransfer(transfer)
     }
@@ -229,6 +232,11 @@ class MegaApiFacade @Inject constructor(
         cancelToken: MegaCancelToken?,
         listener: MegaTransferListenerInterface?,
     ) = megaApi.startDownload(node, localPath, fileName, appData, startFirst, cancelToken, listener)
+
+    override fun getUserEmail(userHandle: Long, callback: MegaRequestListenerInterface) =
+        megaApi.getUserEmail(userHandle, callback)
+
+    override suspend fun getContact(email: String): MegaUser? = megaApi.getContact(email)
 
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10

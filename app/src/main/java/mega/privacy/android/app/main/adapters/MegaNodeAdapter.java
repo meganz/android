@@ -84,19 +84,19 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.databinding.SortByHeaderBinding;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
-import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.main.ContactFileListActivity;
 import mega.privacy.android.app.main.ContactFileListFragment;
 import mega.privacy.android.app.main.ContactSharedFolderFragment;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.main.managerSections.FileBrowserFragment;
 import mega.privacy.android.app.main.managerSections.InboxFragment;
-import mega.privacy.android.app.main.managerSections.IncomingSharesFragment;
-import mega.privacy.android.app.main.managerSections.OutgoingSharesFragment;
-import mega.privacy.android.app.main.managerSections.RubbishBinFragment;
-import mega.privacy.android.app.main.managerSections.SearchFragment;
+import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
+import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
+import mega.privacy.android.app.presentation.search.SearchFragment;
+import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
+import mega.privacy.android.app.presentation.shares.links.LinksFragment;
+import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
@@ -208,11 +208,21 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         private void bind() {
             binding.setSortByHeaderViewModel(sortByViewModel);
-            binding.setOrderNameStringId(SortByHeaderViewModel.getOrderNameMap()
-                    .get(type == INCOMING_SHARES_ADAPTER
-                            && ((ManagerActivity) context).getDeepBrowserTreeIncoming() == 0
-                            ? sortByViewModel.getOrder().getSecond()
-                            : sortByViewModel.getOrder().getFirst()));
+
+            int orderType = sortByViewModel.getOrder().getFirst();
+
+            // Root of incoming shares tab, display sort options OTHERS
+            if (type == INCOMING_SHARES_ADAPTER
+                    && ((ManagerActivity) context).getDeepBrowserTreeIncoming() == 0) {
+                orderType = sortByViewModel.getOrder().getSecond();
+            }
+            // Root of outgoing shares tab, display sort options OTHERS
+            else if (type == OUTGOING_SHARES_ADAPTER
+                    && ((ManagerActivity) context).getDeepBrowserTreeOutgoing() == 0) {
+                orderType = sortByViewModel.getOrder().getSecond();
+            }
+
+            binding.setOrderNameStringId(SortByHeaderViewModel.getOrderNameMap().get(orderType));
 
             binding.listModeSwitch.setVisibility(type == LINKS_ADAPTER
                     ? View.GONE

@@ -12,5 +12,6 @@ internal fun toPushMessage(data: Data): PushMessage =
     PushMessage(
         type = data.getString(PushMessage.KEY_TYPE),
         email = data.getString(PushMessage.KEY_EMAIL),
-        silent = data.getString(PushMessage.KEY_SILENT)
+        silent = data.getString(PushMessage.KEY_SILENT),
+        chatId = data.getString(PushMessage.KEY_CHAT_ID),
     )

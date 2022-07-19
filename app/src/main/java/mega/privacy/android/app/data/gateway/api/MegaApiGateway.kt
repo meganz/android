@@ -13,8 +13,7 @@ import nz.mega.sdk.MegaUser
 /**
  * Mega api gateway
  *
- * The gateway interface to the Mega Api functionality
- *
+ * @constructor Create empty Mega api gateway
  */
 interface MegaApiGateway {
     /**
@@ -257,6 +256,14 @@ interface MegaApiGateway {
     fun handleToBase64(handle: Long): String
 
     /**
+     * Converts a Base64-encoded node handle to a handle.
+     *
+     * @param base64Handle Base64-encoded node handle.
+     * @return Node handle.
+     */
+    fun base64ToHandle(base64Handle: String): Long
+
+    /**
      * Cancel transfer
      *
      * @param transfer to be cancelled
@@ -348,4 +355,20 @@ interface MegaApiGateway {
         cancelToken: MegaCancelToken?,
         listener: MegaTransferListenerInterface?,
     )
+
+    /**
+     * Get user email
+     *
+     * @param userHandle
+     * @param callback
+     */
+    fun getUserEmail(userHandle: Long, callback: MegaRequestListenerInterface)
+
+    /**
+     * Get contact
+     *
+     * @param email
+     * @return Mega user associated with the email address
+     */
+    suspend fun getContact(email: String): MegaUser?
 }

@@ -137,6 +137,7 @@ import mega.privacy.android.app.components.PushNotificationSettingManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
+import mega.privacy.android.app.data.mapper.ChatRequestMapperKt;
 import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.di.MegaApiFolder;
@@ -1421,8 +1422,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                     Timber.d("OK:TYPE_PUSH_RECEIVED");
                     if (!getMegaApi().isEphemeralPlusPlus()) {
-                        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
-                        notificationBuilder.generateChatNotification(request);
+                        ChatAdvancedNotificationBuilder.newInstance(this)
+                                .generateChatNotification(ChatRequestMapperKt.toChatRequest(request));
                     }
                 } else {
                     Timber.w("Error TYPE_PUSH_RECEIVED: %s", e.getErrorString());
