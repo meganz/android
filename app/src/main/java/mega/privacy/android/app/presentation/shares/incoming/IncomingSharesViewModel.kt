@@ -11,6 +11,7 @@ import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import java.util.Stack
 import javax.inject.Inject
 
 /**
@@ -29,6 +30,9 @@ class IncomingSharesViewModel @Inject constructor(
 
     /** public UI state */
     val state: StateFlow<IncomingSharesState> = _state
+
+    /** stack of scroll position for each depth */
+    private val lastPositionStack: Stack<Int> = Stack<Int>()
 
     init {
         viewModelScope.launch {
@@ -95,7 +99,7 @@ class IncomingSharesViewModel @Inject constructor(
      *
      * @return last position saved
      */
-    fun popLastPositionStack(): Int = _state.value.lastPositionStack.pop()
+    fun popLastPositionStack(): Int = lastPositionStack.takeIf { it.isNotEmpty() }?.pop() ?: 0
 
     /**
      * Push scroll position for current depth
@@ -103,7 +107,7 @@ class IncomingSharesViewModel @Inject constructor(
      * @param position the scroll position of the recyclerView for the current depth
      * @return the position saved
      */
-    fun pushToLastPositionState(position: Int): Int = _state.value.lastPositionStack.push(position)
+    fun pushToLastPositionState(position: Int): Int = lastPositionStack.push(position)
 
     /**
      * Set the current nodes displayed

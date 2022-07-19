@@ -9,13 +9,11 @@ import java.util.Stack
  * @param incomingParentHandle current incoming shares parent handle
  * @param incomingTreeDepth current incoming tree depth
  * @param nodes current list of nodes
- * @param lastPositionStack stack of scroll position for each depth
  */
 data class IncomingSharesState(
     val incomingParentHandle: Long = -1L,
     val incomingTreeDepth: Int = 0,
     val nodes: List<MegaNode> = emptyList(),
-    val lastPositionStack: Stack<Int> = Stack<Int>(),
 ) {
 
     /**

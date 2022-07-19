@@ -54,7 +54,6 @@ class IncomingSharesViewModelTest {
             assertThat(initial.incomingParentHandle).isEqualTo(-1L)
             assertThat(initial.incomingTreeDepth).isEqualTo(0)
             assertThat(initial.nodes).isEmpty()
-            assertThat(initial.lastPositionStack).isEmpty()
         }
     }
 

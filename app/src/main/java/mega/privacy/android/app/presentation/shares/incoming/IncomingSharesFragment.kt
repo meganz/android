@@ -144,16 +144,13 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 Timber.d("deepBrowserTree==1")
                 viewModel.resetIncomingTreeDepth()
 
-                val lastVisiblePosition =
-                    if (state().lastPositionStack.isNotEmpty())
-                        viewModel.popLastPositionStack()
-                    else 0
+                val lastVisiblePosition = viewModel.popLastPositionStack()
 
-                if (lastVisiblePosition >= 0) {
+                lastVisiblePosition.takeIf { it > 0 }?.let {
                     if (managerActivity.isList)
-                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        mLayoutManager.scrollToPositionWithOffset(it, 0)
                     else
-                        gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        gridLayoutManager.scrollToPositionWithOffset(it, 0)
                 }
 
                 recyclerView.visibility = View.VISIBLE
@@ -175,16 +172,13 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                     emptyLinearLayout.visibility = View.GONE
                     viewModel.decreaseIncomingTreeDepth(parentNode.handle)
 
-                    val lastVisiblePosition =
-                        if (state().lastPositionStack.isNotEmpty())
-                            viewModel.popLastPositionStack()
-                        else 0
+                    val lastVisiblePosition = viewModel.popLastPositionStack()
 
-                    if (lastVisiblePosition >= 0) {
+                    lastVisiblePosition.takeIf { it > 0 }?.let {
                         if (managerActivity.isList)
-                            mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                            mLayoutManager.scrollToPositionWithOffset(it, 0)
                         else
-                            gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                            gridLayoutManager.scrollToPositionWithOffset(it, 0)
                     }
                 }
 
@@ -244,6 +238,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
+                    Timber.d("Collect ui state")
                     updateNodes(it.nodes)
                     hideTabs(!it.isFirstNavigationLevel())
 
