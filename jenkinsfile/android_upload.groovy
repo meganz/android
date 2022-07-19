@@ -108,15 +108,16 @@ pipeline {
                 gitlabCommitStatus(name: 'Fetch SDK Submodules') {
                     withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
                         script {
+                            cleanOldSdkOutput()
                             sh '''
                             cd ${WORKSPACE}
-                            git config --file=.gitmodules submodule.\"app/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
-                            git config --file=.gitmodules submodule.\"app/src/main/jni/mega/sdk\".branch develop
-                            git config --file=.gitmodules submodule.\"app/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
-                            git config --file=.gitmodules submodule.\"app/src/main/jni/megachat/sdk\".branch develop
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
                             git submodule sync
                             git submodule update --init --recursive --remote 
-                            cd app/src/main/jni/mega/sdk
+                            cd sdk/src/main/jni/mega/sdk
                             git fetch
                             cd ../../megachat/sdk
                             git fetch
@@ -207,7 +208,7 @@ pipeline {
                     script {
                         if (REBUILD_SDK != null && REBUILD_SDK.toLowerCase() == "yes") {
                             sh """
-                                cd ${WORKSPACE}/app/src/main/jni
+                                cd ${WORKSPACE}/sdk/src/main/jni
                                 echo CLEANING SDK
                                 bash build.sh clean
                             """
@@ -215,7 +216,7 @@ pipeline {
                     }
 
                     sh """
-                    cd ${WORKSPACE}/app/src/main/jni
+                    cd ${WORKSPACE}/sdk/src/main/jni
                     echo "=== START SDK BUILD===="
                     bash build.sh all
                     """
@@ -398,7 +399,7 @@ pipeline {
                     echo "workspace size before clean: "
                     du -sh
 
-                    cd ${WORKSPACE}/app/src/main/jni
+                    cd ${WORKSPACE}/sdk/src/main/jni
                     bash build.sh clean
                     
                     cd ${WORKSPACE}
@@ -465,7 +466,7 @@ private void checkoutSdkByCommit(String sdkCommitId) {
     sh """
     echo checkoutSdkByCommit
     cd $WORKSPACE
-    cd app/src/main/jni/mega/sdk
+    cd sdk/src/main/jni/mega/sdk
     git checkout $sdkCommitId
     cd $WORKSPACE
     """
@@ -479,7 +480,7 @@ private void checkoutMegaChatSdkByCommit(String megaChatCommitId) {
     sh """
     echo checkoutMegaChatSdkByCommit
     cd $WORKSPACE
-    cd app/src/main/jni/megachat/sdk
+    cd sdk/src/main/jni/megachat/sdk
     git checkout $megaChatCommitId
     cd $WORKSPACE
     """
@@ -493,7 +494,7 @@ private void checkoutSdkByTag(String sdkTag) {
     sh """
     echo checkoutSdkByTag
     cd $WORKSPACE
-    cd app/src/main/jni/mega/sdk
+    cd sdk/src/main/jni/mega/sdk
     git checkout tags/$sdkTag
     cd $WORKSPACE
     """
@@ -507,7 +508,7 @@ private void checkoutMegaChatSdkByTag(String megaChatTag) {
     sh """
     echo checkoutMegaChatSdkByTag
     cd $WORKSPACE
-    cd app/src/main/jni/megachat/sdk
+    cd sdk/src/main/jni/megachat/sdk
     git checkout tags/$megaChatTag
     cd $WORKSPACE
     """
@@ -520,8 +521,8 @@ private void checkoutMegaChatSdkByTag(String megaChatTag) {
 private void checkoutSdkByBranch(String sdkBranch) {
     sh "echo checkoutSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"app/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git'
-    sh "git config --file=.gitmodules submodule.\"app/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
+    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
 }
@@ -533,8 +534,8 @@ private void checkoutSdkByBranch(String sdkBranch) {
 private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
     sh "echo checkoutMegaChatSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"app/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-    sh "git config --file=.gitmodules submodule.\"app/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
+    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
 }
@@ -717,4 +718,19 @@ private String lastCommitMessage() {
     return sh(script: "git log --pretty=format:\"%x09%s\" -1", returnStdout: true).trim()
 }
 
-
+// TODO this method is to migrate to new SDK module.
+// TODO: it should deleted after all existing MRs have merged new SDK module
+private void cleanOldSdkOutput() {
+    println("cleanOldSdkOutput")
+    sh """
+    cd $WORKSPACE
+    git checkout -- .gitmodules
+    rm -fr app/src/main/java/nz/mega/sdk/*.java  || true
+    rm -fr app/src/main/jni || true
+    rm -fr app/src/main/obj/*  || true
+    rm -fr app/src/main/libs/arm64-v8a || true
+    rm -fr app/src/main/libs/armeabi-v7a || true
+    rm -fr app/src/main/libs/x86 || true
+    rm -fr app/src/main/libs/x86_64 || true
+    """
+}
