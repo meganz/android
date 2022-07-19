@@ -1,4 +1,4 @@
-package mega.privacy.android.app.domain.repository
+package mega.privacy.android.app.data.repository
 
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -6,23 +6,32 @@ import android.hardware.SensorEventListener
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.app.data.gateway.MotionSensorGateway
 import mega.privacy.android.app.data.gateway.VibratorGateway
+import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
 import mega.privacy.android.app.presentation.featureflag.model.ShakeEvent
 import javax.inject.Inject
 
+/**
+ * Repository to handle interaction to gateway
+ */
 class DefaultShakeDetectorRepository @Inject constructor(
-    val vibratorGateway: VibratorGateway,
-    val motionSensorGateway: MotionSensorGateway,
+    private val vibratorGateway: VibratorGateway,
+    private val motionSensorGateway: MotionSensorGateway,
 ) : ShakeDetectorRepository {
 
+    /**
+     * Function to call @VibratorGateway to vibrate device
+     */
     override fun vibrateDevice() {
         vibratorGateway.vibrateDevice(SHAKE_INTERVAL)
     }
 
-    override fun getVibrationCount() = flowOf(true)
-
+    /**
+     * Function to monitor sensor event and return flow of @ShakeEvent
+     *
+     * @return Flow of @ShakeEvent
+     */
     override fun monitorShakeEvents(): Flow<ShakeEvent> {
         return callbackFlow {
             val sensorEventListener = object : SensorEventListener {

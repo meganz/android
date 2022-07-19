@@ -14,7 +14,6 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.utils.ShakeDetector
 import mega.privacy.android.app.utils.threadpool.MegaThreadFactory
 import mega.privacy.android.domain.usecase.DefaultGetThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode

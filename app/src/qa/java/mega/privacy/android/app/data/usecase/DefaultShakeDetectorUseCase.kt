@@ -1,9 +1,10 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.app.data.usecase
 
 import android.hardware.SensorManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
+import mega.privacy.android.app.domain.usecase.ShakeDetectorUseCase
 import mega.privacy.android.app.presentation.featureflag.model.ShakeEvent
 import javax.inject.Inject
 import kotlin.math.sqrt
