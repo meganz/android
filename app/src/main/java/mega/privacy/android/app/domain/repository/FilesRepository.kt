@@ -40,6 +40,15 @@ interface FilesRepository {
     suspend fun getRubbishBinNode(): MegaNode?
 
     /**
+     * Get the parent node of a MegaNode
+     *
+     * @param node
+     * @return the parent node of the node, null if node doesn't exist or
+     *         is the root node
+     */
+    suspend fun getParentNode(node: MegaNode): MegaNode?
+
+    /**
      * Get children of a parent node
      *
      * @param parentNode parent node

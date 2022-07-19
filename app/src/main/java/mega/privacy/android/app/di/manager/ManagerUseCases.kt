@@ -9,6 +9,7 @@ import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.DefaultGetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetIncomingSharesChildrenNode
+import mega.privacy.android.app.domain.usecase.DefaultGetParentNodeHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
@@ -23,6 +24,7 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorUserAlerts
 
@@ -40,6 +42,9 @@ abstract class ManagerUseCases {
 
     @Binds
     abstract fun bindRubbishBinChildrenNode(useCase: DefaultGetRubbishBinChildrenNode): GetRubbishBinChildrenNode
+
+    @Binds
+    abstract fun bindGetParentNode(useCase: DefaultGetParentNodeHandle): GetParentNodeHandle
 
     @Binds
     abstract fun bindBrowserChildrenNode(useCase: DefaultGetBrowserChildrenNode): GetBrowserChildrenNode

@@ -100,6 +100,15 @@ interface MegaApiGateway {
     suspend fun getRootNode(): MegaNode?
 
     /**
+     * Get the parent node of a MegaNode
+     *
+     * @param node
+     * @return the parent node of the node, null if node doesn't exist or
+     *         is the root node
+     */
+    suspend fun getParentNode(node: MegaNode): MegaNode?
+
+    /**
      * Rubbish bin node of the account
      *
      * All accounts have a rubbish bin node, therefore if it is null the account has not been logged in or

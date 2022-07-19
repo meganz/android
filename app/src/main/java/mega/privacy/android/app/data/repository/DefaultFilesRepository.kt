@@ -87,6 +87,10 @@ class DefaultFilesRepository @Inject constructor(
         megaApiGateway.getRubbishBinNode()
     }
 
+    override suspend fun getParentNode(node: MegaNode): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.getParentNode(node)
+    }
+
     override suspend fun getChildrenNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
         withContext(ioDispatcher) {
             megaApiGateway.getChildrenByNode(parentNode, order)
