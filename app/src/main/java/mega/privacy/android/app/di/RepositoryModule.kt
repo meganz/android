@@ -7,7 +7,6 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.repository.DefaultAccountRepository
 import mega.privacy.android.app.data.repository.DefaultAlbumsRepository
 import mega.privacy.android.app.data.repository.DefaultChatRepository
-import mega.privacy.android.app.data.repository.DefaultContactsRepository
 import mega.privacy.android.app.data.repository.DefaultEnvironmentRepository
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.app.data.repository.DefaultFeatureFlagRepository
@@ -15,16 +14,15 @@ import mega.privacy.android.app.data.repository.DefaultFilesRepository
 import mega.privacy.android.app.data.repository.DefaultGlobalStatesRepository
 import mega.privacy.android.app.data.repository.DefaultLoginRepository
 import mega.privacy.android.app.data.repository.DefaultNetworkRepository
+import mega.privacy.android.app.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.app.data.repository.DefaultPushesRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
 import mega.privacy.android.app.data.repository.DefaultSupportRepository
 import mega.privacy.android.app.data.repository.DefaultThumbnailRepository
 import mega.privacy.android.app.data.repository.DefaultTransfersRepository
 import mega.privacy.android.app.data.repository.TimberLoggingRepository
-import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.repository.GlobalStatesRepository
-import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
@@ -35,6 +33,8 @@ import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.NetworkRepository
+import mega.privacy.android.domain.repository.NotificationsRepository
+import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.SupportRepository
 import mega.privacy.android.domain.repository.ThumbnailRepository
@@ -92,7 +92,7 @@ abstract class RepositoryModule {
     abstract fun bindThumbnailRepository(repository: DefaultThumbnailRepository): ThumbnailRepository
 
     @Binds
-    abstract fun bindContactsRepository(repository: DefaultContactsRepository): ContactsRepository
+    abstract fun bindNotificationsRepository(repository: DefaultNotificationsRepository): NotificationsRepository
 
     @Binds
     abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository
