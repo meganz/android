@@ -30,7 +30,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.allHaveFullAccess
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -161,16 +160,12 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
             state().incomingTreeDepth > 1 -> {
                 Timber.d("deepTree>1")
-                val parentNode =
-                    megaApi.getParentNode(
-                        megaApi.getNodeByHandle(state().incomingParentHandle)
-                    )
 
-                if (parentNode != null) {
+                viewModel.getParentNodeHandle()?.let { parentHandle ->
                     recyclerView.visibility = View.VISIBLE
                     emptyImageView.visibility = View.GONE
                     emptyLinearLayout.visibility = View.GONE
-                    viewModel.decreaseIncomingTreeDepth(parentNode.handle)
+                    viewModel.decreaseIncomingTreeDepth(parentHandle)
 
                     val lastVisiblePosition = viewModel.popLastPositionStack()
 
@@ -194,21 +189,6 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     }
 
     override fun setNodes(nodes: List<MegaNode>) {}
-
-    override fun setEmptyView() {
-        var textToShow: String? = null
-
-        if (isInvalidParentHandle()) {
-            setImageViewAlphaIfDark(requireContext(), emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
-            if (Util.isScreenInPortrait(requireContext())) {
-                emptyImageView.setImageResource(R.drawable.incoming_shares_empty)
-            } else {
-                emptyImageView.setImageResource(R.drawable.incoming_empty_landscape)
-            }
-            textToShow = requireContext().getString(R.string.context_empty_incoming)
-        }
-        setFinalEmptyView(textToShow)
-    }
 
     /**
      * Method to update an item when a nickname is added, updated or removed from a contact.
@@ -248,7 +228,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
                     visibilityFastScroller()
                     hideActionMode()
-                    setEmptyView()
+                    setEmptyView(it.isInvalidParentHandle)
 
                 }
             }
@@ -304,16 +284,6 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     }
 
     /**
-     * Check if the parent handle is valid
-     *
-     * @return true if the parent handle is valid
-     */
-    private fun isInvalidParentHandle(): Boolean =
-        state().incomingParentHandle == -1L ||
-                state().incomingParentHandle == INVALID_HANDLE ||
-                megaApi.getNodeByHandle(state().incomingParentHandle) == null
-
-    /**
      * If user navigates from notification about new nodes added to shared folder select all nodes and scroll to the first node in the list
      */
     private fun selectNewlyAddedNodes() {
@@ -332,6 +302,26 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             }
             recyclerView.scrollToPosition(firstPosition)
         }
+    }
+
+    /**
+     * Set the empty view and message depending if the parent handle is valid or not
+     *
+     * @param isInvalidParentHandle true if the parent handle is invalid
+     */
+    private fun setEmptyView(isInvalidParentHandle: Boolean) {
+        var textToShow: String? = null
+
+        if (isInvalidParentHandle) {
+            setImageViewAlphaIfDark(requireContext(), emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
+            if (Util.isScreenInPortrait(requireContext())) {
+                emptyImageView.setImageResource(R.drawable.incoming_shares_empty)
+            } else {
+                emptyImageView.setImageResource(R.drawable.incoming_empty_landscape)
+            }
+            textToShow = requireContext().getString(R.string.context_empty_incoming)
+        }
+        setFinalEmptyView(textToShow)
     }
 
     private inner class ActionBarCallBack(currentTab: Tab?) : BaseActionBarCallBack(currentTab) {

@@ -130,8 +130,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     public abstract void setNodes(List<MegaNode> nodes);
 
-    public abstract void setEmptyView();
-
     public abstract int onBackPressed();
 
     public abstract void itemClick(int position);

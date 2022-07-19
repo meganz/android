@@ -7,8 +7,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
+import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.Stack
@@ -19,8 +23,9 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class IncomingSharesViewModel @Inject constructor(
-//    private val getNodeByHandle: GetNodeByHandle,
+    private val getNodeByHandle: GetNodeByHandle,
 //    private val authorizeNode: AuthorizeNode,
+    private val getParentNodeHandle: GetParentNodeHandle,
     private val getIncomingSharesChildrenNode: GetIncomingSharesChildrenNode,
 //    monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
@@ -91,12 +96,18 @@ class IncomingSharesViewModel @Inject constructor(
     fun setIncomingTreeDepth(depth: Int, handle: Long) = viewModelScope.launch {
         _state.update {
             refreshNodes(handle)?.let { nodes ->
-                it.copy(nodes = nodes, incomingTreeDepth = depth, incomingParentHandle = handle)
+                it.copy(
+                    nodes = nodes,
+                    incomingTreeDepth = depth,
+                    incomingParentHandle = handle,
+                    isInvalidParentHandle = isInvalidParentHandle(handle)
+                )
             } ?: run {
                 it.copy(
                     nodes = emptyList(),
                     incomingTreeDepth = 0,
-                    incomingParentHandle = -1L
+                    incomingParentHandle = -1L,
+                    isInvalidParentHandle = true
                 )
             }
         }
@@ -118,6 +129,15 @@ class IncomingSharesViewModel @Inject constructor(
     fun pushToLastPositionState(position: Int): Int = lastPositionStack.push(position)
 
     /**
+     * Get the parent node handle of current node
+     *
+     * @return the parent node handle of current node
+     */
+    fun getParentNodeHandle(): Long? = runBlocking {
+        return@runBlocking getParentNodeHandle(_state.value.incomingParentHandle)
+    }
+
+    /**
      * Set the current nodes displayed
      *
      * @param nodes the list of nodes to set
@@ -128,9 +148,25 @@ class IncomingSharesViewModel @Inject constructor(
 
     /**
      * Refresh the list of nodes from api
+     *
+     * @param handle
      */
     private suspend fun refreshNodes(handle: Long = _state.value.incomingParentHandle): List<MegaNode>? {
         Timber.d("refreshIncomingSharesNodes")
         return getIncomingSharesChildrenNode(handle)
     }
+
+    /**
+     * Check if the parent handle is valid
+     *
+     * @param handle
+     * @return true if the parent handle is valid
+     */
+    private suspend fun isInvalidParentHandle(handle: Long = _state.value.incomingParentHandle): Boolean {
+        return handle
+            .takeUnless { it == -1L || it == INVALID_HANDLE }
+            ?.let { getNodeByHandle(it) == null }
+            ?: run { true }
+    }
+
 }

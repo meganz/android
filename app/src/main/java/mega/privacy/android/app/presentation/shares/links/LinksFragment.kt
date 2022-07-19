@@ -85,7 +85,7 @@ class LinksFragment : MegaNodeBaseFragment() {
         visibilityFastScroller()
     }
 
-    override fun setEmptyView() {
+    private fun setEmptyView() {
         var textToShow: String? = null
         if (isInvalidParentHandle()) {
             setImageViewAlphaIfDark(requireContext(), emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)

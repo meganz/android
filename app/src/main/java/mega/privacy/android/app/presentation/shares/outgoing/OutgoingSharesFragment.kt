@@ -211,7 +211,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
     override fun setNodes(nodes: List<MegaNode>) {}
 
-    override fun setEmptyView() {
+    private fun setEmptyView() {
         var textToShow: String? = null
 
         if (isInvalidParentHandle()) {
