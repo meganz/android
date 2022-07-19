@@ -36,7 +36,7 @@ class IncomingSharesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            refreshNodes()
+            refreshNodes()?.let { setNodes(it) }
 //            monitorNodeUpdates().collect { list ->
 //                list
 //                    .filter { it.isInShare }
@@ -58,7 +58,7 @@ class IncomingSharesViewModel @Inject constructor(
      * Refresh incoming shares node
      */
     fun refreshIncomingSharesNode() = viewModelScope.launch {
-        refreshNodes()
+        refreshNodes()?.let { setNodes(it) }
     }
 
     /**
@@ -89,9 +89,17 @@ class IncomingSharesViewModel @Inject constructor(
      * @param depth the tree depth value to set
      */
     fun setIncomingTreeDepth(depth: Int, handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(incomingParentHandle = handle) }
-        refreshNodes()
-        _state.update { it.copy(incomingTreeDepth = depth) }
+        _state.update {
+            refreshNodes(handle)?.let { nodes ->
+                it.copy(nodes = nodes, incomingTreeDepth = depth, incomingParentHandle = handle)
+            } ?: run {
+                it.copy(
+                    nodes = emptyList(),
+                    incomingTreeDepth = 0,
+                    incomingParentHandle = -1L
+                )
+            }
+        }
     }
 
     /**
@@ -121,10 +129,8 @@ class IncomingSharesViewModel @Inject constructor(
     /**
      * Refresh the list of nodes from api
      */
-    private suspend fun refreshNodes() {
+    private suspend fun refreshNodes(handle: Long = _state.value.incomingParentHandle): List<MegaNode>? {
         Timber.d("refreshIncomingSharesNodes")
-        getIncomingSharesChildrenNode(_state.value.incomingParentHandle)?.let {
-            setNodes(it)
-        }
+        return getIncomingSharesChildrenNode(handle)
     }
 }
