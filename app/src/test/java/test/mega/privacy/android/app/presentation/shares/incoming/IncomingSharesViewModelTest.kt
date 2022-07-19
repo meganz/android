@@ -5,6 +5,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -16,6 +18,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,7 +36,7 @@ class IncomingSharesViewModelTest {
     private val getParentNodeHandle = mock<GetParentNodeHandle>()
     private val authorizeNode = mock<AuthorizeNode>()
     private val getIncomingSharesChildrenNode = mock<GetIncomingSharesChildrenNode>()
-    private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
+    private val monitorNodeUpdates = FakeMonitorUpdates()
 
 
     @get:Rule
@@ -44,10 +47,10 @@ class IncomingSharesViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = IncomingSharesViewModel(
             getNodeByHandle,
+            authorizeNode,
             getParentNodeHandle,
-//            authorizeNode,
             getIncomingSharesChildrenNode,
-//            monitorNodeUpdates,
+            monitorNodeUpdates,
         )
     }
 
@@ -292,4 +295,54 @@ class IncomingSharesViewModelTest {
             assertThat(underTest.getParentNodeHandle()).isEqualTo(expected)
         }
 
+    @Test
+    fun `test that if monitor node update returns the current node and node is not retrieved, redirect to root of incoming shares`() =
+        runTest {
+            val handle = 123456789L
+            val node = mock<MegaNode> {
+                on { this.handle }.thenReturn(handle)
+                on { this.isInShare }.thenReturn(true)
+            }
+            whenever(getNodeByHandle(any())).thenReturn(null)
+            whenever(authorizeNode(any())).thenReturn(null)
+            whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
+
+            underTest.state.map { it.incomingParentHandle }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(-1L)
+                    underTest.setIncomingTreeDepth(any(), handle)
+                    assertThat(awaitItem()).isEqualTo(handle)
+                    monitorNodeUpdates.emit(listOf(node))
+                    assertThat(awaitItem()).isEqualTo(-1L)
+                }
+        }
+
+    @Test
+    fun `test that if monitor node update does not returns the current node, do not redirect to root of incoming shares`() =
+        runTest {
+            val handle = 123456789L
+            val node = mock<MegaNode> {
+                on { this.handle }.thenReturn(987654321L)
+                on { this.isInShare }.thenReturn(true)
+            }
+            whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
+
+            underTest.state.map { it.incomingParentHandle }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(-1L)
+                    underTest.setIncomingTreeDepth(any(), handle)
+                    assertThat(awaitItem()).isEqualTo(handle)
+                    monitorNodeUpdates.emit(listOf(node))
+                }
+        }
+}
+
+class FakeMonitorUpdates : MonitorNodeUpdates {
+
+    private val flow = MutableSharedFlow<List<MegaNode>>()
+    suspend fun emit(value: List<MegaNode>) = flow.emit(value)
+
+    override fun invoke(): Flow<List<MegaNode>> {
+        return flow
+    }
 }

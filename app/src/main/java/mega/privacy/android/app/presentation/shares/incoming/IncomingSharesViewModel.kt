@@ -8,8 +8,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -24,10 +26,10 @@ import javax.inject.Inject
 @HiltViewModel
 class IncomingSharesViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
-//    private val authorizeNode: AuthorizeNode,
+    private val authorizeNode: AuthorizeNode,
     private val getParentNodeHandle: GetParentNodeHandle,
     private val getIncomingSharesChildrenNode: GetIncomingSharesChildrenNode,
-//    monitorNodeUpdates: MonitorNodeUpdates,
+    monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
     /** private UI state */
@@ -42,19 +44,25 @@ class IncomingSharesViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             refreshNodes()?.let { setNodes(it) }
-//            monitorNodeUpdates().collect { list ->
-//                list
-//                    .filter { it.isInShare }
-//                    .singleOrNull { it.handle == _state.value.incomingParentHandle }
-//                    ?.let { node ->
-//                        getNodeByHandle(node.handle) ?: authorizeNode(node.handle)
-//                            .takeIf { it == null }
-//                            .let {
-//                                resetIncomingTreeDepth(MegaApiJava.INVALID_HANDLE)
-//                            }
-//                    }
-//                refreshNodes()
-//            }
+            monitorNodeUpdates().collect { list ->
+                // If the current incoming parent handle is the node that was updated,
+                // check if the current user still has access to it,
+                // if not redirect to root incoming shares
+                list
+                    .filter { it.isInShare }
+                    .singleOrNull { it.handle == _state.value.incomingParentHandle }
+                    ?.let { node ->
+                        (getNodeByHandle(node.handle) ?: authorizeNode(node.handle))
+                            .takeIf { it == null }
+                            .let {
+                                resetIncomingTreeDepth()
+                            }
+                    }
+
+                // Uncomment this line once OutgoingSharesFragment
+                // and LinksFragment is decoupled from ManagerActivity
+                //refreshNodes()?.let { setNodes(it) }
+            }
         }
     }
 

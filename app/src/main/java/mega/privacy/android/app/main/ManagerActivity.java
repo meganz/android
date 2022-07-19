@@ -9808,31 +9808,9 @@ public class ManagerActivity extends TransfersManagementActivity
     public void updateNodes(@NonNull List<MegaNode> updatedNodes) {
         dismissAlertDialogIfExists(statusDialog);
 
-        boolean updateContacts = false;
-
         //Verify is it is a new item to the inbox
         for (int i = 0; i < updatedNodes.size(); i++) {
             MegaNode updatedNode = updatedNodes.get(i);
-
-            if (!updateContacts) {
-                if (updatedNode.isInShare()) {
-                    updateContacts = true;
-
-                    if (drawerItem == DrawerItem.SHARED_ITEMS
-                            && getTabItemShares() == SharesTab.INCOMING_TAB && incomingSharesState(this).getIncomingParentHandle() == updatedNode.getHandle()) {
-                        getNodeUseCase.get(incomingSharesState(this).getIncomingParentHandle())
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe((result, throwable) -> {
-                                    if (throwable != null) {
-                                        incomingSharesViewModel.decreaseIncomingTreeDepth(INVALID_HANDLE);
-                                        hideTabs(false, SharesTab.INCOMING_TAB);
-                                        refreshIncomingShares();
-                                    }
-                                });
-                    }
-                }
-            }
 
             if (updatedNode.getParentHandle() == inboxNode.getHandle()) {
                 Timber.d("New element to Inbox!!");
