@@ -35,7 +35,7 @@ interface CameraUploadRepository {
      *
      * @return
      */
-    fun setSyncTimeStamp(timestamp: Long, type: DefaultCameraUploadRepository.SyncTimeStamp)
+    fun setSyncTimeStamp(timeStamp: Long, type: DefaultCameraUploadRepository.SyncTimeStamp)
 
     /**
      * Get sync file upload
@@ -311,5 +311,4 @@ interface CameraUploadRepository {
         localPath: String?,
         isSecondary: Boolean,
     )
-
 }
