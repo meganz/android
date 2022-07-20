@@ -2,10 +2,10 @@ package test.mega.privacy.android.app.presentation.featureflag
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.ShakeDetectorUseCase
@@ -35,7 +35,8 @@ class ShakeDetectorViewModelTest {
         underTest = ShakeDetectorViewModel(
             ioDispatcher = standardDispatcher,
             vibrateDeviceUseCase = vibrateDeViceUseCase,
-            shakeDetectorUseCase = shakeDetectorUseCase,)
+            shakeDetectorUseCase = shakeDetectorUseCase,
+            coroutineScope = TestScope())
     }
 
     @Test

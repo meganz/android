@@ -1,6 +1,7 @@
 package mega.privacy.android.app.di
 
 import android.content.Context
+import android.os.Vibrator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,6 +13,8 @@ import mega.privacy.android.app.data.gateway.DistributionGateway
 import mega.privacy.android.app.data.gateway.FirebaseDistributionGateway
 import mega.privacy.android.app.data.gateway.MotionSensorFacade
 import mega.privacy.android.app.data.gateway.MotionSensorGateway
+import mega.privacy.android.app.data.gateway.VibratorFacade
+import mega.privacy.android.app.data.gateway.VibratorGateway
 import mega.privacy.android.app.data.repository.DefaultQARepository
 import mega.privacy.android.app.data.repository.DefaultShakeDetectorRepository
 import mega.privacy.android.app.domain.repository.QARepository
@@ -91,4 +94,7 @@ class QAModule {
     @Provides
     fun provideMotionSensorGateway(@ApplicationContext context: Context): MotionSensorGateway =
         MotionSensorFacade(context)
+
+    @Provides
+    fun provideVibratorGateway(vibrator: Vibrator): VibratorGateway = VibratorFacade(vibrator)
 }
