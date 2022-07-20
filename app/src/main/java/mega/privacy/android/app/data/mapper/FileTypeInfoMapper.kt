@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import nz.mega.sdk.MegaNode
 
@@ -45,10 +46,7 @@ private fun getFileTypeInfoForExtension(
         )
     }
     mimeType.startsWith("web/url") -> {
-        UrlFileTypeInfo(
-            type = mimeType,
-            extension = extension,
-        )
+        UrlFileTypeInfo
     }
     extension.isGifExtension() -> {
         GifFileTypeInfo(
@@ -74,6 +72,12 @@ private fun getFileTypeInfoForExtension(
             extension = extension,
         )
     }
+    mimeType.isVideoMimeType(extension) -> {
+        VideoFileTypeInfo(
+            type = mimeType,
+            extension = extension,
+        )
+    }
     mimeType.isUnMappedMimeType(extension) -> {
         UnMappedFileTypeInfo(extension = extension)
     }
@@ -94,6 +98,9 @@ private fun String.isTextMimeType(extension: String) =
 
 private fun String.isUnMappedMimeType(extension: String) =
     startsWith("application/octet-stream") || extension.isBlank()
+
+private fun String.isVideoMimeType(extension: String) =
+    startsWith("video/") || extension == "vob"
 
 private fun String.isGifExtension() = (this == "gif") || (this == "webp")
 
