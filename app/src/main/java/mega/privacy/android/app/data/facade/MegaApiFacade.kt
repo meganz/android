@@ -233,6 +233,11 @@ class MegaApiFacade @Inject constructor(
         listener: MegaTransferListenerInterface?,
     ) = megaApi.startDownload(node, localPath, fileName, appData, startFirst, cancelToken, listener)
 
+    override fun getUserEmail(userHandle: Long, callback: MegaRequestListenerInterface) =
+        megaApi.getUserEmail(userHandle, callback)
+
+    override suspend fun getContact(email: String): MegaUser? = megaApi.getContact(email)
+
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
     }

@@ -127,7 +127,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Có chắc muốn hủy bỏ quá trình đăng nhập hiện tại không?</string>
     <!-- Login button -->
-    <string name="login_text">Đăng nhập</string>
+    <string name="login_text">Đăng&#160;nhập</string>
     <!-- email label -->
     <string name="email_text">Email</string>
     <!-- password label -->
@@ -408,16 +408,16 @@
     <string name="context_no_renamed">Lỗi. Chưa đặt lại tên được</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">Sao chép hoàn tất</string>
-    <!-- error message when sending a node to Inbox -->
-    <string name="context_no_sent_node">Lỗi. Chưa gửi được tới Hộp Thư</string>
     <!-- error message -->
     <string name="context_no_copied">Lỗi. Chưa sao chép được</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Xin chọn thư mục đích</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Chuyển đi hoàn tất</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved">%d mục đã được di chuyển thành công.</string>
+    <!-- success message when moving a node (file/folder) -->
+    <plurals name="number_correctly_moved">
+        <item quantity="other">Đã di chuyển %d mục</item>
+    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d mục chưa được xóa xong</string>
     <!-- success message when moving a node -->
@@ -460,8 +460,6 @@
     <string name="number_contact_removed">%d tên liên lạc đã được xóa đi hoàn tất</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">%d tên liên lạc chưa được xóa</string>
-    <!-- success message when sending a file to a contact -->
-    <string name="context_correctly_copied_contact">Đã được gửi đến:</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Thùng Rác đã được dọn sạch sẽ</string>
     <!-- error message when emptying the RB -->
@@ -728,7 +726,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">Phiên bản MEGA SDK</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">Phiên bản SDK MEGAchát</string>
+    <string name="settings_about_karere_version">Phiên bản SDK MEGAchat</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Xem mã nguồn</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -945,8 +943,6 @@
     <string name="file_link_unavaible_delete_account">Tài khoản của chủ đường liên kết thư mục hay tệp tin này đã bị ngưng hoạt động do vi phạm Điều Khoản Dịch Vụ.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">Chìa khóa mã vừa cung cấp không đúng để dùng cho thư mục này.</string>
-    <!-- Word to indicate the limited bandwidth of the free accounts -->
-    <string name="limited_bandwith">Bị giới hạn</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Chát</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -962,15 +958,19 @@
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
     <string name="remove_contact_shared_folder">Tên liên lạc %s sẽ bị xóa khỏi mục chia sẻ này.</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
-    <string name="remove_multiple_contacts_shared_folder">%d tên liên lạc sẽ bị xóa khỏi mục chia sẻ này.</string>
+    <plurals name="remove_multiple_contacts_shared_folder">
+        <item quantity="other">%d tên liên lạc sẽ bị xóa khỏi thư mục chia sẻ này.</item>
+    </plurals>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">Thay đổi quyền hạn cho %d tên liên lạc bị thất bại</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Đang tải danh bạ từ điện thoại&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d yêu cầu đã được gửi đi rồi.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">%d lời mời đã được gửi đi thành công.</string>
+    <!-- success message when inviting multiple contacts -->
+    <plurals name="number_correctly_invite_contact_request">
+        <item quantity="other">%d lời mời đã được gửi đi</item>
+    </plurals>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d lời mời đã được gửi đi thành công nhưng có %2$d lời mời còn lại chưa gửi được.</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -1084,7 +1084,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">Thường</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">Host</string>
+    <string name="administrator_permission_label_participants_panel">Người chủ trì</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">(đã chỉnh sửa)</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -1175,10 +1175,6 @@
     <string name="more_users_typing">%1$s [A]và vài người khác đang viết tin nhắn&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Thêm nữa</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="label_storage_upgrade_account">Lưu Trữ</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_upgrade_account">Băng thông truyền tải</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">Không gian lưu trữ</string>
     <!-- Confirmation message before removing something from the Offline section. -->
@@ -1555,10 +1551,11 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Ký tự không hợp lệ</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Các ký tự không được phép sử dụng: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">Các ký tự không được phép sử dụng: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="other">Tên tệp tin không được để trống.</item>
+        <item quantity="one">File name cannot be empty.</item>
+        <item quantity="other">File names cannot be empty.</item>
     </plurals>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">Lỗi. Tệp tin pdf bị hư hỏng hoặc không có tồn tại.</string>
@@ -1633,7 +1630,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Lời mời không gửi đi được. %s đã có tên trong liên lạc.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">Lỗi phát sinh và lời mời chưa được gửi đi.</string>
+    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Đang tạo ra mã QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -1720,28 +1717,26 @@
     <string name="account_suspended_breache_ToS">Tài khoản quý khách đã bị chấm dứt do vi phạm nội quy trong Điều Khoản Dịch Vụ của MEGA, bao gồm nhưng không giới hạn ở điều khoản 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Đang tải tệp tin</string>
-    <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
-    <string name="file_storage_empty_folder">Không có tệp nào</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s KB</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s MB</string>
+    <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s TB</string>
+    <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s B/giây</string>
+    <string name="label_file_speed_byte">%s&#160;B/giây</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s KB/giây</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KB/giây</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s MB/giây</string>
+    <string name="label_file_speed_mega_byte">%s&#160;MB/giây</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_giga_byte">%s&#160;GB/giây</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s TB/giây</string>
+    <string name="label_file_speed_tera_byte">%s&#160;TB/giây</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -1847,10 +1842,6 @@
     <string name="recovery_key_bottom_sheet">Mã Phục Hồi</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Lưu vào File System</string>
-    <!-- text of the label to show that you have messages unread in the chat conversation -->
-    <string name="message_jump_latest">Đi đến dòng cuối</string>
-    <!-- text of the label to show that you have new messages in the chat conversation -->
-    <string name="message_new_messages">Có tin nhắn mới</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Cuộc gọi đến</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
@@ -1994,7 +1985,7 @@
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Xem trước nội dung</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">Không có kết nối mạng. Tệp tin chưa được tải về và không thể truyền được.</string>
+    <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Không thể mở được tệp tin.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2393,9 +2384,10 @@
     <plurals name="num_folders_with_parameter">
         <item quantity="other">%d thư mục</item>
     </plurals>
-    <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="other">%1$d thư mục · %2$d tệp tin</item>
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] đã thêm vào %2$s và %3$s[/B]</string>
@@ -2665,8 +2657,6 @@
     <string name="alert_enter_group_name">Để tạo ra liên kết tới chát, đặt tên cho nhóm trước.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Mời thêm tên liên lạc và để bắt đầu trò chuyện thông qua MEGA và được bảo mật mạnh mẽ.</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="recent_chat_empty_text">Mở một cuộc trò chuyện với các tên liên lạc nằm trong danh sách, với tính bảo mật tối ưu</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
     <string name="invite_contacts_to_start_chat_text_message">Xin chào! Mời bạn cùng sử dụng MEGA để có ngay 20&#160;GB không gian lưu trữ đám mây miễn phí. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
@@ -2706,11 +2696,17 @@
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s và %2$d mục nữa</string>
     <!-- Title of a media recents bucket that only contains some images -->
-    <string name="title_media_bucket_only_images">%d tệp Hình Ảnh</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="other">%d hình ảnh</item>
+    </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
-    <string name="title_media_bucket_only_videos">%d Videos</string>
-    <!-- Title of a media recents bucket that contains some images and some videos -->
-    <string name="title_media_bucket_images_and_videos">%1$d Hình và %2$d Videos</string>
+    <plurals name="title_media_bucket_only_videos">
+        <item quantity="other">%d videos</item>
+    </plurals>
+    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos">
+        <item quantity="other">%1$d hình ảnh&#160;</item>
+    </plurals>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">%d Hình và 1 Video</string>
     <!-- Title of a media recents bucket that contains an image and some videos -->
@@ -2836,7 +2832,9 @@
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">vào ngày %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <string name="alert_remove_several_shares">Bạn có chắc muốn ngừng tất cả chia sẻ cho %1$d thư mục đã chọn?</string>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">Chấm dứt chia sẻ %1$d thư mục này?</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">Vị trí tải xuống</string>
     <!-- Text asking confirmation for download location -->
@@ -3042,7 +3040,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Chọn phiên truyền tải</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Không thay đổi được mức độ ưu tiên cho truyền tải “%1$s”</string>
+    <string name="change_of_transfer_priority_failed">Unable to change priority of the transfer “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Gửi chìa khóa giải mã ra riêng</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3272,9 +3270,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Thêm số điện thoại</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -3321,8 +3319,6 @@
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Dọn tất cả các tệp ngoại tuyến?</string>
-    <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">Bạn là người duy nhất ở đây</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Gọi họp mặt</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3372,25 +3368,13 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Hiện tôi trong kiểu xem chính</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Make host</string>
-    <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">Rời khỏi cuộc họp mặt ngay?</string>
-    <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">No host</string>
-    <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
+    <string name="make_moderator">Đặt ra người chủ trì</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Make host</string>
-    <!-- leave anyway option when the moderator leave meeting-->
-    <string name="leave_anyway">Vẫn cứ rời khỏi</string>
+    <string name="assign_moderator">Đặt làm người chủ trì</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
+    <string name="pick_new_moderator_message">Xin chọn một hoặc vài thành viên làm người chủ trì mới.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">Đổi tên cuộc họp mặt</string>
-    <!-- The number of participants in the meeting on meeting info page-->
-    <string name="info_participants_number">Thành viên: %d</string>
-    <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Đường liên kết họp mặt</string>
     <!-- Subtitle of the meeting screen-->
@@ -3401,8 +3385,6 @@
     <string name="paste_meeting_link_guest_dialog_title">Bạn đã được mời tham gia một cuộc gọi họp mặt.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Chạm vào Đường liên kết Họp Mặt được gửi cho bạn hoặc nhập nó vào đây</string>
-    <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">Đường truyền kết nối yếu</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Cuộc họp mặt đã kết thúc</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -3424,7 +3406,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">Lập nhanh một cuộc họp mặt trên MEGA với các tính năng mã hóa họp mặt an ninh mới</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">You are the new host.</string>
+    <string name="be_new_moderator">Bạn đã được chọn là người chủ trì mới</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Đường liên kết họp mặt đã được sao chép.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3589,8 +3571,6 @@
     <string name="upload_files">Tải lên tệp tin</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Tải lên thư mục</string>
-    <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Hủy tải lên?</string>
     <!-- Title of the Payments screen -->
     <string name="payment">Thanh toán</string>
     <!-- Label indicating payment methods -->
@@ -3615,12 +3595,8 @@
     <string name="pro_iii_monthly">Pro III hằng tháng</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III thường niên</string>
-    <!-- Action button which will cancel uploads. -->
-    <string name="action_cancel_upload">Hủy tải lên</string>
-    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
-    <string name="action_do_not_cancel">Đừng hủy</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Remove host</string>
+    <string name="remove_moderator">Loại bỏ chức người chủ trì</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Mua gói đăng ký dịch vụ mới?</string>
     <!-- Text of buy new subscription button -->
@@ -3746,7 +3722,7 @@
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
     <string name="title_duplicated_items">Mục bị trùng lặp</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
-    <string name="file_already_exists_in_location">A file named [B]%1$s[/B] already exists at this destination.</string>
+    <string name="file_already_exists_in_location">Đã có một tệp tin mang tên [B]%1$s[/B] ở tại chỗ này rồi.</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
     <string name="choose_file">Chọn tệp tin muốn giữ</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose. -->
@@ -3804,7 +3780,7 @@
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
     <string name="skip_folder">Bỏ qua thư mục này</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
-    <string name="folder_already_exists_in_location">The folder named [B]%1$s[/B] already exists at this destination.</string>
+    <string name="folder_already_exists_in_location">Đã có một thư mục mang tên [B]%1$s[/B] ở tại chỗ này rồi.</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">Đường truyền kém</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
@@ -3902,7 +3878,47 @@
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">Gác tất cả</string>
     <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Đặt người chủ trì</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">You’re the only host on the call. Do you want to assign another one before leaving?</string>
+    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">Bạn là người chủ trì duy nhất của cuộc gọi này. Bạn có muốn đặt ra một người trước khi rời khỏi cuộc gọi không?</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Phải</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">Không</string>
+    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos_2">
+        <item quantity="other">và %1$d videos</item>
+    </plurals>
+    <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
+    <plurals name="num_folders_num_files_2">
+        <item quantity="other">%1$d tệp tin</item>
+    </plurals>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
+    <string name="account_upgrade_storage_label">[A]%1$s[/A] không gian lưu trữ</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] băng thông truyền tải</string>
+    <!-- Label of storage in My account section. -->
+    <string name="account_storage_label">Lưu Trữ</string>
+    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
+    <string name="account_choose_free_limited_transfer_quota">Băng thông truyền tải [A]bị giới hạn[/A]</string>
+    <!-- Name of hots or hosts in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
+        <item quantity="other">Người chủ trì: %s</item>
+    </plurals>
+    <!-- Number of participants in the call in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
+        <item quantity="other">Thành viên: %s</item>
+    </plurals>
+    <!-- Chat log message when the permissions for a user has been changed to read-onl -->
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] đã được đổi quyền hạn là chỉ-được-xem bởi [/B][A]%2$s[/A]</string>
+    <!-- Chat log message when the permissions for a user has been changed to standard -->
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] đã được đổi quyền hạn là thành viên bình thường bởi [/B][A]%2$s[/A]</string>
+    <!-- Chat log message when the permissions for a user has been changed to host -->
+    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] đã được đổi quyền hạn là người chủ trì bởi [/B][A]%2$s[/A]</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s đã đổi quyền hạn của %1$s thành chỉ-được-xem</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s đã đổi quyền hạn của %1$s thành bình thường</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s đã đổi quyền hạn của %1$s thành người chủ trì</string>
 </resources>

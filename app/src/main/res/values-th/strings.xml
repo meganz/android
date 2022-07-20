@@ -408,16 +408,16 @@
     <string name="context_no_renamed">ผิดพลาด ยังไม่ได้เปลี่ยนชื่อ</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">คัดลอกได้ถูกต้องแล้ว</string>
-    <!-- error message when sending a node to Inbox -->
-    <string name="context_no_sent_node">ผิดพลาด ไม่ได้ส่งไปกล่องขาเข้า</string>
     <!-- error message -->
     <string name="context_no_copied">ผิดพลาด ยังไมไ่ด้คัดลอก</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">กรุณาเลือกโฟลเดอร์ปลายทาง</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">ย้ายเรียบร้อยแล้ว</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved">ย้าย %d รายการสำเร็จ</string>
+    <!-- success message when moving a node (file/folder) -->
+    <plurals name="number_correctly_moved">
+        <item quantity="other">ย้ายแล้ว %d รายการ</item>
+    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">ไม่สามารถย้ายรายการ %d ได้สำเร็จ</string>
     <!-- success message when moving a node -->
@@ -460,8 +460,6 @@
     <string name="number_contact_removed">ลบผู้ติดต่อ %d เรียบร้อยแล้ว</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">ไม่ได้นำรายชื่อติดต่อของ %d ออก</string>
-    <!-- success message when sending a file to a contact -->
-    <string name="context_correctly_copied_contact">ส่งเรียบร้อยแล้ว:</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">เคลียร์ถังขยะเรียบร้อยแล้ว</string>
     <!-- error message when emptying the RB -->
@@ -945,8 +943,6 @@
     <string name="file_link_unavaible_delete_account">บัญชีผู้ใช้ที่เกี่ยวข้องถูกยกเลิกเนื่องจากการละเมิดเงื่อนไขการให้บริการของเราหลายครั้ง</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">คีย์ถอดรหัสสำหรับลิงก์โฟลเดอร์ไม่ถูกต้อง</string>
-    <!-- Word to indicate the limited bandwidth of the free accounts -->
-    <string name="limited_bandwith">ถูกจำกัด</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">แชท</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -962,15 +958,19 @@
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
     <string name="remove_contact_shared_folder">ผู้ติดต่อ %s จะถูกนำออกจากโฟลเดอร์ที่แชร์</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
-    <string name="remove_multiple_contacts_shared_folder">ผู้ติดต่อ %d รายจะถูกลบออกจากโฟลเดอร์ที่แชร์</string>
+    <plurals name="remove_multiple_contacts_shared_folder">
+        <item quantity="other">ผู้ติดต่อ %d รายจะถูกลบออกจากโฟลเดอร์ที่แชร์</item>
+    </plurals>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">ไม่สามารถอัปเดตการอนุญาตสำหรับ %d ผู้ติดต่อได้</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">กำลังโหลดรายชื่อจากโทรศัพท์&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">คำขอ %d รายการได้ถูกส่งไปแล้ว</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">ส่งคำขอเชิญ %d คำขอเรียบร้อยแล้ว</string>
+    <!-- success message when inviting multiple contacts -->
+    <plurals name="number_correctly_invite_contact_request">
+        <item quantity="other">ส่งคำเชิญ %d รายการแล้ว</item>
+    </plurals>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">ส่งคำขอเชิญ %1$d คำขอแล้ว แต่ยังไม่ได้ส่งอีก %2$d คำขอ</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -1084,7 +1084,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">มาตรฐาน</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">Host</string>
+    <string name="administrator_permission_label_participants_panel">ผู้จัดการประชุม</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">(มีการแก้ไข)</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -1175,10 +1175,6 @@
     <string name="more_users_typing">%1$s [A]และคนอื่น ๆ กำลังพิมพ์&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">เพิ่มเติม</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="label_storage_upgrade_account">ที่เก็บข้อมูล</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_upgrade_account">โควต้าการถ่ายโอน</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">พื้นที่เก็บข้อมูล</string>
     <!-- Confirmation message before removing something from the Offline section. -->
@@ -1555,7 +1551,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">ไม่ได้อนุญาตให้ใช้อักขระนี้</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">ไม่อนุญาตให้ใช้อักขระต่อไปนี้: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">ไม่อนุญาตให้ใช้อักขระต่อไปนี้: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">ชื่อไฟล์ต้องไม่ว่างเปล่า</item>
@@ -1633,7 +1629,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">ยังไม่ได้ส่งคำเชิญ %s อยู่ในรายชื่อติดต่อของคุณแล้ว</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">พบข้อผิดพลาดและยังไม่ได้ส่งคำเชิญ</string>
+    <string name="invite_not_sent_text_error">เกิดข้อผิดพลาดและยังไม่ได้ส่งคำเชิญ</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">กำลังสร้างคิวอาร์โค้ด&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -1720,28 +1716,26 @@
     <string name="account_suspended_breache_ToS">บัญชีของคุณถูกยกเลิกเนื่องจากการละเมิดเงื่อนไขการให้บริการของ MEGA รวมถึงแต่ไม่จำกัดเพียงข้อที่ 15</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">กำลังโหลดไฟล์</string>
-    <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
-    <string name="file_storage_empty_folder">ไม่มีไฟล์</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s KB</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s MB</string>
+    <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s TB</string>
+    <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s B/s</string>
+    <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s KB/s</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s MB/s</string>
+    <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s TB/s</string>
+    <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -1847,10 +1841,6 @@
     <string name="recovery_key_bottom_sheet">คีย์สำหรับกู้คืน</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">บันทึกในระบบไฟล์</string>
-    <!-- text of the label to show that you have messages unread in the chat conversation -->
-    <string name="message_jump_latest">ข้ามไปที่ล่าสุด</string>
-    <!-- text of the label to show that you have new messages in the chat conversation -->
-    <string name="message_new_messages">ข้อความใหม่</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">สายเรียกเข้า</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
@@ -2393,9 +2383,9 @@
     <plurals name="num_folders_with_parameter">
         <item quantity="other">%d โฟลเดอร์</item>
     </plurals>
-    <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="other">%1$d โฟลเดอร์ · %2$d ไฟล์</item>
+        <item quantity="other">%1$d โฟลเดอร์&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] ได้เพิ่ม %2$s และ%3$s[/B]</string>
@@ -2665,8 +2655,6 @@
     <string name="alert_enter_group_name">ในการสร้างลิงก์แชทคุณจะต้องตั้งชื่อกลุ่มก่อน</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">เชิญผู้ติดต่อและเริ่มแชทอย่างปลอดภัยด้วยแชทที่เข้ารหัสบน MEGA</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="recent_chat_empty_text">เริ่มแชทอย่างปลอดภัยกับผู้ติดต่อของคุณโดยใช้การเข้ารหัสแบบต้นทางถึงปลายทาง</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
     <string name="invite_contacts_to_start_chat_text_message">หวัดดี มาร่วมสนทนากับฉันบน MEGA อย่างปลอดภัยสิ แล้วรับพื้นที่เก็บข้อมูลบนคลาวด์ฟรี 20&#160;GB ไปเลย%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
@@ -2706,11 +2694,17 @@
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s และอื่น ๆ อีก %2$d รายการ</string>
     <!-- Title of a media recents bucket that only contains some images -->
-    <string name="title_media_bucket_only_images">%d รูปภาพ</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="other">%d รูปภาพ</item>
+    </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
-    <string name="title_media_bucket_only_videos">%d วิดีโอ</string>
-    <!-- Title of a media recents bucket that contains some images and some videos -->
-    <string name="title_media_bucket_images_and_videos">%1$d รูปภาพและ %2$d วิดีโอ</string>
+    <plurals name="title_media_bucket_only_videos">
+        <item quantity="other">%d วิดีโอ</item>
+    </plurals>
+    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos">
+        <item quantity="other">%1$d รูปภาพ&#160;</item>
+    </plurals>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">%d รูปภาพและ 1 วิดีโอ</string>
     <!-- Title of a media recents bucket that contains an image and some videos -->
@@ -2836,7 +2830,9 @@
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">เมื่อ %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <string name="alert_remove_several_shares">คุณแน่ใจหรือไม่ว่าต้องการหยุดแชร์ %1$d โฟลเดอร์นี้</string>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">ยกเลิกแชร์ %1$d โฟลเดอร์นี้หรือไม่</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">ที่ตั้งดาวน์โหลด</string>
     <!-- Text asking confirmation for download location -->
@@ -3272,9 +3268,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">เพิ่มหมายเลขโทรศัพท์ของคุณ</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -3321,8 +3317,6 @@
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">ล้างไฟล์ออฟไลน์ทั้งหมดหรือไม่</string>
-    <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">มีคุณคนเดียวที่อยู่ที่นี่</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">การประชุม</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3372,25 +3366,13 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">แสดงในมุมมองหลัก</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Make host</string>
-    <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">ออกจากการประชุมตอนนี้หรือไม่</string>
-    <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">No host</string>
-    <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
+    <string name="make_moderator">ตั้งเป็นผู้จัดการประชุม</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Make host</string>
-    <!-- leave anyway option when the moderator leave meeting-->
-    <string name="leave_anyway">ยืนยันที่จะออก</string>
+    <string name="assign_moderator">ตั้งเป็นผู้จัดการประชุม</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
+    <string name="pick_new_moderator_message">กรุณาแต่งตั้งผู้จัดการประชุมคนใหม่อย่างน้อยหนึ่งคน</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">เปลี่ยนชื่อการประชุม</string>
-    <!-- The number of participants in the meeting on meeting info page-->
-    <string name="info_participants_number">ผู้เข้าร่วม: %d คน</string>
-    <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">ลิงก์ประชุม</string>
     <!-- Subtitle of the meeting screen-->
@@ -3401,8 +3383,6 @@
     <string name="paste_meeting_link_guest_dialog_title">คุณได้รับเชิญให้เข้าร่วมการประชุม</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">แตะลิงก์ประชุมที่ส่งถึงคุณหรือวางที่นี่</string>
-    <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">การเชื่อมต่อไม่ดี</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">สิ้นสุดการประชุมแล้ว</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -3424,7 +3404,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">ตั้งค่าการประชุม MEGA อย่างรวดเร็วด้วยฟีเจอร์การประชุมที่เข้ารหัสใหม่ของเรา</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">You are the new host.</string>
+    <string name="be_new_moderator">คุณเป็นผู้จัดการประชุมคนใหม่</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">คัดลอกลิงก์การประชุมแล้ว</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3589,8 +3569,6 @@
     <string name="upload_files">อัปโหลดไฟล์</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">อัปโหลดโฟลเดอร์</string>
-    <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">ยกเลิกการอัปโหลดหรือไม่</string>
     <!-- Title of the Payments screen -->
     <string name="payment">ชำระเงิน</string>
     <!-- Label indicating payment methods -->
@@ -3615,12 +3593,8 @@
     <string name="pro_iii_monthly">Pro III แบบรายเดือน</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III แบบรายปี</string>
-    <!-- Action button which will cancel uploads. -->
-    <string name="action_cancel_upload">ยกเลิกอัปโหลด</string>
-    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
-    <string name="action_do_not_cancel">ไม่ต้องยกเลิก</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Remove host</string>
+    <string name="remove_moderator">ถอนสิทธิ์การเป็นผู้จัดการประชุม</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">ซื้อการสมัครใช้งานใหม่หรือไม่</string>
     <!-- Text of buy new subscription button -->
@@ -3746,11 +3720,11 @@
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
     <string name="title_duplicated_items">รายการที่ซ้ำกัน</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
-    <string name="file_already_exists_in_location">ไฟล์ชื่อ [B]%1$s[/B] มีอยู่แล้วในปลายทางนี้</string>
+    <string name="file_already_exists_in_location">ปลายทางมีไฟล์ชื่อ [B]%1$s[/B] อยู่แล้ว</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
     <string name="choose_file">เลือกไฟล์ที่คุณต้องการเก็บ</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose. -->
-    <string name="choose_folder">เลือกว่าคุณต้องการผสานโฟลเดอร์หรือไม่</string>
+    <string name="choose_folder">เลือกว่าคุณต้องการรวมโฟลเดอร์หรือไม่</string>
     <!-- Informs about what is expected after choose the option upload and replace for a name collision if file versioning is disabled. -->
     <string name="warning_upload_and_replace">ไฟล์เวอร์ชันปัจจุบันจะถูกแทนที่ด้วยไฟล์ที่คุณกำลังอัปโหลด</string>
     <!-- Upload and replace action button for a name collision. -->
@@ -3766,7 +3740,7 @@
     <!-- Upload and rename action button for a name collision. -->
     <string name="upload_and_rename">อัปโหลดและเปลี่ยนชื่อ</string>
     <!-- Informs about what is expected after choose the option move and replace for a name collision if file versioning is disabled. -->
-    <string name="warning_move_and_replace">แทนที่ไฟล์ในโฟลเดอร์ปลายทางด้วยไฟล์ที่คุณกำลังย้าย.</string>
+    <string name="warning_move_and_replace">แทนที่ไฟล์ในโฟลเดอร์ปลายทางด้วยไฟล์ที่คุณกำลังย้าย</string>
     <!-- Move and replace action button for a name collision. -->
     <string name="move_and_replace">ย้ายและแทนที่</string>
     <!-- Don’t move action button for a name collision. -->
@@ -3776,7 +3750,7 @@
     <!-- Move and rename action button for a name collision. -->
     <string name="move_and_rename">ย้ายและเปลี่ยนชื่อ</string>
     <!-- Informs about what is expected after choose the option copy and replace for a name collision if file versioning is disabled. -->
-    <string name="warning_copy_and_replace">แทนที่ไฟล์ในโฟลเดอร์ปลายทางด้วยไฟล์ที่คุณกำลังคัดลอก.</string>
+    <string name="warning_copy_and_replace">แทนที่ไฟล์ในโฟลเดอร์ปลายทางด้วยไฟล์ที่คุณกำลังคัดลอก</string>
     <!-- Copy and replace action button for a name collision. -->
     <string name="copy_and_replace">คัดลอกและวาง</string>
     <!-- Don’t copy action button for a name collision. -->
@@ -3788,7 +3762,7 @@
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
     <string name="file_apply_for_all">ใช้ตัวเลือกนี้กับ %1$d ข้อขัดแย้งต่อไป</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
-    <string name="warning_copy_and_merge">ผสานโฟลเดอร์ที่ปลายทางกับโฟลเดอร์ที่คุณกำลังคัดลอกไว้.</string>
+    <string name="warning_copy_and_merge">รวมโฟลเดอร์ที่ปลายทางกับโฟลเดอร์ที่คุณกำลังคัดลอก</string>
     <!-- Copy and merge action button for a name collision. -->
     <string name="copy_and_merge">คัดลอกและผสาน</string>
     <!-- Informs about what is expected after choose the option move and merge for a name collision. -->
@@ -3804,7 +3778,7 @@
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
     <string name="skip_folder">ข้ามโฟลเดอร์นี้</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
-    <string name="folder_already_exists_in_location">โฟลเดอร์ชื่อ [B]%1$s[/B] มีอยู่แล้วในปลายทางนี้</string>
+    <string name="folder_already_exists_in_location">มีโฟลเดอร์ชื่อ [B]%1$s[/B] อยู่ที่ปลายทางนี้แล้ว</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">การเชื่อมต่อไม่ดี</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
@@ -3902,7 +3876,47 @@
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">วางสายทั้งหมด</string>
     <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">ตั้งเป็นผู้จัดการประชุม</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">You’re the only host on the call. Do you want to assign another one before leaving?</string>
+    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">คุณเป็นผู้จัดการประชุมเพียงคนเดียวที่อยู่ในสายนี้ คุณต้องการมอบหมายให้คนอื่นทำหน้าที่นี้แทนก่อนที่คุณจะออกหรือไม่</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">ใช่</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">ไม่ใช่</string>
+    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos_2">
+        <item quantity="other">และ %1$d วิดีโอ</item>
+    </plurals>
+    <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
+    <plurals name="num_folders_num_files_2">
+        <item quantity="other">%1$d ไฟล์</item>
+    </plurals>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
+    <string name="account_upgrade_storage_label">พื้นที่เก็บข้อมูล [A]%1$s[/A]</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
+    <string name="account_upgrade_transfer_quota_label">โควต้าถ่ายโอน [A]%1$s[/A]</string>
+    <!-- Label of storage in My account section. -->
+    <string name="account_storage_label">ที่เก็บข้อมูล</string>
+    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
+    <string name="account_choose_free_limited_transfer_quota">[A]ถูกจำกัด[/A]โควต้าถ่ายโอน</string>
+    <!-- Name of hots or hosts in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
+        <item quantity="other">ผู้จัดการประชุม: %s</item>
+    </plurals>
+    <!-- Number of participants in the call in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
+        <item quantity="other">จำนวนผู้เข้าร่วม: %d</item>
+    </plurals>
+    <!-- Chat log message when the permissions for a user has been changed to read-onl -->
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] ถูกเปลี่ยนเป็นอ่านอย่างเดียวโดย [/B][A]%2$s[/A]</string>
+    <!-- Chat log message when the permissions for a user has been changed to standard -->
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B]ถูกเปลี่ยนสิทธิ์เป็นแบบมาตรฐานโดย [/B][A]%2$s[/A]</string>
+    <!-- Chat log message when the permissions for a user has been changed to host -->
+    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B]ถูกเปลี่ยนสิทธิ์เป็นผู้จัดการประชุมโดย [/B][A]%2$s[/A]</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s ถูกเปลี่ยนเป็นอ่านอย่างเดียวโดย %2$s</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s ถูกเปลี่ยนสิทธิ์เป็นแบบมาตรฐานโดย %2$s</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s ถูกเปลี่ยนสิทธิ์เป็นผู้จัดการประชุมโดย %2$s</string>
 </resources>

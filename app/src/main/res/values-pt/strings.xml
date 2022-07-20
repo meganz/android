@@ -185,7 +185,7 @@
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Eu entendo que, [B]se eu perder a minha senha, poderei perder os meus dados[/B]. Leia mais sobre a [A]criptografia de ponta a ponta do MEGA[/A].</string>
     <!-- warning dialog -->
-    <string name="create_account_no_terms">Você precisa aceitar os nossos Termos de Serviço</string>
+    <string name="create_account_no_terms">Você precisa aceitar os nossos Termos de serviço</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Você precisa confirmar que entende o perigo de perder a sua senha</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
@@ -426,16 +426,18 @@
     <string name="context_no_renamed">Erro. Não foi renomeado</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">Copiado corretamente</string>
-    <!-- error message when sending a node to Inbox -->
-    <string name="context_no_sent_node">Erro. Não enviados a Caixa de entrada</string>
     <!-- error message -->
     <string name="context_no_copied">Erro. Não foi copiado</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Escolha a pasta de destino</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Movido corretamente</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved">%d itens movidos corretamente.</string>
+    <!-- success message when moving a node (file/folder) -->
+    <plurals name="number_correctly_moved">
+        <item quantity="one">%d item foi movido</item>
+        <item quantity="many">%d de itens foram movidos</item>
+        <item quantity="other">%d itens foram movidos</item>
+    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d itens não foram movidos</string>
     <!-- success message when moving a node -->
@@ -478,8 +480,6 @@
     <string name="number_contact_removed">%d contatos foram removidos</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">%d contatos não foram removidos</string>
-    <!-- success message when sending a file to a contact -->
-    <string name="context_correctly_copied_contact">Enviado corretamente para:</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Lixeira esvaziada com êxito</string>
     <!-- error message when emptying the RB -->
@@ -950,11 +950,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">O link da pasta não está disponível</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">O link da pasta foi removido por infringir os nossos Termos de Serviço.</string>
+    <string name="folder_link_unavaible_ToS_violation">O link da pasta foi removido por infringir os nossos Termos de serviço.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Link de arquivo indisponível</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">O link do arquivo foi removido por infringir os nossos Termos de Serviço.</string>
+    <string name="file_link_unavaible_ToS_violation">O link do arquivo foi removido por infringir os nossos Termos de serviço.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Esta URL está corrupta ou mal formada. O link que você está tentando acessar não existe.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -971,8 +971,6 @@
     <string name="file_link_unavaible_delete_account">A conta deste usuário foi encerrada devido a várias infrações aos nossos Termos de serviço.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">A chave de decodificação fornecida para o link desta pasta é inválida.</string>
-    <!-- Word to indicate the limited bandwidth of the free accounts -->
-    <string name="limited_bandwith">Limitado</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Chat</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -988,15 +986,23 @@
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
     <string name="remove_contact_shared_folder">O acesso do contato %s à pasta compartilhada será removido.</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
-    <string name="remove_multiple_contacts_shared_folder">O acesso dos %d contatos à pasta compartilhada será removido.</string>
+    <plurals name="remove_multiple_contacts_shared_folder">
+        <item quantity="one">O acesso de %d contato à pasta compartilhada será removido.</item>
+        <item quantity="many">O acesso dos %d de contatos à pasta compartilhada será removido.</item>
+        <item quantity="other">O acesso dos %d contatos à pasta compartilhada será removido.</item>
+    </plurals>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">Não foi possível atualizar as permissões de %d contatos</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Carregando contatos do celular&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d solicitações enviadas anteriormente.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">%d solicitações de contato enviadas corretamente.</string>
+    <!-- success message when inviting multiple contacts -->
+    <plurals name="number_correctly_invite_contact_request">
+        <item quantity="one">%d convite enviado</item>
+        <item quantity="many">%d de convites enviados</item>
+        <item quantity="other">%d convites enviados</item>
+    </plurals>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d solicitações de contato foram enviadas corretamente, porém %2$d solicitações não foram enviadas.</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -1058,7 +1064,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">O histórico do chat foi deletado</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">Ocorreu um erro. O histórico do chat não foi apagado com sucesso.</string>
+    <string name="clear_history_error">Ocorreu um erro. O histórico do chat não foi deletado corretamente.</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Adicionar participantes</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1116,7 +1122,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">Predeterminado</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">Host</string>
+    <string name="administrator_permission_label_participants_panel">Anfitrião</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">(editado)</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -1152,7 +1158,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibrar</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Fazer logout[/A] para trocar de conta MEGA</string>
+    <string name="sms_logout">[A]Fazer logout[/A] para acessar outra conta do MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Você tem certeza de que quer fazer logout desta conta?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1184,7 +1190,7 @@
         <item quantity="other">%1$d contatos</item>
     </plurals>
     <!-- Message shown when the folder sharing process fails -->
-    <string name="error_sharing_folder">Erro ao tentar compartilhar a pasta. Por favor, tente novamente.</string>
+    <string name="error_sharing_folder">Não foi possível compartilhar a pasta. Por favor, tente novamente.</string>
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
         <item quantity="one">Todos os dados relacionados com este contato serão eliminados permanentemente.</item>
@@ -1215,10 +1221,6 @@
     <string name="more_users_typing">%1$s [A]e outros estão escrevendo&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Mais</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="label_storage_upgrade_account">Armazenamento</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_upgrade_account">Cota de transferência</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">Espaço de armazenamento</string>
     <!-- Confirmation message before removing something from the Offline section. -->
@@ -1621,7 +1623,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caracteres inválidos</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Os seguintes caracteres não são permitidos: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">Os seguintes caracteres não são permitidos: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">O nome do arquivo não pode estar vazio.</item>
@@ -1687,11 +1689,11 @@
     <!-- Text of dialog shown when multiple contacts request has been sent -->
     <string name="invite_sent_text_multi">Os usuários foram convidados e aparecerão na sua lista de contatos assim que aceitarem.</string>
     <!-- Text shown when it tries to share the QR and occurs an error to process the action -->
-    <string name="error_share_qr">Um erro ocorreu ao tentar compartilhar o código QR. Talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
+    <string name="error_share_qr">Não foi possível compartilhar o código QR - talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
     <!-- Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action -->
-    <string name="error_upload_qr">Ocorreu um erro ao tentar fazer o upload do código QR. Talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
+    <string name="error_upload_qr">Não foi possível fazer o upload do código QR - talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
-    <string name="error_download_qr">Não foi possível fazer o download do código QR, e talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
+    <string name="error_download_qr">Não foi possível fazer o download do código QR - talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">O código QR foi salvo em %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
@@ -1785,11 +1787,9 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">A sua conta foi suspensa devido a múltiplas infrações dos Termos de serviço do MEGA. Verifique a caixa de entrada do seu email para mais detalhes.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">A sua conta foi encerrada por infringir os Termos de Serviço do MEGA, incluindo a cláusula 15, mas não se limitando à mesma.</string>
+    <string name="account_suspended_breache_ToS">A sua conta foi encerrada por infringir os Termos de serviço do MEGA, incluindo a cláusula 15, mas não se limitando à mesma.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Carregando arquivos</string>
-    <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
-    <string name="file_storage_empty_folder">Não há arquivos</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1929,10 +1929,6 @@
     <string name="recovery_key_bottom_sheet">Chave de recuperação</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Salvar no sistema de arquivos</string>
-    <!-- text of the label to show that you have messages unread in the chat conversation -->
-    <string name="message_jump_latest">Ir ao mais recente</string>
-    <!-- text of the label to show that you have new messages in the chat conversation -->
-    <string name="message_new_messages">Novas mensagens</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Chamada recebida</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
@@ -2332,7 +2328,7 @@
     <!-- Message on the title of the chat screen if there were any error loading the chat link -->
     <string name="error_chat_link">Não foi possível carregar o link do chat.</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
-    <string name="error_chat_link_init_error">Erro ao iniciar quando carregando o link do chat.</string>
+    <string name="error_chat_link_init_error">Ocorreu um erro ao inicializar o chat, no momento de carregar o link do chat</string>
     <!-- Message on the alert to close a chat preview if the link is invalid -->
     <string name="alert_invalid_preview">A visualização deste chat já não está disponível. Se você sair da visualização, não será possível reabri-la.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2400,12 +2396,12 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Disputar remoção</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Não acessível pois infringiu os nossos Termos de Serviço</string>
+    <string name="error_download_takendown_node">Não acessível por infringir os nossos Termos de serviço</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="one">%d arquivo não foi baixado porque ele infringiu os nossos Termos de Serviço.</item>
-        <item quantity="many">%d arquivos não foram baixados porque eles infringiram os nossos Termos de Serviço.</item>
-        <item quantity="other">%d arquivos não foram baixados porque eles infringiram os nossos Termos de Serviço.</item>
+        <item quantity="one">Não foi feito o download de %d arquivo porque ele infringia os nossos Termos de serviço.</item>
+        <item quantity="many">Não foi feito o download de %d de arquivos porque eles infringiam os nossos Termos de serviço.</item>
+        <item quantity="other">Não foi feito o download de %d arquivos porque eles infringiam os nossos Termos de serviço.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]O seu arquivo compartilhado publicamente [/A] [B]%s[/B][C] foi restaurado.[/C]</string>
@@ -2440,9 +2436,9 @@
     <!-- title of billing period -->
     <string name="billing_period_title">Ciclo de faturamento</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Faturado mensalmente[/A] %s/mês</string>
+    <string name="billed_monthly_text">[A]Pagamento mensal[/A] %s/mês</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Faturado anualmente[/A] %s/ano</string>
+    <string name="billed_yearly_text">[A]Pagamento anual[/A] %s/ano</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Cancelar</string>
     <!-- dialog option continue in alert dialog -->
@@ -2493,11 +2489,11 @@
         <item quantity="many">%d pastas</item>
         <item quantity="other">%d pastas</item>
     </plurals>
-    <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d pastas · 1 arquivo</item>
-        <item quantity="many">%1$d pastas · %2$d arquivos</item>
-        <item quantity="other">%1$d pastas · %2$d arquivos</item>
+        <item quantity="one">%1$d pasta&#160;·&#160;</item>
+        <item quantity="many">%1$d de pastas&#160;·&#160;</item>
+        <item quantity="other">%1$d pastas&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] adicionou %2$s e %3$s[/B]</string>
@@ -2795,8 +2791,6 @@
     <string name="alert_enter_group_name">Você precisa nomear o grupo para poder criar um link de chat.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Adicione contatos e converse com segurança no chat criptografado do MEGA.</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="recent_chat_empty_text">Converse com segurança com os seus contatos usando criptografia de ponta a ponta</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
     <string name="invite_contacts_to_start_chat_text_message">Olá, converse com segurança comigo no MEGA e obtenha 20&#160;GB de armazenamento em nuvem gratuito. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
@@ -2840,11 +2834,23 @@
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s e mais %2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
-    <string name="title_media_bucket_only_images">%d imagens</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="one">%d imagem</item>
+        <item quantity="many">%d de imagens</item>
+        <item quantity="other">%d imagens</item>
+    </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
-    <string name="title_media_bucket_only_videos">%d vídeos</string>
-    <!-- Title of a media recents bucket that contains some images and some videos -->
-    <string name="title_media_bucket_images_and_videos">%1$d imagens e %2$d vídeos</string>
+    <plurals name="title_media_bucket_only_videos">
+        <item quantity="one">%d vídeo</item>
+        <item quantity="many">%d de vídeos</item>
+        <item quantity="other">%d vídeos</item>
+    </plurals>
+    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos">
+        <item quantity="one">%1$d imagem&#160;</item>
+        <item quantity="many">%1$d de imagens&#160;</item>
+        <item quantity="other">%1$d imagens&#160;</item>
+    </plurals>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">%d imagens e 1 vídeo</string>
     <!-- Title of a media recents bucket that contains an image and some videos -->
@@ -2970,7 +2976,11 @@
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">em %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <string name="alert_remove_several_shares">Você tem certeza de que quer deixar de compartilhar estas %1$d pastas?</string>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Deixar de compartilhar esta pasta?</item>
+        <item quantity="many">Deixar de compartilhar este %1$d de pastas?</item>
+        <item quantity="other">Deixar de compartilhar estas %1$d pastas?</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">Local do download</string>
     <!-- Text asking confirmation for download location -->
@@ -3194,7 +3204,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Selecionar transferências</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Não foi possível alterar a prioridade da transferência ”%1$s”</string>
+    <string name="change_of_transfer_priority_failed">Não foi possível alterar a prioridade da transferência “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Enviar a chave de decodificação separadamente</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3222,7 +3232,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Os usuários Pro do MEGA têm acesso exclusivo a recursos adicionais para a proteção dos links, tornando sua conta ainda mais segura.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Nosso sistema de criptografia de ponta a ponta requer uma chave exclusiva gerada automaticamente para este arquivo ou pasta. Um link com esta chave será criado de maneira predeterminada, mas você pode exportar a chave de decodificação separadamente para assim garantir uma camada adicional de segurança.</string>
+    <string name="decryption_key_explanation">Nosso sistema de criptografia de ponta a ponta requer uma chave exclusiva, gerada automaticamente para este arquivo ou para esta pasta. Um link com esta chave será criado de maneira predeterminada, mas você pode exportar a chave de decodificação separadamente, para assim garantir uma camada adicional de segurança.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Resetar senha</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3393,15 +3403,15 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item movido para a Lixeira, mas o outro item não foi movido. Tente novamente mais tarde.</item>
-        <item quantity="many">1 item movido para a Lixeira, mas %d itens não foram movidos. Tente novamente mais tarde.</item>
-        <item quantity="other">1 item movido para a Lixeira, mas %d itens não foram movidos. Tente novamente mais tarde.</item>
+        <item quantity="one">1 item  foi movido para a Lixeira, mas o outro item não foi movido. Tente novamente mais tarde.</item>
+        <item quantity="many">1 item foi movido para a Lixeira, mas %d de itens não foram movidos. Tente novamente mais tarde.</item>
+        <item quantity="other">1 item foi movido para a Lixeira, mas %d itens não foram movidos. Tente novamente mais tarde.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item movido para a Lixeira, mas o outro item não foi movido. Tente novamente mais tarde.</item>
-        <item quantity="many">%d itens movidos para a Lixeira, mas 1 item não foi movido. Tente novamente mais tarde.</item>
-        <item quantity="other">%d itens movidos para a Lixeira, mas 1 item não foi movido. Tente novamente mais tarde.</item>
+        <item quantity="one">1 item foi movido para a Lixeira, mas o outro item não foi movido. Tente novamente mais tarde.</item>
+        <item quantity="many">%d de itens foram movidos para a Lixeira, mas 1 item não foi movido. Tente novamente mais tarde.</item>
+        <item quantity="other">%d itens foram movidos para a Lixeira, mas 1 item não foi movido. Tente novamente mais tarde.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
@@ -3503,8 +3513,6 @@
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Você quer deletar todos os arquivos offline?</string>
-    <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">Não tem mais ninguém aqui</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Meeting</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3554,25 +3562,13 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Mostrar na vista principal</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Make host</string>
-    <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">Você quer sair da reunião?</string>
-    <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">No host</string>
-    <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
+    <string name="make_moderator">Converter em anfitrião</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Make host</string>
-    <!-- leave anyway option when the moderator leave meeting-->
-    <string name="leave_anyway">Sair mesmo assim</string>
+    <string name="assign_moderator">Converter em anfitrião</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
+    <string name="pick_new_moderator_message">Selecione um ou mais novos anfitriões.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">Alterar o nome da reunião</string>
-    <!-- The number of participants in the meeting on meeting info page-->
-    <string name="info_participants_number">Participantes: %d</string>
-    <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Link da reunião</string>
     <!-- Subtitle of the meeting screen-->
@@ -3583,8 +3579,6 @@
     <string name="paste_meeting_link_guest_dialog_title">Você foi convidado para uma reunião.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Acesse o link que você recebeu ou digite o link aqui</string>
-    <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">A qualidade da sua conexão não é boa</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">A reunião terminou</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -3606,7 +3600,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">Programe rapidamente uma reunião criptografada com o novo recurso do MEGA</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">You are the new host.</string>
+    <string name="be_new_moderator">Você é o novo anfitrião</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">O link da reunião foi copiado.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3682,9 +3676,9 @@
     <!-- Title of the dialog warning the user about disable file versioning. -->
     <string name="disable_versioning_label">Desativar o controle das versões de arquivos</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
-    <string name="disable_versioning_warning">Nosso recurso de controle de versão de arquivos garante que manteremos cópias mais antigas se você substituí-las por versões mais recentes. Se você desativar o Controle de Versão de Arquivos, não terá mais essa proteção; a cópia antiga será perdida quando você a substituir.</string>
+    <string name="disable_versioning_warning">O nosso recurso de controle de versão de arquivos garante que nós vamos manter as cópias anteriores dos seus arquivos se você as substituir por versões mais recentes. Se você desativar o Controle das versões de arquivos, não terá mais essa proteção; a cópia antiga será perdida quando você a substituir.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
-    <string name="location_not_exist">Esta localização não existe mais.</string>
+    <string name="location_not_exist">Esta localização já não existe.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Você já convidou %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
@@ -3722,7 +3716,7 @@
     <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_move_root_folder">Você está a ponto de alterar a localização de uma pasta de backup predeterminada. Ao fazer isso, você poderá ter dificuldades para localizar esta pasta de backup. Assegure-se de lembrar onde ela está localizada para poder encontrá-la no futuro.</string>
     <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Mover esta pasta altera o destino de um ou mais backups configurados e pode ter consequências não intencionais. Os backups serão desativados para a sua segurança. Os backups podem ser reativados com o Aplicativo do MEGA para Desktop. Você quer continuar?</string>
+    <string name="backup_move_sub_folder">Mover esta pasta altera o destino de um ou mais backups configurados e pode ter consequências não intencionais. Os backups serão desativados para a sua segurança, mas poderão ser reativados com o aplicativo do MEGA para desktop. Você quer continuar?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Você está a ponto de excluir a sua pasta de backup. Ao fazer isso, serão removidos todos os backups que você configurou. Você tem certeza de que quer fazer isso?</string>
     <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
@@ -3732,7 +3726,7 @@
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Mover “%1s” à Lixeira</string>
     <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">Mover pastas de backup</string>
+    <string name="backup_move_multiple_folder_title">Mover as pastas de backup</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_multiple_folder_title">Mover as pastas de backup para a Lixeira</string>
     <!-- The confirm information of warning dialog for deleting -->
@@ -3748,13 +3742,13 @@
     <!-- The title of warning dialog for adding item to "My backup" -->
     <string name="backup_add_item_title">Configurar o backup</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Para garantir que esses itens adicionados à sua pasta de backup sejam sincronizados automaticamente com a Nuvem do MEGA, por favor, configure-os no Aplicativo do MEGA para Desktop.</string>
+    <string name="backup_add_item_to_root_text">Para garantir que os itens adicionados à sua pasta de backup sejam sincronizados automaticamente com a Nuvem de arquivos do MEGA, por favor, configure-os no aplicativo do MEGA para desktop.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Somente leitura</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Esta pasta só pode ser compartilhada como somente leitura porque é uma pasta de backup. Qualquer alteração no seu conteúdo pode desativar o backup.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Os itens nessa pasta fazem parte de um backup configurado e são sincronizados com uma pasta local. Esta ação interromperá a sincronização e desativará o backup. O backup pode ser reativado com o Aplicativo do MEGA para Desktop. Você tem certeza de que quer continuar?</string>
+    <string name="backup_add_item_text">Os itens nessa pasta fazem parte de um backup configurado e são sincronizados com uma pasta local. Esta ação interromperá a sincronização e desativará o backup. O backup pode ser reativado com o aplicativo do MEGA para desktop. Você tem certeza de que quer continuar?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Essas pastas só podem ser compartilhadas como somente leitura porque são pastas de backup. Qualquer alteração no seu conteúdo pode desativar o backup.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -3770,11 +3764,9 @@
     <!-- Title of the menu when the select tracks on playlist page-->
     <string name="title_select_tracks">Selecionar faixas</string>
     <!-- Action button to upload files. -->
-    <string name="upload_files">Enviar arquivos</string>
+    <string name="upload_files">Fazer upload de arquivos</string>
     <!-- Action button to upload a folder. -->
-    <string name="upload_folder">Enviar pasta</string>
-    <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Cancelar upload?</string>
+    <string name="upload_folder">Fazer upload de pasta</string>
     <!-- Title of the Payments screen -->
     <string name="payment">Pagamento</string>
     <!-- Label indicating payment methods -->
@@ -3799,36 +3791,32 @@
     <string name="pro_iii_monthly">Pro III mensal</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III anual</string>
-    <!-- Action button which will cancel uploads. -->
-    <string name="action_cancel_upload">Cancelar upload</string>
-    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
-    <string name="action_do_not_cancel">Não cancelar</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Remove host</string>
+    <string name="remove_moderator">Eliminar permissão de anfitrião</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Comprar uma nova assinatura?</string>
     <!-- Text of buy new subscription button -->
     <string name="button_buy_new_subscription">Comprar uma nova assinatura</string>
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">Você já tem uma assinatura. Se você comprar outra, você será cobrada duas vezes. Para evitar isso, cancele sua assinatura atual via %1$s. Visite nossa Central de Ajuda para mais informações.</string>
+    <string name="message_subscription_from_android_platform">Você já tem uma assinatura. Se você comprar outra, você receberá duas cobranças. Para que isso não aconteça, cancele a sua assinatura atual via %1$s. Acesse a nossa Central de ajuda para mais informações.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">Você já tem uma assinatura. Se você comprar outra, você será cobrado duas vezes. Para evitar isso, cancele sua assinatura atual via sua conta no iTunes. Visite nossa Central de Ajuda para mais informações.</string>
+    <string name="message_subscription_from_itunes">Você já tem uma assinatura. Se você comprar outra, você receberá duas cobranças. Para que isso não aconteça, cancele a sua assinatura atual na sua conta no iTunes. Acesse a nossa Central de ajuda para mais informações.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
-    <string name="message_subscription_from_other_platform">Você já tem uma assinatura. Se você comprar outra, você será cobrado duas vezes. Para evitar isso, cancele sua assinatura via MEGA para Desktop ou navegador móvel. Visite nossa Central de Ajuda para mais informações.</string>
+    <string name="message_subscription_from_other_platform">Você já tem uma assinatura. Se você comprar outra, você receberá duas cobranças. Para que isso não aconteça,  cancele a sua assinatura atual acessando o MEGA em um navegador. Acesse a nossa Central de ajuda para mais informações.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Acesse as Configurações para permitir que o MEGA acesse dispositivos próximos utilizando Bluetooth.</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
-    <string name="upgrade_billing_warning">Não podemos seguir com o faturamento. Se você está utilizando um dual app, considere fazer login no MEGA sem ele. Caso contrário, tente fazer o upgrade através de um navegador.</string>
+    <string name="upgrade_billing_warning">Não podemos continuar com a cobrança. Se você está utilizando um dual app, faça login no MEGA sem usà-lo. Caso contrário, tente fazer o upgrade através de um navegador.</string>
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">Assinatura %1s</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">Você tem uma assinatura MEGA ativa com %1$s. Você deve cancelá-la separadamente em %2$s, pois o MEGA não pode cancelá-la por você. Visite a nossa Central de Ajuda para mais informações.</string>
+    <string name="message_android_platform_subscription">Você tem uma assinatura ativa do MEGA com %1$s. Você deve cancelá-la separadamente na %2$s, pois o MEGA não pode cancelá-la por você. Acesse a nossa Central de ajuda para mais informações.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription">Você tem uma assinatura MEGA ativa. Ela será cancelada automaticamente após a exclusão da conta. Visite a nossa Central de Ajuda para mais informações.</string>
+    <string name="message_other_platform_subscription">Você tem uma assinatura ativa do MEGA. Ela será cancelada automaticamente após a exclusão da conta. Acesse a nossa Central de ajuda para mais informações.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">Você tem uma assinatura MEGA ativa com a Apple. Você deve cancelá-la separadamente em sua conta do iTunes, pois o MEGA não pode cancelá-la por você. Visite a nossa Central de Ajuda para mais informações.</string>
+    <string name="message_itunes_platform_subscription">Você tem uma assinatura ativa do MEGA com a Apple. Você deve cancelá-la diretamente na sua conta do iTunes, pois o MEGA não pode cancelá-la por você. Acesse a nossa Central de ajuda para mais informações.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
-    <string name="button_visit_platform">Visite %1s</string>
+    <string name="button_visit_platform">Acesse %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
     <string name="delete_account_text_other_platform_last_step">Este é o último passo para excluir a sua conta. Tanto a sua conta quanto a sua assinatura serão excluídos e você perderá permanentemente todos os dados armazenados na nuvem. Por favor, digite a sua senha abaixo.</string>
     <!-- Title of timeline tab in photos section -->
@@ -3848,11 +3836,11 @@
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">Você digitou a sua senha atual</string>
     <!-- Title of pop-up error message for taken down file -->
-    <string name="error_file_not_available">O arquivo não está mais disponível</string>
+    <string name="error_file_not_available">O arquivo já não está disponível</string>
     <!-- Body of pop-up error message for taken down file. -->
     <string name="error_takendown_file">Arquivo removido porque infringiu os nossos Termos de serviço.</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
-    <string name="error_download_takendown_file">Termos de Serviço infringidos</string>
+    <string name="error_download_takendown_file">Infração dos Termos de serviço</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_warning_no_picker">Este dispositivo não tem um aplicativo para selecionar pastas.</string>
     <!-- Next audios to be played in the audio playlist -->
@@ -4090,7 +4078,55 @@
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">Finalizar para todos</string>
     <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Converter em anfitrião</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">You’re the only host on the call. Do you want to assign another one before leaving?</string>
+    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">Você é o único anfitrião na chamada. Você quer selecionar outro antes de sair?</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Sim</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">Não</string>
+    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos_2">
+        <item quantity="one">e %1$d vídeo</item>
+        <item quantity="many">e %1$d de vídeos</item>
+        <item quantity="other">e %1$d vídeos</item>
+    </plurals>
+    <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
+    <plurals name="num_folders_num_files_2">
+        <item quantity="one">1 arquivo</item>
+        <item quantity="many">%1$d de arquivos</item>
+        <item quantity="other">%1$d arquivos</item>
+    </plurals>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
+    <string name="account_upgrade_storage_label">[A]%1$s[/A] de armazenamento</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] de cota de transferência</string>
+    <!-- Label of storage in My account section. -->
+    <string name="account_storage_label">Armazenamento</string>
+    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
+    <string name="account_choose_free_limited_transfer_quota">Cota de transferência [A]limitada[/A]</string>
+    <!-- Name of hots or hosts in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
+        <item quantity="one">Anfitrião: %s</item>
+        <item quantity="many">Anfitriões: %s</item>
+        <item quantity="other">Anfitriões: %s</item>
+    </plurals>
+    <!-- Number of participants in the call in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
+        <item quantity="one">Participante: %s</item>
+        <item quantity="many">Participantes: %s</item>
+        <item quantity="other">Participantes: %s</item>
+    </plurals>
+    <!-- Chat log message when the permissions for a user has been changed to read-onl -->
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%2$s[/A][B]mudou a permissão de [A]%1$s[/A][/B] a somente leitura</string>
+    <!-- Chat log message when the permissions for a user has been changed to standard -->
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%2$s[/A][B]mudou a permissão de [A]%1$s[/A][/B] a predeterminado</string>
+    <!-- Chat log message when the permissions for a user has been changed to host -->
+    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%2$s[/A][B]mudou a permissão de [A]%1$s[/A][/B] a anfitrião</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s mudou a permissão de %1$s a somente leitura</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s mudou a permissão de %1$s a predeterminado</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s mudou a permissão de %1$s a anfitrião</string>
 </resources>
