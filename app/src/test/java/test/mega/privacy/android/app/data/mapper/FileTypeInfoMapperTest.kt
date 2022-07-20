@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import nz.mega.sdk.MegaNode
 import org.junit.Test
@@ -37,7 +38,7 @@ class FileTypeInfoMapperTest {
         val expectedExtension = "txt"
         val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
 
-        assertThat(underTest(node) { "type" }?.extension).isEqualTo(expectedExtension)
+        assertThat(underTest(node) { "type" }.extension).isEqualTo(expectedExtension)
     }
 
     @Test
@@ -84,10 +85,7 @@ class FileTypeInfoMapperTest {
         val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
-            UrlFileTypeInfo(
-                type = expectedMimeType,
-                extension = expectedExtension
-            )
+            UrlFileTypeInfo
         )
     }
 
@@ -266,6 +264,34 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             UnknownFileTypeInfo(
+                type = expectedMimeType,
+                extension = expectedExtension
+            )
+        )
+    }
+
+    @Test
+    fun `test that video files are mapped to the correct type`() {
+        val expectedExtension = "mp4"
+        val expectedMimeType = "video/mp4"
+        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+
+        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+            VideoFileTypeInfo(
+                type = expectedMimeType,
+                extension = expectedExtension
+            )
+        )
+    }
+
+    @Test
+    fun `test that vob files are mapped to video type`() {
+        val expectedExtension = "vob"
+        val expectedMimeType = "unknown type"
+        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+
+        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+            VideoFileTypeInfo(
                 type = expectedMimeType,
                 extension = expectedExtension
             )
