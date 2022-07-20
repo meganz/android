@@ -37,7 +37,7 @@ class FileTypeInfoMapperTest {
         val expectedExtension = "txt"
         val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
 
-        assertThat(underTest(node) { "type" }?.extension).isEqualTo(expectedExtension)
+        assertThat(underTest(node) { "type" }.extension).isEqualTo(expectedExtension)
     }
 
     @Test
