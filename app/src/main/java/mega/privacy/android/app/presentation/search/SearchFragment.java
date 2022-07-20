@@ -95,6 +95,7 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
+import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -112,6 +113,7 @@ public class SearchFragment extends RotatableFragment {
 
     private ManagerViewModel managerViewModel;
     private IncomingSharesViewModel incomingSharesViewModel;
+    private OutgoingSharesViewModel outgoingSharesViewModel;
     private SearchViewModel viewModel;
 
     @Inject
@@ -523,6 +525,7 @@ public class SearchFragment extends RotatableFragment {
 
         managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
         incomingSharesViewModel = new ViewModelProvider(requireActivity()).get(IncomingSharesViewModel.class);
+        outgoingSharesViewModel = new ViewModelProvider(requireActivity()).get(OutgoingSharesViewModel.class);
         viewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
         viewModel.getUpdateNodes().observe(getViewLifecycleOwner(),
                 new EventObserver<>(nodes -> {
@@ -659,7 +662,7 @@ public class SearchFragment extends RotatableFragment {
                 managerViewModel.getState().getValue().getRubbishBinParentHandle(),
                 managerViewModel.getState().getValue().getInboxParentHandle(),
                 incomingSharesViewModel.getState().getValue().getIncomingParentHandle(),
-                managerViewModel.getState().getValue().getOutgoingParentHandle(),
+                outgoingSharesViewModel.getState().getValue().getOutgoingParentHandle(),
                 managerViewModel.getState().getValue().getLinksParentHandle(),
                 managerViewModel.getState().getValue().isFirstNavigationLevel()
         );

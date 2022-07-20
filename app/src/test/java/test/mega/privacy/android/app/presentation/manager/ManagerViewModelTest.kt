@@ -98,11 +98,9 @@ class ManagerViewModelTest {
             val initial = awaitItem()
             assertThat(initial.browserParentHandle).isEqualTo(-1L)
             assertThat(initial.rubbishBinParentHandle).isEqualTo(-1L)
-            assertThat(initial.outgoingParentHandle).isEqualTo(-1L)
             assertThat(initial.linksParentHandle).isEqualTo(-1L)
             assertThat(initial.inboxParentHandle).isEqualTo(-1L)
             assertThat(initial.isFirstNavigationLevel).isTrue()
-            assertThat(initial.outgoingTreeDepth).isEqualTo(0)
             assertThat(initial.linksTreeDepth).isEqualTo(0)
             assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
             assertThat(initial.transfersTab).isEqualTo(TransfersTab.NONE)
@@ -131,20 +129,6 @@ class ManagerViewModelTest {
                 val newValue = 123456789L
                 assertThat(awaitItem()).isEqualTo(-1L)
                 underTest.setRubbishBinParentHandle(newValue)
-                assertThat(awaitItem()).isEqualTo(newValue)
-            }
-    }
-
-
-    @Test
-    fun `test that outgoing parent handle is updated if new value provided`() = runTest {
-        setUnderTest()
-
-        underTest.state.map { it.outgoingParentHandle }.distinctUntilChanged()
-            .test {
-                val newValue = 123456789L
-                assertThat(awaitItem()).isEqualTo(-1L)
-                underTest.setOutgoingParentHandle(newValue)
                 assertThat(awaitItem()).isEqualTo(newValue)
             }
     }
@@ -189,46 +173,6 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that outgoing tree depth is increased when calling increaseOutgoingTreeDepth`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.outgoingTreeDepth }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isEqualTo(0)
-                    underTest.increaseOutgoingTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(1)
-                }
-        }
-
-    @Test
-    fun `test that outgoing tree depth is decreased when calling decreaseOutgoingTreeDepth`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.outgoingTreeDepth }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isEqualTo(0)
-                    underTest.increaseOutgoingTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(1)
-                    underTest.decreaseOutgoingTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(0)
-                }
-        }
-
-    @Test
-    fun `test that outgoing tree depth equals 0 if resetOutgoingTreeDepth`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.outgoingTreeDepth }.distinctUntilChanged()
-                .test {
-                    underTest.resetOutgoingTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(0)
-                }
-        }
-
-    @Test
     fun `test that links tree depth is increased when calling increaseLinksTreeDepth`() =
         runTest {
             setUnderTest()
@@ -246,12 +190,12 @@ class ManagerViewModelTest {
         runTest {
             setUnderTest()
 
-            underTest.state.map { it.outgoingTreeDepth }.distinctUntilChanged()
+            underTest.state.map { it.linksTreeDepth }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(0)
-                    underTest.increaseOutgoingTreeDepth()
+                    underTest.increaseLinksTreeDepth()
                     assertThat(awaitItem()).isEqualTo(1)
-                    underTest.decreaseOutgoingTreeDepth()
+                    underTest.decreaseLinksTreeDepth()
                     assertThat(awaitItem()).isEqualTo(0)
                 }
         }
@@ -261,7 +205,7 @@ class ManagerViewModelTest {
         runTest {
             setUnderTest()
 
-            underTest.state.map { it.outgoingTreeDepth }.distinctUntilChanged()
+            underTest.state.map { it.linksTreeDepth }.distinctUntilChanged()
                 .test {
                     underTest.resetLinksTreeDepth()
                     assertThat(awaitItem()).isEqualTo(0)
