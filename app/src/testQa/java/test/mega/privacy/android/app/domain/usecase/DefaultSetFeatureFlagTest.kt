@@ -2,8 +2,8 @@ package test.mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.repository.FeatureFlagRepository
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
+import mega.privacy.android.domain.repository.FeatureFlagRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock

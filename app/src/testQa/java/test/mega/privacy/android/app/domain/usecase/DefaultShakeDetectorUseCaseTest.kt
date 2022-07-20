@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.usecase.DefaultShakeDetectorUseCase
 import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
 import mega.privacy.android.app.domain.usecase.ShakeDetectorUseCase
-import mega.privacy.android.app.presentation.featureflag.model.ShakeEvent
+import mega.privacy.android.app.domain.model.ShakeEvent
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock

@@ -1,7 +1,7 @@
 package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.app.presentation.featureflag.model.ShakeEvent
+import mega.privacy.android.app.domain.model.ShakeEvent
 
 /**
  * Repository to handle interaction to gateway

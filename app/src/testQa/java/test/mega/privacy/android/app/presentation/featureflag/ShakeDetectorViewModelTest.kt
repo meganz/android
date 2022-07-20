@@ -11,7 +11,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.ShakeDetectorUseCase
 import mega.privacy.android.app.domain.usecase.VibrateDeviceUseCase
 import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
-import mega.privacy.android.app.presentation.featureflag.model.ShakeEvent
+import mega.privacy.android.app.domain.model.ShakeEvent
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock

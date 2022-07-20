@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.featureflag.model
+package mega.privacy.android.app.domain.model
 
 import mega.privacy.android.domain.entity.FeatureFlag
 

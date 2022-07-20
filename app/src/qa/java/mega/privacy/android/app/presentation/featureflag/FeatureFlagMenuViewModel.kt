@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
-import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagState
+import mega.privacy.android.app.domain.model.FeatureFlagState
 import javax.inject.Inject
 
 /**

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import mega.privacy.android.app.data.gateway.MotionSensorGateway
 import mega.privacy.android.app.data.gateway.VibratorGateway
 import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
-import mega.privacy.android.app.presentation.featureflag.model.ShakeEvent
+import mega.privacy.android.app.domain.model.ShakeEvent
 import javax.inject.Inject
 
 /**
