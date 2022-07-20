@@ -131,6 +131,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.interfaces.ActivityLauncher;

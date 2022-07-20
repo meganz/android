@@ -156,7 +156,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         toolbarTitle = meetingActivity.binding.titleToolbar
         toolbarTitle.apply {
             text = StringResourcesUtils.getString(R.string.assign_moderator)
-                .uppercase(Locale.getDefault())
 
             setTextColor(ContextCompat.getColor(requireContext(), R.color.black_white))
         }
@@ -313,18 +312,14 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
         disableLocalCamera()
         Timber.d("Leave meeting")
-        inMeetingViewModel.leaveMeeting()
+        inMeetingViewModel.hangCall()
     }
 
     /**
      * Method to control how the meeting activity should finish correctly
      */
     fun finishActivity() {
-        if (inMeetingViewModel.amIAGuest()) {
-            inMeetingViewModel.finishActivityAsGuest(meetingActivity)
-        } else {
-            sharedModel.clickEndCall()
-        }
+        sharedModel.clickEndCall()
     }
 
     /**

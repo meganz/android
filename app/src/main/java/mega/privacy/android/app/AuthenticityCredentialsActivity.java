@@ -117,8 +117,8 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
         aB.setElevation(0);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
-        tB.setTitle(getString(R.string.authenticity_credentials_label).toUpperCase());
-        setTitle(getString(R.string.authenticity_credentials_label).toUpperCase());
+        tB.setTitle(getString(R.string.authenticity_credentials_label));
+        setTitle(getString(R.string.authenticity_credentials_label));
 
         authenticityCredentialsLayout = findViewById(R.id.authenticity_credentials_layout);
         scrollView = findViewById(R.id.credentials_scrollview);

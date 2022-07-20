@@ -5,24 +5,26 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.facade.AccountInfoFacade
+import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.facade.MegaApiFacade
+import mega.privacy.android.app.data.facade.MegaApiFolderFacade
 import mega.privacy.android.app.data.facade.MegaChatApiFacade
 import mega.privacy.android.app.data.facade.MegaLocalStorageFacade
-import mega.privacy.android.app.data.facade.AccountInfoWrapper
-import mega.privacy.android.app.data.facade.MegaApiFolderFacade
-import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.app.data.gateway.DeviceGateway
 import mega.privacy.android.app.data.gateway.FileCompressionGateway
 import mega.privacy.android.app.data.gateway.ZipFileCompressionGateway
+import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.app.data.preferences.AppPreferencesDatastore
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
+import mega.privacy.android.app.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.app.data.preferences.LoggingPreferencesDataStore
 
 /**
@@ -61,6 +63,9 @@ abstract class GatewayModule {
 
     @Binds
     abstract fun bindAppPreferencesGateway(implementation: AppPreferencesDatastore): AppPreferencesGateway
+
+    @Binds
+    abstract fun bindFeatureFlagPreferencesGateway(implementation: FeatureFlagPreferencesDataStore): FeatureFlagPreferencesGateway
 
     @Binds
     abstract fun bindDeviceGateway(implementation: AndroidDeviceGateway): DeviceGateway

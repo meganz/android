@@ -1,8 +1,8 @@
 package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.app.domain.entity.FolderVersionInfo
-import mega.privacy.android.app.domain.exception.MegaException
+import mega.privacy.android.domain.entity.FolderVersionInfo
+import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaNode
 
 /**
@@ -68,17 +68,17 @@ interface FilesRepository {
     suspend fun getCameraSortOrder(): Int
 
     /**
-     * Gets Inbox node.
+     * Checks if Inbox node has children.
      *
-     * @return The Inbox node if exists, null otherwise.
+     * @return True if Inbox has children, false otherwise.
      */
-    suspend fun getInboxNode(): MegaNode?
+    suspend fun hasInboxChildren(): Boolean
 
     /**
-     * Checks if the provided node has children.
+     * Downloads a file node in background.
      *
-     * @param node  The node to check.
-     * @return True if the node has children, false otherwise.
+     * @param node  File node to download.
+     * @return The local path of the downloaded file.
      */
-    suspend fun hasChildren(node: MegaNode): Boolean
+    suspend fun downloadBackgroundFile(node: MegaNode): String
 }

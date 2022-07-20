@@ -140,7 +140,6 @@ import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.di.MegaApiFolder;
-import mega.privacy.android.app.domain.usecase.InitialiseLogging;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
@@ -151,7 +150,6 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import mega.privacy.android.app.listeners.GlobalListener;
-import mega.privacy.android.app.logging.InitialiseLoggingUseCaseJavaWrapper;
 import mega.privacy.android.app.main.LoginActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.AccountController;
@@ -164,6 +162,7 @@ import mega.privacy.android.app.middlelayer.BuildFlavorHelper;
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter;
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.logging.InitialiseLoggingUseCaseJavaWrapper;
 import mega.privacy.android.app.presentation.theme.ThemeModeState;
 import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
@@ -171,6 +170,7 @@ import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams;
+import mega.privacy.android.domain.usecase.InitialiseLogging;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1317,7 +1317,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
             notificationManager.notify(NOTIFICATION_PUSH_CLOUD_DRIVE, notificationBuilder.build());
         } catch (Exception e) {
-            Timber.e("Exception", e);
+            Timber.e(e);
         }
     }
 
@@ -1413,7 +1413,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                     this.startActivity(tourIntent);
                 }
             }
-		} else if (request.getType() == MegaChatRequest.TYPE_PUSH_RECEIVED) {
+        } else if (request.getType() == MegaChatRequest.TYPE_PUSH_RECEIVED) {
             Timber.d("TYPE_PUSH_RECEIVED: %d__%s", e.getErrorCode(), e.getErrorString());
 
             //Temporary HMS code to show pushes until AND-13803 is resolved.
@@ -1429,13 +1429,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 }
             }
         } else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
-			chatManagement.removeJoiningChatId(request.getChatHandle());
-			chatManagement.removeJoiningChatId(request.getUserHandle());
-		} else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM
-				&& request.getUserHandle() == INVALID_HANDLE) {
-			chatManagement.removeLeavingChatId(request.getChatHandle());
-		}
-	}
+            chatManagement.removeJoiningChatId(request.getChatHandle());
+            chatManagement.removeJoiningChatId(request.getUserHandle());
+        } else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM
+                && request.getUserHandle() == INVALID_HANDLE) {
+            chatManagement.removeLeavingChatId(request.getChatHandle());
+        }
+    }
 
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {

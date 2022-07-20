@@ -1,9 +1,7 @@
 package mega.privacy.android.app.presentation.transfers
 
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import android.widget.RelativeLayout
@@ -105,6 +103,10 @@ open class TransfersManagementActivity : PasscodeActivity() {
         transfersViewModel.onTransfersInfoUpdate().observe(this) { (transferType, transfersInfo) ->
             transfersWidget?.update(transferType = transferType, transfersInfo = transfersInfo)
         }
+
+        transfersViewModel.onGetTransfersState().observe(this) { areAllTransfersPaused ->
+            transfersWidget?.updateState(areAllTransfersPaused)
+        }
     }
 
     /**
@@ -188,6 +190,10 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * @param transferType  Type of the transfer.
      */
     protected fun updateTransfersWidget(transferType: Int) {
+        if (transfersManagement.isProcessingTransfers || transfersManagement.isProcessingFolders) {
+            return
+        }
+
         transfersViewModel.checkTransfersInfo(transferType)
     }
 
@@ -290,7 +296,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Updates the state of the transfers widget.
      */
     fun updateTransfersWidgetState() {
-        transfersWidget?.updateState()
+        transfersViewModel.checkTransfersState()
     }
 
     /**

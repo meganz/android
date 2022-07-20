@@ -49,6 +49,10 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.20sp.White087">
+        <item name="android:textColor">@color/white_alpha_087</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.20sp.Orange400Orange300">
         <item name="android:textColor">@color/orange_400_orange_300</item>
     </style>
@@ -118,12 +122,6 @@
         <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="TextAppearance.Mega.Subtitle1.AccentColor.Variant1">
-        <item name="android:textAllCaps">true</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="fontFamily">sans-serif-medium</item>
-    </style>
-
     <style name="TextAppearance.Mega.Subtitle1.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
@@ -138,6 +136,11 @@
 
     <style name="TextAppearance.Mega.Subtitle1.White.20sp">
         <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.White.14spBold">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <!-- Roboto regular, 16sp, 0px, textColorSecondary, AllCaps=false -->
@@ -161,17 +164,18 @@
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Medium.AccentColor">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    .Medium.AccentColor
+
     <style name="TextAppearance.Mega.Subtitle1.Medium.Grey900White">
         <item name="android:textColor">@color/grey_900_white</item>
     </style>
 
-    <!-- Mainly for login/create account screen titles -->
-    <style name="TextAppearance.Mega.Subtitle1.Medium.AllCaps">
-        <item name="android:textAllCaps">true</item>
-    </style>
-
     <!-- For title in CollapsingToolbarLayout, text size must be lager than 16sp, otherwise maxLine=3 cannot take effect -->
-    <style name="TextAppearance.Mega.Subtitle1.Medium.AllCaps.Variant">
+    <style name="TextAppearance.Mega.Subtitle1.Medium.16_5sp">
         <item name="android:textSize">16.5sp</item>
     </style>
 
@@ -302,16 +306,29 @@
         <item name="android:textSize">15sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Normal.DarkGrey">
+        <item name="android:textColor">@color/dark_grey</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal.DarkGrey.14spBold">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal.White87">
+        <item name="android:textColor">@color/white_alpha_087</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal.White87.16sp">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.Secondary">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle2.AccentColor">
         <item name="android:textColor">?attr/colorSecondary</item>
-    </style>
-
-    <style name="TextAppearance.Mega.Subtitle2.AccentColor.AllCaps">
-        <item name="android:textAllCaps">true</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle2.PrimaryColor">
@@ -342,9 +359,13 @@
         <item name="android:textColor">@color/grey_087_white</item>
     </style>
 
-    <!--- 0.5px, Medium, AllCap -->
+    <!--- 0.5px, Medium -->
     <style name="TextAppearance.Mega.Subtitle2.Variant">
         <item name="android:letterSpacing">0.035714286</item>
+    </style>
+
+    <!--- 0.5px, Medium, AllCap -->
+    <style name="TextAppearance.Mega.Subtitle2.Variant.AllCaps">
         <item name="android:textAllCaps">true</item>
     </style>
 
@@ -556,7 +577,7 @@
 
     <!-- ================== Button ====================== -->
 
-    <!-- Medium, 14sp, 0px, textColorPrimary, AllCaps=true -->
+    <!-- Medium, 14sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Button" parent="TextAppearance.MaterialComponents.Button">
         <item name="android:textStyle">normal</item>
         <item name="android:letterSpacing">0</item>

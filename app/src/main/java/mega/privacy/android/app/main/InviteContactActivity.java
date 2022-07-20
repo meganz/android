@@ -212,7 +212,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         if (aB != null) {
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
-            aB.setTitle(getString(R.string.invite_contacts).toUpperCase());
+            aB.setTitle(getString(R.string.invite_contacts));
             setTitleAB();
         }
 
@@ -1153,7 +1153,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                         }
                     } else {
                         if (!fromAchievement) {
-                            showSnackbar(getString(R.string.number_correctly_invite_contact_request, numberToSend));
+                            showSnackbar(getQuantityString(R.plurals.number_correctly_invite_contact_request, numberToSend, numberToSend));
                         } else {
                             result.putExtra(KEY_SENT_NUMBER, numberSent);
                         }

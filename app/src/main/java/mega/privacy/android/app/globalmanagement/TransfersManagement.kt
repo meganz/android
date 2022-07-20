@@ -26,7 +26,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.components.transferWidget.TransfersWidget.Companion.NO_TYPE
-import mega.privacy.android.app.constants.BroadcastConstants.*
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH
 import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
 import mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS
@@ -48,8 +47,6 @@ import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.STAGE_TRANSFERRING_FILES
 import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
 import nz.mega.sdk.MegaTransfer.STATE_PAUSED
-import nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD
-import nz.mega.sdk.MegaTransfer.TYPE_UPLOAD
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -187,7 +184,7 @@ class TransfersManagement @Inject constructor(
 
     private val scanningTransfers = ArrayList<ScanningTransferData>()
     private var scanningTransfersToken: MegaCancelToken? = null
-    private var isProcessingFolders = false
+    var isProcessingFolders = false
     var isProcessingTransfers = false
     private var shouldBreakTransfersProcessing = false
 
@@ -213,16 +210,6 @@ class TransfersManagement @Inject constructor(
         isProcessingTransfers = false
         shouldBreakTransfersProcessing = false
     }
-
-    /**
-     * Checks if the queue of transfers is paused or all the current in-progress transfers are individually.
-     *
-     * @return True if the queue of transfers or all the current in-progress transfers are paused, false otherwise.
-     */
-    @Suppress("DEPRECATION")
-    fun areTransfersPaused(): Boolean =
-        megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD)
-                || megaApi.numPendingDownloads + megaApi.numPendingUploads == pausedTransfers.size
 
     /**
      * Removes a resumed transfer.

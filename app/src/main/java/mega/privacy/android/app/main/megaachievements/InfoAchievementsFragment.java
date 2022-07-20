@@ -15,13 +15,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -29,7 +29,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 import timber.log.Timber;
 
-public class InfoAchievementsFragment extends BaseFragment implements GetAchievementsListener.DataCallback {
+public class InfoAchievementsFragment extends Fragment implements GetAchievementsListener.DataCallback {
     ActionBar actionBar;
 
     ImageView icon;
@@ -65,8 +65,8 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
         }
         achievementType = arguments.getInt("achievementType");
 
-        if (Util.isDarkMode(context)) {
-            int backgroundColor = ColorUtils.getColorForElevation(context, 1f);
+        if (Util.isDarkMode(requireContext())) {
+            int backgroundColor = ColorUtils.getColorForElevation(requireContext(), 1f);
             v.findViewById(R.id.title_layout).setBackgroundColor(backgroundColor);
             v.findViewById(R.id.how_it_works_layout).setBackgroundColor(backgroundColor);
         }
@@ -86,7 +86,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
     }
 
     private void updateBarTitle() {
-        actionBar = ((AppCompatActivity) mActivity).getSupportActionBar();
+        actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
 
         if (actionBar == null) return;
         String title = "";
@@ -108,14 +108,14 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
                 break;
         }
 
-        actionBar.setTitle(title.toUpperCase(Locale.getDefault()));
+        actionBar.setTitle(title);
     }
 
     private void updateUI() {
         if (sFetcher == null) return;
         MegaAchievementsDetails details = sFetcher.getAchievementsDetails();
 
-        if (details == null || context == null) return;
+        if (details == null) return;
 
         long count = details.getAwardsCount();
         for (int i = 0; i < count; i++) {
@@ -148,28 +148,28 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
         if (achievementType == MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL) {
             long installAppStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
             long installAppTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
-            icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mobile_big));
+            icon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_install_mobile_big));
 
             if (awardId == -1) {
                 Timber.w("No award for this achievement");
                 checkIcon.setVisibility(View.GONE);
                 title.setText(StringResourcesUtils.getString(R.string.figures_achievements_text, getSizeString(installAppStorageValue)));
-                title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                title.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent));
                 sectionTitle.setVisibility(View.VISIBLE);
                 firstParagraph.setText(StringResourcesUtils.getString(R.string.paragraph_info_achievement_install_mobile_app, getSizeString(installAppStorageValue)));
                 secondParagraph.setVisibility(View.GONE);
             } else {
                 if (diffDays <= 15) {
-                    title.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-                    title.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
+                    title.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_600_red_300));
+                    title.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.expired_border));
                 } else {
-                    title.setBackground(ContextCompat.getDrawable(context, R.drawable.bonus_ts_border));
+                    title.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bonus_ts_border));
                 }
 
                 if (diffDays > 0) {
-                    title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
+                    title.setText(StringResourcesUtils.getString(R.string.expiration_date_for_achievements, diffDays));
                 } else {
-                    title.setText(context.getResources().getString(R.string.expired_label));
+                    title.setText(StringResourcesUtils.getString(R.string.expired_label));
                 }
 
                 long storageAppInstall = details.getRewardStorageByAwardId(awardId);
@@ -180,28 +180,28 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
         } else if (achievementType == MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
             long addPhoneStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
             long addPhoneTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
-            icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.il_verify_phone_drawer));
+            icon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.il_verify_phone_drawer));
 
             if (awardId == -1) {
                 Timber.d("No award for this achievement");
                 checkIcon.setVisibility(View.GONE);
                 title.setText(StringResourcesUtils.getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue)));
-                title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                title.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent));
                 sectionTitle.setVisibility(View.VISIBLE);
                 firstParagraph.setText(StringResourcesUtils.getString(R.string.paragraph_info_achievement_add_phone, getSizeString(addPhoneStorageValue)));
                 secondParagraph.setVisibility(View.GONE);
             } else {
                 if (diffDays <= 15) {
-                    title.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-                    title.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
+                    title.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_600_red_300));
+                    title.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.expired_border));
                 } else {
-                    title.setBackground(ContextCompat.getDrawable(context, R.drawable.bonus_ts_border));
+                    title.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bonus_ts_border));
                 }
 
                 if (diffDays > 0) {
-                    title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
+                    title.setText(StringResourcesUtils.getString(R.string.expiration_date_for_achievements, diffDays));
                 } else {
-                    title.setText(context.getResources().getString(R.string.expired_label));
+                    title.setText(StringResourcesUtils.getString(R.string.expired_label));
                 }
 
                 long storageAddPhone = details.getRewardStorageByAwardId(awardId);
@@ -212,28 +212,28 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
         } else if (achievementType == MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL) {
             long installDesktopStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
             long installDesktopTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
-            icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mega_big));
+            icon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_install_mega_big));
 
             if (awardId == -1) {
                 Timber.w("No award for this achievement");
                 checkIcon.setVisibility(View.GONE);
                 title.setText(StringResourcesUtils.getString(R.string.figures_achievements_text, getSizeString(installDesktopStorageValue)));
-                title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                title.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent));
                 sectionTitle.setVisibility(View.VISIBLE);
                 firstParagraph.setText(StringResourcesUtils.getString(R.string.paragraph_info_achievement_install_desktop, getSizeString(installDesktopStorageValue)));
                 secondParagraph.setVisibility(View.GONE);
             } else {
                 if (diffDays <= 15) {
-                    title.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-                    title.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
+                    title.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_600_red_300));
+                    title.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.expired_border));
                 } else {
-                    title.setBackground(ContextCompat.getDrawable(context, R.drawable.bonus_ts_border));
+                    title.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bonus_ts_border));
                 }
 
                 if (diffDays > 0) {
-                    title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
+                    title.setText(StringResourcesUtils.getString(R.string.expiration_date_for_achievements, diffDays));
                 } else {
-                    title.setText(context.getResources().getString(R.string.expired_label));
+                    title.setText(StringResourcesUtils.getString(R.string.expired_label));
                 }
 
                 long storageDesktopInstall = details.getRewardStorageByAwardId(awardId);
@@ -243,21 +243,21 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 
             }
         } else if (achievementType == MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME) {
-            icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_registration_big));
+            icon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_registration_big));
 //            long registrationStorageValue = achievementsActivity.megaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME);
 //            long registrationTransferValue = achievementsActivity.megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME);
 
             if (diffDays <= 15) {
-                title.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-                title.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
+                title.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_600_red_300));
+                title.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.expired_border));
             } else {
-                title.setBackground(ContextCompat.getDrawable(context, R.drawable.bonus_ts_border));
+                title.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bonus_ts_border));
             }
 
             if (diffDays > 0) {
-                title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
+                title.setText(StringResourcesUtils.getString(R.string.expiration_date_for_achievements, diffDays));
             } else {
-                title.setText(context.getResources().getString(R.string.expired_label));
+                title.setText(StringResourcesUtils.getString(R.string.expired_label));
             }
 
             long storageRegistration = details.getRewardStorageByAwardId(awardId);

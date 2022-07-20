@@ -94,13 +94,13 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.domain.entity.SyncStatus;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileStorageActivity;
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardUtils;
+import mega.privacy.android.domain.entity.SyncStatus;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 

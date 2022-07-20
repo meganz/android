@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.settings.chat.imagequality.model
 
-import mega.privacy.android.app.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.ChatImageQuality
 
 /**
  * Data class representing the state of the chat image quality setting.
@@ -10,5 +10,5 @@ import mega.privacy.android.app.domain.entity.ChatImageQuality
  */
 data class SettingsChatImageQualityState(
     val selectedQuality: ChatImageQuality? = null,
-    val options: List<ChatImageQuality> = ChatImageQuality.values().asList()
+    val options: List<ChatImageQuality> = ChatImageQuality.values().asList(),
 )

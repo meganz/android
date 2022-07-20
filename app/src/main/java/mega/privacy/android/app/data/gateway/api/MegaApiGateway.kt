@@ -2,6 +2,7 @@ package mega.privacy.android.app.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.data.model.GlobalUpdate
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -256,6 +257,14 @@ interface MegaApiGateway {
     fun handleToBase64(handle: Long): String
 
     /**
+     * Converts a Base64-encoded node handle to a handle.
+     *
+     * @param base64Handle Base64-encoded node handle.
+     * @return Node handle.
+     */
+    fun base64ToHandle(base64Handle: String): Long
+
+    /**
      * Cancel transfer
      *
      * @param transfer to be cancelled
@@ -326,4 +335,25 @@ interface MegaApiGateway {
      * @return List with transfers of the desired type.
      */
     suspend fun getTransfers(type: Int): List<MegaTransfer>
+
+    /**
+     * Starts a download.
+     *
+     * @param node        MegaNode that identifies the file or folder.
+     * @param localPath   Destination path for the file or folder.
+     * @param fileName    Custom file name for the file or folder in local destination
+     * @param appData     Custom app data to save in the MegaTransfer object.
+     * @param startFirst  Puts the transfer on top of the download queue.
+     * @param cancelToken MegaCancelToken to be able to cancel a folder/file download process.
+     * @param listener    MegaTransferListener to track this transfer.
+     */
+    fun startDownload(
+        node: MegaNode,
+        localPath: String,
+        fileName: String?,
+        appData: String?,
+        startFirst: Boolean,
+        cancelToken: MegaCancelToken?,
+        listener: MegaTransferListenerInterface?,
+    )
 }

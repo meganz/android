@@ -104,7 +104,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
-        aB.setTitle(StringResourcesUtils.getString(R.string.title_activity_maps).toUpperCase());
+        aB.setTitle(StringResourcesUtils.getString(R.string.title_activity_maps));
 
         ((ViewGroup) findViewById(R.id.parent_layout_maps)).getLayoutTransition().setDuration(500);
         ((ViewGroup) findViewById(R.id.parent_layout_maps)).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);

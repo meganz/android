@@ -65,6 +65,7 @@ import timber.log.Timber;
 public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MegaNode node = null;
+    private MegaNodeList nodeList = null;
     private AndroidMegaChatMessage message = null;
     private long chatId;
     private long messageId;
@@ -286,8 +287,8 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             }
         }
 
-        if (typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && megaChatMessage.getUserHandle() == megaChatApi.getMyUserHandle()) {
-            getNode();
+        if (typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+            getNode(megaChatMessage);
         } else {
             checkSeparatorsVisibility();
         }
@@ -496,36 +497,67 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     /**
      * Method to get the node related to the message
      */
-    private void getNode() {
-        getNodeUseCase.get(message.getMessage().getMegaNodeList().get(0).getHandle())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result, throwable) -> {
-                    if (throwable == null) {
-                        node = result;
-                    }
+    private void getNode(MegaChatMessage megaChatMessage) {
+        if (megaChatMessage.getUserHandle() == megaChatApi.getMyUserHandle()) {
+            getNodeUseCase.get(message.getMessage().getMegaNodeList().get(0).getHandle())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((result, throwable) -> {
+                        if (throwable == null) {
+                            node = result;
+                        }
 
-                    if (node == null) {
-                        optionOpenWith.setVisibility(View.GONE);
-                        optionForward.setVisibility(View.GONE);
-                        optionEdit.setVisibility(View.GONE);
-                        optionCopy.setVisibility(View.GONE);
-                        optionShare.setVisibility(View.GONE);
-                        optionViewContacts.setVisibility(View.GONE);
-                        optionInfoContacts.setVisibility(View.GONE);
-                        optionStartConversation.setVisibility(View.GONE);
-                        optionInviteContact.setVisibility(View.GONE);
-                        optionImport.setVisibility(View.GONE);
-                        optionDownload.setVisibility(View.GONE);
-                        optionSaveOffline.setVisibility(View.GONE);
-                        offlineSwitch.setVisibility(View.GONE);
-                    } else if (!chatC.isInAnonymousMode()) {
-                        offlineSwitch.setChecked(availableOffline(requireContext(), node));
-                        optionSaveOffline.setVisibility(View.VISIBLE);
-                    }
+                        if (node == null) {
+                            optionOpenWith.setVisibility(View.GONE);
+                            optionForward.setVisibility(View.GONE);
+                            optionEdit.setVisibility(View.GONE);
+                            optionCopy.setVisibility(View.GONE);
+                            optionShare.setVisibility(View.GONE);
+                            optionViewContacts.setVisibility(View.GONE);
+                            optionInfoContacts.setVisibility(View.GONE);
+                            optionStartConversation.setVisibility(View.GONE);
+                            optionInviteContact.setVisibility(View.GONE);
+                            optionImport.setVisibility(View.GONE);
+                            optionDownload.setVisibility(View.GONE);
+                            optionSaveOffline.setVisibility(View.GONE);
+                            offlineSwitch.setVisibility(View.GONE);
+                        } else if (!chatC.isInAnonymousMode()) {
+                            offlineSwitch.setChecked(availableOffline(requireContext(), node));
+                            optionSaveOffline.setVisibility(View.VISIBLE);
+                        }
 
-                    checkSeparatorsVisibility();
-                });
+                        checkSeparatorsVisibility();
+                    });
+        } else {
+            nodeList = megaChatMessage.getMegaNodeList();
+            if (nodeList == null || nodeList.size() == 0) {
+                Timber.w("NodeList is NULL or empty");
+                return;
+            }
+
+            node = handle == INVALID_HANDLE ? nodeList.get(0) : getNodeByHandle(handle);
+            if (node == null) {
+                Timber.w("Node is NULL");
+                return;
+            }
+        }
+    }
+
+    /**
+     * Get MegaNode
+     *
+     * @param handle The handle of the node
+     * @return The MegaNode
+     */
+    public MegaNode getNodeByHandle(long handle) {
+        for (int i = 0; i < nodeList.size(); i++) {
+            MegaNode node = nodeList.get(i);
+            if (node.getHandle() == handle) {
+                return node;
+            }
+        }
+
+        return null;
     }
 
     /**

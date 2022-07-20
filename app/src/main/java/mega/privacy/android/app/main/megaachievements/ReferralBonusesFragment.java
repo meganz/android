@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,19 +20,28 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.fragments.BaseFragment;
+import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import nz.mega.sdk.MegaApiAndroid;
 import timber.log.Timber;
 
-public class ReferralBonusesFragment extends BaseFragment implements OnClickListener
+@AndroidEntryPoint
+public class ReferralBonusesFragment extends Fragment implements OnClickListener
         , GetAchievementsListener.DataCallback {
     RelativeLayout parentRelativeLayout;
     RecyclerView recyclerView;
     LinearLayoutManager mLayoutManager;
     MegaReferralBonusesAdapter adapter;
+
+    @Inject
+    @MegaApi
+    MegaApiAndroid megaApi;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,8 +55,8 @@ public class ReferralBonusesFragment extends BaseFragment implements OnClickList
         parentRelativeLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_relative_layout);
 
         recyclerView = (RecyclerView) v.findViewById(R.id.referral_bonuses_recycler_view);
-        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
-        mLayoutManager = new LinearLayoutManager(context);
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
+        mLayoutManager = new LinearLayoutManager(requireContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -58,12 +68,9 @@ public class ReferralBonusesFragment extends BaseFragment implements OnClickList
         super.onActivityCreated(savedInstanceState);
 
         // Activity actionbar has been created which might be accessed by UpdateUI().
-        if (mActivity != null) {
-            ActionBar actionBar = ((AppCompatActivity) mActivity).getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses)
-                        .toUpperCase(Locale.getDefault()));
-            }
+        ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses));
         }
 
         // The root view has been created, fill it with the data when data ready
@@ -89,13 +96,14 @@ public class ReferralBonusesFragment extends BaseFragment implements OnClickList
     }
 
     private void updateUI() {
-        if (context == null || sFetcher == null) return;
+        requireContext();
+        if (sFetcher == null) return;
 
         ArrayList<ReferralBonus> bonuses = sFetcher.getReferralBonuses();
         if (bonuses.size() == 0) return;
 
         if (adapter == null) {
-            adapter = new MegaReferralBonusesAdapter(context, this, bonuses, recyclerView);
+            adapter = new MegaReferralBonusesAdapter(requireActivity(), this, bonuses, recyclerView);
         } else {
             adapter.setReferralBonuses(bonuses);
         }

@@ -323,7 +323,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
             v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
             mLayoutManager = new LinearLayoutManager(context);
             recyclerView.setLayoutManager(mLayoutManager);
-            recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
+            recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getResources().getDisplayMetrics()));
         } else {
             recyclerView = v.findViewById(R.id.file_grid_view_browser);
             v.findViewById(R.id.file_list_view_browser).setVisibility(View.GONE);

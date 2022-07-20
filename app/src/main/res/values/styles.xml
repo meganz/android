@@ -7,11 +7,13 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button</item>
         <item name="backgroundTint">@color/mega_btn_bg_color_selector</item>
         <item name="android:textColor">@color/mega_btn_text_color_selector</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="ThemeOverlay.Mega.Button" parent="">
         <item name="colorPrimary">?attr/colorSecondary</item>
         <item name="colorOnPrimary">?attr/colorOnSecondary</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <!-- Text button -->
@@ -19,10 +21,12 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="ThemeOverlay.Mega.Button.TextButton" parent="">
         <item name="colorPrimary">?attr/colorSecondary</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="Widget.Mega.Button.TextButton.Red">
@@ -40,6 +44,7 @@
         <item name="android:textColor">@color/mega_text_btn_text_color_selector</item>
         <item name="strokeColor">@color/mega_text_btn_text_color_selector</item>
         <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="Widget.Mega.NumberPicker" parent="">
@@ -111,10 +116,12 @@
 
     <style name="Widget.Mega.NegativeButton.Dialog" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="Widget.Mega.PositiveButton.Dialog" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <!-- Chip -->
@@ -124,7 +131,6 @@
         <item name="android:textColor">@color/white</item>
         <item name="android:checkable">false</item>
         <item name="android:clickable">false</item>
-        <item name="android:textAllCaps">true</item>
         <item name="chipMinTouchTargetSize">0dp</item>
         <item name="chipStartPadding">0dp</item>
         <item name="chipEndPadding">0dp</item>
@@ -188,6 +194,7 @@
 
     <style name="Widget.Mega.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
         <item name="android:textColor">@color/teal_200_teal_300</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <!--- SeekBar white, chat room own voice clip -->
@@ -260,6 +267,7 @@
         <item name="android:paddingEnd">@dimen/btn_padding_horizontal</item>
         <item name="android:paddingTop">@dimen/btn_transparent_padding_vertical</item>
         <item name="android:paddingBottom">@dimen/btn_transparent_padding_vertical</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <!--  Same in dark mode and light mode  -->
@@ -273,6 +281,7 @@
         <item name="android:paddingEnd">@dimen/btn_21_padding_horizontal</item>
         <item name="android:paddingTop">@dimen/btn_transparent_padding_vertical</item>
         <item name="android:paddingBottom">@dimen/btn_transparent_padding_vertical</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <!-- For date picker dialog -->
@@ -588,6 +597,28 @@
         <item name="android:paddingEnd">@dimen/bottom_sheet_item_padding_horizontal</item>
         <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
         <item name="drawableTint">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="BottomSheetCallPositiveItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/bottom_sheet_item_height</item>
+        <item name="android:drawablePadding">@dimen/bottom_sheet_item_drawable_padding</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.White.14spBold</item>
+        <item name="android:background">@drawable/border_button_in_bottom_panel</item>
+    </style>
+
+    <style name="BottomSheetCallNegativeItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/bottom_sheet_item_height</item>
+        <item name="android:drawablePadding">@dimen/bottom_sheet_item_drawable_padding</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle2.Normal.DarkGrey.14spBold</item>
+        <item name="android:background">@color/red_600</item>
     </style>
 
     <style name="BottomSheetItemDivider">

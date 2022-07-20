@@ -23,7 +23,6 @@ import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
@@ -34,6 +33,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode

@@ -110,7 +110,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
-import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -476,7 +476,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
             if (savedInstanceState.getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
                 newFolderDialog = showNewFolderDialog(this, this,
-                        savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT));
+                        getCurrentParentNode(), savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT));
             }
         } else {
             Timber.d("Bundle is NULL");
@@ -634,7 +634,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 //Just show Cloud Drive, no INCOMING tab , no need of tabhost
                 mode = SELECT;
 
-                aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
+                aB.setTitle(getString(R.string.title_share_folder_explorer));
                 setView(CLOUD_TAB, false, -1);
                 tabShown = NO_TABS;
 
@@ -645,7 +645,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 selectFile = true;
                 multiselect = true;
 
-                aB.setTitle(getResources().getQuantityString(R.plurals.plural_select_file, 10).toUpperCase());
+                aB.setTitle(getResources().getQuantityString(R.plurals.plural_select_file, 10));
                 setView(SHOW_TABS, false, CHAT_TAB);
             } else if (intent.getAction().equals(ACTION_PICK_MOVE_FOLDER)) {
                 Timber.d("ACTION_PICK_MOVE_FOLDER");
@@ -657,7 +657,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                     parentMoveCopy = megaApi.getParentNode(moveNode);
                 }
 
-                aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
+                aB.setTitle(getString(R.string.title_share_folder_explorer));
                 setView(SHOW_TABS, false, CHAT_TAB);
             } else if (intent.getAction().equals(ACTION_PICK_COPY_FOLDER)) {
                 Timber.d("ACTION_PICK_COPY_FOLDER");
@@ -669,27 +669,27 @@ public class FileExplorerActivity extends TransfersManagementActivity
                     parentMoveCopy = megaApi.getParentNode(copyNode);
                 }
 
-                aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
+                aB.setTitle(getString(R.string.title_share_folder_explorer));
                 setView(SHOW_TABS, false, CHAT_TAB);
             } else if (intent.getAction().equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC)) {
                 Timber.d("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC");
                 mode = SELECT_CAMERA_FOLDER;
 
-                aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
+                aB.setTitle(getString(R.string.title_share_folder_explorer));
                 setView(SHOW_TABS, false, CHAT_TAB);
             } else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)) {
                 mode = IMPORT;
 
                 importChatHandles = intent.getLongArrayExtra("HANDLES_IMPORT_CHAT");
 
-                aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
+                aB.setTitle(getString(R.string.title_share_folder_explorer));
                 setView(SHOW_TABS, false, CHAT_TAB);
             } else if ((intent.getAction().equals(ACTION_UPLOAD_TO_CLOUD))) {
                 Timber.d("action = UPLOAD to Cloud Drive");
                 mode = UPLOAD;
                 selectFile = false;
 
-                aB.setTitle(getString(R.string.title_cloud_explorer).toUpperCase());
+                aB.setTitle(getString(R.string.title_cloud_explorer));
                 setView(CLOUD_TAB, false, -1);
                 tabShown = NO_TABS;
             } else if ((intent.getAction().equals(ACTION_SAVE_TO_CLOUD))) {
@@ -708,10 +708,10 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 isChatFirst = isChatFirst();
 
                 if (isChatFirst) {
-                    aB.setTitle(getString(R.string.title_file_explorer_send_link).toUpperCase());
+                    aB.setTitle(getString(R.string.title_file_explorer_send_link));
                     setView(SHOW_TABS, true, INCOMING_TAB);
                 } else {
-                    aB.setTitle(getString(R.string.title_upload_explorer).toUpperCase());
+                    aB.setTitle(getString(R.string.title_upload_explorer));
                     importFileF = true;
                     action = intent.getAction();
 
@@ -1208,38 +1208,38 @@ public class FileExplorerActivity extends TransfersManagementActivity
         if (mode == SELECT) {
             if (selectFile) {
                 if (multiselect) {
-                    aB.setTitle(getResources().getQuantityString(R.plurals.plural_select_file, 10).toUpperCase());
+                    aB.setTitle(getResources().getQuantityString(R.plurals.plural_select_file, 10));
                 } else {
-                    aB.setTitle(getResources().getQuantityString(R.plurals.plural_select_file, 1).toUpperCase());
+                    aB.setTitle(getResources().getQuantityString(R.plurals.plural_select_file, 1));
                 }
             } else {
-                aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
+                aB.setTitle(getString(R.string.title_share_folder_explorer));
             }
         } else if (mode == MOVE || mode == COPY || mode == SELECT_CAMERA_FOLDER || mode == IMPORT) {
-            aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
+            aB.setTitle(getString(R.string.title_share_folder_explorer));
         } else if (mode == UPLOAD && !importFileF) {
-            aB.setTitle(getString(R.string.title_file_explorer_send_link).toUpperCase());
+            aB.setTitle(getString(R.string.title_file_explorer_send_link));
         } else if (mode == SAVE) {
-            aB.setTitle(StringResourcesUtils.getString(R.string.section_cloud_drive).toUpperCase());
+            aB.setTitle(StringResourcesUtils.getString(R.string.section_cloud_drive));
         } else if (mode == UPLOAD && importFileF) {
             if (importFragmentSelected == -1) {
                 return;
             }
             switch (importFragmentSelected) {
                 case CLOUD_FRAGMENT: {
-                    aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
+                    aB.setTitle(getString(R.string.section_cloud_drive));
                     break;
                 }
                 case INCOMING_FRAGMENT: {
-                    aB.setTitle(getString(R.string.title_incoming_shares_explorer).toUpperCase());
+                    aB.setTitle(getString(R.string.title_incoming_shares_explorer));
                     break;
                 }
                 case CHAT_FRAGMENT: {
-                    aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
+                    aB.setTitle(getString(R.string.title_chat_explorer));
                     break;
                 }
                 case IMPORT_FRAGMENT: {
-                    aB.setTitle(getString(R.string.title_upload_explorer).toUpperCase());
+                    aB.setTitle(getString(R.string.title_upload_explorer));
                     break;
                 }
             }
@@ -1302,7 +1302,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                         tabShown = CHAT_TAB;
                     }
 
-                    aB.setTitle(getString(R.string.title_file_explorer_send_link).toUpperCase());
+                    aB.setTitle(getString(R.string.title_file_explorer_send_link));
                 } else if (f instanceof CloudDriveExplorerFragment) {
                     if (tabShown != NO_TABS) {
                         tabShown = CLOUD_TAB;
@@ -1345,7 +1345,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                         tabShown = CHAT_TAB;
                     }
 
-                    aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
+                    aB.setTitle(getString(R.string.title_chat_explorer));
                 } else if (f instanceof IncomingSharesExplorerFragment) {
                     if (tabShown != NO_TABS) {
                         tabShown = INCOMING_TAB;
@@ -2012,6 +2012,24 @@ public class FileExplorerActivity extends TransfersManagementActivity
         //No update needed
     }
 
+    /**
+     * Get current parent node.
+     *
+     * @return  The current parent node.
+     */
+    private MegaNode getCurrentParentNode() {
+        cDriveExplorer = getCloudExplorerFragment();
+        iSharesExplorer = getIncomingExplorerFragment();
+
+        if (isCloudVisible()) {
+            parentHandle = cDriveExplorer.getParentHandle();
+        } else if (isIncomingVisible()) {
+            parentHandle = iSharesExplorer.getParentHandle();
+        }
+
+        return megaApi.getNodeByHandle(parentHandle);
+    }
+
     @Override
     public void createFolder(@NotNull String title) {
 
@@ -2027,16 +2045,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
         long parentHandle = -1;
 
-        cDriveExplorer = getCloudExplorerFragment();
-        iSharesExplorer = getIncomingExplorerFragment();
-
-        if (isCloudVisible()) {
-            parentHandle = cDriveExplorer.getParentHandle();
-        } else if (isIncomingVisible()) {
-            parentHandle = iSharesExplorer.getParentHandle();
-        }
-
-        MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+        MegaNode parentNode = getCurrentParentNode();
 
         if (parentNode != null) {
             Timber.d("parentNode != null: %s", parentNode.getName());
@@ -2284,7 +2293,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 break;
             }
             case R.id.cab_menu_create_folder: {
-                newFolderDialog = showNewFolderDialog(this, this, null);
+                newFolderDialog = showNewFolderDialog(this, this,
+                        getCurrentParentNode(), null);
                 break;
             }
             case R.id.cab_menu_new_chat: {

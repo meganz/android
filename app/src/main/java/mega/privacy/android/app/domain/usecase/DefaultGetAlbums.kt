@@ -1,12 +1,14 @@
 package mega.privacy.android.app.domain.usecase
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.app.domain.entity.Album
-import mega.privacy.android.app.domain.entity.FavouriteInfo
-import mega.privacy.android.app.domain.repository.AlbumsRepository
+import mega.privacy.android.domain.entity.Album
+import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.repository.AlbumsRepository
+import mega.privacy.android.domain.usecase.GetAlbums
+import mega.privacy.android.domain.usecase.GetAllFavorites
+import mega.privacy.android.domain.usecase.GetThumbnail
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -23,10 +25,7 @@ class DefaultGetAlbums @Inject constructor(
     private val getThumbnail: GetThumbnail,
     private val albumsRepository: AlbumsRepository,
 ) : GetAlbums {
-
-    override fun invoke(): Flow<List<Album>> {
-        return getFavouritesFlow()
-    }
+    override fun invoke() = getFavouritesFlow()
 
     /**
      * Get Favourites Flow
@@ -75,5 +74,4 @@ class DefaultGetAlbums @Inject constructor(
 
     private suspend fun inSyncFolder(parentId: Long): Boolean =
         parentId == albumsRepository.getCameraUploadFolderId() || parentId == albumsRepository.getMediaUploadFolderId()
-
 }

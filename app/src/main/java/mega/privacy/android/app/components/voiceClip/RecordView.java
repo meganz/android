@@ -132,7 +132,7 @@ public class RecordView extends RelativeLayout {
         startTime = 0;
         isSwiped = false;
         slideToCancel = view.findViewById(R.id.slide_to_cancel);
-        slideToCancel.setText(context.getString(R.string.slide_to_cancel).toUpperCase(Locale.getDefault()));
+        slideToCancel.setText(context.getString(R.string.slide_to_cancel));
         slideToCancelLayout = view.findViewById(R.id.shimmer_layout);
         slideToCancelLayout.setVisibility(GONE);
 
@@ -153,7 +153,7 @@ public class RecordView extends RelativeLayout {
         });
 
         textCancelRecord = view.findViewById(R.id.text_cancel_record);
-        textCancelRecord.setText(context.getString(R.string.button_cancel).toUpperCase(Locale.getDefault()));
+        textCancelRecord.setText(context.getString(R.string.button_cancel));
 
         animJump = AnimationUtils.loadAnimation(getContext(), R.anim.jump);
         animJumpFast = AnimationUtils.loadAnimation(getContext(), R.anim.jump_fast);

@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.usecase.DefaultGetFolderVersionInfo
-import mega.privacy.android.app.domain.usecase.GetFolderVersionInfo
+import mega.privacy.android.domain.usecase.GetFolderVersionInfo
 
 @Module
 @InstallIn(ViewModelComponent::class)
