@@ -9,6 +9,7 @@ import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
+import nz.mega.sdk.MegaUserAlert
 
 /**
  * Mega api gateway
@@ -371,4 +372,11 @@ interface MegaApiGateway {
      * @return Mega user associated with the email address
      */
     suspend fun getContact(email: String): MegaUser?
+
+    /**
+     * Get user alerts
+     *
+     * @return all user alerts
+     */
+    suspend fun getUserAlerts(): List<MegaUserAlert>
 }

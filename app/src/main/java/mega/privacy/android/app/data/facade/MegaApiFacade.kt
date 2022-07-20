@@ -238,6 +238,8 @@ class MegaApiFacade @Inject constructor(
 
     override suspend fun getContact(email: String): MegaUser? = megaApi.getContact(email)
 
+    override suspend fun getUserAlerts(): List<MegaUserAlert> = megaApi.userAlerts
+
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
     }
