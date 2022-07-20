@@ -408,16 +408,16 @@
     <string name="context_no_renamed">エラー。名前が変更されていません</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">正常にコピーされました</string>
-    <!-- error message when sending a node to Inbox -->
-    <string name="context_no_sent_node">エラー。受信トレイに送信されませんでした</string>
     <!-- error message -->
     <string name="context_no_copied">エラー。コピーされていません</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">目的のフォルダを選択してください</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">正常に移動しました</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved">%d項目が正常に移動しました。</string>
+    <!-- success message when moving a node (file/folder) -->
+    <plurals name="number_correctly_moved">
+        <item quantity="other">%d項目移動しました</item>
+    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d項目が正常に送信されませんでした</string>
     <!-- success message when moving a node -->
@@ -460,8 +460,6 @@
     <string name="number_contact_removed">%d件の連絡先が正常に削除されました</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">%d件の連絡先は削除されませんでした</string>
-    <!-- success message when sending a file to a contact -->
-    <string name="context_correctly_copied_contact">以下の連絡先に正常に送信されました：</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">ごみ箱が正常に空になりました</string>
     <!-- error message when emptying the RB -->
@@ -945,8 +943,6 @@
     <string name="file_link_unavaible_delete_account">この関連付けられたユーザーアカウントは、当社のご利用規約に複数違反したため、終了しました。</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">このフォルダリンク用の指定された復号キーは無効です。</string>
-    <!-- Word to indicate the limited bandwidth of the free accounts -->
-    <string name="limited_bandwith">制限付き</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">チャット</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -962,15 +958,19 @@
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
     <string name="remove_contact_shared_folder">連絡先の%sさんは共有フォルダから削除されます。</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
-    <string name="remove_multiple_contacts_shared_folder">%d件の連絡先が共有フォルダから削除されます。</string>
+    <plurals name="remove_multiple_contacts_shared_folder">
+        <item quantity="other">%d件の連絡先が共有フォルダから削除されます。</item>
+    </plurals>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">%d件の連絡先用のアクセス権限を更新できませんでした</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">携帯電話からの連絡先を読み込み中&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d件の要求がすでに送信されています。</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">%d件の招待要求が正常に送信されました。</string>
+    <!-- success message when inviting multiple contacts -->
+    <plurals name="number_correctly_invite_contact_request">
+        <item quantity="other">%d個の招待状が送信されました</item>
+    </plurals>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d件の招待要求は正常に送信されましたが、%2$d件の要求は送信されませんでした。</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -1084,7 +1084,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">標準</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">Host</string>
+    <string name="administrator_permission_label_participants_panel">主催者</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">（編集済み）</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -1175,10 +1175,6 @@
     <string name="more_users_typing">%1$s [A]さんたちが入力しています[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">詳細</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="label_storage_upgrade_account">ストレージ</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_upgrade_account">転送容量</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">ストレージスペース</string>
     <!-- Confirmation message before removing something from the Offline section. -->
@@ -1555,7 +1551,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">無効な文字です</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">次の文字は許可されていません： ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">次の文字は許可されていません： ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">ファイル名を空にすることはできません。</item>
@@ -1720,8 +1716,6 @@
     <string name="account_suspended_breache_ToS">お客様のアカウントは、MEGAのご利用規約（第15条を含むがこれに限定されない）に違反したために終了しました。</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">ファイルを読み込んでいます</string>
-    <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
-    <string name="file_storage_empty_folder">ファイルがありません</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1847,10 +1841,6 @@
     <string name="recovery_key_bottom_sheet">回復キー</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">ファイルシステムに保存</string>
-    <!-- text of the label to show that you have messages unread in the chat conversation -->
-    <string name="message_jump_latest">最新項目にジャンプ</string>
-    <!-- text of the label to show that you have new messages in the chat conversation -->
-    <string name="message_new_messages">新しいメッセージ</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">着信</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
@@ -2393,9 +2383,9 @@
     <plurals name="num_folders_with_parameter">
         <item quantity="other">%d個のフォルダ</item>
     </plurals>
-    <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="other">%1$d個のフォルダ・%2$d個のファイル</item>
+        <item quantity="other">%1$d個のフォルダ&#160;・&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B]さんが%2$sと%3$sを追加しました[/B]</string>
@@ -2665,8 +2655,6 @@
     <string name="alert_enter_group_name">チャットリンクを作成するには、グループに名前を付ける必要があります。</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">連絡先を招待し、MEGAの暗号化チャットで安全にチャットを始めましょう。</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="recent_chat_empty_text">エンドツーエンドの暗号化を使用して、ご連絡先と安全にチャットを開始してください</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
     <string name="invite_contacts_to_start_chat_text_message">こんにちは！　私とMEGAでセキュアな会話をして、20&#160;GBの無料クラウドストレージを獲得しましょう。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
@@ -2706,11 +2694,17 @@
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$sとさらに%2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
-    <string name="title_media_bucket_only_images">%d個の画像</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="other">%d個の画像</item>
+    </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
-    <string name="title_media_bucket_only_videos">%d個の動画</string>
-    <!-- Title of a media recents bucket that contains some images and some videos -->
-    <string name="title_media_bucket_images_and_videos">%1$d個の画像と%2$d個の動画</string>
+    <plurals name="title_media_bucket_only_videos">
+        <item quantity="other">%d個の動画</item>
+    </plurals>
+    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos">
+        <item quantity="other">%1$d個の画像&#160;</item>
+    </plurals>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">%d個の画像と1個の動画</string>
     <!-- Title of a media recents bucket that contains an image and some videos -->
@@ -2836,7 +2830,9 @@
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">%1$sに</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <string name="alert_remove_several_shares">これらの%1$d個のフォルダの共有を停止してもよろしいですか？</string>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">これら%1$d個のフォルダの共有を解除しますか？</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">ダウンロード場所</string>
     <!-- Text asking confirmation for download location -->
@@ -3321,8 +3317,6 @@
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">オフラインファイルをすべて消去しますか？</string>
-    <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">ここにいるのはあなただけです</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">ミーティング</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3372,25 +3366,13 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">メインビューで表示</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Make host</string>
-    <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">今すぐミーティングから抜けますか？</string>
-    <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">No host</string>
-    <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
+    <string name="make_moderator">主催者を設定</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Make host</string>
-    <!-- leave anyway option when the moderator leave meeting-->
-    <string name="leave_anyway">とにかく離れる</string>
+    <string name="assign_moderator">主催者を設定</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
+    <string name="pick_new_moderator_message">新しい主催者を1人または複数任命してください。</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">ミーティング名の変更</string>
-    <!-- The number of participants in the meeting on meeting info page-->
-    <string name="info_participants_number">参加者：%d人</string>
-    <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">ミーティングリンク</string>
     <!-- Subtitle of the meeting screen-->
@@ -3401,8 +3383,6 @@
     <string name="paste_meeting_link_guest_dialog_title">ミーティングに招待されています。</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">送られてきたミーティングのリンクをタップするか、こちらに貼り付けてください</string>
-    <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">接続不良</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">ミーティングが終了しました</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -3424,7 +3404,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">当社の新しい暗号化されたミーティング機能で、MEGAミーティングを素早くセットアップ</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">You are the new host.</string>
+    <string name="be_new_moderator">あなたは新しい主催者です</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">ミーティングのリンクをコピーしました。</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3589,8 +3569,6 @@
     <string name="upload_files">ファイルをアップロード</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">フォルダをアップロード</string>
-    <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">アップロードをキャンセルしますか？</string>
     <!-- Title of the Payments screen -->
     <string name="payment">お支払い</string>
     <!-- Label indicating payment methods -->
@@ -3615,12 +3593,8 @@
     <string name="pro_iii_monthly">Pro III 月間</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III 年間</string>
-    <!-- Action button which will cancel uploads. -->
-    <string name="action_cancel_upload">アップロードをキャンセル</string>
-    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
-    <string name="action_do_not_cancel">キャンセルしない</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Remove host</string>
+    <string name="remove_moderator">主催者として削除</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">新規サブスクリプションをご購入いたしますか？</string>
     <!-- Text of buy new subscription button -->
@@ -3902,7 +3876,47 @@
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">全員に対して終了</string>
     <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">主催者を設定</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">You’re the only host on the call. Do you want to assign another one before leaving?</string>
+    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">通話の主催者はあなただけです。通話から離れる前に別の主催者を任命しますか？</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">はい</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">いいえ</string>
+    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos_2">
+        <item quantity="other">と%1$d個の動画</item>
+    </plurals>
+    <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
+    <plurals name="num_folders_num_files_2">
+        <item quantity="other">%1$d個のファイル</item>
+    </plurals>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
+    <string name="account_upgrade_storage_label">[A]%1$s[/A]ストレージ</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A]転送容量</string>
+    <!-- Label of storage in My account section. -->
+    <string name="account_storage_label">ストレージ</string>
+    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
+    <string name="account_choose_free_limited_transfer_quota">[A]限定された[/A]転送容量</string>
+    <!-- Name of hots or hosts in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
+        <item quantity="other">主催者：%s</item>
+    </plurals>
+    <!-- Number of participants in the call in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
+        <item quantity="other">参加者：%s人</item>
+    </plurals>
+    <!-- Chat log message when the permissions for a user has been changed to read-onl -->
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B]は[/B][A]%2$sさん[/A]によって読み取り専用に変更されました</string>
+    <!-- Chat log message when the permissions for a user has been changed to standard -->
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B]は[/B][A]%2$sさん[/A]によって標準的な役割に変更されました</string>
+    <!-- Chat log message when the permissions for a user has been changed to host -->
+    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B]は[/B][A]%2$sさん[/A]によって主催者の役割に変更されました</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$sは%2$sさんによって読み取り専用に変更されました</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$sは%2$sさんによって標準的な役割に変更されました</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$sは%2$sさんによって主催者の役割に変更されました</string>
 </resources>
