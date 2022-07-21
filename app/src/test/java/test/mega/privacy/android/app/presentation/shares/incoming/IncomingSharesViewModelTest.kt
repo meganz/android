@@ -337,12 +337,14 @@ class IncomingSharesViewModelTest {
         }
 }
 
+/**
+ * Fake MonitorNodeUpdates class to simulate values emission
+ */
 class FakeMonitorUpdates : MonitorNodeUpdates {
 
     private val flow = MutableSharedFlow<List<MegaNode>>()
+
     suspend fun emit(value: List<MegaNode>) = flow.emit(value)
 
-    override fun invoke(): Flow<List<MegaNode>> {
-        return flow
-    }
+    override fun invoke(): Flow<List<MegaNode>> = flow
 }
