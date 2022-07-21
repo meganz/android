@@ -10,6 +10,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.app.meeting.startChatCall
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.CallUtil
@@ -120,11 +121,12 @@ class StartCallUseCase @Inject constructor(
                     Manifest.permission.CAMERA)
             }
 
-            megaChatApi.startChatCall(
-                chatId,
-                video,
-                audio,
-                OptionalMegaChatRequestListenerInterface(
+            startChatCall(
+                megaChatApi = megaChatApi,
+                chatId = chatId,
+                enableVideo = video,
+                enableAudio = audio,
+                listener = OptionalMegaChatRequestListenerInterface(
                     onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
                         if (emitter.isDisposed) return@OptionalMegaChatRequestListenerInterface
                         val chatID = request.chatHandle

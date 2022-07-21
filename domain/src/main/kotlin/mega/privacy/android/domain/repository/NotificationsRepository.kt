@@ -22,4 +22,11 @@ interface NotificationsRepository {
      * @return a flow of all global user alerts
      */
     fun monitorUserAlerts(): Flow<List<UserAlert>>
+
+    /**
+     * Get user alerts
+     *
+     * @return list of current user alerts
+     */
+    suspend fun getUserAlerts(): List<UserAlert>
 }
