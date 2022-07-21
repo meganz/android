@@ -88,11 +88,14 @@ class MeetingListFragment : Fragment() {
 
     private fun onItemClick(chatId: Long) {
         viewModel.signalChatPresence()
+
         val intent = Intent(context, ChatActivity::class.java).apply {
             action = Constants.ACTION_CHAT_SHOW_MESSAGES
             putExtra(Constants.CHAT_ID, chatId)
         }
         startActivity(intent)
+
+        (activity as? ManagerActivity?)?.closeSearchView()
     }
 
     private fun onItemMoreClick(chatId: Long) {

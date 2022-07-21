@@ -9,20 +9,19 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.list.MeetingItem
-import mega.privacy.android.app.usecase.chat.CheckChatDndUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result
 import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiAndroid
@@ -43,14 +42,12 @@ import javax.inject.Inject
  * @property megaApi                MegaApi
  * @property megaChatApi            MegaChatApi
  * @property getChatChangesUseCase  Use case needed to get latest changes from Mega Api
- * @property checkChatDndUseCase    Use case needed to check DND chats
  */
 class GetMeetingListUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val getChatChangesUseCase: GetChatChangesUseCase,
-    private val checkChatDndUseCase: CheckChatDndUseCase,
 ) {
 
     private val chatController: ChatController by lazy { ChatController(context) }
@@ -177,7 +174,7 @@ class GetMeetingListUseCase @Inject constructor(
     private fun MegaChatRoom.toMeetingItem(listener: OptionalMegaRequestListenerInterface): MeetingItem {
         val chatListItem = megaChatApi.getChatListItem(chatId)
         val title = ChatUtil.getTitleChat(this)
-        val isMuted = checkChatDndUseCase.check(chatId).blockingGetOrNull() ?: false
+        val isMuted: Boolean = chatId.isChatDndEnabled()
         val formattedDate = TimeUtils.formatDateAndTime(
             context,
             chatListItem.lastTimestamp,
@@ -266,4 +263,14 @@ class GetMeetingListUseCase @Inject constructor(
             avatarColor = userAvatarColor
         )
     }
+
+    /**
+     * Check if chat DND is enabled
+     *
+     * @return  true if its enabled, false otherwise
+     */
+    private fun Long.isChatDndEnabled(): Boolean =
+        MegaApplication.getPushNotificationSettingManagement()?.pushNotificationSetting
+            ?.isChatDndEnabled(this) ?: false
 }
+

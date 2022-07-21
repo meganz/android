@@ -1098,7 +1098,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 return;
 
             if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)) {
-                if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
+                if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
                     getRecentChatsFragment().notifyPushChanged();
                 }
             }
@@ -1137,7 +1137,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param chatIdReceived The chat ID of a call.
      */
     private void updateVisibleCallElements(long chatIdReceived) {
-        if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
+        if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
             getRecentChatsFragment().refreshNode(megaChatApi.getChatListItem(chatIdReceived));
         }
 
@@ -2422,7 +2422,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             if (drawerItem == DrawerItem.CHAT) {
-                if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
+                if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
                     getRecentChatsFragment().onlineStatusUpdate(megaChatApi.getOnlineStatus());
                 }
             }
@@ -3545,7 +3545,7 @@ public class ManagerActivity extends TransfersManagementActivity
         ft.commitNowAllowingStateLoss();
         // refresh manually
         if (f instanceof ChatTabsFragment) {
-            if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
+            if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
                 getRecentChatsFragment().refreshMegaContactsList();
                 getRecentChatsFragment().setCustomisedActionBar();
             }
@@ -4869,7 +4869,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case CHAT: {
                 chatTabsFragment = getChatsFragment();
-                if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
+                if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
                     getRecentChatsFragment().checkScroll();
                 }
                 break;
@@ -5060,7 +5060,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 setCallWidget();
                 setCallMenuItem(returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
                 if (drawerItem == DrawerItem.CHAT) {
-                    if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
+                    if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
                         getRecentChatsFragment().closeSearch();
                         getRecentChatsFragment().setCustomisedActionBar();
                         supportInvalidateOptionsMenu();
@@ -5283,7 +5283,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         doNotDisturbMenuItem.setVisible(true);
                         openLinkMenuItem.setVisible(true);
 
-                        if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed() && getRecentChatsFragment().getItemCount() > 0) {
+                        if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible() && getRecentChatsFragment().getItemCount() > 0) {
                             searchMenuItem.setVisible(true);
                         }
                     }
@@ -5574,7 +5574,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                         break;
                     case CHAT:
-                        if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
+                        if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
                             getRecentChatsFragment().selectAll();
                         }
                         break;
@@ -7283,7 +7283,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     @Override
     public void confirmLeaveChats(@NotNull List<? extends MegaChatListItem> chats) {
-        if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
+        if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
             getRecentChatsFragment().clearSelections();
             getRecentChatsFragment().hideMultipleSelect();
         }
@@ -10344,7 +10344,7 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
 
-        if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
+        if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
             getRecentChatsFragment().listItemUpdate(item);
         }
 
@@ -10367,13 +10367,13 @@ public class ManagerActivity extends TransfersManagementActivity
                 Timber.d("My own status update");
                 setContactStatus();
                 if (drawerItem == DrawerItem.CHAT) {
-                    if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
+                    if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
                         getRecentChatsFragment().onlineStatusUpdate(status);
                     }
                 }
             } else {
                 Timber.d("Status update for the user: %s", userHandle);
-                if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
+                if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
                     Timber.d("Update Recent chats view");
                     getRecentChatsFragment().contactStatusUpdate(userHandle, status);
                 }
@@ -10385,7 +10385,7 @@ public class ManagerActivity extends TransfersManagementActivity
         Timber.d("Chat ID: %d, New state: %d", chatid, newState);
         if (newState == MegaChatApi.CHAT_CONNECTION_ONLINE && chatid == -1) {
             Timber.d("Online Connection: %s", chatid);
-            if (getRecentChatsFragment() != null && getRecentChatsFragment().isResumed()) {
+            if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
                 getRecentChatsFragment().setChats();
                 if (drawerItem == DrawerItem.CHAT) {
                     getRecentChatsFragment().setStatus();
