@@ -125,7 +125,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
-
+import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import dagger.hilt.android.HiltAndroidApp;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
@@ -233,6 +233,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
     InitialiseLogging initialiseLoggingUseCase;
     @Inject
     GetCallSoundsUseCase getCallSoundsUseCase;
+    @Inject
+    EndCallUseCase endCallUseCase;
     @Inject
     HiltWorkerFactory workerFactory;
     @Inject
@@ -826,7 +828,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
 
-        chatManagement = new ChatManagement();
+        chatManagement = new ChatManagement(endCallUseCase);
 
         //Logout check resumed pending transfers
         transfersManagement.checkResumedPendingTransfers();
