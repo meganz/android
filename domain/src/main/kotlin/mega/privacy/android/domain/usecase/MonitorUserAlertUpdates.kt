@@ -4,14 +4,13 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.UserAlert
 
 /**
- * Monitor user alerts
- *
+ * Monitor global user alerts for the current logged in user
  */
-fun interface MonitorUserAlerts {
+fun interface MonitorUserAlertUpdates {
     /**
      * Invoke
      *
-     * @return user alerts as a flow
+     * @return a flow of alerts
      */
     operator fun invoke(): Flow<List<UserAlert>>
 }
