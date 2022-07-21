@@ -2,7 +2,6 @@ package mega.privacy.android.app.domain.usecase
 
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
-import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
@@ -19,6 +18,6 @@ class DefaultGetParentNodeHandle @Inject constructor(
     override suspend fun invoke(handle: Long): Long? {
         return getNodeByHandle(handle)?.let {
             filesRepository.getParentNode(it)?.handle
-        } ?: run { null }
+        }
     }
 }

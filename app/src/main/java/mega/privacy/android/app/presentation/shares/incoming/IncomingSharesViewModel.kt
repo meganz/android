@@ -174,7 +174,7 @@ class IncomingSharesViewModel @Inject constructor(
         return handle
             .takeUnless { it == -1L || it == INVALID_HANDLE }
             ?.let { getNodeByHandle(it) == null }
-            ?: run { true }
+            ?: true
     }
 
 }

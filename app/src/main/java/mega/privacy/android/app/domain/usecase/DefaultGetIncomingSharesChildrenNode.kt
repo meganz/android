@@ -22,9 +22,9 @@ class DefaultGetIncomingSharesChildrenNode @Inject constructor(
         return if (parentHandle == -1L || parentHandle == MegaApiJava.INVALID_HANDLE) {
             filesRepository.getIncomingSharesNode(getOthersSortOrder())
         } else {
-            getNodeByHandle(parentHandle)
-                ?.let { getChildrenNode(it, getCloudSortOrder()) }
-                ?: run { null }
+            getNodeByHandle(parentHandle)?.let {
+                getChildrenNode(it, getCloudSortOrder())
+            }
         }
     }
 }
