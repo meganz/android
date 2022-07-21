@@ -3,7 +3,7 @@ package mega.privacy.android.app.domain.usecase
 import android.content.Context
 import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import javax.inject.Inject

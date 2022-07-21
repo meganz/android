@@ -33,6 +33,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
@@ -457,7 +458,7 @@ class TimelineViewModel @Inject constructor(
         mDbHandler.setCamSyncFileUpload(
             if (syncVideo) MegaPreferences.PHOTOS_AND_VIDEOS else MegaPreferences.ONLY_PHOTOS
         )
-        mDbHandler.setCameraUploadVideoQuality(SettingsConstants.VIDEO_QUALITY_ORIGINAL)
+        mDbHandler.setCameraUploadVideoQuality(VideoQuality.ORIGINAL.value)
         mDbHandler.setConversionOnCharging(true)
         mDbHandler.setChargingOnSize(SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE)
         // After target and local folder setup, then enable CU.

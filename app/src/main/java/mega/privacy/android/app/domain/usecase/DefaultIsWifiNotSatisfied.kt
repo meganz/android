@@ -2,7 +2,7 @@ package mega.privacy.android.app.domain.usecase
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
 import javax.inject.Inject
 

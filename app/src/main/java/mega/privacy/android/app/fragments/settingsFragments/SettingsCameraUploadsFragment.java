@@ -29,7 +29,6 @@ import static mega.privacy.android.app.constants.SettingsConstants.REQUEST_LOCAL
 import static mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_CAMERA_FOLDER;
 import static mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_SECONDARY_MEDIA_FOLDER;
 import static mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER;
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.utils.CameraUploadUtil.disableCameraUploadSettingProcess;
 import static mega.privacy.android.app.utils.CameraUploadUtil.findDefaultFolder;
 import static mega.privacy.android.app.utils.CameraUploadUtil.getSecondaryFolderHandle;
@@ -101,6 +100,7 @@ import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardUtils;
 import mega.privacy.android.domain.entity.SyncStatus;
+import mega.privacy.android.domain.entity.VideoQuality;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
@@ -252,8 +252,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 int quality;
 
                 if (uploadQuality == null || uploadQuality.isEmpty()) {
-                    dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_ORIGINAL);
-                    quality = VIDEO_QUALITY_ORIGINAL;
+                    dbH.setCameraUploadVideoQuality(VideoQuality.ORIGINAL.getValue());
+                    quality = VideoQuality.ORIGINAL.getValue();
                 } else {
                     quality = Integer.parseInt(uploadQuality);
                 }
@@ -261,7 +261,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 videoQuality.setValueIndex(quality);
                 videoQuality.setSummary(videoQuality.getEntry());
 
-                if (quality == VIDEO_QUALITY_ORIGINAL) {
+                if (quality == VideoQuality.ORIGINAL.getValue()) {
                     disableChargingSettings();
                 } else {
                     enableChargingSettings();
@@ -838,14 +838,14 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         String uploadQuality = prefs.getUploadVideoQuality();
 
         if (TextUtils.isEmpty(uploadQuality)) {
-            prefs.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_ORIGINAL));
-            dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_ORIGINAL);
-            videoQuality.setValueIndex(VIDEO_QUALITY_ORIGINAL);
+            prefs.setUploadVideoQuality(String.valueOf(VideoQuality.ORIGINAL.getValue()));
+            dbH.setCameraUploadVideoQuality(VideoQuality.ORIGINAL.getValue());
+            videoQuality.setValueIndex(VideoQuality.ORIGINAL.getValue());
         } else {
             int quality = Integer.parseInt(uploadQuality);
             videoQuality.setValueIndex(quality);
 
-            if (quality != VIDEO_QUALITY_ORIGINAL) {
+            if (quality != VideoQuality.ORIGINAL.getValue()) {
                 enableChargingSettings();
             }
         }
@@ -920,7 +920,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 prefs.setUploadVideoQuality(value + "");
                 videoQuality.setValueIndex(value);
 
-                if (value == VIDEO_QUALITY_ORIGINAL) {
+                if (value == VideoQuality.ORIGINAL.getValue()) {
                     disableChargingSettings();
                     dbH.updateVideoState(SyncStatus.STATUS_PENDING.getValue());
                 } else {

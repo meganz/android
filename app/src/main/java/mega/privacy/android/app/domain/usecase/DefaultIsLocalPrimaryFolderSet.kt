@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject

@@ -3,7 +3,7 @@ package mega.privacy.android.app.domain.usecase
 import android.net.Uri
 import android.provider.MediaStore
 import mega.privacy.android.app.MegaPreferences
-import mega.privacy.android.app.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import timber.log.Timber
 import javax.inject.Inject
 

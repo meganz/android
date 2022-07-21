@@ -1,6 +1,6 @@
 package mega.privacy.android.app.domain.usecase
 
-import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository.SyncTimeStamp
+import mega.privacy.android.domain.entity.SyncTimeStamp
 
 /**
  * Build the camera upload SQL selection query string

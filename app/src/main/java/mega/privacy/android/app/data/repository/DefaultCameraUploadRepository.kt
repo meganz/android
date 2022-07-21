@@ -1,8 +1,9 @@
 package mega.privacy.android.app.data.repository
 
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import javax.inject.Inject
 
 /**
@@ -13,31 +14,6 @@ import javax.inject.Inject
 class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
 ) : CameraUploadRepository {
-
-    /**
-     * All different synchronization timestamps
-     */
-    enum class SyncTimeStamp {
-        /**
-         * only primary photos
-         */
-        PRIMARY_PHOTO,
-
-        /**
-         * primary videos
-         */
-        PRIMARY_VIDEO,
-
-        /**
-         * only secondary photos
-         */
-        SECONDARY_PHOTO,
-
-        /**
-         * secondary videos
-         */
-        SECONDARY_VIDEO
-    }
 
     override fun isSyncByWifi() = localStorageGateway.isSyncByWifi()
 

@@ -1,8 +1,8 @@
 package mega.privacy.android.app.domain.usecase
 
 import android.provider.MediaStore
-import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository.SyncTimeStamp
-import mega.privacy.android.app.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import timber.log.Timber
 import javax.inject.Inject
 

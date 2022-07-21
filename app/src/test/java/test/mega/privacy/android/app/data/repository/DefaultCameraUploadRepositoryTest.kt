@@ -5,10 +5,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
-import mega.privacy.android.app.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
+import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -102,7 +103,7 @@ class DefaultCameraUploadRepositoryTest {
     @Test
     fun `test camera upload retrieves the correct sync time stamp`() = runTest {
         whenever(localStorageGateway.getPhotoTimeStamp()).thenReturn(150L)
-        assertThat(underTest.getSyncTimeStamp(DefaultCameraUploadRepository.SyncTimeStamp.PRIMARY_PHOTO)).isEqualTo(
+        assertThat(underTest.getSyncTimeStamp(SyncTimeStamp.PRIMARY_PHOTO)).isEqualTo(
             150L)
     }
 
