@@ -507,7 +507,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             )
         } else {
             onNodeTapped(
-                requireContext(),
+                requireActivity(),
                 node,
                 { (requireActivity() as ManagerActivity).saveNodeByTap(it) },
                 requireActivity() as ManagerActivity,

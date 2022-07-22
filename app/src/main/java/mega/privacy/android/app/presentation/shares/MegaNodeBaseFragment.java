@@ -626,7 +626,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             manageTextFileIntent(requireContext(), node, fragmentAdapter);
         } else {
             Timber.d("itemClick:isFile:otherOption");
-            onNodeTapped(requireContext(), node, managerActivity::saveNodeByTap, managerActivity, managerActivity);
+            onNodeTapped(requireActivity(), node, managerActivity::saveNodeByTap, managerActivity, managerActivity);
         }
     }
 
