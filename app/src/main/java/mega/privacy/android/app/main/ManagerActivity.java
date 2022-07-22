@@ -7623,6 +7623,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void refreshOthersOrder() {
         refreshIncomingShares();
+        refreshOutgoingShares();
         refreshSharesPageAdapter();
         refreshSearch();
     }
