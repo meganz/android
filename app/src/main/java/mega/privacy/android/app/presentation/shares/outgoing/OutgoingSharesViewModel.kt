@@ -15,6 +15,7 @@ import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import java.util.Stack
 import javax.inject.Inject
 
 /**
@@ -32,6 +33,9 @@ class OutgoingSharesViewModel @Inject constructor(
 
     /** public UI state */
     val state: StateFlow<OutgoingSharesState> = _state
+
+    /** stack of scroll position for each depth */
+    private val lastPositionStack: Stack<Int> = Stack<Int>()
 
     init {
         viewModelScope.launch {
@@ -98,6 +102,21 @@ class OutgoingSharesViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Pop scroll position for previous depth
+     *
+     * @return last position saved
+     */
+    fun popLastPositionStack(): Int = lastPositionStack.takeIf { it.isNotEmpty() }?.pop() ?: 0
+
+    /**
+     * Push scroll position for current depth
+     *
+     * @param position the scroll position of the recyclerView for the current depth
+     * @return the position saved
+     */
+    fun pushToLastPositionState(position: Int): Int = lastPositionStack.push(position)
 
     /**
      * Get the parent node handle of current node

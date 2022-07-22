@@ -240,7 +240,7 @@ class OutgoingSharesViewModelTest {
         }
 
     @Test
-    fun `test that getOutgoingSharesChildrenNode executes when resetIncomingTreeDepth`() =
+    fun `test that getOutgoingSharesChildrenNode executes when resetOutgoingTreeDepth`() =
         runTest {
             underTest.resetOutgoingTreeDepth()
             // initialization call + subsequent call

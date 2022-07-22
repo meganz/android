@@ -114,7 +114,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
         }
 
-        lastPositionStack.push(lastFirstVisiblePosition)
+        viewModel.pushToLastPositionState(lastFirstVisiblePosition)
         viewModel.increaseOutgoingTreeDepth(node.handle)
         recyclerView.scrollToPosition(0)
         checkScroll()
@@ -133,16 +133,13 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 Timber.d("deepBrowserTree==1")
                 viewModel.resetOutgoingTreeDepth()
 
-                val lastVisiblePosition =
-                    if (lastPositionStack.isNotEmpty())
-                        lastPositionStack.pop()
-                    else 0
+                val lastVisiblePosition = viewModel.popLastPositionStack()
 
-                if (lastVisiblePosition >= 0) {
+                lastVisiblePosition.takeIf { it > 0 }?.let {
                     if (managerActivity.isList)
-                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        mLayoutManager.scrollToPositionWithOffset(it, 0)
                     else
-                        gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        gridLayoutManager.scrollToPositionWithOffset(it, 0)
                 }
 
                 recyclerView.visibility = View.VISIBLE
@@ -160,16 +157,13 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                     emptyLinearLayout.visibility = View.GONE
                     viewModel.decreaseOutgoingTreeDepth(parentHandle)
 
-                    val lastVisiblePosition =
-                        if (lastPositionStack.isNotEmpty())
-                            lastPositionStack.pop()
-                        else 0
+                    val lastVisiblePosition = viewModel.popLastPositionStack()
 
-                    if (lastVisiblePosition >= 0) {
+                    lastVisiblePosition.takeIf { it > 0 }?.let {
                         if (managerActivity.isList)
-                            mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                            mLayoutManager.scrollToPositionWithOffset(it, 0)
                         else
-                            gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                            gridLayoutManager.scrollToPositionWithOffset(it, 0)
                     }
                 }
 
