@@ -9,7 +9,11 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
@@ -55,7 +59,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             else getGridView(inflater, container)
 
         initAdapter()
-        refresh()
+        observe()
 
         return view
     }
@@ -70,30 +74,11 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             )
     }
 
-    override fun refresh() {
-        nodes =
-            state().outgoingParentHandle.takeUnless { it == -1L || it == INVALID_HANDLE }
-                ?.let { megaApi.getNodeByHandle(state().outgoingParentHandle) }
-                ?.let { megaApi.getChildren(it, sortOrderManagement.getOrderCloud()) }
-                ?: run {
-                    megaApi.getOutShares(sortOrderManagement.getOrderOthers())
-                        .filter { it.user != null }
-                        .map { megaApi.getNodeByHandle(it.nodeHandle) }
-                        .distinctBy { it.handle }
-                }
-
-        adapter.setNodes(nodes)
-
-        managerActivity.showFabButton()
-        managerActivity.invalidateOptionsMenu()
-        managerActivity.setToolbarTitle()
-
-        visibilityFastScroller()
-        hideActionMode()
-        setEmptyView()
-    }
+    override fun refresh() {}
 
     override fun itemClick(position: Int) {
+        val actualPosition = position - adapter.placeholderCount
+
         when {
             // select mode
             adapter.isMultipleSelect -> {
@@ -104,19 +89,19 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             }
 
             // click on a folder
-            nodes[position].isFolder ->
-                navigateToFolder(nodes[position])
+            state().nodes[actualPosition].isFolder ->
+                navigateToFolder(state().nodes[actualPosition])
 
             // click on a file
             else ->
-                openFile(nodes[position], Constants.OUTGOING_SHARES_ADAPTER, position)
+                openFile(state().nodes[actualPosition],
+                    Constants.OUTGOING_SHARES_ADAPTER,
+                    actualPosition)
         }
     }
 
     override fun navigateToFolder(node: MegaNode) {
-        managerActivity.hideTabs(true, SharesTab.OUTGOING_TAB)
-        viewModel.increaseOutgoingTreeDepth(node.handle)
-        Timber.d("deepBrowserTree after clicking folder%s", managerActivity.deepBrowserTreeOutgoing)
+        Timber.d("Is folder deep: %s", state().outgoingTreeDepth)
 
         val lastFirstVisiblePosition: Int = when {
             managerActivity.isList ->
@@ -130,9 +115,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         }
 
         lastPositionStack.push(lastFirstVisiblePosition)
-
-        refresh()
-
+        viewModel.increaseOutgoingTreeDepth(node.handle)
         recyclerView.scrollToPosition(0)
         checkScroll()
     }
@@ -147,11 +130,8 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
         return when {
             state().outgoingTreeDepth == 1 -> {
-                //In the beginning of the navigation
+                Timber.d("deepBrowserTree==1")
                 viewModel.resetOutgoingTreeDepth()
-                managerActivity.hideTabs(false, SharesTab.OUTGOING_TAB)
-
-                refresh()
 
                 val lastVisiblePosition =
                     if (lastPositionStack.isNotEmpty())
@@ -185,8 +165,6 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                     emptyLinearLayout.visibility = View.GONE
                     viewModel.decreaseOutgoingTreeDepth(parentNode.handle)
 
-                    refresh()
-
                     val lastVisiblePosition =
                         if (lastPositionStack.isNotEmpty())
                             lastPositionStack.pop()
@@ -213,20 +191,6 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
     override fun setNodes(nodes: List<MegaNode>) {}
 
-    private fun setEmptyView() {
-        var textToShow: String? = null
-
-        if (isInvalidParentHandle()) {
-            if (Util.isScreenInPortrait(requireContext())) {
-                emptyImageView.setImageResource(R.drawable.empty_outgoing_portrait)
-            } else {
-                emptyImageView.setImageResource(R.drawable.empty_outgoing_landscape)
-            }
-            textToShow = requireContext().getString(R.string.context_empty_outgoing)
-        }
-        setFinalEmptyView(textToShow)
-    }
-
     /**
      * Method to update an item when a nickname is added, updated or removed from a contact.
      *
@@ -247,6 +211,40 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     override fun viewerFrom(): Int = Constants.VIEWER_FROM_OUTGOING_SHARES
 
     override fun getParentHandle(): Long = state().outgoingParentHandle
+
+    /**
+     * Observe viewModel
+     */
+    private fun observe() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    Timber.d("Collect ui state")
+                    updateNodes(it.nodes)
+                    hideTabs(!it.isFirstNavigationLevel())
+
+                    managerActivity.showFabButton()
+                    managerActivity.invalidateOptionsMenu()
+                    managerActivity.setToolbarTitle()
+
+                    visibilityFastScroller()
+                    hideActionMode()
+                    setEmptyView(it.isInvalidParentHandle)
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Update displayed nodes
+     *
+     * @param nodes the list of nodes to display
+     */
+    private fun updateNodes(nodes: List<MegaNode>) {
+        val mutableListNodes = ArrayList(nodes)
+        adapter.setNodes(mutableListNodes)
+    }
 
     /**
      * Initialize the adapter
@@ -279,14 +277,32 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     }
 
     /**
-     * Check if the parent handle is valid
+     * Hide/Show shares tab
      *
-     * @return true if the parent handle is valid
+     * @param hide true if needs to hide shares tabs
      */
-    private fun isInvalidParentHandle(): Boolean =
-        state().outgoingParentHandle == -1L ||
-                state().outgoingParentHandle == INVALID_HANDLE ||
-                megaApi.getNodeByHandle(state().outgoingParentHandle) == null
+    private fun hideTabs(hide: Boolean) {
+        managerActivity.hideTabs(hide, SharesTab.OUTGOING_TAB)
+    }
+
+    /**
+     * Set the empty view and message depending if the parent handle is valid or not
+     *
+     * @param isInvalidParentHandle true if the parent handle is invalid
+     */
+    private fun setEmptyView(isInvalidParentHandle: Boolean) {
+        var textToShow: String? = null
+
+        if (isInvalidParentHandle) {
+            if (Util.isScreenInPortrait(requireContext())) {
+                emptyImageView.setImageResource(R.drawable.empty_outgoing_portrait)
+            } else {
+                emptyImageView.setImageResource(R.drawable.empty_outgoing_landscape)
+            }
+            textToShow = requireContext().getString(R.string.context_empty_outgoing)
+        }
+        setFinalEmptyView(textToShow)
+    }
 
     private inner class ActionBarCallBack(currentTab: Tab?) : BaseActionBarCallBack(currentTab) {
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {

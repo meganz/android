@@ -9778,10 +9778,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void refreshOutgoingShares() {
-        if (!isOutgoingAdded()) return;
-
-        outgoingSharesFragment.hideMultipleSelect();
-        outgoingSharesFragment.refresh();
+        outgoingSharesViewModel.refreshOutgoingSharesNode();
     }
 
     private void refreshLinks() {

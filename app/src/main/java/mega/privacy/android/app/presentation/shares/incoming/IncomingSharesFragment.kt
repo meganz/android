@@ -139,7 +139,6 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
         return when {
             state().incomingTreeDepth == 1 -> {
-                //In the beginning of the navigation
                 Timber.d("deepBrowserTree==1")
                 viewModel.resetIncomingTreeDepth()
 

@@ -205,7 +205,7 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that is invalid parent handle is set to true when call set incoming tree depth with valid parent handle`() =
+    fun `test that is invalid parent handle is set to false when call set incoming tree depth with valid parent handle`() =
         runTest {
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
@@ -219,7 +219,7 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that is invalid parent handle is set to false when call set incoming tree depth with invalid parent handle`() =
+    fun `test that is invalid parent handle is set to true when call set incoming tree depth with invalid parent handle`() =
         runTest {
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
@@ -284,6 +284,59 @@ class IncomingSharesViewModelTest {
             underTest.resetIncomingTreeDepth()
             // initialization call + subsequent call
             verify(getIncomingSharesChildrenNode, times(2)).invoke(-1L)
+        }
+
+    @Test
+    fun `test that getIncomingSharesNode executes when refresh`() =
+        runTest {
+            whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
+
+            val parentHandle = 123456789L
+            val job = underTest.increaseIncomingTreeDepth(parentHandle)
+            job.invokeOnCompletion {
+                assertThat(underTest.state.value.incomingParentHandle).isEqualTo(parentHandle)
+                underTest.refreshIncomingSharesNode()
+            }
+            // increaseOutgoingTreeDepth call + refreshOutgoingSharesNode call
+            verify(getIncomingSharesChildrenNode, times(2)).invoke(parentHandle)
+        }
+
+    @Test
+    fun `test that nodes is set with result of getIncomingSharesChildrenNode if not null`() =
+        runTest {
+            val node1 = mock<MegaNode>()
+            val node2 = mock<MegaNode>()
+            val expected = listOf(node1, node2)
+
+            whenever(getIncomingSharesChildrenNode(any())).thenReturn(expected)
+
+            underTest.state.map { it.nodes }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEmpty()
+                    underTest.increaseIncomingTreeDepth(123456789L)
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+        }
+
+    @Test
+    fun `test that nodes is empty if result of getIncomingSharesChildrenNode null`() =
+        runTest {
+            val node1 = mock<MegaNode>()
+            val node2 = mock<MegaNode>()
+            val expected = listOf(node1, node2)
+
+            whenever(getIncomingSharesChildrenNode(123456789L)).thenReturn(expected)
+            whenever(getIncomingSharesChildrenNode(987654321L)).thenReturn(null)
+
+            underTest.state.map { it.nodes }.distinctUntilChanged()
+                .test {
+                    underTest.increaseIncomingTreeDepth(123456789L).invokeOnCompletion {
+                        underTest.increaseIncomingTreeDepth(987654321L)
+                    }
+                    assertThat(awaitItem()).isEmpty()
+                    assertThat(awaitItem()).isEqualTo(expected)
+                    assertThat(awaitItem()).isEmpty()
+                }
         }
 
     @Test
