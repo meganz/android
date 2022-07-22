@@ -16,10 +16,10 @@
 
         <ImageView
             android:id="@+id/empty_hint_image"
-            android:layout_width="144dp"
-            android:layout_height="144dp"
+            android:layout_width="108dp"
+            android:layout_height="108dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/ic_zero_data_offline" />
+            android:src="@drawable/ic_save_offline_new" />
 
         <TextView
             android:id="@+id/empty_hint_text"
