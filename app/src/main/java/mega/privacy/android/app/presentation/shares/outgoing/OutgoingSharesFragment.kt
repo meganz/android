@@ -154,16 +154,11 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             state().outgoingTreeDepth > 1 -> {
                 Timber.d("deepTree>1")
 
-                val parentNode =
-                    megaApi.getParentNode(
-                        megaApi.getNodeByHandle(state().outgoingParentHandle)
-                    )
-
-                if (parentNode != null) {
+                viewModel.getParentNodeHandle()?.let { parentHandle ->
                     recyclerView.visibility = View.VISIBLE
                     emptyImageView.visibility = View.GONE
                     emptyLinearLayout.visibility = View.GONE
-                    viewModel.decreaseOutgoingTreeDepth(parentNode.handle)
+                    viewModel.decreaseOutgoingTreeDepth(parentHandle)
 
                     val lastVisiblePosition =
                         if (lastPositionStack.isNotEmpty())

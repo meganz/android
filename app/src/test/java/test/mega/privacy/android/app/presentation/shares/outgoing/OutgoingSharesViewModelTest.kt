@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
+import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
@@ -28,6 +29,7 @@ class OutgoingSharesViewModelTest {
     private lateinit var underTest: OutgoingSharesViewModel
 
     private val getNodeByHandle = mock<GetNodeByHandle>()
+    private val getParentNodeHandle = mock<GetParentNodeHandle>()
     private val getOutgoingSharesChildrenNode = mock<GetOutgoingSharesChildrenNode>()
 
     @get:Rule
@@ -38,6 +40,7 @@ class OutgoingSharesViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = OutgoingSharesViewModel(
             getNodeByHandle,
+            getParentNodeHandle,
             getOutgoingSharesChildrenNode
         )
     }
@@ -295,5 +298,15 @@ class OutgoingSharesViewModelTest {
                     assertThat(awaitItem()).isEqualTo(expected)
                     assertThat(awaitItem()).isEmpty()
                 }
+        }
+
+
+    @Test
+    fun `test that get parent node handle returns the result of get parent node handle use case`() =
+        runTest {
+            val expected = 123456789L
+            whenever(getParentNodeHandle(any())).thenReturn(expected)
+
+            assertThat(underTest.getParentNodeHandle()).isEqualTo(expected)
         }
 }

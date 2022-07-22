@@ -7,9 +7,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
+import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -21,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OutgoingSharesViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
+    private val getParentNodeHandle: GetParentNodeHandle,
     private val getOutgoingSharesChildrenNode: GetOutgoingSharesChildrenNode,
 ) : ViewModel() {
 
@@ -94,6 +97,15 @@ class OutgoingSharesViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    /**
+     * Get the parent node handle of current node
+     *
+     * @return the parent node handle of current node
+     */
+    fun getParentNodeHandle(): Long? = runBlocking {
+        return@runBlocking getParentNodeHandle(_state.value.outgoingParentHandle)
     }
 
     /**
