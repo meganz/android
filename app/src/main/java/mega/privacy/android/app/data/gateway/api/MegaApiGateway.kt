@@ -101,6 +101,15 @@ interface MegaApiGateway {
     suspend fun getRootNode(): MegaNode?
 
     /**
+     * Get the parent node of a MegaNode
+     *
+     * @param node
+     * @return the parent node of the node, null if node doesn't exist or
+     *         is the root node
+     */
+    suspend fun getParentNode(node: MegaNode): MegaNode?
+
+    /**
      * Rubbish bin node of the account
      *
      * All accounts have a rubbish bin node, therefore if it is null the account has not been logged in or
@@ -148,6 +157,14 @@ interface MegaApiGateway {
      * @return children nodes list
      */
     suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): ArrayList<MegaNode>
+
+    /**
+     * Get a list of all incoming shares
+     *
+     * @param order sort order, if null the default order is applied
+     * @return List of MegaNode that other users are sharing with this account
+     */
+    suspend fun getIncomingSharesNode(order: Int?): List<MegaNode>
 
     /**
      * Get child folder number of current folder

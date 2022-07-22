@@ -3,6 +3,7 @@ package mega.privacy.android.app.data.facade
 import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.di.MegaApiFolder
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
@@ -21,4 +22,7 @@ class MegaApiFolderFacade @Inject constructor(
         set(value) {
             megaApiFolder.accountAuth = value
         }
+
+    override suspend fun authorizeNode(handle: Long): MegaNode? =
+        megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle))
 }
