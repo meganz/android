@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaApiJava
@@ -26,6 +27,7 @@ class OutgoingSharesViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getParentNodeHandle: GetParentNodeHandle,
     private val getOutgoingSharesChildrenNode: GetOutgoingSharesChildrenNode,
+    monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
     /** private UI state */
@@ -40,6 +42,10 @@ class OutgoingSharesViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             refreshNodes()?.let { setNodes(it) }
+            monitorNodeUpdates().collect {
+                // Uncomment this line once LinksFragment is decoupled from ManagerActivity
+                refreshNodes()?.let { setNodes(it) }
+            }
         }
     }
 

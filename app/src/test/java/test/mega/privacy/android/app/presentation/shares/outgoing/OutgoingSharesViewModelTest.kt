@@ -23,6 +23,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 
 @ExperimentalCoroutinesApi
 class OutgoingSharesViewModelTest {
@@ -31,6 +32,7 @@ class OutgoingSharesViewModelTest {
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getParentNodeHandle = mock<GetParentNodeHandle>()
     private val getOutgoingSharesChildrenNode = mock<GetOutgoingSharesChildrenNode>()
+    private val monitorNodeUpdates = FakeMonitorUpdates()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -41,7 +43,8 @@ class OutgoingSharesViewModelTest {
         underTest = OutgoingSharesViewModel(
             getNodeByHandle,
             getParentNodeHandle,
-            getOutgoingSharesChildrenNode
+            getOutgoingSharesChildrenNode,
+            monitorNodeUpdates
         )
     }
 
@@ -299,7 +302,6 @@ class OutgoingSharesViewModelTest {
                     assertThat(awaitItem()).isEmpty()
                 }
         }
-
 
     @Test
     fun `test that get parent node handle returns the result of get parent node handle use case`() =

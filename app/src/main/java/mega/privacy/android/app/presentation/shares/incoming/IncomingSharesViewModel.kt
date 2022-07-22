@@ -59,8 +59,7 @@ class IncomingSharesViewModel @Inject constructor(
                             }
                     }
 
-                // Uncomment this line once OutgoingSharesFragment
-                // and LinksFragment is decoupled from ManagerActivity
+                // Uncomment this line once LinksFragment is decoupled from ManagerActivity
                 //refreshNodes()?.let { setNodes(it) }
             }
         }
