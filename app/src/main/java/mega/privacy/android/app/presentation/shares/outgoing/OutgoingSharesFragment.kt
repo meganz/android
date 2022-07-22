@@ -249,7 +249,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             adapter = MegaNodeAdapter(
                 requireActivity(),
                 this,
-                nodes,
+                state().nodes,
                 state().outgoingParentHandle,
                 recyclerView,
                 Constants.OUTGOING_SHARES_ADAPTER,
@@ -267,7 +267,6 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 adapter.getSpanSizeLookup(gridLayoutManager.spanCount)
 
         adapter.isMultipleSelect = false
-
         recyclerView.adapter = adapter
     }
 
