@@ -192,7 +192,7 @@ class FavouriteFolderFragment: Fragment() {
                 }
                 else -> {
                     MegaNodeUtil.onNodeTapped(
-                        context = requireContext(),
+                        context = requireActivity(),
                         node = favourite.node,
                         nodeDownloader = (activity as ManagerActivity)::saveNodeByTap,
                         activityLauncher = activity as ManagerActivity,
