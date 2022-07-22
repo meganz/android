@@ -78,13 +78,6 @@ class LinksFragment : MegaNodeBaseFragment() {
             )
     }
 
-    override fun setNodes(nodes: List<MegaNode>) {
-        this.nodes = nodes
-        adapter.setNodes(nodes)
-        setEmptyView()
-        visibilityFastScroller()
-    }
-
     private fun setEmptyView() {
         var textToShow: String? = null
         if (isInvalidParentHandle()) {

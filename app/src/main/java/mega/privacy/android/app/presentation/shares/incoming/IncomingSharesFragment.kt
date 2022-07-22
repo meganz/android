@@ -187,8 +187,6 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         }
     }
 
-    override fun setNodes(nodes: List<MegaNode>) {}
-
     /**
      * Method to update an item when a nickname is added, updated or removed from a contact.
      *
