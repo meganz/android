@@ -6137,7 +6137,6 @@ public class ManagerActivity extends TransfersManagementActivity
                         incomingSharesViewModel.resetIncomingTreeDepth();
                         refreshIncomingShares();
                     } else if (getTabItemShares() == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE) {
-                        outgoingSharesViewModel.setOutgoingParentHandle(INVALID_HANDLE);
                         outgoingSharesViewModel.resetOutgoingTreeDepth();
                         refreshOutgoingShares();
                     } else if (getTabItemShares() == SharesTab.LINKS_TAB && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE) {
@@ -6410,8 +6409,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             break;
 
                         case OUTGOING_TAB:
-                            outgoingSharesViewModel.decreaseOutgoingTreeDepth();
-                            outgoingSharesViewModel.setOutgoingParentHandle(
+                            outgoingSharesViewModel.decreaseOutgoingTreeDepth(
                                     outgoingSharesState(this).getOutgoingTreeDepth() == 0 ? INVALID_HANDLE : result.getOldParentHandle());
 
                             if (outgoingSharesState(this).getOutgoingParentHandle() == INVALID_HANDLE) {
@@ -10723,8 +10721,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (getTabItemShares() == SharesTab.INCOMING_TAB) {
                     incomingSharesViewModel.increaseIncomingTreeDepth(node.getHandle());
                 } else if (getTabItemShares() == SharesTab.OUTGOING_TAB) {
-                    outgoingSharesViewModel.setOutgoingParentHandle(node.getHandle());
-                    outgoingSharesViewModel.increaseOutgoingTreeDepth();
+                    outgoingSharesViewModel.increaseOutgoingTreeDepth(node.getHandle());
                 } else if (getTabItemShares() == SharesTab.LINKS_TAB) {
                     viewModel.setLinksParentHandle(node.getHandle());
                     viewModel.increaseLinksTreeDepth();

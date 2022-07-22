@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewM
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 
 @ExperimentalCoroutinesApi
 class OutgoingSharesViewModelTest {
@@ -43,7 +44,7 @@ class OutgoingSharesViewModelTest {
             underTest.state.map { it.outgoingTreeDepth }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(0)
-                    underTest.increaseOutgoingTreeDepth()
+                    underTest.increaseOutgoingTreeDepth(any())
                     assertThat(awaitItem()).isEqualTo(1)
                 }
         }
@@ -54,9 +55,9 @@ class OutgoingSharesViewModelTest {
             underTest.state.map { it.outgoingTreeDepth }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(0)
-                    underTest.increaseOutgoingTreeDepth()
+                    underTest.increaseOutgoingTreeDepth(any())
                     assertThat(awaitItem()).isEqualTo(1)
-                    underTest.decreaseOutgoingTreeDepth()
+                    underTest.decreaseOutgoingTreeDepth(any())
                     assertThat(awaitItem()).isEqualTo(0)
                 }
         }
@@ -72,14 +73,39 @@ class OutgoingSharesViewModelTest {
         }
 
     @Test
-    fun `test that outgoing parent handle is updated if new value provided`() =
+    fun `test that outgoing parent handle is updated when increase outgoing tree depth`() =
         runTest {
             underTest.state.map { it.outgoingParentHandle }.distinctUntilChanged()
                 .test {
                     val newValue = 123456789L
                     assertThat(awaitItem()).isEqualTo(-1L)
-                    underTest.setOutgoingParentHandle(newValue)
+                    underTest.increaseOutgoingTreeDepth(newValue)
                     assertThat(awaitItem()).isEqualTo(newValue)
+                }
+        }
+
+    @Test
+    fun `test that outgoing parent handle is updated when decrease outgoing tree depth`() =
+        runTest {
+            underTest.state.map { it.outgoingParentHandle }.distinctUntilChanged()
+                .test {
+                    val newValue = 123456789L
+                    assertThat(awaitItem()).isEqualTo(-1L)
+                    underTest.decreaseOutgoingTreeDepth(newValue)
+                    assertThat(awaitItem()).isEqualTo(newValue)
+                }
+        }
+
+    @Test
+    fun `test that outgoing parent handle is set to -1L when reset outgoing tree depth`() =
+        runTest {
+            underTest.state.map { it.outgoingParentHandle }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(-1L)
+                    underTest.increaseOutgoingTreeDepth(123456789L)
+                    assertThat(awaitItem()).isEqualTo(123456789L)
+                    underTest.resetOutgoingTreeDepth()
+                    assertThat(awaitItem()).isEqualTo(-1L)
                 }
         }
 }

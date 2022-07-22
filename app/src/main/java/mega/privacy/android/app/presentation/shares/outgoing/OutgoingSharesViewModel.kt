@@ -23,33 +23,43 @@ class OutgoingSharesViewModel @Inject constructor() : ViewModel() {
     val state: StateFlow<OutgoingSharesState> = _state
 
     /**
-     * Set the current outgoing parent handle to the UI state
+     * Decrease by 1 the outgoing tree depth
      *
      * @param handle the id of the current outgoing parent handle to set
      */
-    fun setOutgoingParentHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(outgoingParentHandle = handle) }
-    }
-
-    /**
-     * Decrease by 1 the outgoing tree depth
-     */
-    fun decreaseOutgoingTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(outgoingTreeDepth = it.outgoingTreeDepth - 1) }
+    fun decreaseOutgoingTreeDepth(handle: Long) = viewModelScope.launch {
+        setOutgoingTreeDepth(_state.value.outgoingTreeDepth - 1, handle)
     }
 
     /**
      * Increase by 1 the outgoing tree depth
+     *
+     * @param handle the id of the current outgoing parent handle to set
      */
-    fun increaseOutgoingTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(outgoingTreeDepth = it.outgoingTreeDepth + 1) }
+    fun increaseOutgoingTreeDepth(handle: Long) = viewModelScope.launch {
+        setOutgoingTreeDepth(_state.value.outgoingTreeDepth + 1, handle)
     }
 
     /**
      * Reset outgoing tree depth to initial value
      */
     fun resetOutgoingTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(outgoingTreeDepth = 0) }
+        setOutgoingTreeDepth(0, -1L)
+    }
+
+    /**
+     * Set outgoing tree depth with given value
+     *
+     * @param depth the tree depth value to set
+     * @param handle the id of the current outgoing parent handle to set
+     */
+    private fun setOutgoingTreeDepth(depth: Int, handle: Long) = viewModelScope.launch {
+        _state.update {
+            it.copy(
+                outgoingTreeDepth = depth,
+                outgoingParentHandle = handle,
+            )
+        }
     }
 
 

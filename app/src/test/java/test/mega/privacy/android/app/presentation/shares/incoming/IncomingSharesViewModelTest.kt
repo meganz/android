@@ -190,7 +190,7 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that incoming parent handle is set to INVALID_HANDLE when reset incoming tree depth`() =
+    fun `test that incoming parent handle is set to -1L when reset incoming tree depth`() =
         runTest {
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
 

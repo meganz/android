@@ -76,6 +76,8 @@ class IncomingSharesViewModel @Inject constructor(
 
     /**
      * Decrease by 1 the incoming tree depth
+     *
+     * @param handle the id of the current outgoing parent handle to set
      */
     fun decreaseIncomingTreeDepth(handle: Long) = viewModelScope.launch {
         setIncomingTreeDepth(_state.value.incomingTreeDepth - 1, handle)
@@ -83,6 +85,8 @@ class IncomingSharesViewModel @Inject constructor(
 
     /**
      * Increase by 1 the incoming tree depth
+     *
+     * @param handle the id of the current outgoing parent handle to set
      */
     fun increaseIncomingTreeDepth(handle: Long) = viewModelScope.launch {
         setIncomingTreeDepth(_state.value.incomingTreeDepth + 1, handle)
@@ -100,6 +104,7 @@ class IncomingSharesViewModel @Inject constructor(
      * Set incoming tree depth with given value
      *
      * @param depth the tree depth value to set
+     * @param handle the id of the current outgoing parent handle to set
      */
     fun setIncomingTreeDepth(depth: Int, handle: Long) = viewModelScope.launch {
         _state.update {

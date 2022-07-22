@@ -115,7 +115,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
     override fun navigateToFolder(node: MegaNode) {
         managerActivity.hideTabs(true, SharesTab.OUTGOING_TAB)
-        viewModel.increaseOutgoingTreeDepth()
+        viewModel.increaseOutgoingTreeDepth(node.handle)
         Timber.d("deepBrowserTree after clicking folder%s", managerActivity.deepBrowserTreeOutgoing)
 
         val lastFirstVisiblePosition: Int = when {
@@ -130,7 +130,6 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         }
 
         lastPositionStack.push(lastFirstVisiblePosition)
-        viewModel.setOutgoingParentHandle(node.handle)
 
         refresh()
 
@@ -144,13 +143,12 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         if (adapter == null)
             return 0
 
-        viewModel.decreaseOutgoingTreeDepth()
         managerActivity.invalidateOptionsMenu()
 
         return when {
-            state().outgoingTreeDepth == 0 -> {
+            state().outgoingTreeDepth == 1 -> {
                 //In the beginning of the navigation
-                viewModel.setOutgoingParentHandle(INVALID_HANDLE)
+                viewModel.resetOutgoingTreeDepth()
                 managerActivity.hideTabs(false, SharesTab.OUTGOING_TAB)
 
                 refresh()
@@ -173,8 +171,8 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 3
             }
 
-            state().outgoingTreeDepth > 0 -> {
-                Timber.d("deepTree>0")
+            state().outgoingTreeDepth > 1 -> {
+                Timber.d("deepTree>1")
 
                 val parentNode =
                     megaApi.getParentNode(
@@ -185,7 +183,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                     recyclerView.visibility = View.VISIBLE
                     emptyImageView.visibility = View.GONE
                     emptyLinearLayout.visibility = View.GONE
-                    viewModel.setOutgoingParentHandle(parentNode.handle)
+                    viewModel.decreaseOutgoingTreeDepth(parentNode.handle)
 
                     refresh()
 
