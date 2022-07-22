@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.shares.outgoing.model
 import nz.mega.sdk.MegaNode
 
 /**
- * Incoming shares UI state
+ * Outgoing shares UI state
  *
  * @param outgoingParentHandle current outgoing shares parent handle
  * @param outgoingTreeDepth current outgoing tree depth
@@ -18,9 +18,9 @@ data class OutgoingSharesState(
 ) {
 
     /**
-     * Check if we are at the root of the incoming shares page
+     * Check if we are at the root of the outgoing shares page
      *
-     * @return true if at the root of the incoming shares page
+     * @return true if at the root of the outgoing shares page
      */
     fun isFirstNavigationLevel() = outgoingTreeDepth == 0
 }

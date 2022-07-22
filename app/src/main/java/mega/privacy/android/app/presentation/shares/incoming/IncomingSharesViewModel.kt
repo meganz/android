@@ -101,6 +101,7 @@ class IncomingSharesViewModel @Inject constructor(
 
     /**
      * Set incoming tree depth with given value
+     * If refresh nodes return null, else display empty list
      *
      * @param depth the tree depth value to set
      * @param handle the id of the current outgoing parent handle to set
