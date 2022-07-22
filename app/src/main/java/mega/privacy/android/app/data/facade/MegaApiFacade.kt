@@ -153,7 +153,7 @@ class MegaApiFacade @Inject constructor(
 
     override suspend fun getParentNode(node: MegaNode): MegaNode? = megaApi.getParentNode(node)
 
-    override suspend fun getChildrenByNode(parentNode: MegaNode, order: Int?): ArrayList<MegaNode> =
+    override suspend fun getChildrenByNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
         if (order == null)
             megaApi.getChildren(parentNode)
         else

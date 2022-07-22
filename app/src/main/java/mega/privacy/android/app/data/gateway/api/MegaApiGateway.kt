@@ -157,7 +157,7 @@ interface MegaApiGateway {
      * @param order order for the returned list, if null the default order is applied
      * @return children nodes list
      */
-    suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): ArrayList<MegaNode>
+    suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): List<MegaNode>
 
     /**
      * Get a list of all incoming shares
