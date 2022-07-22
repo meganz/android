@@ -9,12 +9,12 @@
         android:id="@+id/file_list_view_browser"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingBottom="10dp"
         android:columnWidth="@dimen/grid_node_item_width"
+        android:paddingBottom="10dp"
         app:layout_constraintBottom_toTopOf="@id/mini_audio_player"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <mega.privacy.android.app.components.scrollBar.FastScroller
         android:id="@+id/fastscroll"
@@ -41,19 +41,18 @@
         android:id="@+id/empty_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias=".2">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/empty_hint_image"
-            android:layout_width="144dp"
-            android:layout_height="144dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/ic_zero_data_favourite"
+            android:src="@drawable/ic_homepage_empty_favourite"
             tools:ignore="ContentDescription" />
 
         <TextView
@@ -62,10 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/empty_hint_image"
             android:layout_centerHorizontal="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginRight="20dp"
-            android:textAllCaps="true"
+            android:text="@string/homepage_empty_hint_favourites"
             android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
     </RelativeLayout>
 
@@ -91,9 +87,9 @@
         android:visibility="gone"
         app:controller_layout_id="@layout/audio_player_control_in_mini_player"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:player_layout_id="@layout/audio_player_view_controller_only"
-        app:surface_type="none"/>
+        app:surface_type="none" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

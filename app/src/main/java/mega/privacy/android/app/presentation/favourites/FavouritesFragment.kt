@@ -2,8 +2,12 @@ package mega.privacy.android.app.presentation.favourites
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.MenuItem.SHOW_AS_ACTION_ALWAYS
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -28,7 +32,9 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.databinding.FragmentFavouritesBinding
-import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.HomepageSearchable
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
@@ -36,9 +42,18 @@ import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
-import mega.privacy.android.app.presentation.favourites.model.*
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.presentation.favourites.model.Favourite
+import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
+import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
+import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
+import mega.privacy.android.app.utils.ColorUtils.getColorHexString
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaChatApiJava
 import javax.inject.Inject
 
@@ -80,13 +95,18 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentFavouritesBinding.inflate(layoutInflater, container, false)
-        binding.emptyHintText.text = TextUtil.formatEmptyScreenText(
-            context,
-            getString(R.string.empty_hint_favourite_album)
-        ).toSpannedHtmlText()
+        val colorStart = getColorHexString(
+            requireContext(), R.color.grey_900_grey_100)
+        val colorEnd = getColorHexString(
+            requireContext(), R.color.grey_300_grey_600)
+        binding.emptyHintText.text = TextUtil.replaceFormatText(
+            getString(R.string.homepage_empty_hint_favourites),
+            colorStart,
+            colorEnd
+        )
         binding.fastscroll.setRecyclerView(binding.fileListViewBrowser)
         gridLayoutManager = GridLayoutManager(requireContext(), 2)
         listLayoutManager = LinearLayoutManager(requireContext())
@@ -318,7 +338,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     /**
      * Activated the action mode
      */
-    private fun activateActionMode(){
+    private fun activateActionMode() {
         if (actionModeCallback == null) {
             actionModeCallback =
                 FavouriteActionModeCallback((requireActivity() as ManagerActivity), viewModel)

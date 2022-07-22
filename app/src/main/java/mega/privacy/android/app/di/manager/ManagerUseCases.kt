@@ -26,6 +26,7 @@ import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
 import mega.privacy.android.domain.usecase.MonitorUserAlerts
 
 /**
@@ -80,6 +81,10 @@ abstract class ManagerUseCases {
         @Provides
         fun provideHasInboxChildren(filesRepository: FilesRepository): HasInboxChildren =
             HasInboxChildren(filesRepository::hasInboxChildren)
+
+        @Provides
+        fun provideMonitorUserAlerts(notificationsRepository: NotificationsRepository): MonitorUserAlertUpdates =
+            MonitorUserAlertUpdates(notificationsRepository::monitorUserAlerts)
 
         @Provides
         fun provideMonitorUserUpdates(notificationsRepository: NotificationsRepository): MonitorUserAlerts =

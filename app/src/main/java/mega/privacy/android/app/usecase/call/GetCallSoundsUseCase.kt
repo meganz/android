@@ -3,20 +3,18 @@ package mega.privacy.android.app.usecase.call
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.meeting.CallSoundType
-import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_ALONE_ON_THE_CALL
-import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_FOR_OTHERS_PARTICIPANTS
+import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS
+import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -25,6 +23,8 @@ import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatSession
 import timber.log.Timber
 import javax.inject.Inject
+import android.util.Pair
+import io.reactivex.rxjava3.disposables.Disposable
 
 /**
  * Main use case to control when a call-related sound should be played.
@@ -56,9 +56,12 @@ class GetCallSoundsUseCase @Inject constructor(
         val clientId: Long,
     )
 
-    var countDownTimer: CustomCountDownTimer? = null
+    var finishCallCountDownTimer: CustomCountDownTimer? = null
+    var waitingForOthersCountDownTimer: CustomCountDownTimer? = null
+
     val participants = ArrayList<ParticipantInfo>()
     val disposable = CompositeDisposable()
+    var disposableCountDownTimer: Disposable? = null
 
     /**
      * Method to get the appropriate sound
@@ -73,8 +76,6 @@ class GetCallSoundsUseCase @Inject constructor(
                         .isRequestSent(call.callId) && call.numParticipants == ONE_PARTICIPANT
                 ) {
                     endCallUseCase.hangCall(call.callId)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribeBy(
                             onError = { error ->
                                 Timber.e(error.stackTraceToString())
@@ -83,8 +84,6 @@ class GetCallSoundsUseCase @Inject constructor(
             }
 
             getCallStatusChangesUseCase.getReconnectingStatus()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onNext = {
                         if (it) {
@@ -98,8 +97,6 @@ class GetCallSoundsUseCase @Inject constructor(
                 ).addTo(disposable)
 
             getSessionStatusChangesUseCase.getSessionChanged()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onNext = { (call, sessionStatus, isRecoverable, peerId, clientId) ->
                         val participant =
@@ -119,7 +116,7 @@ class GetCallSoundsUseCase @Inject constructor(
                                             isRecoverable?.let { isRecoverableSession ->
                                                 if (isRecoverableSession) {
                                                     Timber.d("Session destroyed, recoverable session. Wait 10 seconds to hang up")
-                                                    startCountDown(
+                                                    startFinishCallCountDown(
                                                         call,
                                                         participant,
                                                         SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
@@ -146,30 +143,44 @@ class GetCallSoundsUseCase @Inject constructor(
                 .addTo(disposable)
 
             getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onNext = { (chatId, onlyMeInTheCall, waitingForOthers) ->
+                        removeWaitingForOthersCountDownTimer()
                         MegaApplication.getChatManagement().stopCounterToFinishCall()
-                        MegaApplication.getChatManagement().stopCounterWaitingForOthers()
 
                         if (onlyMeInTheCall) {
-                            if (!waitingForOthers) {
-                                megaChatApi.getChatCall(chatId)?.let { call ->
-                                    if (call.hasLocalAudio()) {
-                                        Timber.d("I am the only participant in the group call/meeting, muted micro")
-                                        megaChatApi.disableAudio(call.chatid, null)
+                            if (waitingForOthers) {
+                                val liveD: MutableLiveData<Boolean> = MutableLiveData()
+                                waitingForOthersCountDownTimer = CustomCountDownTimer(liveD)
+
+                                liveD.observeOnce { counterState ->
+                                    counterState?.let { isFinished ->
+                                        if (isFinished) {
+                                            MegaApplication.getChatManagement()
+                                                .startCounterToFinishCall(chatId)
+
+                                            LiveEventBus.get(
+                                                EVENT_UPDATE_WAITING_FOR_OTHERS,
+                                                Pair::class.java
+                                            ).post(Pair.create(chatId, onlyMeInTheCall))
+
+                                            megaChatApi.getChatCall(chatId)?.let { call ->
+                                                if (call.hasLocalAudio()) {
+                                                    Timber.d("I am the only participant in the group call/meeting, muted micro")
+                                                    megaChatApi.disableAudio(call.chatid, null)
+                                                }
+                                            }
+
+                                            removeWaitingForOthersCountDownTimer()
+                                        }
                                     }
                                 }
-                                Timber.d("I am the only participant in the group call/meeting, wait 2 minutes to hang up")
-                                MegaApplication.getChatManagement().startCounterToFinishCall(chatId,
-                                    SECONDS_TO_WAIT_ALONE_ON_THE_CALL)
 
-                            } else {
-                                Timber.d("I am waiting for other to join in the group call/meeting, wait 5 minutes")
-                                MegaApplication.getChatManagement().startCounterWaitingCall(chatId,
-                                    SECONDS_TO_WAIT_FOR_OTHERS_PARTICIPANTS)
+                                waitingForOthersCountDownTimer?.start(
+                                    SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL)
                             }
+                        } else {
+                            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = false
                         }
                     },
                     onError = { error ->
@@ -179,12 +190,12 @@ class GetCallSoundsUseCase @Inject constructor(
                 .addTo(disposable)
 
             getCallStatusChangesUseCase.getCallStatus()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onNext = { status ->
                         if (status == MegaChatCall.CALL_STATUS_DESTROYED) {
                             Timber.d("Call destroyed")
+                            removeWaitingForOthersCountDownTimer()
+                            MegaApplication.getChatManagement().stopCounterToFinishCall()
                             MegaApplication.getInstance()
                                 .removeRTCAudioManager()
                             emitter.onNext(CallSoundType.CALL_ENDED)
@@ -197,8 +208,6 @@ class GetCallSoundsUseCase @Inject constructor(
                 .addTo(disposable)
 
             getParticipantsChangesUseCase.getChangesFromParticipants()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onNext = { result ->
                         when (result.typeChange) {
@@ -221,6 +230,7 @@ class GetCallSoundsUseCase @Inject constructor(
                     MegaChatCall::class.java)
                     .removeObserver(outgoingRingingStatusObserver)
 
+                removeWaitingForOthersCountDownTimer()
                 disposable.clear()
             }
 
@@ -232,28 +242,27 @@ class GetCallSoundsUseCase @Inject constructor(
      * @param call      MegaChatCall
      * @param seconds   Seconds to wait
      */
-    private fun startCountDown(
+    private fun startFinishCallCountDown(
         call: MegaChatCall,
         participant: ParticipantInfo,
         seconds: Long,
     ) {
         megaChatApi.getChatRoom(call.chatid)?.let { chat ->
             if (!chat.isGroup && !chat.isMeeting && participants.contains(participant)) {
-                if (countDownTimer == null) {
+                if (finishCallCountDownTimer == null) {
                     participants.remove(participant)
 
                     val countDownTimerLiveData: MutableLiveData<Boolean> = MutableLiveData()
-                    countDownTimer = CustomCountDownTimer(countDownTimerLiveData)
+                    finishCallCountDownTimer = CustomCountDownTimer(countDownTimerLiveData)
+
                     countDownTimerLiveData.observeOnce { counterState ->
                         counterState?.let { isFinished ->
                             if (isFinished) {
                                 Timber.d("Count down timer ends. Hang call")
                                 endCallUseCase.hangCall(call.callId)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
                                     .subscribeBy(
                                         onComplete = {
-                                            removeCountDownTimer()
+                                            removeFinishCallCountDownTimer()
                                         },
                                         onError = { error ->
                                             Timber.e(error.stackTraceToString())
@@ -265,7 +274,7 @@ class GetCallSoundsUseCase @Inject constructor(
                 }
 
                 Timber.d("Count down timer starts")
-                countDownTimer?.start(seconds)
+                finishCallCountDownTimer?.start(seconds)
             }
         }
     }
@@ -291,19 +300,30 @@ class GetCallSoundsUseCase @Inject constructor(
                 }
 
                 participants.add(participant)
-                removeCountDownTimer()
+                removeFinishCallCountDownTimer()
             }
         }
     }
 
     /**
-     * Remove Count down timer
+     * Remove Finish call Count down timer
      */
-    private fun removeCountDownTimer() {
-        countDownTimer?.apply {
+    private fun removeFinishCallCountDownTimer() {
+        finishCallCountDownTimer?.apply {
             Timber.d("Count down timer stops")
             stop()
         }
-        countDownTimer = null
+        finishCallCountDownTimer = null
+    }
+
+    /**
+     * Remove Waiting for others Count down timer
+     */
+    private fun removeWaitingForOthersCountDownTimer() {
+        waitingForOthersCountDownTimer?.apply {
+            Timber.d("Count down timer stops")
+            stop()
+        }
+        waitingForOthersCountDownTimer = null
     }
 }

@@ -98,7 +98,6 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NAME_CHANGE
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
-import mega.privacy.android.app.utils.Constants.SECONDS_IN_MINUTE
 import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_ALONE_ON_THE_CALL
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.TYPE_AUDIO
@@ -108,7 +107,6 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.app.utils.TimeUtils.SECOND
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.VideoCaptureUtils
@@ -2030,16 +2028,29 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             toolbar.alpha = 1 - it
             // When the bottom on the top, will set the toolbar invisible, otherwise will cover the scroll event of the panel
             toolbar.isVisible = it != 1.0f
-            if (bannerMuteLayout.isVisible) {
-                bannerMuteLayout.alpha = 1 - it
+
+            bannerMuteLayout.apply {
+                if (isVisible) {
+                    alpha = 1 - it
+                }
             }
 
-            if (bannerInfo != null && bannerInfo!!.isVisible) {
-                bannerInfo!!.alpha = 1 - it
+            callBanner?.apply {
+                if (isVisible) {
+                    alpha = 1 - it
+                }
             }
 
-            if (bannerAnotherCallLayout.isVisible) {
-                bannerAnotherCallLayout.alpha = 1 - it
+            bannerInfo?.apply {
+                if (isVisible) {
+                    alpha = 1 - it
+                }
+            }
+
+            bannerAnotherCallLayout.apply {
+                if (isVisible) {
+                    alpha = 1 - it
+                }
             }
         }
     }
@@ -2796,10 +2807,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         firstButton.text =
             StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call)
-                .uppercase()
+
         secondButton.text =
             StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call)
-                .uppercase()
 
         firstButton.setOnClickListener {
             inMeetingViewModel.checkEndCall()
