@@ -27,7 +27,6 @@ class DefaultGetOutgoingSharesChildrenNode @Inject constructor(
         } else {
             getNodeByHandle(parentHandle)
                 ?.let { getChildrenNode(it, getCloudSortOrder()) }
-                ?: run { null }
         }
     }
 }
