@@ -18,6 +18,8 @@ import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment
 import mega.privacy.android.app.presentation.shares.managerState
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
+import mega.privacy.android.app.utils.Constants.ORDER_OTHERS
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
@@ -209,7 +211,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
     override fun setNodes(nodes: List<MegaNode>) {}
 
-    override fun setEmptyView() {
+    private fun setEmptyView() {
         var textToShow: String? = null
 
         if (isInvalidParentHandle()) {
@@ -232,7 +234,17 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         adapter.updateItem(contactHandle)
     }
 
+    override fun showSortByPanel() {
+        val orderType = when (managerState().outgoingTreeDepth) {
+            0 -> ORDER_OTHERS
+            else -> ORDER_CLOUD
+        }
+        managerActivity.showNewSortByPanel(orderType)
+    }
+
     override fun viewerFrom(): Int = Constants.VIEWER_FROM_OUTGOING_SHARES
+
+    override fun getParentHandle(): Long = managerState().outgoingParentHandle
 
     /**
      * Initialize the adapter

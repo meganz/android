@@ -22,16 +22,13 @@ import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
-import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.listeners.GetUserEmailListener
-import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
@@ -95,7 +92,6 @@ class InMeetingViewModel @Inject constructor(
     var previousState: Int = CALL_STATUS_INITIAL
 
     var isSpeakerSelectionAutomatic: Boolean = true
-    var countDownTimer: CustomCountDownTimer? = null
 
     private var haveConnection: Boolean = false
 
@@ -211,6 +207,20 @@ class InMeetingViewModel @Inject constructor(
         }
     }
 
+    private val waitingForOthersBannerObserver =
+        Observer<android.util.Pair<Long, Boolean>> { result ->
+            val chatId: Long = result.first
+            val onlyMeInTheCall: Boolean = result.second
+            if (currentChatId == chatId) {
+                if (onlyMeInTheCall) {
+                    _showWaitingForOthersBanner.value = false
+                    if (!MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+                        _showOnlyMeBanner.value = true
+                    }
+                }
+            }
+        }
+
     init {
         getParticipantsChangesUseCase.getChangesFromParticipants()
             .subscribeOn(Schedulers.io())
@@ -235,45 +245,24 @@ class InMeetingViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { (chatId, onlyMeInTheCall, waitingForOthers) ->
+                onNext = { (chatId, onlyMeInTheCall, waitingForOthers, isReceivedChange) ->
                     if (currentChatId == chatId) {
+                        val millisecondsOnlyMeInCallDialog =
+                            TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog)
+
                         if (onlyMeInTheCall) {
                             hideBottomPanels()
-                            val millisecondsOnlyMeInCallDialog =
-                                TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog)
-
                             if (waitingForOthers && millisecondsOnlyMeInCallDialog <= 0) {
                                 _showOnlyMeBanner.value = false
                                 _showWaitingForOthersBanner.value = true
-
-                                if (countDownTimer == null) {
-                                    val countDownTimerLiveData: MutableLiveData<Boolean> =
-                                        MutableLiveData()
-
-                                    countDownTimer = CustomCountDownTimer(countDownTimerLiveData)
-                                    countDownTimerLiveData.observeOnce { counterState ->
-                                        counterState?.let { isFinished ->
-                                            if (isFinished) {
-                                                _showWaitingForOthersBanner.value = false
-                                                _showOnlyMeBanner.value = true
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    countDownTimer?.stop()
+                            } else {
+                                _showWaitingForOthersBanner.value = false
+                                if (waitingForOthers || !isReceivedChange) {
+                                    _showOnlyMeBanner.value = true
                                 }
 
-                                val secondsWaitingForOthersCallDialog =
-                                    TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsWaitingForOthersCallDialog)
-                                countDownTimer?.start(if (secondsWaitingForOthersCallDialog > 0) secondsWaitingForOthersCallDialog else SECONDS_TO_WAIT_FOR_OTHERS_PARTICIPANTS)
-
-                            } else {
-                                countDownTimer?.stop()
-                                _showWaitingForOthersBanner.value = false
-                                _showOnlyMeBanner.value = true
                             }
                         } else {
-                            countDownTimer?.stop()
                             _showWaitingForOthersBanner.value = false
                             _showOnlyMeBanner.value = false
                         }
@@ -291,6 +280,11 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
             .observeForever(noOutgoingCallObserver)
+
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
+            .observeForever(waitingForOthersBannerObserver as Observer<Any>)
+
     }
 
     /**
@@ -422,6 +416,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun checkStayCall() {
         MegaApplication.getChatManagement().stopCounterToFinishCall()
+        MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
         if (_showOnlyMeBanner.value) {
             _showOnlyMeBanner.value = false
             if (isRequestSent()) {
@@ -453,7 +448,7 @@ class InMeetingViewModel @Inject constructor(
     fun startCounterTimerAfterBanner() {
         MegaApplication.getChatManagement().stopCounterToFinishCall()
         MegaApplication.getChatManagement()
-            .startCounterToFinishCall(currentChatId, SECONDS_TO_WAIT_ALONE_ON_THE_CALL)
+            .startCounterToFinishCall(currentChatId)
     }
 
     /**
@@ -1932,6 +1927,10 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
             .removeObserver(noOutgoingCallObserver)
+
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EventConstants.EVENT_SESSION_STATUS_CHANGE)
+            .removeObserver(waitingForOthersBannerObserver as Observer<Any>)
     }
 
     override fun onEditedChatRoomName(chatId: Long, name: String) {

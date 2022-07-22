@@ -409,14 +409,12 @@ public class NodeController {
                         drawerItem = DrawerItem.SHARED_ITEMS;
                         if (parentIntentN.getHandle() == -1) {
                             Timber.d("Level 0 of Incoming");
-                            ((ManagerActivity) context).setParentHandleIncoming(-1);
-                            ((ManagerActivity) context).setDeepBrowserTreeIncoming(0);
+                            ((ManagerActivity) context).setDeepBrowserTreeIncoming(0, -1L);
                             firstNavigationLevel = true;
                         } else {
                             firstNavigationLevel = false;
-                            ((ManagerActivity) context).setParentHandleIncoming(parentIntentN.getHandle());
                             int deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, context);
-                            ((ManagerActivity) context).setDeepBrowserTreeIncoming(deepBrowserTreeIncoming);
+                            ((ManagerActivity) context).setDeepBrowserTreeIncoming(deepBrowserTreeIncoming, parentIntentN.getHandle());
                             Timber.d("After calculating deepBrowserTreeIncoming: %s", deepBrowserTreeIncoming);
                         }
                         ((ManagerActivity) context).setTabItemShares(0);
@@ -434,8 +432,7 @@ public class NodeController {
                 Timber.w("Parent is already NULL");
 
                 drawerItem = DrawerItem.SHARED_ITEMS;
-                ((ManagerActivity) context).setParentHandleIncoming(-1);
-                ((ManagerActivity) context).setDeepBrowserTreeIncoming(0);
+                ((ManagerActivity) context).setDeepBrowserTreeIncoming(0, -1L);
                 firstNavigationLevel = true;
                 ((ManagerActivity) context).setTabItemShares(0);
             }

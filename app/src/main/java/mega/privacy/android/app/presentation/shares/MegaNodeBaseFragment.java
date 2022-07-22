@@ -14,8 +14,6 @@ import static mega.privacy.android.app.utils.Constants.LINKS_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
-import static mega.privacy.android.app.utils.Constants.ORDER_CLOUD;
-import static mega.privacy.android.app.utils.Constants.ORDER_OTHERS;
 import static mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
@@ -131,8 +129,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public ManagerViewModel managerViewModel;
 
     public abstract void setNodes(List<MegaNode> nodes);
-
-    public abstract void setEmptyView();
 
     public abstract int onBackPressed();
 
@@ -393,22 +389,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     /**
      * Shows the Sort by panel.
      */
-    protected void showSortByPanel() {
-        int orderType = ORDER_CLOUD;
-
-        // Root of incoming shares tab, display sort options OTHERS
-        if (getCurrentSharesTab() == SharesTab.INCOMING_TAB
-                && managerState(this).getIncomingTreeDepth() == 0) {
-            orderType = ORDER_OTHERS;
-        }
-        // Root of outgoing shares tab, display sort options OTHERS
-        else if (getCurrentSharesTab() == SharesTab.OUTGOING_TAB
-                && managerState(this).getOutgoingTreeDepth() == 0) {
-            orderType = ORDER_OTHERS;
-        }
-
-        managerActivity.showNewSortByPanel(orderType);
-    }
+    protected abstract void showSortByPanel();
 
     public ActionMode getActionMode() {
         return actionMode;
@@ -495,7 +476,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         if (mimeType.isImage()) {
             intent = ImageViewerActivity.getIntentForParentNode(
                     requireContext(),
-                    getParentHandle(fragmentAdapter),
+                    getParentHandle(),
                     getIntentOrder(fragmentAdapter),
                     node.getHandle()
             );
@@ -515,7 +496,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
             intent.putExtra("position", position);
             intent.putExtra("placeholder", adapter.getPlaceholderCount());
-            intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
+            intent.putExtra("parentNodeHandle", getParentHandle());
             intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("HANDLE", node.getHandle());
@@ -626,7 +607,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             manageTextFileIntent(requireContext(), node, fragmentAdapter);
         } else {
             Timber.d("itemClick:isFile:otherOption");
-            onNodeTapped(requireContext(), node, managerActivity::saveNodeByTap, managerActivity, managerActivity);
+            onNodeTapped(requireActivity(), node, managerActivity::saveNodeByTap, managerActivity, managerActivity);
         }
     }
 
@@ -779,21 +760,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         checkEmptyView();
     }
 
-    private long getParentHandle(int fragmentAdapter) {
-        switch (fragmentAdapter) {
-            case INCOMING_SHARES_ADAPTER:
-                return managerState(this).getIncomingParentHandle();
-
-            case OUTGOING_SHARES_ADAPTER:
-                return managerState(this).getOutgoingParentHandle();
-
-            case LINKS_ADAPTER:
-                return managerState(this).getLinksParentHandle();
-            default:
-                return INVALID_HANDLE;
-        }
-
-    }
+    protected abstract long getParentHandle();
 
     protected void hideActionMode() {
         clearSelections();

@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.provider.Settings.System.FONT_SCALE
 import android.provider.Settings.System.getFloat
 import android.util.TypedValue.COMPLEX_UNIT_PX
@@ -58,6 +59,7 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
 import org.jetbrains.anko.configuration
+import timber.log.Timber
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
@@ -181,8 +183,12 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      * @param originalTextSize original text size
      */
     private fun setTextSizeBasedOnSystem(textView: TextView, originalTextSize: Float) {
-        val size = originalTextSize * getFloat(contentResolver, FONT_SCALE)
-        textView.setTextSize(COMPLEX_UNIT_PX, size)
+        try {
+            val size = originalTextSize * getFloat(contentResolver, FONT_SCALE)
+            textView.setTextSize(COMPLEX_UNIT_PX, size)
+        } catch (exception: Settings.SettingNotFoundException) {
+            Timber.e(exception)
+        }
     }
 
     /**

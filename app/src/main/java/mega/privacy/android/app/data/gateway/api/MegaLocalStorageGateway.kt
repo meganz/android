@@ -1,6 +1,7 @@
 package mega.privacy.android.app.data.gateway.api
 
 import mega.privacy.android.app.data.model.UserCredentials
+import mega.privacy.android.app.main.megachat.NonContactInfo
 import mega.privacy.android.domain.entity.SyncRecord
 
 /**
@@ -31,6 +32,12 @@ interface MegaLocalStorageGateway {
      * @return camera sort order
      */
     suspend fun getCameraSortOrder(): Int
+
+    /**
+     * Get others sort order
+     * @return others sort order
+     */
+    suspend fun getOthersSortOrder(): Int
 
     /**
      * Get user credentials
@@ -299,4 +306,19 @@ interface MegaLocalStorageGateway {
         localPath: String?,
         isSecondary: Boolean,
     )
+
+    /**
+     * Get non contact by handle
+     *
+     * @param userHandle
+     */
+    suspend fun getNonContactByHandle(userHandle: Long): NonContactInfo?
+
+    /**
+     * Set non contact email
+     *
+     * @param userHandle
+     * @param email
+     */
+    suspend fun setNonContactEmail(userHandle: Long, email: String)
 }

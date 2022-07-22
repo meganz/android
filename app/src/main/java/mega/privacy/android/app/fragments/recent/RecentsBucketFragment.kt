@@ -216,7 +216,7 @@ class RecentsBucketFragment : Fragment() {
             }
             else -> {
                 onNodeTapped(
-                    requireContext(),
+                    requireActivity(),
                     node,
                     {
                         (requireActivity() as ManagerActivity).saveNodeByTap(it)

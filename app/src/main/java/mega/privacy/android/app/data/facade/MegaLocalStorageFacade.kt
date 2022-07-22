@@ -4,6 +4,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.model.UserCredentials
+import mega.privacy.android.app.main.megachat.NonContactInfo
 import mega.privacy.android.domain.entity.SyncRecord
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
@@ -31,6 +32,9 @@ class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getCameraSortOrder(): Int =
         dbHandler.preferences?.preferredSortCameraUpload?.toInt() ?: ORDER_MODIFICATION_DESC
+
+    override suspend fun getOthersSortOrder(): Int =
+        dbHandler.preferences?.preferredSortOthers?.toInt() ?: ORDER_DEFAULT_ASC
 
     override suspend fun getUserCredentials(): UserCredentials? = dbHandler.credentials
 
@@ -166,4 +170,11 @@ class MegaLocalStorageFacade @Inject constructor(
         localPath: String?,
         isSecondary: Boolean,
     ) = dbHandler.updateSyncRecordStatusByLocalPath(syncStatusType, localPath, isSecondary)
+
+    override suspend fun getNonContactByHandle(userHandle: Long): NonContactInfo? =
+        dbHandler.findNonContactByHandle(userHandle.toString())
+
+    override suspend fun setNonContactEmail(userHandle: Long, email: String) {
+        dbHandler.setNonContactEmail(email, userHandle.toString())
+    }
 }

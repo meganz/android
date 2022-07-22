@@ -1,14 +1,10 @@
 
-
-# env variables from Jenkins
-#WORKSPACE="/Users/robin/work/android"
-
 # local variables
 LIB_DOWNLOAD_ROOT="$WORKSPACE/mega_android_ci_download"
 WEBRTC_DOWNLOAD_PATH="${LIB_DOWNLOAD_ROOT}/webrtc_download"
-BUILD_SH="${WORKSPACE}/app/src/main/jni/build.sh"
+BUILD_SH="${WORKSPACE}/sdk/src/main/jni/build.sh"
 SAMPLE_LIB_FILE="libwebrtc_arm64.a"
-WEBRTC_LIB_FILE=${WORKSPACE}/app/src/main/jni/megachat/webrtc/${SAMPLE_LIB_FILE}
+WEBRTC_LIB_FILE=${WORKSPACE}/sdk/src/main/jni/megachat/webrtc/${SAMPLE_LIB_FILE}
 
 mkdir -p "${WEBRTC_DOWNLOAD_PATH}"
 
@@ -16,7 +12,7 @@ function download_webrtc {
 
     # remove webrtc from target folder
     echo "  Deleting webrtc from target folder"
-    rm -fr ${WORKSPACE}/app/src/main/jni/megachat/webrtc
+    rm -fr ${WORKSPACE}/sdk/src/main/jni/megachat/webrtc
 
     URL=$1
     cd ${WEBRTC_DOWNLOAD_PATH}
@@ -36,7 +32,7 @@ function download_webrtc {
         echo ">>> WebRTC folder found!"
         echo "  $(pwd)"
         echo ">>> copying WebRTC to target folder"
-        cp -fr "webrtc"  ${WORKSPACE}/app/src/main/jni/megachat/
+        cp -fr "webrtc"  ${WORKSPACE}/sdk/src/main/jni/megachat/
     else
         echo ">>> WebRTC not in root of zip file. Go down to subfolder...."
         cd $FOLDER
@@ -44,7 +40,7 @@ function download_webrtc {
         if test -f "${SUB_FOLDER}/libwebrtc_arm64.a"; then
             echo "  $(pwd)"
             echo ">>> Copying webrtc to target folder"
-            cp -fr "webrtc"  ${WORKSPACE}/app/src/main/jni/megachat/
+            cp -fr "webrtc"  ${WORKSPACE}/sdk/src/main/jni/megachat/
         else
             echo ">>> cannot found webrtc in downloaded structure. Aborting...."
             exit 1

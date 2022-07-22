@@ -14,6 +14,7 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.AddContactListener
 import mega.privacy.android.app.meeting.listeners.MeetingAvatarListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
+import mega.privacy.android.app.meeting.startChatCall
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -77,7 +78,12 @@ class InMeetingRepository @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) {
         Timber.d("Starting call with video enable $enableVideo and audio enable $enableAudio")
-        megaChatApi.startChatCall(chatId, enableVideo, enableAudio, listener)
+        startChatCall(
+            megaChatApi = megaChatApi,
+            chatId = chatId,
+            enableVideo = enableVideo,
+            enableAudio = enableAudio,
+            listener = listener)
     }
 
     /**

@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -27,24 +26,46 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentDocumentsBinding
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.ActionModeCallback
+import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.HomepageSearchable
+import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
+import mega.privacy.android.app.fragments.homepage.NodeGridAdapter
+import mega.privacy.android.app.fragments.homepage.NodeListAdapter
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.Constants.DOCUMENTS_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.Constants.DOCUMENTS_SEARCH_ADAPTER
+import mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
+import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.app.utils.displayMetrics
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
-import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -134,15 +155,20 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     }
 
     private fun setupEmptyHint() {
-        binding.emptyHint.emptyHintImage.isVisible = false
-        binding.emptyHint.emptyHintText.isVisible = false
-        binding.emptyHint.emptyHintText.text = HtmlCompat.fromHtml(
-            TextUtil.formatEmptyScreenText(
-                context,
-                StringResourcesUtils.getString(R.string.homepage_empty_hint_documents)
-            ),
-            HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
+        with(binding.emptyHint) {
+            emptyHintImage.isVisible = false
+            emptyHintImage.setImageResource(R.drawable.ic_homepage_empty_document)
+            emptyHintText.isVisible = false
+            val colorStart = ColorUtils.getColorHexString(
+                requireContext(), R.color.grey_900_grey_100)
+            val colorEnd = ColorUtils.getColorHexString(
+                requireContext(), R.color.grey_300_grey_600)
+            emptyHintText.text = TextUtil.replaceFormatText(
+                getString(R.string.homepage_empty_hint_documents),
+                colorStart,
+                colorEnd
+            )
+        }
     }
 
     private fun doIfOnline(operation: () -> Unit) {
@@ -481,7 +507,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             )
         } else {
             onNodeTapped(
-                requireContext(),
+                requireActivity(),
                 node,
                 { (requireActivity() as ManagerActivity).saveNodeByTap(it) },
                 requireActivity() as ManagerActivity,

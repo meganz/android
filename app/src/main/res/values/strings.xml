@@ -1587,7 +1587,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Invalid characters</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">The following characters are not allowed: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">File name cannot be empty.</item>
@@ -4026,4 +4026,6 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to standard role by %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s was changed to host role by %2$s</string>
+    <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
 </resources>

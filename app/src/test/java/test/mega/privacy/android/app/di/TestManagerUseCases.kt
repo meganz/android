@@ -7,16 +7,19 @@ import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.manager.ManagerUseCases
+import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
+import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
-import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.HasInboxChildren
 import nz.mega.sdk.MegaNode
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -75,4 +78,17 @@ object TestManagerUseCases {
     fun provideHasInboxChildren() = mock<HasInboxChildren> {
         onBlocking { invoke() }.thenReturn(false)
     }
+
+    @Provides
+    fun provideGetIncomingSharesNode() = mock<GetIncomingSharesChildrenNode> {
+        onBlocking { invoke(any()) }.thenReturn(emptyList())
+    }
+
+    @Provides
+    fun provideAuthorizeNode() = mock<AuthorizeNode> {
+        onBlocking { invoke(any()) }.thenReturn(MegaNode())
+    }
+
+    @Provides
+    fun provideGetParentNodeHandle() = mock<GetParentNodeHandle> {}
 }

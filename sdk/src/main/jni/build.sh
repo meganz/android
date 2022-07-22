@@ -53,7 +53,12 @@ LIBDIR=${BASE_PATH}/../obj/local/armeabi
 JAVA_OUTPUT_PATH=${BASE_PATH}/../java
 APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
 API_LEVEL=`echo ${APP_PLATFORM} | cut -d'-' -f2`
-JOBS=8
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    JOBS=$(sysctl -n hw.ncpu)
+else
+    JOBS=8
+fi
+
 if [ -z "${LOG_FILE}" ]; then
     # If no build log variable is defined, use below value.
     LOG_FILE=/dev/null # Ensure you use a full path
@@ -290,7 +295,7 @@ if [ "$1" == "bindings" ]; then
     createMEGABindings
     echo "* Bindings ready!"
     echo "* Running ndk-build"
-    ${NDK_BUILD} -j8
+    ${NDK_BUILD} -j${JOBS}
     echo "* ndk-build finished"
     echo "* Task finished OK"
     exit 0
@@ -669,7 +674,7 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     mv ${EXOPLAYER}/flac-${FLAC_VERSION} ${FLAC_EXT_PATH}/flac
     echo "* Building FLAC"
     pushd ${FLAC_EXT_PATH} &>> ${LOG_FILE}
-    ${NDK_BUILD} APP_ABI=all -j4 &>> ${LOG_FILE}
+    ${NDK_BUILD} APP_ABI=all -j${JOBS} &>> ${LOG_FILE}
     popd &>> ${LOG_FILE}
     echo "* Building ExoPlayer FLAC extension"
     pushd ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER} &>> ${LOG_FILE}
