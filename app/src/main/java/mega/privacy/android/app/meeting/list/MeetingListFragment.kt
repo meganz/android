@@ -31,7 +31,7 @@ class MeetingListFragment : Fragment() {
     private lateinit var binding: FragmentMeetingListBinding
 
     private val viewModel by viewModels<MeetingListViewModel>()
-    private val adapter by lazy { MeetingsAdapter(::onItemClick, ::onItemMoreClick) }
+    private val meetingsAdapter by lazy { MeetingsAdapter(::onItemClick, ::onItemMoreClick) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,7 +54,7 @@ class MeetingListFragment : Fragment() {
 
     private fun setupView() {
         binding.list.apply {
-            adapter = adapter
+            adapter = meetingsAdapter
             setHasFixedSize(true)
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -78,7 +78,7 @@ class MeetingListFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.getMeetings().observe(viewLifecycleOwner) { items ->
-            adapter.submitList(items)
+            meetingsAdapter.submitList(items)
             binding.viewEmpty.isVisible = items.isNullOrEmpty()
         }
     }
@@ -106,7 +106,6 @@ class MeetingListFragment : Fragment() {
     }
 
     private fun onItemMoreClick(chatId: Long) {
-        MeetingListBottomSheetDialogFragment.newInstance(chatId)
-            .show(childFragmentManager)
+        MeetingListBottomSheetDialogFragment.newInstance(chatId).show(childFragmentManager)
     }
 }

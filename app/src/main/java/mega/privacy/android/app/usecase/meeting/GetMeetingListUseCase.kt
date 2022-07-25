@@ -3,14 +3,17 @@ package mega.privacy.android.app.usecase.meeting
 import android.content.Context
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
+import androidx.lifecycle.Observer
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -33,6 +36,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -126,6 +130,20 @@ class GetMeetingListUseCase @Inject constructor(
                 }
             )
 
+            val muteObserver = Observer<Any> {
+                if (emitter.isCancelled) return@Observer
+                Completable.fromAction {
+                    val index = meetings.indexOfFirst { it.isMuted != !megaApi.isChatNotifiable(it.chatId) }
+                    if (index != Constants.INVALID_POSITION) {
+                        val oldItem = meetings[index]
+                        meetings[index] = oldItem.copy(isMuted = !oldItem.isMuted)
+                        emitter.onNext(meetings.sortedByDescending { it.timeStamp })
+                    }
+                }
+                    .delaySubscription(1L, TimeUnit.SECONDS) // SDK not updated without delay
+                    .subscribeBy(onError = Timber::e)
+            }
+
             megaChatApi.getChatRoomsByType(MegaChatApi.CHAT_TYPE_MEETING_ROOM)
                 .filter { it.isActive && !it.isArchived }
                 .forEach { chatRoom ->
@@ -160,8 +178,11 @@ class GetMeetingListUseCase @Inject constructor(
                     onError = Timber::e
                 ).addTo(changesSubscription)
 
+            LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).observeForever(muteObserver)
+
             emitter.setCancellable {
                 changesSubscription.dispose()
+                LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).removeObserver(muteObserver)
             }
         }, BackpressureStrategy.LATEST)
 
@@ -174,6 +195,7 @@ class GetMeetingListUseCase @Inject constructor(
     private fun MegaChatRoom.toMeetingItem(listener: OptionalMegaRequestListenerInterface): MeetingItem {
         val chatListItem = megaChatApi.getChatListItem(chatId)
         val title = ChatUtil.getTitleChat(this)
+        val isMuted = !megaApi.isChatNotifiable(chatId)
         val formattedDate = TimeUtils.formatDateAndTime(
             context,
             chatListItem.lastTimestamp,
@@ -205,7 +227,7 @@ class GetMeetingListUseCase @Inject constructor(
             chatId = chatId,
             title = title,
             lastMessage = lastMessageFormatted,
-            isMuted = isChatDndEnabled(),
+            isMuted = isMuted,
             firstUser = firstUser,
             lastUser = lastUser,
             timeStamp = chatListItem.lastTimestamp,
@@ -262,14 +284,5 @@ class GetMeetingListUseCase @Inject constructor(
             avatarColor = userAvatarColor
         )
     }
-
-    /**
-     * Check if chat DND is enabled for a MegaChatRoom
-     *
-     * @return  true if its enabled, false otherwise
-     */
-    private fun MegaChatRoom.isChatDndEnabled(): Boolean =
-        MegaApplication.getPushNotificationSettingManagement()?.pushNotificationSetting
-            ?.isChatDndEnabled(chatId) ?: false
 }
 

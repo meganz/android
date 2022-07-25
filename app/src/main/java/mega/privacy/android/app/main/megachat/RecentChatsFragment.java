@@ -597,7 +597,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 }
 
                 if (context instanceof ManagerActivity) {
-                    chats = megaChatApi.getChatListItems();
+                    chats = megaChatApi.getChatListItemsByType(MegaChatApi.CHAT_TYPE_NON_MEETING);
                 } else {
                     chats = megaChatApi.getArchivedChatListItems();
                 }

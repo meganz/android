@@ -16,6 +16,8 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 public class PushNotificationSettingManagement {
 
     private MegaPushNotificationSettings push;
@@ -151,5 +153,6 @@ public class PushNotificationSettingManagement {
 
         MegaApplication.getInstance().getMegaApi().setPushNotificationSettings(push, null);
         muteChat(context, option);
+        LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).post(null);
     }
 }
