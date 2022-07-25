@@ -160,22 +160,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
         emptyLayout = v.findViewById(R.id.empty_state_recents);
 
-        ImageView emptyImage = v.findViewById(R.id.empty_image_recents);
-
-        ConstraintLayout emptyView = v.findViewById(R.id.empty_layout);
-        ConstraintSet constraintSet = new ConstraintSet();
-        constraintSet.clone(emptyView);
-
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            emptyImage.setImageResource(R.drawable.empty_recents_landscape);
-            constraintSet.connect(R.id.empty_image_recents, ConstraintSet.TOP, R.id.parent, ConstraintSet.TOP, LANDSCAPE_EMPTY_IMAGE_MARGIN);
-        } else {
-            emptyImage.setImageResource(R.drawable.empty_recents_portrait);
-            constraintSet.connect(R.id.empty_image_recents, ConstraintSet.TOP, R.id.guideline, ConstraintSet.BOTTOM, 0);
-        }
-
-        constraintSet.applyTo(emptyView);
-
         emptyText = v.findViewById(R.id.empty_text_recents);
 
         showActivityButton = v.findViewById(R.id.show_activity_button);
