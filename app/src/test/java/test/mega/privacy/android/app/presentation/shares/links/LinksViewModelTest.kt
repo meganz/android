@@ -13,6 +13,8 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaNode
 import org.junit.Before
@@ -32,6 +34,12 @@ class LinksViewModelTest {
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getParentNodeHandle = mock<GetParentNodeHandle>()
     private val getPublicLinks = mock<GetPublicLinks>()
+    private val getCloudSortOrder = mock<GetCloudSortOrder> {
+        onBlocking { invoke() }.thenReturn(1)
+    }
+    private val getLinksSortOrder = mock<GetLinksSortOrder> {
+        onBlocking { invoke() }.thenReturn(2)
+    }
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
     @get:Rule
@@ -44,6 +52,8 @@ class LinksViewModelTest {
             getNodeByHandle,
             getParentNodeHandle,
             getPublicLinks,
+            getCloudSortOrder,
+            getLinksSortOrder,
             monitorNodeUpdates,
         )
     }
@@ -346,4 +356,49 @@ class LinksViewModelTest {
                 }
         }
 
+
+    @Test
+    fun `test that sort order is set with result of getLinksSortOrder if depth is equals to 0 when call setIncomingTreeDepth`() =
+        runTest {
+            val expected = 5
+            whenever(getPublicLinks(any())).thenReturn(mock())
+            whenever(getLinksSortOrder()).thenReturn(expected)
+
+            underTest.state.map { it.sortOrder }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(0)
+                    underTest.resetLinksTreeDepth()
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+        }
+
+    @Test
+    fun `test that sort order is set with result of getCloudSortOrder if depth is different than 0 when call setIncomingTreeDepth`() =
+        runTest {
+            val expected = 5
+            whenever(getPublicLinks(any())).thenReturn(mock())
+            whenever(getCloudSortOrder()).thenReturn(expected)
+
+            underTest.state.map { it.sortOrder }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(0)
+                    underTest.increaseLinksTreeDepth(any())
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+        }
+
+    @Test
+    fun `test that sort order is set with result of getLinksSortOrder when refreshNodes fails`() =
+        runTest {
+            val expected = 5
+            whenever(getPublicLinks(any())).thenReturn(null)
+            whenever(getLinksSortOrder()).thenReturn(expected)
+
+            underTest.state.map { it.sortOrder }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(0)
+                    underTest.increaseLinksTreeDepth(any())
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+        }
 }

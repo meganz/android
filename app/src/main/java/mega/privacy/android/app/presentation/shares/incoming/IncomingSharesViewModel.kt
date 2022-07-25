@@ -12,6 +12,8 @@ import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -28,6 +30,8 @@ class IncomingSharesViewModel @Inject constructor(
     private val authorizeNode: AuthorizeNode,
     private val getParentNodeHandle: GetParentNodeHandle,
     private val getIncomingSharesChildrenNode: GetIncomingSharesChildrenNode,
+    private val getCloudSortOrder: GetCloudSortOrder,
+    private val getOthersSortOrder: GetOthersSortOrder,
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
@@ -111,7 +115,8 @@ class IncomingSharesViewModel @Inject constructor(
                 isLoading = true,
                 incomingTreeDepth = depth,
                 incomingHandle = handle,
-                incomingParentHandle = getParentNodeHandle(handle)
+                incomingParentHandle = getParentNodeHandle(handle),
+                sortOrder = if (depth == 0) getOthersSortOrder() else getCloudSortOrder()
             )
         }
 
@@ -130,7 +135,8 @@ class IncomingSharesViewModel @Inject constructor(
                     incomingHandle = -1L,
                     isInvalidHandle = true,
                     isLoading = false,
-                    incomingParentHandle = null
+                    incomingParentHandle = null,
+                    sortOrder = getOthersSortOrder()
                 )
             }
         }

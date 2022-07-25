@@ -13,6 +13,8 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaNode
 import org.junit.Before
@@ -32,6 +34,12 @@ class OutgoingSharesViewModelTest {
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getParentNodeHandle = mock<GetParentNodeHandle>()
     private val getOutgoingSharesChildrenNode = mock<GetOutgoingSharesChildrenNode>()
+    private val getCloudSortOrder = mock<GetCloudSortOrder> {
+        onBlocking { invoke() }.thenReturn(1)
+    }
+    private val getOtherSortOrder = mock<GetOthersSortOrder> {
+        onBlocking { invoke() }.thenReturn(2)
+    }
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
     @get:Rule
@@ -44,6 +52,8 @@ class OutgoingSharesViewModelTest {
             getNodeByHandle,
             getParentNodeHandle,
             getOutgoingSharesChildrenNode,
+            getCloudSortOrder,
+            getOtherSortOrder,
             monitorNodeUpdates
         )
     }
@@ -57,6 +67,7 @@ class OutgoingSharesViewModelTest {
             assertThat(initial.nodes).isEmpty()
             assertThat(initial.isInvalidHandle).isEqualTo(true)
             assertThat(initial.outgoingParentHandle).isEqualTo(null)
+            assertThat(initial.sortOrder).isEqualTo(0)
         }
     }
 
@@ -343,6 +354,51 @@ class OutgoingSharesViewModelTest {
                     whenever(getOutgoingSharesChildrenNode(any())).thenReturn(null)
                     underTest.increaseOutgoingTreeDepth(123456789L)
                     assertThat(awaitItem()).isEqualTo(null)
+                }
+        }
+
+    @Test
+    fun `test that sort order is set with result of getOthersSortOrder if depth is equals to 0 when call setIncomingTreeDepth`() =
+        runTest {
+            val expected = 5
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOtherSortOrder()).thenReturn(expected)
+
+            underTest.state.map { it.sortOrder }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(0)
+                    underTest.resetOutgoingTreeDepth()
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+        }
+
+    @Test
+    fun `test that sort order is set with result of getCloudSortOrder if depth is different than 0 when call setIncomingTreeDepth`() =
+        runTest {
+            val expected = 5
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getCloudSortOrder()).thenReturn(expected)
+
+            underTest.state.map { it.sortOrder }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(0)
+                    underTest.increaseOutgoingTreeDepth(any())
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+        }
+
+    @Test
+    fun `test that sort order is set with result of getOtherSortOrder when refreshNodes fails`() =
+        runTest {
+            val expected = 5
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(null)
+            whenever(getOtherSortOrder()).thenReturn(expected)
+
+            underTest.state.map { it.sortOrder }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(0)
+                    underTest.increaseOutgoingTreeDepth(any())
+                    assertThat(awaitItem()).isEqualTo(expected)
                 }
         }
 

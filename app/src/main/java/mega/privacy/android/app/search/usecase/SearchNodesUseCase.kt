@@ -1,20 +1,23 @@
 package mega.privacy.android.app.search.usecase
 
 import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
-import mega.privacy.android.app.presentation.shares.links.LinksFragment.Companion.getLinksOrderCloud
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SortUtil.sortByNameAscending
 import mega.privacy.android.app.utils.SortUtil.sortByNameDescending
+import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
-import java.util.ArrayList
 import javax.inject.Inject
 
 /**
@@ -22,10 +25,14 @@ import javax.inject.Inject
  *
  * @property megaApi                MegaApiAndroid object.
  * @property sortOrderManagement    SortOrderManagement object to check order.
+ * @property getLinksSortOrder
+ * @property ioDispatcher
  */
 class SearchNodesUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val sortOrderManagement: SortOrderManagement
+    private val sortOrderManagement: SortOrderManagement,
+    private val getLinksSortOrder: GetLinksSortOrder,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     companion object {
@@ -51,7 +58,7 @@ class SearchNodesUseCase @Inject constructor(
         parentHandleSearch: Long,
         parentHandle: Long,
         searchType: Int,
-        megaCancelToken: MegaCancelToken
+        megaCancelToken: MegaCancelToken,
     ): Single<ArrayList<MegaNode>> =
         get(
             query,
@@ -86,7 +93,7 @@ class SearchNodesUseCase @Inject constructor(
         megaCancelToken: MegaCancelToken,
         drawerItem: DrawerItem?,
         sharesTab: Int,
-        isFirstNavigationLevel: Boolean
+        isFirstNavigationLevel: Boolean,
     ): Single<ArrayList<MegaNode>> =
         Single.create { emitter ->
             if (query == null) {
@@ -128,13 +135,15 @@ class SearchNodesUseCase @Inject constructor(
                                     }
                                     SharesTab.LINKS_TAB -> {
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
-                                            emitter.onSuccess(
-                                                getLinks(
-                                                    query,
-                                                    isFirstNavigationLevel,
-                                                    megaCancelToken
+                                            runBlocking {
+                                                emitter.onSuccess(
+                                                    getLinks(
+                                                        query,
+                                                        isFirstNavigationLevel,
+                                                        megaCancelToken
+                                                    )
                                                 )
-                                            )
+                                            }
                                             return@create
                                         }
 
@@ -235,16 +244,15 @@ class SearchNodesUseCase @Inject constructor(
     /**
      * Gets search result nodes of Links section, root navigation level.
      */
-    private fun getLinks(
+    private suspend fun getLinks(
         query: String,
         isFirstNavigationLevel: Boolean,
-        megaCancelToken: MegaCancelToken
-    ): ArrayList<MegaNode> =
+        megaCancelToken: MegaCancelToken,
+    ): ArrayList<MegaNode> = withContext(ioDispatcher) {
         if (query.isEmpty()) {
-            megaApi.getPublicLinks(
-                getLinksOrderCloud(sortOrderManagement.getOrderCloud(), isFirstNavigationLevel)
-            )
+            megaApi.getPublicLinks(if (isFirstNavigationLevel) getLinksSortOrder() else sortOrderManagement.getOrderCloud())
         } else {
             megaApi.searchOnPublicLinks(query, megaCancelToken, sortOrderManagement.getOrderCloud())
         }
+    }
 }
