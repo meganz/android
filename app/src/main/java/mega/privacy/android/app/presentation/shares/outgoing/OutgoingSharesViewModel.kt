@@ -44,7 +44,7 @@ class OutgoingSharesViewModel @Inject constructor(
             refreshNodes()?.let { setNodes(it) }
             monitorNodeUpdates().collect {
                 // Uncomment this line once LinksFragment is decoupled from ManagerActivity
-                refreshNodes()?.let { setNodes(it) }
+                //refreshNodes()?.let { setNodes(it) }
             }
         }
     }
