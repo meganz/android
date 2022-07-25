@@ -52,7 +52,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -165,16 +164,11 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         showActivityButton = v.findViewById(R.id.show_activity_button);
         showActivityButton.setOnClickListener(v1 -> showRecentActivity());
 
-        String emptyString = formatEmptyScreenText(requireContext(),
+        emptySpanned = formatEmptyScreenText(requireContext(),
                 StringResourcesUtils.getString(R.string.context_empty_recents));
 
-        emptySpanned = HtmlCompat.fromHtml(emptyString, HtmlCompat.FROM_HTML_MODE_LEGACY);
-
-        String activityHiddenString = formatEmptyScreenText(requireContext(),
+        activityHiddenSpanned = formatEmptyScreenText(requireContext(),
                 StringResourcesUtils.getString(R.string.recents_activity_hidden));
-
-        activityHiddenSpanned =
-                HtmlCompat.fromHtml(activityHiddenString, HtmlCompat.FROM_HTML_MODE_LEGACY);
 
 
         listView = v.findViewById(R.id.list_view_recents);

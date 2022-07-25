@@ -28,7 +28,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -85,7 +84,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StyleUtils
-import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
@@ -413,17 +412,14 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
     }
 
     private fun setEmptyState() {
-        binding.emptyHintText.text = HtmlCompat.fromHtml(
-            TextUtil.formatEmptyScreenText(
-                requireContext(),
-                StringResourcesUtils.getString(when (getCurrentFilter()) {
-                    FILTER_CAMERA_UPLOADS -> R.string.photos_empty
-                    FILTER_CLOUD_DRIVE -> R.string.homepage_empty_hint_photos
-                    FILTER_VIDEOS_ONLY -> R.string.homepage_empty_hint_video
-                    else -> R.string.photos_empty
-                })
-            ),
-            HtmlCompat.FROM_HTML_MODE_LEGACY
+        binding.emptyHintText.text = formatEmptyScreenText(
+            requireContext(),
+            StringResourcesUtils.getString(when (getCurrentFilter()) {
+                FILTER_CAMERA_UPLOADS -> R.string.photos_empty
+                FILTER_CLOUD_DRIVE -> R.string.homepage_empty_hint_photos
+                FILTER_VIDEOS_ONLY -> R.string.homepage_empty_hint_video
+                else -> R.string.photos_empty
+            })
         )
 
         binding.emptyHintImage.setImageResource(

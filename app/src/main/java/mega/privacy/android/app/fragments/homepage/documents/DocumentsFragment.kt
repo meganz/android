@@ -42,7 +42,6 @@ import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
-import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.DOCUMENTS_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.DOCUMENTS_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE
@@ -57,7 +56,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.callManager
@@ -159,15 +158,8 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             emptyHintImage.isVisible = false
             emptyHintImage.setImageResource(R.drawable.ic_homepage_empty_document)
             emptyHintText.isVisible = false
-            val colorStart = ColorUtils.getColorHexString(
-                requireContext(), R.color.grey_900_grey_100)
-            val colorEnd = ColorUtils.getColorHexString(
-                requireContext(), R.color.grey_300_grey_600)
-            emptyHintText.text = TextUtil.replaceFormatText(
-                getString(R.string.homepage_empty_hint_documents),
-                colorStart,
-                colorEnd
-            )
+            emptyHintText.text = formatEmptyScreenText(requireContext(),
+                getString(R.string.homepage_empty_hint_documents))
         }
     }
 
