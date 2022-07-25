@@ -5803,6 +5803,26 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
+    /**
+     * Refreshes the contents of InboxFragment once a sorting method has been selected
+     */
+    private void refreshInboxFragment(int order) {
+        if (inboxFragment != null) {
+            MegaNode inboxParentNode;
+
+            if (viewModel.getState().getValue().getInboxParentHandle() == -1) {
+                inboxParentNode = megaApi.getInboxNode();
+            } else {
+                inboxParentNode = megaApi.getNodeByHandle(viewModel.getState().getValue().getInboxParentHandle());
+            }
+
+            if (inboxParentNode != null) {
+                inboxFragment.setNodes(megaApi.getChildren(inboxParentNode, order));
+                inboxFragment.getRecyclerView().invalidate();
+            }
+        }
+    }
+
     public void refreshAfterMoving() {
         Timber.d("refreshAfterMoving");
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
@@ -7601,22 +7621,16 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void refreshCloudOrder(int order) {
-        //Refresh Cloud Fragment
+        // Refresh Cloud Fragment
         refreshCloudDrive();
 
-        //Refresh Rubbish Fragment
+        // Refresh Rubbish Fragment
         refreshRubbishBin();
 
-        onNodesSharedUpdate();
+        // Refresh Inbox Fragment
+        refreshInboxFragment(order);
 
-        if (getInboxFragment() != null) {
-            MegaNode inboxNode = megaApi.getInboxNode();
-            if (inboxNode != null) {
-                ArrayList<MegaNode> nodes = megaApi.getChildren(inboxNode, order);
-                inboxFragment.setNodes(nodes);
-                inboxFragment.getRecyclerView().invalidate();
-            }
-        }
+        onNodesSharedUpdate();
 
         refreshSearch();
     }
