@@ -31,6 +31,9 @@ class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getCameraSortOrder(): Int =
         dbHandler.preferences?.preferredSortCameraUpload?.toInt() ?: ORDER_MODIFICATION_DESC
 
+    override suspend fun getOthersSortOrder(): Int =
+        dbHandler.preferences?.preferredSortOthers?.toInt() ?: ORDER_DEFAULT_ASC
+
     override suspend fun getUserCredentials(): UserCredentials? = dbHandler.credentials
 
     override suspend fun getNonContactByHandle(userHandle: Long): NonContactInfo? =

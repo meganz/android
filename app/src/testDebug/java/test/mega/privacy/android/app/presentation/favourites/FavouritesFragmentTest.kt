@@ -35,6 +35,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.di.TestSortOrderUseCases
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 import test.mega.privacy.android.app.testFragment
 
@@ -154,7 +155,7 @@ class FavouritesFragmentTest {
         whenever(favourite.isFolder).thenReturn(true)
         val list = listOf(favouriteInfo)
         runBlocking {
-            whenever(FavouritesTestModule.getCloudSortOrder()).thenReturn(1)
+            whenever(TestSortOrderUseCases.getCloudSortOrder()).thenReturn(1)
             whenever(FavouritesTestModule.getAllFavourites()).thenReturn(
                 flowOf(list)
             )

@@ -29,6 +29,12 @@ data class UnknownFileTypeInfo(
     override val extension: String,
 ) : FileTypeInfo
 
+/**
+ * Pdf file type info
+ *
+ * @property type
+ * @property extension
+ */
 object PdfFileTypeInfo : FileTypeInfo {
     override val type = "application/pdf"
     override val extension = "pdf"
@@ -51,10 +57,10 @@ data class ZipFileTypeInfo(
  * @property type
  * @property extension
  */
-data class UrlFileTypeInfo(
-    override val type: String,
-    override val extension: String,
-) : FileTypeInfo
+object UrlFileTypeInfo : FileTypeInfo {
+    override val type = "web/url"
+    override val extension = "url"
+}
 
 /**
  * Static image file type info
@@ -110,3 +116,15 @@ data class UnMappedFileTypeInfo(
 ) : TextEditorFileTypeInfo {
     override val type = "application/octet-stream"
 }
+
+/**
+ * Video file type info
+ *
+ * @property type
+ * @property extension
+ * @constructor Create empty Video file type info
+ */
+data class VideoFileTypeInfo(
+    override val type: String,
+    override val extension: String,
+) : FileTypeInfo

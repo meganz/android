@@ -6,11 +6,15 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.repository.FilesRepository
+import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.DefaultGetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.DefaultGetIncomingSharesChildrenNode
+import mega.privacy.android.app.domain.usecase.DefaultGetParentNodeHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
+import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
@@ -20,7 +24,9 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
 import mega.privacy.android.domain.usecase.MonitorUserAlerts
 
 /**
@@ -39,7 +45,13 @@ abstract class ManagerUseCases {
     abstract fun bindRubbishBinChildrenNode(useCase: DefaultGetRubbishBinChildrenNode): GetRubbishBinChildrenNode
 
     @Binds
+    abstract fun bindGetParentNode(useCase: DefaultGetParentNodeHandle): GetParentNodeHandle
+
+    @Binds
     abstract fun bindBrowserChildrenNode(useCase: DefaultGetBrowserChildrenNode): GetBrowserChildrenNode
+
+    @Binds
+    abstract fun bindIncomingSharesChildrenNode(useCase: DefaultGetIncomingSharesChildrenNode): GetIncomingSharesChildrenNode
 
     companion object {
         @Provides
@@ -71,7 +83,15 @@ abstract class ManagerUseCases {
             HasInboxChildren(filesRepository::hasInboxChildren)
 
         @Provides
+        fun provideMonitorUserAlerts(notificationsRepository: NotificationsRepository): MonitorUserAlertUpdates =
+            MonitorUserAlertUpdates(notificationsRepository::monitorUserAlerts)
+
+        @Provides
         fun provideMonitorUserUpdates(notificationsRepository: NotificationsRepository): MonitorUserAlerts =
             MonitorUserAlerts(notificationsRepository::monitorUserAlerts)
+
+        @Provides
+        fun provideAuthorizeNode(filesRepository: FilesRepository): AuthorizeNode =
+            AuthorizeNode(filesRepository::authorizeNode)
     }
 }

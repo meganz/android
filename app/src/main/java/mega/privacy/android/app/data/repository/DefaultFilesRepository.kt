@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
+import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.model.GlobalUpdate
@@ -38,6 +39,7 @@ import kotlin.coroutines.suspendCoroutine
 class DefaultFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
 ) : FilesRepository {
@@ -85,6 +87,10 @@ class DefaultFilesRepository @Inject constructor(
         megaApiGateway.getRubbishBinNode()
     }
 
+    override suspend fun getParentNode(node: MegaNode): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.getParentNode(node)
+    }
+
     override suspend fun getChildrenNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
         withContext(ioDispatcher) {
             megaApiGateway.getChildrenByNode(parentNode, order)
@@ -94,12 +100,25 @@ class DefaultFilesRepository @Inject constructor(
         megaApiGateway.getMegaNodeByHandle(handle)
     }
 
+    override suspend fun getIncomingSharesNode(order: Int?): List<MegaNode> =
+        withContext(ioDispatcher) {
+            megaApiGateway.getIncomingSharesNode(order)
+        }
+
+    override suspend fun authorizeNode(handle: Long): MegaNode? = withContext(ioDispatcher) {
+        megaApiFolderGateway.authorizeNode(handle)
+    }
+
     override suspend fun getCloudSortOrder(): Int = withContext(ioDispatcher) {
         megaLocalStorageGateway.getCloudSortOrder()
     }
 
     override suspend fun getCameraSortOrder(): Int = withContext(ioDispatcher) {
         megaLocalStorageGateway.getCameraSortOrder()
+    }
+
+    override suspend fun getOthersSortOrder(): Int = withContext(ioDispatcher) {
+        megaLocalStorageGateway.getOthersSortOrder()
     }
 
     override suspend fun hasInboxChildren(): Boolean = withContext(ioDispatcher) {
