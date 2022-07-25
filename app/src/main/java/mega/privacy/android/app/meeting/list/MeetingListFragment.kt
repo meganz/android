@@ -15,6 +15,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.chats.ChatTabsFragment
 import mega.privacy.android.app.meeting.list.adapter.MeetingsAdapter
+import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 
@@ -52,21 +53,27 @@ class MeetingListFragment : Fragment() {
     }
 
     private fun setupView() {
-        binding.list.adapter = adapter
-        binding.list.setHasFixedSize(true)
-        binding.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (recyclerView.canScrollVertically(RecyclerView.NO_POSITION)) {
-                    (activity as? ManagerActivity?)?.changeAppBarElevation(Util.isDarkMode(context))
-                    (parentFragment as? ChatTabsFragment?)?.showElevation(Util.isDarkMode(context))
-                } else {
-                    (activity as? ManagerActivity?)?.changeAppBarElevation(false)
-                    (parentFragment as? ChatTabsFragment?)?.showElevation(false)
+        binding.list.apply {
+            adapter = adapter
+            setHasFixedSize(true)
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (recyclerView.canScrollVertically(RecyclerView.NO_POSITION)) {
+                        (activity as? ManagerActivity?)?.changeAppBarElevation(Util.isDarkMode(context))
+                        (parentFragment as? ChatTabsFragment?)?.showElevation(Util.isDarkMode(context))
+                    } else {
+                        (activity as? ManagerActivity?)?.changeAppBarElevation(false)
+                        (parentFragment as? ChatTabsFragment?)?.showElevation(false)
+                    }
                 }
-            }
-        })
+            })
+        }
         binding.listScroller.setRecyclerView(binding.list)
+        binding.btnNewMeeting.setOnClickListener {
+            MeetingBottomSheetDialogFragment.newInstance(true)
+                .show(childFragmentManager, MeetingBottomSheetDialogFragment.TAG)
+        }
     }
 
     private fun setupObservers() {

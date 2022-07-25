@@ -21,16 +21,44 @@
         android:layout_gravity="center|end"
         android:orientation="vertical" />
 
-    <TextView
+    <LinearLayout
         android:id="@+id/view_empty"
-        style="@style/Widget.Mega.EmptyTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/btn_start_meeting"
-        android:textAllCaps="false"
-        android:textAppearance="@style/TextAppearance.Mega.Body1"
+        android:layout_marginBottom="50dp"
+        android:orientation="vertical"
+        android:paddingStart="50dp"
+        android:paddingEnd="50dp"
         android:visibility="gone"
-        app:drawableTopCompat="@drawable/ic_zero_meeting"
-        tools:visibility="visible" />
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/txt_empty_header"
+            style="@style/Widget.Mega.EmptyTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/btn_start_meeting"
+            android:textAllCaps="false"
+            android:textAppearance="@style/TextAppearance.Mega.Body1"
+            app:drawableTopCompat="@drawable/ic_zero_meeting" />
+
+        <TextView
+            android:id="@+id/txt_empty_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="Talk securely and privately on audio or video calls with friends and colleagues around the world." />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_new_meeting"
+            style="@style/Widget.Mega.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="40dp"
+            android:text="@string/new_meeting" />
+    </LinearLayout>
 </FrameLayout>

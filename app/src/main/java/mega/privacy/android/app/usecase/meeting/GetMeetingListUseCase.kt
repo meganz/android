@@ -174,7 +174,6 @@ class GetMeetingListUseCase @Inject constructor(
     private fun MegaChatRoom.toMeetingItem(listener: OptionalMegaRequestListenerInterface): MeetingItem {
         val chatListItem = megaChatApi.getChatListItem(chatId)
         val title = ChatUtil.getTitleChat(this)
-        val isMuted: Boolean = chatId.isChatDndEnabled()
         val formattedDate = TimeUtils.formatDateAndTime(
             context,
             chatListItem.lastTimestamp,
@@ -206,7 +205,7 @@ class GetMeetingListUseCase @Inject constructor(
             chatId = chatId,
             title = title,
             lastMessage = lastMessageFormatted,
-            isMuted = isMuted,
+            isMuted = isChatDndEnabled(),
             firstUser = firstUser,
             lastUser = lastUser,
             timeStamp = chatListItem.lastTimestamp,
@@ -265,12 +264,12 @@ class GetMeetingListUseCase @Inject constructor(
     }
 
     /**
-     * Check if chat DND is enabled
+     * Check if chat DND is enabled for a MegaChatRoom
      *
      * @return  true if its enabled, false otherwise
      */
-    private fun Long.isChatDndEnabled(): Boolean =
+    private fun MegaChatRoom.isChatDndEnabled(): Boolean =
         MegaApplication.getPushNotificationSettingManagement()?.pushNotificationSetting
-            ?.isChatDndEnabled(this) ?: false
+            ?.isChatDndEnabled(chatId) ?: false
 }
 
