@@ -46,12 +46,11 @@ import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
-import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaChatApiJava
@@ -98,15 +97,8 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentFavouritesBinding.inflate(layoutInflater, container, false)
-        val colorStart = getColorHexString(
-            requireContext(), R.color.grey_900_grey_100)
-        val colorEnd = getColorHexString(
-            requireContext(), R.color.grey_300_grey_600)
-        binding.emptyHintText.text = TextUtil.replaceFormatText(
-            getString(R.string.homepage_empty_hint_favourites),
-            colorStart,
-            colorEnd
-        )
+        binding.emptyHintText.text = formatEmptyScreenText(requireContext(),
+            getString(R.string.homepage_empty_hint_favourites))
         binding.fastscroll.setRecyclerView(binding.fileListViewBrowser)
         gridLayoutManager = GridLayoutManager(requireContext(), 2)
         listLayoutManager = LinearLayoutManager(requireContext())
