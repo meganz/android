@@ -162,8 +162,10 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     @Override
     public void onBindViewHolder(ViewHolderPhoneContacts holder, int position) {
         InvitationContactInfo contact = getItem(position);
-        int type = contact.getType();
-        switch (type) {
+        if (contact == null)
+            return;
+
+        switch (contact.getType()) {
             case TYPE_MEGA_CONTACT_HEADER:
             case TYPE_PHONE_CONTACT_HEADER:
                 bindHeader(holder, contact);
