@@ -118,10 +118,7 @@ class LinksFragment : MegaNodeBaseFragment() {
                     else 0
 
                 if (lastVisiblePosition >= 0) {
-                    if (managerActivity.isList)
-                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                    else
-                        gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                    mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
                 }
 
                 3
@@ -148,10 +145,7 @@ class LinksFragment : MegaNodeBaseFragment() {
                         else 0
 
                     if (lastVisiblePosition >= 0) {
-                        if (managerActivity.isList)
-                            mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                        else
-                            gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
                     }
                 }
 
@@ -193,17 +187,7 @@ class LinksFragment : MegaNodeBaseFragment() {
         managerViewModel.increaseLinksTreeDepth()
         Timber.d("Is folder deep: %s", managerState().linksTreeDepth)
 
-        val lastFirstVisiblePosition: Int = when {
-            managerActivity.isList ->
-                mLayoutManager.findFirstCompletelyVisibleItemPosition()
-
-            (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition() == -1 ->
-                (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
-
-            else ->
-                (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
-        }
-        lastPositionStack.push(lastFirstVisiblePosition)
+        lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition())
         managerViewModel.setLinksParentHandle(node.handle)
 
         refresh()
