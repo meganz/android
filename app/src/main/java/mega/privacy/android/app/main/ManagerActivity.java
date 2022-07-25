@@ -5695,11 +5695,13 @@ public class ManagerActivity extends TransfersManagementActivity
         //Refresh Rubbish Fragment
         refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
 
-        //Refresh shares section
-        sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
+        if (sharesPageAdapter != null) {
+            //Refresh shares section
+            sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
 
-        //Refresh shares section
-        sharesPageAdapter.refreshFragment(SharesTab.OUTGOING_TAB.getPosition());
+            //Refresh shares section
+            sharesPageAdapter.refreshFragment(SharesTab.OUTGOING_TAB.getPosition());
+        }
 
         //Refresh search section
         refreshFragment(FragmentTag.SEARCH.getTag());
@@ -5802,6 +5804,26 @@ public class ManagerActivity extends TransfersManagementActivity
             rubbishBinFragment.hideMultipleSelect();
             rubbishBinFragment.setNodes(nodes);
             rubbishBinFragment.getRecyclerView().invalidate();
+        }
+    }
+
+    /**
+     * Refreshes the contents of InboxFragment once a sorting method has been selected
+     */
+    private void refreshInboxFragment(int order) {
+        if (inboxFragment != null) {
+            MegaNode inboxParentNode;
+
+            if (viewModel.getState().getValue().getInboxParentHandle() == -1) {
+                inboxParentNode = megaApi.getInboxNode();
+            } else {
+                inboxParentNode = megaApi.getNodeByHandle(viewModel.getState().getValue().getInboxParentHandle());
+            }
+
+            if (inboxParentNode != null) {
+                inboxFragment.setNodes(megaApi.getChildren(inboxParentNode, order));
+                inboxFragment.getRecyclerView().invalidate();
+            }
         }
     }
 
@@ -7601,22 +7623,16 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void refreshCloudOrder(int order) {
-        //Refresh Cloud Fragment
+        // Refresh Cloud Fragment
         refreshCloudDrive();
 
-        //Refresh Rubbish Fragment
+        // Refresh Rubbish Fragment
         refreshRubbishBin();
 
-        onNodesSharedUpdate();
+        // Refresh Inbox Fragment
+        refreshInboxFragment(order);
 
-        if (getInboxFragment() != null) {
-            MegaNode inboxNode = megaApi.getInboxNode();
-            if (inboxNode != null) {
-                ArrayList<MegaNode> nodes = megaApi.getChildren(inboxNode, order);
-                inboxFragment.setNodes(nodes);
-                inboxFragment.getRecyclerView().invalidate();
-            }
-        }
+        onNodesSharedUpdate();
 
         refreshSearch();
     }
@@ -10930,7 +10946,8 @@ public class ManagerActivity extends TransfersManagementActivity
             selectDrawerItem(DrawerItem.RUBBISH_BIN);
         } else if (parentNode.isInShare()) {
             incomingSharesViewModel.setIncomingTreeDepth(calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node), this), node.getParentHandle());
-            sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
+            if (sharesPageAdapter != null)
+                sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
             viewModel.setSharesTab(SharesTab.INCOMING_TAB);
             if (viewPagerShares != null) {
                 viewPagerShares.setCurrentItem(viewModel.getState().getValue().getSharesTab().getPosition());

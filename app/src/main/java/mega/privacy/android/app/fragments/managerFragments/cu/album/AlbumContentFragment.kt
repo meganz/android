@@ -17,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -32,7 +31,6 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.databinding.FragmentAlbumContentBinding
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -43,6 +41,7 @@ import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
 import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
@@ -50,7 +49,7 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ALBUM_CONTENT_ADAPTER
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.app.utils.callManager
@@ -213,12 +212,9 @@ class AlbumContentFragment : Fragment(), GestureScaleListener.GestureScaleCallba
             binding.emptyHint.emptyHintImage,
             ColorUtils.DARK_IMAGE_ALPHA
         )
-        binding.emptyHint.emptyHintText.text = HtmlCompat.fromHtml(
-            TextUtil.formatEmptyScreenText(
-                context,
-                StringResourcesUtils.getString(R.string.empty_hint_favourite_album)
-            ),
-            HtmlCompat.FROM_HTML_MODE_LEGACY
+        binding.emptyHint.emptyHintText.text = formatEmptyScreenText(
+            context,
+            StringResourcesUtils.getString(R.string.empty_hint_favourite_album)
         )
     }
 
