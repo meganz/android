@@ -2,7 +2,6 @@ package mega.privacy.android.app.main.megachat;
 
 import static android.app.Activity.RESULT_OK;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
-import static mega.privacy.android.app.main.AddContactActivity.FROM_RECENT;
 import static mega.privacy.android.app.utils.CallUtil.hintShown;
 import static mega.privacy.android.app.utils.CallUtil.returnActiveCall;
 import static mega.privacy.android.app.utils.CallUtil.shouldShowMeetingHint;
@@ -75,7 +74,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
