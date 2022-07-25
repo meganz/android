@@ -75,6 +75,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
@@ -197,13 +198,8 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     private ContactsHorizontalAdapter adapter;
 
     //Empty screen
-    private TextView emptyTextView;
-    private LinearLayout emptyLayout;
     private TextView emptyTextViewInvite;
-    private TextView emptyDescriptionText;
-    private ImageView emptyImageView;
 
-    Button inviteButton;
     int chatStatus;
 
     float density;
@@ -416,7 +412,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         } else {
             aB = ((AppCompatActivity) context).getSupportActionBar();
         }
-        emptyLayoutContainer = v.findViewById(R.id.scroller);
+        emptyLayoutContainer = v.findViewById(R.id.empty_view);
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
         fastScroller = (FastScroller) v.findViewById(R.id.fastscroll_chat);
         listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
@@ -434,32 +430,18 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             }
         });
 
-        emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
-        emptyDescriptionText = v.findViewById(R.id.empty_description_text_recent);
-        emptyDescriptionText.setText(TextUtil.formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.context_empty_chat_recent)));
-
         emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
-        emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
-        emptyImageView = v.findViewById(R.id.empty_image_view_recent);
-        emptyImageView.setOnClickListener(this);
 
         if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             adjustLandscape();
-            emptyImageView.setVisibility(View.GONE);
-        } else {
-            addMarginTop();
-            emptyImageView.setImageResource(R.drawable.empty_chat_message_portrait);
         }
 
-        inviteButton = (Button) v.findViewById(R.id.invite_button);
-        inviteButton.setOnClickListener(this);
+        ((Button) v.findViewById(R.id.btn_new_chat)).setOnClickListener(this);
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
         //auto scroll to bottom to show invite button.
         if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             adjustLandscape();
-        } else {
-            addMarginTop();
         }
 
         if (context instanceof ManagerActivity) {
@@ -634,8 +616,8 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                         visibilityFastScroller();
                     }
 
-                    if (emptyLayout != null) {
-                        emptyLayout.setVisibility(View.GONE);
+                    if (emptyLayoutContainer != null) {
+                        emptyLayoutContainer.setVisibility(View.GONE);
                     }
 
                     adapterList.setPositionClicked(-1);
@@ -674,29 +656,8 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         Timber.d("showEmptyChatScreen");
 
         listView.setVisibility(View.GONE);
-        emptyLayout.setVisibility(View.VISIBLE);
-        Spanned result = TextUtil.formatEmptyRecentChatsScreenText(context, StringResourcesUtils.getString(R.string.recent_chat_empty).toUpperCase());
-
-        if (context instanceof ArchivedChatsActivity) {
-            emptyTextView.setVisibility(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ?
-                    View.GONE : View.VISIBLE);
-
-            emptyTextViewInvite.setVisibility(View.GONE);
-            emptyDescriptionText.setVisibility(View.GONE);
-            inviteButton.setVisibility(View.GONE);
-            emptyTextView.setText(result);
-        } else {
-            emptyTextViewInvite.setText(result);
-            emptyTextViewInvite.setVisibility(View.VISIBLE);
-            emptyDescriptionText.setVisibility(View.VISIBLE);
-            inviteButton.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void addMarginTop() {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(dp2px(108, outMetrics), dp2px(52, outMetrics), dp2px(108, outMetrics), dp2px(12, outMetrics));
-        emptyImageView.setLayoutParams(lp);
+        emptyTextViewInvite.setVisibility(View.GONE);
+        emptyLayoutContainer.setVisibility(View.VISIBLE);
     }
 
     public void showConnectingChatScreen() {
@@ -707,14 +668,10 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             ((ManagerActivity) context).hideFabButton();
         }
 
-        emptyTextViewInvite.setVisibility(View.INVISIBLE);
-        emptyDescriptionText.setVisibility(View.INVISIBLE);
-
-        inviteButton.setVisibility(View.GONE);
-
+        emptyLayoutContainer.setVisibility(View.GONE);
         String textToShow = context.getString(R.string.recent_chat_loading_conversations).toUpperCase();
-        emptyTextView.setText(TextUtil.formatEmptyRecentChatsScreenText(context, textToShow));
-        emptyTextView.setVisibility(View.VISIBLE);
+        emptyTextViewInvite.setText(TextUtil.formatEmptyRecentChatsScreenText(context, textToShow));
+        emptyTextViewInvite.setVisibility(View.VISIBLE);
     }
 
     public void showNoConnectionScreen() {
@@ -727,9 +684,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         emptyTextViewInvite.setText(getString(R.string.error_server_connection_problem));
         emptyTextViewInvite.setVisibility(View.VISIBLE);
-        emptyDescriptionText.setVisibility(View.GONE);
-        inviteButton.setVisibility(View.GONE);
-        emptyLayout.setVisibility(View.VISIBLE);
+        emptyLayoutContainer.setVisibility(View.GONE);
     }
 
     @Override
@@ -737,12 +692,11 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         Timber.d("onClick");
 
         switch (v.getId()) {
-            case R.id.invite_button: {
+            case R.id.btn_new_chat: {
                 if (isOnline(context)) {
                     if (context instanceof ManagerActivity) {
                         Intent in = new Intent(context, AddContactActivity.class);
                         in.putExtra("contactType", CONTACT_TYPE_MEGA);
-                        in.putExtra(FROM_RECENT, true);
                         ((ManagerActivity) context).startActivityForResult(in, REQUEST_CREATE_CHAT);
                     }
                     if (megaChatApi.isSignalActivityRequired()) {
@@ -1033,10 +987,10 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                     if (adapterList.getItemCount() == 0 && emptyArchivedChats()) {
                         Timber.d("adapterList.getItemCount() == 0");
                         listView.setVisibility(View.GONE);
-                        emptyLayout.setVisibility(View.VISIBLE);
+                        emptyLayoutContainer.setVisibility(View.VISIBLE);
                     } else {
                         listView.setVisibility(View.VISIBLE);
-                        emptyLayout.setVisibility(View.GONE);
+                        emptyLayoutContainer.setVisibility(View.GONE);
                     }
                 }
             }
@@ -1060,10 +1014,10 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                             if (adapterList.getItemCount() == 0 && emptyArchivedChats()) {
                                 Timber.d("adapterList.getItemCount() == 0");
                                 listView.setVisibility(View.GONE);
-                                emptyLayout.setVisibility(View.VISIBLE);
+                                emptyLayoutContainer.setVisibility(View.VISIBLE);
                             } else {
                                 listView.setVisibility(View.VISIBLE);
-                                emptyLayout.setVisibility(View.GONE);
+                                emptyLayoutContainer.setVisibility(View.GONE);
                             }
 
                             if (chats.isEmpty()) {
@@ -1111,7 +1065,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                                 ((ArchivedChatsActivity) context).invalidateOptionsMenu();
                             } else {
                                 listView.setVisibility(View.VISIBLE);
-                                emptyLayout.setVisibility(View.GONE);
+                                emptyLayoutContainer.setVisibility(View.GONE);
                             }
                         }
                     }
@@ -1511,14 +1465,10 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
                         if (filteredChats.isEmpty()) {
                             listView.setVisibility(View.GONE);
-                            emptyLayout.setVisibility(View.VISIBLE);
-                            inviteButton.setVisibility(View.GONE);
-                            Spanned result = TextUtil.formatEmptyRecentChatsScreenText(context, StringResourcesUtils.getString(R.string.recent_chat_empty).toUpperCase());
-                            emptyTextViewInvite.setText(result);
-                            emptyTextViewInvite.setVisibility(View.VISIBLE);
+                            emptyLayoutContainer.setVisibility(View.VISIBLE);
                         } else {
                             listView.setVisibility(View.VISIBLE);
-                            emptyLayout.setVisibility(View.GONE);
+                            emptyLayoutContainer.setVisibility(View.GONE);
                         }
                     } else {
                         Timber.e(throwable);
@@ -1540,12 +1490,11 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         if (adapterList.getItemCount() == 0 && emptyArchivedChats()) {
             Timber.d("adapterList.getItemCount() == 0");
             listView.setVisibility(View.GONE);
-            emptyLayout.setVisibility(View.VISIBLE);
+            emptyLayoutContainer.setVisibility(View.VISIBLE);
         } else {
             Timber.d("adapterList.getItemCount() NOT = 0");
             listView.setVisibility(View.VISIBLE);
-            emptyLayout.setVisibility(View.GONE);
-
+            emptyLayoutContainer.setVisibility(View.GONE);
         }
     }
 

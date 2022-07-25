@@ -4026,4 +4026,9 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to standard role by %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s was changed to host role by %2$s</string>
+
+    <string name="meeting_chat_list_empty_action">Start a meeting</string>
+    <string name="meeting_chat_list_empty">Talk securely and privately on audio or video calls with friends and colleagues around the world.</string>
+    <string name="recent_chat_list_empty_action">Start chatting now</string>
+    <string name="recent_chat_list_empty">Chat securely and privately, with anyone and on any device, knowing that no one can read your chats, not even MEGA.</string>
 </resources>

@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/btn_start_meeting"
+            android:text="@string/meeting_chat_list_empty_action"
             android:textAllCaps="false"
             android:textAppearance="@style/TextAppearance.Mega.Body1"
             app:drawableTopCompat="@drawable/ic_zero_meeting" />
@@ -50,7 +50,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:gravity="center"
-            android:text="Talk securely and privately on audio or video calls with friends and colleagues around the world." />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Secondary"
+            android:text="@string/meeting_chat_list_empty" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_new_meeting"
