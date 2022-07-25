@@ -5691,11 +5691,13 @@ public class ManagerActivity extends TransfersManagementActivity
         //Refresh Rubbish Fragment
         refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
 
-        //Refresh shares section
-        sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
+        if (sharesPageAdapter != null) {
+            //Refresh shares section
+            sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
 
-        //Refresh shares section
-        sharesPageAdapter.refreshFragment(SharesTab.OUTGOING_TAB.getPosition());
+            //Refresh shares section
+            sharesPageAdapter.refreshFragment(SharesTab.OUTGOING_TAB.getPosition());
+        }
 
         //Refresh search section
         refreshFragment(FragmentTag.SEARCH.getTag());
@@ -10931,7 +10933,8 @@ public class ManagerActivity extends TransfersManagementActivity
             selectDrawerItem(DrawerItem.RUBBISH_BIN);
         } else if (parentNode.isInShare()) {
             incomingSharesViewModel.setIncomingTreeDepth(calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node), this), node.getParentHandle());
-            sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
+            if (sharesPageAdapter != null)
+                sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
             viewModel.setSharesTab(SharesTab.INCOMING_TAB);
             if (viewPagerShares != null) {
                 viewPagerShares.setCurrentItem(viewModel.getState().getValue().getSharesTab().getPosition());
