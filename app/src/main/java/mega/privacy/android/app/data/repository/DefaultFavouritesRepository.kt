@@ -7,7 +7,9 @@ import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
+import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -33,9 +35,10 @@ class DefaultFavouritesRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorNodeChangeFacade: MonitorNodeChangeFacade,
     private val favouriteInfoMapper: FavouriteInfoMapper,
+    private val favouriteFolderInfoMapper: FavouriteFolderInfoMapper,
     private val cacheFolder: CacheFolderGateway,
-) :
-    FavouritesRepository {
+    private val fileTypeInfoMapper: FileTypeInfoMapper,
+) : FavouritesRepository {
 
     override suspend fun getAllFavorites(): List<FavouriteInfo> =
         withContext(ioDispatcher) {
@@ -60,11 +63,10 @@ class DefaultFavouritesRepository @Inject constructor(
     override suspend fun getChildren(parentHandle: Long): FavouriteFolderInfo? =
         withContext(ioDispatcher) {
             megaApiGateway.getMegaNodeByHandle(parentHandle)?.let { parentNode ->
-                FavouriteFolderInfo(
-                    children = mapNodesToFavouriteInfo(megaApiGateway.getChildrenByNode(parentNode)),
-                    name = parentNode.name,
-                    currentHandle = parentHandle,
-                    parentHandle = parentNode.parentHandle
+                favouriteFolderInfoMapper(
+                    parentNode,
+                    mapNodesToFavouriteInfo(megaApiGateway.getChildrenByNode(parentNode)),
+                    parentHandle
                 )
             }
         }
@@ -101,7 +103,8 @@ class DefaultFavouritesRepository @Inject constructor(
                 getThumbnailCacheFilePath(megaNode),
                 megaApiGateway.hasVersion(megaNode),
                 megaApiGateway.getNumChildFolders(megaNode),
-                megaApiGateway.getNumChildFiles(megaNode)
+                megaApiGateway.getNumChildFiles(megaNode),
+                fileTypeInfoMapper,
             )
         }
 
@@ -113,6 +116,5 @@ class DefaultFavouritesRepository @Inject constructor(
     private fun getThumbnailCacheFilePath(megaNode: MegaNode) =
         cacheFolder.getCacheFolder(CacheFolderManager.THUMBNAIL_FOLDER)?.let { thumbnail ->
             "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
-        }
-            ?.takeUnless { megaNode.isFolder }
+        }?.takeUnless { megaNode.isFolder }
 }
