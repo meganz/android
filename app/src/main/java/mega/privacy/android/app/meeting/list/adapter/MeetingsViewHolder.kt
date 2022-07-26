@@ -18,7 +18,7 @@ class MeetingsViewHolder(
         binding.txtLastMessage.isVisible = !item.lastMessage.isNullOrBlank()
 
         val firstUserPlaceholder = item.firstUser.getImagePlaceholder(itemView.context)
-        if (item.isSingleMeeting()) {
+        if (item.isSingleMeeting() || item.lastUser == null) {
             binding.imgThumbnail.hierarchy.setPlaceholderImage(
                 firstUserPlaceholder,
                 ScalingUtils.ScaleType.FIT_CENTER
@@ -27,7 +27,7 @@ class MeetingsViewHolder(
             binding.groupThumbnails.isVisible = false
             binding.imgThumbnail.isVisible = true
         } else {
-            val lastUserPlaceholder = item.lastUser!!.getImagePlaceholder(itemView.context)
+            val lastUserPlaceholder = item.lastUser.getImagePlaceholder(itemView.context)
             binding.imgThumbnailGroupFirst.hierarchy.setPlaceholderImage(
                 firstUserPlaceholder,
                 ScalingUtils.ScaleType.FIT_CENTER

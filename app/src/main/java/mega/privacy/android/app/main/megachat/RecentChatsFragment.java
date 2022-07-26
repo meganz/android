@@ -415,7 +415,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         fastScroller = (FastScroller) v.findViewById(R.id.fastscroll_chat);
         listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
         listView.setClipToPadding(false);
-        listView.addItemDecoration(new ChatDividerItemDecoration(context, outMetrics));
+        listView.addItemDecoration(new ChatDividerItemDecoration(context));
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);

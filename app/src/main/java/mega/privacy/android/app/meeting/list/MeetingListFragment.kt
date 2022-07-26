@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentMeetingListBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
@@ -56,6 +57,7 @@ class MeetingListFragment : Fragment() {
         binding.list.apply {
             adapter = meetingsAdapter
             setHasFixedSize(true)
+            addItemDecoration(ChatDividerItemDecoration(context))
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)

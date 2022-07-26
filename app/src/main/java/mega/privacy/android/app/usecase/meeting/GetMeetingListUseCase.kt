@@ -132,16 +132,12 @@ class GetMeetingListUseCase @Inject constructor(
 
             val muteObserver = Observer<Any> {
                 if (emitter.isCancelled) return@Observer
-                Completable.fromAction {
-                    val index = meetings.indexOfFirst { it.isMuted != !megaApi.isChatNotifiable(it.chatId) }
-                    if (index != Constants.INVALID_POSITION) {
-                        val oldItem = meetings[index]
-                        meetings[index] = oldItem.copy(isMuted = !oldItem.isMuted)
-                        emitter.onNext(meetings.sortedByDescending { it.timeStamp })
-                    }
+                val index = meetings.indexOfFirst { it.isMuted != !megaApi.isChatNotifiable(it.chatId) }
+                if (index != Constants.INVALID_POSITION) {
+                    val oldItem = meetings[index]
+                    meetings[index] = oldItem.copy(isMuted = !oldItem.isMuted)
+                    emitter.onNext(meetings.sortedByDescending { it.timeStamp })
                 }
-                    .delaySubscription(1L, TimeUnit.SECONDS) // SDK not updated without delay
-                    .subscribeBy(onError = Timber::e)
             }
 
             megaChatApi.getChatRoomsByType(MegaChatApi.CHAT_TYPE_MEETING_ROOM)

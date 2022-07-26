@@ -56,6 +56,7 @@ public class PushNotificationSettingManagement {
     public void sendPushNotificationSettings(MegaPushNotificationSettings receivedPush) {
         push = receivedPush != null ? MegaPushNotificationSettingsAndroid.copy(receivedPush) : MegaPushNotificationSettings.createInstance();
         MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
+        LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).post(null);
     }
 
     /**
@@ -153,6 +154,5 @@ public class PushNotificationSettingManagement {
 
         MegaApplication.getInstance().getMegaApi().setPushNotificationSettings(push, null);
         muteChat(context, option);
-        LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).post(null);
     }
 }

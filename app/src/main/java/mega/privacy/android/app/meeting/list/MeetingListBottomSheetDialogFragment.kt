@@ -68,7 +68,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             binding.header.txtTimestamp.text = meeting.formattedTimestamp
 
             val firstUserPlaceholder = meeting.firstUser.getImagePlaceholder(requireContext())
-            if (meeting.isSingleMeeting()) {
+            if (meeting.isSingleMeeting() || meeting.lastUser == null) {
                 binding.header.imgThumbnail.hierarchy.setPlaceholderImage(
                     firstUserPlaceholder,
                     ScalingUtils.ScaleType.FIT_CENTER
@@ -77,7 +77,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.header.groupThumbnails.isVisible = false
                 binding.header.imgThumbnail.isVisible = true
             } else {
-                val lastUserPlaceholder = meeting.lastUser!!.getImagePlaceholder(requireContext())
+                val lastUserPlaceholder = meeting.lastUser.getImagePlaceholder(requireContext())
                 binding.header.imgThumbnailGroupFirst.hierarchy.setPlaceholderImage(
                     firstUserPlaceholder,
                     ScalingUtils.ScaleType.FIT_CENTER

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.view.View;
 
 import mega.privacy.android.app.R;
@@ -12,17 +11,14 @@ import mega.privacy.android.app.R;
 import static mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatAdapter.*;
 
 public class ChatDividerItemDecoration extends RecyclerView.ItemDecoration {
-    DisplayMetrics outMetrics;
     Context context;
     private Drawable mDivider;
 
     public static final int ITEM_VIEW_TYPE_NODE= 0;
     public static final int ITEM_VIEW_TYPE_MONTH = 1;
 
-    public ChatDividerItemDecoration(Context context, DisplayMetrics outMetrics) {
-
+    public ChatDividerItemDecoration(Context context) {
         mDivider = context.getResources().getDrawable(R.drawable.line_divider);
-        this.outMetrics = outMetrics;
         this.context = context;
     }
 
