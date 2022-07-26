@@ -6,6 +6,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
@@ -45,6 +46,15 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
             binding.ivStartMeeting.setOnClickListener(this)
             binding.ivJoinMeeting.setOnClickListener(this)
             dialog.setContentView(binding.root)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (showSimpleList) {
+            val dialog = dialog ?: return
+            BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
+                BottomSheetBehavior.STATE_EXPANDED
         }
     }
 
