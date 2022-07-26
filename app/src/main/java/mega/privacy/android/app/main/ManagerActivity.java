@@ -9831,11 +9831,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 setInboxNavigationDrawer();
             }
         }
-
-        refreshOutgoingShares();
-        refreshIncomingShares();
-        refreshLinks();
-
+        
         checkCameraUploadFolder(false, updatedNodes);
 
         LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
