@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/recent_chat_list_empty_action"
+            android:text="@string/chat_recent_list_empty_action"
             android:textAllCaps="false"
             android:textAppearance="@style/TextAppearance.Mega.Body1"
             app:drawableTopCompat="@drawable/empty_chat_message_portrait" />
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:gravity="center"
-            android:text="@string/recent_chat_list_empty"
+            android:text="@string/chat_recent_list_empty_description"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Secondary" />
 
         <com.google.android.material.button.MaterialButton
