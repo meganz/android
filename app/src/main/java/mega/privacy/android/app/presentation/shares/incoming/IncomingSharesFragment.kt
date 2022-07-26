@@ -20,6 +20,8 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment
+import mega.privacy.android.app.presentation.shares.links.LinksFragment
+import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
@@ -76,8 +78,6 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 ActionBarCallBack(SharesTab.INCOMING_TAB)
             )
     }
-
-    override fun refresh() {}
 
     override fun itemClick(position: Int) {
         val actualPosition = position - 1
@@ -209,6 +209,8 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     override fun getParentHandle(): Long = state().incomingHandle
 
     override fun getIntentOrder(): Int = state().sortOrder
+
+    override fun getCurrentSharesTab(): SharesTab = SharesTab.INCOMING_TAB
 
     /**
      * Observe viewModel

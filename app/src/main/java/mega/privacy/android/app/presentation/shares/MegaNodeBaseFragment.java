@@ -57,7 +57,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import javax.inject.Inject;
 
@@ -70,7 +69,6 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
-import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.ManagerActivity;
@@ -81,9 +79,6 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.manager.model.Tab;
-import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
-import mega.privacy.android.app.presentation.shares.links.LinksFragment;
-import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -98,17 +93,12 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     @MegaApi
     @Inject
     public MegaApiAndroid megaApi;
-    @Inject
-    protected SortOrderManagement sortOrderManagement;
 
     protected ManagerActivity managerActivity;
 
     protected ActionMode actionMode;
 
-    protected List<MegaNode> nodes = new ArrayList<>();
     protected MegaNodeAdapter adapter;
-
-    protected Stack<Integer> lastPositionStack = new Stack<>();
 
     protected FastScroller fastScroller;
     protected RecyclerView recyclerView;
@@ -131,8 +121,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
      * @param node The folder node.
      */
     public abstract void navigateToFolder(MegaNode node);
-
-    public abstract void refresh();
 
     public abstract void updateContact(long contactHandle);
 
@@ -671,19 +659,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
      *
      * @return The current shares tab.
      */
-    private SharesTab getCurrentSharesTab() {
-        SharesTab tab = SharesTab.NONE;
-
-        if (MegaNodeBaseFragment.this instanceof IncomingSharesFragment) {
-            tab = SharesTab.INCOMING_TAB;
-        } else if (MegaNodeBaseFragment.this instanceof OutgoingSharesFragment) {
-            tab = SharesTab.OUTGOING_TAB;
-        } else if (MegaNodeBaseFragment.this instanceof LinksFragment) {
-            tab = SharesTab.LINKS_TAB;
-        }
-
-        return tab;
-    }
+    protected abstract SharesTab getCurrentSharesTab();
 
     private void setRecyclerView() {
         recyclerView.setPadding(0, 0, 0, dp2px(MARGIN_BOTTOM_LIST, getResources().getDisplayMetrics()));

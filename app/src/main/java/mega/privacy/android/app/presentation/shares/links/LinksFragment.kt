@@ -72,8 +72,6 @@ class LinksFragment : MegaNodeBaseFragment() {
             )
     }
 
-    override fun refresh() {}
-
     override fun itemClick(position: Int) {
         val actualPosition = position - 1
 
@@ -166,6 +164,8 @@ class LinksFragment : MegaNodeBaseFragment() {
     override fun viewerFrom(): Int = Constants.VIEWER_FROM_LINKS
 
     override fun getIntentOrder(): Int = state().sortOrder
+
+    override fun getCurrentSharesTab(): SharesTab = SharesTab.LINKS_TAB
 
     override fun getParentHandle(): Long = state().linksHandle
 

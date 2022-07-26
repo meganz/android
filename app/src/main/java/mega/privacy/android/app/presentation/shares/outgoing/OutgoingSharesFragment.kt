@@ -74,8 +74,6 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             )
     }
 
-    override fun refresh() {}
-
     override fun itemClick(position: Int) {
         val actualPosition = position - 1
 
@@ -200,6 +198,9 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     override fun getParentHandle(): Long = state().outgoingHandle
 
     override fun getIntentOrder(): Int = state().sortOrder
+
+    override fun getCurrentSharesTab(): SharesTab = SharesTab.OUTGOING_TAB
+
 
     /**
      * Observe viewModel
