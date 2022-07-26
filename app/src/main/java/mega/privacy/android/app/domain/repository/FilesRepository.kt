@@ -110,6 +110,13 @@ interface FilesRepository {
     suspend fun getOthersSortOrder(): Int
 
     /**
+     * Get links cloud sort order
+     * @return links cloud sort order
+     */
+    suspend fun getLinksSortOrder(): Int
+
+
+    /**
      * Checks if Inbox node has children.
      *
      * @return True if Inbox has children, false otherwise.
