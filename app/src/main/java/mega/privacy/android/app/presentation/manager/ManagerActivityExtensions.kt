@@ -17,3 +17,11 @@ fun ManagerActivity.state() = viewModel.state.value
  * @return the IncomingSharesState hold in IncomingSharesStateViewModel
  */
 fun ManagerActivity.incomingSharesState() = incomingSharesViewModel.state.value
+
+/**
+ * Get the OutgoingSharesState in OutgoingSharesStateViewModel
+ * This function will be used until ManagerActivity is converted to Kotlin
+ *
+ * @return the OutgoingSharesState hold in OutgoingSharesStateViewModel
+ */
+fun ManagerActivity.outgoingSharesState() = outgoingSharesViewModel.state.value

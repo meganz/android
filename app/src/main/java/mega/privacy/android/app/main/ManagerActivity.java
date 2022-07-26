@@ -53,6 +53,7 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isB
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.incomingSharesState;
+import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.outgoingSharesState;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
@@ -376,6 +377,7 @@ import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment;
 import mega.privacy.android.app.presentation.shares.SharesPageAdapter;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
+import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
@@ -502,6 +504,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public ManagerViewModel viewModel;
     public IncomingSharesViewModel incomingSharesViewModel;
+    public OutgoingSharesViewModel outgoingSharesViewModel;
     private SearchViewModel searchViewModel;
 
     @Inject
@@ -1401,6 +1404,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         viewModel = new ViewModelProvider(this).get(ManagerViewModel.class);
         incomingSharesViewModel = new ViewModelProvider(this).get(IncomingSharesViewModel.class);
+        outgoingSharesViewModel = new ViewModelProvider(this).get(OutgoingSharesViewModel.class);
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         viewModel.getUpdateUsers().observe(this,
                 new EventObserver<>(users -> {
@@ -3748,8 +3752,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     case OUTGOING_TAB: {
                         Timber.d("setToolbarTitle: OUTGOING TAB");
                         if (isOutgoingAdded()) {
-                            if (viewModel.getState().getValue().getOutgoingParentHandle() != -1) {
-                                MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getOutgoingParentHandle());
+                            if (outgoingSharesState(this).getOutgoingParentHandle() != -1) {
+                                MegaNode node = megaApi.getNodeByHandle(outgoingSharesState(this).getOutgoingParentHandle());
                                 aB.setTitle(node.getName());
                                 viewModel.setIsFirstNavigationLevel(false);
                             } else {
@@ -4269,7 +4273,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 SharesTab tabItemShares = getTabItemShares();
 
                 if ((tabItemShares == SharesTab.INCOMING_TAB && incomingSharesState(this).getIncomingParentHandle() != INVALID_HANDLE)
-                        || (tabItemShares == SharesTab.OUTGOING_TAB && viewModel.getState().getValue().getOutgoingParentHandle() != INVALID_HANDLE)
+                        || (tabItemShares == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE)
                         || (tabItemShares == SharesTab.LINKS_TAB && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE)) {
                     tabLayoutShares.setVisibility(View.GONE);
                     viewPagerShares.setUserInputEnabled(false);
@@ -4324,7 +4328,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         break;
 
                     case OUTGOING_TAB:
-                        if (!isOutgoingAdded() || (!hide && viewModel.getState().getValue().getOutgoingParentHandle() != INVALID_HANDLE)) {
+                        if (!isOutgoingAdded() || (!hide && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE)) {
                             return;
                         }
 
@@ -5150,7 +5154,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 viewModel.getState().getValue().getRubbishBinParentHandle(),
                                 viewModel.getState().getValue().getInboxParentHandle(),
                                 incomingSharesState(ManagerActivity.this).getIncomingParentHandle(),
-                                viewModel.getState().getValue().getOutgoingParentHandle(),
+                                outgoingSharesState(ManagerActivity.this).getOutgoingParentHandle(),
                                 viewModel.getState().getValue().getLinksParentHandle(),
                                 viewModel.getState().getValue().isFirstNavigationLevel()
                         );
@@ -5326,7 +5330,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 viewModel.getState().getValue().getRubbishBinParentHandle(),
                 viewModel.getState().getValue().getInboxParentHandle(),
                 incomingSharesState(this).getIncomingParentHandle(),
-                viewModel.getState().getValue().getOutgoingParentHandle(),
+                outgoingSharesState(this).getOutgoingParentHandle(),
                 viewModel.getState().getValue().getLinksParentHandle(),
                 viewModel.getState().getValue().isFirstNavigationLevel()
         );
@@ -6154,9 +6158,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (getTabItemShares() == SharesTab.INCOMING_TAB && incomingSharesState(this).getIncomingParentHandle() != INVALID_HANDLE) {
                         incomingSharesViewModel.resetIncomingTreeDepth();
                         refreshIncomingShares();
-                    } else if (getTabItemShares() == SharesTab.OUTGOING_TAB && viewModel.getState().getValue().getOutgoingParentHandle() != INVALID_HANDLE) {
-                        viewModel.setOutgoingParentHandle(INVALID_HANDLE);
-                        viewModel.resetOutgoingTreeDepth();
+                    } else if (getTabItemShares() == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE) {
+                        outgoingSharesViewModel.resetOutgoingTreeDepth();
                         refreshOutgoingShares();
                     } else if (getTabItemShares() == SharesTab.LINKS_TAB && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE) {
                         viewModel.setLinksParentHandle(INVALID_HANDLE);
@@ -6428,11 +6431,10 @@ public class ManagerActivity extends TransfersManagementActivity
                             break;
 
                         case OUTGOING_TAB:
-                            viewModel.decreaseOutgoingTreeDepth();
-                            viewModel.setOutgoingParentHandle(
-                                    viewModel.getState().getValue().getOutgoingTreeDepth() == 0 ? INVALID_HANDLE : result.getOldParentHandle());
+                            outgoingSharesViewModel.decreaseOutgoingTreeDepth(
+                                    outgoingSharesState(this).getOutgoingTreeDepth() == 0 ? INVALID_HANDLE : result.getOldParentHandle());
 
-                            if (viewModel.getState().getValue().getOutgoingParentHandle() == INVALID_HANDLE) {
+                            if (outgoingSharesState(this).getOutgoingParentHandle() == INVALID_HANDLE) {
                                 hideTabs(false, SharesTab.OUTGOING_TAB);
                             }
 
@@ -6834,7 +6836,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (getTabItemShares() == SharesTab.INCOMING_TAB) {
                     parentHandle = incomingSharesState(this).getIncomingParentHandle();
                 } else if (getTabItemShares() == SharesTab.OUTGOING_TAB) {
-                    parentHandle = viewModel.getState().getValue().getOutgoingParentHandle();
+                    parentHandle = outgoingSharesState(this).getOutgoingParentHandle();
                 } else if (getTabItemShares() == SharesTab.LINKS_TAB) {
                     parentHandle = viewModel.getState().getValue().getLinksParentHandle();
                 }
@@ -6856,7 +6858,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                     parentHandle = incomingSharesState(this).getIncomingParentHandle();
                                     break;
                                 case OUTGOING_TAB:
-                                    parentHandle = viewModel.getState().getValue().getOutgoingParentHandle();
+                                    parentHandle = outgoingSharesState(this).getOutgoingParentHandle();
                                     break;
                                 case LINKS_TAB:
                                     parentHandle = viewModel.getState().getValue().getLinksParentHandle();
@@ -7637,6 +7639,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void refreshOthersOrder() {
         refreshIncomingShares();
+        refreshOutgoingShares();
         refreshSharesPageAdapter();
         refreshSearch();
     }
@@ -9792,10 +9795,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void refreshOutgoingShares() {
-        if (!isOutgoingAdded()) return;
-
-        outgoingSharesFragment.hideMultipleSelect();
-        outgoingSharesFragment.refresh();
+        outgoingSharesViewModel.refreshOutgoingSharesNode();
     }
 
     private void refreshLinks() {
@@ -10136,7 +10136,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public int getDeepBrowserTreeOutgoing() {
-        return viewModel.getState().getValue().getOutgoingTreeDepth();
+        return outgoingSharesState(this).getOutgoingTreeDepth();
     }
 
     public int getDeepBrowserTreeLinks() {
@@ -10253,7 +10253,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     case OUTGOING_TAB:
                         if (!isOutgoingAdded()) break;
 
-                        if (viewModel.getState().getValue().getOutgoingTreeDepth() <= 0) {
+                        if (outgoingSharesState(this).getOutgoingTreeDepth() <= 0) {
                             hideFabButton();
                         } else {
                             updateFabAndShow();
@@ -10735,8 +10735,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (getTabItemShares() == SharesTab.INCOMING_TAB) {
                     incomingSharesViewModel.increaseIncomingTreeDepth(node.getHandle());
                 } else if (getTabItemShares() == SharesTab.OUTGOING_TAB) {
-                    viewModel.setOutgoingParentHandle(node.getHandle());
-                    viewModel.increaseOutgoingTreeDepth();
+                    outgoingSharesViewModel.increaseOutgoingTreeDepth(node.getHandle());
                 } else if (getTabItemShares() == SharesTab.LINKS_TAB) {
                     viewModel.setLinksParentHandle(node.getHandle());
                     viewModel.increaseLinksTreeDepth();

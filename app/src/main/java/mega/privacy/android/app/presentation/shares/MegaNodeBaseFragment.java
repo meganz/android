@@ -128,8 +128,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected SortByHeaderViewModel sortByHeaderViewModel;
     public ManagerViewModel managerViewModel;
 
-    public abstract void setNodes(List<MegaNode> nodes);
-
     public abstract int onBackPressed();
 
     public abstract void itemClick(int position);
