@@ -21,7 +21,6 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -404,13 +403,13 @@ class GetNodeUseCase @Inject constructor(
     fun checkNodesAvailable(androidMegaChatMessages: List<AndroidMegaChatMessage>): Single<Boolean> =
         Single.fromCallable {
             androidMegaChatMessages.forEach { chatMessage ->
-                chatMessage.message?.let { message ->
+                chatMessage.message.let { message ->
                     if (message.type == MegaChatMessage.TYPE_NODE_ATTACHMENT
                         && message.userHandle == megaChatApi.myUserHandle
                         && (message.megaNodeList?.size() ?: 0) > 0
                     ) {
-                        message.megaNodeList.get(0)?.let { node ->
-                            checkNodeAvailable(node.handle).blockingGetOrNull()
+                        message.megaNodeList.get(0).let { node ->
+                            checkNodeAvailable(node.handle).blockingGet()
                                 ?.let { isAvailable ->
                                     if (!isAvailable) {
                                         return@fromCallable false
