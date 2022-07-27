@@ -39,6 +39,12 @@ interface MegaLocalStorageGateway {
     suspend fun getOthersSortOrder(): Int
 
     /**
+     * Get links sort order
+     * @return links sort order
+     */
+    suspend fun getLinksSortOrder(): Int
+
+    /**
      * Get user credentials
      *
      * @return user credentials or null

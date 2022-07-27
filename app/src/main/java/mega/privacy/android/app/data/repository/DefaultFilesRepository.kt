@@ -24,6 +24,7 @@ import mega.privacy.android.domain.exception.NullFileException
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaShare
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -105,6 +106,11 @@ class DefaultFilesRepository @Inject constructor(
             megaApiGateway.getIncomingSharesNode(order)
         }
 
+    override suspend fun getOutgoingSharesNode(order: Int?): List<MegaShare> =
+        withContext(ioDispatcher) {
+            megaApiGateway.getOutgoingSharesNode(order)
+        }
+
     override suspend fun authorizeNode(handle: Long): MegaNode? = withContext(ioDispatcher) {
         megaApiFolderGateway.authorizeNode(handle)
     }
@@ -119,6 +125,10 @@ class DefaultFilesRepository @Inject constructor(
 
     override suspend fun getOthersSortOrder(): Int = withContext(ioDispatcher) {
         megaLocalStorageGateway.getOthersSortOrder()
+    }
+
+    override suspend fun getLinksSortOrder(): Int = withContext(ioDispatcher) {
+        megaLocalStorageGateway.getLinksSortOrder()
     }
 
     override suspend fun hasInboxChildren(): Boolean = withContext(ioDispatcher) {

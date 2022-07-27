@@ -19,10 +19,9 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
-import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
+import mega.privacy.android.domain.entity.FavouriteFolder
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matcher
@@ -127,7 +126,7 @@ class FavouriteFolderFragmentTest {
         whenever(node.name).thenReturn("testName.txt")
         whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
         whenever(node.size).thenReturn(1000L)
-        val favouriteInfo = FavouriteInfo(
+        val favouriteInfo = FavouriteFolder(
             id = 123,
             name = node.name,
             size = node.size,
@@ -138,9 +137,6 @@ class FavouriteFolderFragmentTest {
             hasVersion = false,
             numChildFolders = 0,
             numChildFiles = 0,
-            isImage = false,
-            isVideo = false,
-            isFolder = true,
             isFavourite = true,
             isExported = false,
             isTakenDown = false,
@@ -167,11 +163,11 @@ class FavouriteFolderFragmentTest {
             whenever(FavouritesTestModule.stringUtilWrapper.getFolderInfo(any(), any())).thenReturn(
                 "")
             whenever(FavouritesTestModule.favouriteMapper(
-                any<MegaNode>(),
-                any<FavouriteInfo>(),
-                any<Boolean>(),
-                any<StringUtilWrapper>(),
-                any<(String) -> Int>())).thenReturn(
+                any(),
+                any(),
+                any(),
+                any(),
+                any())).thenReturn(
                 favourite
             )
             whenever(FavouritesTestModule.getThumbnail(1)).thenReturn(null)

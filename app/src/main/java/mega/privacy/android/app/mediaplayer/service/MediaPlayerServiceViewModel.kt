@@ -28,6 +28,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_REPEAT_MODE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_SHUFFLE_ENABLED
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
+import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
@@ -98,7 +99,6 @@ import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
 import java.io.File
 import java.util.Collections
-import java.util.Locale
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
@@ -131,8 +131,8 @@ class MediaPlayerServiceViewModel(
         }
     })
 
-    private val _playerSource = MutableLiveData<Triple<List<MediaItem>, Int, String?>>()
-    val playerSource: LiveData<Triple<List<MediaItem>, Int, String?>> = _playerSource
+    private val _playerSource = MutableLiveData<MediaPlaySources>()
+    val playerSource: LiveData<MediaPlaySources> = _playerSource
 
     private val _mediaItemToRemove = MutableLiveData<Int>()
     val mediaItemToRemove: LiveData<Int> = _mediaItemToRemove
@@ -310,7 +310,7 @@ class MediaPlayerServiceViewModel(
             .setUri(firstPlayUri)
             .setMediaId(firstPlayHandle.toString())
             .build()
-        _playerSource.value = Triple(
+        _playerSource.value = MediaPlaySources(
             listOf(mediaItem),
             // we will emit a single item list at first, and the current playing item
             // will always be at index 0 in that single item list.
@@ -879,7 +879,7 @@ class MediaPlayerServiceViewModel(
         }
 
         if (mediaItems.isNotEmpty()) {
-            _playerSource.postValue(Triple(mediaItems, firstPlayIndex, null))
+            _playerSource.postValue(MediaPlaySources(mediaItems, firstPlayIndex, null))
             postPlaylistItems()
         }
 
@@ -1237,7 +1237,7 @@ class MediaPlayerServiceViewModel(
         newPlayerSource.addAll(playSourceChanged)
         _playerSource.value?.run {
             _playerSource.value =
-                copy(first = newPlayerSource, second = playingPosition)
+                copy(mediaItems = newPlayerSource, newIndexForCurrentItem = playingPosition)
             playSourceChanged.clear()
         }
     }
@@ -1261,7 +1261,7 @@ class MediaPlayerServiceViewModel(
         if (playSourceChanged.isEmpty()) {
             // Get the play source
             _playerSource.value?.run {
-                playSourceChanged.addAll(first)
+                playSourceChanged.addAll(mediaItems)
             }
         }
     }

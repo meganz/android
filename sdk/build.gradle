@@ -36,6 +36,11 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    lintOptions {
+        abortOnError false
+        xmlOutput = file("build/reports/lint-results.xml")
+    }
 }
 
 dependencies {
