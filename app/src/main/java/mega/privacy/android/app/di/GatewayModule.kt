@@ -2,15 +2,18 @@ package mega.privacy.android.app.di
 
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
+import mega.privacy.android.app.data.facade.CacheFolderFacade
 import mega.privacy.android.app.data.facade.MegaApiFacade
 import mega.privacy.android.app.data.facade.MegaApiFolderFacade
 import mega.privacy.android.app.data.facade.MegaChatApiFacade
 import mega.privacy.android.app.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.app.data.gateway.AndroidDeviceGateway
+import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.DeviceGateway
 import mega.privacy.android.app.data.gateway.FileCompressionGateway
 import mega.privacy.android.app.data.gateway.ZipFileCompressionGateway
@@ -72,5 +75,13 @@ abstract class GatewayModule {
 
     @Binds
     abstract fun bindFileCompressionGateway(implementation: ZipFileCompressionGateway): FileCompressionGateway
+
+    /**
+     * Provides @CacheFolderGateway
+     * @param cacheFolderFacade : @CacheFolderFacade
+     * @return CacheFolderGateway : @CacheFolderGateway
+     */
+    @Binds
+    abstract fun bindCacheFolderGateway(implementation: CacheFolderFacade): CacheFolderGateway
 
 }

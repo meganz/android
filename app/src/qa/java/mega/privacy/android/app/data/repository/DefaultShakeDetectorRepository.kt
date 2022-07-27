@@ -53,6 +53,6 @@ class DefaultShakeDetectorRepository @Inject constructor(
     }
 
     companion object {
-        private const val SHAKE_INTERVAL = 300L
+        private const val SHAKE_INTERVAL = 200L
     }
 }
