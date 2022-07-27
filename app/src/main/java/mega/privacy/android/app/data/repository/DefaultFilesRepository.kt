@@ -127,6 +127,10 @@ class DefaultFilesRepository @Inject constructor(
         megaLocalStorageGateway.getOthersSortOrder()
     }
 
+    override suspend fun getLinksSortOrder(): Int = withContext(ioDispatcher) {
+        megaLocalStorageGateway.getLinksSortOrder()
+    }
+
     override suspend fun hasInboxChildren(): Boolean = withContext(ioDispatcher) {
         megaApiGateway.getInboxNode()?.let { megaApiGateway.hasChildren(it) } ?: false
     }
