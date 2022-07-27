@@ -24,6 +24,11 @@ class GetGalleryFilesUseCase @Inject constructor(
         const val DATA = "_data"
     }
 
+    /**
+     * Get list of images and videos
+     *
+     * @return MutableList<FileGalleryItem>
+     */
     fun get(): Single<MutableList<FileGalleryItem>> =
         Single.fromCallable {
             val files = mutableListOf<FileGalleryItem>().apply {
@@ -140,32 +145,36 @@ class GetGalleryFilesUseCase @Inject constructor(
                 val path = cursor.getString(dataColumn)
                 Thread {
                     val retriever = MediaMetadataRetriever()
-                    retriever.setDataSource(context, contentUri)
-                    val duration = retriever.extractMetadata(METADATA_KEY_DURATION)
-                    val durationText =
-                        TimeUtils.getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)
-                    val file = FileGalleryItem(
-                        id = id,
-                        isImage = false,
-                        isTakePicture = false,
-                        title = title,
-                        fileUri = contentUri,
-                        dateAdded = date,
-                        duration = durationText,
-                        isSelected = false,
-                        filePath = path
-                    )
-                    videoList.add(file)
+                    try {
+                        retriever.setDataSource(context, contentUri)
+                    } catch (ex: IllegalArgumentException) {
+                        Timber.e(ex)
+                    } catch (ex: RuntimeException) {
+                        Timber.e(ex)
+                    } finally {
+                        try {
+                            val duration = retriever.extractMetadata(METADATA_KEY_DURATION)
+                            retriever.release()
 
+                            val durationText =
+                                TimeUtils.getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)
+                            val file = FileGalleryItem(
+                                id = id,
+                                isImage = false,
+                                isTakePicture = false,
+                                title = title,
+                                fileUri = contentUri,
+                                dateAdded = date,
+                                duration = durationText,
+                                isSelected = false,
+                                filePath = path
+                            )
+                            videoList.add(file)
+                        } catch (ex: Exception) {
+                            Timber.e(ex)
+                        }
+                    }
                 }.start()
-
-                /*val retriever = MediaMetadataRetriever()
-                retriever.setDataSource(context, contentUri)
-                val duration = retriever.extractMetadata(METADATA_KEY_DURATION)
-                retriever.release()
-                val durationText = TimeUtils.getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)*/
-
-
             }
 
         } ?: kotlin.run {
