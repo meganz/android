@@ -21,6 +21,7 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -389,14 +390,10 @@ class GetNodeUseCase @Inject constructor(
      * @return  True, if it is available. False, otherwise.
      */
     fun checkNodeAvailable(nodeHandle: Long): Single<Boolean> =
-        Single.create { emitter ->
-            val node = get(nodeHandle).blockingGetOrNull()
-            emitter.onSuccess(node != null)
-
-            when {
-                emitter.isDisposed -> return@create
-            }
+        Single.fromCallable {
+            get(nodeHandle).blockingGetOrNull() != null
         }
+
 
     /**
      * Check if several MegaNodes are available
@@ -405,32 +402,25 @@ class GetNodeUseCase @Inject constructor(
      * @return  True, if all nodes are available. False, otherwise.
      */
     fun checkNodesAvailable(androidMegaChatMessages: List<AndroidMegaChatMessage>): Single<Boolean> =
-        Single.create { emitter ->
-            var nodesAvailable = true
-            androidMegaChatMessages.forEach { androidMegaChatMsg ->
-                androidMegaChatMsg.message?.let { msg ->
-                    if (msg.type == MegaChatMessage.TYPE_NODE_ATTACHMENT && msg.userHandle == megaChatApi.myUserHandle) {
-                        msg.megaNodeList?.let { nodeList ->
-                            if (nodeList.size() > 0) {
-                                nodeList.get(0).handle.let { handle ->
-                                    checkNodeAvailable(handle).blockingGetOrNull()
-                                        ?.let { availability ->
-                                            if (nodesAvailable) {
-                                                nodesAvailable = availability
-                                            }
-                                        }
+        Single.fromCallable {
+            androidMegaChatMessages.forEach { chatMessage ->
+                chatMessage.message?.let { message ->
+                    if (message.type == MegaChatMessage.TYPE_NODE_ATTACHMENT
+                        && message.userHandle == megaChatApi.myUserHandle
+                        && (message.megaNodeList?.size() ?: 0) > 0
+                    ) {
+                        message.megaNodeList.get(0)?.let { node ->
+                            checkNodeAvailable(node.handle).blockingGetOrNull()
+                                ?.let { isAvailable ->
+                                    if (!isAvailable) {
+                                        return@fromCallable false
+                                    }
                                 }
-                            }
                         }
                     }
                 }
             }
 
-            when {
-                emitter.isDisposed -> return@create
-                else -> {
-                    emitter.onSuccess(nodesAvailable)
-                }
-            }
+            return@fromCallable true
         }
 }
