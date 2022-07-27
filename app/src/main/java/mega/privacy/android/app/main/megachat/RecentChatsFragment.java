@@ -288,30 +288,33 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         if (!isAdded()) {
             return;
         }
-        if (megaContacts.size() > 0) {
-            Timber.d("get %d matched contacts.", megaContacts.size());
-            // change the settings, when have new matched contact.
-            dbH.setShowInviteBanner("true");
 
-            // At the end of the contacts list, add the 'Invite more' element, it's an empty MegaContact object.
-            megaContacts.add(new MegaContactGetter.MegaContact());
-            onContactsCountChange(megaContacts);
-            expandContainer();
-            bannerContainer.setVisibility(View.VISIBLE);
-            requestPermissionLayout.setVisibility(View.GONE);
-            contactsListLayout.setVisibility(View.VISIBLE);
-            collapseBtn.setVisibility(View.VISIBLE);
-            closeBtn.setVisibility(View.GONE);
-            inviteTitle.setClickable(true);
-            moreContactsTitle.setVisibility(View.GONE);
+        requireActivity().runOnUiThread(() -> {
+            if (megaContacts.size() > 0) {
+                Timber.d("get %d matched contacts.", megaContacts.size());
+                // change the settings, when have new matched contact.
+                dbH.setShowInviteBanner("true");
 
-            adapter = new ContactsHorizontalAdapter((Activity) context, this, megaContacts);
-            contactsList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-            contactsList.setAdapter(adapter);
-        } else {
-            noContacts();
-        }
-        checkScroll();
+                // At the end of the contacts list, add the 'Invite more' element, it's an empty MegaContact object.
+                megaContacts.add(new MegaContactGetter.MegaContact());
+                onContactsCountChange(megaContacts);
+                expandContainer();
+                bannerContainer.setVisibility(View.VISIBLE);
+                requestPermissionLayout.setVisibility(View.GONE);
+                contactsListLayout.setVisibility(View.VISIBLE);
+                collapseBtn.setVisibility(View.VISIBLE);
+                closeBtn.setVisibility(View.GONE);
+                inviteTitle.setClickable(true);
+                moreContactsTitle.setVisibility(View.GONE);
+
+                adapter = new ContactsHorizontalAdapter((Activity) context, this, megaContacts);
+                contactsList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+                contactsList.setAdapter(adapter);
+            } else {
+                noContacts();
+            }
+            checkScroll();
+        });
     }
 
     private void expandContainer() {
