@@ -10,17 +10,24 @@ import javax.inject.Inject
  * Implementation of @VibratorGateway to communicate with system vibrator
  */
 @Suppress("DEPRECATION")
-class VibratorFacade @Inject constructor(val vibrator: Vibrator) : VibratorGateway {
+class VibratorFacade @Inject constructor(
+    /**
+     * @param : @Vibrator
+     */
+    val vibrator: Vibrator,
+) : VibratorGateway {
 
     /**
      * Function to call system vibrator
+     *
+     * @param milliseconds: Milliseconds to vibrate the device
      */
-    override fun vibrateDevice(mils: Long) {
+    override fun vibrateDevice(milliseconds: Long) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createOneShot(mils,
+            vibrator.vibrate(VibrationEffect.createOneShot(milliseconds,
                 VibrationEffect.DEFAULT_AMPLITUDE))
         } else {
-            vibrator.vibrate(mils)
+            vibrator.vibrate(milliseconds)
         }
     }
 }

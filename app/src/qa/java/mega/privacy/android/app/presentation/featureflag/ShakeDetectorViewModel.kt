@@ -1,8 +1,5 @@
 package mega.privacy.android.app.presentation.featureflag
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,8 +7,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.usecase.ShakeDetectorUseCase
-import mega.privacy.android.app.domain.usecase.VibrateDeviceUseCase
+import mega.privacy.android.app.domain.usecase.ShakeDetector
+import mega.privacy.android.app.domain.usecase.VibrateDevice
 import javax.inject.Inject
 
 /**
@@ -20,8 +17,8 @@ import javax.inject.Inject
 class ShakeDetectorViewModel @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val vibrateDeviceUseCase: VibrateDeviceUseCase,
-    private val shakeDetectorUseCase: ShakeDetectorUseCase,
+    private val vibrateDevice: VibrateDevice,
+    private val shakeDetector: ShakeDetector,
 ) {
 
     private val _state = MutableStateFlow(false)
@@ -36,9 +33,9 @@ class ShakeDetectorViewModel @Inject constructor(
      */
     fun registerAndCatchShakeEvent() {
         coroutineScope.launch(ioDispatcher) {
-            shakeDetectorUseCase().collect {
+            shakeDetector().collect {
                 state.update { true }
-                vibrateDeviceUseCase()
+                vibrateDevice()
             }
         }
     }

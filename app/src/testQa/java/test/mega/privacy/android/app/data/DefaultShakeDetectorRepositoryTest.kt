@@ -28,7 +28,7 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultShakeDetectorRepositoryTest {
 
-    lateinit var underTest: ShakeDetectorRepository
+    private lateinit var underTest: ShakeDetectorRepository
     private val vibratorGateway = mock<VibratorGateway>()
     private val motionSensorGateway = mock<MotionSensorGateway>()
 
@@ -45,21 +45,24 @@ class DefaultShakeDetectorRepositoryTest {
 
     @Test
     fun `test that flow is returned from the sensor event listener`() {
+        underTest.monitorShakeEvents()
         whenever(motionSensorGateway.monitorMotionEvents(any())).thenAnswer {
             (it.arguments[0] as SensorEventListener).onSensorChanged(sensorEvent)
-        }
-        whenever(underTest.monitorShakeEvents()).thenReturn(flowOf(ShakeEvent(1.1F,
-            2.2F,
-            3.3F)))
-        runTest {
-            underTest.monitorShakeEvents().test {
-                val event = awaitItem()
-                assertEquals(1.1F, event.x)
-                assertEquals(2.2F, event.y)
-                assertEquals(3.3F, event.z)
+            whenever(sensorEvent.values).thenReturn(floatArrayOf(1.1F, 2.2F, 3.3F))
+            runTest {
+                underTest.monitorShakeEvents().test {
+                    assertEquals(1.1F, sensorEvent.values[0])
+                    assertEquals(2.2F, sensorEvent.values[1])
+                    assertEquals(3.3F, sensorEvent.values[2])
+                }
             }
         }
-        verify(motionSensorGateway).monitorMotionEvents(any())
+    }
+
+    @Test
+    fun `test that vibrate device gets called`() {
+        underTest.vibrateDevice()
+        verify(vibratorGateway).vibrateDevice(any())
     }
 
     @After

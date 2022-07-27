@@ -7,6 +7,8 @@ interface VibratorGateway {
 
     /**
      * Function to call system vibrator
+     *
+     * @param milliseconds : Milliseconds to vibrate the device
      */
-    fun vibrateDevice(mils: Long)
+    fun vibrateDevice(milliseconds: Long)
 }

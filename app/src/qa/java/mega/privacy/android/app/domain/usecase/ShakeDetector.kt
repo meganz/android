@@ -6,7 +6,7 @@ import mega.privacy.android.app.domain.model.ShakeEvent
 /**
  * Shake detector use case
  */
-fun interface ShakeDetectorUseCase {
+fun interface ShakeDetector {
     /**
      * operator function
      *

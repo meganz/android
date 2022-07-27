@@ -23,9 +23,9 @@ class MotionSensorFacade @Inject constructor(
      */
     override fun monitorMotionEvents(sensorEventListener: SensorEventListener) {
         sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val acceleroMeter = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         sensorManager.registerListener(sensorEventListener,
-            acceleroMeter,
+            accelerometer,
             SensorManager.SENSOR_DELAY_UI)
     }
 
