@@ -136,16 +136,6 @@ class QAModule {
     fun provideVibratorGateway(vibrator: Vibrator): VibratorGateway = VibratorFacade(vibrator)
 
     /**
-     * Provides implementation of @FeatureFlagRepository
-     *
-     * @param repository : @DefaultFeatureFlagRepository
-     * @return Implementation of FeatureFlagRepository
-     */
-    @Provides
-    fun provideFeatureFlagRepository(repository: DefaultFeatureFlagRepository): FeatureFlagRepository =
-        repository
-
-    /**
      * Provides @ShakeDetectorViewModel instance
      *
      * @param coroutineScope: CoroutineScope
