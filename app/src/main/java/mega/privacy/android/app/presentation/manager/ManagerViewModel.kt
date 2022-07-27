@@ -185,15 +185,6 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Set the current links parent handle to the UI state
-     *
-     * @param handle the id of the current links parent handle to set
-     */
-    fun setLinksParentHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(linksParentHandle = handle) }
-    }
-
-    /**
      * Set the current inbox parent handle to the UI state
      *
      * @param handle the id of the current inbox parent handle to set
@@ -209,27 +200,6 @@ class ManagerViewModel @Inject constructor(
      */
     fun setIsFirstNavigationLevel(isFirstNavigationLevel: Boolean) = viewModelScope.launch {
         _state.update { it.copy(isFirstNavigationLevel = isFirstNavigationLevel) }
-    }
-
-    /**
-     * Decrease by 1 the links tree depth
-     */
-    fun decreaseLinksTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(linksTreeDepth = it.linksTreeDepth - 1) }
-    }
-
-    /**
-     * Increase by 1 the links tree depth
-     */
-    fun increaseLinksTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(linksTreeDepth = it.linksTreeDepth + 1) }
-    }
-
-    /**
-     * Reset links tree depth to initial value
-     */
-    fun resetLinksTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(linksTreeDepth = 0) }
     }
 
     /**
