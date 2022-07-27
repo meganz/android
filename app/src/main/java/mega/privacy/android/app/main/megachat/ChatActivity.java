@@ -716,13 +716,11 @@ public class ChatActivity extends PasscodeActivity
     private MenuItem inviteIcon;
     private MenuItem startConversationIcon;
 
-    private boolean isUploading = false;
     private boolean showDelete = true;
     private boolean showCopy = true;
     private boolean showForward = true;
     private boolean allNodeAttachments = true;
     private boolean allNodeImages = true;
-    private boolean isRemoved = false;
     private boolean allNodeNonContacts = true;
 
     String intentAction;
@@ -5084,206 +5082,274 @@ public class ChatActivity extends PasscodeActivity
             }
         }
 
+        /**
+         * Show appropriate options when the node is available
+         */
+        private void showOptionsForAvailableNode() {
+            shareIcon.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            downloadIcon.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            importIcon.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            shareIcon.setVisible(true);
+            downloadIcon.setVisible(true);
+            importIcon.setVisible(true);
+        }
+
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             List<AndroidMegaChatMessage> selected = adapter.getSelectedMessages();
+            forwardIcon.setVisible(false);
+            shareIcon.setVisible(false);
+            importIcon.setVisible(false);
+            downloadIcon.setVisible(false);
+            inviteIcon.setVisible(false);
+            startConversationIcon.setVisible(false);
             editIcon.setVisible(false);
             copyIcon.setVisible(false);
             deleteIcon.setVisible(false);
-            forwardIcon.setVisible(false);
-            downloadIcon.setVisible(false);
-            shareIcon.setVisible(false);
-            inviteIcon.setVisible(false);
-            startConversationIcon.setVisible(false);
-            importIcon.setVisible(false);
 
-            if (selected.size() > 0) {
-                if ((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview()) {
-                    Timber.d("Chat without permissions || without preview");
-                    boolean showCopy = true;
-                    for (int i = 0; i < selected.size(); i++) {
-                        MegaChatMessage msg = selected.get(i).getMessage();
-                        if (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT
-                                || msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT
-                                || msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP
-                                || (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && msg.getContainsMeta() != null
-                                && msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY)) {
-                            showCopy = false;
-                            break;
-                        }
+            if (selected.isEmpty())
+                return false;
+
+            if ((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview()) {
+                Timber.d("Chat without permissions || without preview");
+                boolean showCopy = true;
+                for (int i = 0; i < selected.size(); i++) {
+                    MegaChatMessage msg = selected.get(i).getMessage();
+                    if (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT
+                            || msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT
+                            || msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP
+                            || (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && msg.getContainsMeta() != null
+                            && msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY)) {
+                        showCopy = false;
+                        break;
                     }
+                }
 
-                    copyIcon.setVisible(showCopy);
-                } else {
-                    Timber.d("Chat with permissions or preview");
-                    if (selected.size() == 1) {
-                        boolean isRemovedMsg = ChatUtil.isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, selected.get(0).getMessage());
-                        if (selected.get(0).isUploading()) {
-                            return false;
-                        }
+                copyIcon.setVisible(showCopy);
+                return false;
+            }
 
-                        boolean shouldForwardOptionVisible = !selected.get(0).isUploading() && !isRemovedMsg && isOnline(chatActivity) && !chatC.isInAnonymousMode();
-                        forwardIcon.setVisible(shouldForwardOptionVisible);
+            Timber.d("Chat with permissions or preview");
+            if (selected.size() == 1) {
+                Timber.d("One message selected");
+                MegaChatMessage chatMessage = selected.get(0).getMessage();
+                if (selected.get(0).isUploading() || chatMessage == null) {
+                    Timber.d("Message is uploading or null");
+                    return false;
+                }
 
-                        boolean shouldDeleteOptionVisible = !isRemovedMsg && selected.get(0).getMessage().getUserHandle() == myUserHandle &&
-                                selected.get(0).getMessage().isDeletable();
-                        deleteIcon.setVisible(shouldDeleteOptionVisible);
+                int typeMessage = chatMessage.getType();
 
-                        if (selected.get(0).getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
-                            MegaNodeList nodeList = selected.get(0).getMessage().getMegaNodeList();
-                            if (nodeList != null && nodeList.size() > 0) {
-                                getNodeUseCase.get(nodeList.get(0).getHandle())
+                boolean isMyOwnMsg = chatMessage.getUserHandle() == myUserHandle;
+
+                boolean isRemovedMsg = ChatUtil.isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, chatMessage);
+                boolean shouldForwardOptionVisible = !isRemovedMsg && isOnline(chatActivity) && !chatC.isInAnonymousMode();
+                forwardIcon.setVisible(shouldForwardOptionVisible);
+
+                boolean shouldDeleteOptionVisible = !isRemovedMsg && isMyOwnMsg &&
+                        chatMessage.isDeletable();
+                deleteIcon.setVisible(shouldDeleteOptionVisible);
+
+                switch (typeMessage) {
+                    case MegaChatMessage.TYPE_NODE_ATTACHMENT:
+                        MegaNodeList nodeList = chatMessage.getMegaNodeList();
+                        boolean isOnlineNotAnonymousAndNotRemoved = isOnline(chatActivity) && !chatC.isInAnonymousMode() && !isRemovedMsg;
+                        if (nodeList != null && nodeList.size() > 0 && isOnlineNotAnonymousAndNotRemoved) {
+                            if (isMyOwnMsg) {
+                                getNodeUseCase.checkNodeAvailable(nodeList.get(0).getHandle())
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe((result, throwable) -> {
-                                            if (throwable == null) {
-                                                shareIcon.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                                                shareIcon.setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && !isRemovedMsg);
-                                                downloadIcon.setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && !isRemovedMsg);
-                                                importIcon.setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && selected.get(0).getMessage().getUserHandle() != myUserHandle && !isRemovedMsg);
+                                            if (throwable != null) {
+                                                Timber.e(throwable);
                                             } else {
-                                                editIcon.setVisible(false);
-                                                copyIcon.setVisible(false);
-                                                forwardIcon.setVisible(false);
-                                                downloadIcon.setVisible(false);
-                                                shareIcon.setVisible(false);
-                                                inviteIcon.setVisible(false);
-                                                startConversationIcon.setVisible(false);
-                                                importIcon.setVisible(false);
+                                                if (result) {
+                                                    showOptionsForAvailableNode();
+                                                } else {
+                                                    editIcon.setVisible(false);
+                                                    copyIcon.setVisible(false);
+                                                    forwardIcon.setVisible(false);
+                                                    downloadIcon.setVisible(false);
+                                                    shareIcon.setVisible(false);
+                                                    inviteIcon.setVisible(false);
+                                                    startConversationIcon.setVisible(false);
+                                                    importIcon.setVisible(false);
+                                                }
                                             }
                                         });
-                            }
-                        } else if (selected.get(0).getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                            Timber.d("TYPE_CONTACT_ATTACHMENT selected");
-                            if (isOnline(chatActivity)) {
-                                String userEmail = selected.get(0).getMessage().getUserEmail(0);
-                                long userHandle = selected.get(0).getMessage().getUserHandle(0);
-                                MegaUser contact = megaApi.getContact(userEmail);
-                                if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                                    startConversationIcon.setVisible(!isRemovedMsg && (chatRoom.isGroup() || userHandle != chatRoom.getPeerHandle(0)));
-                                } else {
-                                    inviteIcon.setVisible(!isRemovedMsg && userHandle != myUserHandle);
-                                }
-                            }
-                        } else {
-                            Timber.d("Other type: %s", selected.get(0).getMessage().getType());
-                            MegaChatMessage messageSelected = megaChatApi.getMessage(idChat, selected.get(0).getMessage().getMsgId());
-                            if (messageSelected == null) {
-                                messageSelected = megaChatApi.getMessage(idChat, selected.get(0).getMessage().getTempId());
-                                if (messageSelected == null) {
-                                    return false;
-                                }
-                            }
-
-                            int type = selected.get(0).getMessage().getType();
-                            copyIcon.setVisible(type != MegaChatMessage.TYPE_CONTAINS_META || messageSelected.getContainsMeta() != null);
-
-                            forwardIcon.setVisible(!isRemovedMsg && isOnline(chatActivity) && !chatC.isInAnonymousMode() && type != MegaChatMessage.TYPE_TRUNCATE &&
-                                    type != MegaChatMessage.TYPE_ALTER_PARTICIPANTS && type != MegaChatMessage.TYPE_CHAT_TITLE && type != MegaChatMessage.TYPE_PRIV_CHANGE &&
-                                    type != MegaChatMessage.TYPE_CALL_ENDED & type != MegaChatMessage.TYPE_CALL_STARTED);
-
-                            editIcon.setVisible(messageSelected.getUserHandle() == myUserHandle && !isRemovedMsg && messageSelected.isEditable());
-                        }
-                    } else {
-                        Timber.d("Many items selected");
-                        for (int i = 0; i < selected.size(); i++) {
-                            isRemoved = ChatUtil.isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, selected.get(i).getMessage());
-
-                            if (!isUploading) {
-                                if (selected.get(i).isUploading()) {
-                                    isUploading = true;
-                                }
-                            }
-
-                            MegaChatMessage msg = selected.get(i).getMessage();
-
-                            if (showCopy
-                                    && (msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT
-                                    || msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT
-                                    || msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP
-                                    || (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && msg.getContainsMeta() != null
-                                    && msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY))) {
-                                showCopy = false;
-                            }
-
-                            if (isRemoved || (showDelete && ((msg.getUserHandle() != myUserHandle) || ((msg.getType() == MegaChatMessage.TYPE_NORMAL || msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_CONTAINS_META || msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP) && (!(msg.isDeletable())))))) {
-                                showDelete = false;
-                            }
-
-                            if ((showForward) && (msg.getType() == MegaChatMessage.TYPE_TRUNCATE || msg.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS || msg.getType() == MegaChatMessage.TYPE_CHAT_TITLE || msg.getType() == MegaChatMessage.TYPE_PRIV_CHANGE || msg.getType() == MegaChatMessage.TYPE_CALL_ENDED || msg.getType() == MegaChatMessage.TYPE_CALL_STARTED)) {
-                                showForward = false;
-                            }
-
-                            if ((allNodeAttachments) && (selected.get(i).getMessage().getType() != MegaChatMessage.TYPE_NODE_ATTACHMENT)) {
-                                allNodeAttachments = false;
-                                allNodeImages = false;
-                            }
-
-                            if (allNodeImages && !isMsgImage(selected.get(i))) {
-                                allNodeImages = false;
-                            }
-
-                            if (allNodeNonContacts) {
-                                if (selected.get(i).getMessage().getType() != MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                                    allNodeNonContacts = false;
-                                } else {
-                                    MegaUser contact = megaApi.getContact(selected.get(i).getMessage().getUserEmail(0));
-                                    if ((contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) ||
-                                            selected.get(i).getMessage().getUserHandle(0) == myUserHandle) {
-                                        allNodeNonContacts = false;
-                                    }
-                                }
-                            }
-
-                            if (selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
-                                MegaNodeList nodeList = selected.get(i).getMessage().getMegaNodeList();
-                                if (nodeList != null && nodeList.size() > 0) {
-                                    getNodeUseCase.get(nodeList.get(i).getHandle())
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe((result, throwable) -> {
-                                                if (throwable != null) {
-                                                    showCopy = false;
-                                                    showForward = false;
-                                                }
-                                            });
-                                }
-                            }
-                        }
-
-                        if (isUploading) {
-                            copyIcon.setVisible(false);
-                            deleteIcon.setVisible(false);
-                            editIcon.setVisible(false);
-                            forwardIcon.setVisible(false);
-                            downloadIcon.setVisible(false);
-                            inviteIcon.setVisible(false);
-                            importIcon.setVisible(false);
-                        } else if (allNodeAttachments && isOnline(chatActivity) && !isRemoved) {
-                            if (chatC.isInAnonymousMode()) {
-                                downloadIcon.setVisible(false);
-                                shareIcon.setVisible(false);
-                                importIcon.setVisible(false);
                             } else {
-                                downloadIcon.setVisible(true);
-                                shareIcon.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                                shareIcon.setVisible(true);
-                                importIcon.setVisible(true);
+                                showOptionsForAvailableNode();
                             }
-                        } else {
-                            downloadIcon.setVisible(false);
-                            importIcon.setVisible(false);
+                        }
+                        break;
+
+                    case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:
+                        Timber.d("Message selected is a contact attachment");
+                        if (isOnline(chatActivity)) {
+                            String userEmail = chatMessage.getUserEmail(0);
+                            long messageUserHandle = chatMessage.getUserHandle(0);
+                            MegaUser contact = megaApi.getContact(userEmail);
+                            if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+                                long chatRoomPeerHandle = chatRoom.getPeerHandle(0);
+                                startConversationIcon.setVisible(!isRemovedMsg && (chatRoom.isGroup() || messageUserHandle != chatRoomPeerHandle));
+                            } else {
+                                inviteIcon.setVisible(!isRemovedMsg && messageUserHandle != myUserHandle);
+                            }
+                        }
+                        break;
+
+                    default:
+                        Timber.d("Other type: %s", chatMessage.getType());
+                        MegaChatMessage messageSelected = megaChatApi.getMessage(idChat, chatMessage.getMsgId());
+                        if (messageSelected == null) {
+                            messageSelected = megaChatApi.getMessage(idChat, chatMessage.getTempId());
+                            if (messageSelected == null) {
+                                return false;
+                            }
                         }
 
-                        editIcon.setVisible(false);
-                        copyIcon.setVisible(!chatC.isInAnonymousMode() && showCopy);
-                        deleteIcon.setVisible(!isRemoved && !chatC.isInAnonymousMode() && showDelete);
-                        forwardIcon.setVisible(!isRemoved && isOnline(chatActivity) && !chatC.isInAnonymousMode() && showForward);
-                        inviteIcon.setVisible(!isRemoved && allNodeNonContacts &&
-                                isOnline(chatActivity) && !chatC.isInAnonymousMode());
+                        copyIcon.setVisible((typeMessage != MegaChatMessage.TYPE_CONTAINS_META && typeMessage != MegaChatMessage.TYPE_VOICE_CLIP) || (messageSelected.getContainsMeta() != null && messageSelected.getContainsMeta().getType() != MegaChatContainsMeta.CONTAINS_META_GIPHY));
+
+                        forwardIcon.setVisible(!isRemovedMsg && isOnline(chatActivity) && !chatC.isInAnonymousMode() && typeMessage != MegaChatMessage.TYPE_TRUNCATE &&
+                                typeMessage != MegaChatMessage.TYPE_ALTER_PARTICIPANTS && typeMessage != MegaChatMessage.TYPE_CHAT_TITLE && typeMessage != MegaChatMessage.TYPE_PRIV_CHANGE &&
+                                typeMessage != MegaChatMessage.TYPE_CALL_ENDED & typeMessage != MegaChatMessage.TYPE_CALL_STARTED);
+
+                        editIcon.setVisible(messageSelected.getUserHandle() == myUserHandle && !isRemovedMsg && messageSelected.isEditable());
+                        break;
+                }
+
+                return false;
+            }
+
+            Timber.d("Many items selected");
+            boolean isUploading = false;
+            boolean isRemoved = false;
+            boolean someNodeIsAttachmentAndSent = false;
+
+            showDelete = true;
+            showCopy = true;
+            showForward = true;
+            allNodeAttachments = true;
+            allNodeImages = true;
+            allNodeNonContacts = true;
+            editIcon.setVisible(false);
+            startConversationIcon.setVisible(false);
+
+            for (int i = 0; i < selected.size(); i++) {
+                MegaChatMessage chatMessage = selected.get(i).getMessage();
+                int typeMessage = chatMessage.getType();
+                boolean isMyOwnMsg = chatMessage.getUserHandle() == myUserHandle;
+
+                isRemoved = ChatUtil.isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, chatMessage);
+
+                if (typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && isMyOwnMsg) {
+                    someNodeIsAttachmentAndSent = true;
+                }
+
+                if (!isUploading) {
+                    if (selected.get(i).isUploading()) {
+                        isUploading = true;
+                    }
+                }
+
+                if (showCopy
+                        && (typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT
+                        || typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT
+                        || typeMessage == MegaChatMessage.TYPE_VOICE_CLIP
+                        || (typeMessage == MegaChatMessage.TYPE_CONTAINS_META && chatMessage.getContainsMeta() != null
+                        && chatMessage.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GIPHY))) {
+                    showCopy = false;
+                }
+
+                if (isRemoved || (showDelete &&
+                        (chatMessage.getUserHandle() != myUserHandle ||
+                                ((typeMessage == MegaChatMessage.TYPE_NORMAL ||
+                                        typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ||
+                                        typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT ||
+                                        typeMessage == MegaChatMessage.TYPE_CONTAINS_META ||
+                                        typeMessage == MegaChatMessage.TYPE_VOICE_CLIP) && !chatMessage.isDeletable())))) {
+                    showDelete = false;
+                }
+
+                if (showForward &&
+                        (typeMessage == MegaChatMessage.TYPE_TRUNCATE ||
+                                typeMessage == MegaChatMessage.TYPE_ALTER_PARTICIPANTS ||
+                                typeMessage == MegaChatMessage.TYPE_CHAT_TITLE ||
+                                typeMessage == MegaChatMessage.TYPE_PRIV_CHANGE ||
+                                typeMessage == MegaChatMessage.TYPE_CALL_ENDED ||
+                                typeMessage == MegaChatMessage.TYPE_CALL_STARTED)) {
+                    showForward = false;
+                }
+
+                if (allNodeAttachments &&
+                        typeMessage != MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+                    allNodeAttachments = false;
+                    allNodeImages = false;
+                }
+
+                if (allNodeImages && !isMsgImage(selected.get(i))) {
+                    allNodeImages = false;
+                }
+
+                if (allNodeNonContacts) {
+                    if (typeMessage != MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
+                        allNodeNonContacts = false;
+                    } else {
+                        MegaUser contact = megaApi.getContact(chatMessage.getUserEmail(0));
+                        if ((contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) ||
+                                chatMessage.getUserHandle(0) == myUserHandle) {
+                            allNodeNonContacts = false;
+                        }
                     }
                 }
             }
+
+            boolean isNotUploadingNotAnonymousNotRemoved = !isUploading && !chatC.isInAnonymousMode() && !isRemoved;
+            boolean isOnlineNotUploadingNotAnonymousNotRemoved = isOnline(chatActivity) && isNotUploadingNotAnonymousNotRemoved;
+
+            if (someNodeIsAttachmentAndSent) {
+                getNodeUseCase.checkNodesAvailable(selected)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe((result, throwable) -> {
+                            if (throwable != null) {
+                                Timber.e(throwable);
+                            } else {
+                                if (result) {
+                                    if(allNodeAttachments && isOnlineNotUploadingNotAnonymousNotRemoved) {
+                                        showOptionsForAvailableNode();
+                                    }
+
+                                    deleteIcon.setVisible(showDelete && isNotUploadingNotAnonymousNotRemoved);
+                                    copyIcon.setVisible(showCopy && isNotUploadingNotAnonymousNotRemoved);
+                                    inviteIcon.setVisible(allNodeNonContacts && isOnlineNotUploadingNotAnonymousNotRemoved);
+                                    forwardIcon.setVisible(showForward && isOnlineNotUploadingNotAnonymousNotRemoved);
+                                } else {
+                                    editIcon.setVisible(false);
+                                    copyIcon.setVisible(false);
+                                    forwardIcon.setVisible(false);
+                                    downloadIcon.setVisible(false);
+                                    shareIcon.setVisible(false);
+                                    inviteIcon.setVisible(false);
+                                    startConversationIcon.setVisible(false);
+                                    importIcon.setVisible(false);
+                                    deleteIcon.setVisible(showDelete && isNotUploadingNotAnonymousNotRemoved);
+
+                                }
+                            }
+                        });
+
+            } else {
+                if(allNodeAttachments && isOnlineNotUploadingNotAnonymousNotRemoved) {
+                    showOptionsForAvailableNode();
+                }
+
+                deleteIcon.setVisible(showDelete && isNotUploadingNotAnonymousNotRemoved);
+                copyIcon.setVisible(showCopy && isNotUploadingNotAnonymousNotRemoved);
+                inviteIcon.setVisible(allNodeNonContacts && isOnlineNotUploadingNotAnonymousNotRemoved);
+                forwardIcon.setVisible(showForward && isOnlineNotUploadingNotAnonymousNotRemoved);
+            }
+
             return false;
         }
     }
