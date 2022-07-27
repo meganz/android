@@ -2,6 +2,7 @@ package mega.privacy.android.app.usecase.chat
 
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.utils.ChatUtil
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatListItem
 import javax.inject.Inject
@@ -25,7 +26,7 @@ class SearchChatsUseCase @Inject constructor(
     fun search(query: String, archivedChats: Boolean): Single<List<MegaChatListItem>> =
         Single.fromCallable {
             val items = mutableListOf<MegaChatListItem>().apply {
-                addAll(megaChatApi.chatListItems)
+                addAll(megaChatApi.getChatListItemsByType(MegaChatApi.CHAT_TYPE_NON_MEETING))
                 if (archivedChats) addAll(megaChatApi.archivedChatListItems)
             }
 

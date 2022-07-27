@@ -16,6 +16,8 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 public class PushNotificationSettingManagement {
 
     private MegaPushNotificationSettings push;
@@ -54,6 +56,7 @@ public class PushNotificationSettingManagement {
     public void sendPushNotificationSettings(MegaPushNotificationSettings receivedPush) {
         push = receivedPush != null ? MegaPushNotificationSettingsAndroid.copy(receivedPush) : MegaPushNotificationSettings.createInstance();
         MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
+        LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).post(null);
     }
 
     /**

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_relative_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -135,7 +136,22 @@
         <include layout="@layout/empty_screen_recents_chat"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:id="@+id/empty_view"
             android:layout_below="@+id/linear_layout_add"/>
+
+        <TextView
+            android:id="@+id/empty_text_chat_recent_invite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linear_layout_add"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:padding="16dp"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
+            android:textSize="16sp"
+            android:visibility="gone"
+            tools:text="@tools:sample/lorem"
+            tools:visibility="visible" />
 
         <LinearLayout
             android:id="@+id/linear_layout_recycler"
