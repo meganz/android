@@ -172,8 +172,6 @@
     <string name="login_before_share">Veuillez vous connecter pour partager avec MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Votre lien de confirmation n’est plus valide. Votre compte est peut-être déjà activé ou vous avez peut-être annulé votre inscription.</string>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Inscrivez-vous maintenant et obtenez 20&#160;Go d’espace de stockage gratuit</string>
     <!-- category in sort by action -->
     <string name="name_text">Nom</string>
     <!-- First Name of the user -->
@@ -4129,4 +4127,8 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s a attribué un droit normal à %1$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s a attribué un droit d’hôte à %1$s</string>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">Nous attendons que d’autres se joignent</string>
+    <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_favourites">[B]Aucun[/B] [A]favori[/A] [B]n’a été trouvé[/B]</string>
 </resources>

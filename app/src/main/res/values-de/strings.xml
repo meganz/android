@@ -170,8 +170,6 @@
     <string name="login_before_share">Bitte loggen Sie sich ein, um Freigaben zu erstellen</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Der Bestätigungslink ist nicht mehr gültig. Entweder haben Sie Ihren Account bereits aktiviert, oder die Registrierung wurde abgebrochen.</string>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Registrieren Sie sich jetzt und erhalten Sie 20&#160;GB kostenlosen Speicherplatz</string>
     <!-- category in sort by action -->
     <string name="name_text">Name</string>
     <!-- First Name of the user -->
@@ -1847,7 +1845,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Android-[A]Einstellungen[/A] öffnen</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">[A]Apps &amp; Benachrichtigungen[/A] öffnen</string>
+    <string name="turn_on_notifications_second_step">Open [A]Apps and notifications[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">[A]MEGA[/A] auswählen</string>
     <!-- Fourth step to turn on notifications -->
@@ -4024,4 +4022,8 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s wurde von %2$s auf die Standardrolle umgestellt</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s wurde von %2$s auf die Gastgeberrolle umgestellt</string>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">Warten auf weitere Teilnehmer</string>
+    <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
 </resources>

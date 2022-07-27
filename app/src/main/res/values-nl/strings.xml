@@ -170,8 +170,6 @@
     <string name="login_before_share">Log in om te delen met MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Uw bevestigingslink is niet langer geldig. Uw account kan al geactiveerd zijn of u kunt uw registratie geannuleerd hebben.</string>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Registreer nu en krijg 20&#160;GB aan gratis opslag</string>
     <!-- category in sort by action -->
     <string name="name_text">Naam</string>
     <!-- First Name of the user -->
@@ -1847,7 +1845,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Open Android apparaat [A]Instellingen[/A]</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Open [A]Applicaties &amp; meldingen[/A]</string>
+    <string name="turn_on_notifications_second_step">[A]Applicatie en notificaties[/A] openen</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">Selecteer [A]MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -4024,4 +4022,8 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was gewijzigd naar standaard door %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s was gewijzigd naar gastheer/gastvrouw door %2$s</string>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">Wachten voor andere om aan te sluiten</string>
+    <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_favourites">[B]Geen[/B] [A]favorieten[/A] [B]gevonden[/B]</string>
 </resources>

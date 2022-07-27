@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Nessuno spazio esterno rilevato</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Esci</string>
+    <string name="action_logout">Disconnettersi</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Carica</string>
     <!-- Menu item -->
@@ -172,8 +172,6 @@
     <string name="login_before_share">Per favore, effettua l’accesso per condividere con MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Il tuo link di conferma non è più valido. Il tuo account potrebbe essere stato già attivato o potresti aver annullato la tua registrazione.</string>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Registrati adesso e ottieni 20&#160;GB di spazio gratuito</string>
     <!-- category in sort by action -->
     <string name="name_text">Nome</string>
     <!-- First Name of the user -->
@@ -1890,7 +1888,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Apri le [A]Impostazioni[/A] del dispositivo Android</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Apri [A]App &amp; notifiche[/A]</string>
+    <string name="turn_on_notifications_second_step">Open [A]Apps and notifications[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">Seleziona [A]MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -4129,4 +4127,8 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">L\’utente %1$s è stato impostato come standard da %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">L\’utente %1$s è stato impostato come host da %2$s</string>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">In attesa che si uniscano altre persone</string>
+    <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
 </resources>

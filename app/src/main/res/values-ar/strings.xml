@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">لم يتم العثور على وحدة تخزين خارجية</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">تسجيل&#160;خروج</string>
+    <string name="action_logout">تسجيل خروج</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">رفع</string>
     <!-- Menu item -->
@@ -178,8 +178,6 @@
     <string name="login_before_share">الرجاء تسجيل الدخول للمشاركة مع ميغا MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">رابط التأكيد خاصتك لم يعد صالحاً. قد يكون حسابك مفعلاً مسبقاً أو قد تكون قد ألغيت تسجيل حسابك.</string>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">سجل الآن واحصل على 20&#160;غيغابايت من مساحة التخزين المجانية</string>
     <!-- category in sort by action -->
     <string name="name_text">الاسم</string>
     <!-- First Name of the user -->
@@ -2015,7 +2013,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">افتح [A]اعدادات[/A] جهاز اندرويد</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">افتح [A]التطبيقات والإشعارات[/A]</string>
+    <string name="turn_on_notifications_second_step">Open [A]Apps and notifications[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">اختر [A]ميغا MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -4432,4 +4430,8 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to standard role by %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s تم تغيير دوره إلى مُضيف من قبل %2$s</string>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">Waiting for others to join</string>
+    <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
 </resources>

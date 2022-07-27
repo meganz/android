@@ -168,8 +168,6 @@
     <string name="login_before_share">MEGAと共有するにはログインしてください</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">あなたの確認リンクはもう有効ではありません。あなたのアカウントは既に有効になっているか、登録をキャンセルしたかもしれません。</string>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">今すぐ登録し、20&#160;GBの無料ストレージを取得してください</string>
     <!-- category in sort by action -->
     <string name="name_text">名前</string>
     <!-- First Name of the user -->
@@ -1804,7 +1802,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Android端末の[A]設定[/A]を開きます</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">[A]アプリ＆通知[/A]を開きます</string>
+    <string name="turn_on_notifications_second_step">[A]アプリと通知[/A]を開く</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">[A]MEGA[/A]を選択します</string>
     <!-- Fourth step to turn on notifications -->
@@ -3919,4 +3917,8 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$sは%2$sさんによって標準的な役割に変更されました</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$sは%2$sさんによって主催者の役割に変更されました</string>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">他の人が参加するのを待機中</string>
+    <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_favourites">[B][/B][A]お気に入り[/A][B]が見つかりません[/B]</string>
 </resources>
