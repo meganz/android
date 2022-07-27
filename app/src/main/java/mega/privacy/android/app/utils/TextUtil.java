@@ -185,10 +185,10 @@ public class TextUtil {
      * @param textToShow The text to format.
      * @return The string formatted.
      */
-    public static String formatEmptyScreenText(Context context, String textToShow) {
+    public static Spanned formatEmptyScreenText(Context context, String textToShow) {
         String colorStart = ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
         String colorEnd = ColorUtils.getColorHexString(context, R.color.grey_300_grey_600);
-        return replaceFormatText(textToShow, colorStart, colorEnd).toString();
+        return replaceFormatText(textToShow, colorStart, colorEnd);
     }
 
     /**

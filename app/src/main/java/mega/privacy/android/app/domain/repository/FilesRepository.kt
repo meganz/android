@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaShare
 
 /**
  * Files repository
@@ -40,6 +41,15 @@ interface FilesRepository {
     suspend fun getRubbishBinNode(): MegaNode?
 
     /**
+     * Get the parent node of a MegaNode
+     *
+     * @param node
+     * @return the parent node of the node, null if node doesn't exist or
+     *         is the root node
+     */
+    suspend fun getParentNode(node: MegaNode): MegaNode?
+
+    /**
      * Get children of a parent node
      *
      * @param parentNode parent node
@@ -55,6 +65,32 @@ interface FilesRepository {
      */
     suspend fun getNodeByHandle(handle: Long): MegaNode?
 
+
+    /**
+     * Get a list of all incoming shares
+     *
+     * @param order sort order, if null the default order is applied
+     * @return List of MegaNode that other users are sharing with this account
+     */
+    suspend fun getIncomingSharesNode(order: Int? = null): List<MegaNode>
+
+    /**
+     * Get a list of all outgoing shares
+     *
+     * @param order sort order, if null the default order is applied
+     * @return List of MegaNode of all active and pending outbound shared by current user
+     */
+    suspend fun getOutgoingSharesNode(order: Int? = null): List<MegaShare>
+
+    /**
+     * Authorize and return a MegaNode can be downloaded with any instance of MegaApi
+     *
+     * @param handle the handle of the node to authorize
+     * @return a MegaNode that can be downloaded with any instance of MegaApi,
+     *         null if can't be authorized
+     */
+    suspend fun authorizeNode(handle: Long): MegaNode?
+
     /**
      * Get cloud sort order
      * @return cloud sort order
@@ -66,6 +102,19 @@ interface FilesRepository {
      * @return camera sort order
      */
     suspend fun getCameraSortOrder(): Int
+
+    /**
+     * Get others sort order
+     * @return others sort order
+     */
+    suspend fun getOthersSortOrder(): Int
+
+    /**
+     * Get links cloud sort order
+     * @return links cloud sort order
+     */
+    suspend fun getLinksSortOrder(): Int
+
 
     /**
      * Checks if Inbox node has children.

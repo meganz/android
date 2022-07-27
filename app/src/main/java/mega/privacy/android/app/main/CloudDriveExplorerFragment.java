@@ -34,7 +34,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -429,13 +428,11 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        emptyRootText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
-                        StringResourcesUtils.getString(R.string.context_empty_cloud_drive)),
-                HtmlCompat.FROM_HTML_MODE_LEGACY);
+        emptyRootText = formatEmptyScreenText(requireContext(),
+                        StringResourcesUtils.getString(R.string.context_empty_cloud_drive));
 
-        emptyGeneralText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
-                        StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)),
-                HtmlCompat.FROM_HTML_MODE_LEGACY);
+        emptyGeneralText = formatEmptyScreenText(requireContext(),
+                        StringResourcesUtils.getString(R.string.file_browser_empty_folder_new));
 
         updateEmptyScreen();
         super.onViewCreated(view, savedInstanceState);

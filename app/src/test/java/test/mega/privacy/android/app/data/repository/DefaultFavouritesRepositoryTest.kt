@@ -7,9 +7,11 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
+import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.app.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
+import mega.privacy.android.domain.entity.FavouriteFolder
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.FavouriteInfo
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.FavouritesRepository
 import nz.mega.sdk.MegaApiJava
@@ -31,6 +33,7 @@ class DefaultFavouritesRepositoryTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val favouriteInfoMapper = mock<FavouriteInfoMapper>()
+    private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
 
     private val node = mock<MegaNode> {
         on { handle }.thenReturn(1L)
@@ -45,7 +48,7 @@ class DefaultFavouritesRepositoryTest {
         on { getNumChildFiles(node) }.thenReturn(0)
     }
 
-    private val favouriteInfo = FavouriteInfo(
+    private val favouriteInfo = FavouriteFolder(
         id = 0,
         name = node.name,
         size = node.size,
@@ -56,13 +59,13 @@ class DefaultFavouritesRepositoryTest {
         hasVersion = true,
         numChildFiles = 0,
         numChildFolders = 0,
-        isImage = false,
-        isVideo = false,
-        isFolder = true,
         isFavourite = true,
         isExported = false,
         isTakenDown = false,
     )
+
+    private val favouriteFolderInfoMapper = ::toFavouriteFolderInfo
+
 
     @Before
     fun setUp() {
@@ -71,7 +74,9 @@ class DefaultFavouritesRepositoryTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             monitorNodeChangeFacade = MonitorNodeChangeFacade(),
             favouriteInfoMapper = favouriteInfoMapper,
-            cacheFolder = mock()
+            favouriteFolderInfoMapper = favouriteFolderInfoMapper,
+            cacheFolder = mock(),
+            fileTypeInfoMapper = fileTypeInfoMapper
         )
     }
 
@@ -89,11 +94,14 @@ class DefaultFavouritesRepositoryTest {
             }
 
             whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(node)
-            whenever(favouriteInfoMapper(node,
+            whenever(favouriteInfoMapper(
+                node,
                 null,
                 gateway.hasVersion(node),
                 gateway.getNumChildFolders(node),
-                gateway.getNumChildFiles(node))).thenReturn(
+                gateway.getNumChildFiles(node),
+                fileTypeInfoMapper,
+            )).thenReturn(
                 favouriteInfo
             )
 
@@ -132,11 +140,14 @@ class DefaultFavouritesRepositoryTest {
             }
 
             whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(node)
-            whenever(favouriteInfoMapper(node,
+            whenever(favouriteInfoMapper(
+                node,
                 null,
                 gateway.hasVersion(node),
                 gateway.getNumChildFolders(node),
-                gateway.getNumChildFiles(node))).thenReturn(
+                gateway.getNumChildFiles(node),
+                fileTypeInfoMapper,
+            )).thenReturn(
                 favouriteInfo
             )
 
@@ -170,7 +181,7 @@ class DefaultFavouritesRepositoryTest {
                 on { name }.thenReturn(expectedParentName)
                 on { parentHandle }.thenReturn(expectedParentNodeHandle)
             }
-            val favouriteInfo = FavouriteInfo(
+            val favouriteInfo = FavouriteFolder(
                 id = 0,
                 name = node.name,
                 size = node.size,
@@ -181,9 +192,6 @@ class DefaultFavouritesRepositoryTest {
                 hasVersion = true,
                 numChildFiles = 0,
                 numChildFolders = 0,
-                isImage = false,
-                isVideo = false,
-                isFolder = true,
                 isFavourite = true,
                 isExported = false,
                 isTakenDown = false,
@@ -192,11 +200,14 @@ class DefaultFavouritesRepositoryTest {
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(parentNode)
             whenever(megaApiGateway.getChildrenByNode(parentNode)).thenReturn(arrayListOf(node))
 
-            whenever(favouriteInfoMapper(node,
+            whenever(favouriteInfoMapper(
+                node,
                 null,
                 gateway.hasVersion(node),
                 gateway.getNumChildFolders(node),
-                gateway.getNumChildFiles(node))).thenReturn(
+                gateway.getNumChildFiles(node),
+                fileTypeInfoMapper,
+            )).thenReturn(
                 favouriteInfo
             )
 

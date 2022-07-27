@@ -1,7 +1,7 @@
 package mega.privacy.android.app.data.mapper
 
-import mega.privacy.android.app.utils.MegaNodeUtil.isImage
-import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.domain.entity.FavouriteFile
+import mega.privacy.android.domain.entity.FavouriteFolder
 import mega.privacy.android.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 
@@ -14,6 +14,7 @@ typealias FavouriteInfoMapper = (
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards Int,
     @JvmSuppressWildcards Int,
+    @JvmSuppressWildcards FileTypeInfoMapper,
 ) -> @JvmSuppressWildcards FavouriteInfo
 
 internal fun toFavouriteInfo(
@@ -22,22 +23,42 @@ internal fun toFavouriteInfo(
     hasVersion: Boolean,
     numberOfChildFolders: Int,
     numberOfChildFiles: Int,
-) = FavouriteInfo(
-    id = megaNode.handle,
-    name = megaNode.name,
-    size = megaNode.size,
-    label = megaNode.label,
-    parentId = megaNode.parentHandle,
-    base64Id = megaNode.base64Handle,
-    modificationTime = megaNode.modificationTime,
-    hasVersion = hasVersion,
-    numChildFolders = numberOfChildFolders,
-    numChildFiles = numberOfChildFiles,
-    thumbnailPath = thumbnailPath,
-    isFolder = megaNode.isFolder,
-    isImage = megaNode.isImage(),
-    isVideo = megaNode.isVideo(),
-    isFavourite = megaNode.isFavourite,
-    isExported = megaNode.isExported,
-    isTakenDown = megaNode.isTakenDown,
-)
+    fileTypeInfoMapper: FileTypeInfoMapper,
+) = if (megaNode.isFolder) {
+    FavouriteFolder(
+        id = megaNode.handle,
+        name = megaNode.name,
+        size = megaNode.size,
+        label = megaNode.label,
+        parentId = megaNode.parentHandle,
+        base64Id = megaNode.base64Handle,
+        modificationTime = megaNode.modificationTime,
+        hasVersion = hasVersion,
+        numChildFolders = numberOfChildFolders,
+        numChildFiles = numberOfChildFiles,
+        thumbnailPath = thumbnailPath,
+        isFavourite = megaNode.isFavourite,
+        isExported = megaNode.isExported,
+        isTakenDown = megaNode.isTakenDown,
+    )
+} else {
+    FavouriteFile(
+        id = megaNode.handle,
+        name = megaNode.name,
+        size = megaNode.size,
+        label = megaNode.label,
+        parentId = megaNode.parentHandle,
+        base64Id = megaNode.base64Handle,
+        modificationTime = megaNode.modificationTime,
+        hasVersion = hasVersion,
+        numChildFolders = numberOfChildFolders,
+        numChildFiles = numberOfChildFiles,
+        thumbnailPath = thumbnailPath,
+        type = fileTypeInfoMapper(megaNode),
+        isFavourite = megaNode.isFavourite,
+        isExported = megaNode.isExported,
+        isTakenDown = megaNode.isTakenDown,
+    )
+}
+
+

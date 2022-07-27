@@ -26,6 +26,12 @@ import mega.privacy.android.app.data.preferences.AppPreferencesDatastore
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.app.data.preferences.LoggingPreferencesDataStore
+import mega.privacy.android.app.di.mediaplayer.AudioPlayer
+import mega.privacy.android.app.di.mediaplayer.VideoPlayer
+import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
+import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
+import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
+import javax.inject.Singleton
 
 /**
  * Gateway module
@@ -72,5 +78,37 @@ abstract class GatewayModule {
 
     @Binds
     abstract fun bindFileCompressionGateway(implementation: ZipFileCompressionGateway): FileCompressionGateway
+
+    /**
+     * Provide MediaPlayerGateway implementation
+     */
+    @AudioPlayer
+    @Binds
+    @Singleton
+    abstract fun bindsAudioPlayerGateway(@AudioPlayer mediaPlayerFacade: MediaPlayerFacade): MediaPlayerGateway
+
+    /**
+     * Provide MediaPlayerServiceGateway implementation
+     */
+    @AudioPlayer
+    @Binds
+    @Singleton
+    abstract fun bindsAudioPlayerServiceGateway(@AudioPlayer mediaPlayerFacade: MediaPlayerFacade): MediaPlayerServiceGateway
+
+    /**
+     * Provide MediaPlayerGateway implementation
+     */
+    @VideoPlayer
+    @Binds
+    @Singleton
+    abstract fun bindsVideoPlayerGateway(@VideoPlayer mediaPlayerFacade: MediaPlayerFacade): MediaPlayerGateway
+
+    /**
+     * Provide MediaPlayerServiceGateway implementation
+     */
+    @VideoPlayer
+    @Binds
+    @Singleton
+    abstract fun bindsVideoPlayerServiceGateway(@VideoPlayer mediaPlayerFacade: MediaPlayerFacade): MediaPlayerServiceGateway
 
 }

@@ -27,6 +27,7 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPO
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.isServiceRunning;
 import static mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage.extractMegaLink;
 import static mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage.isChatLink;
@@ -171,7 +172,6 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_SEND_CONTACTS;
 import static mega.privacy.android.app.utils.Constants.REQUEST_STORAGE_VOICE_CLIP;
 import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE_TAKE_PICTURE;
 import static mega.privacy.android.app.utils.Constants.RICH_WARNING_TRUE;
-import static mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_FOR_OTHERS_PARTICIPANTS;
 import static mega.privacy.android.app.utils.Constants.SELECTED_CHATS;
 import static mega.privacy.android.app.utils.Constants.SELECTED_USERS;
 import static mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE;
@@ -240,7 +240,6 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -308,7 +307,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -805,8 +803,6 @@ public class ChatActivity extends PasscodeActivity
     private ActivityResultLauncher<Intent> scanDocumentLauncher = null;
     private ActivityResultLauncher<Intent> takePictureLauncher = null;
 
-    private CountDownTimer countDownTimerWaitingForOthers = null;
-
     /**
      * Current contact online status.
      */
@@ -882,6 +878,22 @@ public class ChatActivity extends PasscodeActivity
 
         if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
             updateCallBanner();
+        }
+    };
+
+    private final Observer<Pair> waitingForOthersBannerObserver = result -> {
+        Long chatId = (Long) result.first;
+
+        if (chatId != getCurrentChatid()) {
+            Timber.d("Different chat");
+            return;
+        }
+
+        Boolean onlyMeInTheCall = (Boolean) result.second;
+        if (onlyMeInTheCall) {
+            showOnlyMeInTheCallDialog();
+        } else {
+            hideDialogCall();
         }
     };
 
@@ -1503,6 +1515,7 @@ public class ChatActivity extends PasscodeActivity
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observe(this, callStatusObserver);
         LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall.class).observe(this, callCompositionChangeObserver);
+        LiveEventBus.get(EVENT_UPDATE_WAITING_FOR_OTHERS, Pair.class).observe(this, waitingForOthersBannerObserver);
 
         getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
                 .subscribeOn(Schedulers.io())
@@ -1512,35 +1525,15 @@ public class ChatActivity extends PasscodeActivity
                     if (chatRoom != null && chatId == chatRoom.getChatId()) {
                         boolean onlyMeInTheCall = result.component2();
                         boolean waitingForOthers = result.component3();
-                        stopCountDownTimerWaitingForOthers();
+                        long millisecondsOnlyMeInCallDialog =
+                                TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog);
 
-                        if (onlyMeInTheCall) {
-                            long millisecondsOnlyMeInCallDialog =
-                                    TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog);
-                            if (waitingForOthers && millisecondsOnlyMeInCallDialog <= 0) {
+                        boolean hideDialogCall = MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored || !onlyMeInTheCall || (waitingForOthers && millisecondsOnlyMeInCallDialog <=0);
 
-                                if (countDownTimerWaitingForOthers == null) {
-                                    long secondsWaitingForOthersCallDialog = TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsWaitingForOthersCallDialog);
-                                    long timeToWait = secondsWaitingForOthersCallDialog > 0 ? secondsWaitingForOthersCallDialog : SECONDS_TO_WAIT_FOR_OTHERS_PARTICIPANTS;
-                                    countDownTimerWaitingForOthers = new CountDownTimer(TimeUnit.SECONDS.toMillis(timeToWait), TimeUnit.SECONDS.toMillis(1)) {
-
-                                        @Override
-                                        public void onTick(long millisUntilFinished) {
-                                        }
-
-                                        @Override
-                                        public void onFinish() {
-                                            showOnlyMeInTheCallDialog();
-                                        }
-                                    }.start();
-                                }
-                            } else if (MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog <= 0 || MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
-                                hideDialogCall();
-                            } else {
-                                showOnlyMeInTheCallDialog();
-                            }
-                        } else {
+                        if (hideDialogCall) {
                             hideDialogCall();
+                        } else {
+                            showOnlyMeInTheCallDialog();
                         }
                     }
                 });
@@ -4266,51 +4259,43 @@ public class ChatActivity extends PasscodeActivity
      * Dialogue to allow you to end or stay on a group call or meeting when you are left alone on the call
      */
     private void showOnlyMeInTheCallDialog() {
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
-
-        Button firstButton = dialogLayout.findViewById(R.id.first_button);
-        Button secondButton = dialogLayout.findViewById(R.id.second_button);
-        firstButton.setVisibility(View.VISIBLE);
-        secondButton.setVisibility(View.VISIBLE);
-
-        firstButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call));
-        secondButton.setText(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call));
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-        builder.setView(dialogLayout);
         boolean isRequestSent = false;
-        if(chatRoom != null) {
+        if (chatRoom != null) {
             MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
-            if(call != null) {
+            if (call != null) {
                 isRequestSent = MegaApplication.getChatManagement().isRequestSent(call.getCallId());
             }
         }
-        dialogOnlyMeInCall = builder.create();
-        dialogOnlyMeInCall.setTitle(isRequestSent ?
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
+        builder.setTitle(isRequestSent ?
                 StringResourcesUtils.getString(R.string.calls_call_screen_dialog_title_only_you_in_the_call) :
                 StringResourcesUtils.getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call));
-        dialogOnlyMeInCall.setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call));
-        dialogOnlyMeInCall.setCancelable(false);
-        dialogOnlyMeInCall.show();
 
-        dialogOnlyMeInCall.setOnDismissListener(dialog -> {
-            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true;
-        });
+        builder.setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call));
 
-        firstButton.setOnClickListener(v13 -> {
+        builder.setPositiveButton(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call), (dialog, which) -> {
             MegaApplication.getChatManagement().stopCounterToFinishCall();
             hideDialogCall();
             MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
+
             if (call != null) {
-                megaChatApi.hangChatCall(call.getCallId(), null);
+                endCallUseCase.hangCall(call.getCallId())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(() -> {
+                        }, (error) -> Timber.e("Error " + error));
             }
         });
 
-        secondButton.setOnClickListener(v13 -> {
+        builder.setNegativeButton(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call), (dialog, which) -> {
             MegaApplication.getChatManagement().stopCounterToFinishCall();
+            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true;
             hideDialogCall();
         });
+
+        dialogOnlyMeInCall = builder.create();
+        dialogOnlyMeInCall.setCancelable(false);
+        dialogOnlyMeInCall.show();
     }
 
     /**
@@ -8421,7 +8406,6 @@ public class ChatActivity extends PasscodeActivity
         }
 
         hideCallBar(null);
-        stopCountDownTimerWaitingForOthers();
         destroyAudioRecorderElements();
         if (adapter != null) {
             adapter.stopAllReproductionsInProgress();
@@ -10136,16 +10120,6 @@ public class ChatActivity extends PasscodeActivity
             } else {
                 break;
             }
-        }
-    }
-
-    /**
-     * Stop waiting for others count down timer
-     */
-    private void stopCountDownTimerWaitingForOthers() {
-        if (countDownTimerWaitingForOthers != null) {
-            countDownTimerWaitingForOthers.cancel();
-            countDownTimerWaitingForOthers = null;
         }
     }
 

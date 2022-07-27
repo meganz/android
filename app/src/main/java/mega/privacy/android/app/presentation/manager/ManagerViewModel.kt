@@ -47,11 +47,8 @@ import javax.inject.Inject
  * @param getRubbishBinChildrenNode Fetch the rubbish bin nodes
  * @param getBrowserChildrenNode Fetch the browser nodes
  * @param getRootFolder Fetch the root node
- * @param getRubbishBinChildrenNode
- * @param getBrowserChildrenNode
  * @param getNumUnreadUserAlerts
- * @param getInboxNode
- * @param hasChildren
+ * @param hasInboxChildren
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -188,24 +185,6 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Set the current incoming parent handle to the UI state
-     *
-     * @param handle the id of the current incoming parent handle to set
-     */
-    fun setIncomingParentHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(incomingParentHandle = handle) }
-    }
-
-    /**
-     * Set the current outgoing parent handle to the UI state
-     *
-     * @param handle the id of the current outgoing parent handle to set
-     */
-    fun setOutgoingParentHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(outgoingParentHandle = handle) }
-    }
-
-    /**
      * Set the current links parent handle to the UI state
      *
      * @param handle the id of the current links parent handle to set
@@ -230,57 +209,6 @@ class ManagerViewModel @Inject constructor(
      */
     fun setIsFirstNavigationLevel(isFirstNavigationLevel: Boolean) = viewModelScope.launch {
         _state.update { it.copy(isFirstNavigationLevel = isFirstNavigationLevel) }
-    }
-
-    /**
-     * Decrease by 1 the incoming tree depth
-     */
-    fun decreaseIncomingTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(incomingTreeDepth = it.incomingTreeDepth - 1) }
-    }
-
-    /**
-     * Increase by 1 the incoming tree depth
-     */
-    fun increaseIncomingTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(incomingTreeDepth = it.incomingTreeDepth + 1) }
-    }
-
-    /**
-     * Reset incoming tree depth to initial value
-     */
-    fun resetIncomingTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(incomingTreeDepth = 0) }
-    }
-
-    /**
-     * Set incoming tree depth with given value
-     *
-     * @param depth the tree depth value to set
-     */
-    fun setIncomingTreeDepth(depth: Int) = viewModelScope.launch {
-        _state.update { it.copy(incomingTreeDepth = depth) }
-    }
-
-    /**
-     * Decrease by 1 the outgoing tree depth
-     */
-    fun decreaseOutgoingTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(outgoingTreeDepth = it.outgoingTreeDepth - 1) }
-    }
-
-    /**
-     * Increase by 1 the outgoing tree depth
-     */
-    fun increaseOutgoingTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(outgoingTreeDepth = it.outgoingTreeDepth + 1) }
-    }
-
-    /**
-     * Reset outgoing tree depth to initial value
-     */
-    fun resetOutgoingTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(outgoingTreeDepth = 0) }
     }
 
     /**

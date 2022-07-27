@@ -26,10 +26,11 @@ import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFra
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
-import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import javax.inject.Inject
 
 /**
@@ -54,10 +55,8 @@ class FavouriteFolderFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentFavouriteFolderBinding.inflate(inflater, container, false)
-        binding.emptyHintText.text = TextUtil.formatEmptyScreenText(
-            context,
-            getString(R.string.file_browser_empty_folder_new)
-        ).toSpannedHtmlText()
+        binding.emptyHintText.text = formatEmptyScreenText(context,
+            getString(R.string.file_browser_empty_folder_new))
         setupAdapter()
         return binding.root
     }
@@ -192,7 +191,7 @@ class FavouriteFolderFragment: Fragment() {
                 }
                 else -> {
                     MegaNodeUtil.onNodeTapped(
-                        context = requireContext(),
+                        context = requireActivity(),
                         node = favourite.node,
                         nodeDownloader = (activity as ManagerActivity)::saveNodeByTap,
                         activityLauncher = activity as ManagerActivity,

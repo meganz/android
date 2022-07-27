@@ -8,12 +8,19 @@ import android.os.IBinder
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.view.isVisible
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.google.android.exoplayer2.ui.PlayerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
-import mega.privacy.android.app.mediaplayer.service.*
+import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
+import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 
@@ -36,10 +43,12 @@ class MiniAudioPlayerController constructor(
     private var serviceBound = false
     private var playerService: MediaPlayerService? = null
 
+    /**
+     * The parameter that determine the player view whether should be visible
+     */
     var shouldVisible = false
         set(value) {
             field = value
-
             updatePlayerViewVisibility()
         }
 
@@ -55,7 +64,7 @@ class MiniAudioPlayerController constructor(
             if (service is MediaPlayerServiceBinder) {
                 playerService = service.service
 
-                setupPlayerView(service.service.player)
+                setupPlayerView(service.service.mediaPlayerServiceGateway)
                 service.service.metadata.observeForever(metadataObserver)
 
                 if (visible()) {
@@ -105,7 +114,7 @@ class MiniAudioPlayerController constructor(
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        when(event){
+        when (event) {
             Lifecycle.Event.ON_RESUME -> onResume()
             Lifecycle.Event.ON_PAUSE -> onPause()
             Lifecycle.Event.ON_DESTROY -> onDestroy()
@@ -116,7 +125,7 @@ class MiniAudioPlayerController constructor(
     fun onResume() {
         val service = playerService
         if (service != null) {
-            setupPlayerView(service.player)
+            setupPlayerView(service.mediaPlayerServiceGateway)
         }
         playerView.onResume()
     }
@@ -137,6 +146,11 @@ class MiniAudioPlayerController constructor(
      */
     fun playerHeight() = playerView.measuredHeight
 
+    /**
+     * The player view whether is visible.
+     *
+     * @return true is player view is visible, otherwise is false.
+     */
     fun visible() = playerView.isVisible
 
     private fun updatePlayerViewVisibility() {
@@ -157,15 +171,9 @@ class MiniAudioPlayerController constructor(
         onPlayerVisibilityChanged?.invoke()
     }
 
-    private fun setupPlayerView(player: MediaMegaPlayer) {
+    private fun setupPlayerView(mediaPlayerServiceGateway: MediaPlayerServiceGateway) {
         updatePlayerViewVisibility()
-        playerView.player = player
-
-        playerView.useController = true
-        playerView.controllerShowTimeoutMs = 0
-        playerView.controllerHideOnTouch = false
-
-        playerView.showController()
+        mediaPlayerServiceGateway.setupPlayerView(playerView = playerView)
     }
 
     companion object {

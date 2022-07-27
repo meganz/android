@@ -37,7 +37,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,7 +46,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Stack;
 
@@ -417,13 +415,11 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        emptyRootText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
-                        StringResourcesUtils.getString(R.string.context_empty_incoming)),
-                HtmlCompat.FROM_HTML_MODE_LEGACY);
+        emptyRootText = formatEmptyScreenText(requireContext(),
+                        StringResourcesUtils.getString(R.string.context_empty_incoming));
 
-        emptyGeneralText = HtmlCompat.fromHtml(formatEmptyScreenText(requireContext(),
-                        StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)),
-                HtmlCompat.FROM_HTML_MODE_LEGACY);
+        emptyGeneralText = formatEmptyScreenText(requireContext(),
+                        StringResourcesUtils.getString(R.string.file_browser_empty_folder_new));
 
         updateEmptyScreen();
         super.onViewCreated(view, savedInstanceState);

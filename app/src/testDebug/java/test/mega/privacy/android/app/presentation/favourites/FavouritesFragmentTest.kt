@@ -22,7 +22,6 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.presentation.favourites.FavouritesFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.model.Favourite
-import mega.privacy.android.domain.entity.FavouriteInfo
 import nz.mega.sdk.MegaNode
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
@@ -32,9 +31,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.di.TestSortOrderUseCases
+import test.mega.privacy.android.app.di.TestWrapperModule
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 import test.mega.privacy.android.app.testFragment
 
@@ -131,7 +133,7 @@ class FavouritesFragmentTest {
         whenever(node.name).thenReturn("testName.txt")
         whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
         whenever(node.size).thenReturn(1000L)
-        val favouriteInfo = FavouriteInfo(
+        val favouriteInfo = mega.privacy.android.domain.entity.FavouriteFolder(
             id = 123,
             name = node.name,
             size = node.size,
@@ -142,9 +144,6 @@ class FavouritesFragmentTest {
             hasVersion = false,
             numChildFolders = 0,
             numChildFiles = 0,
-            isImage = false,
-            isVideo = false,
-            isFolder = true,
             isFavourite = true,
             isExported = false,
             isTakenDown = false,
@@ -154,18 +153,19 @@ class FavouritesFragmentTest {
         whenever(favourite.isFolder).thenReturn(true)
         val list = listOf(favouriteInfo)
         runBlocking {
-            whenever(FavouritesTestModule.getCloudSortOrder()).thenReturn(1)
+            whenever(TestSortOrderUseCases.getCloudSortOrder()).thenReturn(1)
             whenever(FavouritesTestModule.getAllFavourites()).thenReturn(
                 flowOf(list)
             )
             whenever(FavouritesTestModule.stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
             whenever(FavouritesTestModule.favouriteMapper(any(),
-                any(),
-                any(),
-                any(),
-                any())).thenReturn(
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull())).thenReturn(
                 favourite)
             whenever(FavouritesTestModule.getThumbnail(1)).thenReturn(null)
+            whenever(TestWrapperModule.fetchNodeWrapper(any())).thenReturn(node)
         }
     }
 

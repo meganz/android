@@ -16,8 +16,8 @@ import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.domain.entity.FavouriteFolder
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.FavouriteInfo
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import nz.mega.sdk.MegaNode
 import org.junit.After
@@ -96,7 +96,7 @@ class FavouriteFolderViewModelTest {
         whenever(node.isFolder).thenReturn(true)
         whenever(node.isInShare).thenReturn(true)
         whenever(node.name).thenReturn("testName.txt")
-        val favourite = FavouriteInfo(
+        val favourite = FavouriteFolder(
             id = node.handle,
             name = node.name,
             label = node.label,
@@ -107,9 +107,6 @@ class FavouriteFolderViewModelTest {
             hasVersion = false,
             numChildFolders = 0,
             numChildFiles = 0,
-            isImage = false,
-            isVideo = false,
-            isFolder = true,
             isFavourite = true,
             isExported = false,
             isTakenDown = false,

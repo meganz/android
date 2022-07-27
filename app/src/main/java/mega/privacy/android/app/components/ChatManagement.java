@@ -13,7 +13,9 @@ import static mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_ALONE_ON_
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
-
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -44,8 +46,6 @@ public class ChatManagement {
     private final MegaApplication app;
     private CountDownTimer countDownTimerToEndCall = null;
     public long millisecondsOnlyMeInCallDialog = 0;
-    private CountDownTimer countDownTimerWaitingForOthers = null;
-    public long millisecondsWaitingForOthersCallDialog = 0;
 
     // Boolean indicating whether the end call dialog was ignored.
     public Boolean hasEndCallDialogBeenIgnored = false;
@@ -80,10 +80,12 @@ public class ChatManagement {
     private boolean isDisablingLocalVideo = false;
     private boolean isScreenOn = true;
     private boolean isScreenBroadcastRegister = false;
+    private EndCallUseCase endCallUseCase;
 
-    public ChatManagement() {
+    public ChatManagement(EndCallUseCase endCallUseCase) {
         chatRoomListener = new ChatRoomListener();
         app = MegaApplication.getInstance();
+        this.endCallUseCase = endCallUseCase;
     }
 
     /**
@@ -331,45 +333,17 @@ public class ChatManagement {
     }
 
     /**
-     * Method to start a timer to wait for other participants to join
-     *
-     * @param chatId     Chat ID of the call
-     * @param timeToWait seconds to wait
-     */
-    public void startCounterWaitingCall(long chatId, long timeToWait) {
-        stopCounterWaitingForOthers();
-        millisecondsWaitingForOthersCallDialog = TimeUnit.SECONDS.toMillis(timeToWait);
-
-        if (countDownTimerWaitingForOthers == null) {
-            countDownTimerWaitingForOthers = new CountDownTimer(TimeUnit.SECONDS.toMillis(timeToWait), TimeUnit.SECONDS.toMillis(1)) {
-
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    millisecondsWaitingForOthersCallDialog = millisUntilFinished;
-                }
-
-                @Override
-                public void onFinish() {
-                    startCounterToFinishCall(chatId, SECONDS_TO_WAIT_ALONE_ON_THE_CALL);
-                }
-            }.start();
-        }
-    }
-
-    /**
      * Method to start a timer to end the call
      *
      * @param chatId        Chat ID of the call
-     * @param secondsToWait seconds to wait
      */
-    public void startCounterToFinishCall(long chatId, long secondsToWait) {
+    public void startCounterToFinishCall(long chatId) {
         stopCounterToFinishCall();
         hasEndCallDialogBeenIgnored = false;
-        millisecondsOnlyMeInCallDialog = TimeUnit.SECONDS.toMillis(secondsToWait);
+        millisecondsOnlyMeInCallDialog = TimeUnit.SECONDS.toMillis(SECONDS_TO_WAIT_ALONE_ON_THE_CALL);
 
         if (countDownTimerToEndCall == null) {
-            countDownTimerToEndCall = new CountDownTimer(TimeUnit.SECONDS.toMillis(secondsToWait), TimeUnit.SECONDS.toMillis(1)) {
-
+            countDownTimerToEndCall = new CountDownTimer(millisecondsOnlyMeInCallDialog, TimeUnit.SECONDS.toMillis(1)) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     millisecondsOnlyMeInCallDialog = millisUntilFinished;
@@ -379,21 +353,14 @@ public class ChatManagement {
                 public void onFinish() {
                     MegaChatCall call = app.getMegaChatApi().getChatCall(chatId);
                     if (call != null) {
-                        app.getMegaChatApi().hangChatCall(call.getCallId(), null);
+                        endCallUseCase.hangCall(call.getCallId())
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(() -> {
+                                }, (error) -> Timber.e("Error %s", error));
                     }
                 }
             }.start();
-        }
-    }
-
-    /**
-     * Method to stop the counter to end the call
-     */
-    public void stopCounterWaitingForOthers() {
-        millisecondsWaitingForOthersCallDialog = 0;
-        if (countDownTimerWaitingForOthers != null) {
-            countDownTimerWaitingForOthers.cancel();
-            countDownTimerWaitingForOthers = null;
         }
     }
 

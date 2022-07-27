@@ -36,7 +36,7 @@ import timber.log.Timber
 class ImageViewerPageFragment : Fragment() {
 
     companion object {
-        private const val IMAGE_SCALE_FACTOR = 4f
+        private const val ZOOM_MAX_SCALE_FACTOR = 6f
 
         /**
          * Main method to create a ImageViewerPageFragment.
@@ -107,7 +107,7 @@ class ImageViewerPageFragment : Fragment() {
             setZoomingEnabled(true)
             setIsLongpressEnabled(true)
             setAllowTouchInterceptionWhileZoomed(false)
-            setMaxScaleFactor(IMAGE_SCALE_FACTOR)
+            setMaxScaleFactor(ZOOM_MAX_SCALE_FACTOR)
             setTapListener(
                 MultiTapGestureListener(
                     this,
