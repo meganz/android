@@ -208,11 +208,13 @@ public final class EmojiManager {
         try {
             verifyInstalled();
             if (!TextUtils.isEmpty(text)) {
-                final Matcher matcher = emojiPattern.matcher(text);
-                while (matcher.find()) {
-                    final Emoji found = findEmoji(text.subSequence(matcher.start(), matcher.end()));
-                    if (found != null) {
-                        result.add(new EmojiRange(matcher.start(), matcher.end(), found));
+                if (text != null) {
+                    final Matcher matcher = emojiPattern.matcher(text);
+                    while (matcher.find()) {
+                        final Emoji found = findEmoji(text.subSequence(matcher.start(), matcher.end()));
+                        if (found != null) {
+                            result.add(new EmojiRange(matcher.start(), matcher.end(), found));
+                        }
                     }
                 }
             }
