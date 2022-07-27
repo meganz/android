@@ -6,6 +6,12 @@ import android.animation.AnimatorSet
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -14,13 +20,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -46,10 +45,10 @@ import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomVi
 import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
-import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
+import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.ALL_VIEW
 import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.DAYS_INDEX
 import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.DAYS_VIEW
@@ -63,16 +62,24 @@ import mega.privacy.android.app.gallery.ui.MediaViewModel.Companion.YEARS_VIEW
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.Constants.ALBUM_CONTENT_ADAPTER
+import mega.privacy.android.app.utils.Constants.ANIMATION_DURATION
+import mega.privacy.android.app.utils.Constants.MEDIA_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
+import mega.privacy.android.app.utils.Constants.ORDER_CAMERA
+import mega.privacy.android.app.utils.Constants.PHOTOS_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.Constants.VIEWER_FROM_PHOTOS
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.StyleUtils
+import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.ZoomUtil
+import mega.privacy.android.app.utils.callManager
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
-import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants.MEDIA_BROWSE_ADAPTER
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.ZoomUtil
-import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
 /**
@@ -249,12 +256,9 @@ class MediaDiscoveryFragment : Fragment(), GestureScaleListener.GestureScaleCall
             binding.emptyHint.emptyHintImage,
             ColorUtils.DARK_IMAGE_ALPHA
         )
-        binding.emptyHint.emptyHintText.text = HtmlCompat.fromHtml(
-            TextUtil.formatEmptyScreenText(
-                context,
-                StringResourcesUtils.getString(R.string.homepage_empty_hint_photos)
-            ),
-            HtmlCompat.FROM_HTML_MODE_LEGACY
+        binding.emptyHint.emptyHintText.text = formatEmptyScreenText(
+            context,
+            StringResourcesUtils.getString(R.string.homepage_empty_hint_photos)
         )
     }
 

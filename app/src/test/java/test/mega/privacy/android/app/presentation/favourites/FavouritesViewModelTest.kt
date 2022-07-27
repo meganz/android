@@ -8,14 +8,14 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.domain.entity.FavouriteInfo
-import mega.privacy.android.domain.usecase.GetAllFavorites
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.app.presentation.favourites.FavouritesViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.domain.entity.FavouriteFolder
+import mega.privacy.android.domain.usecase.GetAllFavorites
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -85,7 +85,7 @@ class FavouritesViewModelTest {
         whenever(node.isFolder).thenReturn(true)
         whenever(node.isInShare).thenReturn(true)
         whenever(node.name).thenReturn("testName.txt")
-        val favourite = FavouriteInfo(
+        val favourite = FavouriteFolder(
             id = node.handle,
             name = node.name,
             label = node.label,
@@ -96,9 +96,6 @@ class FavouritesViewModelTest {
             hasVersion = false,
             numChildFolders = 0,
             numChildFiles = 0,
-            isImage = false,
-            isVideo = false,
-            isFolder = true,
             isFavourite = true,
             isExported = false,
             isTakenDown = false,

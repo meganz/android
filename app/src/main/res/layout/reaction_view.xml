@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/reaction_layout"
     android:layout_width="52dp"
     android:layout_height="62dp"
@@ -12,13 +13,31 @@
         android:layout_centerInParent="true"
         android:gravity="center">
 
-        <mega.privacy.android.app.components.twemoji.EmojiImageView
-            android:id="@+id/reaction_image"
+        <RelativeLayout
+            android:id="@+id/reaction_image_layout"
             android:layout_width="23dp"
-            android:layout_height="23dp"
-            android:adjustViewBounds="true"
-            android:layout_marginEnd="3dp"
-            android:layout_centerVertical="true" />
+            android:layout_height="23dp">
+
+            <mega.privacy.android.app.components.twemoji.reaction.ReactionImageView
+                android:id="@+id/reaction_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="3dp"
+                android:adjustViewBounds="true"
+                android:background="@null" />
+
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
+                android:id="@+id/reaction_image_text"
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="3dp"
+                android:adjustViewBounds="true"
+                android:background="@null"
+                android:visibility="gone"
+                app:emojiSize="23dp" />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/reaction_text"
@@ -26,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:maxLines="1"
-            android:layout_toEndOf="@id/reaction_image"
+            android:layout_toEndOf="@id/reaction_image_layout"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
     </RelativeLayout>
 </RelativeLayout>

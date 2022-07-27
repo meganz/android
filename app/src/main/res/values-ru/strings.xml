@@ -435,16 +435,19 @@
     <string name="context_no_renamed">Ошибка. Не перемещено</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">Скопировано корректно</string>
-    <!-- error message when sending a node to Inbox -->
-    <string name="context_no_sent_node">Ошибка: не отправлено во «входящие»</string>
     <!-- error message -->
     <string name="context_no_copied">Ошибка. Не скопировано</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Выберите папку назначения</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Перемещено успешно</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved">Элементы успешно перемещены (%d).</string>
+    <!-- success message when moving a node (file/folder) -->
+    <plurals name="number_correctly_moved">
+        <item quantity="one">Перемещён %d элемент</item>
+        <item quantity="few">Перемещено %d элемента</item>
+        <item quantity="many">Перемещено %d элементов</item>
+        <item quantity="other">Перемещено %d элемента</item>
+    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">Элементы не были перемещены (%d)</string>
     <!-- success message when moving a node -->
@@ -487,8 +490,6 @@
     <string name="number_contact_removed">Контакты успешно удалены (%d)</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">Контакты не удалены (%d)</string>
-    <!-- success message when sending a file to a contact -->
-    <string name="context_correctly_copied_contact">Успешно отправлено:</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Корзина очищена</string>
     <!-- error message when emptying the RB -->
@@ -984,8 +985,6 @@
     <string name="file_link_unavaible_delete_account">Связанный аккаунт был заблокирован из-за многочисленных нарушений условий использования.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">Введённый вместе со ссылкой ключ дешифрирования неверен.</string>
-    <!-- Word to indicate the limited bandwidth of the free accounts -->
-    <string name="limited_bandwith">Ограничено</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Чат</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -1001,15 +1000,25 @@
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
     <string name="remove_contact_shared_folder">Контакту %s будет закрыт доступ к папке.</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
-    <string name="remove_multiple_contacts_shared_folder">Доступ к папке будет закрыт контактам: %d.</string>
+    <plurals name="remove_multiple_contacts_shared_folder">
+        <item quantity="one">Доступ к папке будет закрыт %d контакту.</item>
+        <item quantity="few">Доступ к папке будет закрыт %d контактам.</item>
+        <item quantity="many">Доступ к папке будет закрыт %d контактам.</item>
+        <item quantity="other">Доступ к папке будет закрыт %d контактам.</item>
+    </plurals>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">Не удалось обновить разрешения для контактов (%d)</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Загрузка контактов из телефона&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">Запросы (%d) уже отправлены.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">Приглашения отправлены (%d).</string>
+    <!-- success message when inviting multiple contacts -->
+    <plurals name="number_correctly_invite_contact_request">
+        <item quantity="one">Отправлено %d приглашение</item>
+        <item quantity="few">Отправлено %d приглашения</item>
+        <item quantity="many">Отправлено %d приглашений</item>
+        <item quantity="other">Отправлено %d приглашения</item>
+    </plurals>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">Часть приглашений отправлена успешно (%1$d), но некоторые не были отправлены (%2$d).</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -1132,7 +1141,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">Обычный</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">Host</string>
+    <string name="administrator_permission_label_participants_panel">Организатор</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">(изменено)</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -1235,10 +1244,6 @@
     <string name="more_users_typing">%1$s [A]и другие печатают&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Больше</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="label_storage_upgrade_account">Хранилище</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_upgrade_account">трафика</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">Дисковое пространство</string>
     <!-- Confirmation message before removing something from the Offline section. -->
@@ -1654,13 +1659,13 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Недопустимые символы</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Следующие символы не допускаются: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">Следующие символы не допускаются: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">Имя файла не может быть пустым.</item>
-        <item quantity="few">Имена файлов не могут быть пустыми.</item>
-        <item quantity="many">Имена файлов не могут быть пустыми.</item>
-        <item quantity="other">Имена файлов не могут быть пустыми.</item>
+        <item quantity="one">Название файла не может быть пустым.</item>
+        <item quantity="few">Названия файлов не могут быть пустыми.</item>
+        <item quantity="many">Названия файлов не могут быть пустыми.</item>
+        <item quantity="other">Названия файлов не могут быть пустыми.</item>
     </plurals>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">Ошибка. Файл pdf повреждён или не существует.</string>
@@ -1822,28 +1827,26 @@
     <string name="account_suspended_breache_ToS">Ваш аккаунт был заблокирован из-за нарушения условий использования MEGA, включая, помимо прочего, пункт 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Загрузка файлов</string>
-    <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
-    <string name="file_storage_empty_folder">Нет файлов</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s Б</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s КБ</string>
+    <string name="label_file_size_kilo_byte">%s&#160;КБ</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s МБ</string>
+    <string name="label_file_size_mega_byte">%s&#160;МБ</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_giga_byte">%s&#160;ГБ</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s ТБ</string>
+    <string name="label_file_size_tera_byte">%s&#160;ТБ</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s Б/с</string>
+    <string name="label_file_speed_byte">%s&#160;Б/с</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s КБ/с</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KБ/с</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s МБ/с</string>
+    <string name="label_file_speed_mega_byte">%s&#160;МБ/с</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_giga_byte">%s&#160;ГБ/с</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s ТБ/с</string>
+    <string name="label_file_speed_tera_byte">%s&#160;ТБ/с</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">МБ</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -1970,10 +1973,6 @@
     <string name="recovery_key_bottom_sheet">Ключ восстановления</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Сохранить в файловую систему</string>
-    <!-- text of the label to show that you have messages unread in the chat conversation -->
-    <string name="message_jump_latest">К последнему</string>
-    <!-- text of the label to show that you have new messages in the chat conversation -->
-    <string name="message_new_messages">Новые сообщения</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Входящий звонок</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
@@ -2543,12 +2542,12 @@
         <item quantity="many">%d папок</item>
         <item quantity="other">%d папки</item>
     </plurals>
-    <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">Папки: %1$d · Файлы: 1</item>
-        <item quantity="few">Папки: %1$d · Файлы: %2$d</item>
-        <item quantity="many">Папки: %1$d · Файлы: %2$d</item>
-        <item quantity="other">Папки: %1$d · Файлы: %2$d</item>
+        <item quantity="one">%1$d папка&#160;·&#160;</item>
+        <item quantity="few">%1$d папки&#160;·&#160;</item>
+        <item quantity="many">%1$d папок&#160;·&#160;</item>
+        <item quantity="other">%1$d папки&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] добавил %2$s и %3$s[/B]</string>
@@ -2860,8 +2859,6 @@
     <string name="alert_enter_group_name">Для создания ссылки на чат нужно назвать группу.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Пригласите контакты и начните безопасно общаться в зашифрованном чате MEGA.</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="recent_chat_empty_text">Начните безопасное общение со своими контактами благодаря сквозному шифрованию.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
     <string name="invite_contacts_to_start_chat_text_message">Привет. Начните зашифрованное общение со мной с помощью MEGA и получите 20&#160;ГБ на диске бесплатно. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
@@ -2907,11 +2904,26 @@
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s и ещё %2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
-    <string name="title_media_bucket_only_images">Изображения (%d)</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="one">%d изображение</item>
+        <item quantity="few">%d изображения</item>
+        <item quantity="many">%d изображений</item>
+        <item quantity="other">%d изображения</item>
+    </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
-    <string name="title_media_bucket_only_videos">Видео (%d)</string>
-    <!-- Title of a media recents bucket that contains some images and some videos -->
-    <string name="title_media_bucket_images_and_videos">Изображения (%1$d) и видео (%2$d)</string>
+    <plurals name="title_media_bucket_only_videos">
+        <item quantity="one">%d видео</item>
+        <item quantity="few">%d видео</item>
+        <item quantity="many">%d видео</item>
+        <item quantity="other">%d видео</item>
+    </plurals>
+    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos">
+        <item quantity="one">%1$d изображение&#160;</item>
+        <item quantity="few">%1$d изображения&#160;</item>
+        <item quantity="many">%1$d изображений&#160;</item>
+        <item quantity="other">%1$d изображения&#160;</item>
+    </plurals>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">Изображения (%d) и 1 видео</string>
     <!-- Title of a media recents bucket that contains an image and some videos -->
@@ -3037,7 +3049,12 @@
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">%1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <string name="alert_remove_several_shares">Вы действительно хотите закрыть доступ к этим %1$d папкам?</string>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Закрыть доступ к этой папке?</item>
+        <item quantity="few">Закрыть доступ к этим %1$d папкам?</item>
+        <item quantity="many">Закрыть доступ к этим %1$d папкам?</item>
+        <item quantity="other">Закрыть доступ к этим %1$d папкам?</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">Папка загрузки</string>
     <!-- Text asking confirmation for download location -->
@@ -3533,9 +3550,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s ПБ</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;ПБ</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s ЭБ</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;ЭБ</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Добавить номер телефона</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -3594,8 +3611,6 @@
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Очистить все локальные файлы?</string>
-    <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">Здесь только вы</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Встреча</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3645,25 +3660,13 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Показать в главном окне</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Make host</string>
-    <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">Покинуть встречу?</string>
-    <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">No host</string>
-    <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
+    <string name="make_moderator">Сделать организатором</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Make host</string>
-    <!-- leave anyway option when the moderator leave meeting-->
-    <string name="leave_anyway">Всё равно выйти</string>
+    <string name="assign_moderator">Сделать организатором</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
+    <string name="pick_new_moderator_message">Пожалуйста, назначьте одного или нескольких новых организаторов.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">Название встречи</string>
-    <!-- The number of participants in the meeting on meeting info page-->
-    <string name="info_participants_number">Участники: %d</string>
-    <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Ссылка на встречу</string>
     <!-- Subtitle of the meeting screen-->
@@ -3674,8 +3677,6 @@
     <string name="paste_meeting_link_guest_dialog_title">Вас приглашают на встречу.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Нажмите на отправленную вам ссылку на встречу или вставьте ее сюда</string>
-    <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">Плохое качество связи</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Встреча закончилась</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -3697,7 +3698,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">Быстро организуйте встречу в MEGA с помощью нашей новой функции зашифрованной встречи</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">You are the new host.</string>
+    <string name="be_new_moderator">Вы новый организатор</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Ссылка на встречу скопирована.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3865,8 +3866,6 @@
     <string name="upload_files">Загрузить файлы</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Загрузить папку</string>
-    <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Отменить загрузку?</string>
     <!-- Title of the Payments screen -->
     <string name="payment">Платёж</string>
     <!-- Label indicating payment methods -->
@@ -3891,12 +3890,8 @@
     <string name="pro_iii_monthly">месячный Pro III</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">годовой Pro III</string>
-    <!-- Action button which will cancel uploads. -->
-    <string name="action_cancel_upload">Отменить загрузку</string>
-    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
-    <string name="action_do_not_cancel">Не отменять</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Remove host</string>
+    <string name="remove_moderator">Лишить прав организатора</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Оформить ещё одну подписку?</string>
     <!-- Text of buy new subscription button -->
@@ -4184,7 +4179,59 @@
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">Завершить для всех</string>
     <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Сделать организатором</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">You’re the only host on the call. Do you want to assign another one before leaving?</string>
+    <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">Вы единственный организатор звонка. Хотите назначить ещё одного перед тем, как выйти?</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Да</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">Нет</string>
+    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos_2">
+        <item quantity="one">и %1$d видео</item>
+        <item quantity="few">и %1$d видео</item>
+        <item quantity="many">и %1$d видео</item>
+        <item quantity="other">и %1$d видео</item>
+    </plurals>
+    <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
+    <plurals name="num_folders_num_files_2">
+        <item quantity="one">1 файл</item>
+        <item quantity="few">%1$d файла</item>
+        <item quantity="many">%1$d файлов</item>
+        <item quantity="other">%1$d файла</item>
+    </plurals>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
+    <string name="account_upgrade_storage_label">[A]%1$s[/A] на диске</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] трафика</string>
+    <!-- Label of storage in My account section. -->
+    <string name="account_storage_label">на диске</string>
+    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
+    <string name="account_choose_free_limited_transfer_quota">[A]Ограниченный[/A] трафик</string>
+    <!-- Name of hots or hosts in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
+        <item quantity="one">Организатор: %s</item>
+        <item quantity="few">Организаторы: %s</item>
+        <item quantity="many">Организаторы: %s</item>
+        <item quantity="other">Организаторы: %s</item>
+    </plurals>
+    <!-- Number of participants in the call in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
+        <item quantity="one">Участник: %s</item>
+        <item quantity="few">Участники: %s</item>
+        <item quantity="many">Участники: %s</item>
+        <item quantity="other">Участники: %s</item>
+    </plurals>
+    <!-- Chat log message when the permissions for a user has been changed to read-onl -->
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] получил права только на чтение от [/B][A]%2$s[/A]</string>
+    <!-- Chat log message when the permissions for a user has been changed to standard -->
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] получил стандартные права от [/B][A]%2$s[/A]</string>
+    <!-- Chat log message when the permissions for a user has been changed to host -->
+    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] получил права организатора от [/B][A]%2$s[/A]</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s получил права только на чтение от %2$s</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s получил стандартные права от %2$s</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s получил права организатора от %2$s</string>
 </resources>

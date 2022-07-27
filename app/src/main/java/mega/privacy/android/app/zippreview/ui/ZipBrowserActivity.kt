@@ -119,7 +119,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         recyclerView = zipBrowserBinding.zipListViewBrowser.also {
             it.setPadding(0, 0, 0, recycleViewBottomPadding())
             it.clipToPadding = false
-            it.addItemDecoration(ChatDividerItemDecoration(this, outMetrics))
+            it.addItemDecoration(ChatDividerItemDecoration(this))
             it.layoutManager = LinearLayoutManager(this)
             it.setHasFixedSize(true)
             it.itemAnimator = DefaultItemAnimator()

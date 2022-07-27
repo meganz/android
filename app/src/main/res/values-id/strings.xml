@@ -408,16 +408,16 @@
     <string name="context_no_renamed">Terjadi kesalahan. Belum ubah nama</string>
     <!-- success message when copying a node -->
     <string name="context_correctly_copied">Berhasil disalin</string>
-    <!-- error message when sending a node to Inbox -->
-    <string name="context_no_sent_node">Terjadi kesalahan. Tidak terkirim ke Kotak Masuk</string>
     <!-- error message -->
     <string name="context_no_copied">Terjadi kesalahan. Belum tersalin</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Silahkan pilih folder tujuan</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Berhasil dipindahkan</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved">%d item berhasil dipindahkan.</string>
+    <!-- success message when moving a node (file/folder) -->
+    <plurals name="number_correctly_moved">
+        <item quantity="other">Memindahkan %d barang</item>
+    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d item tidak berhasil dipindahkan</string>
     <!-- success message when moving a node -->
@@ -460,8 +460,6 @@
     <string name="number_contact_removed">%d kontak berhasil dihapus</string>
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">%d kontak tidak dihapus</string>
-    <!-- success message when sending a file to a contact -->
-    <string name="context_correctly_copied_contact">Telah berhasil mengirimkan ke:</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Sampah telah berhasil dikosongkan</string>
     <!-- error message when emptying the RB -->
@@ -945,8 +943,6 @@
     <string name="file_link_unavaible_delete_account">Akun pengguna terkait telah dihentikan karena beberapa pelanggaran terhadap Kebijakan Layanan kami.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">Kunci dekripsi yang disediakan untuk link folder tidak valid.</string>
-    <!-- Word to indicate the limited bandwidth of the free accounts -->
-    <string name="limited_bandwith">Terbatas</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Obrolan</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -962,15 +958,19 @@
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
     <string name="remove_contact_shared_folder">Kontak %s akan dihapus dari folder bersama.</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
-    <string name="remove_multiple_contacts_shared_folder">%d kontak akan dihapus dari folder bersama.</string>
+    <plurals name="remove_multiple_contacts_shared_folder">
+        <item quantity="other">%d kontak akan dihapus dari folder bersama.</item>
+    </plurals>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">Gagal memperbarui izin untuk %d kontak</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Memuat kontak dari telepon&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d permintaan sudah terkirim.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">%d permintaan undangan berhasil dikirim.</string>
+    <!-- success message when inviting multiple contacts -->
+    <plurals name="number_correctly_invite_contact_request">
+        <item quantity="other">%d undangan terkirim</item>
+    </plurals>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d permintaan undangan berhasil dikirim namun %2$d permintaan tidak terkirim.</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -1084,7 +1084,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">Standar</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">Host</string>
+    <string name="administrator_permission_label_participants_panel">Tuan rumah</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">(diedit)</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -1175,10 +1175,6 @@
     <string name="more_users_typing">%1$s [A]dan lainnya sedang mengetik&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Selebihnya</string>
-    <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="label_storage_upgrade_account">Penyimpanan</string>
-    <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_upgrade_account">Kuota transfer</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">Tempat penyimpanan</string>
     <!-- Confirmation message before removing something from the Offline section. -->
@@ -1555,10 +1551,11 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Karakter salah</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Karakter berikut tidak diperbolehkan: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">Karakter berikut tidak diperbolehkan: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="other">Nama file tidak boleh kosong.</item>
+        <item quantity="one">File name cannot be empty.</item>
+        <item quantity="other">File names cannot be empty.</item>
     </plurals>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">Kesalahan. File pdf rusak atau tidak ada.</string>
@@ -1633,7 +1630,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Undangan belum dikirim. %s sudah ada dalam daftar kontak anda.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">Terjadi kesalahan dan undangan belum dikirim.</string>
+    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Membuat kode QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -1720,8 +1717,6 @@
     <string name="account_suspended_breache_ToS">Akun anda dihentikan karena pelanggaran Persyaratan Layanan MEGA termasuk, namun tidak terbatas pada, klausul 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Memuat file</string>
-    <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
-    <string name="file_storage_empty_folder">Tidak ada data</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1847,10 +1842,6 @@
     <string name="recovery_key_bottom_sheet">Kunci Pemulihan</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Simpan pada Sistem File</string>
-    <!-- text of the label to show that you have messages unread in the chat conversation -->
-    <string name="message_jump_latest">Lompat ke terbaru</string>
-    <!-- text of the label to show that you have new messages in the chat conversation -->
-    <string name="message_new_messages">Pesan baru</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Panggilan masuk</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
@@ -1994,7 +1985,7 @@
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Pratinjau konten</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">Tidak ada koneksi jaringan. File belum diunduh dan tidak dapat dialirkan.</string>
+    <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Tidak dapat membuka file.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2393,9 +2384,10 @@
     <plurals name="num_folders_with_parameter">
         <item quantity="other">%d folder</item>
     </plurals>
-    <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="other">%1$d folder · %2$d file</item>
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] menambahkan %2$s dan %3$s[/B]</string>
@@ -2665,8 +2657,6 @@
     <string name="alert_enter_group_name">Untuk membuat tautan obrolan, anda harus memberi nama grup.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Undang kontak dan mulailah mengobrol dengan aman dengan obrolan terenkripsi MEGA.</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="recent_chat_empty_text">Mulai mengobrol dengan aman dengan kontak anda menggunakan enkripsi menyeluruh</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
     <string name="invite_contacts_to_start_chat_text_message">Halo. Lakukan percakapan aman di MEGA dengan saya dan dapatkan 20&#160;GB penyimpanan cloud gratis. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
@@ -2706,11 +2696,17 @@
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s dan %2$d lebih</string>
     <!-- Title of a media recents bucket that only contains some images -->
-    <string name="title_media_bucket_only_images">%d Gambar</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="other">%d gambar</item>
+    </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
-    <string name="title_media_bucket_only_videos">%d Video</string>
-    <!-- Title of a media recents bucket that contains some images and some videos -->
-    <string name="title_media_bucket_images_and_videos">%1$d Gambar dan %2$d Video</string>
+    <plurals name="title_media_bucket_only_videos">
+        <item quantity="other">%d video</item>
+    </plurals>
+    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos">
+        <item quantity="other">%1$d gambar&#160;</item>
+    </plurals>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">%d Gambar dan 1 Video</string>
     <!-- Title of a media recents bucket that contains an image and some videos -->
@@ -2836,7 +2832,9 @@
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">pada %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
-    <string name="alert_remove_several_shares">Anda yakin ingin berhenti berbagi %1$d folder ini?</string>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">Batalkan berbagi %1$d folder ini?</item>
+    </plurals>
     <!-- Download location label -->
     <string name="download_location">Unduh lokasi</string>
     <!-- Text asking confirmation for download location -->
@@ -3042,7 +3040,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Pilih transfer</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Tidak dapat mengubah prioritas transfer “%1$s”</string>
+    <string name="change_of_transfer_priority_failed">Unable to change priority of the transfer “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Kirim kunci dekripsi secara terpisah</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3321,8 +3319,6 @@
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Hapus semua file offline?</string>
-    <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">Anda sendirian di sini</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Pertemuan</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3372,25 +3368,13 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Tampilan di tampilan utama</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Make host</string>
-    <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">Tinggalkan pertemuan sekarang?</string>
-    <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">No host</string>
-    <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Before leaving, please assign one or more new hosts for the meeting.</string>
+    <string name="make_moderator">Jadikan tuan rumah</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Make host</string>
-    <!-- leave anyway option when the moderator leave meeting-->
-    <string name="leave_anyway">Tetap pergi</string>
+    <string name="assign_moderator">Jadikan tuan rumah</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
+    <string name="pick_new_moderator_message">Harap tetapkan satu atau beberapa tuan rumah baru.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">Ubah nama pertemuan</string>
-    <!-- The number of participants in the meeting on meeting info page-->
-    <string name="info_participants_number">Peserta: %d</string>
-    <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">Host: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Link pertemuan</string>
     <!-- Subtitle of the meeting screen-->
@@ -3401,8 +3385,6 @@
     <string name="paste_meeting_link_guest_dialog_title">Anda diundang ke petemuan.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Ketuk link Pertemuan yang dikirimkan kepada anda atau tempel di sini</string>
-    <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">Kualitas sambungan buruk</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Pertemuan telah berakhir</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -3424,7 +3406,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">Siapkan Pertemuan MEGA dengan cepat dengan fitur rapat terenkripsi baru kami</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">You are the new host.</string>
+    <string name="be_new_moderator">Anda adalah tuan rumah baru</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Tautan pertemuan disalin.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
@@ -3589,8 +3571,6 @@
     <string name="upload_files">Unggah berkas</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Unggah folder</string>
-    <!-- Text of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Batalkan unggahan?</string>
     <!-- Title of the Payments screen -->
     <string name="payment">Pembayaran</string>
     <!-- Label indicating payment methods -->
@@ -3615,12 +3595,8 @@
     <string name="pro_iii_monthly">Pro III bulanan</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III tahunan</string>
-    <!-- Action button which will cancel uploads. -->
-    <string name="action_cancel_upload">Batalkan unggahan</string>
-    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
-    <string name="action_do_not_cancel">Jangan batalkan</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Remove host</string>
+    <string name="remove_moderator">Hapus sebagai tuan rumah</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Beli langganan baru?</string>
     <!-- Text of buy new subscription button -->
@@ -3804,7 +3780,7 @@
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
     <string name="skip_folder">Lewati folder ini</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
-    <string name="folder_already_exists_in_location">Folder bernama [B]%1$s[/B] sudah ada di tujuan ini.</string>
+    <string name="folder_already_exists_in_location">Sebuah folder bernama [B]%1$s[/B] sudah ada di tujuan ini.</string>
     <!-- Banner text to indicate poor network quality -->
     <string name="calls_call_screen_poor_network_quality">Koneksi buruk</string>
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
@@ -3902,7 +3878,47 @@
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_end_call_for_all_option">Akhiri untuk semua</string>
     <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
-    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
+    <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Jadikan tuan rumah</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
     <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">Anda adalah satu-satunya tuan rumah yang menelepon. Apakah anda ingin menugaskan yang lain sebelum pergi?</string>
+    <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Ya</string>
+    <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
+    <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">Tidak</string>
+    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
+    <plurals name="title_media_bucket_images_and_videos_2">
+        <item quantity="other">dan %1$d video</item>
+    </plurals>
+    <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
+    <plurals name="num_folders_num_files_2">
+        <item quantity="other">%1$d berkas</item>
+    </plurals>
+    <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
+    <string name="account_upgrade_storage_label">[A]%1$s[/A] penyimpanan</string>
+    <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] kuota pemindahan</string>
+    <!-- Label of storage in My account section. -->
+    <string name="account_storage_label">Penyimpanan</string>
+    <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
+    <string name="account_choose_free_limited_transfer_quota">kuota pemindahan [A]Terbatas[/A]</string>
+    <!-- Name of hots or hosts in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
+        <item quantity="other">Tuan rumah: %s</item>
+    </plurals>
+    <!-- Number of participants in the call in the meeting info bottom panel -->
+    <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
+        <item quantity="other">Peserta: %s</item>
+    </plurals>
+    <!-- Chat log message when the permissions for a user has been changed to read-onl -->
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] diubah menjadi hanya-baca oleh  [/B][A]%2$s[/A]</string>
+    <!-- Chat log message when the permissions for a user has been changed to standard -->
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] diubah menjadi peran standar oleh  [/B][A]%2$s[/A]</string>
+    <!-- Chat log message when the permissions for a user has been changed to host -->
+    <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] diubah menjadi tuan rumah oleh [/B][A]%2$s[/A]</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s diubah menjadi hanya-baca oleh %2$s</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s diubah menjadi peran standar oleh %2$s</string>
+    <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s diubah menjadi tuan rumah oleh %2$s</string>
 </resources>

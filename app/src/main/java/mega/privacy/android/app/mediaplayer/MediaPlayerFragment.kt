@@ -18,7 +18,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.util.RepeatModeUtil
+import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
+import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
+import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -26,6 +28,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
+import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
@@ -36,8 +39,10 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
 import timber.log.Timber
-import java.util.Locale
 
+/**
+ * MediaPlayer Fragment
+ */
 class MediaPlayerFragment : Fragment() {
     private var audioPlayerVH: AudioPlayerViewHolder? = null
     private var videoPlayerVH: VideoPlayerViewHolder? = null
@@ -163,7 +168,7 @@ class MediaPlayerFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
 
-        playerService?.player?.removeListener(playerListener)
+        playerService?.mediaPlayerGateway?.removeListener(playerListener)
         playerService = null
         requireContext().unbindService(connection)
     }
@@ -225,7 +230,7 @@ class MediaPlayerFragment : Fragment() {
         if (MediaPlayerActivity.isAudioPlayer(activity?.intent)) {
             val viewHolder = audioPlayerVH ?: return
 
-            setupPlayerView(service.player, viewHolder.binding.playerView, false)
+            setupPlayerView(service.mediaPlayerServiceGateway, viewHolder.binding.playerView, false)
             viewHolder.layoutArtwork()
             service.metadata.observe(viewLifecycleOwner, viewHolder::displayMetadata)
 
@@ -235,7 +240,7 @@ class MediaPlayerFragment : Fragment() {
         } else {
             val viewHolder = videoPlayerVH ?: return
             videoPlayerView = viewHolder.binding.playerView
-            setupPlayerView(service.player, viewHolder.binding.playerView, true)
+            setupPlayerView(service.mediaPlayerServiceGateway, viewHolder.binding.playerView, true)
             service.metadata.observe(viewLifecycleOwner, viewHolder::displayMetadata)
 
             // we need setup control buttons again, because reset player would reset
@@ -254,46 +259,35 @@ class MediaPlayerFragment : Fragment() {
     }
 
     private fun setupPlayerView(
-        player: MediaMegaPlayer,
+        mediaPlayerServiceGateway: MediaPlayerServiceGateway,
         playerView: PlayerView,
-        videoPlayer: Boolean,
+        isVideoPlayer: Boolean,
     ) {
-        with(playerView) {
-            this.player = player
-
-            useController = true
-            controllerShowTimeoutMs = 0
-
-            setRepeatToggleModes(
-                if (videoPlayer)
-                    RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
-                else
-                    RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
-            )
-
-            controllerHideOnTouch = videoPlayer
-            setShowShuffleButton(!videoPlayer)
-            setControllerVisibilityListener { visibility ->
+        mediaPlayerServiceGateway.setupPlayerView(
+            playerView = playerView,
+            repeatToggleModes = if (isVideoPlayer) {
+                REPEAT_TOGGLE_MODE_NONE
+            } else {
+                REPEAT_TOGGLE_MODE_ONE or REPEAT_TOGGLE_MODE_ALL
+            },
+            controllerHideOnTouch = isVideoPlayer,
+            showShuffleButton = !isVideoPlayer,
+            visibilityCallback = { visibility ->
                 if (visibility == View.VISIBLE && !toolbarVisible) {
-                    hideController()
+                    playerView.hideController()
                 }
-            }
-
-            setOnClickListener {
+            },
+            clickedCallback = {
                 if (toolbarVisible) {
                     hideToolbar()
                 } else {
                     delayHideToolbarCanceled = true
-
                     showToolbar()
                 }
             }
-
-            showController()
-        }
-
-        updateLoadingAnimation(player.playbackState)
-        player.wrappedPlayer.addListener(playerListener)
+        )
+        updateLoadingAnimation(mediaPlayerServiceGateway.getPlaybackState())
+        mediaPlayerServiceGateway.addPlayerListener(playerListener)
     }
 
     private fun updateLoadingAnimation(@Player.State playbackState: Int) {
@@ -325,6 +319,11 @@ class MediaPlayerFragment : Fragment() {
         (requireActivity() as MediaPlayerActivity).showToolbar()
     }
 
+    /**
+     * Run the enter animation
+     *
+     * @param dragToExit DragToExitSupport
+     */
     fun runEnterAnimation(dragToExit: DragToExitSupport) {
         val binding = videoPlayerVH?.binding ?: return
 
@@ -342,6 +341,12 @@ class MediaPlayerFragment : Fragment() {
         }
     }
 
+    /**
+     * On drag activated
+     *
+     * @param dragToExit DragToExitSupport
+     * @param activated true is activated, otherwise is false
+     */
     fun onDragActivated(dragToExit: DragToExitSupport, activated: Boolean) {
         if (activated) {
             delayHideToolbarCanceled = true

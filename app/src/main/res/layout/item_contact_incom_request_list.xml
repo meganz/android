@@ -1,5 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/contact_request_list_item_layout"
     android:layout_width="match_parent"

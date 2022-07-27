@@ -61,7 +61,11 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener {
                         case CHAT: {
                             Timber.d("Create new chat");
                             if (!Util.isFastDoubleClick()) {
-                                ((ManagerActivity) context).fabMainClickCallback();
+                                if (((ManagerActivity) context).isMeetingTabShown()) {
+                                    ((ManagerActivity) context).showMeetingOptionsPanel(true);
+                                } else {
+                                    ((ManagerActivity) context).fabMainClickCallback();
+                                }
                             }
                             break;
                         }

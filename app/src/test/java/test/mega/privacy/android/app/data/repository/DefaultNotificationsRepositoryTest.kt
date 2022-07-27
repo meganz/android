@@ -130,4 +130,13 @@ class DefaultNotificationsRepositoryTest {
             verify(megaApiGateway).getContact(email)
         }
     }
+
+    @Test
+    fun `test that current user alerts are fetched`() = runTest{
+        whenever(megaApiGateway.getUserAlerts()).thenReturn(listOf())
+
+        underTest.getUserAlerts()
+
+        verify(megaApiGateway).getUserAlerts()
+    }
 }

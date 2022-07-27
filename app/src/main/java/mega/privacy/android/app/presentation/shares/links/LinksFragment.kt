@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
@@ -20,6 +19,7 @@ import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
@@ -77,14 +77,7 @@ class LinksFragment : MegaNodeBaseFragment() {
             )
     }
 
-    override fun setNodes(nodes: List<MegaNode>) {
-        this.nodes = nodes
-        adapter.setNodes(nodes)
-        setEmptyView()
-        visibilityFastScroller()
-    }
-
-    override fun setEmptyView() {
+    private fun setEmptyView() {
         var textToShow: String? = null
         if (isInvalidParentHandle()) {
             setImageViewAlphaIfDark(requireContext(), emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
@@ -117,10 +110,7 @@ class LinksFragment : MegaNodeBaseFragment() {
                     else 0
 
                 if (lastVisiblePosition >= 0) {
-                    if (managerActivity.isList)
-                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                    else
-                        gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                    mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
                 }
 
                 3
@@ -147,10 +137,7 @@ class LinksFragment : MegaNodeBaseFragment() {
                         else 0
 
                     if (lastVisiblePosition >= 0) {
-                        if (managerActivity.isList)
-                            mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                        else
-                            gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
                     }
                 }
 
@@ -192,17 +179,7 @@ class LinksFragment : MegaNodeBaseFragment() {
         managerViewModel.increaseLinksTreeDepth()
         Timber.d("Is folder deep: %s", managerState().linksTreeDepth)
 
-        val lastFirstVisiblePosition: Int = when {
-            managerActivity.isList ->
-                mLayoutManager.findFirstCompletelyVisibleItemPosition()
-
-            (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition() == -1 ->
-                (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
-
-            else ->
-                (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
-        }
-        lastPositionStack.push(lastFirstVisiblePosition)
+        lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition())
         managerViewModel.setLinksParentHandle(node.handle)
 
         refresh()
@@ -269,7 +246,14 @@ class LinksFragment : MegaNodeBaseFragment() {
 
     override fun updateContact(contactHandle: Long) {}
 
+    override fun showSortByPanel() {
+
+        managerActivity.showNewSortByPanel(ORDER_CLOUD)
+    }
+
     override fun viewerFrom(): Int = Constants.VIEWER_FROM_LINKS
+
+    override fun getParentHandle(): Long = managerState().linksParentHandle
 
     private inner class ActionBarCallBack(currentTab: Tab?) : BaseActionBarCallBack(currentTab) {
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {

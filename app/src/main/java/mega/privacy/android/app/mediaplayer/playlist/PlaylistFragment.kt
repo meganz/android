@@ -7,7 +7,10 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
@@ -19,9 +22,12 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlaylistBinding
-import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
-import mega.privacy.android.app.mediaplayer.service.*
+import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
+import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.autoCleared
@@ -60,7 +66,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                 playerService = service.service
 
                 if (service.service.viewModel.audioPlayer) {
-                    setupPlayerView(service.service.player)
+                    setupPlayerView(service.service.mediaPlayerServiceGateway)
                 } else {
                     binding.playerView.isVisible = false
                 }
@@ -90,7 +96,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentAudioPlaylistBinding.inflate(inflater, container, false)
         setupRecycleView()
@@ -137,7 +143,8 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                 isAudio = isAudioPlayer
             )
         }
-        listLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        listLayoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         binding.playlist.run {
             setHasFixedSize(true)
@@ -232,7 +239,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
     /**
      * Activated the action mode
      */
-    private fun activateActionMode(){
+    private fun activateActionMode() {
         if (playlistActionModeCallback == null) {
             playerService?.viewModel?.run {
                 playlistActionModeCallback = PlaylistActionModeCallback(this)
@@ -246,27 +253,21 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
 
     /**
      * Setup PlayerView
-     * @param player MediaMegaPlayer
+     * @param mediaPlayerServiceGateway mediaPlayerServiceGateway
      */
-    private fun setupPlayerView(player: MediaMegaPlayer) {
-        binding.playerView.run {
-            this.player = player
-            useController = true
-            controllerShowTimeoutMs = 0
-            controllerHideOnTouch = false
-            setShowShuffleButton(true)
-            setRepeatToggleModes(
-                RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
-            )
-            showController()
-        }
+    private fun setupPlayerView(mediaPlayerServiceGateway: MediaPlayerServiceGateway) {
+        mediaPlayerServiceGateway.setupPlayerView(
+            playerView = binding.playerView,
+            repeatToggleModes = RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL,
+            showShuffleButton = true
+        )
     }
 
     override fun onItemClick(
         view: View,
         item: PlaylistItem,
         holder: PlaylistViewHolder,
-        position: Int
+        position: Int,
     ) {
         playerService?.run {
             if (viewModel.isActionMode.value == true) {
@@ -277,7 +278,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                     return
                 }
                 if (!CallUtil.participatingInACall()) {
-                   seekTo(viewModel.getIndexFromPlaylistItems(item))
+                    seekTo(viewModel.getIndexFromPlaylistItems(item))
                 }
                 (requireActivity() as MediaPlayerActivity).closeSearch()
 

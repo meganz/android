@@ -12,6 +12,7 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.repository.NotificationsRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaUser
@@ -43,6 +44,12 @@ class DefaultNotificationsRepository @Inject constructor(
                 withContext(dispatcher) { userAlertsMapper(it, ::provideEmail, ::provideContact) }
             }
         }
+
+    override suspend fun getUserAlerts() = withContext(dispatcher){
+        megaApiGateway.getUserAlerts().map {
+            userAlertsMapper(it, ::provideEmail, ::provideContact)
+        }
+    }
 
     private suspend fun provideEmail(userId: Long): String? =
         getEmailLocally(userId) ?: fetchAndCacheEmail(userId)
