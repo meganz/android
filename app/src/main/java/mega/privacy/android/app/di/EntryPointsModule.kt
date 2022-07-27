@@ -33,17 +33,4 @@ class EntryPointsModule {
          */
         val cacheFolderGateway: CacheFolderGateway
     }
-
-    /**
-     * Entry point gateway for ThreadPoolExecutor
-     */
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface MegaThreadPoolExecutorEntryPoint {
-
-        /**
-         * ThreadPoolExecutor
-         */
-        val megaThreadPoolExecutor: ThreadPoolExecutor
-    }
 }
