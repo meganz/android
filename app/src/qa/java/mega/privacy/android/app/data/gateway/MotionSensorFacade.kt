@@ -14,7 +14,9 @@ class MotionSensorFacade @Inject constructor(
     @ApplicationContext val context: Context,
 ) : MotionSensorGateway {
 
-    private lateinit var sensorManager: SensorManager
+    private val sensorManager: SensorManager by lazy {
+        context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    }
 
     /**
      * Function to register listener & monitor motion events
@@ -22,7 +24,6 @@ class MotionSensorFacade @Inject constructor(
      * @param sensorEventListener: @SensorEventListener
      */
     override fun monitorMotionEvents(sensorEventListener: SensorEventListener) {
-        sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         sensorManager.registerListener(sensorEventListener,
             accelerometer,
