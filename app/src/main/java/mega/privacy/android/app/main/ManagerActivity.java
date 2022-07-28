@@ -380,7 +380,6 @@ import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment;
 import mega.privacy.android.app.presentation.shares.SharesPageAdapter;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
-import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaViewHolder;
@@ -9838,8 +9837,6 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshLinks();
 
         checkCameraUploadFolder(false, updatedNodes);
-
-        refreshCUNodes();
 
         LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
 
