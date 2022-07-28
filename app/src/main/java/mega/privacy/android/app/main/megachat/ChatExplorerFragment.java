@@ -256,7 +256,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 }
             } else {
                 if (Util.isDarkMode(context)) {
-                    addLayout.setBackgroundColor(android.R.color.transparent);
+                    addLayout.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
                 } else {
                     addLayout.setElevation(0);
                 }
