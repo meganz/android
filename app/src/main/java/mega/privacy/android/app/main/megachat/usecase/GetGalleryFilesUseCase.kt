@@ -146,6 +146,7 @@ class GetGalleryFilesUseCase @Inject constructor(
                 val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(context, contentUri)
                 val duration = retriever.extractMetadata(METADATA_KEY_DURATION)
+                retriever.release()
                 val durationText = TimeUtils.getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)
                 val file = FileGalleryItem(
                     id = id,
