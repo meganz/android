@@ -884,14 +884,14 @@ public class FileExplorerActivity extends TransfersManagementActivity
                         int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
                         tB.setBackgroundColor(toolbarElevationColor);
                     } else {
-                        tB.setBackgroundColor(android.R.color.transparent);
+                        tB.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
                     }
                 } else {
                     if (elevate) {
-                        tB.setBackgroundColor(android.R.color.transparent);
+                        tB.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
                         abL.setElevation(elevation);
                     } else {
-                        tB.setBackgroundColor(android.R.color.transparent);
+                        tB.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
                         abL.setElevation(0);
                     }
                 }
