@@ -10359,14 +10359,14 @@ public class ManagerActivity extends TransfersManagementActivity
                     case OUTGOING_TAB:
                         if (!isOutgoingAdded()) break;
 
-                        MegaNode parentNodeInOutgoing = megaApi.getNodeByHandle(outgoingSharesState(this).getOutgoingHandle());
                         // If the user is in the main page of Outgoing Shares, hide the Fab Button
                         if (outgoingSharesState(this).getOutgoingTreeDepth() <= 0) {
                             hideFabButton();
                         } else {
                             // Otherwise, check if the current parent node of the Outgoing Shares section is a Backup folder or not.
                             // Hide the Fab button if it is a Backup folder. Otherwise, show the Fab button.
-                            if (parentNodeInOutgoing != null && megaApi.isInInbox(parentNodeInOutgoing)) {
+                            MegaNode outgoingParentNode = megaApi.getNodeByHandle(outgoingSharesState(this).getOutgoingHandle());
+                            if (outgoingParentNode != null && megaApi.isInInbox(outgoingParentNode)) {
                                 hideFabButton();
                             } else {
                                 updateFabAndShow();
@@ -10377,14 +10377,14 @@ public class ManagerActivity extends TransfersManagementActivity
                     case LINKS_TAB:
                         if (!isLinksAdded()) break;
 
-                        MegaNode parentNodeInLinks = megaApi.getNodeByHandle(linksState(this).getLinksHandle());
                         // If the user is in the main page of Links, hide the Fab Button
                         if (linksState(this).getLinksTreeDepth() <= 0) {
                             hideFabButton();
                         } else {
                             // Otherwise, check if the current parent node of the Links section is a Backup folder or not.
                             // Hide the Fab button if it is a Backup folder. Otherwise, show the Fab button.
-                            if (parentNodeInLinks != null && megaApi.isInInbox(parentNodeInLinks)) {
+                            MegaNode linksParentNode = megaApi.getNodeByHandle(linksState(this).getLinksHandle());
+                            if (linksParentNode != null && megaApi.isInInbox(linksParentNode)) {
                                 hideFabButton();
                             } else {
                                 updateFabAndShow();
