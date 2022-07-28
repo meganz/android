@@ -56,11 +56,14 @@ class ShakeDetectorViewModelTest {
             verify(shakeDetectorUseCase, times(1))
             scheduler.advanceUntilIdle()
             shakeDetectorUseCase().collect {
+                underTest.state.apply {
+                    tryEmit(true)
+                    test {
+                        assertTrue(awaitItem())
+                    }
+                }
                 verify(vibrateDeViceUseCase, times(1))
             }
-
-            assertTrue(underTest.state.value)
-
         }
     }
 }
