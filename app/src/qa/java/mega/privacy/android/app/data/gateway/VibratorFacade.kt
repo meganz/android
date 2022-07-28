@@ -3,7 +3,6 @@ package mega.privacy.android.app.data.gateway
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
-import timber.log.Timber
 import javax.inject.Inject
 
 /**

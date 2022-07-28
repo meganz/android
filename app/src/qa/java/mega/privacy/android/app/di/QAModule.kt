@@ -19,15 +19,14 @@ import mega.privacy.android.app.data.gateway.MotionSensorFacade
 import mega.privacy.android.app.data.gateway.MotionSensorGateway
 import mega.privacy.android.app.data.gateway.VibratorFacade
 import mega.privacy.android.app.data.gateway.VibratorGateway
-import mega.privacy.android.app.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.app.data.repository.DefaultQARepository
 import mega.privacy.android.app.data.repository.DefaultShakeDetectorRepository
-import mega.privacy.android.app.data.usecase.DefaultShakeDetector
+import mega.privacy.android.app.data.usecase.DefaultDetectShake
 import mega.privacy.android.app.domain.repository.QARepository
 import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
+import mega.privacy.android.app.domain.usecase.DetectShake
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
-import mega.privacy.android.app.domain.usecase.ShakeDetector
 import mega.privacy.android.app.domain.usecase.UpdateApp
 import mega.privacy.android.app.domain.usecase.VibrateDevice
 import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
@@ -103,8 +102,8 @@ class QAModule {
      * @return ShakeDetector: Implementation class @DefaultShakeDetector
      */
     @Provides
-    fun provideShakeDetectorUseCase(repository: DefaultShakeDetectorRepository): ShakeDetector =
-        DefaultShakeDetector(repository)
+    fun provideDetectShakeUseCase(repository: DefaultShakeDetectorRepository): DetectShake =
+        DefaultDetectShake(repository)
 
     /**
      * Provides implementation of @VibrateDevice
@@ -150,12 +149,12 @@ class QAModule {
         @ApplicationScope coroutineScope: CoroutineScope,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         vibrateDevice: VibrateDevice,
-        shakeDetector: ShakeDetector,
+        detectShake: DetectShake,
     ): ShakeDetectorViewModel =
         ShakeDetectorViewModel(coroutineScope,
             ioDispatcher,
             vibrateDevice,
-            shakeDetector)
+            detectShake)
 
     /**
      * Provides device vibrator

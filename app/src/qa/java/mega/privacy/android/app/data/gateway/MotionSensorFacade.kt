@@ -9,6 +9,8 @@ import javax.inject.Inject
 
 /**
  * Implementation of @MotionSensorGateway to interact with @SensorEventListener
+ *
+ * @param context : @ApplicationContext
  */
 class MotionSensorFacade @Inject constructor(
     @ApplicationContext val context: Context,

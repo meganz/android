@@ -3,10 +3,10 @@ package test.mega.privacy.android.app.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.usecase.DefaultShakeDetector
-import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
+import mega.privacy.android.app.data.usecase.DefaultDetectShake
 import mega.privacy.android.app.domain.model.ShakeEvent
-import mega.privacy.android.app.domain.usecase.ShakeDetector
+import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
+import mega.privacy.android.app.domain.usecase.DetectShake
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -15,14 +15,14 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultShakeDetectorTest {
+class DefaultDetectShakeTest {
 
-    private lateinit var underTest: ShakeDetector
+    private lateinit var underTest: DetectShake
     private val repository = mock<ShakeDetectorRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultShakeDetector(repository)
+        underTest = DefaultDetectShake(repository)
     }
 
     @Test

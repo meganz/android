@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.domain.usecase.ShakeDetector
+import mega.privacy.android.app.domain.usecase.DetectShake
 import mega.privacy.android.app.domain.usecase.VibrateDevice
 import javax.inject.Inject
 
@@ -18,7 +18,7 @@ class ShakeDetectorViewModel @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val vibrateDevice: VibrateDevice,
-    private val shakeDetector: ShakeDetector,
+    private val detectShake: DetectShake,
 ) {
 
     private val _state = MutableStateFlow(false)
@@ -33,7 +33,7 @@ class ShakeDetectorViewModel @Inject constructor(
      */
     fun registerAndCatchShakeEvent() {
         coroutineScope.launch(ioDispatcher) {
-            shakeDetector().collect {
+            detectShake().collect {
                 state.update { true }
                 vibrateDevice()
             }

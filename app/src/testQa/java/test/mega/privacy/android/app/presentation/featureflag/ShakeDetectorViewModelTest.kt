@@ -1,27 +1,23 @@
 package test.mega.privacy.android.app.presentation.featureflag
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
 import mega.privacy.android.app.domain.model.ShakeEvent
-import mega.privacy.android.app.domain.usecase.ShakeDetector
+import mega.privacy.android.app.domain.usecase.DetectShake
 import mega.privacy.android.app.domain.usecase.VibrateDevice
+import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -29,10 +25,10 @@ import kotlin.test.assertTrue
 class ShakeDetectorViewModelTest {
 
     private lateinit var underTest: ShakeDetectorViewModel
-    private val shakeDetectorUseCase = mock<ShakeDetector> {
+    private val detectShake = mock<DetectShake> {
         on { invoke() }.thenReturn(flowOf(ShakeEvent(1.1F, 2.2F, 3.3F)))
     }
-    private val vibrateDeViceUseCase = mock<VibrateDevice>()
+    private val vibrateDeVice = mock<VibrateDevice>()
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
 
@@ -41,8 +37,8 @@ class ShakeDetectorViewModelTest {
         Dispatchers.setMain(standardDispatcher)
         underTest = ShakeDetectorViewModel(
             ioDispatcher = standardDispatcher,
-            vibrateDevice = vibrateDeViceUseCase,
-            shakeDetector = shakeDetectorUseCase,
+            vibrateDevice = vibrateDeVice,
+            detectShake = detectShake,
             coroutineScope = TestScope())
     }
 
@@ -53,16 +49,16 @@ class ShakeDetectorViewModelTest {
             underTest.state.test {
                 assertFalse(awaitItem())
             }
-            verify(shakeDetectorUseCase, times(1))
+            verify(detectShake, times(1))
             scheduler.advanceUntilIdle()
-            shakeDetectorUseCase().collect {
+            detectShake().collect {
                 underTest.state.apply {
                     tryEmit(true)
                     test {
                         assertTrue(awaitItem())
                     }
                 }
-                verify(vibrateDeViceUseCase, times(1))
+                verify(vibrateDeVice, times(1))
             }
         }
     }

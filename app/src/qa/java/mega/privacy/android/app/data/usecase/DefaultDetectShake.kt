@@ -5,12 +5,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
 import mega.privacy.android.app.domain.model.ShakeEvent
-import mega.privacy.android.app.domain.usecase.ShakeDetector
+import mega.privacy.android.app.domain.usecase.DetectShake
 import javax.inject.Inject
 import kotlin.math.sqrt
 
-class DefaultShakeDetector @Inject constructor(val repository: ShakeDetectorRepository) :
-    ShakeDetector {
+/**
+ * Implementation of @DetectShake
+ *
+ * @param repository: @ShakeDetectorRepository
+ */
+class DefaultDetectShake @Inject constructor(val repository: ShakeDetectorRepository) :
+    DetectShake {
 
     override fun invoke(): Flow<ShakeEvent> {
         return repository.monitorShakeEvents().filter {

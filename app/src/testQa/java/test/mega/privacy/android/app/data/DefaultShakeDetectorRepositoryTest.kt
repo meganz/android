@@ -5,7 +5,6 @@ import android.hardware.SensorEventListener
 import app.cash.turbine.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.resetMain
@@ -15,7 +14,6 @@ import mega.privacy.android.app.data.gateway.MotionSensorGateway
 import mega.privacy.android.app.data.gateway.VibratorGateway
 import mega.privacy.android.app.data.repository.DefaultShakeDetectorRepository
 import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
-import mega.privacy.android.app.domain.model.ShakeEvent
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
