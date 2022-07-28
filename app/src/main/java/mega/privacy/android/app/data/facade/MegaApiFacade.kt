@@ -171,6 +171,12 @@ class MegaApiFacade @Inject constructor(
         else
             megaApi.getOutShares(order)
 
+    override suspend fun getPublicLinks(order: Int?): List<MegaNode> =
+        if (order == null)
+            megaApi.publicLinks
+        else
+            megaApi.getPublicLinks(order)
+
 
     override fun getNumChildFolders(node: MegaNode): Int = megaApi.getNumChildFolders(node)
 
