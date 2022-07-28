@@ -2,6 +2,10 @@ package mega.privacy.android.domain.entity
 
 /**
  * User alert
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
  */
 sealed interface UserAlert {
     val id: Long
@@ -10,8 +14,13 @@ sealed interface UserAlert {
     val isOwnChange: Boolean
 }
 
+
 /**
  * Contact alert
+ *
+ * @property userId
+ * @property email
+ * @property contact
  */
 interface ContactAlert {
     val userId: Long

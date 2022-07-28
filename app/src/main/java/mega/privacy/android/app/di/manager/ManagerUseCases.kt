@@ -92,10 +92,6 @@ abstract class ManagerUseCases {
             MonitorUserAlertUpdates(notificationsRepository::monitorUserAlerts)
 
         @Provides
-        fun provideMonitorUserUpdates(notificationsRepository: NotificationsRepository): MonitorUserAlerts =
-            MonitorUserAlerts(notificationsRepository::monitorUserAlerts)
-
-        @Provides
         fun provideAuthorizeNode(filesRepository: FilesRepository): AuthorizeNode =
             AuthorizeNode(filesRepository::authorizeNode)
     }
