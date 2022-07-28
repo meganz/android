@@ -4266,35 +4266,34 @@ public class ChatActivity extends PasscodeActivity
                 isRequestSent = MegaApplication.getChatManagement().isRequestSent(call.getCallId());
             }
         }
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-        builder.setTitle(isRequestSent ?
-                StringResourcesUtils.getString(R.string.calls_call_screen_dialog_title_only_you_in_the_call) :
-                StringResourcesUtils.getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call));
 
-        builder.setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call));
+        dialogOnlyMeInCall = new MaterialAlertDialogBuilder(this)
+                .setTitle(isRequestSent ?
+                        StringResourcesUtils.getString(R.string.calls_call_screen_dialog_title_only_you_in_the_call) :
+                        StringResourcesUtils.getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call))
+                .setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call))
+                .setPositiveButton(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call), (dialog, which) -> {
+                    MegaApplication.getChatManagement().stopCounterToFinishCall();
+                    hideDialogCall();
+                    MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
 
-        builder.setPositiveButton(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call), (dialog, which) -> {
-            MegaApplication.getChatManagement().stopCounterToFinishCall();
-            hideDialogCall();
-            MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
+                    if (call != null) {
+                        endCallUseCase.hangCall(call.getCallId())
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(() -> {
+                                }, (error) -> Timber.e("Error " + error));
+                    }
+                })
+                .setNegativeButton(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call), (dialog, which) -> {
+                    MegaApplication.getChatManagement().stopCounterToFinishCall();
+                    MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true;
+                    hideDialogCall();
+                })
+                .setCancelable(false)
+                .setOnDismissListener(dialog -> MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true)
+                .create();
 
-            if (call != null) {
-                endCallUseCase.hangCall(call.getCallId())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(() -> {
-                        }, (error) -> Timber.e("Error " + error));
-            }
-        });
-
-        builder.setNegativeButton(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call), (dialog, which) -> {
-            MegaApplication.getChatManagement().stopCounterToFinishCall();
-            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true;
-            hideDialogCall();
-        });
-
-        dialogOnlyMeInCall = builder.create();
-        dialogOnlyMeInCall.setCancelable(false);
         dialogOnlyMeInCall.show();
     }
 
