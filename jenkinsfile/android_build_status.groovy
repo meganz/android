@@ -6,6 +6,12 @@ GMS_APK_BUILD_LOG = "gms_build.log"
 HMS_APK_BUILD_LOG = "hms_build.log"
 QA_APK_BUILD_LOG = "qa_build.log"
 
+MODULE_LIST = ['app', 'domain', 'sdk']
+
+LINT_REPORT_FOLDER = "lint_reports"
+LINT_REPORT_ARCHIVE = "lint_reports.zip"
+LINT_REPORT_SUMMARY = ""
+
 APP_UNIT_TEST_SUMMARY = ""
 DOMAIN_UNIT_TEST_SUMMARY = ""
 APP_UNIT_TEST_REPORT_ARCHIVE = "app_unit_test_result_${env.GIT_COMMIT}.zip"
@@ -137,6 +143,8 @@ pipeline {
     post {
         failure {
             script {
+                cleanUp()
+
                 if (env.BRANCH_NAME.startsWith('MR-')) {
                     def mrNumber = env.BRANCH_NAME.replace('MR-', '')
 
@@ -150,7 +158,7 @@ pipeline {
                         final String respJenkinsLog = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
                         def jsonJenkinsLog = new groovy.json.JsonSlurperClassic().parseText(respJenkinsLog)
 
-                        // upload unit test report if unit test fails
+                        // upload unit test report if unit test fail
                         String unitTestResult = ""
                         if (BUILD_STEP == "Unit Test") {
                             def appUnitTestSummary = unitTestSummaryWithArchiveLink(
@@ -202,6 +210,8 @@ pipeline {
         }
         success {
             script {
+                cleanUp()
+
                 if (env.BRANCH_NAME.startsWith('MR-')) {
                     def mrNumber = env.BRANCH_NAME.replace('MR-', '')
 
@@ -215,11 +225,17 @@ pipeline {
                     } else {
                         // always report build success to MR comment
                         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+
+                            //Upload Lint check reports
+                            final String respLintReports = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${LINT_REPORT_ARCHIVE} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
+                            def jsonLintReports = new groovy.json.JsonSlurperClassic().parseText(respLintReports)
+
                             env.MARKDOWN_LINK = ":white_check_mark: Build Succeeded!" +
-                                    "<br/>Last Commit: <b>${getLastCommitMessage()}</b> (${env.GIT_COMMIT})" +
-                                    "<br/>Build Warnings: ${readBuildWarnings()}" +
-                                    "<br/>App Unit Test: ${APP_UNIT_TEST_SUMMARY}" +
-                                    "<br/>Domain Unit Test: ${DOMAIN_UNIT_TEST_SUMMARY}"
+                                    "<br/><b>Last Commit:</b> ${getLastCommitMessage()} (${env.GIT_COMMIT})" +
+                                    "<br/><b>Build Warnings:</b> ${readBuildWarnings()}" +
+                                    "<br/><b>App Unit Test:</b> ${APP_UNIT_TEST_SUMMARY}" +
+                                    "<br/><b>Domain Unit Test:</b> ${DOMAIN_UNIT_TEST_SUMMARY}" +
+                                    "<br/><b>Lint Summary (${jsonLintReports.markdown}):</b><br/>${LINT_REPORT_SUMMARY}"
 
                             env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
                             sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
@@ -395,38 +411,42 @@ pipeline {
                 }
             }
         }
-        // stage('Static analysis') {
-        //   when {
-        //      expression { (!shouldSkip()) }
-        //   }
-        //   steps {
-        //     // Run Lint and analyse the results
-        //     sh './gradlew lintDebug'
-        //     androidLint pattern: '**/lint-results-*.xml'
-        //   }
-        // }
-
-        stage('Clean up') {
+        stage('Lint Check') {
+            when {
+                expression { (!shouldSkipBuild()) }
+            }
             steps {
+                // Run Lint and analyse the results
                 script {
-                    BUILD_STEP = "Clean Up"
+                    BUILD_STEP = "Lint Check"
                 }
-                gitlabCommitStatus(name: 'Clean Up') {
-                    sh """
-                    cd ${WORKSPACE}
-                    echo "workspace size before clean: "
-                    du -sh
-                    cd ${WORKSPACE}/sdk/src/main/jni
-                    bash build.sh clean
-                    cd ${WORKSPACE}
-                    ./gradlew clean
-                    echo "workspace size after clean: "
-                    du -sh
-                    """
+
+                gitlabCommitStatus(name: 'Lint Check') {
+                    sh "./gradlew lint"
+                    script {
+                        MODULE_LIST.eachWithIndex { module, index ->
+                            LINT_REPORT_SUMMARY += "<li><b>${module}</b>: ${lintSummary(module)}</li>"
+                        }
+                        LINT_REPORT_SUMMARY = "<ul>${LINT_REPORT_SUMMARY}</ul>"
+
+                        print("LINT_REPORT_SUMMARY = ${LINT_REPORT_SUMMARY}")
+
+                        archiveLintReports()
+                    }
                 }
             }
         }
     }
+}
+
+def cleanUp() {
+    sh """
+        cd ${WORKSPACE}
+        ./gradlew clean
+
+        cd ${WORKSPACE}/sdk/src/main/jni
+        bash build.sh clean
+    """
 }
 
 String readBuildWarnings() {
@@ -477,6 +497,42 @@ String unitTestSummary(String testReportPath) {
     return sh(
             script: "python3 ${WORKSPACE}/jenkinsfile/junit_report.py ${testReportPath}",
             returnStdout: true).trim()
+}
+
+/**
+ * Parse lint analysis report and create summary
+ *
+ * @param module module of the code. Possible values can be app, domain or sdk.
+ * @return lint summary report of the given module. Example return value:
+ *{'Error': 248, 'Fatal': 17, 'Warning': 4781, 'Information': 1}
+ */
+String lintSummary(String module) {
+    summary = sh(
+            script: "python3 ${WORKSPACE}/jenkinsfile/lint_report.py $WORKSPACE/${module}/build/reports/lint-results.xml",
+            returnStdout: true).trim()
+    print("lintSummary($module) = $summary")
+    return summary
+}
+
+/**
+ * Archive all HTML lint reports into a zip file.
+ */
+def archiveLintReports() {
+    sh """
+        cd ${WORKSPACE}
+        rm -frv ${LINT_REPORT_FOLDER}
+        mkdir -pv ${LINT_REPORT_FOLDER}
+        rm -fv ${LINT_REPORT_ARCHIVE}
+    """
+
+    MODULE_LIST.eachWithIndex { module, _ ->
+        sh("cp -fv ${module}/build/reports/lint*.html ${WORKSPACE}/${LINT_REPORT_FOLDER}/${module}_lint_report.html")
+    }
+
+    sh """
+        cd ${WORKSPACE}
+        zip -r ${LINT_REPORT_ARCHIVE} ${LINT_REPORT_FOLDER}/*.html
+    """
 }
 
 /**

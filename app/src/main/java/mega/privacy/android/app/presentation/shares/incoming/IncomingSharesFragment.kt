@@ -139,7 +139,6 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
         return when {
             state().incomingTreeDepth == 1 -> {
-                //In the beginning of the navigation
                 Timber.d("deepBrowserTree==1")
                 viewModel.resetIncomingTreeDepth()
 
@@ -187,8 +186,6 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             }
         }
     }
-
-    override fun setNodes(nodes: List<MegaNode>) {}
 
     /**
      * Method to update an item when a nickname is added, updated or removed from a contact.

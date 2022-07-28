@@ -123,7 +123,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
         List<EmojiRange> emojis = EmojiUtils.emojis(reaction);
         Emoji emoji = null;
-        if (!emojis.isEmpty() && emojis.get(0) != null) {
+        if (emojis != null && !emojis.isEmpty() && emojis.get(0) != null) {
             emoji = emojis.get(0).emoji;
         }
 
@@ -300,7 +300,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     @Override
     public boolean onLongClick(View v) {
         ViewHolderReaction holder = (ViewHolderReaction) v.getTag();
-        if (holder == null || !chatRoom.isGroup() ||
+        if (holder == null || (!chatRoom.isGroup() && !chatRoom.isMeeting()) ||
                 ((ChatActivity) context).isMultiselectOn())
             return true;
 
@@ -312,7 +312,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
         switch (v.getId()) {
             case R.id.item_reaction_layout:
-                ((ChatActivity) context).openInfoReactionBottomSheet(chatId, megaMessage, holder.reaction);
+               ((ChatActivity) context).openInfoReactionBottomSheet(chatId, megaMessage, holder.reaction);
                 break;
         }
 

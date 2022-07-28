@@ -40,18 +40,12 @@ public final class EmojiUtils {
    * @param text The text.
    * @return List of emojis.
    */
-  @NonNull
   public static List<EmojiRange> emojis(final String text) {
     if (isTextEmpty(text))
       return null;
 
     return EmojiManager.getInstance().findAllEmojis(text);
   }
-
-//  returns the number of all emojis that were found in the given text
-//  public static int emojisCount(@Nullable final String text) {
-//    return emojis(text).size();
-//  }
 
   //returns a class that contains all of the emoji information that was found in the given text
   @NonNull public EmojiInformation emojiInformation(@Nullable final String text) {

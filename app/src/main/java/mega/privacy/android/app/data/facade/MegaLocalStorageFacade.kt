@@ -7,6 +7,9 @@ import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.main.megachat.NonContactInfo
 import mega.privacy.android.domain.entity.SyncRecord
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_DESC
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
 import javax.inject.Inject
 
@@ -35,6 +38,14 @@ class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getOthersSortOrder(): Int =
         dbHandler.preferences?.preferredSortOthers?.toInt() ?: ORDER_DEFAULT_ASC
+
+    override suspend fun getLinksSortOrder(): Int =
+        when (val order = getCloudSortOrder()) {
+            ORDER_MODIFICATION_ASC -> ORDER_LINK_CREATION_ASC
+            ORDER_MODIFICATION_DESC -> ORDER_LINK_CREATION_DESC
+            else -> order
+        }
+
 
     override suspend fun getUserCredentials(): UserCredentials? = dbHandler.credentials
 

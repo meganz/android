@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/items_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/btn_start_meeting"
+        style="@style/BottomSheetOption"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/btn_start_meeting"
+        app:drawableStartCompat="@drawable/ic_video_plus" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="72dp"
+        android:background="@color/grey_012_white_012" />
+
+    <TextView
+        android:id="@+id/btn_join_meeting"
+        style="@style/BottomSheetOption"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/join_meeting"
+        app:drawableStartCompat="@drawable/ic_video_join" />
+</LinearLayout>

@@ -6,6 +6,7 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
@@ -156,7 +157,7 @@ interface MegaApiGateway {
      * @param order order for the returned list, if null the default order is applied
      * @return children nodes list
      */
-    suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): ArrayList<MegaNode>
+    suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): List<MegaNode>
 
     /**
      * Get a list of all incoming shares
@@ -165,6 +166,14 @@ interface MegaApiGateway {
      * @return List of MegaNode that other users are sharing with this account
      */
     suspend fun getIncomingSharesNode(order: Int?): List<MegaNode>
+
+    /**
+     * Get a list of all outgoing shares
+     *
+     * @param order sort order, if null the default order is applied
+     * @return List of MegaNode of all active and pending outbound shared by current user
+     */
+    suspend fun getOutgoingSharesNode(order: Int?): List<MegaShare>
 
     /**
      * Get child folder number of current folder

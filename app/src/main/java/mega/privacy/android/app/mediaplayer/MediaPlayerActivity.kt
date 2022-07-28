@@ -120,9 +120,11 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
-import java.util.Locale
 import javax.inject.Inject
 
+/**
+ * Media player Activity
+ */
 @AndroidEntryPoint
 abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, ActivityLauncher {
 
@@ -217,7 +219,6 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             binding.toolbar.setBackgroundColor(Color.TRANSPARENT)
         } else {
             setContentView(dragToExit.wrapContentView(binding.root))
-            MediaPlayerService.pauseAudioPlayer(this)
             dragToExit.observeThumbnailLocation(this, intent)
         }
 
@@ -297,6 +298,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
     }
 
+    /**
+     * Judge the player whether is audio player
+     *
+     * @return true is audio player, otherwise is false.
+     */
     abstract fun isAudioPlayer(): Boolean
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -313,7 +319,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
     private fun setupToolbar() {
         setSupportActionBar(binding.toolbar)
-        actionBar = supportActionBar!!
+        supportActionBar?.run {
+            actionBar = this
+        }
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
         actionBar.title = ""
@@ -605,11 +613,10 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 when (adapterType) {
                     OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(playingHandle, true)
                     ZIP_ADAPTER -> {
-                        val uri = service.player.currentMediaItem?.localConfiguration?.uri
-                            ?: return false
+                        val mediaItem = service.mediaPlayerServiceGateway.getCurrentMediaItem()
+                        val uri = mediaItem?.localConfiguration?.uri ?: return false
                         val playlistItem =
-                            service.viewModel.getPlaylistItem(service.player.currentMediaItem?.mediaId)
-                                ?: return false
+                            service.viewModel.getPlaylistItem(mediaItem.mediaId) ?: return false
 
                         nodeSaver.saveUri(uri, playlistItem.nodeName, playlistItem.size, true)
                     }
@@ -650,7 +657,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             R.id.properties -> {
                 if (isAudioPlayer()) {
                     val uri =
-                        service.player.currentMediaItem?.localConfiguration?.uri ?: return true
+                        service.mediaPlayerServiceGateway.getCurrentMediaItem()?.localConfiguration?.uri
+                            ?: return true
                     navController.navigate(
                         MediaPlayerFragmentDirections.actionPlayerToTrackInfo(
                             adapterType, adapterType == INCOMING_SHARES_ADAPTER, playingHandle, uri
@@ -708,11 +716,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             R.id.share -> {
                 when (adapterType) {
                     OFFLINE_ADAPTER, ZIP_ADAPTER -> {
+                        val mediaItem = service.mediaPlayerServiceGateway.getCurrentMediaItem()
                         val nodeName =
-                            service.viewModel.getPlaylistItem(service.player.currentMediaItem?.mediaId)?.nodeName
+                            service.viewModel.getPlaylistItem(mediaItem?.mediaId)?.nodeName
                                 ?: return false
-                        val uri = service.player.currentMediaItem?.localConfiguration?.uri
-                            ?: return false
+                        val uri = mediaItem?.localConfiguration?.uri ?: return false
 
                         shareUri(this, nodeName, uri)
                     }
@@ -908,14 +916,27 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
     }
 
+    /**
+     * Set toolbar title
+     *
+     * @param title toolbar title
+     */
     fun setToolbarTitle(title: String) {
         binding.toolbar.title = title
     }
 
+    /**
+     * Close search mode
+     */
     fun closeSearch() {
         searchMenuItem?.collapseActionView()
     }
 
+    /**
+     * Hide tool bar
+     *
+     * @param animate true is that adds hide animation, otherwise is false
+     */
     fun hideToolbar(animate: Boolean = true) {
         if (animate) {
             binding.toolbar.animate()
@@ -928,6 +949,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
     }
 
+    /**
+     * Show tool bar
+     *
+     * @param animate true is that adds show animation, otherwise is false
+     */
     fun showToolbar(animate: Boolean = true) {
         if (animate) {
             binding.toolbar.animate()
@@ -940,6 +966,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
     }
 
+    /**
+     * Setup toolbar colors
+     *
+     * @param showElevation true is show elevation, otherwise is false.
+     */
     fun setupToolbarColors(showElevation: Boolean = false) {
         val isDarkMode = Util.isDarkMode(this)
         val isMainPlayer = navController.currentDestination?.id == R.id.main_player
@@ -1011,6 +1042,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         binding.toolbar.elevation = toolbarElevation
     }
 
+    /**
+     * Set draggable
+     *
+     * @param draggable ture is draggable, otherwise is false
+     */
     fun setDraggable(draggable: Boolean) {
         dragToExit.setDraggable(draggable)
     }
@@ -1053,11 +1089,19 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
      */
     private fun manageException(throwable: Throwable) {
         if (!manageCopyMoveException(throwable) && throwable is MegaException) {
-            showSnackbar(throwable.message!!)
+            throwable.message?.run {
+                showSnackbar(this)
+            }
         }
     }
 
     companion object {
+        /**
+         * Judge the player whether is audio player
+         *
+         * @param intent Intent
+         * @return true is audio player, otherwise is false.
+         */
         fun isAudioPlayer(intent: Intent?): Boolean {
             val nodeName = intent?.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: return true
 

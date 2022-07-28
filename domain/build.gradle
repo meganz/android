@@ -1,5 +1,11 @@
 plugins {
     id 'kotlin'
+    id 'com.android.lint'
+}
+
+lint {
+    abortOnError false
+    xmlOutput = file("build/reports/lint-results.xml")
 }
 
 compileKotlin {

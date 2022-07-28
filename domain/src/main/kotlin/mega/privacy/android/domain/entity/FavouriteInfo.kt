@@ -1,39 +1,176 @@
 package mega.privacy.android.domain.entity
 
+
 /**
- * The entity for favourite info
- * @param id current favourite node handle
- * @param name current favourite node name
- * @param size current favourite node size
- * @param label current favourite node label
- * @param parentId current favourite node parent handle
- * @param base64Id current favourite node base64handle
- * @property modificationTime current favourite node modificationTime
- * @param node current favourite node
- * @param hasVersion whether current favourite item has version
- * @param numChildFolders child folders number
- * @param numChildFiles child files number
- * @param isImage node type. True is image, otherwise False
- * @param isVideo node type. True is video, otherwise False
- * @param isFolder node whether is folder. True is folder, otherwise False
- * @param thumbnailPath thumbnail file path
+ * Favourite info
  */
-data class FavouriteInfo(
-    val id: Long,
-    val name: String,
-    val parentId: Long,
-    val base64Id: String,
-    val size: Long,
-    val label: Int,
-    val modificationTime: Long,
-    val hasVersion: Boolean,
-    val numChildFolders: Int,
-    val numChildFiles: Int,
-    val isImage: Boolean,
-    val isVideo: Boolean,
-    val isFolder: Boolean,
-    val thumbnailPath: String? = null,
-    val isFavourite: Boolean,
-    val isExported: Boolean,
-    val isTakenDown: Boolean,
-)
+sealed interface FavouriteInfo {
+
+    /**
+     * Id
+     */
+    val id: Long
+
+    /**
+     * Name
+     */
+    val name: String
+
+    /**
+     * Parent id
+     */
+    val parentId: Long
+
+    /**
+     * Base64id
+     */
+    val base64Id: String
+
+    /**
+     * Size
+     */
+    val size: Long
+
+    /**
+     * Label
+     */
+    val label: Int
+
+    /**
+     * Modification time
+     */
+    val modificationTime: Long
+
+    /**
+     * Has version
+     */
+    val hasVersion: Boolean
+
+    /**
+     * Num child folders
+     */
+    val numChildFolders: Int
+
+    /**
+     * Num child files
+     */
+    val numChildFiles: Int
+
+    /**
+     * Is image
+     */
+    val isImage: Boolean
+
+    /**
+     * Is video
+     */
+    val isVideo: Boolean
+
+    /**
+     * Is folder
+     */
+    val isFolder: Boolean
+
+    /**
+     * Thumbnail path
+     */
+    val thumbnailPath: String?
+
+    /**
+     * Is favourite
+     */
+    val isFavourite: Boolean
+
+    /**
+     * Is exported
+     */
+    val isExported: Boolean
+
+    /**
+     * Is taken down
+     */
+    val isTakenDown: Boolean
+}
+
+/**
+ * Favourite file
+ *
+ * @property id
+ * @property name
+ * @property parentId
+ * @property base64Id
+ * @property size
+ * @property label
+ * @property modificationTime
+ * @property hasVersion
+ * @property numChildFolders
+ * @property numChildFiles
+ * @property type
+ * @property thumbnailPath
+ * @property isFavourite
+ * @property isExported
+ * @property isTakenDown
+ */
+data class FavouriteFile(
+    override val id: Long,
+    override val name: String,
+    override val parentId: Long,
+    override val base64Id: String,
+    override val size: Long,
+    override val label: Int,
+    override val modificationTime: Long,
+    override val hasVersion: Boolean,
+    override val numChildFolders: Int,
+    override val numChildFiles: Int,
+    val type: FileTypeInfo,
+    override val thumbnailPath: String? = null,
+    override val isFavourite: Boolean,
+    override val isExported: Boolean,
+    override val isTakenDown: Boolean,
+) : FavouriteInfo {
+    override val isFolder: Boolean = false
+    override val isImage: Boolean
+        get() = type is ImageFileTypeInfo
+    override val isVideo: Boolean
+        get() = type is VideoFileTypeInfo
+}
+
+/**
+ * Favourite folder
+ *
+ * @property id
+ * @property name
+ * @property parentId
+ * @property base64Id
+ * @property size
+ * @property label
+ * @property modificationTime
+ * @property hasVersion
+ * @property numChildFolders
+ * @property numChildFiles
+ * @property thumbnailPath
+ * @property isFavourite
+ * @property isExported
+ * @property isTakenDown
+ * @constructor Create empty Favourite folder
+ */
+data class FavouriteFolder(
+    override val id: Long,
+    override val name: String,
+    override val parentId: Long,
+    override val base64Id: String,
+    override val size: Long,
+    override val label: Int,
+    override val modificationTime: Long,
+    override val hasVersion: Boolean,
+    override val numChildFolders: Int,
+    override val numChildFiles: Int,
+    override val thumbnailPath: String? = null,
+    override val isFavourite: Boolean,
+    override val isExported: Boolean,
+    override val isTakenDown: Boolean,
+) : FavouriteInfo {
+    override val isFolder: Boolean = true
+    override val isImage: Boolean = false
+    override val isVideo: Boolean = false
+}

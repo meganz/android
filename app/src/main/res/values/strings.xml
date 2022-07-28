@@ -170,8 +170,6 @@
     <string name="login_before_share">Please log in to share with MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Your confirmation link is no longer valid. Your account may already be activated or you may have cancelled your registration.</string>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Register now and get 20&#160;GB of free storage</string>
     <!-- category in sort by action -->
     <string name="name_text">Name</string>
     <!-- First Name of the user -->
@@ -1847,7 +1845,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Open Android device [A]Settings[/A]</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Open [A]Apps &amp; notifications[/A]</string>
+    <string name="turn_on_notifications_second_step">Open [A]Apps and notifications[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">Select [A]MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -3980,8 +3978,6 @@
     <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
     <string name="meeting_call_screen_description_of_bottom_panel_to_assign_another_host">You’re the only host on the call. Do you want to assign another one before leaving?</string>
-    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
-    <string name="calls_call_screen_waiting_for_participants">Waiting for others to join</string>
     <!-- Yes button for the confirmation dialog before removing the outgoing shares of several folders. -->
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_yes">Yes</string>
     <!-- No button for the confirmation dialog before removing the outgoing shares of several folders. -->
@@ -4026,6 +4022,16 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to standard role by %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s was changed to host role by %2$s</string>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">Waiting for others to join</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
+    <!--Action text to start a meeting from Meeting screen empty view-->
+    <string name="meetings_list_empty_action">Start a meeting</string>
+    <!--Description text from Meeting screen empty view-->
+    <string name="meetings_list_empty_description">Talk securely and privately on audio or video calls with friends and colleagues around the world.</string>
+    <!--Action text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_action">Start chatting now</string>
+    <!--Description text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_description">Chat securely and privately, with anyone and on any device, knowing that no one can read your chats, not even MEGA.</string>
 </resources>

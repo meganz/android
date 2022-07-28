@@ -19,6 +19,7 @@ import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
@@ -152,7 +153,7 @@ class MegaApiFacade @Inject constructor(
 
     override suspend fun getParentNode(node: MegaNode): MegaNode? = megaApi.getParentNode(node)
 
-    override suspend fun getChildrenByNode(parentNode: MegaNode, order: Int?): ArrayList<MegaNode> =
+    override suspend fun getChildrenByNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
         if (order == null)
             megaApi.getChildren(parentNode)
         else
@@ -163,6 +164,13 @@ class MegaApiFacade @Inject constructor(
             megaApi.inShares
         else
             megaApi.getInShares(order)
+
+    override suspend fun getOutgoingSharesNode(order: Int?): List<MegaShare> =
+        if (order == null)
+            megaApi.outShares
+        else
+            megaApi.getOutShares(order)
+
 
     override fun getNumChildFolders(node: MegaNode): Int = megaApi.getNumChildFolders(node)
 

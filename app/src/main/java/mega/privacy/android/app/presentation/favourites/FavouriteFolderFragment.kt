@@ -13,51 +13,60 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentFavouriteFolderBinding
-import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
-import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import javax.inject.Inject
 
 /**
  * The Fragment for open the file from favourites tab of homepage
  */
 @AndroidEntryPoint
-class FavouriteFolderFragment: Fragment() {
+class FavouriteFolderFragment : Fragment() {
     private val viewModel by viewModels<FavouriteFolderViewModel>()
     private val thumbnailViewModel by viewModels<ThumbnailViewModel>()
     private lateinit var binding: FragmentFavouriteFolderBinding
     private lateinit var adapter: FavouritesAdapter
 
+    /**
+     * MegaUtilWrapper variable
+     */
     @Inject
     lateinit var megaUtilWrapper: MegaUtilWrapper
 
+    /**
+     * OpenFileWrapper variable
+     */
     @Inject
     lateinit var openFileWrapper: OpenFileWrapper
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            viewModel.backToPreviousPage()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentFavouriteFolderBinding.inflate(inflater, container, false)
-        binding.emptyHintText.text = TextUtil.formatEmptyScreenText(
-            context,
-            getString(R.string.file_browser_empty_folder_new)
-        ).toSpannedHtmlText()
+        binding.emptyHintText.text = formatEmptyScreenText(context,
+            getString(R.string.file_browser_empty_folder_new))
         setupAdapter()
         return binding.root
     }
@@ -65,28 +74,16 @@ class FavouriteFolderFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupFlow()
-
-        with(requireActivity()) {
-            onBackPressedDispatcher.addCallback(
-                viewLifecycleOwner,
-                object : OnBackPressedCallback(true) {
-                    // The function is invoked if back button is clicked when current fragment is opened
-                    override fun handleOnBackPressed() {
-                        if (viewModel.shouldHandleBackPressed()) {
-                            isEnabled = false
-                            onBackPressed()
-                        }
-                    }
-                })
-        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+            onBackPressedCallback)
     }
 
     /**
      * Setup adapter
      */
-    private fun setupAdapter(){
+    private fun setupAdapter() {
         adapter = FavouritesAdapter(
-            onItemClicked = { item, _, _->
+            onItemClicked = { item, _, _ ->
                 viewModel.openFile(item)
             },
             onThreeDotsClicked = { item ->
@@ -109,6 +106,8 @@ class FavouriteFolderFragment: Fragment() {
                     setViewVisible(childrenState)
                     if (childrenState is ChildrenNodesLoadState.Success) {
                         setToolbarText(childrenState.title)
+                        // According to the state to enable the onBackPressedCallback
+                        onBackPressedCallback.isEnabled = childrenState.isBackPressedEnable
                         adapter.submitList(childrenState.children)
                     } else if (childrenState is ChildrenNodesLoadState.Empty) {
                         setToolbarText(
@@ -139,14 +138,7 @@ class FavouriteFolderFragment: Fragment() {
                         is FavouritesEventState.OpenFile -> {
                             openNode(eventState.favouriteFile)
                         }
-                        is FavouritesEventState.OpenFolder -> {
-                            findNavController().navigate(
-                                HomepageFragmentDirections.actionHomepageFragmentToFavouritesFolderFragment(
-                                    eventState.parentHandle
-                                )
-                            )
-                        }
-                        is FavouritesEventState.ActionModeState -> {}
+                        else -> {}
                     }
                 }
             }
