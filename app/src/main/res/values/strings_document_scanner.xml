@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Screen title for cropping current scan (Document scanner) -->
     <string name="scan_title_crop">Crop</string>
@@ -46,6 +46,6 @@
     <string name="scan_snackbar_incorrect_name">Please correct your filename before proceeding</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">Preparing %1$s. Please wait&#8230;</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="scan_snackbar_invalid_characters">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+    <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->
+    <string name="scan_snackbar_invalid_characters">The following characters are not allowed: %1$s</string>
 </resources>

@@ -326,7 +326,7 @@ dependencies {
     implementation 'org.hamcrest:hamcrest-library:1.3'
     implementation 'com.google.android:flexbox:2.0.1'
     implementation 'jp.wasabeef:blurry:2.1.0'
-    implementation 'com.github.meganz.AndroidDocumentScanner:documentscanner:2.0.9'
+    implementation 'com.github.meganz.AndroidDocumentScanner:documentscanner:2.0.10'
 
     implementation "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
     implementation "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
