@@ -3,10 +3,7 @@ package test.mega.privacy.android.app.data.mapper
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.mapper.toFavouriteInfo
-import mega.privacy.android.app.utils.MegaNodeUtil.isImage
-import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.domain.entity.FavouriteFile
-import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import nz.mega.sdk.MegaNode
@@ -57,18 +54,11 @@ class FavouriteInfoMapperTest {
             gateway.getNumChildFiles(node)) { VideoFileTypeInfo("", "") }
 
         assertThat(actual.name).isEqualTo(expectedName)
-        assertThat(actual.size).isEqualTo(expectedSize)
         assertThat(actual.label).isEqualTo(expectedLabel)
         assertThat(actual.hasVersion).isEqualTo(expectedHasVersion)
-        assertThat(actual.numChildFolders).isEqualTo(expectedNumChildFolders)
-        assertThat(actual.numChildFiles).isEqualTo(expectedNumChildFiles)
         assertThat(actual.id).isEqualTo(expectedId)
         assertThat(actual.parentId).isEqualTo(expectedParentId)
         assertThat(actual.base64Id).isEqualTo(expectedBase64Id)
-        assertThat(actual.modificationTime).isEqualTo(expectedModificationTime)
-        assertThat(actual.isImage).isEqualTo(false)
-        assertThat(actual.isVideo).isEqualTo(true)
-        assertThat(actual.isFolder).isEqualTo(node.isFolder)
         assertThat(actual.isFavourite).isEqualTo(node.isFavourite)
         assertThat(actual.isExported).isEqualTo(node.isExported)
         assertThat(actual.isTakenDown).isEqualTo(node.isTakenDown)

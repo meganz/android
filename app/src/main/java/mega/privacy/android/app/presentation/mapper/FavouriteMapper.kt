@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.mapper
 
+import mega.privacy.android.domain.entity.FavouriteFile as FileEntity
+import mega.privacy.android.domain.entity.FavouriteFolder as FolderEntity
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
@@ -34,86 +36,83 @@ internal fun toFavourite(
     isAvailableOffline: Boolean,
     stringUtil: StringUtilWrapper,
     getFileIcon: (String) -> Int = { 0 },
-) =
-    if (favouriteInfo.isFolder) {
-        createFolder(
+) = when (favouriteInfo) {
+    is FolderEntity -> {
+        favouriteInfo.createFolder(
             node,
-            favouriteInfo,
             getFolderInfo(favouriteInfo, stringUtil),
             isAvailableOffline,
         )
-    } else {
-        createFile(
+    }
+    is FileEntity -> {
+        favouriteInfo.createFile(
             node,
-            favouriteInfo,
             getFileInfo(favouriteInfo, stringUtil),
             isAvailableOffline,
             getFileIcon,
         )
     }
+}
+
 
 /**
  * Create favourite folder based on favourite info
- * @param favouriteInfo FavouriteInfo
+ * @param node
  * @param folderInfo folder info
  * @param isAvailableOffline whether is available for offline
  * @return FavouriteFolder
  */
-private fun createFolder(
+private fun FolderEntity.createFolder(
     node: MegaNode,
-    favouriteInfo: FavouriteInfo,
     folderInfo: String,
     isAvailableOffline: Boolean,
 ) = FavouriteFolder(
-    handle = favouriteInfo.id,
+    handle = id,
     icon = MegaNodeUtil.getFolderIcon(node,
         DrawerItem.HOMEPAGE),
-    name = favouriteInfo.name,
-    label = favouriteInfo.label,
-    size = favouriteInfo.size,
-    modificationTime = favouriteInfo.modificationTime,
-    labelColour = MegaNodeUtil.getNodeLabelColor(favouriteInfo.label),
-    showLabel = favouriteInfo.label != MegaNode.NODE_LBL_UNKNOWN,
+    name = name,
+    label = label,
+    labelColour = MegaNodeUtil.getNodeLabelColor(label),
+    showLabel = label != MegaNode.NODE_LBL_UNKNOWN,
     node = node,
-    hasVersion = favouriteInfo.hasVersion,
+    hasVersion = hasVersion,
     info = folderInfo,
-    isFavourite = favouriteInfo.isFavourite,
-    isExported = favouriteInfo.isExported,
-    isTakenDown = favouriteInfo.isTakenDown,
+    isFavourite = isFavourite,
+    isExported = isExported,
+    isTakenDown = isTakenDown,
     isAvailableOffline = isAvailableOffline
 )
 
 /**
  * Create favourite file based on favourite info
- * @param favouriteInfo FavouriteInfo
+ * @param node
  * @param fileInfo file info
  * @param isAvailableOffline whether is available for offline
  * @param getFileIcon getFileIcon
  * @return FavouriteFile
  */
-private fun createFile(
+private fun FileEntity.createFile(
     node: MegaNode,
-    favouriteInfo: FavouriteInfo,
     fileInfo: String,
     isAvailableOffline: Boolean,
     getFileIcon: (String) -> Int,
 ) = FavouriteFile(
-    handle = favouriteInfo.id,
-    icon = getFileIcon(favouriteInfo.name),
-    name = favouriteInfo.name,
-    label = favouriteInfo.label,
-    labelColour = MegaNodeUtil.getNodeLabelColor(favouriteInfo.label),
-    showLabel = favouriteInfo.label != MegaNode.NODE_LBL_UNKNOWN,
+    handle = id,
+    icon = getFileIcon(name),
+    name = name,
+    label = label,
+    labelColour = MegaNodeUtil.getNodeLabelColor(label),
+    showLabel = label != MegaNode.NODE_LBL_UNKNOWN,
     node = node,
-    hasVersion = favouriteInfo.hasVersion,
+    hasVersion = hasVersion,
     info = fileInfo,
-    size = favouriteInfo.size,
-    modificationTime = favouriteInfo.modificationTime,
-    isFavourite = favouriteInfo.isFavourite,
-    isExported = favouriteInfo.isExported,
-    isTakenDown = favouriteInfo.isTakenDown,
+    size = size,
+    modificationTime = modificationTime,
+    isFavourite = isFavourite,
+    isExported = isExported,
+    isTakenDown = isTakenDown,
     isAvailableOffline = isAvailableOffline,
-    thumbnailPath = favouriteInfo.thumbnailPath
+    thumbnailPath = thumbnailPath
 )
 
 /**
@@ -123,7 +122,7 @@ private fun createFile(
  * @param stringUtil StringUtilWrapper
  * @return file info
  */
-private fun getFileInfo(favouriteInfo: FavouriteInfo, stringUtil: StringUtilWrapper) =
+private fun getFileInfo(favouriteInfo: FileEntity, stringUtil: StringUtilWrapper) =
     String.format(
         "%s · %s",
         stringUtil.getSizeString(favouriteInfo.size),
@@ -136,5 +135,5 @@ private fun getFileInfo(favouriteInfo: FavouriteInfo, stringUtil: StringUtilWrap
  * @param stringUtil StringUtilWrapper
  * @return folder info
  */
-private fun getFolderInfo(favouriteInfo: FavouriteInfo, stringUtil: StringUtilWrapper) =
+private fun getFolderInfo(favouriteInfo: FolderEntity, stringUtil: StringUtilWrapper) =
     stringUtil.getFolderInfo(favouriteInfo.numChildFolders, favouriteInfo.numChildFiles)

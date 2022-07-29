@@ -299,8 +299,6 @@ class DefaultGetAlbumsTest {
             base64Id = "",
             modificationTime = lastModified,
             hasVersion = false,
-            numChildFolders = 0,
-            numChildFiles = 0,
             isFavourite = true,
             isExported = false,
             isTakenDown = false,

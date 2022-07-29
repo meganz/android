@@ -51,11 +51,9 @@ class DefaultFavouritesRepositoryTest {
     private val favouriteInfo = FavouriteFolder(
         id = 0,
         name = node.name,
-        size = node.size,
         label = node.label,
         parentId = 0,
         base64Id = "",
-        modificationTime = 0L,
         hasVersion = true,
         numChildFiles = 0,
         numChildFolders = 0,
@@ -184,11 +182,9 @@ class DefaultFavouritesRepositoryTest {
             val favouriteInfo = FavouriteFolder(
                 id = 0,
                 name = node.name,
-                size = node.size,
                 label = node.label,
                 parentId = 0,
                 base64Id = "",
-                modificationTime = 0L,
                 hasVersion = true,
                 numChildFiles = 0,
                 numChildFolders = 0,
