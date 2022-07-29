@@ -55,7 +55,9 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
 
     private lateinit var binding: ActivityVerifyTwoFactorBinding
 
-    private lateinit var onBackPressedCallback: OnBackPressedCallback
+    private var onBackPressedCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {}
+    }
 
     /**
      * @see KEY_VERIFY_TYPE
@@ -114,9 +116,6 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         binding = ActivityVerifyTwoFactorBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        onBackPressedCallback = object : OnBackPressedCallback(false) {
-            override fun handleOnBackPressed() {}
-        }
         onBackPressedDispatcher.addCallback(onBackPressedCallback)
 
         setSupportActionBar(binding.toolbar)
