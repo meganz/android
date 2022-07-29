@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.featureflag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.ApplicationScope
@@ -26,7 +27,7 @@ class ShakeDetectorViewModel @Inject constructor(
     /**
      * State to be absorbed by UI
      */
-    val state: MutableStateFlow<Boolean> = _state
+    val state = _state.asStateFlow()
 
     /**
      * function to register shake listener & catch shake event
@@ -34,7 +35,7 @@ class ShakeDetectorViewModel @Inject constructor(
     fun registerAndCatchShakeEvent() {
         coroutineScope.launch(ioDispatcher) {
             detectShake().collect {
-                state.update { true }
+                _state.value = true
                 vibrateDevice()
             }
         }

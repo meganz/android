@@ -48,18 +48,12 @@ class ShakeDetectorViewModelTest {
         runTest {
             underTest.state.test {
                 assertFalse(awaitItem())
+                scheduler.advanceUntilIdle()
+                assertTrue(awaitItem())
+
             }
-            verify(detectShake, times(1))
-            scheduler.advanceUntilIdle()
-            detectShake().collect {
-                underTest.state.apply {
-                    tryEmit(true)
-                    test {
-                        assertTrue(awaitItem())
-                    }
-                }
-                verify(vibrateDeVice, times(1))
-            }
+            verify(detectShake, times(1)).invoke()
+            verify(vibrateDeVice, times(1)).invoke()
         }
     }
 }
