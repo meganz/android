@@ -9833,7 +9833,9 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         }
 
-        onNodesSharedUpdate();
+        refreshOutgoingShares();
+        refreshIncomingShares();
+        refreshLinks();
 
         checkCameraUploadFolder(false, updatedNodes);
 
@@ -11143,7 +11145,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 refreshInboxList();
                 break;
             case SHARED_ITEMS:
-                onNodesSharedUpdate();
+                refreshOutgoingShares();
+                refreshIncomingShares();
+                refreshLinks();
                 break;
             case HOMEPAGE:
                 refreshOfflineNodes();
@@ -11358,7 +11362,7 @@ public class ManagerActivity extends TransfersManagementActivity
         Timber.d("The index of the TAB Shares is: %s", viewModel.getState().getValue().getSharesTab());
 
         if (viewPagerShares != null) {
-            viewPagerShares.setCurrentItem(viewModel.getState().getValue().getSharesTab().getPosition());
+            viewPagerShares.setCurrentItem(viewModel.getState().getValue().getSharesTab().getPosition(), false);
         }
 
         viewModel.setSharesTab(SharesTab.NONE);

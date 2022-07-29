@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Não foi detectado nenhum dispositivo de armazenamento externo</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Fazer logout</string>
+    <string name="action_logout">Fazer&#160;logout</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Upload</string>
     <!-- Menu item -->
@@ -131,7 +131,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Você tem certeza de que quer cancelar o login?</string>
     <!-- Login button -->
-    <string name="login_text">Fazer login</string>
+    <string name="login_text">Fazer&#160;login</string>
     <!-- email label -->
     <string name="email_text">Email</string>
     <!-- password label -->
@@ -172,8 +172,6 @@
     <string name="login_before_share">Faça login para compartilhar com o MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">O seu link de confirmação já não é válido. A sua conta pode já estar ativa, ou você pode ter cancelado o seu registro.</string>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Cadastre-se agora e obtenha 20&#160;GB de espaço gratuito</string>
     <!-- category in sort by action -->
     <string name="name_text">Nome</string>
     <!-- First Name of the user -->
@@ -4129,4 +4127,16 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s mudou a permissão de %1$s a predeterminado</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s mudou a permissão de %1$s a anfitrião</string>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">Esperando que as outras pessoas se conectem</string>
+    <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_favourites">[B]Não[/B] [B]há[/B] [A]favoritos[/A]</string>
+    <!--Action text to start a meeting from Meeting screen empty view-->
+    <string name="meetings_list_empty_action">Fazer uma reunião</string>
+    <!--Description text from Meeting screen empty view-->
+    <string name="meetings_list_empty_description">Converse com segurança e privacidade por meio de chamadas de áudio ou de vídeo com amigos e colegas do mundo inteiro.</string>
+    <!--Action text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_action">Comece já a usar o chat</string>
+    <!--Description text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_description">Converse com segurança e privacidade, com qualquer pessoa e em qualquer dispositivo, sabendo que ninguém pode ler os seus chats, nem mesmo o MEGA.</string>
 </resources>

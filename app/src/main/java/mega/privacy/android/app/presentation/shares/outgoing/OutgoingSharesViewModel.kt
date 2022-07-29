@@ -90,19 +90,29 @@ class OutgoingSharesViewModel @Inject constructor(
      */
     private fun setOutgoingTreeDepth(depth: Int, handle: Long) = viewModelScope.launch {
         _state.update {
+            it.copy(
+                isLoading = true,
+                outgoingTreeDepth = depth,
+                outgoingParentHandle = handle
+            )
+        }
+
+        _state.update {
             refreshNodes(handle)?.let { nodes ->
                 it.copy(
                     nodes = nodes,
                     outgoingTreeDepth = depth,
                     outgoingParentHandle = handle,
-                    isInvalidParentHandle = isInvalidParentHandle(handle)
+                    isInvalidParentHandle = isInvalidParentHandle(handle),
+                    isLoading = false
                 )
             } ?: run {
                 it.copy(
                     nodes = emptyList(),
                     outgoingTreeDepth = 0,
                     outgoingParentHandle = -1L,
-                    isInvalidParentHandle = true
+                    isInvalidParentHandle = true,
+                    isLoading = false
                 )
             }
         }
@@ -138,7 +148,7 @@ class OutgoingSharesViewModel @Inject constructor(
      * @param nodes the list of nodes to set
      */
     private fun setNodes(nodes: List<MegaNode>) {
-        _state.update { it.copy(nodes = nodes) }
+        _state.update { it.copy(nodes = nodes, isLoading = false) }
     }
 
     /**

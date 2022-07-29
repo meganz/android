@@ -168,8 +168,6 @@
     <string name="login_before_share">請先登入，以便使用MEGA共享功能</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">您的確認連結已無效。您的帳戶可能已啟用，或您可能已取消註冊</string>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">立即註冊即可獲得20&#160;GB免費儲存空間</string>
     <!-- category in sort by action -->
     <string name="name_text">名稱</string>
     <!-- First Name of the user -->
@@ -1711,7 +1709,7 @@
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">手機通訊錄</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">由於多次違反MEGA的服務條款，您的帳戶已被暫停使用。請至您的電子信箱收信以了解詳情。</string>
+    <string name="account_suspended_multiple_breaches_ToS">由於多次違反MEGA的服務條款，您的帳戶已被暫停使用。請至您的電子郵件收件匣收信以了解詳情。</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
     <string name="account_suspended_breache_ToS">您的帳戶因違反MEGA服務條款，包括但不限於第15條而被終止。</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -1804,7 +1802,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">開啟Android裝置[A]設定[/A]</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">開啟[A]應用程式和訊息通知[/A]</string>
+    <string name="turn_on_notifications_second_step">開啟[A]應用程式和通知[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">選擇[A]MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -2862,7 +2860,7 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">資料夾不存在。</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">在您的雲端硬碟中找不到此檔案。</string>
+    <string name="warning_node_not_exists_in_cloud">在您的雲端硬碟中未找到此檔案。</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">空間已滿</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -2942,7 +2940,7 @@
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">新的對話</string>
     <!-- Text that indicates that there’s no image to show in image section -->
-    <string name="homepage_empty_hint_photos">[B]沒有[/B][A]圖片[/A][B]被找到[/B]</string>
+    <string name="homepage_empty_hint_photos">[B]未[/B][B]找到[/B][A]圖片[/A]</string>
     <!-- Text that indicates that there’s no document to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_documents">[B]未[/B][B]找到[/B][A]文件[/A]</string>
     <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
@@ -2952,7 +2950,7 @@
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">搜尋GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
-    <string name="empty_search_giphy">找不到[A]GIFs[/A]</string>
+    <string name="empty_search_giphy">未找到[A]GIFs[/A]</string>
     <!-- Label indicating there is not available GIFs due to down server -->
     <string name="server_down_giphy">沒有可用的GIF圖案，請稍後再試</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
@@ -3866,7 +3864,7 @@
     <!-- Title of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_title_end_call_for_all">是否結束所有人的通話？</string>
     <!-- Description of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen. Allows to end call for all participants -->
-    <string name="meetings_chat_screen_dialog_description_end_call_for_all">這將結束所有與會者的通話。</string>
+    <string name="meetings_chat_screen_dialog_description_end_call_for_all">這將結束所有參與者的通話。</string>
     <!-- Positive button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">是</string>
     <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
@@ -3919,4 +3917,16 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s將%1$s的權限更改為標準角色</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s將%1$s的權限更改為主持人</string>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">正在等待其他人加入</string>
+    <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_favourites">[B]未[/B][B]找到[/B][A]收藏[/A]</string>
+    <!--Action text to start a meeting from Meeting screen empty view-->
+    <string name="meetings_list_empty_action">開始會議</string>
+    <!--Description text from Meeting screen empty view-->
+    <string name="meetings_list_empty_description">透過語音或視訊與全世界的朋友和同事們進行安全私密交談。</string>
+    <!--Action text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_action">開始對話</string>
+    <!--Description text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_description">在任何裝置上與任何人安全而私密的進行對話，沒有人可以讀取您們的對話記錄，即使是MEGA也不行。</string>
 </resources>

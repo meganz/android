@@ -9,12 +9,14 @@ import nz.mega.sdk.MegaNode
  * @param outgoingTreeDepth current outgoing tree depth
  * @param nodes current list of nodes
  * @param isInvalidParentHandle true if parent handle is invalid
+ * @param isLoading true if the nodes are loading
  */
 data class OutgoingSharesState(
     val outgoingParentHandle: Long = -1L,
     val outgoingTreeDepth: Int = 0,
     val nodes: List<MegaNode> = emptyList(),
-    val isInvalidParentHandle: Boolean = true
+    val isInvalidParentHandle: Boolean = true,
+    val isLoading: Boolean = false,
 ) {
 
     /**
