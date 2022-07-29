@@ -13,6 +13,7 @@ import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
+import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
@@ -87,6 +88,11 @@ object TestManagerUseCases {
 
     @Provides
     fun provideGetOutgoingSharesNode() = mock<GetOutgoingSharesChildrenNode> {
+        onBlocking { invoke(any()) }.thenReturn(emptyList())
+    }
+
+    @Provides
+    fun provideGetPublicLinks() = mock<GetPublicLinks> {
         onBlocking { invoke(any()) }.thenReturn(emptyList())
     }
 

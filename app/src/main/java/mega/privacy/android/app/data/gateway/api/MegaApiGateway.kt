@@ -176,6 +176,18 @@ interface MegaApiGateway {
     suspend fun getOutgoingSharesNode(order: Int?): List<MegaShare>
 
     /**
+     * Get a list with all public links
+     *
+     * Valid value for order are: MegaApi::ORDER_NONE, MegaApi::ORDER_DEFAULT_ASC,
+     * MegaApi::ORDER_DEFAULT_DESC, MegaApi::ORDER_LINK_CREATION_ASC,
+     * MegaApi::ORDER_LINK_CREATION_DESC
+     *
+     * @param order sort order, if null the default order is applied
+     * @return List of MegaNode corresponding of a public link
+     */
+    suspend fun getPublicLinks(order: Int?): List<MegaNode>
+
+    /**
      * Get child folder number of current folder
      * @param node current folder node
      * @return child folder number

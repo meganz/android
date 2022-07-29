@@ -1,12 +1,15 @@
 package test.mega.privacy.android.app.data.mapper
 
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.mapper.toFavourite
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
-import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.entity.FavouriteFile
+import mega.privacy.android.domain.entity.FavouriteFolder
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -48,20 +51,15 @@ class FavouriteMapperTest {
             on { isVideo() }.thenReturn(false)
         }
 
-        val favouriteInfo = FavouriteInfo(
+        val favouriteInfo = FavouriteFolder(
             id = expectedHandle,
             name = expectedName,
-            size = expectedSize,
             label = expectedLabel,
             parentId = expectedHandle,
             base64Id = "",
-            modificationTime = expectedModificationTime,
             hasVersion = expectedHasVersion,
             numChildFiles = 0,
             numChildFolders = 0,
-            isImage = false,
-            isVideo = false,
-            isFolder = true,
             isFavourite = expectedIsFavourite,
             isExported = expectedIsExported,
             isTakenDown = expectedIsTakenDown,
@@ -76,21 +74,27 @@ class FavouriteMapperTest {
 
         val actual = toFavourite(testNode, favouriteInfo, false, stringUtil)
 
-        assertThat(actual.handle).isEqualTo(expectedHandle)
-        assertThat(actual.name).isEqualTo(expectedName)
-        assertThat(actual.size).isEqualTo(expectedSize)
-        assertThat(actual.label).isEqualTo(expectedLabel)
-        assertThat(actual.modificationTime).isEqualTo(expectedModificationTime)
-        assertThat(actual.hasVersion).isEqualTo(expectedHasVersion)
-        assertThat(actual.showLabel).isEqualTo(expectedShowLabel)
-        assertThat(actual.info).isEqualTo(expectedInfo)
-        assertThat(actual.isAvailableOffline).isEqualTo(expectedIsAvailableOffline)
-        assertThat(actual.isExported).isEqualTo(expectedIsExported)
-        assertThat(actual.isFavourite).isEqualTo(expectedIsFavourite)
-        assertThat(actual.isTakenDown).isEqualTo(expectedIsTakenDown)
-        assertThat(actual.labelColour).isEqualTo(expectedLabelColour)
-        assertThat(actual.icon).isEqualTo(expectedIcon)
-        assertThat(actual.node).isSameInstanceAs(testNode)
+        assertWithMessage("Name not mapped correctly").that(actual.name).isEqualTo(expectedName)
+        assertWithMessage("Label not mapped correctly").that(actual.label).isEqualTo(expectedLabel)
+        assertWithMessage("HasVersion not mapped correctly").that(actual.hasVersion)
+            .isEqualTo(expectedHasVersion)
+        assertWithMessage("ShowLabel not mapped correctly").that(actual.showLabel)
+            .isEqualTo(expectedShowLabel)
+        assertWithMessage("Info not mapped correctly").that(actual.info).isEqualTo(expectedInfo)
+        assertWithMessage("IsAvailableOffline not mapped correctly").that(actual.isAvailableOffline)
+            .isEqualTo(expectedIsAvailableOffline)
+        assertWithMessage("IsExported not mapped correctly").that(actual.isExported)
+            .isEqualTo(expectedIsExported)
+        assertWithMessage("IsFavourite not mapped correctly").that(actual.isFavourite)
+            .isEqualTo(expectedIsFavourite)
+        assertWithMessage("IsTakenDown not mapped correctly").that(actual.isTakenDown)
+            .isEqualTo(expectedIsTakenDown)
+        assertWithMessage("LabelColour not mapped correctly").that(actual.labelColour)
+            .isEqualTo(expectedLabelColour)
+        assertWithMessage("Icon not mapped correctly").that(actual.icon).isEqualTo(expectedIcon)
+        assertWithMessage("Node not mapped correctly").that(actual.node).isSameInstanceAs(testNode)
+        assertWithMessage("Handle not mapped correctly").that(actual.handle)
+            .isEqualTo(expectedHandle)
     }
 
     @Test
@@ -126,7 +130,7 @@ class FavouriteMapperTest {
             on { isVideo() }.thenReturn(false)
         }
 
-        val favouriteInfo = FavouriteInfo(
+        val favouriteInfo = FavouriteFile(
             id = expectedHandle,
             name = expectedName,
             size = expectedSize,
@@ -135,14 +139,10 @@ class FavouriteMapperTest {
             base64Id = "",
             modificationTime = expectedModificationTime,
             hasVersion = expectedHasVersion,
-            numChildFiles = 0,
-            numChildFolders = 0,
-            isImage = false,
-            isVideo = false,
-            isFolder = false,
             isFavourite = expectedIsFavourite,
             isExported = expectedIsExported,
             isTakenDown = expectedIsTakenDown,
+            type = PdfFileTypeInfo
         )
 
 

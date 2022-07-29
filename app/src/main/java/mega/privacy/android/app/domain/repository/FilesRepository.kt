@@ -92,6 +92,18 @@ interface FilesRepository {
     suspend fun authorizeNode(handle: Long): MegaNode?
 
     /**
+     * Get a list with all public links
+     *
+     * Valid value for order are: MegaApi::ORDER_NONE, MegaApi::ORDER_DEFAULT_ASC,
+     * MegaApi::ORDER_DEFAULT_DESC, MegaApi::ORDER_LINK_CREATION_ASC,
+     * MegaApi::ORDER_LINK_CREATION_DESC
+     *
+     * @param order sort order, if null the default order is applied
+     * @return List of MegaNode corresponding of a public link
+     */
+    suspend fun getPublicLinks(order: Int?): List<MegaNode>?
+
+    /**
      * Get cloud sort order
      * @return cloud sort order
      */
@@ -108,6 +120,13 @@ interface FilesRepository {
      * @return others sort order
      */
     suspend fun getOthersSortOrder(): Int
+
+    /**
+     * Get links cloud sort order
+     * @return links cloud sort order
+     */
+    suspend fun getLinksSortOrder(): Int
+
 
     /**
      * Checks if Inbox node has children.

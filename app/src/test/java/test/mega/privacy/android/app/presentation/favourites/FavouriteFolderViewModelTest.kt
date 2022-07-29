@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.presentation.favourites
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -16,8 +17,8 @@ import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.domain.entity.FavouriteFolder
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.FavouriteInfo
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import nz.mega.sdk.MegaNode
 import org.junit.After
@@ -37,14 +38,41 @@ class FavouriteFolderViewModelTest {
     private val stringUtilWrapper = mock<StringUtilWrapper>()
     private val favouriteMapper = mock<FavouriteMapper>()
 
-    private val megaNode = mock<MegaNode>()
+    private val megaNode: MegaNode = mock {
+        on { handle }.thenReturn(123)
+        on { label }.thenReturn(MegaNode.NODE_LBL_RED)
+        on { size }.thenReturn(1000L)
+        on { parentHandle }.thenReturn(1234)
+        on { base64Handle }.thenReturn("base64Handle")
+        on { modificationTime }.thenReturn(1234567890)
+        on { isFolder }.thenReturn(true)
+        on { isInShare }.thenReturn(true)
+        on { name }.thenReturn("testName.txt")
+    }
 
     private val fetchNodeWrapper = mock<FetchNodeWrapper> {
-        onBlocking { invoke(any()) }.thenReturn(
-            megaNode)
+        onBlocking { invoke(any()) }.thenReturn(megaNode)
     }
 
     private val megaUtilWrapper = mock<MegaUtilWrapper>()
+
+    private val favourite = FavouriteFolder(
+        id = megaNode.handle,
+        name = megaNode.name,
+        label = megaNode.label,
+        parentId = megaNode.parentHandle,
+        base64Id = megaNode.base64Handle,
+        hasVersion = false,
+        numChildFolders = 0,
+        numChildFiles = 0,
+        isFavourite = true,
+        isExported = false,
+        isTakenDown = false,
+    )
+
+    private val list = listOf(favourite)
+    private val rootHandle: Long = -1
+    private val currentHandle: Long = 1
 
     @Before
     fun setUp() {
@@ -85,54 +113,54 @@ class FavouriteFolderViewModelTest {
     }
 
     @Test
-    fun `test that start with loading state and children nodes is not empty`() = runTest {
-        val node = megaNode
-        whenever(node.handle).thenReturn(123)
-        whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
-        whenever(node.size).thenReturn(1000L)
-        whenever(node.parentHandle).thenReturn(1234)
-        whenever(node.base64Handle).thenReturn("base64Handle")
-        whenever(node.modificationTime).thenReturn(1234567890)
-        whenever(node.isFolder).thenReturn(true)
-        whenever(node.isInShare).thenReturn(true)
-        whenever(node.name).thenReturn("testName.txt")
-        val favourite = FavouriteInfo(
-            id = node.handle,
-            name = node.name,
-            label = node.label,
-            size = node.size,
-            parentId = node.parentHandle,
-            base64Id = node.base64Handle,
-            modificationTime = node.modificationTime,
-            hasVersion = false,
-            numChildFolders = 0,
-            numChildFiles = 0,
-            isImage = false,
-            isVideo = false,
-            isFolder = true,
-            isFavourite = true,
-            isExported = false,
-            isTakenDown = false,
-        )
-        val list = listOf(favourite)
-        whenever(stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
-        whenever(getFavouriteFolderInfo(-1)).thenReturn(
-            flowOf(
-                FavouriteFolderInfo(
-                    list,
-                    "testName",
-                    1,
-                    1
+    fun `test that start with loading state, children nodes is not empty and back pressed callback is not enable`() =
+        runTest {
+            whenever(stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
+            whenever(getFavouriteFolderInfo(rootHandle)).thenReturn(
+                flowOf(
+                    FavouriteFolderInfo(
+                        list,
+                        "testName",
+                        rootHandle,
+                        1
+                    )
                 )
             )
-        )
-        whenever(favouriteMapper(any(), any(), any(), any(), any())).thenReturn(mock())
-        whenever(fetchNodeWrapper(anyOrNull())).thenReturn(node)
-        whenever(megaUtilWrapper.availableOffline(anyOrNull(),
-            anyOrNull())).thenReturn(true)
-        underTest.childrenNodesState.test {
-            assertTrue(awaitItem() is ChildrenNodesLoadState.Loading)
-            assertTrue(awaitItem() is ChildrenNodesLoadState.Success)
+            whenever(favouriteMapper(any(), any(), any(), any(), any())).thenReturn(mock())
+            whenever(fetchNodeWrapper(anyOrNull())).thenReturn(megaNode)
+            whenever(megaUtilWrapper.availableOffline(anyOrNull(),
+                anyOrNull())).thenReturn(true)
+            underTest.childrenNodesState.test {
+                assertTrue(awaitItem() is ChildrenNodesLoadState.Loading)
+                val actual = awaitItem()
+                assertTrue(actual is ChildrenNodesLoadState.Success)
+                assertThat(actual.isBackPressedEnable).isFalse()
+            }
         }
-    }
+
+    @Test
+    fun `test that start with loading state, children nodes is not empty and back pressed callback is enable`() =
+        runTest {
+            whenever(stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
+            whenever(getFavouriteFolderInfo(rootHandle)).thenReturn(
+                flowOf(
+                    FavouriteFolderInfo(
+                        list,
+                        "testName",
+                        currentHandle,
+                        1
+                    )
+                )
+            )
+            whenever(favouriteMapper(any(), any(), any(), any(), any())).thenReturn(mock())
+            whenever(fetchNodeWrapper(anyOrNull())).thenReturn(megaNode)
+            whenever(megaUtilWrapper.availableOffline(anyOrNull(),
+                anyOrNull())).thenReturn(true)
+            underTest.childrenNodesState.test {
+                assertTrue(awaitItem() is ChildrenNodesLoadState.Loading)
+                val actual = awaitItem()
+                assertTrue(actual is ChildrenNodesLoadState.Success)
+                assertThat(actual.isBackPressedEnable).isTrue()
+            }
+        }
 }

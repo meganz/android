@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.mapper.ChatRequestMapper
 import mega.privacy.android.app.data.mapper.ContactRequestMapper
 import mega.privacy.android.app.data.mapper.DataMapper
+import mega.privacy.android.app.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.app.data.mapper.FeatureFlagMapper
 import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
@@ -21,6 +22,7 @@ import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.app.data.mapper.toChatRequest
 import mega.privacy.android.app.data.mapper.toContactRequest
 import mega.privacy.android.app.data.mapper.toData
+import mega.privacy.android.app.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.app.data.mapper.toFavouriteInfo
 import mega.privacy.android.app.data.mapper.toFeatureFlag
 import mega.privacy.android.app.data.mapper.toPushMessage
@@ -73,4 +75,7 @@ class MapperModule {
     fun provideFileTypeInfoMapper(mimeTypeMapper: MimeTypeMapper): FileTypeInfoMapper = { node ->
         getFileTypeInfo(node, mimeTypeMapper)
     }
+
+    @Provides
+    fun provideFavouriteFolderInfoMapper(): FavouriteFolderInfoMapper = ::toFavouriteFolderInfo
 }

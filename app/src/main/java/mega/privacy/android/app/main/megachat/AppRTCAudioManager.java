@@ -826,7 +826,9 @@ public class AppRTCAudioManager {
      */
     @Deprecated
     private boolean hasWiredHeadset() {
-        final AudioDeviceInfo[] devices = audioManager.getDevices(AudioManager.GET_DEVICES_ALL);
+        final AudioDeviceInfo[] devices = audioManager.getDevices(
+                AudioManager.GET_DEVICES_INPUTS | AudioManager.GET_DEVICES_OUTPUTS);
+
         for (AudioDeviceInfo device : devices) {
             final int type = device.getType();
             if (type == AudioDeviceInfo.TYPE_WIRED_HEADSET) {

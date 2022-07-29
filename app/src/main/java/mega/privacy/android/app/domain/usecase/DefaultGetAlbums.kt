@@ -4,7 +4,10 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.Album
+import mega.privacy.android.domain.entity.FavouriteFile
 import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.repository.AlbumsRepository
 import mega.privacy.android.domain.usecase.GetAlbums
 import mega.privacy.android.domain.usecase.GetAllFavorites
@@ -47,8 +50,9 @@ class DefaultGetAlbums @Inject constructor(
      * Filter favourites albums
      */
     private suspend fun getFavouriteAlbum(favInfoList: List<FavouriteInfo>?): Album.FavouriteAlbum {
-        val favouriteList = favInfoList?.filter { favItem ->
-            favItem.isImage || (favItem.isVideo && inSyncFolder(favItem.parentId))
+        val favouriteList = favInfoList?.filterIsInstance<FavouriteFile>()?.filter { favItem ->
+            favItem.type is ImageFileTypeInfo || (favItem.type is VideoFileTypeInfo && inSyncFolder(
+                favItem.parentId))
         }
         return Album.FavouriteAlbum(
             thumbnail = getThumbnailOrNull(favouriteList),
@@ -59,7 +63,7 @@ class DefaultGetAlbums @Inject constructor(
     /**
      * Get thumbnail,return null when there is an exception
      */
-    private suspend fun getThumbnailOrNull(favouriteList: List<FavouriteInfo>?): File? {
+    private suspend fun getThumbnailOrNull(favouriteList: List<FavouriteFile>?): File? {
         return favouriteList?.maxByOrNull { favItem ->
             favItem.modificationTime
         }?.let {

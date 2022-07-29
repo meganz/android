@@ -10,6 +10,7 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.*
@@ -38,7 +39,7 @@ class GetNodeUseCase @Inject constructor(
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val getChatMessageUseCase: GetChatMessageUseCase,
-    private val databaseHandler: DatabaseHandler
+    private val databaseHandler: DatabaseHandler,
 ) {
 
     /**
@@ -111,10 +112,12 @@ class GetNodeUseCase @Inject constructor(
                 }
             }
 
-            val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
+            val isAvailableOffline =
+                isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
             val hasVersions = megaApi.hasVersions(node)
 
-            val isMine = hasOwnerAccess || (node.owner != INVALID_HANDLE && node.owner == megaApi.myUserHandleBinary)
+            val isMine =
+                hasOwnerAccess || (node.owner != INVALID_HANDLE && node.owner == megaApi.myUserHandleBinary)
             val isExternalNode = !isMine && (node.isPublic || node.isForeign)
             val rootParentNode = megaApi.getRootParentNode(node)
             val isFromIncoming = rootParentNode.isInShare
@@ -273,7 +276,8 @@ class GetNodeUseCase @Inject constructor(
                 val offlineFile = OfflineUtils.getOfflineFile(context, offlineNode)
                 val isFileAvailable = FileUtil.isFileAvailable(offlineFile)
                 val isFileDownloadedLatest = nodeHandle.getMegaNode()?.let { node ->
-                    FileUtil.isFileDownloadedLatest(offlineFile, node) && offlineFile.length() == node.size
+                    FileUtil.isFileDownloadedLatest(offlineFile,
+                        node) && offlineFile.length() == node.size
                 } ?: false
                 return@fromCallable isFileAvailable && isFileDownloadedLatest
             }
@@ -296,7 +300,7 @@ class GetNodeUseCase @Inject constructor(
         setOffline: Boolean,
         isFromIncomingShares: Boolean = false,
         isFromInbox: Boolean = false,
-        activity: Activity
+        activity: Activity,
     ): Completable =
         get(nodeHandle).flatMapCompletable {
             setNodeAvailableOffline(
@@ -323,11 +327,12 @@ class GetNodeUseCase @Inject constructor(
         setOffline: Boolean,
         isFromIncomingShares: Boolean = false,
         isFromInbox: Boolean = false,
-        activity: Activity
+        activity: Activity,
     ): Completable =
         Completable.fromCallable {
             requireNotNull(node)
-            val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
+            val isAvailableOffline =
+                isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
             when {
                 setOffline && !isAvailableOffline -> {
                     val from = when {
@@ -336,7 +341,8 @@ class GetNodeUseCase @Inject constructor(
                         else -> Constants.FROM_OTHERS
                     }
 
-                    val offlineParent = OfflineUtils.getOfflineParentFile(activity, from, node, megaApi)
+                    val offlineParent =
+                        OfflineUtils.getOfflineParentFile(activity, from, node, megaApi)
                     if (FileUtil.isFileAvailable(offlineParent)) {
                         val offlineFile = File(offlineParent, node.name)
                         if (FileUtil.isFileAvailable(offlineFile)) {
@@ -375,4 +381,44 @@ class GetNodeUseCase @Inject constructor(
     private fun Long.getMegaNode(): MegaNode? =
         megaApi.getNodeByHandle(this)
             ?: megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(this))
+
+    /**
+     * Check if a node is available
+     *
+     * @param nodeHandle  node handle
+     * @return  True, if it is available. False, otherwise.
+     */
+    fun checkNodeAvailable(nodeHandle: Long): Single<Boolean> =
+        Single.fromCallable {
+            get(nodeHandle).blockingGetOrNull() != null
+        }
+
+
+    /**
+     * Check if several MegaNodes are available
+     *
+     * @param androidMegaChatMessages List of mega chat messages
+     * @return  True, if all nodes are available. False, otherwise.
+     */
+    fun checkNodesAvailable(androidMegaChatMessages: List<AndroidMegaChatMessage>): Single<Boolean> =
+        Single.fromCallable {
+            androidMegaChatMessages.forEach { chatMessage ->
+                chatMessage.message?.let { message ->
+                    if (message.type == MegaChatMessage.TYPE_NODE_ATTACHMENT
+                        && message.userHandle == megaChatApi.myUserHandle
+                        && (message.megaNodeList?.size() ?: 0) > 0
+                    ) {
+                        message.megaNodeList.get(0)?.let { node ->
+                            checkNodeAvailable(node.handle).blockingGet().let { isAvailable ->
+                                if (!isAvailable) {
+                                    return@fromCallable false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return@fromCallable true
+        }
 }
