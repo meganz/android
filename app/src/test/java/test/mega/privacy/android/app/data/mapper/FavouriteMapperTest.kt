@@ -54,11 +54,9 @@ class FavouriteMapperTest {
         val favouriteInfo = FavouriteFolder(
             id = expectedHandle,
             name = expectedName,
-            size = expectedSize,
             label = expectedLabel,
             parentId = expectedHandle,
             base64Id = "",
-            modificationTime = expectedModificationTime,
             hasVersion = expectedHasVersion,
             numChildFiles = 0,
             numChildFolders = 0,
@@ -77,20 +75,26 @@ class FavouriteMapperTest {
         val actual = toFavourite(testNode, favouriteInfo, false, stringUtil)
 
         assertWithMessage("Name not mapped correctly").that(actual.name).isEqualTo(expectedName)
-        assertWithMessage("Size not mapped correctly").that(actual.size).isEqualTo(expectedSize)
         assertWithMessage("Label not mapped correctly").that(actual.label).isEqualTo(expectedLabel)
-        assertWithMessage("ModificationTime not mapped correctly").that(actual.modificationTime).isEqualTo(expectedModificationTime)
-        assertWithMessage("HasVersion not mapped correctly").that(actual.hasVersion).isEqualTo(expectedHasVersion)
-        assertWithMessage("ShowLabel not mapped correctly").that(actual.showLabel).isEqualTo(expectedShowLabel)
+        assertWithMessage("HasVersion not mapped correctly").that(actual.hasVersion)
+            .isEqualTo(expectedHasVersion)
+        assertWithMessage("ShowLabel not mapped correctly").that(actual.showLabel)
+            .isEqualTo(expectedShowLabel)
         assertWithMessage("Info not mapped correctly").that(actual.info).isEqualTo(expectedInfo)
-        assertWithMessage("IsAvailableOffline not mapped correctly").that(actual.isAvailableOffline).isEqualTo(expectedIsAvailableOffline)
-        assertWithMessage("IsExported not mapped correctly").that(actual.isExported).isEqualTo(expectedIsExported)
-        assertWithMessage("IsFavourite not mapped correctly").that(actual.isFavourite).isEqualTo(expectedIsFavourite)
-        assertWithMessage("IsTakenDown not mapped correctly").that(actual.isTakenDown).isEqualTo(expectedIsTakenDown)
-        assertWithMessage("LabelColour not mapped correctly").that(actual.labelColour).isEqualTo(expectedLabelColour)
+        assertWithMessage("IsAvailableOffline not mapped correctly").that(actual.isAvailableOffline)
+            .isEqualTo(expectedIsAvailableOffline)
+        assertWithMessage("IsExported not mapped correctly").that(actual.isExported)
+            .isEqualTo(expectedIsExported)
+        assertWithMessage("IsFavourite not mapped correctly").that(actual.isFavourite)
+            .isEqualTo(expectedIsFavourite)
+        assertWithMessage("IsTakenDown not mapped correctly").that(actual.isTakenDown)
+            .isEqualTo(expectedIsTakenDown)
+        assertWithMessage("LabelColour not mapped correctly").that(actual.labelColour)
+            .isEqualTo(expectedLabelColour)
         assertWithMessage("Icon not mapped correctly").that(actual.icon).isEqualTo(expectedIcon)
         assertWithMessage("Node not mapped correctly").that(actual.node).isSameInstanceAs(testNode)
-        assertWithMessage("Handle not mapped correctly").that(actual.handle).isEqualTo(expectedHandle)
+        assertWithMessage("Handle not mapped correctly").that(actual.handle)
+            .isEqualTo(expectedHandle)
     }
 
     @Test
@@ -135,8 +139,6 @@ class FavouriteMapperTest {
             base64Id = "",
             modificationTime = expectedModificationTime,
             hasVersion = expectedHasVersion,
-            numChildFiles = 0,
-            numChildFolders = 0,
             isFavourite = expectedIsFavourite,
             isExported = expectedIsExported,
             isTakenDown = expectedIsTakenDown,

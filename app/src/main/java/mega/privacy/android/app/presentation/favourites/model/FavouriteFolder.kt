@@ -21,10 +21,12 @@ data class FavouriteFolder(
     override val isTakenDown: Boolean,
     override val isAvailableOffline: Boolean,
     override val isSelected: Boolean = false,
-    override val size: Long,
     override val label: Int,
-    override val modificationTime: Long
 ) : Favourite {
     override val isFolder = true
+    override val size: Long
+        get() = 0L
+    override val modificationTime: Long
+        get() = 0L
     override val thumbnailPath: String? = null
 }

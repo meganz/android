@@ -136,11 +136,9 @@ class FavouritesFragmentTest {
         val favouriteInfo = mega.privacy.android.domain.entity.FavouriteFolder(
             id = 123,
             name = node.name,
-            size = node.size,
             label = node.label,
             parentId = 1234,
             base64Id = "base64Handle",
-            modificationTime = 1234567890,
             hasVersion = false,
             numChildFolders = 0,
             numChildFiles = 0,
