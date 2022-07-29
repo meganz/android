@@ -3921,4 +3921,12 @@
     <string name="calls_call_screen_waiting_for_participants">Menunggu yang lain untuk bergabung</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]Tidak ada[/B] [A]favorit[/A] [B]ditemukan[/B]</string>
+    <!--Action text to start a meeting from Meeting screen empty view-->
+    <string name="meetings_list_empty_action">Mulai rapat</string>
+    <!--Description text from Meeting screen empty view-->
+    <string name="meetings_list_empty_description">Bicaralah dengan aman dan pribadi di panggilan audio atau video dengan teman dan kolega di seluruh dunia.</string>
+    <!--Action text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_action">Mulai mengobrol sekarang</string>
+    <!--Description text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_description">Ngobrol dengan aman dan pribadi, dengan siapa saja dan di perangkat apa pun, mengetahui bahwa tidak ada yang bisa membaca obrolan anda, bahkan MEGA.</string>
 </resources>

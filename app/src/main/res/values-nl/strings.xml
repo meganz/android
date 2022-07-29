@@ -4026,4 +4026,12 @@
     <string name="calls_call_screen_waiting_for_participants">Wachten voor andere om aan te sluiten</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]Geen[/B] [A]favorieten[/A] [B]gevonden[/B]</string>
+    <!--Action text to start a meeting from Meeting screen empty view-->
+    <string name="meetings_list_empty_action">Begin vergadering</string>
+    <!--Description text from Meeting screen empty view-->
+    <string name="meetings_list_empty_description">Praat veilig en privé tijdens audio- of videogesprekken met vrienden en collega\’s over de hele wereld.</string>
+    <!--Action text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_action">Begin nu met chatten</string>
+    <!--Description text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_description">Chat veilig en privé, met iedereen en op elk apparaat, wetende dat niemand uw chats kan lezen, zelfs MEGA niet.</string>
 </resources>

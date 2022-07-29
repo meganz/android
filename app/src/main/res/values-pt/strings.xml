@@ -4131,4 +4131,12 @@
     <string name="calls_call_screen_waiting_for_participants">Esperando que as outras pessoas se conectem</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]Não[/B] [B]há[/B] [A]favoritos[/A]</string>
+    <!--Action text to start a meeting from Meeting screen empty view-->
+    <string name="meetings_list_empty_action">Fazer uma reunião</string>
+    <!--Description text from Meeting screen empty view-->
+    <string name="meetings_list_empty_description">Converse com segurança e privacidade por meio de chamadas de áudio ou de vídeo com amigos e colegas do mundo inteiro.</string>
+    <!--Action text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_action">Comece já a usar o chat</string>
+    <!--Description text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_description">Converse com segurança e privacidade, com qualquer pessoa e em qualquer dispositivo, sabendo que ninguém pode ler os seus chats, nem mesmo o MEGA.</string>
 </resources>

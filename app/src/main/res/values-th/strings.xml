@@ -3921,4 +3921,12 @@
     <string name="calls_call_screen_waiting_for_participants">กำลังรอให้คนอื่นเข้าร่วม</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]ไม่[/B][B]พบ[/B][A]รายการโปรด[/A]</string>
+    <!--Action text to start a meeting from Meeting screen empty view-->
+    <string name="meetings_list_empty_action">เริ่มการประชุม</string>
+    <!--Description text from Meeting screen empty view-->
+    <string name="meetings_list_empty_description">โทรด้วยเสียงหรือวิดีโอที่ปลอดภัยและเป็นส่วนตัวกับเพื่อนและเพื่อนร่วมงานทั่วโลก</string>
+    <!--Action text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_action">เริ่มแชทได้เลย</string>
+    <!--Description text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_description">คุณสามารถแชทได้อย่างปลอดภัยและเป็นส่วนตัวกับทุกคนบนอุปกรณ์ใดก็ได้ มั่นใจได้ว่าไม่มีใครแม้แต่ MEGA ก็ไม่สามารถอ่านแชทของคุณได้</string>
 </resources>

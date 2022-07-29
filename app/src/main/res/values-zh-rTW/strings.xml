@@ -3921,4 +3921,12 @@
     <string name="calls_call_screen_waiting_for_participants">正在等待其他人加入</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]未[/B][B]找到[/B][A]收藏[/A]</string>
+    <!--Action text to start a meeting from Meeting screen empty view-->
+    <string name="meetings_list_empty_action">開始會議</string>
+    <!--Description text from Meeting screen empty view-->
+    <string name="meetings_list_empty_description">透過語音或視訊與全世界的朋友和同事們進行安全私密交談。</string>
+    <!--Action text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_action">開始對話</string>
+    <!--Description text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_description">在任何裝置上與任何人安全而私密的進行對話，沒有人可以讀取您們的對話記錄，即使是MEGA也不行。</string>
 </resources>
