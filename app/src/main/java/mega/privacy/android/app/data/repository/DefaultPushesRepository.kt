@@ -74,11 +74,10 @@ class DefaultPushesRepository @Inject constructor(
             .apply()
     }
 
-    override suspend fun pushReceived(beep: Boolean, chatId: String?): ChatRequest =
+    override suspend fun pushReceived(beep: Boolean): ChatRequest =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 megaChatApi.pushReceived(beep,
-                    if (chatId != null) megaApi.base64ToHandle(chatId) else CHAT_INVALID_HANDLE,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = onRequestPushReceivedCompleted(continuation)
                     )

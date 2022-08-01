@@ -103,7 +103,7 @@ class PushMessageWorker @AssistedInject constructor(
             Timber.d("PushMessage.type: ${pushMessage.type}")
 
             if (pushMessage.type == TYPE_CHAT) {
-                kotlin.runCatching { pushReceived(pushMessage.shouldBeep(), pushMessage.chatId) }
+                kotlin.runCatching { pushReceived(pushMessage.shouldBeep()) }
                     .fold(
                         { request ->
                             ChatAdvancedNotificationBuilder.newInstance(applicationContext)
