@@ -15,9 +15,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.DatabaseHandler
@@ -192,14 +189,6 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Flow that monitors global node updates
-     */
-    var updateNodes: Flow<List<MegaNode>> =
-        monitorNodeUpdates()
-            .also { Timber.d("onNodesUpdate()") }
-            .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-
     fun List<GalleryCard>.sortDescending() = sortedWith(
         compareByDescending<GalleryCard> { it.localDate }
             .thenByDescending { it.name }
@@ -221,6 +210,13 @@ class TimelineViewModel @Inject constructor(
         LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
             .observeForever(nodesChangeObserver)
         loadPhotos(true)
+
+        viewModelScope.launch {
+            // Whenever the app detects MegaNode updates, load the photos
+            monitorNodeUpdates().collect {
+                loadPhotos(true)
+            }
+        }
     }
 
 

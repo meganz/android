@@ -498,15 +498,6 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
                 hideCUProgress()
             }
         }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                // Whenever the app detects MegaNode updates, load the photos
-                viewModel.updateNodes.collect {
-                    viewModel.loadPhotos(true)
-                }
-            }
-        }
     }
 
     /**
