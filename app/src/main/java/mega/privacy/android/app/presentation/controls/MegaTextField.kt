@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.controls
 
 import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -16,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.theme.AndroidTheme
-import mega.privacy.android.domain.entity.ThemeMode
 
 @Composable
 fun MegaTextField(
@@ -56,7 +56,7 @@ private fun PreviewTextField() {
     var content by remember {
         mutableStateOf("")
     }
-    AndroidTheme(mode = ThemeMode.System) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         MegaTextField(
             label = "This is the label",
             description = content,

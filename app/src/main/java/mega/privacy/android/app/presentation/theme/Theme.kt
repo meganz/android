@@ -1,18 +1,15 @@
 package mega.privacy.android.app.presentation.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import mega.privacy.android.domain.entity.ThemeMode
 
 
 @Composable
 fun AndroidTheme(
-    mode: ThemeMode,
+    isDark: Boolean,
     content: @Composable () -> Unit,
 ) {
-    val darkTheme: Boolean = isAppDarkTheme(mode)
-    val colors = if (darkTheme) {
+    val colors = if (isDark) {
         DarkColorPalette
     } else {
         LightColorPalette
@@ -26,10 +23,5 @@ fun AndroidTheme(
     )
 }
 
-@Composable
-fun isAppDarkTheme(mode: ThemeMode) = when (mode) {
-    ThemeMode.Light -> false
-    ThemeMode.Dark -> true
-    ThemeMode.System -> isSystemInDarkTheme()
-}
+
 
