@@ -3,6 +3,7 @@ package mega.privacy.android.app;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES;
+import static mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_MS_FILE_AND_OPEN;
 import static mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER;
 import static mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER_OPEN;
 import static mega.privacy.android.app.constants.BroadcastConstants.NODE_HANDLE;
@@ -663,7 +664,15 @@ public class DownloadService extends Service implements MegaRequestListenerInter
             Timber.d("onQueueComplete: reset total downloads");
             // When download a single file by tapping it, and auto play is enabled.
             int totalDownloads = megaApi.getTotalDownloads() - backgroundTransfers.size();
-            if (totalDownloads == 1 && Boolean.parseBoolean(dbH.getAutoPlayEnabled()) && autoPlayInfo != null && downloadByTap) {
+            if (totalDownloads == 1 && autoPlayInfo != null && isMSFile(autoPlayInfo.getNodeName()) && downloadByTap) {
+                // If the file is Microsoft file, send the corresponding broadcast
+                sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
+                        .putExtra(TRANSFER_TYPE, DOWNLOAD_MS_FILE_AND_OPEN)
+                        .putExtra(NODE_NAME, autoPlayInfo.getNodeName())
+                        .putExtra(NODE_HANDLE, autoPlayInfo.getNodeHandle())
+                        .putExtra(NUMBER_FILES, 1)
+                        .putExtra(NODE_LOCAL_PATH, autoPlayInfo.getLocalPath()));
+            } else if (totalDownloads == 1 && Boolean.parseBoolean(dbH.getAutoPlayEnabled()) && autoPlayInfo != null && downloadByTap) {
                 sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
                         .putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER_OPEN)
                         .putExtra(NODE_NAME, autoPlayInfo.getNodeName())
@@ -687,6 +696,35 @@ public class DownloadService extends Service implements MegaRequestListenerInter
             errorCount = 0;
             alreadyDownloaded = 0;
         }
+    }
+
+    private final String[] wordFileExtensions = new String[]{"doc", "docx", "docm", "dot", "dotx"};
+    private final String[] pptFileExtensions = new String[]{"ppt", "pptx", "pot", "potm", "potx", "ppam", "pps", "ppsm", "ppsx", "pptm"};
+    private final String[] excelFileExtensions = new String[]{"xls", "xlsx", "xla", "xlam", "xll", "xlm", "xlsm", "xlt", "xltm", "xltx"};
+
+    private boolean isMSFile(String fileName) {
+        return isWordFile(fileName) || isExcelFile(fileName) || isPowerPointFile(fileName);
+    }
+
+    private boolean isWordFile(String fileName) {
+       return endsWithExtension(fileName, wordFileExtensions);
+    }
+
+    private boolean isExcelFile(String fileName) {
+        return endsWithExtension(fileName, excelFileExtensions);
+    }
+
+    private boolean isPowerPointFile(String fileName) {
+        return endsWithExtension(fileName, pptFileExtensions);
+    }
+
+    private boolean endsWithExtension(String fileName, String[] extensions) {
+        for (String extension : extensions) {
+            if (fileName.substring(fileName.lastIndexOf(".")).endsWith(extension)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void sendTakenDownAlert() {
@@ -802,7 +840,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
         } else {
             try {
                 boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
-                if (openFile && autoPlayEnabled) {
+                if (isMSFile(currentDocument.getName()) || (openFile && autoPlayEnabled)) {
                     String fileLocalPath;
                     String path = getLocalFile(megaApi.getNodeByHandle(handle));
                     if (path != null) {
