@@ -80,7 +80,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     override fun refresh() {}
 
     override fun itemClick(position: Int) {
-        val actualPosition = position - adapter.placeholderCount
+        val actualPosition = position - 1
 
         when {
             // select mode
@@ -216,6 +216,14 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
                     Timber.d("Collect ui state")
+
+                    // If the nodes are loading, don't display the UI
+                    if (it.isLoading) {
+                        recyclerView.visibility = View.GONE
+                        hideTabs(true)
+                        return@collect
+                    }
+
                     updateNodes(it.nodes)
                     hideTabs(!it.isFirstNavigationLevel())
 

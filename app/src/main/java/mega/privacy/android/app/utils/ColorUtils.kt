@@ -65,7 +65,7 @@ object ColorUtils {
     private fun doSetEditTextUnderlineColor(
         editText: EditText,
         reset: Boolean,
-        color: Int
+        color: Int,
     ) {
         var editTextBackground = editText.background ?: return
         if (DrawableUtils.canSafelyMutateDrawable(editTextBackground)) {
@@ -121,7 +121,7 @@ object ColorUtils {
     fun getShapeDrawableForElevation(
         context: Context,
         elevation: Float = 0f,
-        cornerSize: Float = 0f
+        cornerSize: Float = 0f,
     ): MaterialShapeDrawable {
         val colorInt = getColorForElevation(context, elevation)
         val shapeAppearanceModel = ShapeAppearanceModel.builder().setTopLeftCornerSize(cornerSize)
@@ -183,10 +183,12 @@ object ColorUtils {
             } else {
                 when {
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
-                        decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                        decor.systemUiVisibility =
+                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
                     }
                     else -> {
-                        decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or 0x00000010
+                        decor.systemUiVisibility =
+                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or 0x00000010
                     }
                 }
             }
@@ -200,7 +202,7 @@ object ColorUtils {
     fun setImageViewAlphaIfDark(
         context: Context,
         imageView: ImageView,
-        alpha: Float = DARK_IMAGE_ALPHA
+        alpha: Float = DARK_IMAGE_ALPHA,
     ) {
         if (!Util.isDarkMode(context) || alpha < 0f || alpha > 1f) return
         imageView.imageAlpha = (255 * alpha).roundToInt()
@@ -243,7 +245,10 @@ object ColorUtils {
             val toolbarElevationColor = getColorForElevation(activity, elevation)
             RunOnUIThreadUtils.post { activity.window.statusBarColor = toolbarElevationColor }
         } else {
-            RunOnUIThreadUtils.post { activity.window.statusBarColor = android.R.color.transparent }
+            RunOnUIThreadUtils.post {
+                activity.window.statusBarColor =
+                    activity.resources.getColor(android.R.color.transparent, null)
+            }
         }
     }
 
@@ -255,6 +260,8 @@ object ColorUtils {
      */
     @JvmStatic
     fun changeStatusBarColor(activity: Activity, resId: Int) {
-        RunOnUIThreadUtils.post { activity.window.statusBarColor = ContextCompat.getColor(activity, resId) }
+        RunOnUIThreadUtils.post {
+            activity.window.statusBarColor = ContextCompat.getColor(activity, resId)
+        }
     }
 }

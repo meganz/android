@@ -6,6 +6,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_AC
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR;
+import static mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_MS_FILE_AND_OPEN;
 import static mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER;
 import static mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER_OPEN;
 import static mega.privacy.android.app.constants.BroadcastConstants.EVENT_NUMBER;
@@ -642,6 +643,16 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                             true
                     );
                     showSnackbar(OPEN_FILE_SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE);
+                    break;
+                case DOWNLOAD_MS_FILE_AND_OPEN:
+                    //If the file is Microsoft file, open the file directly after downloaded
+                    autoPlayInfo = new AutoPlayInfo(
+                            intent.getStringExtra(NODE_NAME),
+                            intent.getLongExtra(NODE_HANDLE, INVALID_VALUE),
+                            intent.getStringExtra(NODE_LOCAL_PATH),
+                            true
+                    );
+                    openDownloadedFile();
                     break;
             }
         }

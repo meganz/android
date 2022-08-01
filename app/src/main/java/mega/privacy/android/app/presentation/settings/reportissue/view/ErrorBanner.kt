@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.settings.reportissue.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,7 +16,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.theme.AndroidTheme
-import mega.privacy.android.domain.entity.ThemeMode
 
 @Composable
 fun ErrorBanner(
@@ -45,7 +45,7 @@ fun ErrorBanner(
 @Preview
 @Composable
 fun PreviewErrorBanner() {
-    AndroidTheme(mode = ThemeMode.System) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         ErrorBanner(
             errorMessage = "This is an error message. If you broke it, " +
                     "please fix whatever is wrong, if we broke it,we are very sorry" +

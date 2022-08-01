@@ -24,7 +24,6 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_READ_CONTACTS;
 import static mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
-import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isDarkMode;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
@@ -34,6 +33,7 @@ import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermi
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -57,7 +57,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -1520,14 +1519,14 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                     Timber.d("read contacts permission denied!");
                     showPermissionDeniedView();
                     grantedContactPermission = false;
-                    boolean should = PermissionUtils.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_CONTACTS);
+                    boolean should = PermissionUtils.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_CONTACTS);
                     if (should) {
                         showExplanationDialog();
                     } else {
                         // the system request permission dialog can no longer show.
-                        Snackbar snackbar = Snackbar.make(bannerContainer, getString(R.string.on_permanently_denied), Snackbar.LENGTH_LONG)
-                                .setAction(getString(R.string.action_settings), PermissionUtils.toAppInfo(getContext()))
-                                .setDuration(DURATION);
+                        @SuppressLint("WrongConstant")
+                        Snackbar snackbar = Snackbar.make(bannerContainer, getString(R.string.on_permanently_denied), DURATION)
+                                .setAction(getString(R.string.action_settings), PermissionUtils.toAppInfo(requireContext()));
                         TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
                         snackbarTextView.setMaxLines(MAX_LINES);
                         snackbar.show();

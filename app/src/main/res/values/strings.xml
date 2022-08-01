@@ -1584,8 +1584,8 @@
     <string name="general_incorrect_names">Please correct your filenames before proceeding</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Invalid characters</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">The following characters are not allowed: ” * / : &lt; &gt; ? \\ |</string>
+    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
+    <string name="invalid_characters_defined">The following characters are not allowed: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">File name cannot be empty.</item>

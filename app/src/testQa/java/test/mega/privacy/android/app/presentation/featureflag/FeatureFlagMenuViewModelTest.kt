@@ -11,10 +11,11 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.domain.entity.FeatureFlag
+
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import mega.privacy.android.app.presentation.featureflag.FeatureFlagMenuViewModel
+import mega.privacy.android.domain.entity.FeatureFlag
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

@@ -1630,7 +1630,9 @@ public class Util {
      * @param withElevation true should show elevation, false otherwise.
      */
     private static void changeToolBarElevationOnDarkMode(Activity activity, Toolbar tB, float elevation, boolean withElevation) {
-        tB.setBackgroundColor(withElevation ? ColorUtils.getColorForElevation(activity, elevation) : android.R.color.transparent);
+        tB.setBackgroundColor(withElevation ?
+                ColorUtils.getColorForElevation(activity, elevation) :
+                activity.getResources().getColor(android.R.color.transparent, null));
     }
 
     /**

@@ -168,8 +168,6 @@
     <string name="login_before_share">Silakan masuk untuk berbagi dengan MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Tautan konfirmasi anda tidak lagi valid. Akun anda mungkin sudah diaktifkan atau anda mungkin telah membatalkan pendaftaran anda.</string>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Daftar sekarang dan dapatkan 20&#160;GB penyimpanan gratis</string>
     <!-- category in sort by action -->
     <string name="name_text">Nama</string>
     <!-- First Name of the user -->
@@ -1554,8 +1552,7 @@
     <string name="invalid_characters_defined">Karakter berikut tidak diperbolehkan: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">File name cannot be empty.</item>
-        <item quantity="other">File names cannot be empty.</item>
+        <item quantity="other">Nama file tidak boleh kosong.</item>
     </plurals>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">Kesalahan. File pdf rusak atau tidak ada.</string>
@@ -1630,7 +1627,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Undangan belum dikirim. %s sudah ada dalam daftar kontak anda.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
+    <string name="invite_not_sent_text_error">Terjadi kesalahan dan undangan belum dikirim.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Membuat kode QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -1805,7 +1802,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Buka perangkat Android [A]Pengaturan[/A]</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Buka [A]Aplikasi &amp; notifikasi[/A]</string>
+    <string name="turn_on_notifications_second_step">Buka [A]Aplikasi dan notifikasi[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">Pilih [A]MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -1985,7 +1982,7 @@
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Pratinjau konten</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
+    <string name="no_network_connection_on_play_file">Tidak ada koneksi jaringan. File belum diunduh dan tidak dapat dialirkan.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Tidak dapat membuka file.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2386,8 +2383,7 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="other">%1$d folder&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] menambahkan %2$s dan %3$s[/B]</string>
@@ -3040,7 +3036,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Pilih transfer</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Unable to change priority of the transfer “%1$s”</string>
+    <string name="change_of_transfer_priority_failed">Tidak dapat mengubah prioritas transfer “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Kirim kunci dekripsi secara terpisah</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3921,4 +3917,16 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s diubah menjadi peran standar oleh %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s diubah menjadi tuan rumah oleh %2$s</string>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">Menunggu yang lain untuk bergabung</string>
+    <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_favourites">[B]Tidak ada[/B] [A]favorit[/A] [B]ditemukan[/B]</string>
+    <!--Action text to start a meeting from Meeting screen empty view-->
+    <string name="meetings_list_empty_action">Mulai rapat</string>
+    <!--Description text from Meeting screen empty view-->
+    <string name="meetings_list_empty_description">Bicaralah dengan aman dan pribadi di panggilan audio atau video dengan teman dan kolega di seluruh dunia.</string>
+    <!--Action text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_action">Mulai mengobrol sekarang</string>
+    <!--Description text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_description">Ngobrol dengan aman dan pribadi, dengan siapa saja dan di perangkat apa pun, mengetahui bahwa tidak ada yang bisa membaca obrolan anda, bahkan MEGA.</string>
 </resources>

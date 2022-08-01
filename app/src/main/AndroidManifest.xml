@@ -22,6 +22,9 @@
     <uses-feature
         android:name="android.hardware.sensor.proximity"
         android:required="false" />
+    <uses-feature
+        android:name="android.hardware.sensor.accelerometer"
+        android:required="true" />
 
     <supports-screens
         android:anyDensity="true"

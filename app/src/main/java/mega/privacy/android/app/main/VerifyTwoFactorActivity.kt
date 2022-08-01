@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -46,10 +47,17 @@ import nz.mega.sdk.MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK
 import nz.mega.sdk.MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET
 import timber.log.Timber
 
+/**
+ * Activity for verifying two factor authentication code
+ */
 @AndroidEntryPoint
 class VerifyTwoFactorActivity : PasscodeActivity() {
 
     private lateinit var binding: ActivityVerifyTwoFactorBinding
+
+    private var onBackPressedCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {}
+    }
 
     /**
      * @see KEY_VERIFY_TYPE
@@ -89,28 +97,35 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
      */
     private var newPassword: String? = null
 
-    /**
-     * If there's an in-progress request(except checking 2fa status request, TYPE_MULTI_FACTOR_AUTH_CHECK),
-     * quitting the activity is not allowed.
-     * Reset to false once the request finished.
-     */
-    var isRequesting = false
-
     companion object {
+        /** Specifies intent data for verification type value */
         const val KEY_VERIFY_TYPE = "key_verify_type"
+
+        /** Specifies intent data for the new email value */
         const val KEY_NEW_EMAIL = "key_new_email"
+
+        /** Specifies intent data for the new password value */
         const val KEY_NEW_PASSWORD = "key_new_password"
     }
 
+    /**
+     * Perform initialization of the activity for verifying two factor authentication code
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityVerifyTwoFactorBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        onBackPressedDispatcher.addCallback(onBackPressedCallback)
+
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.toolbar.setNavigationOnClickListener { onBackPressed() }
+        binding.toolbar.setNavigationOnClickListener {
+            if (!onBackPressedCallback.isEnabled) {
+                finish()
+            }
+        }
 
         // Popup soft input.
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
@@ -123,13 +138,6 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
 
         // Check current 2fa enable state again.
         megaApi.multiFactorAuthCheck(megaApi.myEmail, listener)
-    }
-
-    override fun onBackPressed() {
-        // Prevent to quit when the request starts.
-        if (!isRequesting) {
-            super.onBackPressed()
-        }
     }
 
     /**
@@ -196,8 +204,8 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                     false
                 }
 
-                setOnFocusChangeListener { _, hasFoucs ->
-                    if (hasFoucs) {
+                setOnFocusChangeListener { _, hasFocus ->
+                    if (hasFocus) {
                         setText("")
                     }
                 }
@@ -514,15 +522,18 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
             Timber.d("Start ${request.type}: ${request.requestString} request.")
 
-            // Prevent to quit when the request starts.
+            // If there's an in-progress request (except checking 2fa status request, TYPE_MULTI_FACTOR_AUTH_CHECK),
+            // quitting the activity is not allowed.
             if (request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
-                isRequesting = true
+                onBackPressedCallback.isEnabled = true
             }
         }
 
         override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
             Timber.d("${request.type}: ${request.requestString} finished.")
-            isRequesting = false
+
+            // Reset to false in order to allow quitting the activity.
+            onBackPressedCallback.isEnabled = false
 
             if (request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
                 hideKeyboard()

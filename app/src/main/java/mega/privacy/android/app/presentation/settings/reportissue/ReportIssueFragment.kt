@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,12 +23,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.app.presentation.settings.reportissue.view.ReportIssueView
 import mega.privacy.android.app.presentation.theme.AndroidTheme
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
@@ -48,7 +50,9 @@ class ReportIssueFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireContext()).apply {
         setContent {
-            AndroidTheme(mode = getThemeMode().collectAsState(initial = ThemeMode.System).value) {
+            val darkMode by getThemeMode().map { it.isDarkMode() }
+                .collectAsState(initial = isSystemInDarkTheme())
+            AndroidTheme(isDark = darkMode) {
                 ReportIssueView(viewModel)
             }
         }

@@ -14,6 +14,7 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
+import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.NetworkRepository
@@ -77,4 +78,7 @@ object TestRepositoryModule {
 
     @Provides
     fun provideTransfersRepository(): TransfersRepository = mock()
+
+    @Provides
+    fun provideFeatureFlagRepository(): FeatureFlagRepository = mock()
 }

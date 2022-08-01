@@ -11,6 +11,7 @@ import mega.privacy.android.app.domain.usecase.DefaultGetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetParentNodeHandle
+import mega.privacy.android.app.domain.usecase.DefaultGetPublicLinks
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
@@ -18,6 +19,7 @@ import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
+import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
@@ -50,13 +52,16 @@ abstract class ManagerUseCases {
     abstract fun bindGetParentNode(useCase: DefaultGetParentNodeHandle): GetParentNodeHandle
 
     @Binds
-    abstract fun bindBrowserChildrenNode(useCase: DefaultGetBrowserChildrenNode): GetBrowserChildrenNode
+    abstract fun bindGetBrowserChildrenNode(useCase: DefaultGetBrowserChildrenNode): GetBrowserChildrenNode
 
     @Binds
-    abstract fun bindIncomingSharesChildrenNode(useCase: DefaultGetIncomingSharesChildrenNode): GetIncomingSharesChildrenNode
+    abstract fun bindGetIncomingSharesChildrenNode(useCase: DefaultGetIncomingSharesChildrenNode): GetIncomingSharesChildrenNode
 
     @Binds
-    abstract fun bindOutgoingSharesChildrenNode(useCase: DefaultGetOutgoingSharesChildrenNode): GetOutgoingSharesChildrenNode
+    abstract fun bindGetOutgoingSharesChildrenNode(useCase: DefaultGetOutgoingSharesChildrenNode): GetOutgoingSharesChildrenNode
+
+    @Binds
+    abstract fun bindGetPublicLinks(useCase: DefaultGetPublicLinks): GetPublicLinks
 
     companion object {
         @Provides
@@ -90,10 +95,6 @@ abstract class ManagerUseCases {
         @Provides
         fun provideMonitorUserAlerts(notificationsRepository: NotificationsRepository): MonitorUserAlertUpdates =
             MonitorUserAlertUpdates(notificationsRepository::monitorUserAlerts)
-
-        @Provides
-        fun provideMonitorUserUpdates(notificationsRepository: NotificationsRepository): MonitorUserAlerts =
-            MonitorUserAlerts(notificationsRepository::monitorUserAlerts)
 
         @Provides
         fun provideAuthorizeNode(filesRepository: FilesRepository): AuthorizeNode =

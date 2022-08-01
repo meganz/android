@@ -26,6 +26,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiEditText
+import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -408,7 +409,7 @@ object MegaNodeDialogUtil {
                 showDialogError(
                     typeText,
                     errorText,
-                    getString(R.string.invalid_characters_defined)
+                    getString(R.string.invalid_characters_defined, INVALID_CHARACTERS)
                 )
             }
             nameAlreadyExists(typedString, dialogType == TYPE_RENAME, node) -> {
