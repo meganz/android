@@ -1,6 +1,8 @@
 package mega.privacy.android.app.di
 
 import android.content.Context
+import android.net.Uri
+import androidx.documentfile.provider.DocumentFile
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,10 +13,13 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
+import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnlineWrapper
@@ -44,6 +49,24 @@ class UtilWrapperModule {
         return object : IsOnWifiWrapper {
             override fun isOnWifi(context: Context): Boolean {
                 return Util.isOnWifi(context)
+            }
+        }
+    }
+
+    @Provides
+    fun provideGetFullPathFileWrapper(): GetFullPathFileWrapper {
+        return object : GetFullPathFileWrapper {
+            override fun getFullPathFromTreeUri(uri: Uri, context: Context): String? {
+                return FileUtil.getFullPathFromTreeUri(uri, context)
+            }
+        }
+    }
+
+    @Provides
+    fun provideGetDocumentFileWrapper(): GetDocumentFileWrapper {
+        return object : GetDocumentFileWrapper {
+            override fun getDocumentFileFromTreeUri(context: Context, uri: Uri): DocumentFile? {
+                return DocumentFile.fromTreeUri(context, uri)
             }
         }
     }

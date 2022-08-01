@@ -2,8 +2,8 @@ package mega.privacy.android.app.domain.usecase
 
 import android.content.Context
 import android.net.Uri
-import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
+import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import timber.log.Timber
@@ -22,13 +22,14 @@ class DefaultIsLocalSecondaryFolderSet @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val getLocalPathSecondary: GetCameraUploadLocalPathSecondary,
+    private val getDocumentFileWrapper: GetDocumentFileWrapper,
     @ApplicationContext private val context: Context,
 ) : IsLocalSecondaryFolderSet {
     override fun invoke(): Boolean {
         return if (isSecondaryFolderEnabled()) {
             if (cameraUploadRepository.isMediaFolderExternalSd()) {
                 val uri = Uri.parse(cameraUploadRepository.getUriMediaFolderExternalSd())
-                val file = DocumentFile.fromTreeUri(context, uri)
+                val file = getDocumentFileWrapper.getDocumentFileFromTreeUri(context, uri)
                 if (file == null) {
                     Timber.d("Local Media Folder on SD card is unavailable")
                     return false

@@ -3,9 +3,9 @@ package mega.privacy.android.app.domain.usecase
 import android.content.Context
 import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import javax.inject.Inject
 
 /**
@@ -16,13 +16,14 @@ import javax.inject.Inject
  */
 class DefaultGetCameraUploadLocalPathSecondary @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
+    private val getFullPathFileWrapper: GetFullPathFileWrapper,
     @ApplicationContext private val context: Context,
 ) : GetCameraUploadLocalPathSecondary {
 
     override fun invoke(): String? {
         var localPath = if (cameraUploadRepository.isMediaFolderExternalSd()) {
             val uri = Uri.parse(cameraUploadRepository.getUriMediaFolderExternalSd())
-            FileUtil.getFullPathFromTreeUri(uri, context)
+            getFullPathFileWrapper.getFullPathFromTreeUri(uri, context)
         } else {
             cameraUploadRepository.getSecondaryFolderPath()
         }

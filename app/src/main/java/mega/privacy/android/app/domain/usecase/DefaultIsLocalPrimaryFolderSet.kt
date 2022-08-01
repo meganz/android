@@ -2,8 +2,8 @@ package mega.privacy.android.app.domain.usecase
 
 import android.content.Context
 import android.net.Uri
-import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
+import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import timber.log.Timber
 import java.io.File
@@ -20,12 +20,13 @@ import javax.inject.Inject
 class DefaultIsLocalPrimaryFolderSet @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val getCameraUploadLocalPath: GetCameraUploadLocalPath,
+    private val getDocumentFileWrapper: GetDocumentFileWrapper,
     @ApplicationContext private val context: Context,
 ) : IsLocalPrimaryFolderSet {
     override fun invoke(): Boolean {
         return if (cameraUploadRepository.isFolderExternalSd()) {
             val uri = Uri.parse(cameraUploadRepository.getUriExternalSd())
-            val file = DocumentFile.fromTreeUri(context, uri)
+            val file = getDocumentFileWrapper.getDocumentFileFromTreeUri(context, uri)
             if (file == null) {
                 Timber.d("Local Folder on SD card is unavailable")
                 return false
