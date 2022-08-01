@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.controls
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.selection.toggleable
@@ -21,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.theme.AndroidTheme
-import mega.privacy.android.domain.entity.ThemeMode
 
 @Composable
 internal fun LabelledSwitch(
@@ -73,7 +73,7 @@ fun ShowkasePreviewLabelledSwitch() = PreviewLabelledSwitch()
 @Composable
 private fun PreviewLabelledSwitch() {
     var checked by remember { mutableStateOf(true) }
-    AndroidTheme(mode = ThemeMode.System) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         LabelledSwitch(label = "The label",
             checked = checked,
             onCheckChanged = { checked = !checked })

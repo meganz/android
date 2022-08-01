@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.settings.reportissue.view
 
 import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -14,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.theme.AndroidTheme
-import mega.privacy.android.domain.entity.ThemeMode
 
 @Composable
 fun DiscardReportDialog(
@@ -71,7 +71,7 @@ fun DiscardReportDialog(
 )
 @Composable
 fun PreviewDiscardReportDialog() {
-    AndroidTheme(mode = ThemeMode.System) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         DiscardReportDialog(onDiscardCancelled = {},
             onDiscard = {})
     }

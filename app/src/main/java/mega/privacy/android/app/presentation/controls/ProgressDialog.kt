@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.controls
 
 import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +25,6 @@ import androidx.compose.ui.window.DialogProperties
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.theme.AndroidTheme
-import mega.privacy.android.domain.entity.ThemeMode
 
 @Composable
 fun ProgressDialog(
@@ -95,7 +95,7 @@ fun ShowkasePreviewProgressDialog() = PreviewProgressDialog()
 )
 @Composable
 private fun PreviewProgressDialog() {
-    AndroidTheme(mode = ThemeMode.System) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         ProgressDialog(
             title = "Title goes here",
             progress = 0.3f,
