@@ -207,7 +207,7 @@ android {
                 // This flag must be enabled to see properly-symbolicated native
                 // stack traces in the Crashlytics dashboard.
                 nativeSymbolUploadEnabled true
-                unstrippedNativeLibsDir 'src/main/obj/local'
+                unstrippedNativeLibsDir '../sdk/src/main/obj/local'
             }
             firebaseAppDistribution {
                 appId = "1:268821755439:android:9b611c50c9f7a503"
