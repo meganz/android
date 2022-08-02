@@ -406,6 +406,17 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     }
                     true
                 }
+
+                val currentPosition = viewModel.getCurrentPosition()
+                val imagesSize = items.size
+                binding.txtPageCount.apply {
+                    text = StringResourcesUtils.getString(
+                        R.string.wizard_steps_indicator,
+                        currentPosition + 1,
+                        imagesSize
+                    )
+                    isVisible = imagesSize > 1
+                }
             }
             binding.progress.hide()
         }
@@ -425,20 +436,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             bottomSheet?.dismissAllowingStateLoss()
             showTransfersSnackBar(StringResourcesUtils.getString(message))
         }
-        viewModel.onCurrentPosition().observe(this) { (first, second) ->
-            binding.txtPageCount.apply {
-                text = StringResourcesUtils.getString(
-                    R.string.wizard_steps_indicator,
-                    first + 1,
-                    second
-                )
-                isVisible = second > 1
-            }
 
+        viewModel.onCurrentPosition().observe(this) { position ->
             binding.viewPager.apply {
                 waitForLayout {
-                    if (currentItem != first) {
-                        setCurrentItem(first, false)
+                    if (currentItem != position) {
+                        setCurrentItem(position, pageCallbackSet)
                     }
 
                     if (!pageCallbackSet) {
@@ -447,6 +450,16 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     }
                     true
                 }
+            }
+
+            binding.txtPageCount.apply {
+                val imagesSize = viewModel.getImagesSize()
+                text = StringResourcesUtils.getString(
+                    R.string.wizard_steps_indicator,
+                    position + 1,
+                    imagesSize
+                )
+                isVisible = imagesSize > 1
             }
         }
     }

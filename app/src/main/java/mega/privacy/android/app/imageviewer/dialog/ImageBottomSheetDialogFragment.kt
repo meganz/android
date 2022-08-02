@@ -48,6 +48,7 @@ import mega.privacy.android.app.imageviewer.util.shouldShowRestoreOption
 import mega.privacy.android.app.imageviewer.util.shouldShowRubbishBinOption
 import mega.privacy.android.app.imageviewer.util.shouldShowSendToContactOption
 import mega.privacy.android.app.imageviewer.util.shouldShowShareOption
+import mega.privacy.android.app.imageviewer.util.shouldShowSlideshowOption
 import mega.privacy.android.app.main.FileInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
@@ -252,6 +253,13 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 dismissAllowingStateLoss()
             }
 
+            // Slideshow
+            optionSlideshow.isVisible = imageItem.shouldShowSlideshowOption() && viewModel.getImagesSize() > 1
+            optionSlideshow.setOnClickListener {
+                viewModel.startSlideshow()
+                dismissAllowingStateLoss()
+            }
+
             // Open with
             optionOpenWith.isVisible = imageItem.shouldShowOpenWithOption(isUserLoggedIn)
             optionOpenWith.setOnClickListener {
@@ -392,7 +400,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Separators
             separatorLabel.isVisible = optionLabelLayout.isVisible || optionInfo.isVisible
             separatorDispute.isVisible = optionDispute.isVisible
-            separatorOpen.isVisible = optionOpenWith.isVisible || optionForward.isVisible
+            separatorOpen.isVisible = optionSlideshow.isVisible || optionOpenWith.isVisible
+                    || optionForward.isVisible
             separatorOffline.isVisible = optionOfflineLayout.isVisible || optionShare.isVisible
             separatorShare.isVisible =
                 optionShare.isVisible || optionSendToChat.isVisible || optionManageLink.isVisible

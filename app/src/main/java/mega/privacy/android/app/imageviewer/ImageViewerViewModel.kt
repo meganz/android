@@ -10,7 +10,9 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -48,6 +50,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.usecase.AreTransfersPaused
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -90,6 +93,11 @@ class ImageViewerViewModel @Inject constructor(
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
 ) : BaseRxViewModel() {
 
+    companion object {
+        private const val SLIDESHOW_DELAY = 4L
+    }
+
+    private val timerComposite = CompositeDisposable()
     private val images = MutableLiveData<List<ImageItem>?>()
     private val currentPosition = MutableLiveData<Int>()
     private val showToolbar = MutableLiveData<Boolean>()
@@ -106,6 +114,7 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        timerComposite.dispose()
         Fresco.getImagePipeline()?.clearMemoryCaches()
         super.onCleared()
     }
@@ -116,8 +125,14 @@ class ImageViewerViewModel @Inject constructor(
     fun onImage(itemId: Long): LiveData<ImageItem?> =
         images.map { items -> items?.firstOrNull { it.id == itemId } }
 
-    fun onCurrentPosition(): LiveData<Pair<Int, Int>> =
-        currentPosition.map { position -> Pair(position, images.value?.size ?: 0) }
+    fun getImagesSize(): Int =
+        images.value?.size ?: 0
+
+    fun onCurrentPosition(): LiveData<Int> =
+        currentPosition
+
+    fun getCurrentPosition(): Int =
+        currentPosition.value ?: 0
 
     fun onCurrentImageItem(): LiveData<ImageItem?> =
         currentPosition.map { images.value?.getOrNull(it) }
@@ -526,7 +541,6 @@ class ImageViewerViewModel @Inject constructor(
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
-
         val node = getExistingNode(nodeHandle) ?: return
 
         checkNameCollision(
@@ -722,5 +736,23 @@ class ImageViewerViewModel @Inject constructor(
             ).also {
                 if (addToComposite) it.addTo(composite)
             }
+    }
+
+    fun startSlideshow() {
+        timerComposite.clear()
+        Observable.interval(SLIDESHOW_DELAY, SLIDESHOW_DELAY, TimeUnit.SECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    val imagePosition = getCurrentPosition()
+                    if (imagePosition < getImagesSize() - 1) {
+                        updateCurrentPosition(imagePosition + 1, true)
+                    } else {
+                        timerComposite.clear()
+                    }
+                },
+                onError = Timber::e
+            )
+            .addTo(timerComposite)
     }
 }
