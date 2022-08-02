@@ -168,8 +168,6 @@
     <string name="login_before_share">กรุณาลงชื่อเข้าใช้เพื่อแชร์กับ MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">ลิงก์ยืนยันของคุณใช้ไม่ได้อีกต่อไป บัญชีของคุณอาจถูกเปิดใช้งานหรือคุณอาจยกเลิกการลงทะเบียนแล้ว</string>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">ลงทะเบียนตอนนี้และรับพื้นที่เก็บข้อมูลฟรี 20&#160;GB</string>
     <!-- category in sort by action -->
     <string name="name_text">ชื่อ</string>
     <!-- First Name of the user -->
@@ -3919,4 +3917,16 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s ถูกเปลี่ยนสิทธิ์เป็นแบบมาตรฐานโดย %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s ถูกเปลี่ยนสิทธิ์เป็นผู้จัดการประชุมโดย %2$s</string>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">กำลังรอให้คนอื่นเข้าร่วม</string>
+    <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_favourites">[B]ไม่[/B][B]พบ[/B][A]รายการโปรด[/A]</string>
+    <!--Action text to start a meeting from Meeting screen empty view-->
+    <string name="meetings_list_empty_action">เริ่มการประชุม</string>
+    <!--Description text from Meeting screen empty view-->
+    <string name="meetings_list_empty_description">โทรด้วยเสียงหรือวิดีโอที่ปลอดภัยและเป็นส่วนตัวกับเพื่อนและเพื่อนร่วมงานทั่วโลก</string>
+    <!--Action text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_action">เริ่มแชทได้เลย</string>
+    <!--Description text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_description">คุณสามารถแชทได้อย่างปลอดภัยและเป็นส่วนตัวกับทุกคนบนอุปกรณ์ใดก็ได้ มั่นใจได้ว่าไม่มีใครแม้แต่ MEGA ก็ไม่สามารถอ่านแชทของคุณได้</string>
 </resources>

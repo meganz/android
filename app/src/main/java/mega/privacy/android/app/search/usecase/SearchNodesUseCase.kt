@@ -2,10 +2,10 @@ package mega.privacy.android.app.search.usecase
 
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.main.ManagerActivity.*
+import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.shares.links.LinksFragment.Companion.getLinksOrderCloud
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SortUtil.sortByNameAscending
 import mega.privacy.android.app.utils.SortUtil.sortByNameDescending
@@ -13,6 +13,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.util.ArrayList
 import javax.inject.Inject
 
@@ -103,9 +104,8 @@ class SearchNodesUseCase @Inject constructor(
                             DrawerItem.CLOUD_DRIVE -> parent =
                                 megaApi.getNodeByHandle(parentHandle)
                             DrawerItem.SHARED_ITEMS -> {
-                                @Suppress("DEPRECATION")
-                                when (sharesTab) {
-                                    INCOMING_TAB -> {
+                                when (SharesTab.fromPosition(sharesTab)) {
+                                    SharesTab.INCOMING_TAB -> {
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                                             emitter.onSuccess(getInShares(query, megaCancelToken))
                                             return@create
@@ -113,7 +113,7 @@ class SearchNodesUseCase @Inject constructor(
 
                                         parent = megaApi.getNodeByHandle(parentHandle)
                                     }
-                                    OUTGOING_TAB -> {
+                                    SharesTab.OUTGOING_TAB -> {
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                                             emitter.onSuccess(
                                                 getOutShares(
@@ -126,7 +126,7 @@ class SearchNodesUseCase @Inject constructor(
 
                                         parent = megaApi.getNodeByHandle(parentHandle)
                                     }
-                                    LINKS_TAB -> {
+                                    SharesTab.LINKS_TAB -> {
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                                             emitter.onSuccess(
                                                 getLinks(
@@ -139,6 +139,10 @@ class SearchNodesUseCase @Inject constructor(
                                         }
 
                                         parent = megaApi.getNodeByHandle(parentHandle)
+                                    }
+                                    else -> {
+                                        Timber.w("Unhandled current sharesTab value")
+                                        return@create
                                     }
                                 }
                             }

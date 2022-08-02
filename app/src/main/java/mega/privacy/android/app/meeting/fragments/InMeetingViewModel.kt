@@ -29,7 +29,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.listeners.GetUserEmailListener
-import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
@@ -59,6 +58,7 @@ import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaRequestListenerInterface
 import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -69,7 +69,7 @@ class InMeetingViewModel @Inject constructor(
     private val getNetworkChangesUseCase: GetNetworkChangesUseCase,
     private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
     private val endCallUseCase: EndCallUseCase,
-    getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
+    private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
     /**
@@ -114,12 +114,20 @@ class InMeetingViewModel @Inject constructor(
     private val _showOnlyMeBanner = MutableStateFlow(false)
     val showOnlyMeBanner: StateFlow<Boolean> get() = _showOnlyMeBanner
 
+    private val _showWaitingForOthersBanner = MutableStateFlow(false)
+    val showWaitingForOthersBanner: StateFlow<Boolean> get() = _showWaitingForOthersBanner
+
     private val _showEndMeetingAsModeratorBottomPanel = MutableLiveData<Boolean>()
     val showEndMeetingAsModeratorBottomPanel: LiveData<Boolean> = _showEndMeetingAsModeratorBottomPanel
 
     private val _showAssignModeratorBottomPanel = MutableLiveData<Boolean>()
     val showAssignModeratorBottomPanel: LiveData<Boolean> = _showAssignModeratorBottomPanel
 
+    /**
+     * Participant in carousel clicked
+     *
+     * @param item Participant clicked
+     */
     fun onItemClick(item: Participant) {
         _pinItemEvent.value = Event(item)
     }
@@ -199,6 +207,20 @@ class InMeetingViewModel @Inject constructor(
         }
     }
 
+    private val waitingForOthersBannerObserver =
+        Observer<android.util.Pair<Long, Boolean>> { result ->
+            val chatId: Long = result.first
+            val onlyMeInTheCall: Boolean = result.second
+            if (currentChatId == chatId) {
+                if (onlyMeInTheCall) {
+                    _showWaitingForOthersBanner.value = false
+                    if (!MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+                        _showOnlyMeBanner.value = true
+                    }
+                }
+            }
+        }
+
     init {
         getParticipantsChangesUseCase.getChangesFromParticipants()
             .subscribeOn(Schedulers.io())
@@ -219,17 +241,31 @@ class InMeetingViewModel @Inject constructor(
             )
             .addTo(composite)
 
-        getParticipantsChangesUseCase.checkIfIAmAloneOnACall()
+        getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { (chatId, onlyMeInTheCall) ->
+                onNext = { (chatId, onlyMeInTheCall, waitingForOthers, isReceivedChange) ->
                     if (currentChatId == chatId) {
-                        if(onlyMeInTheCall) {
-                            hideBottomPanels()
-                        }
+                        val millisecondsOnlyMeInCallDialog =
+                            TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog)
 
-                        _showOnlyMeBanner.value = onlyMeInTheCall
+                        if (onlyMeInTheCall) {
+                            hideBottomPanels()
+                            if (waitingForOthers && millisecondsOnlyMeInCallDialog <= 0) {
+                                _showOnlyMeBanner.value = false
+                                _showWaitingForOthersBanner.value = true
+                            } else {
+                                _showWaitingForOthersBanner.value = false
+                                if (waitingForOthers || !isReceivedChange) {
+                                    _showOnlyMeBanner.value = true
+                                }
+
+                            }
+                        } else {
+                            _showWaitingForOthersBanner.value = false
+                            _showOnlyMeBanner.value = false
+                        }
                     }
                 },
                 onError = Timber::e
@@ -244,6 +280,32 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
             .observeForever(noOutgoingCallObserver)
+
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
+            .observeForever(waitingForOthersBannerObserver as Observer<Any>)
+
+    }
+
+    /**
+     * Method to check if only me dialog and the call will end banner should be displayed.
+     */
+    fun checkShowOnlyMeBanner() {
+        if (isOneToOneCall())
+            return
+
+        _callLiveData.value?.let { call ->
+            getParticipantsChangesUseCase.checkIfIAmAloneOnSpecificCall(call).let { result ->
+                if (result.onlyMeInTheCall) {
+                    if (_showOnlyMeBanner.value) {
+                        _showOnlyMeBanner.value = false
+                    }
+
+                    _showWaitingForOthersBanner.value = false
+                    _showOnlyMeBanner.value = true
+                }
+            }
+        }
     }
 
     /**
@@ -350,6 +412,30 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
+     * Control when Stay on call option is chosen
+     */
+    fun checkStayCall() {
+        MegaApplication.getChatManagement().stopCounterToFinishCall()
+        MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
+        if (_showOnlyMeBanner.value) {
+            _showOnlyMeBanner.value = false
+            if (isRequestSent()) {
+                _showWaitingForOthersBanner.value = true
+            }
+        }
+    }
+
+    /**
+     * Control when End call now option is chosen
+     */
+    fun checkEndCall() {
+        MegaApplication.getChatManagement().stopCounterToFinishCall()
+        _showOnlyMeBanner.value = false
+        _showWaitingForOthersBanner.value = false
+        hangCall()
+    }
+
+    /**
      * Method that controls whether the toolbar should be clickable or not.
      */
     private fun checkToolbarClickability() {
@@ -362,7 +448,7 @@ class InMeetingViewModel @Inject constructor(
     fun startCounterTimerAfterBanner() {
         MegaApplication.getChatManagement().stopCounterToFinishCall()
         MegaApplication.getChatManagement()
-            .startCounterToFinishCall(currentChatId, SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT)
+            .startCounterToFinishCall(currentChatId)
     }
 
     /**
@@ -1841,6 +1927,10 @@ class InMeetingViewModel @Inject constructor(
 
         LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
             .removeObserver(noOutgoingCallObserver)
+
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EventConstants.EVENT_SESSION_STATUS_CHANGE)
+            .removeObserver(waitingForOthersBannerObserver as Observer<Any>)
     }
 
     override fun onEditedChatRoomName(chatId: Long, name: String) {
@@ -2059,7 +2149,6 @@ class InMeetingViewModel @Inject constructor(
 
     companion object {
         const val IS_SHOWED_TIPS = "is_showed_meeting_bottom_tips"
-        const val SECONDS_TO_WAIT_TO_WHEN_I_AM_ONLY_PARTICIPANT: Long = 2 * SECONDS_IN_MINUTE
     }
 
     override fun onUserEmailUpdate(email: String?, handler: Long, position: Int) {

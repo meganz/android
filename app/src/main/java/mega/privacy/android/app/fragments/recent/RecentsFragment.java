@@ -52,7 +52,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -160,37 +159,16 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
         emptyLayout = v.findViewById(R.id.empty_state_recents);
 
-        ImageView emptyImage = v.findViewById(R.id.empty_image_recents);
-
-        ConstraintLayout emptyView = v.findViewById(R.id.empty_layout);
-        ConstraintSet constraintSet = new ConstraintSet();
-        constraintSet.clone(emptyView);
-
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            emptyImage.setImageResource(R.drawable.empty_recents_landscape);
-            constraintSet.connect(R.id.empty_image_recents, ConstraintSet.TOP, R.id.parent, ConstraintSet.TOP, LANDSCAPE_EMPTY_IMAGE_MARGIN);
-        } else {
-            emptyImage.setImageResource(R.drawable.empty_recents_portrait);
-            constraintSet.connect(R.id.empty_image_recents, ConstraintSet.TOP, R.id.guideline, ConstraintSet.BOTTOM, 0);
-        }
-
-        constraintSet.applyTo(emptyView);
-
         emptyText = v.findViewById(R.id.empty_text_recents);
 
         showActivityButton = v.findViewById(R.id.show_activity_button);
         showActivityButton.setOnClickListener(v1 -> showRecentActivity());
 
-        String emptyString = formatEmptyScreenText(requireContext(),
+        emptySpanned = formatEmptyScreenText(requireContext(),
                 StringResourcesUtils.getString(R.string.context_empty_recents));
 
-        emptySpanned = HtmlCompat.fromHtml(emptyString, HtmlCompat.FROM_HTML_MODE_LEGACY);
-
-        String activityHiddenString = formatEmptyScreenText(requireContext(),
+        activityHiddenSpanned = formatEmptyScreenText(requireContext(),
                 StringResourcesUtils.getString(R.string.recents_activity_hidden));
-
-        activityHiddenSpanned =
-                HtmlCompat.fromHtml(activityHiddenString, HtmlCompat.FROM_HTML_MODE_LEGACY);
 
 
         listView = v.findViewById(R.id.list_view_recents);

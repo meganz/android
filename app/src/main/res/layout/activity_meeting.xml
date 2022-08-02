@@ -156,7 +156,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/call_will_end_banner"
+        android:id="@+id/call_banner"
         style="@style/MeetingBanner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

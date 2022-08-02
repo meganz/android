@@ -52,6 +52,8 @@ import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
+import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.incomingSharesState;
+import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.outgoingSharesState;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
@@ -140,7 +142,6 @@ import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.isTablet;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
-import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
 import static mega.privacy.android.app.utils.Util.resetActionBar;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
@@ -179,6 +180,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -240,6 +242,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -252,6 +255,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
@@ -262,7 +266,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -305,7 +308,6 @@ import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
-import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
@@ -328,7 +330,6 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
 import mega.privacy.android.app.logging.LegacyLoggingSettings;
-import mega.privacy.android.app.main.adapters.SharesPageAdapter;
 import mega.privacy.android.app.main.adapters.TransfersPageAdapter;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.main.controllers.ContactController;
@@ -336,13 +337,8 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment;
-import mega.privacy.android.app.main.managerSections.FileBrowserFragment;
 import mega.privacy.android.app.main.managerSections.InboxFragment;
-import mega.privacy.android.app.main.managerSections.IncomingSharesFragment;
 import mega.privacy.android.app.main.managerSections.NotificationsFragment;
-import mega.privacy.android.app.main.managerSections.OutgoingSharesFragment;
-import mega.privacy.android.app.main.managerSections.RubbishBinFragment;
-import mega.privacy.android.app.main.managerSections.SearchFragment;
 import mega.privacy.android.app.main.managerSections.TransfersFragment;
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment;
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable;
@@ -368,11 +364,20 @@ import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
+import mega.privacy.android.app.presentation.manager.model.Tab;
+import mega.privacy.android.app.presentation.manager.model.TransfersTab;
+import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
+import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
+import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment;
+import mega.privacy.android.app.presentation.shares.SharesPageAdapter;
+import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
+import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
@@ -463,7 +468,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private static final String BUSINESS_GRACE_ALERT_SHOWN = "BUSINESS_GRACE_ALERT_SHOWN";
     private static final String BUSINESS_CU_ALERT_SHOWN = "BUSINESS_CU_ALERT_SHOWN";
 
-    private static final String DEEP_BROWSER_TREE_LINKS = "DEEP_BROWSER_TREE_LINKS";
     public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
     public static final String JOINING_CHAT_LINK = "JOINING_CHAT_LINK";
     public static final String LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK";
@@ -472,27 +476,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private static final String OPEN_LINK_TEXT = "OPEN_LINK_TEXT";
     private static final String OPEN_LINK_ERROR = "OPEN_LINK_ERROR";
     private static final String COMES_FROM_NOTIFICATIONS_SHARED_INDEX = "COMES_FROM_NOTIFICATIONS_SHARED_INDEX";
-
-    public static final int ERROR_TAB = -1;
-    /**
-     * @deprecated Should use SharedTab
-     */
-    @Deprecated
-    public static final int INCOMING_TAB = 0;
-    /**
-     * @deprecated Should use SharedTab
-     */
-    @Deprecated
-    public static final int OUTGOING_TAB = 1;
-
-    /**
-     * @deprecated Should use SharedTab
-     */
-    @Deprecated
-    public static final int LINKS_TAB = 2;
-
-    public static final int PENDING_TAB = 0;
-    public static final int COMPLETED_TAB = 1;
 
     // 8dp + 56dp(Fab's size) + 8dp
     public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 72;
@@ -519,7 +502,9 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
-    private ManagerViewModel viewModel;
+    public ManagerViewModel viewModel;
+    public IncomingSharesViewModel incomingSharesViewModel;
+    public OutgoingSharesViewModel outgoingSharesViewModel;
     private SearchViewModel searchViewModel;
 
     @Inject
@@ -722,7 +707,7 @@ public class ManagerActivity extends TransfersManagementActivity
     //Tabs in Shares
     private TabLayout tabLayoutShares;
     private SharesPageAdapter sharesPageAdapter;
-    private CustomViewPager viewPagerShares;
+    private ViewPager2 viewPagerShares;
 
     //Tabs in Transfers
     private TabLayout tabLayoutTransfers;
@@ -758,20 +743,14 @@ public class ManagerActivity extends TransfersManagementActivity
     public boolean isList = true;
 
     private String pathNavigationOffline;
-    public int deepBrowserTreeIncoming = 0;
-    public int deepBrowserTreeOutgoing = 0;
-    private int deepBrowserTreeLinks;
-
-    int indexShares = -1;
-    int indexTransfers = -1;
 
     // Fragments
     private FileBrowserFragment fileBrowserFragment;
     private RubbishBinFragment rubbishBinFragment;
     private InboxFragment inboxFragment;
-    private IncomingSharesFragment incomingSharesFragment;
-    private OutgoingSharesFragment outgoingSharesFragment;
-    private LinksFragment linksFragment;
+    private MegaNodeBaseFragment incomingSharesFragment;
+    private MegaNodeBaseFragment outgoingSharesFragment;
+    private MegaNodeBaseFragment linksFragment;
     private TransfersFragment transfersFragment;
     private CompletedTransfersFragment completedTransfersFragment;
     private SearchFragment searchFragment;
@@ -834,7 +813,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public long comesFromNotificationHandleSaved = INVALID_VALUE;
     public int comesFromNotificationDeepBrowserTreeIncoming = INVALID_VALUE;
     public long[] comesFromNotificationChildNodeHandleList;
-    public int comesFromNotificationSharedIndex = INVALID_VALUE;
+    public SharesTab comesFromNotificationSharedIndex = SharesTab.NONE;
 
     RelativeLayout myAccountHeader;
     ImageView contactStatus;
@@ -940,6 +919,8 @@ public class ManagerActivity extends TransfersManagementActivity
     private int versionsToRemove = 0;
     private int versionsRemoved = 0;
     private int errorVersionRemove = 0;
+
+    public MegaNode viewInFolderNode;
 
     /**
      * Broadcast to update the completed transfers tab.
@@ -1309,23 +1290,6 @@ public class ManagerActivity extends TransfersManagementActivity
         outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
         outState.putBoolean(STATE_KEY_SMS_DIALOG, isSMSDialogShowing);
 
-        if (viewModel.getState().getValue().getIncomingParentHandle() != INVALID_HANDLE) {
-            outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
-        }
-
-        if (viewModel.getState().getValue().getOutgoingParentHandle() != INVALID_HANDLE) {
-            outState.putInt("deepBrowserTreeOutgoing", deepBrowserTreeOutgoing);
-        }
-
-        if (viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE) {
-            outState.putInt(DEEP_BROWSER_TREE_LINKS, deepBrowserTreeLinks);
-        }
-
-        if (viewPagerShares != null) {
-            indexShares = viewPagerShares.getCurrentItem();
-        }
-        outState.putInt("indexShares", indexShares);
-
         outState.putString("pathNavigationOffline", pathNavigationOffline);
 
         if (turnOnNotifications) {
@@ -1340,7 +1304,7 @@ public class ManagerActivity extends TransfersManagementActivity
         outState.putInt("comesFromNotificationsLevel", comesFromNotificationsLevel);
         outState.putLong("comesFromNotificationHandle", comesFromNotificationHandle);
         outState.putLong("comesFromNotificationHandleSaved", comesFromNotificationHandleSaved);
-        outState.putInt(COMES_FROM_NOTIFICATIONS_SHARED_INDEX, comesFromNotificationSharedIndex);
+        outState.putSerializable(COMES_FROM_NOTIFICATIONS_SHARED_INDEX, comesFromNotificationSharedIndex);
         outState.putBoolean("onAskingPermissionsFragment", onAskingPermissionsFragment);
         permissionsFragment = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
         if (onAskingPermissionsFragment && permissionsFragment != null) {
@@ -1439,6 +1403,8 @@ public class ManagerActivity extends TransfersManagementActivity
         Timber.d("onCreate after call super");
 
         viewModel = new ViewModelProvider(this).get(ManagerViewModel.class);
+        incomingSharesViewModel = new ViewModelProvider(this).get(IncomingSharesViewModel.class);
+        outgoingSharesViewModel = new ViewModelProvider(this).get(OutgoingSharesViewModel.class);
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         viewModel.getUpdateUsers().observe(this,
                 new EventObserver<>(users -> {
@@ -1489,16 +1455,11 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (savedInstanceState != null) {
             Timber.d("Bundle is NOT NULL");
-            deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
-            deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
-            deepBrowserTreeLinks = savedInstanceState.getInt(DEEP_BROWSER_TREE_LINKS, 0);
             isSMSDialogShowing = savedInstanceState.getBoolean(STATE_KEY_SMS_DIALOG, false);
             firstLogin = savedInstanceState.getBoolean(EXTRA_FIRST_LOGIN);
             askPermissions = savedInstanceState.getBoolean(EXTRA_ASK_PERMISSIONS);
             drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
             bottomItemBeforeOpenFullscreenOffline = savedInstanceState.getInt(BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE);
-            indexShares = savedInstanceState.getInt("indexShares", indexShares);
-            Timber.d("savedInstanceState -> indexShares: %s", indexShares);
             pathNavigationOffline = savedInstanceState.getString("pathNavigationOffline", pathNavigationOffline);
             Timber.d("savedInstanceState -> pathNavigationOffline: %s", pathNavigationOffline);
             selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
@@ -1511,7 +1472,10 @@ public class ManagerActivity extends TransfersManagementActivity
             comesFromNotificationsLevel = savedInstanceState.getInt("comesFromNotificationsLevel", 0);
             comesFromNotificationHandle = savedInstanceState.getLong("comesFromNotificationHandle", INVALID_VALUE);
             comesFromNotificationHandleSaved = savedInstanceState.getLong("comesFromNotificationHandleSaved", INVALID_VALUE);
-            comesFromNotificationSharedIndex = savedInstanceState.getInt(COMES_FROM_NOTIFICATIONS_SHARED_INDEX, INVALID_VALUE);
+            if(savedInstanceState.getSerializable(COMES_FROM_NOTIFICATIONS_SHARED_INDEX) != null)
+                comesFromNotificationSharedIndex = (SharesTab) savedInstanceState.getSerializable(COMES_FROM_NOTIFICATIONS_SHARED_INDEX);
+            else
+                comesFromNotificationSharedIndex = SharesTab.NONE;
             onAskingPermissionsFragment = savedInstanceState.getBoolean("onAskingPermissionsFragment", false);
             if (onAskingPermissionsFragment) {
                 permissionsFragment = (PermissionsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.PERMISSIONS.getTag());
@@ -1555,9 +1519,6 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         } else {
             Timber.d("Bundle is NULL");
-            deepBrowserTreeIncoming = 0;
-            deepBrowserTreeOutgoing = 0;
-            deepBrowserTreeLinks = 0;
             this.setPathNavigationOffline(OFFLINE_ROOT);
         }
 
@@ -1594,7 +1555,7 @@ public class ManagerActivity extends TransfersManagementActivity
         });
 
         LiveEventBus.get(EVENT_FAILED_TRANSFERS, Boolean.class).observe(this, failed -> {
-            if (drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == COMPLETED_TAB) {
+            if (drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == TransfersTab.COMPLETED_TAB) {
                 retryTransfers.setVisible(failed);
             }
         });
@@ -1895,9 +1856,10 @@ public class ManagerActivity extends TransfersManagementActivity
         tabLayoutShares = findViewById(R.id.sliding_tabs_shares);
         viewPagerShares = findViewById(R.id.shares_tabs_pager);
         viewPagerShares.setOffscreenPageLimit(3);
+        // Set an empty page transformer to override default animation when notifying the adapter
+        viewPagerShares.setPageTransformer((page, position) -> { });
 
-        viewPagerShares.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
+        viewPagerShares.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             }
@@ -1907,8 +1869,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 Timber.d("selectDrawerItemSharedItems - TabId: %s", position);
                 supportInvalidateOptionsMenu();
                 checkScrollElevation();
-                setSharesTabIcons(position);
-                switch (position) {
+                SharesTab selectedTab = SharesTab.Companion.fromPosition(position);
+                switch (selectedTab) {
                     case INCOMING_TAB:
                         if (isOutgoingAdded() && outgoingSharesFragment.isMultipleSelect()) {
                             outgoingSharesFragment.getActionMode().finish();
@@ -1940,6 +1902,26 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         });
 
+        tabLayoutShares.addOnTabSelectedListener(
+                new TabLayout.OnTabSelectedListener() {
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        int tabIconColor = ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300);
+                        tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
+                    }
+
+                    @Override
+                    public void onTabUnselected(TabLayout.Tab tab) {
+                        int tabIconColor = ContextCompat.getColor(getApplicationContext(), R.color.grey_300_grey_600);
+                        tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
+                    }
+
+                    @Override
+                    public void onTabReselected(TabLayout.Tab tab) {
+                    }
+                }
+        );
+
         //Tab section Transfers
         tabLayoutTransfers = (TabLayout) findViewById(R.id.sliding_tabs_transfers);
         viewPagerTransfers = findViewById(R.id.transfers_tabs_pager);
@@ -1953,9 +1935,10 @@ public class ManagerActivity extends TransfersManagementActivity
                 supportInvalidateOptionsMenu();
                 checkScrollElevation();
 
-                if (position == PENDING_TAB && isTransfersInProgressAdded()) {
+                TransfersTab selectedTab = TransfersTab.Companion.fromPosition(position);
+                if (selectedTab == TransfersTab.PENDING_TAB && isTransfersInProgressAdded()) {
                     transfersFragment.setGetMoreQuotaViewVisibility();
-                } else if (position == COMPLETED_TAB) {
+                } else if (selectedTab == TransfersTab.COMPLETED_TAB) {
                     if (isTransfersCompletedAdded()) {
                         completedTransfersFragment.setGetMoreQuotaViewVisibility();
                     }
@@ -2096,7 +2079,10 @@ public class ManagerActivity extends TransfersManagementActivity
                         intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.setAction(ACTION_SHOW_TRANSFERS);
-                        intent.putExtra(TRANSFERS_TAB, getIntent().getIntExtra(TRANSFERS_TAB, ERROR_TAB));
+                        if (getIntent().getSerializableExtra(TRANSFERS_TAB) != null)
+                            intent.putExtra(TRANSFERS_TAB, (TransfersTab) getIntent().getSerializableExtra(TRANSFERS_TAB));
+                        else
+                            intent.putExtra(TRANSFERS_TAB, TransfersTab.NONE);
                         startActivity(intent);
                         finish();
                         return;
@@ -2290,12 +2276,11 @@ public class ManagerActivity extends TransfersManagementActivity
                                 } else {
                                     //Incoming
                                     drawerItem = DrawerItem.SHARED_ITEMS;
-                                    indexShares = 0;
+                                    viewModel.setSharesTab(SharesTab.INCOMING_TAB);
                                     MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
                                     if (parentIntentN != null) {
-                                        deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, this);
+                                        incomingSharesViewModel.setIncomingTreeDepth(calculateDeepBrowserTreeIncoming(parentIntentN, this), handleIntent);
                                     }
-                                    viewModel.setIncomingParentHandle(handleIntent);
                                     selectDrawerItem(drawerItem);
                                     selectDrawerItemPending = false;
                                 }
@@ -2377,7 +2362,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         markNotificationsSeen(true);
 
                         drawerItem = DrawerItem.SHARED_ITEMS;
-                        indexShares = 0;
+                        viewModel.setSharesTab(SharesTab.INCOMING_TAB);
                         selectDrawerItem(drawerItem);
                         selectDrawerItemPending = false;
                     } else if (getIntent().getAction().equals(ACTION_SHOW_MY_ACCOUNT)) {
@@ -2532,7 +2517,10 @@ public class ManagerActivity extends TransfersManagementActivity
                             }
 
                             drawerItem = DrawerItem.TRANSFERS;
-                            indexTransfers = intentRec.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
+                            if (intentRec.getSerializableExtra(TRANSFERS_TAB) != null)
+                                viewModel.setTransfersTab((TransfersTab) intentRec.getSerializableExtra(TRANSFERS_TAB));
+                            else
+                                viewModel.setTransfersTab(TransfersTab.NONE);
                             setIntent(null);
                         } else if (intentRec.getAction().equals(ACTION_REFRESH_AFTER_BLOCKED)) {
                             drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -3081,8 +3069,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case MegaShare.ACCESS_READ:
             case MegaShare.ACCESS_READWRITE:
             case MegaShare.ACCESS_FULL:
-                viewModel.setIncomingParentHandle(handleIntent);
-                deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, this);
+                incomingSharesViewModel.setIncomingTreeDepth(calculateDeepBrowserTreeIncoming(parentIntentN, this), handleIntent);
                 drawerItem = DrawerItem.SHARED_ITEMS;
                 break;
 
@@ -3225,7 +3212,10 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else if (intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
                     Timber.d("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
                     drawerItem = DrawerItem.TRANSFERS;
-                    indexTransfers = intent.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
+                    if (intent.getSerializableExtra(TRANSFERS_TAB) != null)
+                        viewModel.setTransfersTab((TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
+                    else
+                        viewModel.setTransfersTab(TransfersTab.NONE);
                     selectDrawerItem(drawerItem);
 
                     String text = getString(R.string.cam_sync_cancel_sync);
@@ -3253,7 +3243,10 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
 
                     drawerItem = DrawerItem.TRANSFERS;
-                    indexTransfers = intent.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
+                    if (intent.getSerializableExtra(TRANSFERS_TAB) != null)
+                        viewModel.setTransfersTab((TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
+                    else
+                        viewModel.setTransfersTab(TransfersTab.NONE);
                     selectDrawerItem(drawerItem);
                 } else if (intent.getAction().equals(ACTION_TAKE_SELFIE)) {
                     Timber.d("Intent take selfie");
@@ -3287,7 +3280,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     markNotificationsSeen(true);
 
                     drawerItem = DrawerItem.SHARED_ITEMS;
-                    indexShares = 0;
+                    viewModel.setSharesTab(SharesTab.INCOMING_TAB);
                     selectDrawerItem(drawerItem);
                 } else if (getIntent().getAction().equals(ACTION_OPEN_CONTACTS_SECTION)) {
                     Timber.d("ACTION_OPEN_CONTACTS_SECTION");
@@ -3733,13 +3726,13 @@ public class ManagerActivity extends TransfersManagementActivity
             case SHARED_ITEMS: {
                 Timber.d("Shared Items SECTION");
                 aB.setSubtitle(null);
-                int indexShares = getTabItemShares();
-                if (indexShares == ERROR_TAB) break;
+                SharesTab indexShares = getTabItemShares();
+                if (indexShares == SharesTab.NONE) break;
                 switch (indexShares) {
                     case INCOMING_TAB: {
                         if (isIncomingAdded()) {
-                            if (viewModel.getState().getValue().getIncomingParentHandle() != -1) {
-                                MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getIncomingParentHandle());
+                            if (incomingSharesState(this).getIncomingParentHandle() != -1) {
+                                MegaNode node = megaApi.getNodeByHandle(incomingSharesState(this).getIncomingParentHandle());
                                 if (node == null) {
                                     aB.setTitle(getResources().getString(R.string.title_shared_items));
                                 } else {
@@ -3759,8 +3752,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     case OUTGOING_TAB: {
                         Timber.d("setToolbarTitle: OUTGOING TAB");
                         if (isOutgoingAdded()) {
-                            if (viewModel.getState().getValue().getOutgoingParentHandle() != -1) {
-                                MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getOutgoingParentHandle());
+                            if (outgoingSharesState(this).getOutgoingParentHandle() != -1) {
+                                MegaNode node = megaApi.getNodeByHandle(outgoingSharesState(this).getOutgoingParentHandle());
                                 aB.setTitle(node.getName());
                                 viewModel.setIsFirstNavigationLevel(false);
                             } else {
@@ -4120,43 +4113,26 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (sharesPageAdapter == null) {
             Timber.w("sharesPageAdapter is NULL");
-            sharesPageAdapter = new SharesPageAdapter(getSupportFragmentManager(), this);
+            sharesPageAdapter = new SharesPageAdapter(this);
             viewPagerShares.setAdapter(sharesPageAdapter);
-            tabLayoutShares.setupWithViewPager(viewPagerShares);
-            setSharesTabIcons(indexShares);
+            new TabLayoutMediator(tabLayoutShares, viewPagerShares, (tab, position) -> {
+                if (position == SharesTab.INCOMING_TAB.getPosition()) {
+                    tab.setText(R.string.tab_incoming_shares);
+                    tab.setIcon(R.drawable.ic_incoming_shares);
+                } else if (position == SharesTab.OUTGOING_TAB.getPosition()) {
+                    tab.setText(R.string.tab_outgoing_shares);
+                    tab.setIcon(R.drawable.ic_outgoing_shares);
+                } else if (position == SharesTab.LINKS_TAB.getPosition()) {
+                    tab.setText(R.string.tab_links_shares);
+                    tab.setIcon(R.drawable.link_ic);
+                }
+            }).attach();
         }
 
         updateSharesTab();
         setToolbarTitle();
 
         drawerLayout.closeDrawer(Gravity.LEFT);
-    }
-
-    private void setSharesTabIcons(int tabSelected) {
-        if (tabLayoutShares == null
-                || tabLayoutShares.getTabAt(INCOMING_TAB) == null
-                || tabLayoutShares.getTabAt(OUTGOING_TAB) == null
-                || tabLayoutShares.getTabAt(LINKS_TAB) == null) {
-            return;
-        }
-
-        // The TabLayout style sets the default icon tint
-        switch (tabSelected) {
-            case OUTGOING_TAB:
-                tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(R.drawable.ic_incoming_shares);
-                tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIconSecondary(this, R.drawable.ic_outgoing_shares, R.color.red_600_red_300));
-                tabLayoutShares.getTabAt(LINKS_TAB).setIcon(R.drawable.link_ic);
-                break;
-            case LINKS_TAB:
-                tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(R.drawable.ic_incoming_shares);
-                tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(R.drawable.ic_outgoing_shares);
-                tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIconSecondary(this, R.drawable.link_ic, R.color.red_600_red_300));
-                break;
-            default:
-                tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIconSecondary(this, R.drawable.ic_incoming_shares, R.color.red_600_red_300));
-                tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(R.drawable.ic_outgoing_shares);
-                tabLayoutShares.getTabAt(LINKS_TAB).setIcon(R.drawable.link_ic);
-        }
     }
 
     public void selectDrawerItemNotifications() {
@@ -4213,17 +4189,19 @@ public class ManagerActivity extends TransfersManagementActivity
         if (viewPagerTransfers == null) {
             return;
         }
-        indexTransfers = transfersManagement.getAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
 
-        switch (indexTransfers) {
+
+        viewModel.setTransfersTab(transfersManagement.getAreFailedTransfers() || showCompleted ? TransfersTab.COMPLETED_TAB : TransfersTab.PENDING_TAB);
+
+        switch (viewModel.getState().getValue().getTransfersTab()) {
             case COMPLETED_TAB:
                 refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
-                viewPagerTransfers.setCurrentItem(COMPLETED_TAB);
+                viewPagerTransfers.setCurrentItem(TransfersTab.COMPLETED_TAB.getPosition());
                 break;
 
             default:
                 refreshFragment(FragmentTag.TRANSFERS.getTag());
-                viewPagerTransfers.setCurrentItem(PENDING_TAB);
+                viewPagerTransfers.setCurrentItem(TransfersTab.PENDING_TAB.getPosition());
 
                 if (transfersManagement.getShouldShowNetworkWarning()) {
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
@@ -4236,7 +4214,8 @@ public class ManagerActivity extends TransfersManagementActivity
             mTabsAdapterTransfers.notifyDataSetChanged();
         }
 
-        indexTransfers = viewPagerTransfers.getCurrentItem();
+        viewModel.setTransfersTab(TransfersTab.Companion.fromPosition(viewPagerTransfers.getCurrentItem()));
+
         setToolbarTitle();
     }
 
@@ -4291,16 +4270,16 @@ public class ManagerActivity extends TransfersManagementActivity
 
         switch (drawerItem) {
             case SHARED_ITEMS: {
-                int tabItemShares = getTabItemShares();
+                SharesTab tabItemShares = getTabItemShares();
 
-                if ((tabItemShares == INCOMING_TAB && viewModel.getState().getValue().getIncomingParentHandle() != INVALID_HANDLE)
-                        || (tabItemShares == OUTGOING_TAB && viewModel.getState().getValue().getOutgoingParentHandle() != INVALID_HANDLE)
-                        || (tabItemShares == LINKS_TAB && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE)) {
+                if ((tabItemShares == SharesTab.INCOMING_TAB && incomingSharesState(this).getIncomingParentHandle() != INVALID_HANDLE)
+                        || (tabItemShares == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE)
+                        || (tabItemShares == SharesTab.LINKS_TAB && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE)) {
                     tabLayoutShares.setVisibility(View.GONE);
-                    viewPagerShares.disableSwipe(true);
+                    viewPagerShares.setUserInputEnabled(false);
                 } else {
                     tabLayoutShares.setVisibility(View.VISIBLE);
-                    viewPagerShares.disableSwipe(false);
+                    viewPagerShares.setUserInputEnabled(true);
                 }
 
                 viewPagerShares.setVisibility(View.VISIBLE);
@@ -4335,21 +4314,21 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param hide       If true, hides the tabs, else shows them.
      * @param currentTab The current tab where the action happens.
      */
-    public void hideTabs(boolean hide, int currentTab) {
+    public void hideTabs(boolean hide, Tab currentTab) {
         int visibility = hide ? View.GONE : View.VISIBLE;
 
         switch (drawerItem) {
             case SHARED_ITEMS:
-                switch (currentTab) {
+                switch ((SharesTab) currentTab) {
                     case INCOMING_TAB:
-                        if (!isIncomingAdded() || (!hide && viewModel.getState().getValue().getIncomingParentHandle() != INVALID_HANDLE)) {
+                        if (!isIncomingAdded() || (!hide && incomingSharesState(this).getIncomingParentHandle() != INVALID_HANDLE)) {
                             return;
                         }
 
                         break;
 
                     case OUTGOING_TAB:
-                        if (!isOutgoingAdded() || (!hide && viewModel.getState().getValue().getOutgoingParentHandle() != INVALID_HANDLE)) {
+                        if (!isOutgoingAdded() || (!hide && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE)) {
                             return;
                         }
 
@@ -4364,11 +4343,11 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
 
                 tabLayoutShares.setVisibility(visibility);
-                viewPagerShares.disableSwipe(hide);
+                viewPagerShares.setUserInputEnabled(!hide);
                 break;
 
             case TRANSFERS:
-                if (currentTab == PENDING_TAB && !isTransfersInProgressAdded()) {
+                if (currentTab == TransfersTab.PENDING_TAB && !isTransfersInProgressAdded()) {
                     return;
                 }
 
@@ -4810,7 +4789,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isIncomingAdded() {
         if (sharesPageAdapter == null) return false;
 
-        incomingSharesFragment = (IncomingSharesFragment) sharesPageAdapter.instantiateItem(viewPagerShares, INCOMING_TAB);
+        incomingSharesFragment = (MegaNodeBaseFragment) sharesPageAdapter.getFragment(SharesTab.INCOMING_TAB.getPosition());
 
         return incomingSharesFragment != null && incomingSharesFragment.isAdded();
     }
@@ -4818,7 +4797,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isOutgoingAdded() {
         if (sharesPageAdapter == null) return false;
 
-        outgoingSharesFragment = (OutgoingSharesFragment) sharesPageAdapter.instantiateItem(viewPagerShares, OUTGOING_TAB);
+        outgoingSharesFragment = (MegaNodeBaseFragment) sharesPageAdapter.getFragment(SharesTab.OUTGOING_TAB.getPosition());
 
         return outgoingSharesFragment != null && outgoingSharesFragment.isAdded();
     }
@@ -4826,7 +4805,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isLinksAdded() {
         if (sharesPageAdapter == null) return false;
 
-        linksFragment = (LinksFragment) sharesPageAdapter.instantiateItem(viewPagerShares, LINKS_TAB);
+        linksFragment = (MegaNodeBaseFragment)  sharesPageAdapter.getFragment(SharesTab.LINKS_TAB.getPosition());
 
         return linksFragment != null && linksFragment.isAdded();
     }
@@ -4834,7 +4813,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isTransfersInProgressAdded() {
         if (mTabsAdapterTransfers == null) return false;
 
-        transfersFragment = (TransfersFragment) mTabsAdapterTransfers.instantiateItem(viewPagerTransfers, PENDING_TAB);
+        transfersFragment = (TransfersFragment) mTabsAdapterTransfers.instantiateItem(viewPagerTransfers, TransfersTab.PENDING_TAB.getPosition());
 
         return transfersFragment.isAdded();
     }
@@ -4842,7 +4821,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isTransfersCompletedAdded() {
         if (mTabsAdapterTransfers == null) return false;
 
-        completedTransfersFragment = (CompletedTransfersFragment) mTabsAdapterTransfers.instantiateItem(viewPagerTransfers, COMPLETED_TAB);
+        completedTransfersFragment = (CompletedTransfersFragment) mTabsAdapterTransfers.instantiateItem(viewPagerTransfers, TransfersTab.COMPLETED_TAB.getPosition());
 
         return completedTransfersFragment.isAdded();
     }
@@ -4879,11 +4858,11 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
             }
             case SHARED_ITEMS: {
-                if (getTabItemShares() == INCOMING_TAB && isIncomingAdded())
+                if (getTabItemShares() == SharesTab.INCOMING_TAB && isIncomingAdded())
                     incomingSharesFragment.checkScroll();
-                else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded())
+                else if (getTabItemShares() == SharesTab.OUTGOING_TAB && isOutgoingAdded())
                     outgoingSharesFragment.checkScroll();
-                else if (getTabItemShares() == LINKS_TAB && isLinksAdded())
+                else if (getTabItemShares() == SharesTab.LINKS_TAB && isLinksAdded())
                     linksFragment.checkScroll();
                 break;
             }
@@ -4909,9 +4888,9 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             case TRANSFERS: {
-                if (getTabItemTransfers() == PENDING_TAB && isTransfersInProgressAdded()) {
+                if (getTabItemTransfers() == TransfersTab.PENDING_TAB && isTransfersInProgressAdded()) {
                     transfersFragment.checkScroll();
-                } else if (getTabItemTransfers() == COMPLETED_TAB && isTransfersCompletedAdded()) {
+                } else if (getTabItemTransfers() == TransfersTab.COMPLETED_TAB && isTransfersCompletedAdded()) {
                     completedTransfersFragment.checkScroll();
                 }
             }
@@ -5174,8 +5153,8 @@ public class ManagerActivity extends TransfersManagementActivity
                                 viewModel.getState().getValue().getBrowserParentHandle(),
                                 viewModel.getState().getValue().getRubbishBinParentHandle(),
                                 viewModel.getState().getValue().getInboxParentHandle(),
-                                viewModel.getState().getValue().getIncomingParentHandle(),
-                                viewModel.getState().getValue().getOutgoingParentHandle(),
+                                incomingSharesState(ManagerActivity.this).getIncomingParentHandle(),
+                                outgoingSharesState(ManagerActivity.this).getOutgoingParentHandle(),
                                 viewModel.getState().getValue().getLinksParentHandle(),
                                 viewModel.getState().getValue().isFirstNavigationLevel()
                         );
@@ -5260,15 +5239,15 @@ public class ManagerActivity extends TransfersManagementActivity
                 case SHARED_ITEMS:
                     moreMenuItem.setVisible(!isFirstNavigationLevel());
 
-                    if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) {
+                    if (getTabItemShares() == SharesTab.INCOMING_TAB && isIncomingAdded()) {
                         if (isIncomingAdded() && incomingSharesFragment.getItemCount() > 0) {
                             searchMenuItem.setVisible(true);
                         }
-                    } else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) {
+                    } else if (getTabItemShares() == SharesTab.OUTGOING_TAB && isOutgoingAdded()) {
                         if (isOutgoingAdded() && outgoingSharesFragment.getItemCount() > 0) {
                             searchMenuItem.setVisible(true);
                         }
-                    } else if (getTabItemShares() == LINKS_TAB && isLinksAdded()) {
+                    } else if (getTabItemShares() == SharesTab.LINKS_TAB && isLinksAdded()) {
                         if (isLinksAdded() && linksFragment.getItemCount() > 0) {
                             searchMenuItem.setVisible(true);
                         }
@@ -5286,7 +5265,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     break;
 
                 case TRANSFERS:
-                    if (getTabItemTransfers() == PENDING_TAB && isTransfersInProgressAdded() && transfersInProgress.size() > 0) {
+                    if (getTabItemTransfers() == TransfersTab.PENDING_TAB && isTransfersInProgressAdded() && transfersInProgress.size() > 0) {
                         if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
                             playTransfersMenuIcon.setVisible(true);
                         } else {
@@ -5295,7 +5274,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                         cancelAllTransfersMenuItem.setVisible(true);
                         enableSelectMenuItem.setVisible(true);
-                    } else if (getTabItemTransfers() == COMPLETED_TAB && isTransfersInProgressAdded() && completedTransfersFragment.isAnyTransferCompleted()) {
+                    } else if (getTabItemTransfers() == TransfersTab.COMPLETED_TAB && isTransfersInProgressAdded() && completedTransfersFragment.isAnyTransferCompleted()) {
                         clearCompletedTransfers.setVisible(true);
                         retryTransfers.setVisible(thereAreFailedOrCancelledTransfers());
                     }
@@ -5350,8 +5329,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 viewModel.getState().getValue().getBrowserParentHandle(),
                 viewModel.getState().getValue().getRubbishBinParentHandle(),
                 viewModel.getState().getValue().getInboxParentHandle(),
-                viewModel.getState().getValue().getIncomingParentHandle(),
-                viewModel.getState().getValue().getOutgoingParentHandle(),
+                incomingSharesState(this).getIncomingParentHandle(),
+                outgoingSharesState(this).getOutgoingParentHandle(),
                 viewModel.getState().getValue().getLinksParentHandle(),
                 viewModel.getState().getValue().isFirstNavigationLevel()
         );
@@ -5464,11 +5443,11 @@ public class ManagerActivity extends TransfersManagementActivity
                             rubbishBinFragment.onBackPressed();
                         }
                     } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
-                        if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) {
+                        if (getTabItemShares() == SharesTab.INCOMING_TAB && isIncomingAdded()) {
                             incomingSharesFragment.onBackPressed();
-                        } else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) {
+                        } else if (getTabItemShares() == SharesTab.OUTGOING_TAB && isOutgoingAdded()) {
                             outgoingSharesFragment.onBackPressed();
-                        } else if (getTabItemShares() == LINKS_TAB && isLinksAdded()) {
+                        } else if (getTabItemShares() == SharesTab.LINKS_TAB && isLinksAdded()) {
                             linksFragment.onBackPressed();
                         }
                     } else if (drawerItem == DrawerItem.PHOTOS) {
@@ -5716,13 +5695,13 @@ public class ManagerActivity extends TransfersManagementActivity
         //Refresh Rubbish Fragment
         refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
 
-        //Refresh shares section
-        refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+        if (sharesPageAdapter != null) {
+            //Refresh shares section
+            sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
 
-        //Refresh shares section
-        refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
-
-        refreshSharesPageAdapter();
+            //Refresh shares section
+            sharesPageAdapter.refreshFragment(SharesTab.OUTGOING_TAB.getPosition());
+        }
 
         //Refresh search section
         refreshFragment(FragmentTag.SEARCH.getTag());
@@ -5825,6 +5804,26 @@ public class ManagerActivity extends TransfersManagementActivity
             rubbishBinFragment.hideMultipleSelect();
             rubbishBinFragment.setNodes(nodes);
             rubbishBinFragment.getRecyclerView().invalidate();
+        }
+    }
+
+    /**
+     * Refreshes the contents of InboxFragment once a sorting method has been selected
+     */
+    private void refreshInboxFragment(int order) {
+        if (inboxFragment != null) {
+            MegaNode inboxParentNode;
+
+            if (viewModel.getState().getValue().getInboxParentHandle() == -1) {
+                inboxParentNode = megaApi.getInboxNode();
+            } else {
+                inboxParentNode = megaApi.getNodeByHandle(viewModel.getState().getValue().getInboxParentHandle());
+            }
+
+            if (inboxParentNode != null) {
+                inboxFragment.setNodes(megaApi.getChildren(inboxParentNode, order));
+                inboxFragment.getRecyclerView().invalidate();
+            }
         }
     }
 
@@ -6156,15 +6155,16 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case R.id.bottom_navigation_item_shared_items: {
                 if (drawerItem == DrawerItem.SHARED_ITEMS) {
-                    if (getTabItemShares() == INCOMING_TAB && viewModel.getState().getValue().getIncomingParentHandle() != INVALID_HANDLE) {
-                        viewModel.setIncomingParentHandle(INVALID_HANDLE);
-                        refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
-                    } else if (getTabItemShares() == OUTGOING_TAB && viewModel.getState().getValue().getOutgoingParentHandle() != INVALID_HANDLE) {
-                        viewModel.setOutgoingParentHandle(INVALID_HANDLE);
-                        refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
-                    } else if (getTabItemShares() == LINKS_TAB && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE) {
+                    if (getTabItemShares() == SharesTab.INCOMING_TAB && incomingSharesState(this).getIncomingParentHandle() != INVALID_HANDLE) {
+                        incomingSharesViewModel.resetIncomingTreeDepth();
+                        refreshIncomingShares();
+                    } else if (getTabItemShares() == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE) {
+                        outgoingSharesViewModel.resetOutgoingTreeDepth();
+                        refreshOutgoingShares();
+                    } else if (getTabItemShares() == SharesTab.LINKS_TAB && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE) {
                         viewModel.setLinksParentHandle(INVALID_HANDLE);
-                        refreshFragment(FragmentTag.LINKS.getTag());
+                        viewModel.resetLinksTreeDepth();
+                        refreshLinks();
                     }
 
                     refreshSharesPageAdapter();
@@ -6425,28 +6425,29 @@ public class ManagerActivity extends TransfersManagementActivity
                 case SHARED_ITEMS:
                     switch (getTabItemShares()) {
                         case INCOMING_TAB:
-                            decreaseDeepBrowserTreeIncoming();
-                            viewModel.setIncomingParentHandle(deepBrowserTreeIncoming == 0 ? INVALID_HANDLE : result.getOldParentHandle());
+                            incomingSharesViewModel.decreaseIncomingTreeDepth(
+                                    incomingSharesState(this).getIncomingTreeDepth() == 0 ? INVALID_HANDLE : result.getOldParentHandle());
                             refreshIncomingShares();
                             break;
 
                         case OUTGOING_TAB:
-                            decreaseDeepBrowserTreeOutgoing();
-                            viewModel.setOutgoingParentHandle(deepBrowserTreeOutgoing == 0 ? INVALID_HANDLE : result.getOldParentHandle());
+                            outgoingSharesViewModel.decreaseOutgoingTreeDepth(
+                                    outgoingSharesState(this).getOutgoingTreeDepth() == 0 ? INVALID_HANDLE : result.getOldParentHandle());
 
-                            if (viewModel.getState().getValue().getOutgoingParentHandle() == INVALID_HANDLE) {
-                                hideTabs(false, OUTGOING_TAB);
+                            if (outgoingSharesState(this).getOutgoingParentHandle() == INVALID_HANDLE) {
+                                hideTabs(false, SharesTab.OUTGOING_TAB);
                             }
 
                             refreshOutgoingShares();
                             break;
 
                         case LINKS_TAB:
-                            decreaseDeepBrowserTreeLinks();
-                            viewModel.setLinksParentHandle(deepBrowserTreeLinks == 0 ? INVALID_HANDLE : result.getOldParentHandle());
+                            viewModel.decreaseLinksTreeDepth();
+                            viewModel.setLinksParentHandle(
+                                    viewModel.getState().getValue().getLinksTreeDepth() == 0 ? INVALID_HANDLE : result.getOldParentHandle());
 
                             if (viewModel.getState().getValue().getLinksParentHandle() == INVALID_HANDLE) {
-                                hideTabs(false, LINKS_TAB);
+                                hideTabs(false, SharesTab.LINKS_TAB);
                             }
 
                             refreshLinks();
@@ -6832,11 +6833,11 @@ public class ManagerActivity extends TransfersManagementActivity
             case SHARED_ITEMS:
                 if (viewPagerShares == null) break;
 
-                if (getTabItemShares() == INCOMING_TAB) {
-                    parentHandle = viewModel.getState().getValue().getIncomingParentHandle();
-                } else if (getTabItemShares() == OUTGOING_TAB) {
-                    parentHandle = viewModel.getState().getValue().getOutgoingParentHandle();
-                } else if (getTabItemShares() == LINKS_TAB) {
+                if (getTabItemShares() == SharesTab.INCOMING_TAB) {
+                    parentHandle = incomingSharesState(this).getIncomingParentHandle();
+                } else if (getTabItemShares() == SharesTab.OUTGOING_TAB) {
+                    parentHandle = outgoingSharesState(this).getOutgoingParentHandle();
+                } else if (getTabItemShares() == SharesTab.LINKS_TAB) {
                     parentHandle = viewModel.getState().getValue().getLinksParentHandle();
                 }
                 break;
@@ -6854,10 +6855,10 @@ public class ManagerActivity extends TransfersManagementActivity
                         case SHARED_ITEMS:
                             switch (searchViewModel.getState().getValue().getSearchSharesTab()) {
                                 case INCOMING_TAB:
-                                    parentHandle = viewModel.getState().getValue().getIncomingParentHandle();
+                                    parentHandle = incomingSharesState(this).getIncomingParentHandle();
                                     break;
                                 case OUTGOING_TAB:
-                                    parentHandle = viewModel.getState().getValue().getOutgoingParentHandle();
+                                    parentHandle = outgoingSharesState(this).getOutgoingParentHandle();
                                     break;
                                 case LINKS_TAB:
                                     parentHandle = viewModel.getState().getValue().getLinksParentHandle();
@@ -7425,10 +7426,6 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
 
-        if (orderType == ORDER_OTHERS && deepBrowserTreeIncoming > 0) {
-            orderType = ORDER_CLOUD;
-        }
-
         bottomSheetDialogFragment = SortByBottomSheetDialogFragment.newInstance(orderType);
 
         bottomSheetDialogFragment.show(getSupportFragmentManager(),
@@ -7619,33 +7616,30 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private void refreshSharesPageAdapter() {
         if (sharesPageAdapter != null) {
-            sharesPageAdapter.notifyDataSetChanged();
-            setSharesTabIcons(getTabItemShares());
+            sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
+            sharesPageAdapter.refreshFragment(SharesTab.OUTGOING_TAB.getPosition());
+            sharesPageAdapter.refreshFragment(SharesTab.LINKS_TAB.getPosition());
         }
     }
 
     public void refreshCloudOrder(int order) {
-        //Refresh Cloud Fragment
+        // Refresh Cloud Fragment
         refreshCloudDrive();
 
-        //Refresh Rubbish Fragment
+        // Refresh Rubbish Fragment
         refreshRubbishBin();
 
-        onNodesSharedUpdate();
+        // Refresh Inbox Fragment
+        refreshInboxFragment(order);
 
-        if (getInboxFragment() != null) {
-            MegaNode inboxNode = megaApi.getInboxNode();
-            if (inboxNode != null) {
-                ArrayList<MegaNode> nodes = megaApi.getChildren(inboxNode, order);
-                inboxFragment.setNodes(nodes);
-                inboxFragment.getRecyclerView().invalidate();
-            }
-        }
+        onNodesSharedUpdate();
 
         refreshSearch();
     }
 
     public void refreshOthersOrder() {
+        refreshIncomingShares();
+        refreshOutgoingShares();
         refreshSharesPageAdapter();
         refreshSearch();
     }
@@ -7676,19 +7670,9 @@ public class ManagerActivity extends TransfersManagementActivity
         viewModel.setRubbishBinParentHandle(parentHandleRubbish);
     }
 
-    public void setParentHandleIncoming(long parentHandleIncoming) {
-        Timber.d("setParentHandleIncoming: %s", parentHandleIncoming);
-        viewModel.setIncomingParentHandle(parentHandleIncoming);
-    }
-
     public void setParentHandleInbox(long parentHandleInbox) {
         Timber.d("setParentHandleInbox: %s", parentHandleInbox);
         viewModel.setInboxParentHandle(parentHandleInbox);
-    }
-
-    public void setParentHandleOutgoing(long parentHandleOutgoing) {
-        Timber.d("Outgoing parent handle: %s", parentHandleOutgoing);
-        viewModel.setOutgoingParentHandle(parentHandleOutgoing);
     }
 
     @Override
@@ -7718,7 +7702,10 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
 
                 drawerItem = DrawerItem.TRANSFERS;
-                indexTransfers = intent.getIntExtra(TRANSFERS_TAB, ERROR_TAB);
+                if (intent.getSerializableExtra(TRANSFERS_TAB) != null)
+                    viewModel.setTransfersTab( (TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
+                else
+                    viewModel.setTransfersTab(TransfersTab.NONE);
                 selectDrawerItem(drawerItem);
                 return;
             }
@@ -9720,15 +9707,16 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             //Incoming Shares
             drawerItem = DrawerItem.SHARED_ITEMS;
-            comesFromNotificationSharedIndex = viewPagerShares.getCurrentItem();
-            indexShares = INCOMING_TAB;
-            comesFromNotificationDeepBrowserTreeIncoming = deepBrowserTreeIncoming;
-            comesFromNotificationHandleSaved = viewModel.getState().getValue().getIncomingParentHandle();
+            comesFromNotificationSharedIndex = SharesTab.Companion.fromPosition(viewPagerShares.getCurrentItem());
+            viewModel.setSharesTab(SharesTab.INCOMING_TAB);
+            comesFromNotificationDeepBrowserTreeIncoming = incomingSharesState(this).getIncomingTreeDepth();
+            comesFromNotificationHandleSaved = incomingSharesState(this).getIncomingParentHandle();
             if (parent != null) {
-                comesFromNotificationsLevel = deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(node, this);
+                int depth = calculateDeepBrowserTreeIncoming(node, this);
+                incomingSharesViewModel.setIncomingTreeDepth(depth, nodeHandle);
+                comesFromNotificationsLevel = depth;
             }
             openFolderRefresh = true;
-            viewModel.setIncomingParentHandle(nodeHandle);
             selectDrawerItem(drawerItem);
         }
     }
@@ -9803,17 +9791,11 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void refreshIncomingShares() {
-        if (!isIncomingAdded()) return;
-
-        incomingSharesFragment.hideMultipleSelect();
-        incomingSharesFragment.refresh();
+        incomingSharesViewModel.refreshIncomingSharesNode();
     }
 
     private void refreshOutgoingShares() {
-        if (!isOutgoingAdded()) return;
-
-        outgoingSharesFragment.hideMultipleSelect();
-        outgoingSharesFragment.refresh();
+        outgoingSharesViewModel.refreshOutgoingSharesNode();
     }
 
     private void refreshLinks() {
@@ -9842,32 +9824,9 @@ public class ManagerActivity extends TransfersManagementActivity
     public void updateNodes(@NonNull List<MegaNode> updatedNodes) {
         dismissAlertDialogIfExists(statusDialog);
 
-        boolean updateContacts = false;
-
         //Verify is it is a new item to the inbox
         for (int i = 0; i < updatedNodes.size(); i++) {
             MegaNode updatedNode = updatedNodes.get(i);
-
-            if (!updateContacts) {
-                if (updatedNode.isInShare()) {
-                    updateContacts = true;
-
-                    if (drawerItem == DrawerItem.SHARED_ITEMS
-                            && getTabItemShares() == INCOMING_TAB && viewModel.getState().getValue().getIncomingParentHandle() == updatedNode.getHandle()) {
-                        getNodeUseCase.get(viewModel.getState().getValue().getIncomingParentHandle())
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe((result, throwable) -> {
-                                    if (throwable != null) {
-                                        decreaseDeepBrowserTreeIncoming();
-                                        viewModel.setIncomingParentHandle(INVALID_HANDLE);
-                                        hideTabs(false, INCOMING_TAB);
-                                        refreshIncomingShares();
-                                    }
-                                });
-                    }
-                }
-            }
 
             if (updatedNode.getParentHandle() == inboxNode.getHandle()) {
                 Timber.d("New element to Inbox!!");
@@ -9875,7 +9834,9 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         }
 
-        onNodesSharedUpdate();
+        refreshOutgoingShares();
+        refreshIncomingShares();
+        refreshLinks();
 
         checkCameraUploadFolder(false, updatedNodes);
 
@@ -10169,51 +10130,19 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public int getDeepBrowserTreeIncoming() {
-        return deepBrowserTreeIncoming;
+        return incomingSharesState(this).getIncomingTreeDepth();
     }
 
-    public void setDeepBrowserTreeIncoming(int deep) {
-        deepBrowserTreeIncoming = deep;
-    }
-
-    public void increaseDeepBrowserTreeIncoming() {
-        deepBrowserTreeIncoming++;
-    }
-
-    public void decreaseDeepBrowserTreeIncoming() {
-        deepBrowserTreeIncoming--;
+    public void setDeepBrowserTreeIncoming(int deep, Long parentHandle) {
+        incomingSharesViewModel.setIncomingTreeDepth(deep, parentHandle);
     }
 
     public int getDeepBrowserTreeOutgoing() {
-        return deepBrowserTreeOutgoing;
-    }
-
-    public void setDeepBrowserTreeOutgoing(int deep) {
-        this.deepBrowserTreeOutgoing = deep;
-    }
-
-    public void increaseDeepBrowserTreeOutgoing() {
-        deepBrowserTreeOutgoing++;
-    }
-
-    public void decreaseDeepBrowserTreeOutgoing() {
-        deepBrowserTreeOutgoing--;
-    }
-
-    public void setDeepBrowserTreeLinks(int deepBrowserTreeLinks) {
-        this.deepBrowserTreeLinks = deepBrowserTreeLinks;
+        return outgoingSharesState(this).getOutgoingTreeDepth();
     }
 
     public int getDeepBrowserTreeLinks() {
-        return deepBrowserTreeLinks;
-    }
-
-    public void increaseDeepBrowserTreeLinks() {
-        deepBrowserTreeLinks++;
-    }
-
-    public void decreaseDeepBrowserTreeLinks() {
-        deepBrowserTreeLinks--;
+        return viewModel.getState().getValue().getLinksTreeDepth();
     }
 
     public DrawerItem getDrawerItem() {
@@ -10224,14 +10153,14 @@ public class ManagerActivity extends TransfersManagementActivity
         this.drawerItem = drawerItem;
     }
 
-    public int getTabItemShares() {
-        if (viewPagerShares == null) return ERROR_TAB;
-
-        return viewPagerShares.getCurrentItem();
+    public SharesTab getTabItemShares() {
+        return viewPagerShares == null ? SharesTab.NONE :
+                SharesTab.Companion.fromPosition(viewPagerShares.getCurrentItem());
     }
 
-    private int getTabItemTransfers() {
-        return viewPagerTransfers == null ? ERROR_TAB : viewPagerTransfers.getCurrentItem();
+    private TransfersTab getTabItemTransfers() {
+        return viewPagerTransfers == null ? TransfersTab.NONE :
+                TransfersTab.Companion.fromPosition(viewPagerTransfers.getCurrentItem());
     }
 
     public void setTabItemShares(int index) {
@@ -10304,8 +10233,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     case INCOMING_TAB:
                         if (!isIncomingAdded()) break;
 
-                        MegaNode parentNodeInSF = megaApi.getNodeByHandle(viewModel.getState().getValue().getIncomingParentHandle());
-                        if (deepBrowserTreeIncoming <= 0 || parentNodeInSF == null) {
+                        MegaNode parentNodeInSF = megaApi.getNodeByHandle(incomingSharesState(this).getIncomingParentHandle());
+                        if (incomingSharesState(this).getIncomingTreeDepth() <= 0 || parentNodeInSF == null) {
                             hideFabButton();
                             break;
                         }
@@ -10326,7 +10255,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     case OUTGOING_TAB:
                         if (!isOutgoingAdded()) break;
 
-                        if (deepBrowserTreeOutgoing <= 0) {
+                        if (outgoingSharesState(this).getOutgoingTreeDepth() <= 0) {
                             hideFabButton();
                         } else {
                             updateFabAndShow();
@@ -10336,7 +10265,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     case LINKS_TAB:
                         if (!isLinksAdded()) break;
 
-                        if (deepBrowserTreeLinks <= 0) {
+                        if (viewModel.getState().getValue().getLinksTreeDepth() <= 0) {
                             hideFabButton();
                         } else {
                             updateFabAndShow();
@@ -10805,15 +10734,13 @@ public class ManagerActivity extends TransfersManagementActivity
             case SHARED_ITEMS:
                 if (viewPagerShares == null || sharesPageAdapter == null) break;
 
-                if (getTabItemShares() == INCOMING_TAB) {
-                    viewModel.setIncomingParentHandle(node.getHandle());
-                    increaseDeepBrowserTreeIncoming();
-                } else if (getTabItemShares() == OUTGOING_TAB) {
-                    viewModel.setOutgoingParentHandle(node.getHandle());
-                    increaseDeepBrowserTreeOutgoing();
-                } else if (getTabItemShares() == LINKS_TAB) {
+                if (getTabItemShares() == SharesTab.INCOMING_TAB) {
+                    incomingSharesViewModel.increaseIncomingTreeDepth(node.getHandle());
+                } else if (getTabItemShares() == SharesTab.OUTGOING_TAB) {
+                    outgoingSharesViewModel.increaseOutgoingTreeDepth(node.getHandle());
+                } else if (getTabItemShares() == SharesTab.LINKS_TAB) {
                     viewModel.setLinksParentHandle(node.getHandle());
-                    increaseDeepBrowserTreeLinks();
+                    viewModel.increaseLinksTreeDepth();
                 }
                 refreshSharesPageAdapter();
 
@@ -10882,7 +10809,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (drawerItem == DrawerItem.SEARCH) return;
 
         searchViewModel.setSearchDrawerItem(drawerItem);
-        searchViewModel.setSearchSharedTab(SharesTab.Companion.fromPosition(getTabItemShares()));
+        searchViewModel.setSearchSharedTab(getTabItemShares());
 
         drawerItem = DrawerItem.SEARCH;
     }
@@ -10914,22 +10841,6 @@ public class ManagerActivity extends TransfersManagementActivity
         if (this.searchView != null) {
             this.searchView.setQuery(searchQuery, false);
         }
-    }
-
-    public long getParentHandleIncoming() {
-        return viewModel.getState().getValue().getIncomingParentHandle();
-    }
-
-    public long getParentHandleOutgoing() {
-        return viewModel.getState().getValue().getOutgoingParentHandle();
-    }
-
-    public long getParentHandleLinks() {
-        return viewModel.getState().getValue().getLinksParentHandle();
-    }
-
-    public void setParentHandleLinks(long parentHandleLinks) {
-        viewModel.setLinksParentHandle(parentHandleLinks);
     }
 
     private SearchFragment getSearchFragment() {
@@ -11026,6 +10937,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void viewNodeInFolder(MegaNode node) {
         MegaNode parentNode = MegaNodeUtil.getRootParentNode(megaApi, node);
+        viewInFolderNode = node;
         if (parentNode.getHandle() == megaApi.getRootNode().getHandle()) {
             viewModel.setBrowserParentHandle(node.getParentHandle());
             refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
@@ -11035,16 +10947,13 @@ public class ManagerActivity extends TransfersManagementActivity
             refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
             selectDrawerItem(DrawerItem.RUBBISH_BIN);
         } else if (parentNode.isInShare()) {
-            viewModel.setIncomingParentHandle(node.getParentHandle());
-            deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node),
-                    this);
-            refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
-            indexShares = INCOMING_TAB;
+            incomingSharesViewModel.setIncomingTreeDepth(calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node), this), node.getParentHandle());
+            if (sharesPageAdapter != null)
+                sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.getPosition());
+            viewModel.setSharesTab(SharesTab.INCOMING_TAB);
             if (viewPagerShares != null) {
-                viewPagerShares.setCurrentItem(indexShares);
-                if (sharesPageAdapter != null) {
-                    sharesPageAdapter.notifyDataSetChanged();
-                }
+                viewPagerShares.setCurrentItem(viewModel.getState().getValue().getSharesTab().getPosition());
+                refreshSharesPageAdapter();
             }
             selectDrawerItem(DrawerItem.SHARED_ITEMS);
         }
@@ -11227,7 +11136,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 refreshInboxList();
                 break;
             case SHARED_ITEMS:
-                onNodesSharedUpdate();
+                refreshOutgoingShares();
+                refreshIncomingShares();
+                refreshLinks();
                 break;
             case HOMEPAGE:
                 refreshOfflineNodes();
@@ -11434,24 +11345,18 @@ public class ManagerActivity extends TransfersManagementActivity
      * Updates the Shares section tab as per the indexShares.
      */
     public void updateSharesTab() {
-        if (indexShares == ERROR_TAB) {
+        if (viewModel.getState().getValue().getSharesTab() == SharesTab.NONE) {
             Timber.d("indexShares is -1");
             return;
         }
 
-        Timber.d("The index of the TAB Shares is: %s", indexShares);
+        Timber.d("The index of the TAB Shares is: %s", viewModel.getState().getValue().getSharesTab());
 
         if (viewPagerShares != null) {
-            switch (indexShares) {
-                case INCOMING_TAB:
-                case OUTGOING_TAB:
-                case LINKS_TAB:
-                    viewPagerShares.setCurrentItem(indexShares);
-                    break;
-            }
+            viewPagerShares.setCurrentItem(viewModel.getState().getValue().getSharesTab().getPosition(), false);
         }
 
-        indexShares = ERROR_TAB;
+        viewModel.setSharesTab(SharesTab.NONE);
     }
 
     /**
@@ -11462,12 +11367,11 @@ public class ManagerActivity extends TransfersManagementActivity
         comesFromNotifications = false;
         comesFromNotificationsLevel = 0;
         comesFromNotificationHandle = INVALID_VALUE;
-        indexShares = comesFromNotificationSharedIndex;
+        viewModel.setSharesTab(comesFromNotificationSharedIndex);
         updateSharesTab();
-        comesFromNotificationSharedIndex = INVALID_VALUE;
-        setDeepBrowserTreeIncoming(comesFromNotificationDeepBrowserTreeIncoming);
+        comesFromNotificationSharedIndex = SharesTab.NONE;
+        setDeepBrowserTreeIncoming(comesFromNotificationDeepBrowserTreeIncoming, comesFromNotificationHandleSaved);
         comesFromNotificationDeepBrowserTreeIncoming = INVALID_VALUE;
-        setParentHandleIncoming(comesFromNotificationHandleSaved);
         comesFromNotificationHandleSaved = INVALID_VALUE;
         refreshIncomingShares();
     }

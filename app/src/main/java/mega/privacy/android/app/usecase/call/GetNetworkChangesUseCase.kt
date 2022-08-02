@@ -42,8 +42,9 @@ class GetNetworkChangesUseCase @Inject constructor(
      */
     fun get(chatId: Long): Flowable<NetworkQuality> =
         Flowable.create({ emitter ->
-            val currentCall = megaChatApi.getChatCall(chatId)
-            emitter.checkCallNetworkQuality(currentCall)
+            megaChatApi.getChatCall(chatId)?.let { currentCall ->
+                emitter.checkCallNetworkQuality(currentCall)
+            }
             val localNetworkQualityObserver = Observer<MegaChatCall> { call ->
                 if (chatId == call.chatid) {
                     emitter.checkCallNetworkQuality(call)

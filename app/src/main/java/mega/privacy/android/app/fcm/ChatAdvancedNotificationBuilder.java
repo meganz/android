@@ -64,6 +64,7 @@ import android.os.Build;
 import android.view.View;
 import android.widget.RemoteViews;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
@@ -71,6 +72,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -84,6 +86,7 @@ import mega.privacy.android.app.meeting.CallNotificationIntentService;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.domain.entity.ChatRequest;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -91,7 +94,6 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNodeList;
@@ -131,7 +133,7 @@ public final class ChatAdvancedNotificationBuilder {
     private String notificationChannelIdIncomingCall = NOTIFICATION_CHANNEL_INCOMING_CALLS_ID;
     private String notificationChannelNameIncomingCall = NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME;
 
-    private MegaChatRequest request;
+    private ChatRequest request;
     private boolean isUpdatingUserName;
 
     private ChatController chatC;
@@ -161,7 +163,8 @@ public final class ChatAdvancedNotificationBuilder {
         chatC = new ChatController(context);
     }
 
-    public void sendBundledNotification(Uri uriParameter, String vibration, long chatId, MegaHandleList unreadHandleList) {
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void sendBundledNotification(Uri uriParameter, String vibration, long chatId, List<Long> unreadHandleList) {
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
 
         ArrayList<MegaChatMessage> unreadMessages = new ArrayList<>();
@@ -203,14 +206,13 @@ public final class ChatAdvancedNotificationBuilder {
         notificationManager.notify(id, notification);
     }
 
-    public void buildNotificationPreN(Uri uriParameter, String vibration, MegaChatRequest request) {
+    public void buildNotificationPreN(Uri uriParameter, String vibration, ChatRequest request) {
         Timber.d("buildNotificationPreN");
 
-        MegaHandleList chatHandleList = request.getMegaHandleList();
-
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
-        for (int i = 0; i < chatHandleList.size(); i++) {
-            MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));
+
+        for (Long chatHandle : request.getHandleList()) {
+            MegaChatListItem chat = megaChatApi.getChatListItem(chatHandle);
             if (chat != null) {
                 if (isEnableChatNotifications(chat.getChatId())) {
                     chats.add(chat);
@@ -285,7 +287,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         for (int i = 0; i < chats.size(); i++) {
             if (MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
-                MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
+                List<Long> handleListUnread = request.getPeersListByChatHandle().get(chats.get(i).getChatId());
 
                 for (int j = 0; j < handleListUnread.size(); j++) {
                     Timber.d("Get message id: %d from chatId: %d", handleListUnread.get(j), chats.get(i).getChatId());
@@ -412,6 +414,7 @@ public final class ChatAdvancedNotificationBuilder {
         return message.getContent();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public Notification buildNotification(Uri uriParameter, String vibration, String groupKey, MegaChatRoom chat, ArrayList<MegaChatMessage> unreadMessageList) {
         Intent intent = new Intent(context, ManagerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1168,7 +1171,7 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    public void generateChatNotification(MegaChatRequest request) {
+    public void generateChatNotification(ChatRequest request) {
         Timber.d("generateChatNotification");
         this.request = request;
 
@@ -1190,18 +1193,20 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    public void newGenerateChatNotification(MegaChatRequest request) {
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void newGenerateChatNotification(ChatRequest request) {
         Timber.d("newGenerateChatNotification");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             boolean beep = request.getFlag();
             Timber.d("Should beep: %s", beep);
 
-            MegaHandleList chatHandleList = request.getMegaHandleList();
+            List<Long> chatHandleList = request.getHandleList();
             Timber.d("chats size: %s", chatHandleList.size());
             ArrayList<MegaChatListItem> chats = new ArrayList<>();
-            for (int i = 0; i < chatHandleList.size(); i++) {
-                MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));
-                chats.add(chat);
+
+
+            for (Long chatHandle : chatHandleList) {
+                chats.add(megaChatApi.getChatListItem(chatHandle));
             }
 
             //Order by last interaction
@@ -1231,11 +1236,9 @@ public final class ChatAdvancedNotificationBuilder {
             boolean beep = request.getFlag();
             Timber.d("Should beep: %s", beep);
 
-            MegaHandleList chatHandleList = request.getMegaHandleList();
             ArrayList<MegaChatListItem> chats = new ArrayList<>();
-            for (int i = 0; i < chatHandleList.size(); i++) {
-                MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));
-                chats.add(chat);
+            for (Long chatHandle : request.getHandleList()) {
+                chats.add(megaChatApi.getChatListItem(chatHandle));
             }
 
             //Order by last interaction
@@ -1272,12 +1275,13 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    private void checkShowChatNotifications(long lastChatId, boolean beep, MegaChatRequest request, ArrayList<MegaChatListItem> chats) {
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void checkShowChatNotifications(long lastChatId, boolean beep, ChatRequest request, ArrayList<MegaChatListItem> chats) {
         if (MegaApplication.getOpenChatId() != lastChatId) {
             Timber.d("Generate chat notification for: %d chats", chats.size());
             for (int i = 0; i < chats.size(); i++) {
                 if (megaApi.isChatNotifiable(chats.get(i).getChatId()) && MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
-                    MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
+                    List<Long> handleListUnread = request.getPeersListByChatHandle().get(chats.get(i).getChatId());
                     showChatNotification(chats.get(i).getChatId(), handleListUnread, beep);
                     beep = false;
                 }
@@ -1287,17 +1291,18 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    public void generateChatNotificationPreN(MegaChatRequest request) {
+    public void generateChatNotificationPreN(ChatRequest request) {
         Timber.d("generateChatNotificationPreN");
         boolean beep = request.getFlag();
         Timber.d("Should beep: %s", beep);
 
-        MegaHandleList chatHandleList = request.getMegaHandleList();
-        Timber.d("size chatHandleList: %s", chatHandleList.size());
+        List<Long> chatHandleList = request.getHandleList();
+        Timber.d("chats size: %s", chatHandleList.size());
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
-        for (int i = 0; i < chatHandleList.size(); i++) {
-            MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));
-            chats.add(chat);
+
+
+        for (Long chatHandle : chatHandleList) {
+            chats.add(megaChatApi.getChatListItem(chatHandle));
         }
 
         //Order by last interaction
@@ -1320,7 +1325,7 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    public void showChatNotificationPreN(MegaChatRequest request, boolean beep, long lastChatId) {
+    public void showChatNotificationPreN(ChatRequest request, boolean beep, long lastChatId) {
         Timber.d("Beep: %s, Last Chat ID: %d", beep, lastChatId);
 
         if (beep) {
@@ -1334,7 +1339,7 @@ public final class ChatAdvancedNotificationBuilder {
         buildNotificationPreN(beep ? RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) : null, beep ? STRING_TRUE : STRING_FALSE, request);
     }
 
-    public void checkNotificationsSoundPreN(MegaChatRequest request, boolean beep, long lastChatId) {
+    public void checkNotificationsSoundPreN(ChatRequest request, boolean beep, long lastChatId) {
         Timber.d("Beep: %s, Last Chat ID: %d", beep, lastChatId);
 
         ChatSettings chatSettings = dbH.getChatSettings();
@@ -1366,7 +1371,8 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    private boolean showChatNotification(long chatid, MegaHandleList handleListUnread, boolean beep) {
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private boolean showChatNotification(long chatid, List<Long> handleListUnread, boolean beep) {
         Timber.d("Beep: %s", beep);
         if (beep) {
             ChatSettings chatSettings = dbH.getChatSettings();
@@ -1380,7 +1386,8 @@ public final class ChatAdvancedNotificationBuilder {
         return true;
     }
 
-    private void checkNotificationsSound(long chatid, MegaHandleList handleListUnread, boolean beep) {
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void checkNotificationsSound(long chatid, List<Long> handleListUnread, boolean beep) {
         Timber.d("Chat ID: %d, Beep: %s", chatid, beep);
 
         ChatSettings chatSettings = dbH.getChatSettings();

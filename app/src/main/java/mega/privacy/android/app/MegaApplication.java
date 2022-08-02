@@ -125,7 +125,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
-
+import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import dagger.hilt.android.HiltAndroidApp;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
@@ -137,6 +137,7 @@ import mega.privacy.android.app.components.PushNotificationSettingManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
+import mega.privacy.android.app.data.mapper.ChatRequestMapperKt;
 import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.di.MegaApiFolder;
@@ -232,6 +233,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
     InitialiseLogging initialiseLoggingUseCase;
     @Inject
     GetCallSoundsUseCase getCallSoundsUseCase;
+    @Inject
+    EndCallUseCase endCallUseCase;
     @Inject
     HiltWorkerFactory workerFactory;
     @Inject
@@ -825,7 +828,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
 
-        chatManagement = new ChatManagement();
+        chatManagement = new ChatManagement(endCallUseCase);
 
         //Logout check resumed pending transfers
         transfersManagement.checkResumedPendingTransfers();
@@ -1421,8 +1424,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                     Timber.d("OK:TYPE_PUSH_RECEIVED");
                     if (!getMegaApi().isEphemeralPlusPlus()) {
-                        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
-                        notificationBuilder.generateChatNotification(request);
+                        ChatAdvancedNotificationBuilder.newInstance(this)
+                                .generateChatNotification(ChatRequestMapperKt.toChatRequest(request));
                     }
                 } else {
                     Timber.w("Error TYPE_PUSH_RECEIVED: %s", e.getErrorString());

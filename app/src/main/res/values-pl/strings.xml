@@ -174,8 +174,6 @@
     <string name="login_before_share">Zaloguj się aby móc udostępnić</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Twój link potwierdzający nie jest już ważny. Twoje konto może już być aktywne lub możesz anulować rejestrację.</string>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Zarejestruj się teraz i otrzymaj 20&#160;GB darmowej pamięci masowej</string>
     <!-- category in sort by action -->
     <string name="name_text">Nazwa</string>
     <!-- First Name of the user -->
@@ -1662,8 +1660,10 @@
     <string name="invalid_characters_defined">Następujące znaki są niedozwolone: ” * / : &lt; &gt; ? \\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">File name cannot be empty.</item>
-        <item quantity="other">File names cannot be empty.</item>
+        <item quantity="one">Nazwa pliku nie może być pusta.</item>
+        <item quantity="few">Nazwy plików nie mogą być puste.</item>
+        <item quantity="many">Nazwy plików nie mogą być puste.</item>
+        <item quantity="other">Nazwy plików nie mogą być puste.</item>
     </plurals>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">Błąd. Plik pdf jest uszkodzony lub nie istnieje.</string>
@@ -1738,7 +1738,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Zaproszenie nie zostało wysłane. %s jest już&#160;na liście Twoich kontaktów.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
+    <string name="invite_not_sent_text_error">Wystąpił błąd i zaproszenie nie zostało wysłane.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Generowanie kodu QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -1931,7 +1931,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Otwórz urządzenie z Androidem [A]Ustawienia[/A]</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Otwórz [A]aplikacje i powiadomienia[/A]</string>
+    <string name="turn_on_notifications_second_step">Otwórz [A]Aplikacje i powiadomienia[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">Wybierz [A]MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -2123,7 +2123,7 @@
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Podgląd</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
+    <string name="no_network_connection_on_play_file">Brak połączenia sieciowego. Plik nie został pobrany i nie może być przesyłany strumieniowo.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Nie można otworzyć pliku.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2542,8 +2542,10 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="one">%1$d katalog&#160;·&#160;</item>
+        <item quantity="few">%1$d katalogów&#160;·&#160;</item>
+        <item quantity="many">%1$d katalogów&#160;·&#160;</item>
+        <item quantity="other">%1$d katalogów&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] dodane %2$s i %3$s[/B]</string>
@@ -2915,8 +2917,10 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="one">%1$d zdjęcie&#160;</item>
+        <item quantity="few">%1$d zdjęć&#160;</item>
+        <item quantity="many">%1$d zdjęć&#160;</item>
+        <item quantity="other">%1$d zdjęć&#160;</item>
     </plurals>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">%d zdjęć i 1 film</string>
@@ -3281,7 +3285,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Wybierz transfery</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Unable to change priority of the transfer “%1$s”</string>
+    <string name="change_of_transfer_priority_failed">Nie można zmienić priorytetu transferu “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Wyślij klucz deszyfrujący osobno</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -4228,4 +4232,16 @@
     <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s został zmieniony na rolę standardową przez %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s został zmieniony na rolę prowadzącego przez %2$s</string>
+    <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
+    <string name="calls_call_screen_waiting_for_participants">Oczekiwanie na pozostałych</string>
+    <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_favourites">[B]Nie[/B] [B]znaleziono[/B] [A]ulubionych[/A]</string>
+    <!--Action text to start a meeting from Meeting screen empty view-->
+    <string name="meetings_list_empty_action">Rozpocznij spotkanie</string>
+    <!--Description text from Meeting screen empty view-->
+    <string name="meetings_list_empty_description">Bezpieczne i prywatne rozmowy audio lub wideo z przyjaciółmi i współpracownikami z całego świata.</string>
+    <!--Action text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_action">Zacznij czatować teraz</string>
+    <!--Description text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_description">Rozmawiaj bezpiecznie i prywatnie z każdym i na każdym urządzeniu, wiedząc, że nikt nie może czytać twoich czatów, nawet MEGA.</string>
 </resources>

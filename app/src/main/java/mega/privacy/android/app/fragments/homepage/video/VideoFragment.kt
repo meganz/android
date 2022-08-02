@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -57,7 +56,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
@@ -137,15 +136,13 @@ class VideoFragment : Fragment(), HomepageSearchable {
     }
 
     private fun setupEmptyHint() {
-        binding.emptyHint.emptyHintImage.isVisible = false
-        binding.emptyHint.emptyHintText.isVisible = false
-        binding.emptyHint.emptyHintText.text = HtmlCompat.fromHtml(
-            TextUtil.formatEmptyScreenText(
-                context,
-                StringResourcesUtils.getString(R.string.homepage_empty_hint_video)
-            ),
-            HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
+        with(binding.emptyHint) {
+            emptyHintImage.isVisible = false
+            emptyHintImage.setImageResource(R.drawable.ic_homepage_empty_video)
+            emptyHintText.isVisible = false
+            emptyHintText.text = formatEmptyScreenText(requireContext(),
+                getString(R.string.homepage_empty_hint_video))
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

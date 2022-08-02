@@ -21,15 +21,17 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
-import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.presentation.manager.model.ManagerState
+import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.ContactRequest
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
@@ -45,11 +47,8 @@ import javax.inject.Inject
  * @param getRubbishBinChildrenNode Fetch the rubbish bin nodes
  * @param getBrowserChildrenNode Fetch the browser nodes
  * @param getRootFolder Fetch the root node
- * @param getRubbishBinChildrenNode
- * @param getBrowserChildrenNode
  * @param getNumUnreadUserAlerts
- * @param getInboxNode
- * @param hasChildren
+ * @param hasInboxChildren
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -186,24 +185,6 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Set the current incoming parent handle to the UI state
-     *
-     * @param handle the id of the current incoming parent handle to set
-     */
-    fun setIncomingParentHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(incomingParentHandle = handle) }
-    }
-
-    /**
-     * Set the current outgoing parent handle to the UI state
-     *
-     * @param handle the id of the current outgoing parent handle to set
-     */
-    fun setOutgoingParentHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(outgoingParentHandle = handle) }
-    }
-
-    /**
      * Set the current links parent handle to the UI state
      *
      * @param handle the id of the current links parent handle to set
@@ -229,6 +210,46 @@ class ManagerViewModel @Inject constructor(
     fun setIsFirstNavigationLevel(isFirstNavigationLevel: Boolean) = viewModelScope.launch {
         _state.update { it.copy(isFirstNavigationLevel = isFirstNavigationLevel) }
     }
+
+    /**
+     * Decrease by 1 the links tree depth
+     */
+    fun decreaseLinksTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(linksTreeDepth = it.linksTreeDepth - 1) }
+    }
+
+    /**
+     * Increase by 1 the links tree depth
+     */
+    fun increaseLinksTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(linksTreeDepth = it.linksTreeDepth + 1) }
+    }
+
+    /**
+     * Reset links tree depth to initial value
+     */
+    fun resetLinksTreeDepth() = viewModelScope.launch {
+        _state.update { it.copy(linksTreeDepth = 0) }
+    }
+
+    /**
+     * Set the current shares tab to the UI state
+     *
+     * @param tab shares tab to set
+     */
+    fun setSharesTab(tab: SharesTab) = viewModelScope.launch {
+        _state.update { it.copy(sharesTab = tab) }
+    }
+
+    /**
+     * Set the current transfers tab to the UI state
+     *
+     * @param tab transfer tab to set
+     */
+    fun setTransfersTab(tab: TransfersTab) = viewModelScope.launch {
+        _state.update { it.copy(transfersTab = tab) }
+    }
+
 
     private val numUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
 

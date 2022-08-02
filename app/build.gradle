@@ -10,7 +10,7 @@ apply plugin: 'com.google.firebase.appdistribution'
 def getSdkGitHash = { ->
     def stdout = new ByteArrayOutputStream()
     exec {
-        workingDir 'src/main/jni/mega/sdk'
+        workingDir '../sdk/src/main/jni/mega/sdk'
         commandLine 'git', 'rev-parse', '--short', 'HEAD'
         standardOutput = stdout
     }
@@ -21,7 +21,7 @@ def getSdkGitHash = { ->
 def getKarereGitHash = { ->
     def stdout = new ByteArrayOutputStream()
     exec {
-        workingDir 'src/main/jni/megachat/sdk'
+        workingDir '../sdk/src/main/jni/megachat/sdk'
         commandLine 'git', 'rev-parse', '--short', 'HEAD'
         standardOutput = stdout
     }
@@ -123,12 +123,13 @@ android {
     sourceSets {
         main {
             java {
-                srcDirs += 'src/main/jni/mega/sdk/bindings/java'
-                srcDirs += 'src/main/jni/megachat/sdk/bindings/java'
+                srcDirs += '../sdk/src/main/jni/mega/sdk/bindings/java'
+                srcDirs += '../sdk/src/main/jni/megachat/sdk/bindings/java'
+
                 exclude '**/MegaApiSwing.java'
             }
             //jni.srcDirs = [] //disable automatic ndk-build
-            jniLibs.srcDir 'src/main/libs'
+            jniLibs.srcDir '../sdk/src/main/libs'
             // This is not necessary unless you have precompiled libraries in your project.
         }
 
@@ -167,7 +168,6 @@ android {
             debuggable true
         }
     }
-
 
     compileOptions {
         // Flag to enable support for the new language APIs
@@ -247,11 +247,16 @@ android {
     lint {
         checkReleaseBuilds false
     }
+    lintOptions {
+        abortOnError false
+        xmlOutput = file("build/reports/lint-results.xml")
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: "$rootProject.projectDir/app/src/main/jni/ExoPlayer/", include: ['*.aar'])
+    implementation fileTree(dir: "$rootProject.projectDir/sdk/src/main/jni/ExoPlayer/", include: ['*.aar'])
     implementation project(':domain')
+    implementation project(':sdk')
 
     // App dependencies
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
@@ -345,7 +350,7 @@ dependencies {
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation files('src/main/jni/megachat/webrtc/libwebrtc.jar')
+    implementation files('../sdk/src/main/jni/megachat/webrtc/libwebrtc.jar')
 
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
