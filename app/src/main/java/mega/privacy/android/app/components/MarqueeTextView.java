@@ -4,15 +4,16 @@ import android.content.Context;
 import android.os.Handler;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.widget.TextView;
+
+import androidx.appcompat.widget.AppCompatTextView;
 
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import timber.log.Timber;
 
-public class MarqueeTextView extends TextView {
+public class MarqueeTextView extends AppCompatTextView {
 
-    private Handler mHandler = new Handler();
-    private long mDelay = 200;
+    private final Handler mHandler = new Handler();
+    private final long mDelay = 200;
     private int mFirstIndex;
     private int mLastIndex;
     private int scrollIndex;
@@ -41,17 +42,12 @@ public class MarqueeTextView extends TextView {
 
         if (context instanceof ChatActivity) {
             final TextPaint textPaint1 = textPaint;
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    scroll(textPaint1, getMeasuredWidth());
-                }
-            }, 1000);
+            if(mHandler != null) {
+                mHandler.postDelayed(() -> scroll(textPaint1, getMeasuredWidth()), 1000);
+            }
         } else {
             scroll(textPaint, getMaxWidth());
         }
-
-
     }
 
     private void scroll(TextPaint textPaint, int width) {
@@ -77,7 +73,7 @@ public class MarqueeTextView extends TextView {
         setText(text);
     }
 
-    private Runnable characterAdder = new Runnable() {
+    private final Runnable characterAdder = new Runnable() {
         @Override
         public void run() {
             text = text + " ";
