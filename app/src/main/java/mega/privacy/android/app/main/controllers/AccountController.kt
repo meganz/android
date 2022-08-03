@@ -361,7 +361,7 @@ class AccountController(private val context: Context) {
             context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
                 .edit().clear().apply()
 
-            // Clear chat and camera upload preferences
+            //clear chat preferences
             sharingScope.launch {
                 ChatPreferencesDataStore(context, Dispatchers.IO).clearPreferences()
             }
