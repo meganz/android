@@ -29,6 +29,8 @@ import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LE
 import static mega.privacy.android.app.utils.Constants.NAME;
 import static mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_DELETE_VERSIONS_HISTORY;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.WRITE_SD_CARD_REQUEST_CODE;
 import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
@@ -334,8 +336,6 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     boolean moveToRubbish = false;
 
     public static int REQUEST_CODE_SELECT_CONTACT = 1000;
-    public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
-    public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 
     Display display;
     DisplayMetrics outMetrics;
@@ -1575,7 +1575,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("COPY_FROM", longArray);
-        startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY);
     }
 
     public void showMove() {
@@ -1590,7 +1590,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("MOVE_FROM", longArray);
-        startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
     }
 
     public void moveToTrash() {
@@ -1848,7 +1848,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
      * @param type         Type of name collision to check.
      */
     private void checkCollision(long parentHandle, NameCollisionType type) {
-        checkNameCollisionUseCase.check(handle, parentHandle, type)
+        checkNameCollisionUseCase.check(node.getHandle(), parentHandle, type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(collision -> {
@@ -1858,14 +1858,16 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                             nameCollisionActivityContract.launch(list);
                         },
                         throwable -> {
-                            if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
-                                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
-                            } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+                            dismissAlertDialogIfExists(statusDialog);
+
+                            if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
                                 if (type == NameCollisionType.MOVE) {
                                     move(parentHandle);
                                 } else {
                                     copy(parentHandle);
                                 }
+                            } else {
+                                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
                             }
                         });
     }
@@ -1876,7 +1878,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
      * @param parentHandle Parent handle in which the node will be moved.
      */
     private void move(long parentHandle) {
-        moveNodeUseCase.move(handle, parentHandle)
+        moveNodeUseCase.move(node.getHandle(), parentHandle)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
@@ -1899,7 +1901,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
      * @param parentHandle Parent handle in which the node will be copied.
      */
     private void copy(long parentHandle) {
-        copyNodeUseCase.copy(handle, parentHandle)
+        copyNodeUseCase.copy(node.getHandle(), parentHandle)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
@@ -1932,7 +1934,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             return;
         }
 
-        if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == RESULT_OK) {
             if (!isOnline(this)) {
                 showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 return;
@@ -1952,7 +1954,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             statusDialog = temp;
 
             checkCollision(toHandle, NameCollisionType.MOVE);
-        } else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK) {
+        } else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
             if (!isOnline(this)) {
                 showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 return;
