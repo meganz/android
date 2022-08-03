@@ -30,7 +30,7 @@ class CookiePreferencesActivity : PreferencesBaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
+        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
 
         if (!viewModel.areCookiesSaved()) {
             showUnsavedDialog()

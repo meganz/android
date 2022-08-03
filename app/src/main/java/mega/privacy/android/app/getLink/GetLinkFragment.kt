@@ -1,6 +1,7 @@
 package mega.privacy.android.app.getLink
 
 import android.annotation.SuppressLint
+import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
@@ -543,7 +544,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     private fun handleActivityResult(data: Intent?) {
         MegaAttacher(requireActivity() as ActivityLauncher).handleActivityResult(
             REQUEST_CODE_SELECT_CHAT,
-            BaseActivity.RESULT_OK,
+            RESULT_OK,
             data,
             requireActivity() as SnackbarShower
         )
