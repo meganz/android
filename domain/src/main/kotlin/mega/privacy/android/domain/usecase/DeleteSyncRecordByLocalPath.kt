@@ -4,7 +4,7 @@ package mega.privacy.android.domain.usecase
  * Delete camera upload sync record by local path
  *
  */
-interface DeleteSyncRecordByLocalPath {
+fun interface DeleteSyncRecordByLocalPath {
 
     /**
      * Invoke

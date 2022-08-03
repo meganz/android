@@ -4,7 +4,7 @@ package mega.privacy.android.domain.usecase
  * Does media local path exists
  *
  */
-interface MediaLocalPathExists {
+fun interface MediaLocalPathExists {
 
     /**
      * Invoke

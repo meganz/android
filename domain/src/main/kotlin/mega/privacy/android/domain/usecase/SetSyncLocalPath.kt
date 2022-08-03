@@ -4,7 +4,7 @@ package mega.privacy.android.domain.usecase
  * Set sync folder path
  *
  */
-interface SetSyncLocalPath {
+fun interface SetSyncLocalPath {
 
     /**
      * Invoke

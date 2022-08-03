@@ -5,7 +5,7 @@ package mega.privacy.android.domain.usecase
  *
  * @return true, if secondary enabled
  */
-interface IsSecondaryFolderEnabled {
+fun interface IsSecondaryFolderEnabled {
 
     /**
      * Invoke

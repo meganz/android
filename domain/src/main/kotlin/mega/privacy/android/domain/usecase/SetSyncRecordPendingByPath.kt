@@ -4,7 +4,7 @@ package mega.privacy.android.domain.usecase
  * Set sync record pending by local path
  *
  */
-interface SetSyncRecordPendingByPath {
+fun interface SetSyncRecordPendingByPath {
 
     /**
      * Invoke

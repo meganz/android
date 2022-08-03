@@ -4,7 +4,7 @@ package mega.privacy.android.domain.usecase
  * Get video quality setting
  *
  */
-interface GetVideoQuality {
+fun interface GetVideoQuality {
 
     /**
      * Invoke

@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.SyncStatus
  * Get video sync records by status
  *
  */
-interface GetVideoSyncRecordsByStatus {
+fun interface GetVideoSyncRecordsByStatus {
 
     /**
      * Invoke

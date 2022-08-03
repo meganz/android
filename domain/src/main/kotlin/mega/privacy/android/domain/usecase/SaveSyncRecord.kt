@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.SyncRecord
  * Save sync record
  *
  */
-interface SaveSyncRecord {
+fun interface SaveSyncRecord {
 
     /**
      * Invoke

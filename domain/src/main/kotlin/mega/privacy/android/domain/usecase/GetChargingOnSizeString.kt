@@ -4,7 +4,7 @@ package mega.privacy.android.domain.usecase
  * Get charging on size
  *
  */
-interface GetChargingOnSizeString {
+fun interface GetChargingOnSizeString {
 
     /**
      * Invoke

@@ -4,7 +4,7 @@ package mega.privacy.android.domain.usecase
  * Set secondary folder path
  *
  */
-interface SetSecondaryFolderPath {
+fun interface SetSecondaryFolderPath {
 
     /**
      * Invoke

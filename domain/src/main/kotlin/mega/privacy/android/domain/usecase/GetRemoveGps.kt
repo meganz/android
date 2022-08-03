@@ -4,7 +4,7 @@ package mega.privacy.android.domain.usecase
  * Get remove GPS setting
  *
  */
-interface GetRemoveGps {
+fun interface GetRemoveGps {
 
     /**
      * Invoke

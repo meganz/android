@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.SyncRecord
  * Get sync record by fingerprint
  *
  */
-interface GetSyncRecordByFingerprint {
+fun interface GetSyncRecordByFingerprint {
 
     /**
      * Invoke

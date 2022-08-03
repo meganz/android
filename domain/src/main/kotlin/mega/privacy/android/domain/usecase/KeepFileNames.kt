@@ -4,7 +4,7 @@ package mega.privacy.android.domain.usecase
  * Should keep file names
  *
  */
-interface KeepFileNames {
+fun interface KeepFileNames {
 
     /**
      * Invoke

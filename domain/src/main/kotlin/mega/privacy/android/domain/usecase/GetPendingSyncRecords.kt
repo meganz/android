@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.SyncRecord
  * Get pending sync records
  *
  */
-interface GetPendingSyncRecords {
+fun interface GetPendingSyncRecords {
 
     /**
      * Invoke

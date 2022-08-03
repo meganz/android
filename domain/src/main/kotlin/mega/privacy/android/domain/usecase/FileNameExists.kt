@@ -4,7 +4,7 @@ package mega.privacy.android.domain.usecase
  * Does sync record file name exist
  *
  */
-interface FileNameExists {
+fun interface FileNameExists {
 
     /**
      * Invoke
