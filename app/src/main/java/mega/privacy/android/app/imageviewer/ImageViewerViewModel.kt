@@ -752,10 +752,15 @@ class ImageViewerViewModel @Inject constructor(
             .subscribeBy(
                 onNext = {
                     val imagePosition = getCurrentPosition()
-                    if (imagePosition < getImagesSize() - 1) {
-                        updateCurrentPosition(imagePosition + 1, true)
-                    } else {
-                        stopSlideshow()
+                    when {
+                        imagePosition + 1 == getImagesSize() - 1 -> {
+                            updateCurrentPosition(imagePosition + 1, true)
+                            stopSlideshow()
+                        }
+                        imagePosition < getImagesSize() - 1 ->
+                            updateCurrentPosition(imagePosition + 1, true)
+                        else ->
+                            stopSlideshow()
                     }
                 },
                 onComplete = { slideShowState.value = STOPPED },

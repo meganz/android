@@ -27,6 +27,7 @@ class ImageViewerFragment : Fragment() {
 
     private lateinit var binding: FragmentImageViewerBinding
 
+    private var shouldReportPosition = false
     private val viewModel by activityViewModels<ImageViewerViewModel>()
     private val pagerAdapter by lazy {
         ImageViewerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
@@ -35,7 +36,7 @@ class ImageViewerFragment : Fragment() {
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                viewModel.updateCurrentPosition(position, false)
+                if (shouldReportPosition) viewModel.updateCurrentPosition(position, false)
             }
         }
     }
@@ -52,7 +53,12 @@ class ImageViewerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
-        setupObservers(savedInstanceState == null)
+        setupObservers()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -66,8 +72,13 @@ class ImageViewerFragment : Fragment() {
         super.onLowMemory()
     }
 
-    override fun onDestroyView() {
+    override fun onStop() {
+        shouldReportPosition = false
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
+        super.onStop()
+    }
+
+    override fun onDestroyView() {
         binding.viewPager.adapter = null
         super.onDestroyView()
     }
@@ -87,63 +98,55 @@ class ImageViewerFragment : Fragment() {
         binding.motion.post { binding.motion.transitionToEnd() }
     }
 
-    private fun setupObservers(freshStart: Boolean) {
+    private fun setupObservers() {
         viewModel.onImagesIds().observe(viewLifecycleOwner) { items ->
             if (items.isNullOrEmpty()) {
                 Timber.e("Null or empty image items")
                 activity?.finish()
             } else {
-                binding.viewPager.waitForLayout {
-                    val sizeDifference = pagerAdapter.itemCount != items.size
-                    pagerAdapter.submitList(items) {
-                        if (sizeDifference) {
-                            pagerAdapter.notifyDataSetChanged()
+                pagerAdapter.submitList(items) {
+                    binding.progress.hide()
+
+                    val currentPosition = viewModel.getCurrentPosition()
+                    val imagesSize = items.size
+
+                    if (!shouldReportPosition) {
+                        binding.viewPager.setCurrentItem(viewModel.getCurrentPosition(), false)
+                        binding.viewPager.waitForLayout {
+                            viewModel.onCurrentPosition().observe(viewLifecycleOwner, ::updateCurrentPosition)
+                            shouldReportPosition = true
+                            true
                         }
                     }
-                    true
-                }
 
-                val currentPosition = viewModel.getCurrentPosition()
-                val imagesSize = items.size
-                binding.txtPageCount.apply {
-                    text = StringResourcesUtils.getString(
-                        R.string.wizard_steps_indicator,
-                        currentPosition + 1,
-                        imagesSize
-                    )
-                    isVisible = imagesSize > 1
-                }
-            }
-            binding.progress.hide()
-        }
-
-        viewModel.onCurrentPosition().observe(viewLifecycleOwner) { position ->
-            binding.viewPager.apply {
-                waitForLayout {
-                    if (currentItem != position) {
-                        setCurrentItem(position, !freshStart)
+                    binding.txtPageCount.apply {
+                        text = StringResourcesUtils.getString(
+                            R.string.wizard_steps_indicator,
+                            currentPosition + 1,
+                            imagesSize
+                        )
+                        isVisible = imagesSize > 1
                     }
-
-                    if (freshStart) {
-                        registerOnPageChangeCallback(pageChangeCallback)
-                    }
-                    true
                 }
-            }
-
-            binding.txtPageCount.apply {
-                val imagesSize = viewModel.getImagesSize()
-                text = StringResourcesUtils.getString(
-                    R.string.wizard_steps_indicator,
-                    position + 1,
-                    imagesSize
-                )
-                isVisible = imagesSize > 1
             }
         }
 
         viewModel.onCurrentImageItem().observe(viewLifecycleOwner, ::showCurrentImageInfo)
         viewModel.onShowToolbar().observe(viewLifecycleOwner, ::changeBottomBarVisibility)
+    }
+
+    private fun updateCurrentPosition(newPosition: Int) {
+        binding.viewPager.setCurrentItem(newPosition, true)
+
+        val imagesSize = viewModel.getImagesSize()
+        binding.txtPageCount.apply {
+            text = StringResourcesUtils.getString(
+                R.string.wizard_steps_indicator,
+                newPosition + 1,
+                imagesSize
+            )
+            isVisible = imagesSize > 1
+        }
     }
 
     /**

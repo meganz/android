@@ -22,6 +22,7 @@ import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STARTED
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STOPPED
 import mega.privacy.android.app.utils.ContextUtils.isLowMemory
+import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -29,8 +30,7 @@ class ImageSlideshowFragment : Fragment() {
 
     private lateinit var binding: FragmentImageSlideshowBinding
 
-    private var imagesObserverInitialised = false
-    private var positionObserverInitialised = false
+    private var shouldReportPosition = false
     private val viewModel by activityViewModels<ImageViewerViewModel>()
     private val pagerAdapter by lazy {
         ImageViewerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
@@ -39,8 +39,7 @@ class ImageSlideshowFragment : Fragment() {
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                if (!positionObserverInitialised)
-                    viewModel.updateCurrentPosition(position, false)
+                if (shouldReportPosition) viewModel.updateCurrentPosition(position, false)
             }
         }
     }
@@ -58,6 +57,11 @@ class ImageSlideshowFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
         setupObservers()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -80,8 +84,14 @@ class ImageSlideshowFragment : Fragment() {
         super.onLowMemory()
     }
 
-    override fun onDestroyView() {
+    override fun onStop() {
+        viewModel.stopSlideshow()
+        shouldReportPosition = false
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
+        super.onStop()
+    }
+
+    override fun onDestroyView() {
         binding.viewPager.adapter = null
         super.onDestroyView()
     }
@@ -96,7 +106,6 @@ class ImageSlideshowFragment : Fragment() {
             }
             setPageTransformer(MarginPageTransformer(resources.getDimensionPixelSize(R.dimen.image_viewer_pager_margin)))
             adapter = pagerAdapter
-            registerOnPageChangeCallback(pageChangeCallback)
         }
 
         binding.btnPlay.setOnClickListener { viewModel.startSlideshow() }
@@ -111,29 +120,26 @@ class ImageSlideshowFragment : Fragment() {
                 activity?.finish()
             } else {
                 pagerAdapter.submitList(items) {
-                    if (!imagesObserverInitialised) {
-                        imagesObserverInitialised = true
-                        viewModel.onCurrentPosition().observe(viewLifecycleOwner) { position ->
-                            binding.viewPager.apply {
-                                if (currentItem != position) {
-                                    setCurrentItem(position, positionObserverInitialised)
-                                }
+                    binding.progress.hide()
 
-                                if (!positionObserverInitialised) {
-                                    positionObserverInitialised
-                                }
-                            }
+                    if (!shouldReportPosition) {
+                        binding.viewPager.setCurrentItem(viewModel.getCurrentPosition(), false)
+                        binding.viewPager.waitForLayout {
+                            viewModel.onCurrentPosition().observe(viewLifecycleOwner, ::updateCurrentPosition)
+                            shouldReportPosition = true
+                            true
                         }
                     }
                 }
-
-
             }
-            binding.progress.hide()
         }
 
-        viewModel.onShowToolbar().observe(viewLifecycleOwner, ::changeBottomBarVisibility)
         viewModel.onSlideshowState().observe(viewLifecycleOwner, ::updateSlideshowButtons)
+        viewModel.onShowToolbar().observe(viewLifecycleOwner, ::changeBottomBarVisibility)
+    }
+
+    private fun updateCurrentPosition(newPosition: Int) {
+        binding.viewPager.setCurrentItem(newPosition, true)
     }
 
     /**
