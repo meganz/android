@@ -1,5 +1,21 @@
 package mega.privacy.android.domain.entity
 
-enum class SyncStatus(val value: Int) {
-    STATUS_PENDING(0), STATUS_TO_COMPRESS(3);
+/**
+ * Status of sync record
+ */
+enum class SyncStatus(
+    /**
+     * status value
+     */
+    val value: Int,
+) {
+    /**
+     * status pending
+     */
+    STATUS_PENDING(0),
+
+    /**
+     * status compressing
+     */
+    STATUS_TO_COMPRESS(3);
 }
