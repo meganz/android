@@ -262,6 +262,11 @@ class MegaApiFacade @Inject constructor(
 
     override suspend fun getUserAlerts(): List<MegaUserAlert> = megaApi.userAlerts
 
+    @Suppress("DEPRECATION")
+    override suspend fun sendEvent(eventID: Int, message: String) =
+        megaApi.sendEvent(eventID, message)
+
+
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
     }
