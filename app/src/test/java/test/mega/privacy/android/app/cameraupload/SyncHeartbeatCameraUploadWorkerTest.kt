@@ -43,7 +43,7 @@ class SyncHeartbeatCameraUploadWorkerTest {
     lateinit var workerFactory: HiltWorkerFactory
 
     private lateinit var context: Context
-    private lateinit var workManager: WorkManager
+    private lateinit var underTest: WorkManager
 
     @Before
     fun setUp() {
@@ -59,21 +59,21 @@ class SyncHeartbeatCameraUploadWorkerTest {
 
         // Initialize WorkManager for instrumentation tests
         WorkManagerTestInitHelper.initializeTestWorkManager(context, configuration)
-        workManager = WorkManager.getInstance(context)
+        underTest = WorkManager.getInstance(context)
     }
 
     @Test
     @Throws(Exception::class)
-    fun `test sync heartbeat camera upload worker`() {
+    fun `test that one time sync heartbeat camera upload worker is successful`() {
         // Create the OneTimeWorkRequest
         val request = OneTimeWorkRequestBuilder<SyncHeartbeatCameraUploadWorker>().build()
 
         // Enqueue and wait for result. This also runs the Worker synchronously
         // due to SynchronousExecutor
-        workManager.enqueue(request).result.get()
+        underTest.enqueue(request).result.get()
 
         // Get WorkInfo
-        val workInfo = workManager.getWorkInfoById(request.id).get()
+        val workInfo = underTest.getWorkInfoById(request.id).get()
 
         // Perform Assertion
         assertThat(workInfo.state).isEqualTo(WorkInfo.State.SUCCEEDED)
@@ -81,7 +81,7 @@ class SyncHeartbeatCameraUploadWorkerTest {
 
     @Test
     @Throws(Exception::class)
-    fun `test periodic sync heartbeat camera upload worker`() {
+    fun `test that periodic sync heartbeat camera upload worker is enqueued`() {
         // Create the PeriodicWorkRequest
         val request = PeriodicWorkRequestBuilder<SyncHeartbeatCameraUploadWorker>(
             repeatInterval = 30,
@@ -94,13 +94,13 @@ class SyncHeartbeatCameraUploadWorkerTest {
 
         // Enqueue and wait for result. This also runs the Worker synchronously
         // due to SynchronousExecutor
-        workManager.enqueue(request).result.get()
+        underTest.enqueue(request).result.get()
 
         // Tells the testing framework the period delay is met
         testDriver?.setPeriodDelayMet(request.id)
 
         // Get WorkInfo
-        val workInfo = workManager.getWorkInfoById(request.id).get()
+        val workInfo = underTest.getWorkInfoById(request.id).get()
 
         // Perform Assertion
         assertThat(workInfo.state).isEqualTo(WorkInfo.State.ENQUEUED)
