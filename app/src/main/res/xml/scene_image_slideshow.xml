@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        android:id="@+id/transition"
+        app:constraintSetEnd="@+id/end"
+        app:constraintSetStart="@+id/start"
+        app:duration="250" />
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint android:id="@id/bg_bottom">
+            <PropertySet android:alpha="1" />
+            <Layout
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </Constraint>
+
+        <Constraint android:id="@id/btn_play">
+            <PropertySet
+                android:alpha="1"
+                app:visibilityMode="ignore" />
+        </Constraint>
+
+        <Constraint android:id="@id/btn_pause">
+            <PropertySet
+                android:alpha="1"
+                app:visibilityMode="ignore" />
+        </Constraint>
+
+        <Constraint android:id="@id/progress">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint android:id="@id/bg_bottom">
+            <PropertySet android:alpha="0" />
+            <Layout
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="parent" />
+        </Constraint>
+
+        <Constraint android:id="@id/btn_play">
+            <PropertySet
+                android:alpha="0"
+                app:visibilityMode="ignore" />
+        </Constraint>
+
+        <Constraint android:id="@id/btn_pause">
+            <PropertySet
+                android:alpha="0"
+                app:visibilityMode="ignore" />
+        </Constraint>
+
+        <Constraint android:id="@id/progress">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+    </ConstraintSet>
+</MotionScene>

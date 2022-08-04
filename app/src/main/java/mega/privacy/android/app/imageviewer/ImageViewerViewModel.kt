@@ -22,6 +22,9 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.data.ImageResult
+import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState
+import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STARTED
+import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STOPPED
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -105,6 +108,7 @@ class ImageViewerViewModel @Inject constructor(
     private val actionBarMessage = SingleLiveEvent<Int>()
     private val copyMoveException = SingleLiveEvent<Throwable>()
     private val collision = SingleLiveEvent<NameCollision>()
+    private val slideShowState = MutableLiveData(STOPPED)
 
     private var isUserLoggedIn = false
 
@@ -150,6 +154,8 @@ class ImageViewerViewModel @Inject constructor(
     fun onCopyMoveException(): LiveData<Throwable> = copyMoveException
 
     fun onCollision(): LiveData<NameCollision> = collision
+
+    fun onSlideshowState(): LiveData<ImageSlideshowState> = slideShowState
 
     fun onShowToolbar(): LiveData<Boolean> = showToolbar
 
@@ -739,20 +745,30 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun startSlideshow() {
-        timerComposite.clear()
+        stopSlideshow()
         Observable.interval(SLIDESHOW_DELAY, SLIDESHOW_DELAY, TimeUnit.SECONDS)
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { slideShowState.value = STARTED }
             .subscribeBy(
                 onNext = {
                     val imagePosition = getCurrentPosition()
                     if (imagePosition < getImagesSize() - 1) {
                         updateCurrentPosition(imagePosition + 1, true)
                     } else {
-                        timerComposite.clear()
+                        stopSlideshow()
                     }
                 },
-                onError = Timber::e
+                onComplete = { slideShowState.value = STOPPED },
+                onError = { error ->
+                    Timber.e(error)
+                    slideShowState.value = STOPPED
+                }
             )
             .addTo(timerComposite)
+    }
+
+    fun stopSlideshow() {
+        timerComposite.clear()
+        slideShowState.value = STOPPED
     }
 }

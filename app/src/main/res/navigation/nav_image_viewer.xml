@@ -7,10 +7,20 @@
     <fragment
         android:id="@+id/image_viewer"
         android:name="mega.privacy.android.app.imageviewer.ImageViewerFragment"
-        tools:layout="@layout/fragment_image_viewer" />
+        tools:layout="@layout/fragment_image_viewer">
 
-<!--    <fragment-->
-<!--        android:id="@+id/image_slideshow"-->
-<!--        android:name="mega.privacy.android.app.contacts.group.ContactGroupsFragment"-->
-<!--        tools:layout="@layout/fragment_contact_groups" />-->
+        <action
+            android:id="@+id/action_viewer_to_slideshow"
+            app:destination="@id/image_slideshow" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/image_slideshow"
+        android:name="mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowFragment"
+        tools:layout="@layout/fragment_image_slideshow">
+
+        <action
+            android:id="@+id/action_slideshow_to_viewer"
+            app:destination="@id/image_viewer" />
+    </fragment>
 </navigation>

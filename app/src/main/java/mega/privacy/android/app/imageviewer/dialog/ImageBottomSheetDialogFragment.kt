@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.common.RotationOptions
@@ -28,6 +29,7 @@ import mega.privacy.android.app.activities.contract.SelectFolderToImportActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.databinding.BottomSheetImageOptionsBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
+import mega.privacy.android.app.imageviewer.ImageViewerFragmentDirections
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.util.shouldShowChatRemoveOption
@@ -256,7 +258,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Slideshow
             optionSlideshow.isVisible = imageItem.shouldShowSlideshowOption() && viewModel.getImagesSize() > 1
             optionSlideshow.setOnClickListener {
-                viewModel.startSlideshow()
+                findNavController().navigate(ImageViewerFragmentDirections.actionViewerToSlideshow())
                 dismissAllowingStateLoss()
             }
 

@@ -28,6 +28,11 @@ import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
+import mega.privacy.android.app.imageviewer.util.shouldShowDownloadOption
+import mega.privacy.android.app.imageviewer.util.shouldShowForwardOption
+import mega.privacy.android.app.imageviewer.util.shouldShowManageLinkOption
+import mega.privacy.android.app.imageviewer.util.shouldShowSendToContactOption
+import mega.privacy.android.app.imageviewer.util.shouldShowShareOption
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -298,11 +303,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.fragment_image_viewer, menu)
-        return true
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         nodeSaver?.saveState(outState)
@@ -415,6 +415,23 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 start()
             }
         }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val imageItem = viewModel.getCurrentImageItem() ?: return super.onPrepareOptionsMenu(menu)
+        menu?.apply {
+            findItem(R.id.action_forward)?.isVisible =
+                imageItem.shouldShowForwardOption() && !isFileVersion
+            findItem(R.id.action_share)?.isVisible =
+                imageItem is ImageItem.ChatNode && imageItem.shouldShowShareOption() && !isFileVersion
+            findItem(R.id.action_download)?.isVisible = imageItem.shouldShowDownloadOption()
+            findItem(R.id.action_get_link)?.isVisible =
+                imageItem.shouldShowManageLinkOption() && !isFileVersion
+            findItem(R.id.action_send_to_chat)?.isVisible =
+                imageItem.shouldShowSendToContactOption(viewModel.isUserLoggedIn()) && !isFileVersion
+            findItem(R.id.action_more)?.isVisible = imageItem.nodeItem != null && !isFileVersion
+        }
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
