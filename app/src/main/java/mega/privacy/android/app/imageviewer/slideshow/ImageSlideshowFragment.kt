@@ -39,7 +39,7 @@ class ImageSlideshowFragment : Fragment() {
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                if (shouldReportPosition) viewModel.updateCurrentPosition(position, false)
+                if (shouldReportPosition) viewModel.updateCurrentPosition(position)
             }
         }
     }
@@ -114,7 +114,7 @@ class ImageSlideshowFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.onImagesIds().observe(viewLifecycleOwner) { items ->
+        viewModel.onAdapterImages().observe(viewLifecycleOwner) { items ->
             if (items.isNullOrEmpty()) {
                 Timber.e("Null or empty image items")
                 activity?.finish()
@@ -139,6 +139,11 @@ class ImageSlideshowFragment : Fragment() {
     }
 
     private fun updateCurrentPosition(newPosition: Int) {
+        if (newPosition >= pagerAdapter.itemCount) {
+            Timber.w("Wrong position: $newPosition")
+            return
+        }
+
         binding.viewPager.setCurrentItem(newPosition, true)
     }
 
@@ -172,10 +177,12 @@ class ImageSlideshowFragment : Fragment() {
             STARTED -> {
                 binding.btnPlay.isVisible = false
                 binding.btnPause.isVisible = true
+                viewModel.switchToolbar(false)
             }
             STOPPED -> {
                 binding.btnPause.isVisible = false
                 binding.btnPlay.isVisible = true
+                viewModel.switchToolbar(true)
             }
         }
     }

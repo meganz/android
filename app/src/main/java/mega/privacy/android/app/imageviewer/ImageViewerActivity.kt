@@ -364,7 +364,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
         }
 
-        viewModel.onShowToolbar().observe(this, ::changeBottomBarVisibility)
+        viewModel.onShowToolbar().observe(this, ::changeToolbarVisibility)
         viewModel.onSnackBarMessage().observe(this) { message ->
             bottomSheet?.dismissAllowingStateLoss()
             showSnackbar(message)
@@ -403,11 +403,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     /**
-     * Change bottomBar visibility with animation.
+     * Change toolbar visibility with animation.
      *
      * @param show                  Show or hide toolbar/bottombar
      */
-    private fun changeBottomBarVisibility(show: Boolean) {
+    private fun changeToolbarVisibility(show: Boolean) {
         binding.toolbar.post {
             val value = if (!show) -binding.toolbar.height.toFloat() else 0f
             ObjectAnimator.ofFloat(binding.toolbar, "translationY", value).apply {

@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
+import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState
@@ -100,7 +102,6 @@ class ImageViewerViewModel @Inject constructor(
         private const val SLIDESHOW_DELAY = 4L
     }
 
-    private val timerComposite = CompositeDisposable()
     private val images = MutableLiveData<List<ImageItem>?>()
     private val currentPosition = MutableLiveData<Int>()
     private val showToolbar = MutableLiveData<Boolean>()
@@ -109,6 +110,7 @@ class ImageViewerViewModel @Inject constructor(
     private val copyMoveException = SingleLiveEvent<Throwable>()
     private val collision = SingleLiveEvent<NameCollision>()
     private val slideShowState = MutableLiveData(STOPPED)
+    private val timerComposite = CompositeDisposable()
 
     private var isUserLoggedIn = false
 
@@ -123,11 +125,14 @@ class ImageViewerViewModel @Inject constructor(
         super.onCleared()
     }
 
-    fun onImagesIds(): LiveData<List<Long>?> =
-        images.map { items -> items?.map(ImageItem::id) }
+    fun onAdapterImages(): LiveData<List<ImageAdapterItem>?> =
+        images.map { items -> items?.map { ImageAdapterItem(it.id, it.hashCode()) } }
 
     fun onImage(itemId: Long): LiveData<ImageItem?> =
         images.map { items -> items?.firstOrNull { it.id == itemId } }
+
+    fun onImage(position: Int): LiveData<ImageItem?> =
+        images.map { items -> items?.getOrNull(position) }
 
     fun getImagesSize(): Int =
         images.value?.size ?: 0
@@ -139,7 +144,7 @@ class ImageViewerViewModel @Inject constructor(
         currentPosition.value ?: 0
 
     fun onCurrentImageItem(): LiveData<ImageItem?> =
-        currentPosition.map { images.value?.getOrNull(it) }
+        currentPosition.switchMap { onImage(it) }
 
     fun getCurrentImageItem(): ImageItem? =
         currentPosition.value?.let { images.value?.getOrNull(it) }
@@ -331,20 +336,25 @@ class ImageViewerViewModel @Inject constructor(
             val index = items.indexOfFirst { it.id == itemId }
             if (index != INVALID_POSITION) {
                 val currentItem = items[index]
-                if (nodeItem != null) {
+                var refreshNeeded = false
+                if (nodeItem != null && nodeItem != currentItem.nodeItem) {
+                    refreshNeeded = true
                     items[index] = currentItem.copy(
                         nodeItem = nodeItem
                     )
                 }
                 if (imageResult != null && imageResult != currentItem.imageResult) {
+                    refreshNeeded = true
                     items[index] = currentItem.copy(
                         imageResult = imageResult
                     )
                 }
 
-                images.value = items.toList()
+                if (refreshNeeded) {
+                    images.value = items.toList()
+                }
                 if (index == currentPosition.value) {
-                    updateCurrentPosition(index, true)
+                    updateCurrentPosition(index)
                 }
             } else {
                 Timber.w("Node $itemId not found")
@@ -486,7 +496,7 @@ class ImageViewerViewModel @Inject constructor(
                 }
             }
 
-        updateCurrentPosition(newPosition, true)
+        updateCurrentPosition(newPosition)
     }
 
     fun showTransfersAction() {
@@ -654,8 +664,8 @@ class ImageViewerViewModel @Inject constructor(
         }
     }
 
-    fun updateCurrentPosition(position: Int, forceUpdate: Boolean) {
-        if (forceUpdate || position != currentPosition.value) {
+    fun updateCurrentPosition(position: Int) {
+        if (position != currentPosition.value) {
             currentPosition.value = position
         }
     }
@@ -706,15 +716,15 @@ class ImageViewerViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { items ->
-                    images.value = items.toList()
-
-                    val position =
-                        items.indexOfFirst { currentNodeHandle == it.getNodeHandle() || currentNodeHandle == it.id }
-                    if (position != INVALID_POSITION) {
-                        updateCurrentPosition(position, true)
-                    } else {
-                        updateCurrentPosition(0, true)
+                    val position = items.indexOfFirst {
+                        currentNodeHandle == it.getNodeHandle() || currentNodeHandle == it.id
                     }
+                    if (position != INVALID_POSITION) {
+                        updateCurrentPosition(position)
+                    } else {
+                        updateCurrentPosition(0)
+                    }
+                    images.value = items.toList()
                 },
                 onError = { error ->
                     Timber.e(error)
@@ -754,11 +764,11 @@ class ImageViewerViewModel @Inject constructor(
                     val imagePosition = getCurrentPosition()
                     when {
                         imagePosition + 1 == getImagesSize() - 1 -> {
-                            updateCurrentPosition(imagePosition + 1, true)
+                            updateCurrentPosition(imagePosition + 1)
                             stopSlideshow()
                         }
                         imagePosition < getImagesSize() - 1 ->
-                            updateCurrentPosition(imagePosition + 1, true)
+                            updateCurrentPosition(imagePosition + 1)
                         else ->
                             stopSlideshow()
                     }

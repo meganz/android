@@ -4,21 +4,22 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import mega.privacy.android.app.imageviewer.ImageViewerPageFragment
-import mega.privacy.android.app.utils.LongDiffCallback
+import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.utils.view.DiffFragmentStateAdapter
 
 /**
- * Image Viewer adapter based on a list of longs that creates a ImageViewerPageFragment.
+ * Image Viewer adapter based on a list of ImageAdapterItemss that creates a ImageViewerPageFragment.
  */
 class ImageViewerAdapter(fragmentManager: FragmentManager, viewLifecycle: Lifecycle) :
-    DiffFragmentStateAdapter<Long>(fragmentManager, viewLifecycle, LongDiffCallback()) {
+    DiffFragmentStateAdapter<ImageAdapterItem>
+        (fragmentManager, viewLifecycle, ImageAdapterItem.DiffCallback()) {
 
     override fun createFragment(position: Int): Fragment =
-        ImageViewerPageFragment.newInstance(getItem(position))
+        ImageViewerPageFragment.newInstance(getItem(position).id)
 
     override fun getItemId(position: Int): Long =
-        getItem(position)
+        getItem(position).id
 
     override fun containsItem(itemId: Long): Boolean =
-        getCurrentList().contains(itemId)
+        getCurrentList().any { itemId == it.id }
 }

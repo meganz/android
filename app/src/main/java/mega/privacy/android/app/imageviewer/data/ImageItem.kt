@@ -2,6 +2,7 @@ package mega.privacy.android.app.imageviewer.data
 
 import android.net.Uri
 import mega.privacy.android.app.usecase.data.MegaNodeItem
+import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 
 /**
  * Data object that encapsulates an item representing an Image.
@@ -142,10 +143,10 @@ sealed class ImageItem {
      */
     fun copy(nodeItem: MegaNodeItem? = null, imageResult: ImageResult? = null): ImageItem =
         when (this) {
-            is Node -> copy(handle, id, name, infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
-            is OfflineNode -> copy(handle, fileUri, id, name, infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
-            is ChatNode -> copy(handle, chatMessageId, chatRoomId, isDeletable, id, name, infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
-            is PublicNode -> copy(handle, nodePublicLink, id, name, infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
+            is Node -> copy(handle, id, nodeItem?.name ?: name, nodeItem?.node?.getInfoText() ?: infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
+            is OfflineNode -> copy(handle, fileUri, id, nodeItem?.name ?: name, nodeItem?.node?.getInfoText() ?: infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
+            is ChatNode -> copy(handle, chatMessageId, chatRoomId, isDeletable, id, nodeItem?.name ?: name, nodeItem?.node?.getInfoText() ?: infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
+            is PublicNode -> copy(handle, nodePublicLink, id, nodeItem?.name ?: name, nodeItem?.node?.getInfoText() ?: infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
             is File -> copy(fileUri, id, name, infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
         }
 }
