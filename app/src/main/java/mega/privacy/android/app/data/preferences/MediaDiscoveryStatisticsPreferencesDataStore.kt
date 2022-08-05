@@ -81,11 +81,14 @@ class MediaDiscoveryStatisticsPreferencesDataStore @Inject constructor(
                     throw exception
                 }
             }.map { preferences ->
+                val clickCountFolderPreferenceKey =
+                    intPreferencesKey(CLICK_COUNT_FOLDER + mediaHandle)
                 preferences[clickCountFolderPreferenceKey] ?: 0
             }
 
 
     override suspend fun setClickCountFolder(count: Int, mediaHandle: Long) {
+        val clickCountFolderPreferenceKey = intPreferencesKey(CLICK_COUNT_FOLDER + mediaHandle)
         withContext(ioDispatcher) {
             context.mediaDiscoveryStatisticsDataStore.edit {
                 it[clickCountFolderPreferenceKey] = count
