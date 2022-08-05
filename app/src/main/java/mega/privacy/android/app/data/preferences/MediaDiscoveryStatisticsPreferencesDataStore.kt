@@ -2,11 +2,11 @@ package mega.privacy.android.app.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,12 +17,17 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.MediaDiscoveryStatisticsPreferencesGateway
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.domain.entity.ChatImageQuality
 import java.io.IOException
 import javax.inject.Inject
 
+private const val mdClickPreferenceName = "MEDIA_DISCOVERY_CLICK"
 private val Context.mediaDiscoveryStatisticsDataStore: DataStore<Preferences> by preferencesDataStore(
-    name = "MEDIA_DISCOVERY_CLICK"
+    name = mdClickPreferenceName,
+    produceMigrations = {
+        listOf(
+            SharedPreferencesMigration(it, mdClickPreferenceName)
+        )
+    }
 )
 
 /**
