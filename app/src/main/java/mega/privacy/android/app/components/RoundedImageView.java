@@ -22,6 +22,8 @@
 package mega.privacy.android.app.components;
 
 import mega.privacy.android.app.R;
+import timber.log.Timber;
+
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -29,13 +31,12 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.widget.ImageView;
 
-
-public class RoundedImageView extends ImageView {
+public class RoundedImageView extends AppCompatImageView {
 
     public static final String TAG = "RoundedImageView";
     public static final int DEFAULT_RADIUS = 0;
@@ -118,7 +119,6 @@ public class RoundedImageView extends ImageView {
     /**
      * Return the current scale type in use by this ImageView.
      *
-     * @attr ref android.R.styleable#ImageView_scaleType
      * @see android.widget.ImageView.ScaleType
      */
     @Override
@@ -131,7 +131,6 @@ public class RoundedImageView extends ImageView {
      * of this ImageView.
      *
      * @param scaleType The desired scaling mode.
-     * @attr ref android.R.styleable#ImageView_scaleType
      */
     @Override
     public void setScaleType(ScaleType scaleType) {
@@ -202,7 +201,7 @@ public class RoundedImageView extends ImageView {
             try {
                 d = ContextCompat.getDrawable(getContext(), mResource);
             } catch (Exception e) {
-                Log.w(TAG, "Unable to find resource: " + mResource, e);
+                Timber.tag(TAG).w(e, "Unable to find resource: %s", mResource);
                 // Don't try again.
                 mResource = 0;
             }
