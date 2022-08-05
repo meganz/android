@@ -85,7 +85,9 @@ class ImageSlideshowFragment : Fragment() {
     }
 
     override fun onStop() {
-        viewModel.stopSlideshow()
+        if (activity?.isChangingConfigurations != true && activity?.isFinishing != true) {
+            viewModel.stopSlideshow()
+        }
         shouldReportPosition = false
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
         super.onStop()
@@ -110,7 +112,6 @@ class ImageSlideshowFragment : Fragment() {
 
         binding.btnPlay.setOnClickListener { viewModel.startSlideshow() }
         binding.btnPause.setOnClickListener { viewModel.stopSlideshow() }
-        binding.motion.post { binding.motion.transitionToEnd() }
     }
 
     private fun setupObservers() {
