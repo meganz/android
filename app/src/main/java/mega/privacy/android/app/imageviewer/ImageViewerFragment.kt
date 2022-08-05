@@ -30,7 +30,7 @@ class ImageViewerFragment : Fragment() {
     private var shouldReportPosition = false
     private val viewModel by activityViewModels<ImageViewerViewModel>()
     private val pagerAdapter by lazy {
-        ImageViewerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
+        ImageViewerAdapter(true, childFragmentManager, viewLifecycleOwner.lifecycle)
     }
 
     private val pageChangeCallback by lazy {
@@ -108,7 +108,6 @@ class ImageViewerFragment : Fragment() {
                     binding.progress.hide()
 
                     val currentPosition = viewModel.getCurrentPosition()
-
                     if (!shouldReportPosition) {
                         binding.viewPager.setCurrentItem(currentPosition, false)
                         binding.viewPager.waitForLayout {

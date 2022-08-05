@@ -8,14 +8,17 @@ import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.utils.view.DiffFragmentStateAdapter
 
 /**
- * Image Viewer adapter based on a list of ImageAdapterItemss that creates a ImageViewerPageFragment.
+ * Image Viewer adapter based on a list of ImageAdapterItems that contains ImageViewerPageFragment.
  */
-class ImageViewerAdapter(fragmentManager: FragmentManager, viewLifecycle: Lifecycle) :
-    DiffFragmentStateAdapter<ImageAdapterItem>
-        (fragmentManager, viewLifecycle, ImageAdapterItem.DiffCallback()) {
+class ImageViewerAdapter(
+    val enableZoom: Boolean,
+    fragmentManager: FragmentManager,
+    viewLifecycle: Lifecycle,
+) : DiffFragmentStateAdapter<ImageAdapterItem>
+    (fragmentManager, viewLifecycle, ImageAdapterItem.DiffCallback()) {
 
     override fun createFragment(position: Int): Fragment =
-        ImageViewerPageFragment.newInstance(getItem(position).id)
+        ImageViewerPageFragment.newInstance(getItem(position).id, enableZoom)
 
     override fun getItemId(position: Int): Long =
         getItem(position).id

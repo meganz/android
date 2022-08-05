@@ -33,7 +33,7 @@ class ImageSlideshowFragment : Fragment() {
     private var shouldReportPosition = false
     private val viewModel by activityViewModels<ImageViewerViewModel>()
     private val pagerAdapter by lazy {
-        ImageViewerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
+        ImageViewerAdapter(false, childFragmentManager, viewLifecycleOwner.lifecycle)
     }
 
     private val pageChangeCallback by lazy {

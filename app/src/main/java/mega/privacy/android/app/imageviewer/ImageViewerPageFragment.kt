@@ -4,11 +4,16 @@ import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Size
-import android.view.*
+import android.view.GestureDetector
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.fragment.findNavController
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.drawable.ScalingUtils.ScaleType
@@ -23,9 +28,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageResult
+import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowFragmentDirections
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
-import mega.privacy.android.app.utils.ExtraUtils.extra
+import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
 import timber.log.Timber
 
@@ -36,6 +42,7 @@ import timber.log.Timber
 class ImageViewerPageFragment : Fragment() {
 
     companion object {
+        private const val EXTRA_ENABLE_ZOOM = "EXTRA_ENABLE_ZOOM"
         private const val ZOOM_MAX_SCALE_FACTOR = 6f
 
         /**
@@ -44,10 +51,11 @@ class ImageViewerPageFragment : Fragment() {
          * @param itemId        Item to show
          * @return              ImageBottomSheetDialogFragment to be shown
          */
-        fun newInstance(itemId: Long): ImageViewerPageFragment =
+        fun newInstance(itemId: Long, enableZoom: Boolean = true): ImageViewerPageFragment =
             ImageViewerPageFragment().apply {
                 arguments = Bundle().apply {
                     putLong(INTENT_EXTRA_KEY_HANDLE, itemId)
+                    putBoolean(EXTRA_ENABLE_ZOOM, enableZoom)
                 }
             }
     }
@@ -57,13 +65,13 @@ class ImageViewerPageFragment : Fragment() {
     private var hasScreenBeenRotated = false
     private var hasZoomBeenTriggered = false
     private val viewModel by activityViewModels<ImageViewerViewModel>()
-    private val itemId: Long? by extra(INTENT_EXTRA_KEY_HANDLE)
+    private val itemId: Long by extraNotNull(INTENT_EXTRA_KEY_HANDLE)
+    private val enableZoom: Boolean by extraNotNull(EXTRA_ENABLE_ZOOM, true)
     private val controllerListener by lazy { buildImageControllerListener() }
     private val screenSize: Size by lazy { requireContext().getScreenSize() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requireNotNull(itemId)
         hasScreenBeenRotated = savedInstanceState != null
     }
 
@@ -97,34 +105,56 @@ class ImageViewerPageFragment : Fragment() {
 
     override fun onDestroy() {
         if (activity?.isFinishing == true) {
-            viewModel.stopImageLoading(itemId!!)
+            viewModel.stopImageLoading(itemId)
         }
         super.onDestroy()
     }
 
     private fun setupView() {
         binding.image.apply {
-            setZoomingEnabled(true)
-            setIsLongpressEnabled(true)
-            setAllowTouchInterceptionWhileZoomed(false)
+            setZoomingEnabled(enableZoom)
+            setAllowTouchInterceptionWhileZoomed(!enableZoom)
+            setIsLongpressEnabled(enableZoom)
             setMaxScaleFactor(ZOOM_MAX_SCALE_FACTOR)
-            setTapListener(
-                MultiTapGestureListener(
-                    this,
-                    onSingleTapCallback = viewModel::switchToolbar,
-                    onZoomCallback = {
-                        if (!hasZoomBeenTriggered) {
-                            hasZoomBeenTriggered = true
-                            viewModel.loadSingleImage(itemId!!, fullSize = true)
+            if (enableZoom) {
+                setTapListener(
+                    MultiTapGestureListener(
+                        this,
+                        onSingleTapCallback = viewModel::switchToolbar,
+                        onZoomCallback = {
+                            if (!hasZoomBeenTriggered) {
+                                hasZoomBeenTriggered = true
+                                viewModel.loadSingleImage(itemId, fullSize = true)
+                            }
                         }
-                    }
+                    )
                 )
-            )
+            } else {
+                setTapListener(object : GestureDetector.SimpleOnGestureListener() {
+                    override fun onSingleTapUp(e: MotionEvent): Boolean {
+                        viewModel.switchToolbar()
+                        return true
+                    }
+
+                    override fun onScroll(
+                        e1: MotionEvent,
+                        e2: MotionEvent,
+                        distanceX: Float,
+                        distanceY: Float
+                    ): Boolean {
+                        if (e2.pointerCount > 1) navigateToViewer()
+                        return super.onScroll(e1, e2, distanceX, distanceY)
+                    }
+                })
+                setOnClickListener {
+                    viewModel.switchToolbar()
+                }
+            }
         }
     }
 
     private fun setupObservers() {
-        viewModel.onImage(itemId!!).observe(viewLifecycleOwner) { imageItem ->
+        viewModel.onImage(itemId).observe(viewLifecycleOwner) { imageItem ->
             val imageResult = imageItem?.imageResult ?: return@observe
 
             when (lifecycle.currentState) {
@@ -141,8 +171,8 @@ class ImageViewerPageFragment : Fragment() {
         }
 
         if (!hasScreenBeenRotated) {
-            viewModel.loadSingleNode(itemId!!)
-            viewModel.loadSingleImage(itemId!!, fullSize = false)
+            viewModel.loadSingleNode(itemId)
+            viewModel.loadSingleImage(itemId, fullSize = false)
         }
     }
 
@@ -152,7 +182,7 @@ class ImageViewerPageFragment : Fragment() {
      * @param imageResult   ImageResult to obtain images from
      */
     private fun showPreviewImage(
-        imageResult: ImageResult? = viewModel.getImageItem(itemId!!)?.imageResult
+        imageResult: ImageResult? = viewModel.getImageItem(itemId)?.imageResult
     ) {
         val previewImageRequest = imageResult?.previewUri?.toImageRequest(false)
         val thumbnailImageRequest = imageResult?.thumbnailUri?.toImageRequest(false)
@@ -185,7 +215,7 @@ class ImageViewerPageFragment : Fragment() {
      * ImageResult to obtain images from
      */
     private fun showFullImage(
-        imageResult: ImageResult? = viewModel.getImageItem(itemId!!)?.imageResult
+        imageResult: ImageResult? = viewModel.getImageItem(itemId)?.imageResult
     ) {
         val fullImageRequest = imageResult?.fullSizeUri?.toImageRequest(true) ?: run {
             showPreviewImage(imageResult)
@@ -218,7 +248,7 @@ class ImageViewerPageFragment : Fragment() {
             imageInfo: ImageInfo?,
             animatable: Animatable?
         ) {
-            val imageResult = viewModel.getImageItem(itemId!!)?.imageResult ?: return
+            val imageResult = viewModel.getImageItem(itemId)?.imageResult ?: return
             if (imageResult.isFullyLoaded) {
                 binding.image.post {
                     if (imageResult.isVideo) showVideoButton()
@@ -230,7 +260,7 @@ class ImageViewerPageFragment : Fragment() {
             Timber.e(throwable)
             if (throwable is BasePool.PoolSizeViolationException) activity?.onLowMemory()
 
-            val imageResult = viewModel.getImageItem(itemId!!)?.imageResult ?: return
+            val imageResult = viewModel.getImageItem(itemId)?.imageResult ?: return
             binding.image.hierarchy.setFailureImage(R.drawable.ic_error, ScaleType.FIT_CENTER)
             binding.image.controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(imageResult.previewUri?.toImageRequest(false))
@@ -264,8 +294,14 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun launchVideoScreen() {
-        val imageItem = itemId?.let { viewModel.getImageItem(it) } ?: return
+        val imageItem = viewModel.getImageItem(itemId) ?: return
         (activity as? ImageViewerActivity?)?.launchVideoScreen(imageItem)
+    }
+
+    private fun navigateToViewer() {
+        if (!findNavController().popBackStack()) {
+            findNavController().navigate(ImageSlideshowFragmentDirections.actionSlideshowToViewer())
+        }
     }
 
     private fun Uri.toImageRequest(isFullImage: Boolean): ImageRequest? {
