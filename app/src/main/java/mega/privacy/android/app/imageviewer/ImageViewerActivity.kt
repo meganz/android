@@ -55,6 +55,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_NEARBY_FILES
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_URI
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
+import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
@@ -77,6 +78,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     companion object {
         const val IMAGE_OFFSCREEN_PAGE_LIMIT = 2
+        private const val EXTRA_SHOW_SLIDESHOW = "EXTRA_SHOW_SLIDESHOW"
 
         /**
          * Get Image Viewer intent to show a single image node.
@@ -160,11 +162,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             parentNodeHandle: Long,
             childOrder: Int = ORDER_PHOTO_ASC,
             currentNodeHandle: Long? = null,
+            showSlideshow: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentNodeHandle)
                 putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, childOrder)
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
             }
 
         /**
@@ -181,10 +185,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             context: Context,
             childrenHandles: LongArray,
             currentNodeHandle: Long? = null,
+            showSlideshow: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(NODE_HANDLES, childrenHandles)
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
             }
 
         /**
@@ -203,11 +209,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             chatRoomId: Long,
             messageIds: LongArray,
             currentNodeHandle: Long? = null,
+            showSlideshow: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatRoomId)
                 putExtra(INTENT_EXTRA_KEY_MSG_ID, messageIds)
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
             }
 
         /**
@@ -223,10 +231,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             context: Context,
             childrenHandles: LongArray,
             currentNodeHandle: Long? = null,
+            showSlideshow: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE, childrenHandles)
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
             }
 
         /**
@@ -242,10 +252,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             context: Context,
             imageFileUri: Uri,
             showNearbyFiles: Boolean = false,
+            showSlideshow: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_URI, imageFileUri)
                 putExtra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES, showNearbyFiles)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
             }
     }
 
@@ -254,8 +266,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
     private val nodeOfflineHandle: Long? by extra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, INVALID_HANDLE)
-    private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-        INVALID_HANDLE)
+    private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
     private val nodeFileLink: String? by extra(EXTRA_LINK)
     private val childrenHandles: LongArray? by extra(NODE_HANDLES)
     private val childrenOfflineHandles: LongArray? by extra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
@@ -264,6 +275,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val chatMessagesId: LongArray? by extra(INTENT_EXTRA_KEY_MSG_ID)
     private val imageFileUri: Uri? by extra(INTENT_EXTRA_KEY_URI)
     private val showNearbyFiles: Boolean? by extra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES)
+    private val showSlideshow: Boolean by extraNotNull(EXTRA_SHOW_SLIDESHOW, false)
     private val isFileVersion by lazy {
         intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_FILE_VERSION,
             false)
@@ -384,8 +396,18 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private fun setupNavigation() {
         getNavController().let { navController ->
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
-            val navGraph = navController.navInflater.inflate(R.navigation.nav_image_viewer)
-            navController.setGraph(navGraph, null)
+            navController.setGraph(
+                navController.navInflater.inflate(R.navigation.nav_image_viewer).apply {
+                    setStartDestination(
+                        if (showSlideshow) {
+                            R.id.image_slideshow
+                        } else {
+                            R.id.image_viewer
+                        }
+                    )
+                },
+                null
+            )
         }
     }
 

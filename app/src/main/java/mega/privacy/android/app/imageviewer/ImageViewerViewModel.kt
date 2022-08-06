@@ -336,26 +336,17 @@ class ImageViewerViewModel @Inject constructor(
             val index = items.indexOfFirst { it.id == itemId }
             if (index != INVALID_POSITION) {
                 val currentItem = items[index]
-                var refreshNeeded = false
                 if (nodeItem != null && nodeItem != currentItem.nodeItem) {
-                    refreshNeeded = true
                     items[index] = currentItem.copy(
                         nodeItem = nodeItem
                     )
                 }
                 if (imageResult != null && imageResult != currentItem.imageResult) {
-                    refreshNeeded = true
                     items[index] = currentItem.copy(
                         imageResult = imageResult
                     )
                 }
-
-                if (refreshNeeded) {
-                    images.value = items.toList()
-                }
-                if (index == currentPosition.value) {
-                    updateCurrentPosition(index)
-                }
+                images.value = items.toList()
             } else {
                 Timber.w("Node $itemId not found")
             }

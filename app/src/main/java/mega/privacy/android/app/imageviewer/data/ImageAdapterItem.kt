@@ -2,7 +2,7 @@ package mega.privacy.android.app.imageviewer.data
 
 import androidx.recyclerview.widget.DiffUtil
 
-data class ImageAdapterItem(
+data class ImageAdapterItem constructor(
     val id: Long,
     val hash: Int,
 ) {

@@ -134,6 +134,9 @@ sealed class ImageItem {
             else -> null
         }
 
+    override fun hashCode(): Int =
+        super.hashCode() + (nodeItem?.hashCode() ?: 0) + (imageResult?.hashCode() ?: 0)
+
     /**
      * Get a copy of an existing ImageItem by replacing nodeItem or imageResult fields.
      *
