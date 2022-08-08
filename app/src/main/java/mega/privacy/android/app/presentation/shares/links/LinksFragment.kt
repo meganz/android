@@ -63,7 +63,7 @@ class LinksFragment : MegaNodeBaseFragment() {
     }
 
     override fun activateActionMode() {
-        if (adapter.isMultipleSelect) return
+        if (adapter?.isMultipleSelect == true) return
 
         super.activateActionMode()
         actionMode =
@@ -77,10 +77,10 @@ class LinksFragment : MegaNodeBaseFragment() {
 
         when {
             // select mode
-            adapter.isMultipleSelect -> {
-                adapter.toggleSelection(position)
-                val selectedNodes = adapter.selectedNodes
-                if (selectedNodes.size > 0)
+            adapter?.isMultipleSelect == true -> {
+                adapter?.toggleSelection(position)
+                val selectedNodes = adapter?.selectedNodes
+                if ((selectedNodes?.size ?: 0) > 0)
                     updateActionModeTitle()
             }
 
@@ -97,9 +97,10 @@ class LinksFragment : MegaNodeBaseFragment() {
     override fun navigateToFolder(node: MegaNode) {
         Timber.d("Is folder deep: %s", state().linksTreeDepth)
 
-        viewModel.pushToLastPositionStack(mLayoutManager.findFirstCompletelyVisibleItemPosition())
+        mLayoutManager?.findFirstCompletelyVisibleItemPosition()
+            ?.let { viewModel.pushToLastPositionStack(it) }
         viewModel.increaseLinksTreeDepth(node.handle)
-        recyclerView.scrollToPosition(0)
+        recyclerView?.scrollToPosition(0)
         checkScroll()
     }
 
@@ -117,12 +118,12 @@ class LinksFragment : MegaNodeBaseFragment() {
                 val lastVisiblePosition = viewModel.popLastPositionStack()
 
                 lastVisiblePosition.takeIf { it > 0 }?.let {
-                    mLayoutManager.scrollToPositionWithOffset(it, 0)
+                    mLayoutManager?.scrollToPositionWithOffset(it, 0)
                 }
 
-                recyclerView.visibility = View.VISIBLE
-                emptyImageView.visibility = View.GONE
-                emptyLinearLayout.visibility = View.GONE
+                recyclerView?.visibility = View.VISIBLE
+                emptyImageView?.visibility = View.GONE
+                emptyLinearLayout?.visibility = View.GONE
 
                 3
             }
@@ -131,15 +132,15 @@ class LinksFragment : MegaNodeBaseFragment() {
                 Timber.d("deepTree>1")
 
                 state().linksParentHandle?.let { parentHandle ->
-                    recyclerView.visibility = View.VISIBLE
-                    emptyImageView.visibility = View.GONE
-                    emptyLinearLayout.visibility = View.GONE
+                    recyclerView?.visibility = View.VISIBLE
+                    emptyImageView?.visibility = View.GONE
+                    emptyLinearLayout?.visibility = View.GONE
                     viewModel.decreaseLinksTreeDepth(parentHandle)
 
                     val lastVisiblePosition = viewModel.popLastPositionStack()
 
                     lastVisiblePosition.takeIf { it > 0 }?.let {
-                        mLayoutManager.scrollToPositionWithOffset(it, 0)
+                        mLayoutManager?.scrollToPositionWithOffset(it, 0)
                     }
                 }
 
@@ -158,16 +159,17 @@ class LinksFragment : MegaNodeBaseFragment() {
     override fun updateContact(contactHandle: Long) {}
 
     override fun showSortByPanel() {
-        managerActivity.showNewSortByPanel(ORDER_CLOUD)
+        managerActivity?.showNewSortByPanel(ORDER_CLOUD)
     }
 
-    override fun viewerFrom(): Int = Constants.VIEWER_FROM_LINKS
-
-    override fun getIntentOrder(): Int = state().sortOrder
-
-    override fun getCurrentSharesTab(): SharesTab = SharesTab.LINKS_TAB
-
-    override fun getParentHandle(): Long = state().linksHandle
+    override val viewerFrom: Int
+        get() = Constants.VIEWER_FROM_LINKS
+    override val intentOrder: Int
+        get() = state().sortOrder
+    override val currentSharesTab: SharesTab
+        get() = SharesTab.LINKS_TAB
+    override val parentHandle: Long
+        get() = state().linksHandle
 
     /**
      * Observe viewModel
@@ -180,7 +182,7 @@ class LinksFragment : MegaNodeBaseFragment() {
 
                     // If the nodes are loading, don't display the UI
                     if (it.isLoading) {
-                        recyclerView.visibility = View.GONE
+                        recyclerView?.visibility = View.GONE
                         hideTabs(true)
                         return@collect
                     }
@@ -188,9 +190,9 @@ class LinksFragment : MegaNodeBaseFragment() {
                     updateNodes(it.nodes)
                     hideTabs(!it.isFirstNavigationLevel())
 
-                    managerActivity.showFabButton()
-                    managerActivity.invalidateOptionsMenu()
-                    managerActivity.setToolbarTitle()
+                    managerActivity?.showFabButton()
+                    managerActivity?.invalidateOptionsMenu()
+                    managerActivity?.setToolbarTitle()
 
                     visibilityFastScroller()
                     hideActionMode()
@@ -215,12 +217,12 @@ class LinksFragment : MegaNodeBaseFragment() {
                 MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
                 sortByHeaderViewModel)
         } else {
-            adapter.parentHandle = state().linksHandle
-            adapter.setListFragment(recyclerView)
+            adapter?.parentHandle = state().linksHandle
+            adapter?.setListFragment(recyclerView)
         }
 
-        adapter.isMultipleSelect = false
-        recyclerView.adapter = adapter
+        adapter?.isMultipleSelect = false
+        recyclerView?.adapter = adapter
     }
 
     /**
@@ -230,7 +232,7 @@ class LinksFragment : MegaNodeBaseFragment() {
      */
     private fun updateNodes(nodes: List<MegaNode>) {
         val mutableListNodes = ArrayList(nodes)
-        adapter.setNodes(mutableListNodes)
+        adapter?.setNodes(mutableListNodes)
     }
 
     /**
@@ -239,7 +241,7 @@ class LinksFragment : MegaNodeBaseFragment() {
      * @param hide true if needs to hide shares tabs
      */
     private fun hideTabs(hide: Boolean) {
-        managerActivity.hideTabs(hide, SharesTab.LINKS_TAB)
+        managerActivity?.hideTabs(hide, SharesTab.LINKS_TAB)
     }
 
     /**
@@ -250,14 +252,17 @@ class LinksFragment : MegaNodeBaseFragment() {
     private fun setEmptyView(isInvalidHandle: Boolean) {
         var textToShow: String? = null
         if (isInvalidHandle) {
-            setImageViewAlphaIfDark(requireContext(), emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
-            emptyImageView.setImageResource(R.drawable.ic_zero_data_public_links)
+            emptyImageView?.let {
+                setImageViewAlphaIfDark(requireContext(),
+                    it, ColorUtils.DARK_IMAGE_ALPHA)
+            }
+            emptyImageView?.setImageResource(R.drawable.ic_zero_data_public_links)
             textToShow = requireContext().getString(R.string.context_empty_links)
         }
         setFinalEmptyView(textToShow)
     }
 
-    private inner class ActionBarCallBack(currentTab: Tab?) : BaseActionBarCallBack(currentTab) {
+    private inner class ActionBarCallBack(currentTab: Tab) : BaseActionBarCallBack(currentTab) {
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
             super.onPrepareActionMode(mode, menu)
             val control = CloudStorageOptionControlUtil.Control()
