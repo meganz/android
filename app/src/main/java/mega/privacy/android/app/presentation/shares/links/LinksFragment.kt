@@ -88,7 +88,7 @@ class LinksFragment : MegaNodeBaseFragment() {
     override fun refresh() {}
 
     override fun itemClick(position: Int) {
-        val actualPosition = position - adapter.placeholderCount
+        val actualPosition = position - 1
 
         when {
             // select mode
