@@ -88,8 +88,8 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
      */
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     @Deprecated("Use registerForActivityResult()")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
 
         viewModel.manageActivityResult(this, requestCode, resultCode, intent)
     }
