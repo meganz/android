@@ -49,40 +49,54 @@ pipeline {
         CONSOLE_LOG_FILE = 'console.txt'
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
-
-        // BUILD_ARCHS = "arm64-v8a"
     }
     post {
         failure {
             script {
                 downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+
                 if (hasGitLabMergeRequest()) {
                     String link = uploadFileToGitLab(CONSOLE_LOG_FILE)
-                    String message = failureMessage("<br/>") +
-                            "<br/>Build Log:\t${link}"
+
+                    def message = ""
+                    if (triggeredByDeliverAppStore()) {
+                        message = releaseFailureMessage("<br/>") +
+                                "<br/>Build Log:\t${link}"
+                    } else if (triggeredByUploadSymbol()) {
+                        message = uploadSymbolFailureMessage("<br/>") +
+                                "<br/>Build Log:\t${link}"
+                    }
                     sendToMR(message)
                 } else {
-                    slackSend color: 'danger', message: failureMessage("\n")
+                    slackSend color: 'danger', message: releaseFailureMessage("\n")
                     slackUploadFile filePath: CONSOLE_LOG_FILE, initialComment: 'Jenkins Log'
                 }
             }
         }
         success {
             script {
-                if (shouldSkip()) {
+                if (!isOnReleaseBranch()) {
                     sendToMR(skipMessage("<br/>"))
-                } else {
-                    if (hasGitLabMergeRequest()) {
-                        downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
-                        String link = uploadFileToGitLab(CONSOLE_LOG_FILE)
-                        def message = successMessage("<br/>") +
+                } else if (hasGitLabMergeRequest()) {
+                    downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+                    String link = uploadFileToGitLab(CONSOLE_LOG_FILE)
+
+                    if (triggeredByDeliverAppStore()) {
+                        def message = releaseSuccessMessage("<br/>") +
                                 "<br/>Build Log:\t${link}"
                         sendToMR(message)
 
-                        def versionInfoMsg = getBuildVersionInfo()
-                        sendToMR(versionInfoMsg)
+                        sendToMR(getBuildVersionInfo())
+
+                        slackSend color: "good", message: releaseSuccessMessage("\n")
+                    } else if (triggeredByUploadSymbol()) {
+                        def message = uploadSymbolSuccessMessage("<br/>") +
+                                "<br/>Build Log:\t${link}"
+                        sendToMR(message)
+
+                        slackSend color: "good", message: uploadSymbolSuccessMessage("\n")
                     }
-                    slackSend color: "good", message: successMessage("\n")
+
                 }
             }
         }
@@ -90,13 +104,21 @@ pipeline {
     stages {
         stage('Preparation') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
             }
             steps {
                 script {
                     BUILD_STEP = 'Preparation'
+
+                    // send command acknowledgement to MR
+                    sendToMR(":runner: Android CD Release pipeline has started!!!" +
+                            "<br/><b>Command</b>: ${env.gitlabTriggerPhrase}"
+                    )
+
                     checkSDKVersion()
+
                     REBUILD_SDK = getValueInMRDescriptionBy("REBUILD_SDK")
+
                     sh("rm -frv $ARCHIVE_FOLDER")
                     sh("mkdir -p ${WORKSPACE}/${ARCHIVE_FOLDER}")
                     sh("rm -fv ${CONSOLE_LOG_FILE}")
@@ -106,7 +128,7 @@ pipeline {
         }
         stage('Fetch SDK Submodules') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
             }
             steps {
                 script {
@@ -136,7 +158,7 @@ pipeline {
         }
         stage('Select SDK Version') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
             }
             steps {
                 script {
@@ -153,7 +175,7 @@ pipeline {
 
         stage('Download Dependency Lib for SDK') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
             }
             steps {
                 script {
@@ -186,26 +208,25 @@ pipeline {
         }
         stage('Build SDK') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
             }
             steps {
                 script {
                     BUILD_STEP = 'Build SDK'
 
+                    cleanSdk()
+
                     sh """
-                        cd ${WORKSPACE}/sdk/src/main/jni
-                        echo "=== CLEAN SDK ===="
-                        bash build.sh clean
                         echo "=== START SDK BUILD===="
+                        cd ${WORKSPACE}/sdk/src/main/jni
                         bash build.sh all
                     """
                 }
-
             }
         }
         stage('Build GMS APK') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() }
             }
             steps {
                 script {
@@ -216,7 +237,7 @@ pipeline {
         }
         stage('Sign GMS APK') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() }
             }
             steps {
                 script {
@@ -247,7 +268,7 @@ pipeline {
 
         stage('Build HMS APK') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() }
             }
             steps {
                 script {
@@ -259,7 +280,7 @@ pipeline {
 
         stage('Sign HMS APK') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() }
             }
             steps {
                 script {
@@ -290,7 +311,7 @@ pipeline {
 
         stage('Build GMS AAB') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() }
             }
             steps {
                 script {
@@ -302,7 +323,7 @@ pipeline {
 
         stage('Sign GMS AAB') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() }
             }
             steps {
                 script {
@@ -330,7 +351,7 @@ pipeline {
         }
         stage('Build HMS AAB') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() }
             }
             steps {
                 script {
@@ -341,7 +362,7 @@ pipeline {
         }
         stage('Sign HMS AAB') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() }
             }
             steps {
                 script {
@@ -368,9 +389,23 @@ pipeline {
                 }
             }
         }
+        stage('Upload Firebase Crashlytics symbol files') {
+            when {
+                expression { triggeredByUploadSymbol() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Upload Firebase Crashlytics symbol files'
+                    sh """
+                    cd $WORKSPACE
+                    ./gradlew clean app:assembleGmsRelease app:uploadCrashlyticsSymbolFileGmsRelease
+                    """
+                }
+            }
+        }
         stage('Collect native symbol files') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() }
             }
             steps {
                 script {
@@ -401,7 +436,7 @@ pipeline {
         }
         stage('Archive files') {
             when {
-                expression { (!shouldSkip()) }
+                expression { triggeredByDeliverAppStore() }
             }
             steps {
                 script {
@@ -451,6 +486,9 @@ pipeline {
             }
         }
         stage('Deploy to Google Play Alpha') {
+            when {
+                expression { triggeredByDeliverAppStore() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Deploy to Google Play Alpha'
@@ -467,31 +505,27 @@ pipeline {
             }
         }
         stage('Clean up') {
-            when {
-                expression { (DO_CLEANUP) }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Clean Up'
 
-                    sh """
-                    cd ${WORKSPACE}
-                    echo "workspace size before clean: "
-                    du -sh
-
-                    cd ${WORKSPACE}
-                    ./gradlew clean
-                    
-                    echo "workspace size after clean: "
-                    du -sh
-                    """
+                    printWorkspaceSize("workspace size before clean:")
+                    cleanAndroid()
+                    cleanSdk()
+                    printWorkspaceSize("workspace size after clean:")
                 }
             }
         }
     }
 }
 
-private String failureMessage(String lineBreak) {
+/**
+ * Compose the failure message of "deliver_appStore" command, which might be used for Slack or GitLab MR.
+ * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
+ * while GitLab MR uses "<br/>".
+ * @return The success message to be sent
+ */
+private String releaseFailureMessage(String lineBreak) {
     String message = ":x: Android Release Failed!" +
             "${lineBreak}Branch:\t${gitlabSourceBranch}" +
             "${lineBreak}Author:\t${gitlabUserName}" +
@@ -502,6 +536,19 @@ private String failureMessage(String lineBreak) {
         message += "${lineBreak}Trigger Reason: MR comment (${gitlabTriggerPhrase})"
     }
     return message
+}
+
+/**
+ * compose the success message of "upload_symbol" command, which might be used for Slack or GitLab MR.
+ * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
+ * while GitLab MR uses "<br/>".
+ * @return The success message to be sent
+ */
+private String uploadSymbolFailureMessage(String lineBreak) {
+    return ":x: Android Firebase Crashlytics symbol upload Failed!" +
+            "${lineBreak}Branch:\t${gitlabSourceBranch}" +
+            "${lineBreak}Author:\t${gitlabUserName}" +
+            "${lineBreak}Commit:\t${GIT_COMMIT}"
 }
 
 /**
@@ -585,13 +632,29 @@ private void sendToMR(String message) {
 }
 
 /**
- * compose the success message, which might be used for Slack or GitLab MR.
+ * compose the success message of "deliver_appStore" command, which might be used for Slack or GitLab MR.
  * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
  * while GitLab MR uses "<br/>".
  * @return The success message to be sent
  */
-private String successMessage(String lineBreak) {
-    return ":rocket: Android Release uploaded successfully" +
+private String releaseSuccessMessage(String lineBreak) {
+    return ":rocket: Android Release uploaded to Google Play Alpha channel successfully!" +
+            "${lineBreak}Version:\t${readAppVersion1()}" +
+            "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
+            "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
+            "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
+            "${lineBreak}Author:\t${gitlabUserName}" +
+            "${lineBreak}Commit:\t${GIT_COMMIT}"
+}
+
+/**
+ * compose the success message of "upload_symbol" command, which might be used for Slack or GitLab MR.
+ * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
+ * while GitLab MR uses "<br/>".
+ * @return The success message to be sent
+ */
+private String uploadSymbolSuccessMessage(String lineBreak) {
+    return ":rocket: Firebase Crashlytics symbol uploaded successfully!" +
             "${lineBreak}Version:\t${readAppVersion1()}" +
             "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
@@ -745,9 +808,32 @@ private String lastCommitMessage() {
     return sh(script: "git log --pretty=format:\"%x09%s\" -1", returnStdout: true).trim()
 }
 
-private boolean shouldSkip() {
-    // so we can only trigger process pipeline from 'release/*' branch
-    return env.gitlabSourceBranch == null || !env.gitlabSourceBranch.startsWith("release/")
+/**
+ * Check if the branch is a release branch
+ * @return true if triggered branch is 'release/*', otherwise return false.
+ */
+private boolean isOnReleaseBranch() {
+    return env.gitlabSourceBranch != null && env.gitlabSourceBranch.startsWith("release/")
+}
+
+/**
+ * Check if build is triggered by 'deliver_appStore' command.
+ * @return true if build is triggered by 'deliver_appStore' command. Otherwise return false.
+ */
+private boolean triggeredByDeliverAppStore() {
+    return isOnReleaseBranch() &&
+            env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase == "deliver_appStore"
+}
+
+/**
+ * Check if build is triggered by 'upload_symbol' command.
+ * @return true if build is triggered by 'upload_symbol' command. Otherwise return false.
+ */
+private boolean triggeredByUploadSymbol() {
+    return isOnReleaseBranch() &&
+            env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase == "upload_symbol"
 }
 
 private void deleteAllFilesExcept(String folder, String except) {
@@ -811,4 +897,36 @@ private void cleanOldSdkOutput() {
     """
 }
 
+/**
+ * clean SDK
+ */
+private void cleanSdk() {
+    println("clean SDK")
+    sh """
+        cd $WORKSPACE/sdk/src/main/jni
+        bash build.sh clean
+    """
+}
 
+/**
+ * clean Android project
+ */
+private void cleanAndroid() {
+    println("clean Android code")
+    sh """
+        cd $WORKSPACE
+        ./gradlew clean
+    """
+}
+
+/**
+ * print the size of workspace.
+ * @param prompt a prompt message can be printed before the size value.
+ */
+private void printWorkspaceSize(String prompt) {
+    println(prompt)
+    sh """
+        cd ${WORKSPACE}
+        du -sh
+    """
+}

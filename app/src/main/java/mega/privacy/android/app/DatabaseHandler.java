@@ -1,7 +1,5 @@
 package mega.privacy.android.app;
 
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.utils.Constants.INVALID_ID;
 import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
 import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
@@ -50,6 +48,7 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.domain.entity.SyncRecord;
 import mega.privacy.android.domain.entity.SyncRecordType;
 import mega.privacy.android.domain.entity.SyncStatus;
+import mega.privacy.android.domain.entity.VideoQuality;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
 import timber.log.Timber;
@@ -384,7 +383,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_PREFERRED_SORT_OTHERS + " TEXT,"                                                                        //26
                 + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "                                                                        //27
                 + KEY_AUTO_PLAY + " BOOLEAN,"                                                                                //28
-                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT DEFAULT '" + encrypt(String.valueOf(VIDEO_QUALITY_ORIGINAL)) + "',"            //29
+                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT DEFAULT '" + encrypt(String.valueOf(VideoQuality.ORIGINAL.getValue())) + "',"            //29
                 + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"                                                                    //30
                 + KEY_CHARGING_ON_SIZE + " TEXT,"                                                                            //31
                 + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"                                                                //32
@@ -452,7 +451,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, "                                                    //1
                 + KEY_CHAT_SOUND_NOTIFICATIONS + " TEXT, "                                                            //2
                 + KEY_CHAT_VIBRATION_ENABLED + " BOOLEAN, "                                                        //3
-                + KEY_CHAT_VIDEO_QUALITY + " TEXT DEFAULT '" + encrypt(String.valueOf(VIDEO_QUALITY_MEDIUM)) + "'"    //4
+                + KEY_CHAT_VIDEO_QUALITY + " TEXT DEFAULT '" + encrypt(String.valueOf(VideoQuality.MEDIUM.getValue())) + "'"    //4
                 + ")";
         db.execSQL(CREATE_CHAT_TABLE);
 
@@ -1640,7 +1639,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             if (!isTextEmpty(uploadVideoQuality)
                     && Integer.parseInt(uploadVideoQuality) == OLD_VIDEO_QUALITY_ORIGINAL) {
-                preferences.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_ORIGINAL));
+                preferences.setUploadVideoQuality(String.valueOf(VideoQuality.ORIGINAL.getValue()));
             }
         }
 
@@ -1755,8 +1754,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 String chatStatus = decrypt(cursor.getString(5));
                 String sendOriginalAttachments = decrypt(cursor.getString(6));
                 String videoQuality = Boolean.parseBoolean(sendOriginalAttachments)
-                        ? VIDEO_QUALITY_ORIGINAL + ""
-                        : VIDEO_QUALITY_MEDIUM + "";
+                        ? VideoQuality.ORIGINAL.getValue() + ""
+                        : VideoQuality.MEDIUM.getValue() + "";
 
                 chatSettings = new ChatSettings(notificationSound, vibrationEnabled, videoQuality);
             }
@@ -1784,8 +1783,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 String vibrationEnabled = decrypt(cursor.getString(3));
                 String sendOriginalAttachments = decrypt(cursor.getString(4));
                 String videoQuality = Boolean.parseBoolean(sendOriginalAttachments)
-                        ? VIDEO_QUALITY_ORIGINAL + ""
-                        : VIDEO_QUALITY_MEDIUM + "";
+                        ? VideoQuality.ORIGINAL.getValue() + ""
+                        : VideoQuality.MEDIUM.getValue() + "";
 
                 chatSettings = new ChatSettings(notificationSound, vibrationEnabled, videoQuality);
             }
@@ -1878,7 +1877,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     public int getChatVideoQuality() {
         Timber.d("getChatVideoQuality");
-        return getIntValue(TABLE_CHAT_SETTINGS, KEY_CHAT_VIDEO_QUALITY, VIDEO_QUALITY_MEDIUM);
+        return getIntValue(TABLE_CHAT_SETTINGS, KEY_CHAT_VIDEO_QUALITY, VideoQuality.MEDIUM.getValue());
     }
 
     public void setNotificationSoundChat(String sound) {

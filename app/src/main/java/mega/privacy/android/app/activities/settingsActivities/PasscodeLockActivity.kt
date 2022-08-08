@@ -651,12 +651,12 @@ class PasscodeLockActivity : BaseActivity() {
      * Clears the passcode fields.
      */
     private fun clearTypedPasscode() {
-        binding.passFirstInput.text.clear()
-        binding.passSecondInput.text.clear()
-        binding.passThirdInput.text.clear()
-        binding.passFourthInput.text.clear()
-        binding.passFifthInput.text.clear()
-        binding.passSixthInput.text.clear()
+        binding.passFirstInput.text?.clear()
+        binding.passSecondInput.text?.clear()
+        binding.passThirdInput.text?.clear()
+        binding.passFourthInput.text?.clear()
+        binding.passFifthInput.text?.clear()
+        binding.passSixthInput.text?.clear()
 
         binding.passwordInput.text.clear()
 

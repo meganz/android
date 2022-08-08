@@ -777,6 +777,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
+        super.onActivityResult(requestCode, resultCode, intent);
         if (intent == null) {
             return;
         }
