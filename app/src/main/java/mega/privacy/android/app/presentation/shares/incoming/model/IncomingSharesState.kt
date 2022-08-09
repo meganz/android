@@ -5,17 +5,19 @@ import nz.mega.sdk.MegaNode
 /**
  * Incoming shares UI state
  *
- * @param incomingParentHandle current incoming shares parent handle
+ * @param incomingHandle current incoming shares handle
  * @param incomingTreeDepth current incoming tree depth
+ * @param incomingParentHandle parent handle of the current incoming node
  * @param nodes current list of nodes
- * @param isInvalidParentHandle true if parent handle is invalid
+ * @param isInvalidHandle true if parent handle is invalid
  * @param isLoading true if the nodes are loading
  */
 data class IncomingSharesState(
-    val incomingParentHandle: Long = -1L,
+    val incomingHandle: Long = -1L,
     val incomingTreeDepth: Int = 0,
+    val incomingParentHandle: Long? = null,
     val nodes: List<MegaNode> = emptyList(),
-    val isInvalidParentHandle: Boolean = true,
+    val isInvalidHandle: Boolean = true,
     val isLoading: Boolean = false,
 ) {
 
