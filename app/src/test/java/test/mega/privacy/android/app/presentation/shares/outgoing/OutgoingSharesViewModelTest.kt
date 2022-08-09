@@ -208,7 +208,7 @@ class OutgoingSharesViewModelTest {
         }
 
     @Test
-    fun `test that is invalid parent handle is set to false when cannot retrieve node`() =
+    fun `test that is invalid parent handle is set to true when cannot retrieve node`() =
         runTest {
             whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
