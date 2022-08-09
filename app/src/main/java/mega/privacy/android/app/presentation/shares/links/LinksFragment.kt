@@ -256,11 +256,11 @@ class LinksFragment : MegaNodeBaseFragment() {
     /**
      * Set the empty view and message depending if the handle is valid or not
      *
-     * @param isInvalidParentHandle true if the handle is invalid
+     * @param isInvalidHandle true if the handle is invalid
      */
-    private fun setEmptyView(isInvalidParentHandle: Boolean) {
+    private fun setEmptyView(isInvalidHandle: Boolean) {
         var textToShow: String? = null
-        if (isInvalidParentHandle) {
+        if (isInvalidHandle) {
             setImageViewAlphaIfDark(requireContext(), emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
             emptyImageView.setImageResource(R.drawable.ic_zero_data_public_links)
             textToShow = requireContext().getString(R.string.context_empty_links)
