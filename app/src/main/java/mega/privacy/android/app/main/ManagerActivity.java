@@ -3754,8 +3754,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     case OUTGOING_TAB: {
                         Timber.d("setToolbarTitle: OUTGOING TAB");
                         if (isOutgoingAdded()) {
-                            if (outgoingSharesState(this).getOutgoingParentHandle() != -1) {
-                                MegaNode node = megaApi.getNodeByHandle(outgoingSharesState(this).getOutgoingParentHandle());
+                            if (outgoingSharesState(this).getOutgoingHandle() != -1) {
+                                MegaNode node = megaApi.getNodeByHandle(outgoingSharesState(this).getOutgoingHandle());
                                 aB.setTitle(node.getName());
                                 viewModel.setIsFirstNavigationLevel(false);
                             } else {
@@ -4275,7 +4275,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 SharesTab tabItemShares = getTabItemShares();
 
                 if ((tabItemShares == SharesTab.INCOMING_TAB && incomingSharesState(this).getIncomingParentHandle() != INVALID_HANDLE)
-                        || (tabItemShares == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE)
+                        || (tabItemShares == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingHandle() != INVALID_HANDLE)
                         || (tabItemShares == SharesTab.LINKS_TAB && linksState(this).getLinksHandle() != INVALID_HANDLE)) {
                     tabLayoutShares.setVisibility(View.GONE);
                     viewPagerShares.setUserInputEnabled(false);
@@ -4330,7 +4330,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         break;
 
                     case OUTGOING_TAB:
-                        if (!isOutgoingAdded() || (!hide && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE)) {
+                        if (!isOutgoingAdded() || (!hide && outgoingSharesState(this).getOutgoingHandle() != INVALID_HANDLE)) {
                             return;
                         }
 
@@ -5155,7 +5155,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 viewModel.getState().getValue().getRubbishBinParentHandle(),
                                 viewModel.getState().getValue().getInboxParentHandle(),
                                 incomingSharesState(ManagerActivity.this).getIncomingParentHandle(),
-                                outgoingSharesState(ManagerActivity.this).getOutgoingParentHandle(),
+                                outgoingSharesState(ManagerActivity.this).getOutgoingHandle(),
                                 linksState(ManagerActivity.this).getLinksHandle(),
                                 viewModel.getState().getValue().isFirstNavigationLevel()
                         );
@@ -5331,7 +5331,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 viewModel.getState().getValue().getRubbishBinParentHandle(),
                 viewModel.getState().getValue().getInboxParentHandle(),
                 incomingSharesState(this).getIncomingParentHandle(),
-                outgoingSharesState(this).getOutgoingParentHandle(),
+                outgoingSharesState(this).getOutgoingHandle(),
                 linksState(this).getLinksHandle(),
                 viewModel.getState().getValue().isFirstNavigationLevel()
         );
@@ -6159,7 +6159,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (getTabItemShares() == SharesTab.INCOMING_TAB && incomingSharesState(this).getIncomingParentHandle() != INVALID_HANDLE) {
                         incomingSharesViewModel.resetIncomingTreeDepth();
                         refreshIncomingShares();
-                    } else if (getTabItemShares() == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE) {
+                    } else if (getTabItemShares() == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingHandle() != INVALID_HANDLE) {
                         outgoingSharesViewModel.resetOutgoingTreeDepth();
                         refreshOutgoingShares();
                     } else if (getTabItemShares() == SharesTab.LINKS_TAB && linksState(this).getLinksHandle() != INVALID_HANDLE) {
@@ -6434,7 +6434,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             outgoingSharesViewModel.decreaseOutgoingTreeDepth(
                                     outgoingSharesState(this).getOutgoingTreeDepth() == 0 ? INVALID_HANDLE : result.getOldParentHandle());
 
-                            if (outgoingSharesState(this).getOutgoingParentHandle() == INVALID_HANDLE) {
+                            if (outgoingSharesState(this).getOutgoingHandle() == INVALID_HANDLE) {
                                 hideTabs(false, SharesTab.OUTGOING_TAB);
                             }
 
@@ -6835,7 +6835,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (getTabItemShares() == SharesTab.INCOMING_TAB) {
                     parentHandle = incomingSharesState(this).getIncomingParentHandle();
                 } else if (getTabItemShares() == SharesTab.OUTGOING_TAB) {
-                    parentHandle = outgoingSharesState(this).getOutgoingParentHandle();
+                    parentHandle = outgoingSharesState(this).getOutgoingHandle();
                 } else if (getTabItemShares() == SharesTab.LINKS_TAB) {
                     parentHandle = linksState(this).getLinksHandle();
                 }
@@ -6857,7 +6857,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                     parentHandle = incomingSharesState(this).getIncomingParentHandle();
                                     break;
                                 case OUTGOING_TAB:
-                                    parentHandle = outgoingSharesState(this).getOutgoingParentHandle();
+                                    parentHandle = outgoingSharesState(this).getOutgoingHandle();
                                     break;
                                 case LINKS_TAB:
                                     parentHandle = linksState(this).getLinksHandle();
