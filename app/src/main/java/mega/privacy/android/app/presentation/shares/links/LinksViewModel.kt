@@ -59,7 +59,7 @@ class LinksViewModel @Inject constructor(
     /**
      * Decrease by 1 the links tree depth
      *
-     * @param handle the id of the current outgoing parent handle to set
+     * @param handle the id of the current links parent handle to set
      */
     fun decreaseLinksTreeDepth(handle: Long) = viewModelScope.launch {
         setLinksTreeDepth(_state.value.linksTreeDepth - 1, handle)
@@ -68,7 +68,7 @@ class LinksViewModel @Inject constructor(
     /**
      * Increase by 1 the links tree depth
      *
-     * @param handle the id of the current outgoing parent handle to set
+     * @param handle the id of the current links parent handle to set
      */
     fun increaseLinksTreeDepth(handle: Long) = viewModelScope.launch {
         setLinksTreeDepth(_state.value.linksTreeDepth + 1, handle)
@@ -86,7 +86,7 @@ class LinksViewModel @Inject constructor(
      * If refresh nodes return null, else display empty list
      *
      * @param depth the tree depth value to set
-     * @param handle the id of the current outgoing parent handle to set
+     * @param handle the id of the current links parent handle to set
      */
     private suspend fun setLinksTreeDepth(depth: Int, handle: Long) {
         _state.update {
@@ -155,7 +155,7 @@ class LinksViewModel @Inject constructor(
      * @param handle
      */
     private suspend fun refreshNodes(handle: Long = _state.value.linksParentHandle): List<MegaNode>? {
-        Timber.d("refreshOutgoingSharesNodes")
+        Timber.d("refreshPublicLinks")
         return getPublicLinks(handle)
     }
 
