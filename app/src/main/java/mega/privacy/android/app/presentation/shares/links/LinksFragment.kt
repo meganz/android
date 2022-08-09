@@ -112,7 +112,7 @@ class LinksFragment : MegaNodeBaseFragment() {
     override fun navigateToFolder(node: MegaNode) {
         Timber.d("Is folder deep: %s", state().linksTreeDepth)
 
-        viewModel.pushToLastPositionState(mLayoutManager.findFirstCompletelyVisibleItemPosition())
+        viewModel.pushToLastPositionStack(mLayoutManager.findFirstCompletelyVisibleItemPosition())
         viewModel.increaseLinksTreeDepth(node.handle)
         recyclerView.scrollToPosition(0)
         checkScroll()

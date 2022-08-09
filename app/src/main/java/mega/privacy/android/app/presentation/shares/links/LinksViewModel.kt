@@ -129,7 +129,7 @@ class LinksViewModel @Inject constructor(
      * @param position the scroll position of the recyclerView for the current depth
      * @return the position saved
      */
-    fun pushToLastPositionState(position: Int): Int = lastPositionStack.push(position)
+    fun pushToLastPositionStack(position: Int): Int = lastPositionStack.push(position)
 
     /**
      * Get the parent node handle of current node
