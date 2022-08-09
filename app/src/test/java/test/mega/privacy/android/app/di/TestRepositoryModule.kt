@@ -21,6 +21,7 @@ import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
 import org.mockito.kotlin.mock
 
@@ -81,4 +82,7 @@ object TestRepositoryModule {
 
     @Provides
     fun provideFeatureFlagRepository(): FeatureFlagRepository = mock()
+
+    @Provides
+    fun provideStatisticsRepository(): StatisticsRepository = mock()
 }
