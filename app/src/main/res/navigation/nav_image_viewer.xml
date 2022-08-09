@@ -7,6 +7,7 @@
     <fragment
         android:id="@+id/image_viewer"
         android:name="mega.privacy.android.app.imageviewer.ImageViewerFragment"
+        android:label=""
         tools:layout="@layout/fragment_image_viewer">
 
         <action
@@ -17,6 +18,7 @@
     <fragment
         android:id="@+id/image_slideshow"
         android:name="mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowFragment"
+        android:label="@string/action_slideshow"
         tools:layout="@layout/fragment_image_slideshow">
 
         <action

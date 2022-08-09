@@ -116,7 +116,7 @@ class ImageSlideshowFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.onAdapterImages().observe(viewLifecycleOwner) { items ->
+        viewModel.onAdapterImagesOnly().observe(viewLifecycleOwner) { items ->
             if (items.isNullOrEmpty()) {
                 Timber.e("Null or empty image items")
                 activity?.finish()

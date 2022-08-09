@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
@@ -33,6 +34,7 @@ import mega.privacy.android.app.imageviewer.util.shouldShowForwardOption
 import mega.privacy.android.app.imageviewer.util.shouldShowManageLinkOption
 import mega.privacy.android.app.imageviewer.util.shouldShowSendToContactOption
 import mega.privacy.android.app.imageviewer.util.shouldShowShareOption
+import mega.privacy.android.app.imageviewer.util.shouldShowSlideshowOption
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -442,6 +444,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val imageItem = viewModel.getCurrentImageItem() ?: return super.onPrepareOptionsMenu(menu)
         menu?.apply {
+            findItem(R.id.action_slideshow)?.isVisible =
+                imageItem.shouldShowSlideshowOption() && viewModel.getImagesSize() > 1
             findItem(R.id.action_forward)?.isVisible =
                 imageItem.shouldShowForwardOption() && !isFileVersion
             findItem(R.id.action_share)?.isVisible =
@@ -463,6 +467,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         return when (item.itemId) {
             android.R.id.home -> {
                 onBackPressed()
+                true
+            }
+            R.id.action_slideshow -> {
+                getNavController().navigate(ImageViewerFragmentDirections.actionViewerToSlideshow())
                 true
             }
             R.id.action_forward -> {

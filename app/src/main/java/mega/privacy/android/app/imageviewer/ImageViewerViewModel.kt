@@ -128,6 +128,12 @@ class ImageViewerViewModel @Inject constructor(
     fun onAdapterImages(): LiveData<List<ImageAdapterItem>?> =
         images.map { items -> items?.map { ImageAdapterItem(it.id, it.hashCode()) } }
 
+    fun onAdapterImagesOnly(): LiveData<List<ImageAdapterItem>?> =
+        images.map { items ->
+            items?.filter { it.imageResult?.isVideo != true }
+                ?.map { ImageAdapterItem(it.id, it.hashCode()) }
+        }
+
     fun onImage(itemId: Long): LiveData<ImageItem?> =
         images.map { items -> items?.firstOrNull { it.id == itemId } }
 
