@@ -23,6 +23,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.main.FileStorageActivity;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
 import nz.mega.sdk.MegaNode;
+import timber.log.Timber;
 
 import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -113,7 +114,7 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
                                 uploadUseCase.upload(requireActivity(), info, null, parentNode.getHandle())
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(() -> showSnackbar(requireActivity(), text));
+                                        .subscribe(() -> showSnackbar(requireActivity(), text), Timber::e);
                             }
                         });
     }

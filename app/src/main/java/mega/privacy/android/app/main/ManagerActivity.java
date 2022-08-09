@@ -8220,7 +8220,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                             uploadUseCase.upload(this, file, parentHandle)
                                                     .subscribeOn(Schedulers.io())
                                                     .observeOn(AndroidSchedulers.mainThread())
-                                                    .subscribe(() -> Timber.d("Upload started"));
+                                                    .subscribe(() -> Timber.d("Upload started"), Timber::e);
                                         }
                                     });
                 }
@@ -9035,7 +9035,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                     uploadUseCase.upload(this, info, null, parentNode.getHandle())
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(() -> Timber.d("Upload started"));
+                                            .subscribe(() -> Timber.d("Upload started"), Timber::e);
                                 }
                             }
                         }
@@ -9136,7 +9136,8 @@ public class ManagerActivity extends TransfersManagementActivity
                                 uploadUseCase.upload(this, file, parentNode.getHandle())
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(() -> showSnackbar(SNACKBAR_TYPE, text, MEGACHAT_INVALID_HANDLE));
+                                        .subscribe(() -> showSnackbar(SNACKBAR_TYPE, text, MEGACHAT_INVALID_HANDLE),
+                                                Timber::e);
                             }
                         });
     }
@@ -10881,7 +10882,7 @@ public class ManagerActivity extends TransfersManagementActivity
             uploadUseCase.upload(this, file, transfer.getParentHandle())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(() -> Timber.d("Transfer retried."));
+                    .subscribe(() -> Timber.d("Transfer retried."), Timber::e);
         }
 
         removeCompletedTransfer(transfer);

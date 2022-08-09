@@ -822,7 +822,8 @@ public class ContactFileListActivity extends PasscodeActivity
                                             uploadUseCase.upload(this, file, contactFileListFragment.getParentHandle())
                                                     .subscribeOn(Schedulers.io())
                                                     .observeOn(AndroidSchedulers.mainThread())
-                                                    .subscribe(() -> Timber.d("Upload started"));
+                                                    .subscribe(() -> Timber.d("Upload started"),
+                                                            Timber::e);
                                         }
                                     });
                 }
@@ -896,7 +897,7 @@ public class ContactFileListActivity extends PasscodeActivity
                             uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(() -> showSnackbar(SNACKBAR_TYPE, text));
+                                    .subscribe(() -> showSnackbar(SNACKBAR_TYPE, text), Timber::e);
                         }
                     }
                 });
