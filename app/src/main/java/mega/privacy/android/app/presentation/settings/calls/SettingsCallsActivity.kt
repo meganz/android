@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.settings.chat.imagequality
+package mega.privacy.android.app.presentation.settings.calls
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -6,14 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import timber.log.Timber
 import javax.inject.Inject
 
-/**
- * Activity which allows to change the chat image quality setting.
- */
 @AndroidEntryPoint
-class SettingsChatImageQualityActivity : AppCompatActivity() {
+class SettingsCallsActivity : AppCompatActivity() {
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
@@ -25,7 +21,7 @@ class SettingsChatImageQualityActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.settings, SettingsChatImageQualityFragment())
+                .replace(R.id.settings, SettingsCallsFragment())
                 .commit()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

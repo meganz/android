@@ -96,6 +96,7 @@ class SettingsViewModel @Inject constructor(
             deleteEnabled = false,
             cameraUploadEnabled = true,
             chatEnabled = true,
+            callsEnabled = true,
             startScreen = 0,
             hideRecentActivityChecked = false,
             email = "",
@@ -152,7 +153,12 @@ class SettingsViewModel @Inject constructor(
                 isChatLoggedIn()
                     .combine(online) { loggedIn, online -> loggedIn && online }
                     .map { enabled ->
-                        { state: SettingsState -> state.copy(chatEnabled = enabled) }
+                        { state: SettingsState ->
+                            state.copy(
+                                chatEnabled = enabled,
+                                callsEnabled = enabled,
+                            )
+                        }
                     },
             ).collect {
                 state.update(it)

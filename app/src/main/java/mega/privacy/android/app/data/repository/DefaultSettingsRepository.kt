@@ -15,12 +15,14 @@ import mega.privacy.android.app.data.gateway.MonitorHideRecentActivityFacade
 import mega.privacy.android.app.data.gateway.MonitorStartScreenFacade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
+import mega.privacy.android.app.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.SharedPreferenceConstants
+import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -43,6 +45,8 @@ import kotlin.coroutines.suspendCoroutine
  * @property monitorHideRecentActivityFacade
  * @property ioDispatcher
  * @property chatPreferencesGateway
+ * @property callsPreferencesGateway
+
  */
 @ExperimentalContracts
 class DefaultSettingsRepository @Inject constructor(
@@ -53,6 +57,7 @@ class DefaultSettingsRepository @Inject constructor(
     private val monitorHideRecentActivityFacade: MonitorHideRecentActivityFacade,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val chatPreferencesGateway: ChatPreferencesGateway,
+    private val callsPreferencesGateway: CallsPreferencesGateway,
     private val appPreferencesGateway: AppPreferencesGateway,
 ) : SettingsRepository {
     init {
@@ -178,6 +183,14 @@ class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun setChatImageQuality(quality: ChatImageQuality) =
         withContext(ioDispatcher) { chatPreferencesGateway.setChatImageQualityPreference(quality) }
+
+    override fun getCallsSoundNotifications(): Flow<CallsSoundNotifications> =
+        callsPreferencesGateway.getCallSoundNotificationsPreference()
+
+    override suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundNotifications) =
+        withContext(ioDispatcher) {
+            callsPreferencesGateway.setCallSoundNotificationsPreference(soundNotifications)
+        }
 
     override suspend fun setStringPreference(key: String?, value: String?) =
         setPreference(key to value, appPreferencesGateway::putString)

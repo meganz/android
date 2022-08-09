@@ -40,7 +40,14 @@
 			android:key="settings_features_chat"
 			android:title="@string/section_chat"
 			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
+			app:allowDividerBelow="false"
+			app:iconSpaceReserved="false" />
+
+		<androidx.preference.Preference
+			android:key="settings_features_calls"
+			android:title="Calls"
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="false"
 			app:iconSpaceReserved="false" />
 	</androidx.preference.PreferenceCategory>
 

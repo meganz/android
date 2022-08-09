@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
 
 /**
@@ -102,6 +103,21 @@ interface SettingsRepository {
      * @return Chat image quality.
      */
     suspend fun setChatImageQuality(quality: ChatImageQuality)
+
+    /**
+     * Gets chat image quality.
+     *
+     * @return Chat image quality.
+     */
+    fun getCallsSoundNotifications(): Flow<CallsSoundNotifications>
+
+    /**
+     * Sets chat image quality.
+     *
+     * @param quality New chat image quality.
+     * @return Chat image quality.
+     */
+    suspend fun setCallsSoundNotifications(quality: CallsSoundNotifications)
 
     /**
      * Set string preference
