@@ -254,9 +254,9 @@ class LinksFragment : MegaNodeBaseFragment() {
     }
 
     /**
-     * Set the empty view and message depending if the parent handle is valid or not
+     * Set the empty view and message depending if the handle is valid or not
      *
-     * @param isInvalidParentHandle true if the parent handle is invalid
+     * @param isInvalidParentHandle true if the handle is invalid
      */
     private fun setEmptyView(isInvalidParentHandle: Boolean) {
         var textToShow: String? = null

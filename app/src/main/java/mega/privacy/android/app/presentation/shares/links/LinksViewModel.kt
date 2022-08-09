@@ -58,7 +58,7 @@ class LinksViewModel @Inject constructor(
     /**
      * Decrease by 1 the links tree depth
      *
-     * @param handle the id of the current links parent handle to set
+     * @param handle the id of the current links handle to set
      */
     fun decreaseLinksTreeDepth(handle: Long) = viewModelScope.launch {
         setLinksTreeDepth(_state.value.linksTreeDepth - 1, handle)
@@ -67,7 +67,7 @@ class LinksViewModel @Inject constructor(
     /**
      * Increase by 1 the links tree depth
      *
-     * @param handle the id of the current links parent handle to set
+     * @param handle the id of the current links handle to set
      */
     fun increaseLinksTreeDepth(handle: Long) = viewModelScope.launch {
         setLinksTreeDepth(_state.value.linksTreeDepth + 1, handle)
@@ -85,7 +85,7 @@ class LinksViewModel @Inject constructor(
      * If refresh nodes return null, else display empty list
      *
      * @param depth the tree depth value to set
-     * @param handle the id of the current links parent handle to set
+     * @param handle the id of the current links handle to set
      */
     private suspend fun setLinksTreeDepth(depth: Int, handle: Long) {
         _state.update {
@@ -101,7 +101,7 @@ class LinksViewModel @Inject constructor(
             refreshNodes(handle)?.let { nodes ->
                 it.copy(
                     nodes = nodes,
-                    isInvalidHandle = isInvalidParentHandle(handle),
+                    isInvalidHandle = isInvalidHandle(handle),
                     isLoading = false
                 )
             } ?: run {
@@ -152,12 +152,12 @@ class LinksViewModel @Inject constructor(
     }
 
     /**
-     * Check if the parent handle is valid
+     * Check if the handle is valid or not
      *
      * @param handle
-     * @return true if the parent handle is valid
+     * @return true if the handle is invalid
      */
-    private suspend fun isInvalidParentHandle(handle: Long = _state.value.linksHandle): Boolean {
+    private suspend fun isInvalidHandle(handle: Long = _state.value.linksHandle): Boolean {
         return handle
             .takeUnless { it == -1L || it == MegaApiJava.INVALID_HANDLE }
             ?.let { getNodeByHandle(it) == null }
