@@ -3768,11 +3768,11 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                     case LINKS_TAB:
                         if (isLinksAdded()) {
-                            if (linksState(this).getLinksParentHandle() == INVALID_HANDLE) {
+                            if (linksState(this).getLinksHandle() == INVALID_HANDLE) {
                                 aB.setTitle(getResources().getString(R.string.title_shared_items));
                                 viewModel.setIsFirstNavigationLevel(true);
                             } else {
-                                MegaNode node = megaApi.getNodeByHandle(linksState(this).getLinksParentHandle());
+                                MegaNode node = megaApi.getNodeByHandle(linksState(this).getLinksHandle());
                                 aB.setTitle(node.getName());
                                 viewModel.setIsFirstNavigationLevel(false);
                             }
@@ -4277,7 +4277,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 if ((tabItemShares == SharesTab.INCOMING_TAB && incomingSharesState(this).getIncomingParentHandle() != INVALID_HANDLE)
                         || (tabItemShares == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE)
-                        || (tabItemShares == SharesTab.LINKS_TAB && linksState(this).getLinksParentHandle() != INVALID_HANDLE)) {
+                        || (tabItemShares == SharesTab.LINKS_TAB && linksState(this).getLinksHandle() != INVALID_HANDLE)) {
                     tabLayoutShares.setVisibility(View.GONE);
                     viewPagerShares.setUserInputEnabled(false);
                 } else {
@@ -4338,7 +4338,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         break;
 
                     case LINKS_TAB:
-                        if (!isLinksAdded() || (!hide && linksState(this).getLinksParentHandle() != INVALID_HANDLE)) {
+                        if (!isLinksAdded() || (!hide && linksState(this).getLinksHandle() != INVALID_HANDLE)) {
                             return;
                         }
 
@@ -5157,7 +5157,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 viewModel.getState().getValue().getInboxParentHandle(),
                                 incomingSharesState(ManagerActivity.this).getIncomingParentHandle(),
                                 outgoingSharesState(ManagerActivity.this).getOutgoingParentHandle(),
-                                linksState(ManagerActivity.this).getLinksParentHandle(),
+                                linksState(ManagerActivity.this).getLinksHandle(),
                                 viewModel.getState().getValue().isFirstNavigationLevel()
                         );
                     }
@@ -5333,7 +5333,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 viewModel.getState().getValue().getInboxParentHandle(),
                 incomingSharesState(this).getIncomingParentHandle(),
                 outgoingSharesState(this).getOutgoingParentHandle(),
-                linksState(this).getLinksParentHandle(),
+                linksState(this).getLinksHandle(),
                 viewModel.getState().getValue().isFirstNavigationLevel()
         );
     }
@@ -6163,7 +6163,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     } else if (getTabItemShares() == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE) {
                         outgoingSharesViewModel.resetOutgoingTreeDepth();
                         refreshOutgoingShares();
-                    } else if (getTabItemShares() == SharesTab.LINKS_TAB && linksState(this).getLinksParentHandle() != INVALID_HANDLE) {
+                    } else if (getTabItemShares() == SharesTab.LINKS_TAB && linksState(this).getLinksHandle() != INVALID_HANDLE) {
                         linksViewModel.resetLinksTreeDepth();
                         refreshLinks();
                     }
@@ -6446,7 +6446,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             linksViewModel.decreaseLinksTreeDepth(
                                     linksState(this).getLinksTreeDepth() == 0 ? INVALID_HANDLE : result.getOldParentHandle());
 
-                            if (linksState(this).getLinksParentHandle() == INVALID_HANDLE) {
+                            if (linksState(this).getLinksHandle() == INVALID_HANDLE) {
                                 hideTabs(false, SharesTab.LINKS_TAB);
                             }
 
@@ -6838,7 +6838,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else if (getTabItemShares() == SharesTab.OUTGOING_TAB) {
                     parentHandle = outgoingSharesState(this).getOutgoingParentHandle();
                 } else if (getTabItemShares() == SharesTab.LINKS_TAB) {
-                    parentHandle = linksState(this).getLinksParentHandle();
+                    parentHandle = linksState(this).getLinksHandle();
                 }
                 break;
 
@@ -6861,7 +6861,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                     parentHandle = outgoingSharesState(this).getOutgoingParentHandle();
                                     break;
                                 case LINKS_TAB:
-                                    parentHandle = linksState(this).getLinksParentHandle();
+                                    parentHandle = linksState(this).getLinksHandle();
                                     break;
                             }
                             break;

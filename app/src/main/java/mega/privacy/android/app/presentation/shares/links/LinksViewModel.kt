@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
@@ -93,7 +92,8 @@ class LinksViewModel @Inject constructor(
             it.copy(
                 isLoading = true,
                 linksTreeDepth = depth,
-                linksParentHandle = handle,
+                linksHandle = handle,
+                linksParentHandle = getParentNodeHandle(handle)
             )
         }
 
@@ -101,16 +101,17 @@ class LinksViewModel @Inject constructor(
             refreshNodes(handle)?.let { nodes ->
                 it.copy(
                     nodes = nodes,
-                    isInvalidParentHandle = isInvalidParentHandle(handle),
+                    isInvalidHandle = isInvalidParentHandle(handle),
                     isLoading = false
                 )
             } ?: run {
                 it.copy(
                     nodes = emptyList(),
                     linksTreeDepth = 0,
-                    linksParentHandle = -1L,
-                    isInvalidParentHandle = true,
-                    isLoading = false
+                    linksHandle = -1L,
+                    isInvalidHandle = true,
+                    isLoading = false,
+                    linksParentHandle = null
                 )
             }
         }
@@ -132,15 +133,6 @@ class LinksViewModel @Inject constructor(
     fun pushToLastPositionStack(position: Int): Int = lastPositionStack.push(position)
 
     /**
-     * Get the parent node handle of current node
-     *
-     * @return the parent node handle of current node
-     */
-    fun getParentNodeHandle(): Long? = runBlocking {
-        return@runBlocking getParentNodeHandle(_state.value.linksParentHandle)
-    }
-
-    /**
      * Set the current nodes displayed
      *
      * @param nodes the list of nodes to set
@@ -154,7 +146,7 @@ class LinksViewModel @Inject constructor(
      *
      * @param handle
      */
-    private suspend fun refreshNodes(handle: Long = _state.value.linksParentHandle): List<MegaNode>? {
+    private suspend fun refreshNodes(handle: Long = _state.value.linksHandle): List<MegaNode>? {
         Timber.d("refreshPublicLinks")
         return getPublicLinks(handle)
     }
@@ -165,7 +157,7 @@ class LinksViewModel @Inject constructor(
      * @param handle
      * @return true if the parent handle is valid
      */
-    private suspend fun isInvalidParentHandle(handle: Long = _state.value.linksParentHandle): Boolean {
+    private suspend fun isInvalidParentHandle(handle: Long = _state.value.linksHandle): Boolean {
         return handle
             .takeUnless { it == -1L || it == MegaApiJava.INVALID_HANDLE }
             ?.let { getNodeByHandle(it) == null }

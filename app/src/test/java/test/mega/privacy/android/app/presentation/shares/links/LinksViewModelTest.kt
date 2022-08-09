@@ -52,8 +52,9 @@ class LinksViewModelTest {
     fun `test that initial state is returned`() = runTest {
         underTest.state.test {
             val initial = awaitItem()
-            assertThat(initial.linksParentHandle).isEqualTo(-1L)
+            assertThat(initial.linksHandle).isEqualTo(-1L)
             assertThat(initial.linksTreeDepth).isEqualTo(0)
+            assertThat(initial.linksParentHandle).isEqualTo(null)
             assertThat(initial.nodes).isEmpty()
             assertThat(initial.isLoading).isFalse()
         }
@@ -120,11 +121,11 @@ class LinksViewModelTest {
         }
 
     @Test
-    fun `test that links parent handle is updated when increase links tree depth`() =
+    fun `test that links handle is updated when increase links tree depth`() =
         runTest {
             whenever(getPublicLinks(any())).thenReturn(mock())
 
-            underTest.state.map { it.linksParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.linksHandle }.distinctUntilChanged()
                 .test {
                     val newValue = 123456789L
                     assertThat(awaitItem()).isEqualTo(-1L)
@@ -134,11 +135,11 @@ class LinksViewModelTest {
         }
 
     @Test
-    fun `test that links parent handle is updated when decrease links tree depth`() =
+    fun `test that links handle is updated when decrease links tree depth`() =
         runTest {
             whenever(getPublicLinks(any())).thenReturn(mock())
 
-            underTest.state.map { it.linksParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.linksHandle }.distinctUntilChanged()
                 .test {
                     val newValue = 123456789L
                     assertThat(awaitItem()).isEqualTo(-1L)
@@ -148,11 +149,11 @@ class LinksViewModelTest {
         }
 
     @Test
-    fun `test that links parent handle is set to -1L when reset links tree depth`() =
+    fun `test that links handle is set to -1L when reset links tree depth`() =
         runTest {
             whenever(getPublicLinks(any())).thenReturn(mock())
 
-            underTest.state.map { it.linksParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.linksHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(-1L)
                     underTest.increaseLinksTreeDepth(123456789L)
@@ -163,12 +164,12 @@ class LinksViewModelTest {
         }
 
     @Test
-    fun `test that links parent handle is reset to default if fails to get public links when calling set links tree depth`() =
+    fun `test that links handle is reset to default if fails to get public links when calling set links tree depth`() =
         runTest {
             whenever(getPublicLinks(any())).thenReturn(mock())
             underTest.increaseLinksTreeDepth(123456789L)
 
-            underTest.state.map { it.linksParentHandle }
+            underTest.state.map { it.linksHandle }
                 .test {
                     assertThat(awaitItem()).isEqualTo(123456789L)
                     whenever(getPublicLinks(any())).thenReturn(null)
@@ -180,17 +181,17 @@ class LinksViewModelTest {
     @Test
     fun `test that getPublicLinks executes when calling increaseLinksTreeDepth`() =
         runTest {
-            val parentHandle = 123456789L
-            underTest.increaseLinksTreeDepth(parentHandle)
-            verify(getPublicLinks).invoke(parentHandle)
+            val handle = 123456789L
+            underTest.increaseLinksTreeDepth(handle)
+            verify(getPublicLinks).invoke(handle)
         }
 
     @Test
     fun `test that getPublicLinks executes when calling decreaseLinksTreeDepth`() =
         runTest {
-            val parentHandle = 123456789L
-            underTest.decreaseLinksTreeDepth(parentHandle)
-            verify(getPublicLinks).invoke(parentHandle)
+            val handle = 123456789L
+            underTest.decreaseLinksTreeDepth(handle)
+            verify(getPublicLinks).invoke(handle)
         }
 
     @Test
@@ -206,14 +207,14 @@ class LinksViewModelTest {
         runTest {
             whenever(getPublicLinks(any())).thenReturn(mock())
 
-            val parentHandle = 123456789L
-            val job = underTest.increaseLinksTreeDepth(parentHandle)
+            val handle = 123456789L
+            val job = underTest.increaseLinksTreeDepth(handle)
             job.invokeOnCompletion {
-                assertThat(underTest.state.value.linksParentHandle).isEqualTo(parentHandle)
+                assertThat(underTest.state.value.linksHandle).isEqualTo(handle)
                 underTest.refreshLinksSharesNode()
             }
             // increaseLinksTreeDepth call + refreshLinksSharesNode call
-            verify(getPublicLinks, times(2)).invoke(parentHandle)
+            verify(getPublicLinks, times(2)).invoke(handle)
         }
 
     @Test
@@ -260,7 +261,7 @@ class LinksViewModelTest {
             whenever(getPublicLinks(any())).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
-            underTest.state.map { it.isInvalidParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.isInvalidHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(true)
                     underTest.increaseLinksTreeDepth(any())
@@ -269,12 +270,12 @@ class LinksViewModelTest {
         }
 
     @Test
-    fun `test that is invalid parent handle is set to true when call set links tree depth with invalid parent handle`() =
+    fun `test that is invalid handle is set to true when call set links tree depth with invalid handle`() =
         runTest {
             whenever(getPublicLinks(any())).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
-            underTest.state.map { it.isInvalidParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.isInvalidHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(true)
                     underTest.increaseLinksTreeDepth(123456789L)
@@ -285,12 +286,12 @@ class LinksViewModelTest {
         }
 
     @Test
-    fun `test that is invalid parent handle is set to true when cannot retrieve node`() =
+    fun `test that is invalid handle is set to true when cannot retrieve node`() =
         runTest {
             whenever(getPublicLinks(any())).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
-            underTest.state.map { it.isInvalidParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.isInvalidHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(true)
                     underTest.increaseLinksTreeDepth(123456789L)
@@ -303,14 +304,46 @@ class LinksViewModelTest {
                 }
         }
 
+    @Test
+    fun `test that getParentNodeHandle is called when setLinksTreeDepth`() =
+        runTest {
+            val handle = 123456789L
+            underTest.increaseLinksTreeDepth(handle)
+            verify(getParentNodeHandle).invoke(handle)
+        }
 
     @Test
-    fun `test that get parent node handle returns the result of get parent node handle use case`() =
+    fun `test that parent handle is set with result of getParentNodeHandle`() =
         runTest {
-            val expected = 123456789L
+            val expected = 111111111L
             whenever(getParentNodeHandle(any())).thenReturn(expected)
+            whenever(getPublicLinks(any())).thenReturn(mock())
+            whenever(getNodeByHandle(any())).thenReturn(mock())
 
-            assertThat(underTest.getParentNodeHandle()).isEqualTo(expected)
+            underTest.state.map { it.linksParentHandle }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(null)
+                    underTest.increaseLinksTreeDepth(123456789L)
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+        }
+
+    @Test
+    fun `test that parent handle is set to null when refreshNodes fails`() =
+        runTest {
+            whenever(getParentNodeHandle(any())).thenReturn(111111111L)
+            whenever(getPublicLinks(any())).thenReturn(mock())
+            whenever(getNodeByHandle(any())).thenReturn(mock())
+
+            underTest.state.map { it.linksParentHandle }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(null)
+                    underTest.increaseLinksTreeDepth(123456789L)
+                    assertThat(awaitItem()).isEqualTo(111111111L)
+                    whenever(getPublicLinks(any())).thenReturn(null)
+                    underTest.increaseLinksTreeDepth(123456789L)
+                    assertThat(awaitItem()).isEqualTo(null)
+                }
         }
 
 }

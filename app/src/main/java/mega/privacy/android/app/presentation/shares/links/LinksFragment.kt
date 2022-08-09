@@ -145,7 +145,7 @@ class LinksFragment : MegaNodeBaseFragment() {
             state().linksTreeDepth > 1 -> {
                 Timber.d("deepTree>1")
 
-                viewModel.getParentNodeHandle()?.let { parentHandle ->
+                state().linksParentHandle?.let { parentHandle ->
                     recyclerView.visibility = View.VISIBLE
                     emptyImageView.visibility = View.GONE
                     emptyLinearLayout.visibility = View.GONE
@@ -178,7 +178,7 @@ class LinksFragment : MegaNodeBaseFragment() {
 
     override fun viewerFrom(): Int = Constants.VIEWER_FROM_LINKS
 
-    override fun getParentHandle(): Long = state().linksParentHandle
+    override fun getParentHandle(): Long = state().linksHandle
 
     /**
      * Observe viewModel
@@ -205,7 +205,7 @@ class LinksFragment : MegaNodeBaseFragment() {
 
                     visibilityFastScroller()
                     hideActionMode()
-                    setEmptyView(it.isInvalidParentHandle)
+                    setEmptyView(it.isInvalidHandle)
 
                 }
             }
@@ -220,13 +220,13 @@ class LinksFragment : MegaNodeBaseFragment() {
             adapter = MegaNodeAdapter(requireActivity(),
                 this,
                 state().nodes,
-                state().linksParentHandle,
+                state().linksHandle,
                 recyclerView,
                 Constants.LINKS_ADAPTER,
                 MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
                 sortByHeaderViewModel)
         } else {
-            adapter.parentHandle = state().linksParentHandle
+            adapter.parentHandle = state().linksHandle
             adapter.setListFragment(recyclerView)
         }
 

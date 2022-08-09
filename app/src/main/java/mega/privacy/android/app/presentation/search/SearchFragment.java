@@ -666,7 +666,7 @@ public class SearchFragment extends RotatableFragment {
                 managerViewModel.getState().getValue().getInboxParentHandle(),
                 incomingSharesViewModel.getState().getValue().getIncomingParentHandle(),
                 outgoingSharesViewModel.getState().getValue().getOutgoingParentHandle(),
-                linksViewModel.getState().getValue().getLinksParentHandle(),
+                linksViewModel.getState().getValue().getLinksHandle(),
                 managerViewModel.getState().getValue().isFirstNavigationLevel()
         );
     }

@@ -5,17 +5,19 @@ import nz.mega.sdk.MegaNode
 /**
  * Links shares UI state
  *
- * @param linksParentHandle current links parent handle
+ * @param linksHandle current links handle
  * @param linksTreeDepth current links tree depth
+ * @param linksParentHandle parent handle of the current link node
  * @param nodes current list of nodes
- * @param isInvalidParentHandle true if parent handle is invalid
+ * @param isInvalidHandle true if parent handle is invalid
  * @param isLoading true if the nodes are loading
  */
 data class LinksState(
-    val linksParentHandle: Long = -1L,
+    val linksHandle: Long = -1L,
     val linksTreeDepth: Int = 0,
+    val linksParentHandle: Long? = null,
     val nodes: List<MegaNode> = emptyList(),
-    val isInvalidParentHandle: Boolean = true,
+    val isInvalidHandle: Boolean = true,
     val isLoading: Boolean = false,
 ) {
     /**
