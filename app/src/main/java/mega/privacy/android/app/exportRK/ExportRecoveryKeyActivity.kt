@@ -19,9 +19,16 @@ import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import timber.log.Timber
 
+/**
+ * Activity to export or backup the Recovery Key
+ */
 class ExportRecoveryKeyActivity : PasscodeActivity() {
 
     companion object {
+        /**
+         * Request code value indicating app is requesting `WRITE_EXTERNAL_STORAGE` permission
+         * in order to save the Recovery Key
+         */
         const val WRITE_STORAGE_TO_SAVE_RK = 1
     }
 
@@ -29,6 +36,9 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
 
     private lateinit var binding: ActivityExportRecoveryKeyBinding
 
+    /**
+     * Perform Activity initialization
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -38,11 +48,21 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
         setUpView()
     }
 
+    /**
+     * Callback for the result from requesting permissions.
+     *
+     * @param requestCode   The request code passed in requestPermissions(Activity, String[], int)
+     * @param permissions   The requested permissions. Never null.
+     * @param grantResults  The grant results for the corresponding permissions which is either
+     *                      PackageManager.PERMISSION_GRANTED or PackageManager.PERMISSION_DENIED. Never null.
+     */
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray,
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
         if (grantResults.isEmpty() || requestCode != WRITE_STORAGE_TO_SAVE_RK) {
             Timber.w("Permissions ${permissions[0]} not granted")
         }
@@ -54,7 +74,20 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
         }
     }
 
+    /**
+     * Callback called when an activity you launched exits, giving you the requestCode
+     * you started it with, the resultCode it returned, and any additional data from it.
+     *
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who this
+     *                    result came from.
+     * @param resultCode The integer result code returned by the child activity
+     *                   through its setResult().
+     * @param data An Intent, which can return result data to the caller
+     *             (various data can be attached to Intent "extras").
+     */
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Deprecated("Use registerForActivityResult()")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 

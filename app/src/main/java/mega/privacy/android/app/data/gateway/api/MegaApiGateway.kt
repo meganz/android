@@ -417,4 +417,12 @@ interface MegaApiGateway {
      * @return all user alerts
      */
     suspend fun getUserAlerts(): List<MegaUserAlert>
+
+    /**
+     * Send a MEGA Stats event
+     *
+     * @param eventID
+     * @param message
+     */
+    suspend fun sendEvent(eventID: Int, message: String)
 }

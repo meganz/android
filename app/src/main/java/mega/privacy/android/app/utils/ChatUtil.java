@@ -1,6 +1,5 @@
 package mega.privacy.android.app.utils;
 
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildChatTempFile;
 import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
 import static mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR;
@@ -118,6 +117,7 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.main.megachat.RemovedMessage;
 import mega.privacy.android.app.textEditor.TextEditorActivity;
+import mega.privacy.android.domain.entity.VideoQuality;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -1594,7 +1594,7 @@ public class ChatUtil {
         pendingMsg.setName(fileName);
         pendingMsg.setFingerprint(MegaApplication.getInstance().getMegaApi().getFingerprint(filePath));
 
-        if (MimeTypeList.typeForName(fileName).isMp4Video() && dbH.getChatVideoQuality() != VIDEO_QUALITY_ORIGINAL) {
+        if (MimeTypeList.typeForName(fileName).isMp4Video() && dbH.getChatVideoQuality() != VideoQuality.ORIGINAL.getValue()) {
             idPendingMessage = dbH.addPendingMessage(pendingMsg, PendingMessageSingle.STATE_COMPRESSING);
             pendingMsg.setState(PendingMessageSingle.STATE_COMPRESSING);
         } else if (fromExplorer) {

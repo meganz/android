@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.repository.DefaultAccountRepository
 import mega.privacy.android.app.data.repository.DefaultAlbumsRepository
+import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.app.data.repository.DefaultChatRepository
 import mega.privacy.android.app.data.repository.DefaultEnvironmentRepository
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
@@ -17,6 +18,7 @@ import mega.privacy.android.app.data.repository.DefaultNetworkRepository
 import mega.privacy.android.app.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.app.data.repository.DefaultPushesRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
+import mega.privacy.android.app.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.app.data.repository.DefaultSupportRepository
 import mega.privacy.android.app.data.repository.DefaultThumbnailRepository
 import mega.privacy.android.app.data.repository.DefaultTransfersRepository
@@ -26,6 +28,7 @@ import mega.privacy.android.app.domain.repository.GlobalStatesRepository
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
@@ -36,6 +39,7 @@ import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
 import mega.privacy.android.domain.repository.ThumbnailRepository
 import javax.inject.Singleton
@@ -62,6 +66,9 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindNetworkRepository(repository: DefaultNetworkRepository): NetworkRepository
+
+    @Binds
+    abstract fun bindCameraUploadRepository(repository: DefaultCameraUploadRepository): CameraUploadRepository
 
     @Binds
     abstract fun bindChatRepository(repository: DefaultChatRepository): ChatRepository
@@ -105,4 +112,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindTransfersRepository(repository: DefaultTransfersRepository): TransfersRepository
+
+    @Binds
+    abstract fun bindStatisticsRepository(repository: DefaultStatisticsRepository): StatisticsRepository
 }
