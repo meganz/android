@@ -426,7 +426,7 @@ class NameCollisionViewModel @Inject constructor(
                     setUploadResult(1)
                     continueWithNext(choice)
                 },
-                onError = Timber::w
+                onError = Timber::e
             ).addTo(composite)
     }
 
@@ -464,7 +464,7 @@ class NameCollisionViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = { setUploadResult(list.size) },
-                onError = Timber::w
+                onError = Timber::e
             ).addTo(composite)
     }
 
