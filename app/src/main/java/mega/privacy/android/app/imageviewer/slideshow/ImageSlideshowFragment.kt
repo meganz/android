@@ -11,7 +11,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -21,6 +20,7 @@ import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STARTED
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STOPPED
+import mega.privacy.android.app.imageviewer.util.FadeOutPageTransformer
 import mega.privacy.android.app.utils.ContextUtils.isLowMemory
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import timber.log.Timber
@@ -99,6 +99,7 @@ class ImageSlideshowFragment : Fragment() {
     }
 
     private fun setupView() {
+        binding.root.keepScreenOn = true
         binding.viewPager.apply {
             isSaveEnabled = false
             offscreenPageLimit = if (requireContext().isLowMemory()) {
@@ -106,7 +107,7 @@ class ImageSlideshowFragment : Fragment() {
             } else {
                 ImageViewerActivity.IMAGE_OFFSCREEN_PAGE_LIMIT
             }
-            setPageTransformer(MarginPageTransformer(resources.getDimensionPixelSize(R.dimen.image_viewer_pager_margin)))
+            setPageTransformer(FadeOutPageTransformer())
             adapter = pagerAdapter
         }
 
