@@ -119,67 +119,24 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
                     break;
                 }
-                case MegaRequest.TYPE_REMOVE_CONTACT: {
-                    Timber.d("Multi contact remove request finish");
-                    if (error > 0) {
-                        message = context.getString(R.string.number_contact_removed, max_items - error) + context.getString(R.string.number_contact_not_removed, error);
-                    } else {
-                        message = context.getString(R.string.number_contact_removed, max_items);
-                    }
-
-                    break;
-                }
                 case MegaRequest.TYPE_COPY: {
-                    if (actionListener == MULTIPLE_CONTACTS_SEND_INBOX) {
-                        Timber.d("Send to inbox multiple contacts request finished");
-                        if (error > 0) {
-                            message = context.getString(R.string.number_correctly_sent, max_items - error) + context.getString(R.string.number_no_sent, error);
-                        } else {
-                            message = context.getString(R.string.number_correctly_sent, max_items);
+                    Timber.d("Copy request finished");
+                    if (error > 0) {
+                        if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+                            showForeignStorageOverQuotaWarningDialog(context);
                         }
-                    } else if (actionListener == MULTIPLE_FILES_SEND_INBOX) {
-                        Timber.d("Send to inbox multiple files request finished");
-                        if (error > 0) {
-                            message = context.getString(R.string.number_correctly_sent_multifile, max_items - error) + context.getString(R.string.number_no_sent_multifile, error);
-                        } else {
-                            message = context.getString(R.string.number_correctly_sent_multifile, max_items);
-                        }
-                    } else if (actionListener == MULTIPLE_CHAT_IMPORT) {
-                        //Many files shared with one contacts
-                        if (error > 0) {
-                            message = context.getString(R.string.number_correctly_imported_from_chat, max_items - error) + context.getString(R.string.number_no_imported_from_chat, error);
-                        } else {
-                            message = context.getString(R.string.import_success_message);
-                        }
+
+                        message = context.getString(R.string.number_correctly_copied, max_items - error) + context.getString(R.string.number_no_copied, error);
                     } else {
-                        Timber.d("Copy request finished");
-                        if (error > 0) {
-                            if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
-                                showForeignStorageOverQuotaWarningDialog(context);
-                            }
-
-                            message = context.getString(R.string.number_correctly_copied, max_items - error) + context.getString(R.string.number_no_copied, error);
-                        } else {
-                            message = context.getString(R.string.number_correctly_copied, max_items);
-                        }
-
-                        resetAccountDetailsTimeStamp();
+                        message = context.getString(R.string.number_correctly_copied, max_items);
                     }
+
+                    resetAccountDetailsTimeStamp();
                     break;
                 }
                 case MegaRequest.TYPE_INVITE_CONTACT: {
 
-                    if (request.getNumber() == MegaContactRequest.INVITE_ACTION_REMIND) {
-                        Timber.d("Remind contact request finished");
-                        message = context.getString(R.string.number_correctly_reinvite_contact_request, max_items);
-                    } else if (request.getNumber() == MegaContactRequest.INVITE_ACTION_DELETE) {
-                        Timber.d("Delete contact request finished");
-                        if (error > 0) {
-                            message = context.getString(R.string.number_no_delete_contact_request, max_items - error, error);
-                        } else {
-                            message = context.getString(R.string.number_correctly_delete_contact_request, max_items);
-                        }
-                    } else if (request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD) {
+                    if (request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD) {
                         Timber.d("Invite contact request finished");
                         if (errorExist > 0) {
                             message = getString(R.string.number_existing_invite_contact_request, errorExist);
@@ -193,16 +150,6 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         } else {
                             message = getQuantityString(R.plurals.number_correctly_invite_contact_request, max_items, max_items);
                         }
-                    }
-                    break;
-                }
-                case MegaRequest.TYPE_REPLY_CONTACT_REQUEST: {
-                    Timber.d("Multiple reply request sent");
-
-                    if (error > 0) {
-                        message = context.getString(R.string.number_incorrectly_invitation_reply_sent, max_items - error, error);
-                    } else {
-                        message = context.getString(R.string.number_correctly_invitation_reply_sent, max_items);
                     }
                     break;
                 }

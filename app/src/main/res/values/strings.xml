@@ -4034,4 +4034,8 @@
     <string name="chat_recent_list_empty_action">Start chatting now</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chat securely and privately, with anyone and on any device, knowing that no one can read your chats, not even MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Archive meeting</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">Start meeting now</string>
 </resources>
