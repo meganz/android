@@ -121,7 +121,7 @@ class OutgoingSharesViewModelTest {
         }
 
     @Test
-    fun `test that outgoing parent handle is updated when increase outgoing tree depth`() =
+    fun `test that outgoing handle is updated when increase outgoing tree depth`() =
         runTest {
             whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
 
@@ -135,7 +135,7 @@ class OutgoingSharesViewModelTest {
         }
 
     @Test
-    fun `test that outgoing parent handle is updated when decrease outgoing tree depth`() =
+    fun `test that outgoing handle is updated when decrease outgoing tree depth`() =
         runTest {
             whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
 
@@ -149,7 +149,7 @@ class OutgoingSharesViewModelTest {
         }
 
     @Test
-    fun `test that outgoing parent handle is set to -1L when reset outgoing tree depth`() =
+    fun `test that outgoing handle is set to -1L when reset outgoing tree depth`() =
         runTest {
             whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
 
@@ -164,7 +164,7 @@ class OutgoingSharesViewModelTest {
         }
 
     @Test
-    fun `test that outgoing parent handle is reset to default if fails to get node list when calling set outgoing tree depth`() =
+    fun `test that outgoing handle is reset to default if fails to get node list when calling set outgoing tree depth`() =
         runTest {
             whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
             underTest.increaseOutgoingTreeDepth(123456789L)
@@ -179,7 +179,7 @@ class OutgoingSharesViewModelTest {
         }
 
     @Test
-    fun `test that is invalid parent handle is set to false when call set outgoing tree depth with valid parent handle`() =
+    fun `test that is invalid handle is set to false when call set outgoing tree depth with valid handle`() =
         runTest {
             whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
@@ -193,7 +193,7 @@ class OutgoingSharesViewModelTest {
         }
 
     @Test
-    fun `test that is invalid parent handle is set to true when call set outgoing tree depth with invalid parent handle`() =
+    fun `test that is invalid handle is set to true when call set outgoing tree depth with invalid handle`() =
         runTest {
             whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
@@ -209,7 +209,7 @@ class OutgoingSharesViewModelTest {
         }
 
     @Test
-    fun `test that is invalid parent handle is set to true when cannot retrieve node`() =
+    fun `test that is invalid handle is set to true when cannot retrieve node`() =
         runTest {
             whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
