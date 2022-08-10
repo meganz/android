@@ -18,6 +18,7 @@ import mega.privacy.android.app.data.repository.DefaultNetworkRepository
 import mega.privacy.android.app.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.app.data.repository.DefaultPushesRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
+import mega.privacy.android.app.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.app.data.repository.DefaultSupportRepository
 import mega.privacy.android.app.data.repository.DefaultThumbnailRepository
 import mega.privacy.android.app.data.repository.DefaultTransfersRepository
@@ -38,6 +39,7 @@ import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
 import mega.privacy.android.domain.repository.ThumbnailRepository
 import javax.inject.Singleton
@@ -110,4 +112,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindTransfersRepository(repository: DefaultTransfersRepository): TransfersRepository
+
+    @Binds
+    abstract fun bindStatisticsRepository(repository: DefaultStatisticsRepository): StatisticsRepository
 }

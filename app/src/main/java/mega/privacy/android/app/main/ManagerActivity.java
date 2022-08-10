@@ -53,6 +53,7 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isB
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.incomingSharesState;
+import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.linksState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.outgoingSharesState;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
@@ -98,7 +99,6 @@ import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
-import static mega.privacy.android.app.utils.MDClickStatsUtil.fireMDStatsEvent;
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
@@ -379,6 +379,7 @@ import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment;
 import mega.privacy.android.app.presentation.shares.SharesPageAdapter;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
+import mega.privacy.android.app.presentation.shares.links.LinksViewModel;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
@@ -506,6 +507,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public ManagerViewModel viewModel;
     public IncomingSharesViewModel incomingSharesViewModel;
     public OutgoingSharesViewModel outgoingSharesViewModel;
+    public LinksViewModel linksViewModel;
     private SearchViewModel searchViewModel;
 
     @Inject
@@ -1406,6 +1408,7 @@ public class ManagerActivity extends TransfersManagementActivity
         viewModel = new ViewModelProvider(this).get(ManagerViewModel.class);
         incomingSharesViewModel = new ViewModelProvider(this).get(IncomingSharesViewModel.class);
         outgoingSharesViewModel = new ViewModelProvider(this).get(OutgoingSharesViewModel.class);
+        linksViewModel = new ViewModelProvider(this).get(LinksViewModel.class);
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         viewModel.getUpdateUsers().observe(this,
                 new EventObserver<>(users -> {
@@ -3526,7 +3529,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public void skipToMediaDiscoveryFragment(Fragment f, Long mediaHandle) {
         mediaDiscoveryFragment = (MediaDiscoveryFragment) f;
         replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
-        fireMDStatsEvent(megaApi, this, mediaHandle);
+        viewModel.onMediaDiscoveryOpened(mediaHandle);
         isInMDMode = true;
     }
 
@@ -3764,11 +3767,11 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                     case LINKS_TAB:
                         if (isLinksAdded()) {
-                            if (viewModel.getState().getValue().getLinksParentHandle() == INVALID_HANDLE) {
+                            if (linksState(this).getLinksHandle() == INVALID_HANDLE) {
                                 aB.setTitle(getResources().getString(R.string.title_shared_items));
                                 viewModel.setIsFirstNavigationLevel(true);
                             } else {
-                                MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getLinksParentHandle());
+                                MegaNode node = megaApi.getNodeByHandle(linksState(this).getLinksHandle());
                                 aB.setTitle(node.getName());
                                 viewModel.setIsFirstNavigationLevel(false);
                             }
@@ -4273,7 +4276,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 if ((tabItemShares == SharesTab.INCOMING_TAB && incomingSharesState(this).getIncomingParentHandle() != INVALID_HANDLE)
                         || (tabItemShares == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE)
-                        || (tabItemShares == SharesTab.LINKS_TAB && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE)) {
+                        || (tabItemShares == SharesTab.LINKS_TAB && linksState(this).getLinksHandle() != INVALID_HANDLE)) {
                     tabLayoutShares.setVisibility(View.GONE);
                     viewPagerShares.setUserInputEnabled(false);
                 } else {
@@ -4334,7 +4337,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         break;
 
                     case LINKS_TAB:
-                        if (!isLinksAdded() || (!hide && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE)) {
+                        if (!isLinksAdded() || (!hide && linksState(this).getLinksHandle() != INVALID_HANDLE)) {
                             return;
                         }
 
@@ -5153,7 +5156,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 viewModel.getState().getValue().getInboxParentHandle(),
                                 incomingSharesState(ManagerActivity.this).getIncomingParentHandle(),
                                 outgoingSharesState(ManagerActivity.this).getOutgoingParentHandle(),
-                                viewModel.getState().getValue().getLinksParentHandle(),
+                                linksState(ManagerActivity.this).getLinksHandle(),
                                 viewModel.getState().getValue().isFirstNavigationLevel()
                         );
                     }
@@ -5329,7 +5332,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 viewModel.getState().getValue().getInboxParentHandle(),
                 incomingSharesState(this).getIncomingParentHandle(),
                 outgoingSharesState(this).getOutgoingParentHandle(),
-                viewModel.getState().getValue().getLinksParentHandle(),
+                linksState(this).getLinksHandle(),
                 viewModel.getState().getValue().isFirstNavigationLevel()
         );
     }
@@ -6159,9 +6162,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     } else if (getTabItemShares() == SharesTab.OUTGOING_TAB && outgoingSharesState(this).getOutgoingParentHandle() != INVALID_HANDLE) {
                         outgoingSharesViewModel.resetOutgoingTreeDepth();
                         refreshOutgoingShares();
-                    } else if (getTabItemShares() == SharesTab.LINKS_TAB && viewModel.getState().getValue().getLinksParentHandle() != INVALID_HANDLE) {
-                        viewModel.setLinksParentHandle(INVALID_HANDLE);
-                        viewModel.resetLinksTreeDepth();
+                    } else if (getTabItemShares() == SharesTab.LINKS_TAB && linksState(this).getLinksHandle() != INVALID_HANDLE) {
+                        linksViewModel.resetLinksTreeDepth();
                         refreshLinks();
                     }
 
@@ -6440,11 +6442,10 @@ public class ManagerActivity extends TransfersManagementActivity
                             break;
 
                         case LINKS_TAB:
-                            viewModel.decreaseLinksTreeDepth();
-                            viewModel.setLinksParentHandle(
-                                    viewModel.getState().getValue().getLinksTreeDepth() == 0 ? INVALID_HANDLE : result.getOldParentHandle());
+                            linksViewModel.decreaseLinksTreeDepth(
+                                    linksState(this).getLinksTreeDepth() == 0 ? INVALID_HANDLE : result.getOldParentHandle());
 
-                            if (viewModel.getState().getValue().getLinksParentHandle() == INVALID_HANDLE) {
+                            if (linksState(this).getLinksHandle() == INVALID_HANDLE) {
                                 hideTabs(false, SharesTab.LINKS_TAB);
                             }
 
@@ -6836,7 +6837,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else if (getTabItemShares() == SharesTab.OUTGOING_TAB) {
                     parentHandle = outgoingSharesState(this).getOutgoingParentHandle();
                 } else if (getTabItemShares() == SharesTab.LINKS_TAB) {
-                    parentHandle = viewModel.getState().getValue().getLinksParentHandle();
+                    parentHandle = linksState(this).getLinksHandle();
                 }
                 break;
 
@@ -6859,7 +6860,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                     parentHandle = outgoingSharesState(this).getOutgoingParentHandle();
                                     break;
                                 case LINKS_TAB:
-                                    parentHandle = viewModel.getState().getValue().getLinksParentHandle();
+                                    parentHandle = linksState(this).getLinksHandle();
                                     break;
                             }
                             break;
@@ -8220,7 +8221,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                             uploadUseCase.upload(this, file, parentHandle)
                                                     .subscribeOn(Schedulers.io())
                                                     .observeOn(AndroidSchedulers.mainThread())
-                                                    .subscribe(() -> Timber.d("Upload started"));
+                                                    .subscribe(() -> Timber.d("Upload started"), Timber::e);
                                         }
                                     });
                 }
@@ -9035,7 +9036,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                     uploadUseCase.upload(this, info, null, parentNode.getHandle())
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(() -> Timber.d("Upload started"));
+                                            .subscribe(() -> Timber.d("Upload started"), Timber::e);
                                 }
                             }
                         }
@@ -9136,7 +9137,8 @@ public class ManagerActivity extends TransfersManagementActivity
                                 uploadUseCase.upload(this, file, parentNode.getHandle())
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(() -> showSnackbar(SNACKBAR_TYPE, text, MEGACHAT_INVALID_HANDLE));
+                                        .subscribe(() -> showSnackbar(SNACKBAR_TYPE, text, MEGACHAT_INVALID_HANDLE),
+                                                Timber::e);
                             }
                         });
     }
@@ -9797,9 +9799,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void refreshLinks() {
-        if (!isLinksAdded()) return;
-
-        linksFragment.refresh();
+        linksViewModel.refreshLinksSharesNode();
     }
 
     public void refreshInboxList() {
@@ -10138,7 +10138,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public int getDeepBrowserTreeLinks() {
-        return viewModel.getState().getValue().getLinksTreeDepth();
+        return linksState(this).getLinksTreeDepth();
     }
 
     public DrawerItem getDrawerItem() {
@@ -10261,7 +10261,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     case LINKS_TAB:
                         if (!isLinksAdded()) break;
 
-                        if (viewModel.getState().getValue().getLinksTreeDepth() <= 0) {
+                        if (linksState(this).getLinksTreeDepth() <= 0) {
                             hideFabButton();
                         } else {
                             updateFabAndShow();
@@ -10732,8 +10732,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else if (getTabItemShares() == SharesTab.OUTGOING_TAB) {
                     outgoingSharesViewModel.increaseOutgoingTreeDepth(node.getHandle());
                 } else if (getTabItemShares() == SharesTab.LINKS_TAB) {
-                    viewModel.setLinksParentHandle(node.getHandle());
-                    viewModel.increaseLinksTreeDepth();
+                    linksViewModel.increaseLinksTreeDepth(node.getHandle());
                 }
                 refreshSharesPageAdapter();
 
@@ -10881,7 +10880,7 @@ public class ManagerActivity extends TransfersManagementActivity
             uploadUseCase.upload(this, file, transfer.getParentHandle())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(() -> Timber.d("Transfer retried."));
+                    .subscribe(() -> Timber.d("Transfer retried."), Timber::e);
         }
 
         removeCompletedTransfer(transfer);

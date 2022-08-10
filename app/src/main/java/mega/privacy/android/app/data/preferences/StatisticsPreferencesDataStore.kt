@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
-import mega.privacy.android.app.data.gateway.preferences.MediaDiscoveryStatisticsPreferencesGateway
+import mega.privacy.android.app.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.app.di.IoDispatcher
 import java.io.IOException
 import javax.inject.Inject
@@ -37,10 +37,10 @@ private val Context.mediaDiscoveryStatisticsDataStore: DataStore<Preferences> by
  * @property ioDispatcher
  * @constructor Create empty chat preferences data store.
  **/
-class MediaDiscoveryStatisticsPreferencesDataStore @Inject constructor(
+class StatisticsPreferencesDataStore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : MediaDiscoveryStatisticsPreferencesGateway {
+) : StatisticsPreferencesGateway {
 
     companion object {
         private const val CLICK_COUNT = "ClickCount"

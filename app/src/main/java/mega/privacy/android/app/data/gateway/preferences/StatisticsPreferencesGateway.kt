@@ -2,7 +2,7 @@ package mega.privacy.android.app.data.gateway.preferences
 
 import kotlinx.coroutines.flow.Flow
 
-interface MediaDiscoveryStatisticsPreferencesGateway {
+interface StatisticsPreferencesGateway {
     /**
      * Get the click count
      *
