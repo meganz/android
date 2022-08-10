@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.manager
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.entity.ContactRequest
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
+import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
@@ -60,6 +62,7 @@ class ManagerViewModel @Inject constructor(
     private val getRootFolder: GetRootFolder,
     private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
     private val hasInboxChildren: HasInboxChildren,
+    private val sendStatisticsMediaDiscovery: SendStatisticsMediaDiscovery,
 ) : ViewModel() {
 
     /**
@@ -286,4 +289,12 @@ class ManagerViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Fire a Media Discovery stats event
+     */
+    fun onMediaDiscoveryOpened(mediaHandle: Long) {
+        viewModelScope.launch {
+            sendStatisticsMediaDiscovery(mediaHandle)
+        }
+    }
 }
