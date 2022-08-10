@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.settings.calls
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -35,8 +37,8 @@ fun SettingsCallsView(
 ) {
     Column {
         settingsCallsState.let {
-            CallSoundNotificationsItem(R.string.automatic_image_quality,
-                R.string.automatic_image_quality,
+            CallSoundNotificationsItem(R.string.settings_calls_preferences_sound_notifications,
+                R.string.settings_calls_preferences_sound_notifications_text,
                 true) {
                 onOptionChanged(it.soundNotifications ?: return@CallSoundNotificationsItem)
             }
@@ -58,10 +60,12 @@ fun CallSoundNotificationsItem(
                 role = Role.RadioButton,
                 onValueChange = {})
             .clickable { onClick() }
-            .padding(start = 15.dp, top = 16.dp, bottom = 16.dp, end = 10.dp),
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(Modifier.weight(1f)) {
+        Column(Modifier
+            .weight(1f)
+            .padding(start = 0.dp, top = 0.dp, bottom = 0.dp, end = 19.dp)) {
             Text(
                 text = stringResource(id = titleId),
                 style = Typography.subtitle1,
