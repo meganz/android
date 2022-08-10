@@ -794,7 +794,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private MenuItem clearCompletedTransfers;
     private MenuItem scanQRcodeMenuItem;
     private MenuItem returnCallMenuItem;
-    private MenuItem openMeetingMenuItem;
     private MenuItem openLinkMenuItem;
     private Chronometer chronometerMenuItem;
     private LinearLayout layoutCallMenuItem;
@@ -5171,7 +5170,6 @@ public class ManagerActivity extends TransfersManagementActivity
         pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
         scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
         returnCallMenuItem = menu.findItem(R.id.action_return_call);
-        openMeetingMenuItem = menu.findItem(R.id.action_menu_open_meeting);
         RelativeLayout rootView = (RelativeLayout) returnCallMenuItem.getActionView();
         layoutCallMenuItem = rootView.findViewById(R.id.layout_menu_call);
         chronometerMenuItem = rootView.findViewById(R.id.chrono_menu);
@@ -5282,7 +5280,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (searchExpand) {
                         openSearchView();
                     } else {
-                        openMeetingMenuItem.setVisible(true);
                         doNotDisturbMenuItem.setVisible(true);
                         openLinkMenuItem.setVisible(true);
 
@@ -5621,11 +5618,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     transfersFragment.activateActionMode();
                 }
                 return true;
-            case R.id.action_menu_open_meeting:
-                // Click to enter "create meeting"
-                onCreateMeeting();
-                return true;
-
             case R.id.action_more:
                 showNodeOptionsPanel(getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE));
                 return true;
@@ -5647,7 +5639,6 @@ public class ManagerActivity extends TransfersManagementActivity
             playTransfersMenuIcon.setVisible(false);
             clearRubbishBinMenuitem.setVisible(false);
             searchMenuItem.setVisible(false);
-            openMeetingMenuItem.setVisible(false);
             openLinkMenuItem.setVisible(false);
         }
     }
