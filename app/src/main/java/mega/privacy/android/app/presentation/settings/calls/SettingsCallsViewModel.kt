@@ -40,9 +40,9 @@ class SettingsCallsViewModel @Inject constructor(
     }
 
     /**
-     * Sets a new chat image quality setting.
+     * Enable or disable sound notifications.
      *
-     * @param soundNotifications The new quality.
+     * @param soundNotifications The sound notifications status.
      */
     fun setNewCallsSoundNotifications(
         soundNotifications: CallsSoundNotifications,

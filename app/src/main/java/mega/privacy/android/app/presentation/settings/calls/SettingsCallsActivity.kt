@@ -8,6 +8,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import javax.inject.Inject
 
+/**
+ * Activity which allows to change the calls settings.
+ */
 @AndroidEntryPoint
 class SettingsCallsActivity : AppCompatActivity() {
 

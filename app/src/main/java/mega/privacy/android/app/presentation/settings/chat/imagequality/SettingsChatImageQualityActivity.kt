@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import timber.log.Timber
 import javax.inject.Inject
 
 /**

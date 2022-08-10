@@ -10,7 +10,6 @@ import mega.privacy.android.domain.entity.ChatImageQuality
  */
 interface SettingsRepository {
 
-
     /**
      * Is passcode lock preference enabled
      *
@@ -79,6 +78,7 @@ interface SettingsRepository {
      * Is use https preference set
      *
      * @return true if set
+     * @return true if set
      */
     suspend fun isUseHttpsPreferenceEnabled(): Boolean
 
@@ -105,19 +105,19 @@ interface SettingsRepository {
     suspend fun setChatImageQuality(quality: ChatImageQuality)
 
     /**
-     * Gets chat image quality.
+     * Gets if call notification sounds are enabled or disabled.
      *
-     * @return Chat image quality.
+     * @return Sound notifications status.
      */
     fun getCallsSoundNotifications(): Flow<CallsSoundNotifications>
 
     /**
-     * Sets chat image quality.
+     * Enabling or disabling call notification sounds.
      *
-     * @param quality New chat image quality.
-     * @return Chat image quality.
+     * @param soundNotifications New Sound notifications status.
+     * @return Sound notifications status.
      */
-    suspend fun setCallsSoundNotifications(quality: CallsSoundNotifications)
+    suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundNotifications)
 
     /**
      * Set string preference

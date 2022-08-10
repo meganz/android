@@ -1,6 +1,5 @@
 package mega.privacy.android.app.usecase.call
 
-import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -31,20 +30,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.VideoDownsampling
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
-import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.di.ApplicationScope
-import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.CallsSoundNotifications
-import mega.privacy.android.domain.entity.ChatImageQuality
-import nz.mega.sdk.MegaTransfer
-import java.io.File
 
 /**
  * Main use case to control when a call-related sound should be played.

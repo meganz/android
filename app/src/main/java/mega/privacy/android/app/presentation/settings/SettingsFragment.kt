@@ -233,22 +233,21 @@ class SettingsFragment :
                     CameraUploadsPreferencesActivity::class.java
                 )
             )
-            KEY_FEATURES_CHAT -> {
+            KEY_FEATURES_CHAT ->
                 startActivity(
-                Intent(
-                    context,
-                    ChatPreferencesActivity::class.java
+                    Intent(
+                        context,
+                        ChatPreferencesActivity::class.java
+                    )
                 )
-            )
-            }
-            KEY_FEATURES_CALLS -> {
+
+            KEY_FEATURES_CALLS ->
                 startActivity(
                     Intent(
                         context,
                         SettingsCallsActivity::class.java
                     )
                 )
-            }
             KEY_STORAGE_DOWNLOAD -> startActivity(
                 Intent(
                     context,
