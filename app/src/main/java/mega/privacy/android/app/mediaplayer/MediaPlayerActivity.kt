@@ -128,13 +128,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, ActivityLauncher {
 
-    @MegaApi
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
-
-    @Inject
-    lateinit var megaChatApi: MegaChatApiAndroid
-
     private val viewModel: MediaPlayerViewModel by viewModels()
 
     private lateinit var binding: ActivityMediaPlayerBinding
@@ -249,7 +242,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         serviceBound = true
 
         viewModel.getCollision().observe(this) { collision ->
-            nameCollisionActivityContract.launch(arrayListOf(collision))
+            nameCollisionActivityContract?.launch(arrayListOf(collision))
         }
 
         viewModel.onSnackbarMessage().observe(this) { message ->
@@ -332,7 +325,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
+        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
         if (!navController.navigateUp()) {
             finish()
         }
@@ -879,14 +872,14 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
 
-        if (nodeAttacher.handleActivityResult(requestCode, resultCode, data, this)) {
+        if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
             return
         }
 
-        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, data)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return
         }
 
@@ -894,22 +887,22 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             REQUEST_CODE_SELECT_IMPORT_FOLDER -> {
                 val node = getChatMessageNode() ?: return
 
-                val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
+                val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
                     ?: return
 
                 viewModel.copyNode(node = node, newParentHandle = toHandle)
             }
             REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
-                val moveHandles = data?.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)
+                val moveHandles = intent?.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)
                     ?: return
-                val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+                val toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
 
                 viewModel.moveNode(moveHandles[0], toHandle)
             }
             REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
-                val copyHandles = data?.getLongArrayExtra(Constants.INTENT_EXTRA_KEY_COPY_HANDLES)
+                val copyHandles = intent?.getLongArrayExtra(Constants.INTENT_EXTRA_KEY_COPY_HANDLES)
                     ?: return
-                val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+                val toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
 
                 viewModel.copyNode(nodeHandle = copyHandles[0], newParentHandle = toHandle)
             }

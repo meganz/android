@@ -206,9 +206,9 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     }
 
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        viewModel.manageActivityResult(this, requestCode, resultCode, data, this)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        viewModel.manageActivityResult(this, requestCode, resultCode, intent, this)
     }
 
     override fun onBackPressed() {
@@ -219,7 +219,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
     override fun onResume() {
         super.onResume()
-        app.refreshAccountInfo()
+        app?.refreshAccountInfo()
     }
 
     override fun onPostResume() {
@@ -376,7 +376,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
      */
     private fun updateInfo() {
         viewModel.checkVersions()
-        app.refreshAccountInfo()
+        app?.refreshAccountInfo()
     }
 
     private fun setupObservers() {
@@ -436,7 +436,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             )
         )
 
-        app.askForCCSubscriptions()
+        app?.askForCCSubscriptions()
     }
 
     /**

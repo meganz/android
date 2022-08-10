@@ -69,10 +69,7 @@ object AlertsAndWarnings {
      */
     @JvmStatic
     fun showResumeTransfersWarning(context: Context) {
-        if (context is BaseActivity
-            && context.resumeTransfersWarning != null
-            && context.resumeTransfersWarning.isShowing
-        ) {
+        if (context is BaseActivity && context.resumeTransfersWarning?.isShowing == true) {
             return
         }
 
@@ -95,12 +92,12 @@ object AlertsAndWarnings {
                 dialog.dismiss()
             }.setOnDismissListener {
                 if (context is BaseActivity) {
-                    context.setIsResumeTransfersWarningShown(false)
+                    context.isResumeTransfersWarningShown = false
                 }
             }
 
         if (context is BaseActivity) {
-            context.setIsResumeTransfersWarningShown(true)
+            context.isResumeTransfersWarningShown = true
             context.resumeTransfersWarning = resumeTransfersDialogBuilder.create()
         }
 
