@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.settings.calls
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,10 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -33,16 +29,13 @@ import mega.privacy.android.domain.entity.CallsSoundNotifications
 @Composable
 fun SettingsCallsView(
     settingsCallsState: SettingsCallsState,
-    onOptionChanged: (CallsSoundNotifications) -> Unit = {},
+    onCheckedChange: (CallsSoundNotifications) -> Unit = {},
 ) {
     Column {
-        settingsCallsState.let {
-            CallSoundNotificationsItem(R.string.settings_calls_preferences_sound_notifications,
-                R.string.settings_calls_preferences_sound_notifications_text,
-                true) {
-                onOptionChanged(it.soundNotifications ?: return@CallSoundNotificationsItem)
-            }
-        }
+        CallSoundNotificationsItem(R.string.settings_calls_preferences_sound_notifications,
+            R.string.settings_calls_preferences_sound_notifications_text,
+            settingsCallsState.soundNotifications == CallsSoundNotifications.Enabled,
+            onCheckedChange = onCheckedChange)
     }
 }
 
@@ -50,16 +43,19 @@ fun SettingsCallsView(
 fun CallSoundNotificationsItem(
     titleId: Int,
     textId: Int,
-    selected: Boolean,
-    onClick: () -> Unit,
+    checked: Boolean,
+    onCheckedChange: (CallsSoundNotifications) -> Unit,
 ) {
     Row(
         modifier = Modifier
             .toggleable(
-                value = selected,
-                role = Role.RadioButton,
-                onValueChange = {})
-            .clickable { onClick() }
+                value = checked,
+                role = Role.Switch,
+                onValueChange = {
+                    onCheckedChange(
+                        if (it) CallsSoundNotifications.Enabled else CallsSoundNotifications.Disabled
+                    )
+                })
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -76,7 +72,7 @@ fun CallSoundNotificationsItem(
                 color = colorResource(id = R.color.grey_054_white_054)
             )
         }
-        Switch(checked = selected, onCheckedChange = null)
+        Switch(checked = checked, onCheckedChange = null)
     }
     Divider(color = colorResource(id = R.color.grey_012_white_012), thickness = 1.dp)
 }
@@ -85,12 +81,11 @@ fun CallSoundNotificationsItem(
 @Preview
 @Composable
 fun PreviewSettingsCallsView() {
-    var selected by remember { mutableStateOf(CallsSoundNotifications.Enabled) }
+    val checked by remember { mutableStateOf(CallsSoundNotifications.Enabled) }
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         SettingsCallsView(
             settingsCallsState = SettingsCallsState(
-                CallsSoundNotifications.Enabled
-            ),
-            onOptionChanged = { selected = it })
+                soundNotifications = checked
+            ))
     }
 }

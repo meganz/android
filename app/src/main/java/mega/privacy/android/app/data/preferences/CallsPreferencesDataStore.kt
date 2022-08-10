@@ -16,7 +16,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.domain.entity.CallsSoundNotifications
-import mega.privacy.android.domain.entity.ChatImageQuality
 import java.io.IOException
 import javax.inject.Inject
 
@@ -49,17 +48,16 @@ class CallsPreferencesDataStore @Inject constructor(
             }.map { preferences ->
                 CallsSoundNotifications.valueOf(
                     preferences[callsSoundNotificationsPreferenceKey]
-                        ?: ChatImageQuality.DEFAULT.name
+                        ?: CallsSoundNotifications.DEFAULT.name
                 )
             }
 
-
     override suspend fun setCallSoundNotificationsPreference(soundNotifications: CallsSoundNotifications) {
-       /* withContext(ioDispatcher) {
+        withContext(ioDispatcher) {
             context.callsDataStore.edit {
-                it[callsSoundNotificationsPreferenceKey] = soundNotifications.toString()
+                it[callsSoundNotificationsPreferenceKey] = soundNotifications.name
             }
-        }*/
+        }
     }
 
     override suspend fun clearPreferences() {

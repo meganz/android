@@ -1,5 +1,6 @@
 package mega.privacy.android.app.usecase.call
 
+import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -25,6 +26,25 @@ import timber.log.Timber
 import javax.inject.Inject
 import android.util.Pair
 import io.reactivex.rxjava3.disposables.Disposable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.VideoDownsampling
+import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
+import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
+import mega.privacy.android.app.di.ApplicationScope
+import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.ChatImageQuality
+import nz.mega.sdk.MegaTransfer
+import java.io.File
 
 /**
  * Main use case to control when a call-related sound should be played.
@@ -38,6 +58,7 @@ class GetCallSoundsUseCase @Inject constructor(
     private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase,
     private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
     private val endCallUseCase: EndCallUseCase,
+    @ApplicationScope private val sharingScope: CoroutineScope,
 ) {
 
     companion object {
@@ -210,10 +231,23 @@ class GetCallSoundsUseCase @Inject constructor(
             getParticipantsChangesUseCase.getChangesFromParticipants()
                 .subscribeBy(
                     onNext = { result ->
-                        when (result.typeChange) {
-                            TYPE_JOIN -> emitter.onNext(CallSoundType.PARTICIPANT_JOINED_CALL)
-                            TYPE_LEFT -> emitter.onNext(CallSoundType.PARTICIPANT_LEFT_CALL)
+                        sharingScope.launch {
+                            CallsPreferencesDataStore(MegaApplication.getInstance().applicationContext,
+                                Dispatchers.IO)
+                                .getCallSoundNotificationsPreference()
+                                .collectLatest { soundNotifications ->
+                                    val isEnabled =
+                                        soundNotifications == CallsSoundNotifications.Enabled
+                                    if (isEnabled) {
+                                        when (result.typeChange) {
+                                            TYPE_JOIN -> emitter.onNext(CallSoundType.PARTICIPANT_JOINED_CALL)
+                                            TYPE_LEFT -> emitter.onNext(CallSoundType.PARTICIPANT_LEFT_CALL)
+                                        }
+                                    }
+                                    this.cancel()
+                                }
                         }
+
                     },
                     onError = { error ->
                         Timber.e(error.stackTraceToString())
