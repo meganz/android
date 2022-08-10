@@ -11,7 +11,7 @@
         style="@style/BottomSheetOption"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:text="@string/btn_start_meeting"
+        android:text="@string/action_start_meeting_now"
         app:drawableStartCompat="@drawable/ic_video_plus" />
 
     <View
