@@ -1,100 +1,81 @@
 package mega.privacy.android.app
 
-import mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning
-import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
-import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
-import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
-import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
-import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
-import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
-import mega.privacy.android.app.utils.billing.PaymentUtils.updatePricing
-import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionType
-import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionRenewalType
-import mega.privacy.android.app.utils.billing.PaymentUtils.updateAccountInfo
-import mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel
-import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
-import dagger.hilt.android.AndroidEntryPoint
-import androidx.appcompat.app.AppCompatActivity
-import mega.privacy.android.app.interfaces.ActivityLauncher
-import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import javax.inject.Inject
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.logging.LegacyLoggingSettings
-import androidx.activity.result.ActivityResultLauncher
-import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.middlelayer.iab.BillingManager
-import mega.privacy.android.app.middlelayer.iab.MegaSku
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatApiAndroid
-import com.google.android.material.snackbar.Snackbar
-import mega.privacy.android.app.components.saver.AutoPlayInfo
-import mega.privacy.android.app.psa.Psa
-import android.util.DisplayMetrics
-import android.widget.FrameLayout
-import mega.privacy.android.app.psa.PsaWebBrowser
-import android.os.Looper
-import android.os.Bundle
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
-import android.content.IntentFilter
-import mega.privacy.android.app.constants.BroadcastConstants
-import com.jeremyliao.liveeventbus.LiveEventBus
-import mega.privacy.android.app.upgradeAccount.PaymentActivity
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
-import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
-import android.view.ViewGroup
-import android.content.Intent
-import timber.log.Timber
-import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.StringResourcesUtils
-import android.widget.TextView
-import android.widget.LinearLayout
-import android.view.Gravity
-import mega.privacy.android.app.meeting.activity.MeetingActivity
-import kotlin.jvm.JvmOverloads
-import com.google.android.material.snackbar.Snackbar.SnackbarLayout
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import androidx.core.text.HtmlCompat
-import android.content.DialogInterface
-import mega.privacy.android.app.listeners.ChatLogoutListener
-import mega.privacy.android.app.smsVerification.SMSVerificationActivity
-import mega.privacy.android.app.main.LoginFragment
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaAccountDetails
-import mega.privacy.android.app.main.LoginActivity
-import nz.mega.sdk.MegaChatApi
-import mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode
 import android.content.BroadcastReceiver
 import android.content.Context
-import mega.privacy.android.app.service.iab.BillingManagerImpl
-import mega.privacy.android.app.middlelayer.iab.MegaPurchase
-import mega.privacy.android.app.service.iar.RatingHandlerImpl
-import android.widget.CheckBox
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
+import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
+import android.util.DisplayMetrics
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
+import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.snackbar.Snackbar.SnackbarLayout
+import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
+import mega.privacy.android.app.components.saver.AutoPlayInfo
+import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
+import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.PermissionRequester
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.listeners.ChatLogoutListener
+import mega.privacy.android.app.logging.LegacyLoggingSettings
+import mega.privacy.android.app.main.LoginActivity
+import mega.privacy.android.app.main.LoginFragment
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.middlelayer.iab.BillingManager
+import mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode
+import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener
+import mega.privacy.android.app.middlelayer.iab.MegaPurchase
+import mega.privacy.android.app.middlelayer.iab.MegaSku
+import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.psa.Psa
+import mega.privacy.android.app.psa.PsaWebBrowser
+import mega.privacy.android.app.service.iab.BillingManagerImpl
+import mega.privacy.android.app.service.iar.RatingHandlerImpl
+import mega.privacy.android.app.smsVerification.SMSVerificationActivity
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
+import mega.privacy.android.app.upgradeAccount.PaymentActivity
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.exception.ForeignNodeException
-import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
+import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
+import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
+import mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning
+import mega.privacy.android.app.utils.ColorUtils.getColorHexString
+import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
 import mega.privacy.android.app.utils.Constants.ACCOUNT_NOT_BLOCKED
 import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
@@ -128,15 +109,29 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.Constants.WEAK_PROTECTION_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.DBUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
+import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionRenewalType
+import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionType
+import mega.privacy.android.app.utils.billing.PaymentUtils.updateAccountInfo
+import mega.privacy.android.app.utils.billing.PaymentUtils.updatePricing
+import mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
 import mega.privacy.android.domain.entity.LogsType
 import mega.privacy.android.domain.entity.PurchaseType
+import nz.mega.sdk.MegaAccountDetails
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApi
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import java.lang.Exception
-import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
-import java.util.ArrayList
+import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Base activity which includes common behaviors for several activities.
@@ -206,7 +201,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     private var psaWebBrowserContainer: FrameLayout? = null
     private val uiHandler = Handler(Looper.getMainLooper())
 
-    val outMetrics: DisplayMetrics by lazy { resources.displayMetrics }
+    protected val outMetrics: DisplayMetrics by lazy { resources.displayMetrics }
     var isResumeTransfersWarningShown = false
     var resumeTransfersWarning: AlertDialog? = null
 
@@ -263,7 +258,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * In order to show the newly retrieved PSA at any occasion
      */
     @JvmField
-    var psaWebBrowser: PsaWebBrowser? = null
+    protected var psaWebBrowser: PsaWebBrowser? = null
 
     /**
      * Broadcast receiver to manage the errors shown and actions when an account is blocked.
@@ -303,6 +298,10 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             }
         }
     }
+
+    /**
+     * Broadcast to show an alert informing about the current business account has expired.
+     */
     private val businessExpiredReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             showExpiredBusinessAlert()
@@ -383,6 +382,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         }
     }
 
+    /**
+     * Broadcast to show a Snackbar with the received text.
+     */
     private val showSnackbarReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (isActivityInBackground || intent == null || intent.action == null || intent.action != BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR
@@ -414,7 +416,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      */
     protected var cookieSettingsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (isActivityInBackground || isActivityInBackground || intent == null) {
+            if (isActivityInBackground || intent == null) {
                 return
             }
             val view = window.decorView.findViewById<View>(android.R.id.content)
@@ -719,19 +721,21 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * @param view Layout where the snackbar is going to show.
      * @param s    Text to shown in the snackbar
      */
-    open fun showSnackbar(view: View, s: String?) {
-        showSnackbar(SNACKBAR_TYPE, view, s, -1)
+    open fun showSnackbar(view: View, s: String) {
+        showSnackbar(type = SNACKBAR_TYPE, view = view, s = s)
     }
 
     /**
      * Method to display a simple or action Snackbar.
      *
-     * @param type There are three possible values to this param:
-     *              - SNACKBAR_TYPE: creates a simple snackbar
-     *              - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
-     *              - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
-     * @param view Layout where the snackbar is going to show.
-     * @param s    Text to shown in the snackbar
+     * @param type   There are three possible values to this param:
+     *                - SNACKBAR_TYPE: creates a simple snackbar
+     *                - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
+     *                - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     * @param view   Layout where the snackbar is going to show.
+     * @param s      Text to shown in the snackbar
+     * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
+     *               If the value is -1 (MEGACHAT_INVALID_HANDLE) the function ends in chats list view.
      */
     @JvmOverloads
     fun showSnackbar(
@@ -740,7 +744,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         s: String?,
         idChat: Long = MEGACHAT_INVALID_HANDLE,
     ) {
-        showSnackbar(type, view, null, s, idChat, null)
+        showSnackbar(type = type, view = view, s = s, idChat = idChat, userEmail = null)
     }
 
     /**
@@ -756,10 +760,16 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * @param anchor Sets the view the Snackbar should be anchored above, null as default
      * @param s      Text to shown in the snackbar
      * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
-     *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
+     *               If the value is -1 (MEGACHAT_INVALID_HANDLE) the function ends in chats list view.
      */
-    fun showSnackbarWithAnchorView(type: Int, view: View, anchor: View?, s: String?, idChat: Long) {
-        showSnackbar(type, view, anchor, s, idChat, null)
+    fun showSnackbarWithAnchorView(
+        type: Int,
+        view: View,
+        anchor: View?,
+        s: String?,
+        idChat: Long = MEGACHAT_INVALID_HANDLE,
+    ) {
+        showSnackbar(type = type, view = view, anchor = anchor, s = s, idChat = idChat)
     }
 
     /**
@@ -775,16 +785,16 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * @param anchor    Sets the view the Snackbar should be anchored above, null as default
      * @param s         Text to shown in the snackbar
      * @param idChat    Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
-     *                  If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
+     *                  If the value is -1 (MEGACHAT_INVALID_HANDLE) the function ends in chats list view.
      * @param userEmail Email of the user to be invited.
      */
     fun showSnackbar(
         type: Int,
         view: View,
-        anchor: View?,
+        anchor: View? = null,
         s: String?,
-        idChat: Long,
-        userEmail: String?,
+        idChat: Long = MEGACHAT_INVALID_HANDLE,
+        userEmail: String? = null,
     ) {
         Timber.d("Show snackbar: %s", s)
         snackbar = try {
@@ -810,7 +820,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         }
 
         snackbar?.apply {
-            val snackbarLayout = view as SnackbarLayout
+            val snackbarLayout = this.view as SnackbarLayout
             snackbarLayout.setBackgroundResource(R.drawable.background_snackbar)
 
             if (anchor != null) {
@@ -844,8 +854,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     show()
                 }
                 INVITE_CONTACT_TYPE -> {
-                    setAction(R.string.contact_invite,
-                        SnackbarNavigateOption(view.context, type, userEmail))
+                    setAction(R.string.contact_invite, SnackbarNavigateOption(view.context, type, userEmail))
                     show()
                 }
                 DISMISS_ACTION_SNACKBAR -> {
@@ -1298,7 +1307,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         val rootView = Util.getRootViewFromContext(this)
-        showSnackbar(type, rootView, content, chatId)
+        showSnackbar(type = type, view = rootView, s = content, idChat = chatId)
     }
 
     /**
