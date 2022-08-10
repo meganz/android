@@ -114,7 +114,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
         }
 
-        viewModel.pushToLastPositionState(lastFirstVisiblePosition)
+        viewModel.pushToLastPositionStack(lastFirstVisiblePosition)
         viewModel.increaseOutgoingTreeDepth(node.handle)
         recyclerView.scrollToPosition(0)
         checkScroll()

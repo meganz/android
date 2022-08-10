@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.shares.outgoing
+package mega.privacy.android.app.presentation.shares.links
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,11 +7,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
+import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
+import mega.privacy.android.app.presentation.shares.links.model.LinksState
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -20,21 +19,21 @@ import java.util.Stack
 import javax.inject.Inject
 
 /**
- * ViewModel associated to OutgoingSharesFragment
+ * ViewModel associated to LinksFragment
  */
 @HiltViewModel
-class OutgoingSharesViewModel @Inject constructor(
+class LinksViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getParentNodeHandle: GetParentNodeHandle,
-    private val getOutgoingSharesChildrenNode: GetOutgoingSharesChildrenNode,
+    private val getPublicLinks: GetPublicLinks,
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
     /** private UI state */
-    private val _state = MutableStateFlow(OutgoingSharesState())
+    private val _state = MutableStateFlow(LinksState())
 
     /** public UI state */
-    val state: StateFlow<OutgoingSharesState> = _state
+    val state: StateFlow<LinksState> = _state
 
     /** stack of scroll position for each depth */
     private val lastPositionStack: Stack<Int> = Stack<Int>()
@@ -50,50 +49,51 @@ class OutgoingSharesViewModel @Inject constructor(
     }
 
     /**
-     * Refresh outgoing shares node
+     * Refresh links shares node
      */
-    fun refreshOutgoingSharesNode() = viewModelScope.launch {
+    fun refreshLinksSharesNode() = viewModelScope.launch {
         refreshNodes()?.let { setNodes(it) }
     }
 
     /**
-     * Decrease by 1 the outgoing tree depth
+     * Decrease by 1 the links tree depth
      *
-     * @param handle the id of the current outgoing parent handle to set
+     * @param handle the id of the current links handle to set
      */
-    fun decreaseOutgoingTreeDepth(handle: Long) = viewModelScope.launch {
-        setOutgoingTreeDepth(_state.value.outgoingTreeDepth - 1, handle)
+    fun decreaseLinksTreeDepth(handle: Long) = viewModelScope.launch {
+        setLinksTreeDepth(_state.value.linksTreeDepth - 1, handle)
     }
 
     /**
-     * Increase by 1 the outgoing tree depth
+     * Increase by 1 the links tree depth
      *
-     * @param handle the id of the current outgoing parent handle to set
+     * @param handle the id of the current links handle to set
      */
-    fun increaseOutgoingTreeDepth(handle: Long) = viewModelScope.launch {
-        setOutgoingTreeDepth(_state.value.outgoingTreeDepth + 1, handle)
+    fun increaseLinksTreeDepth(handle: Long) = viewModelScope.launch {
+        setLinksTreeDepth(_state.value.linksTreeDepth + 1, handle)
     }
 
     /**
-     * Reset outgoing tree depth to initial value
+     * Reset links tree depth to initial value
      */
-    fun resetOutgoingTreeDepth() = viewModelScope.launch {
-        setOutgoingTreeDepth(0, -1L)
+    fun resetLinksTreeDepth() = viewModelScope.launch {
+        setLinksTreeDepth(0, -1L)
     }
 
     /**
-     * Set outgoing tree depth with given value
-     * If refresh nodes return null,  else display empty list
+     * Set links tree depth with given value
+     * If refresh nodes return null, else display empty list
      *
      * @param depth the tree depth value to set
-     * @param handle the id of the current outgoing parent handle to set
+     * @param handle the id of the current links handle to set
      */
-    private fun setOutgoingTreeDepth(depth: Int, handle: Long) = viewModelScope.launch {
+    private suspend fun setLinksTreeDepth(depth: Int, handle: Long) {
         _state.update {
             it.copy(
                 isLoading = true,
-                outgoingTreeDepth = depth,
-                outgoingParentHandle = handle
+                linksTreeDepth = depth,
+                linksHandle = handle,
+                linksParentHandle = getParentNodeHandle(handle)
             )
         }
 
@@ -101,18 +101,17 @@ class OutgoingSharesViewModel @Inject constructor(
             refreshNodes(handle)?.let { nodes ->
                 it.copy(
                     nodes = nodes,
-                    outgoingTreeDepth = depth,
-                    outgoingParentHandle = handle,
-                    isInvalidParentHandle = isInvalidParentHandle(handle),
+                    isInvalidHandle = isInvalidHandle(handle),
                     isLoading = false
                 )
             } ?: run {
                 it.copy(
                     nodes = emptyList(),
-                    outgoingTreeDepth = 0,
-                    outgoingParentHandle = -1L,
-                    isInvalidParentHandle = true,
-                    isLoading = false
+                    linksTreeDepth = 0,
+                    linksHandle = -1L,
+                    isInvalidHandle = true,
+                    isLoading = false,
+                    linksParentHandle = null
                 )
             }
         }
@@ -134,15 +133,6 @@ class OutgoingSharesViewModel @Inject constructor(
     fun pushToLastPositionStack(position: Int): Int = lastPositionStack.push(position)
 
     /**
-     * Get the parent node handle of current node
-     *
-     * @return the parent node handle of current node
-     */
-    fun getParentNodeHandle(): Long? = runBlocking {
-        return@runBlocking getParentNodeHandle(_state.value.outgoingParentHandle)
-    }
-
-    /**
      * Set the current nodes displayed
      *
      * @param nodes the list of nodes to set
@@ -156,23 +146,22 @@ class OutgoingSharesViewModel @Inject constructor(
      *
      * @param handle
      */
-    private suspend fun refreshNodes(handle: Long = _state.value.outgoingParentHandle): List<MegaNode>? {
-        Timber.d("refreshOutgoingSharesNodes")
-        return getOutgoingSharesChildrenNode(handle)
+    private suspend fun refreshNodes(handle: Long = _state.value.linksHandle): List<MegaNode>? {
+        Timber.d("refreshPublicLinks")
+        return getPublicLinks(handle)
     }
 
     /**
-     * Check if the parent handle is valid
+     * Check if the handle is valid or not
      *
      * @param handle
-     * @return true if the parent handle is valid
+     * @return true if the handle is invalid
      */
-    private suspend fun isInvalidParentHandle(handle: Long = _state.value.outgoingParentHandle): Boolean {
+    private suspend fun isInvalidHandle(handle: Long = _state.value.linksHandle): Boolean {
         return handle
             .takeUnless { it == -1L || it == MegaApiJava.INVALID_HANDLE }
             ?.let { getNodeByHandle(it) == null }
             ?: true
     }
-
 
 }

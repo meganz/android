@@ -102,10 +102,8 @@ class ManagerViewModelTest {
             val initial = awaitItem()
             assertThat(initial.browserParentHandle).isEqualTo(-1L)
             assertThat(initial.rubbishBinParentHandle).isEqualTo(-1L)
-            assertThat(initial.linksParentHandle).isEqualTo(-1L)
             assertThat(initial.inboxParentHandle).isEqualTo(-1L)
             assertThat(initial.isFirstNavigationLevel).isTrue()
-            assertThat(initial.linksTreeDepth).isEqualTo(0)
             assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
             assertThat(initial.transfersTab).isEqualTo(TransfersTab.NONE)
         }
@@ -138,19 +136,6 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that links parent handle is updated if new value provided`() = runTest {
-        setUnderTest()
-
-        underTest.state.map { it.linksParentHandle }.distinctUntilChanged()
-            .test {
-                val newValue = 123456789L
-                assertThat(awaitItem()).isEqualTo(-1L)
-                underTest.setLinksParentHandle(newValue)
-                assertThat(awaitItem()).isEqualTo(newValue)
-            }
-    }
-
-    @Test
     fun `test that inbox parent handle is updated if new value provided`() = runTest {
         setUnderTest()
 
@@ -175,46 +160,6 @@ class ManagerViewModelTest {
                 assertThat(awaitItem()).isEqualTo(newValue)
             }
     }
-
-    @Test
-    fun `test that links tree depth is increased when calling increaseLinksTreeDepth`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.linksTreeDepth }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isEqualTo(0)
-                    underTest.increaseLinksTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(1)
-                }
-        }
-
-    @Test
-    fun `test that links tree depth is decreased when calling decreaseLinksTreeDepth`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.linksTreeDepth }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isEqualTo(0)
-                    underTest.increaseLinksTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(1)
-                    underTest.decreaseLinksTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(0)
-                }
-        }
-
-    @Test
-    fun `test that links tree depth equals 0 if resetLinksTreeDepth`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.linksTreeDepth }.distinctUntilChanged()
-                .test {
-                    underTest.resetLinksTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(0)
-                }
-        }
 
     @Test
     fun `test that shares tab is updated if new value provided`() = runTest {

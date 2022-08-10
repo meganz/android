@@ -25,3 +25,11 @@ fun ManagerActivity.incomingSharesState() = incomingSharesViewModel.state.value
  * @return the OutgoingSharesState hold in OutgoingSharesStateViewModel
  */
 fun ManagerActivity.outgoingSharesState() = outgoingSharesViewModel.state.value
+
+/**
+ * Get the LinksState in LinksViewModel
+ * This function will be used until ManagerActivity is converted to Kotlin
+ *
+ * @return the LinksState hold in LinksViewModel
+ */
+fun ManagerActivity.linksState() = linksViewModel.state.value
