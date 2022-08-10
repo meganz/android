@@ -28,6 +28,7 @@ import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.constants.SettingsConstants
+import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.data.repository.DefaultPushesRepository.Companion.PUSH_TOKEN
 import mega.privacy.android.app.fragments.offline.OfflineFragment
@@ -361,9 +362,10 @@ class AccountController(private val context: Context) {
             context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
                 .edit().clear().apply()
 
-            //clear chat preferences
+            //clear chat and calls preferences
             sharingScope.launch {
                 ChatPreferencesDataStore(context, Dispatchers.IO).clearPreferences()
+                CallsPreferencesDataStore(context, Dispatchers.IO).clearPreferences()
             }
 
             // Clear text editor preference
