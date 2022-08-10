@@ -295,7 +295,7 @@ class IncomingSharesViewModelTest {
                 assertThat(underTest.state.value.incomingHandle).isEqualTo(handle)
                 underTest.refreshIncomingSharesNode()
             }
-            // increaseOutgoingTreeDepth call + refreshOutgoingSharesNode call
+            // increaseIncomingTreeDepth call + refreshIncomingSharesNode call
             verify(getIncomingSharesChildrenNode, times(2)).invoke(handle)
         }
 
