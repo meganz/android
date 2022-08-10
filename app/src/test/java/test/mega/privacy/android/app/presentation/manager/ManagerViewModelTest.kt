@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.entity.ContactRequestStatus
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
+import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
 import org.junit.Rule
@@ -48,6 +50,7 @@ class ManagerViewModelTest {
     private val getNumUnreadUserAlerts = mock<GetNumUnreadUserAlerts>()
     private val hasInboxChildren = mock<HasInboxChildren>()
     private val monitorContactRequestUpdates = mock<MonitorContactRequestUpdates>()
+    private val sendStatisticsMediaDiscovery = mock<SendStatisticsMediaDiscovery>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -71,6 +74,7 @@ class ManagerViewModelTest {
             getRootFolder = getRootFolder,
             getNumUnreadUserAlerts = getNumUnreadUserAlerts,
             hasInboxChildren = hasInboxChildren,
+            sendStatisticsMediaDiscovery = sendStatisticsMediaDiscovery,
         )
     }
 
