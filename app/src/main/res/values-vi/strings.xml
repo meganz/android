@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
-    <string name="prolite_account">Pro Lite</string>
+    <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA Xem PDF</string>
     <!-- Answer for confirmation dialog. -->
@@ -443,21 +443,9 @@
     <!-- error message when moving a node -->
     <string name="number_no_leaved">Phát sinh lỗi khi thực hiện việc từ chối %d thư mục chia sẻ</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent">Tệp tin đã được gửi tới cho %d người thành công</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent">Lỗi. Tệp tin chưa được gửi tới cho %d tên liên lạc</string>
-    <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent_multifile">%d tệp tin đã được gửi đi</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent_multifile">Thất bại. %d tệp tin chưa được gửi đi</string>
-    <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d tệp tin đã được sao chép thành công</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d tệp tin chưa được sao chép</string>
-    <!-- success message when removing several contacts -->
-    <string name="number_contact_removed">%d tên liên lạc đã được xóa đi hoàn tất</string>
-    <!-- error message when removing several contacts -->
-    <string name="number_contact_not_removed">%d tên liên lạc chưa được xóa</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Thùng Rác đã được dọn sạch sẽ</string>
     <!-- error message when emptying the RB -->
@@ -770,13 +758,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Tài Khoản Miễn Phí</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Tài khoản hạng Pro I</string>
+    <string name="my_account_pro1">Pro&#160;I Account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Tài khoản hạng Pro II</string>
+    <string name="my_account_pro2">Pro&#160;II Account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Tài khoản hạng Pro III</string>
+    <string name="my_account_pro3">Pro&#160;III Account</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Tài Khoản Pro Lite</string>
+    <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
     <!--  -->
     <string name="backup_title">Sao lưu dự phòng Mã Phục Hồi</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -897,16 +885,6 @@
     <string name="edit_link_option">Quản lý đường liên kết</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">Mật khẩu hiện tại bạn cung cấp không chính xác.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_reinvite_contact_request">%d lời mời đã được gửi lại thành công.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_delete_contact_request">%d lời mời đã được xóa bỏ thành công.</string>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_delete_contact_request">%1$d lời mời đã được xóa bỏ thành công nhưng còn %2$d lời mời chưa xóa được.</string>
-    <!-- success message when replying to multiple received request -->
-    <string name="number_correctly_invitation_reply_sent">%d lời yêu cầu hồi đáp đã được gửi đi.</string>
-    <!-- error message when replying to multiple received request -->
-    <string name="number_incorrectly_invitation_reply_sent">%1$d lời yêu cầu hồi đáp đã được gửi đi thành công, nhưng còn lại %2$d mục chưa gửi được.</string>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="other">Thư mục này đang được chia sẻ cho %1$d tên liên lạc. Có chắc muốn xóa không?</item>
@@ -1097,8 +1075,6 @@
     <string name="number_correctly_add_participant">Lời mời đã được gửi tới %d người</string>
     <!-- error message when inviting multiple contacts to a group chat -->
     <string name="number_no_add_participant_request">Lời mời đã được gửi tới %1$d thành viên thành công nhưng còn lại %2$d lời mời không gửi được.</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="message_permissions_changed">Quyền hạn của [A]%1$s[/A][B] đã bị thay đổi thành [/B][C]%2$s[/C][D] bởi [/D][E]%3$s[/E]</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] vừa gia nhập nhóm chát từ lời mời của [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1127,8 +1103,6 @@
     <string name="history_cleared_message">Lịch sử chát được được dọn sạch</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">Lịch sử nội dung chat đã bị xóa bởi %1$s</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="non_format_message_permissions_changed">%3$s đã đổi quyền của %1$s thành %2$s</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="non_format_message_add_participant">%2$s đã thêm %1$s vào nhóm chát</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1302,8 +1276,6 @@
     <string name="add_to_cloud_node_chat">Lưu vào Ổ Mây</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Xem sổ liên lạc</string>
-    <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">Đã thêm vào Ổ Mây thành công</string>
     <!-- Menu option -->
     <string name="import_success_error">Lỗi. Chưa thêm vào Ổ Mây được</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1548,12 +1520,11 @@
     <string name="general_incorrect_names">Xin sửa lại tên tệp tin cho phù hợp trước khi tiếp tục</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Ký tự không hợp lệ</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Các ký tự không được phép sử dụng: ” * / : &lt; &gt; ? \\ |</string>
+    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
+    <string name="invalid_characters_defined">Các ký tự này không được phép sử dụng: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">File name cannot be empty.</item>
-        <item quantity="other">File names cannot be empty.</item>
+        <item quantity="other">Tên tệp tin không được để trống.</item>
     </plurals>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">Lỗi. Tệp tin pdf bị hư hỏng hoặc không có tồn tại.</string>
@@ -1628,7 +1599,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Lời mời không gửi đi được. %s đã có tên trong liên lạc.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
+    <string name="invite_not_sent_text_error">Lỗi phát sinh và lời mời chưa được gửi đi.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Đang tạo ra mã QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -1716,7 +1687,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Đang tải tệp tin</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s B</string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1803,7 +1774,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Vào phần [A]Cài Đặt[/A] trên máy Android</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Open [A]Apps and notifications[/A]</string>
+    <string name="turn_on_notifications_second_step">Vào [A]Ứng dụng và thông báo[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">Chọn [A]MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -1976,14 +1947,12 @@
     <string name="play_store_label">CH Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Cần phải có một app lập xác thực để bật tính năng XT2B với MEGA. Bạn có thể tải và cài đặt Google Authenticator, Duo Mobile, Authy hoặc Microsoft Authenticator app về thiết bị của mình.</string>
-    <!-- success message when importing multiple files from -->
-    <string name="number_correctly_imported_from_chat">%d tệp tin đã được chia sẻ thành công</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">Chia sẻ %d tệp tin chưa được hoàn tất</string>
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Xem trước nội dung</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
+    <string name="no_network_connection_on_play_file">Không có kết nối mạng. Tệp tin chưa được tải về và không thể truyền được.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Không thể mở được tệp tin.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2370,10 +2339,6 @@
     <string name="title_compress_video">Đang Nén Videos %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Thư mục vừa chọn không hợp lệ</string>
-    <!-- Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_one_file">1 thư mục · 1 tệp</string>
-    <!-- Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_several_files">1 thư mục · %1$d tệp</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d tệp tin</item>
@@ -2384,8 +2349,7 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="other">%1$d thư mục&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] đã thêm vào %2$s và %3$s[/B]</string>
@@ -2705,12 +2669,6 @@
     <plurals name="title_media_bucket_images_and_videos">
         <item quantity="other">%1$d hình ảnh&#160;</item>
     </plurals>
-    <!-- Title of a media recents bucket that contains some images and a video -->
-    <string name="title_media_bucket_images_and_video">%d Hình và 1 Video</string>
-    <!-- Title of a media recents bucket that contains an image and some videos -->
-    <string name="title_media_bucket_image_and_videos">1 Hình và %d Videos</string>
-    <!-- Title of a media recents bucket that contains an image and a video -->
-    <string name="title_media_bucket_image_and_video">1 Hình và 1 Video</string>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]tạo bởi [/A]%s</string>
     <!-- Label that indicates who updated a file into a recents bucket -->
@@ -3038,7 +2996,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Chọn phiên truyền tải</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Unable to change priority of the transfer “%1$s”</string>
+    <string name="change_of_transfer_priority_failed">Không thay đổi được mức độ ưu tiên cho truyền tải “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Gửi chìa khóa giải mã ra riêng</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3576,23 +3534,23 @@
     <!-- Button to proceed with a payment -->
     <string name="proceed">Tiến hành</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Cảm ơn quý khách đã mua gói đăng ký dịch vụ %1$s!</string>
+    <string name="successful_upgrade">Cảm ơn quý khách đã mua gói đăng ký dịch vụ %1$s</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro Lite hằng tháng</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro Lite thường niên</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro I hằng tháng</string>
+    <string name="pro_i_monthly">Pro&#160;I monthly</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro I thường niên</string>
+    <string name="pro_i_yearly">Pro&#160;I yearly</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro II hằng tháng</string>
+    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro II thường niên</string>
+    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro III hằng tháng</string>
+    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro III thường niên</string>
+    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Loại bỏ chức người chủ trì</string>
     <!-- Title message of existing subscription dialog -->
@@ -3784,19 +3742,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Không thể kết nối lại</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">Cuộc gọi sẽ kết thúc trong %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -3920,15 +3878,15 @@
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s đã đổi quyền hạn của %1$s thành người chủ trì</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
-    <string name="calls_call_screen_waiting_for_participants">Waiting for others to join</string>
+    <string name="calls_call_screen_waiting_for_participants">Đang chờ người khác tham gia</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_favourites">[B]Không có[/B] [A]mục ưa thích[/A] [B]nào[/B]</string>
     <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Start a meeting</string>
+    <string name="meetings_list_empty_action">Lập một cuộc họp</string>
     <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Talk securely and privately on audio or video calls with friends and colleagues around the world.</string>
+    <string name="meetings_list_empty_description">Nói chuyện an toàn và riêng tư vớI gọi thoại hay gọi video với bạn bè và đồng nghiệp trên toàn cầu.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_action">Start chatting now</string>
+    <string name="chat_recent_list_empty_action">Bắt đầu trò chuyện ngay</string>
     <!--Description text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_description">Chat securely and privately, with anyone and on any device, knowing that no one can read your chats, not even MEGA.</string>
+    <string name="chat_recent_list_empty_description">Chát an toàn và riêng tư, với bất kỳ ai và bất kỳ thiết bị, và an tâm sẽ không có ai có thể đọc tin nhắn của bạn, ngay cả MEGA.</string>
 </resources>

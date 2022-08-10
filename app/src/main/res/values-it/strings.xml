@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
-    <string name="prolite_account">Pro Lite</string>
+    <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">Visualizzatore PDF</string>
     <!-- Answer for confirmation dialog. -->
@@ -463,21 +463,9 @@
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d cartelle non sono state lasciate con successo</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent">File inviato a %d contatti con successo</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent">File non inviato a %d contatti</string>
-    <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent_multifile">%d file inviati con successo</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent_multifile">Invio di %d file fallito</string>
-    <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d oggetti copiati con successo</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d oggetti non sono stati copiati</string>
-    <!-- success message when removing several contacts -->
-    <string name="number_contact_removed">%d contatti rimossi con successo</string>
-    <!-- error message when removing several contacts -->
-    <string name="number_contact_not_removed">%d contatti non sono stati rimossi</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Cestino pulisto con successo</string>
     <!-- error message when emptying the RB -->
@@ -794,13 +782,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Account free</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Account Pro I</string>
+    <string name="my_account_pro1">Pro&#160;I Account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Account Pro II</string>
+    <string name="my_account_pro2">Pro&#160;II Account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Account Pro III</string>
+    <string name="my_account_pro3">Pro&#160;III Account</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Account Pro Lite</string>
+    <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
     <!--  -->
     <string name="backup_title">Copia la tua Chiave di Recupero</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -921,16 +909,6 @@
     <string name="edit_link_option">Gestisci link</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">La password corrente che hai fornito non è corretta.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_reinvite_contact_request">%d richieste di reinvito inviate con successo.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_delete_contact_request">%d richieste eliminate con successo.</string>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_delete_contact_request">%1$d richieste eliminate con successo ma %2$d richieste non sono state cancellate.</string>
-    <!-- success message when replying to multiple received request -->
-    <string name="number_correctly_invitation_reply_sent">%d risposte inviate.</string>
-    <!-- error message when replying to multiple received request -->
-    <string name="number_incorrectly_invitation_reply_sent">%1$d risposte inviate con successo ma %2$d non sono state inviate.</string>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">La cartella è condivisa con %1$d contatto. Rimuovere la condivisione?</item>
@@ -1135,8 +1113,6 @@
     <string name="number_correctly_add_participant">%d partecipanti sono stati invitati con successo</string>
     <!-- error message when inviting multiple contacts to a group chat -->
     <string name="number_no_add_participant_request">%1$d partecipanti sono stati invitati con successo ma %2$d partecipanti non sono stati invitati.</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="message_permissions_changed">[A]%1$s[/A][B] è stato cambiato in [/B][C]%2$s[/C][D] da [/D][E]%3$s[/E]</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] si è unito alla chat di gruppo sotto invito di [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1165,8 +1141,6 @@
     <string name="history_cleared_message">La cronologia della chat è stata pulita</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">La storia della chat è stata cancellata da %1$s</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="non_format_message_permissions_changed">%1$s è stato cambiato in %2$s da %3$s</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="non_format_message_add_participant">%1$s è stato aggiunto a questa chat di gruppo su invito di %2$s</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1364,8 +1338,6 @@
     <string name="add_to_cloud_node_chat">Aggiungi al Cloud Drive</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Vedi contatti</string>
-    <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">Aggiunto con successo al Cloud Drive</string>
     <!-- Menu option -->
     <string name="import_success_error">Errore. Non aggiunto al Cloud Drive</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1620,8 +1592,8 @@
     <string name="general_incorrect_names">Per favore, correggi i nomi dei tuoi file prima di procedere</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caratteri non ammessi</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">I seguenti caratteri non sono ammessi: ” * / : &lt; &gt; ?? \\ |</string>
+    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
+    <string name="invalid_characters_defined">I seguenti caratteri non sono ammessi: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Il nome del file non può essere vuoto.</item>
@@ -1789,7 +1761,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Caricamento dei file</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s B</string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1888,7 +1860,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Apri le [A]Impostazioni[/A] del dispositivo Android</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Open [A]Apps and notifications[/A]</string>
+    <string name="turn_on_notifications_second_step">Apri [A]App e notifiche[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">Seleziona [A]MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -2069,8 +2041,6 @@
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Hai bisogno di un’applicazione di autenticazione per attivare l’Autenticazione a 2 fattori su MEGA. Puoi scaricare ed installare le app di Google Authenticator, Duo Mobile, Authy o Microsoft Authenticator per il tuo telefono o tablet.</string>
-    <!-- success message when importing multiple files from -->
-    <string name="number_correctly_imported_from_chat">%d file condivisi con successo</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d file non sono stati condivisi</string>
     <!-- button’s text to open a full screen image -->
@@ -2471,10 +2441,6 @@
     <string name="title_compress_video">Compressione di video %1$d su %2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Cartella non valida selezionata</string>
-    <!-- Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_one_file">1 cartella · 1 file</string>
-    <!-- Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_several_files">1 cartella · %1$d file</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d file</item>
@@ -2849,12 +2815,6 @@
         <item quantity="many">%1$d di immagini&#160;</item>
         <item quantity="other">%1$d immagini&#160;</item>
     </plurals>
-    <!-- Title of a media recents bucket that contains some images and a video -->
-    <string name="title_media_bucket_images_and_video">%d immagini e 1 video</string>
-    <!-- Title of a media recents bucket that contains an image and some videos -->
-    <string name="title_media_bucket_image_and_videos">1 immagine e %d video</string>
-    <!-- Title of a media recents bucket that contains an image and a video -->
-    <string name="title_media_bucket_image_and_video">1 immagine e 1 video</string>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]creato da[/A] %s</string>
     <!-- Label that indicates who updated a file into a recents bucket -->
@@ -3772,23 +3732,23 @@
     <!-- Button to proceed with a payment -->
     <string name="proceed">Procedi</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Grazie mille per il tuo abbonamento %1$s!</string>
+    <string name="successful_upgrade">Grazie mille per il tuo abbonamento %1$s</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro Lite mensile</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro Lite annuale</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro I mensile</string>
+    <string name="pro_i_monthly">Pro&#160;I monthly</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro I annuale</string>
+    <string name="pro_i_yearly">Pro&#160;I yearly</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro II mensile</string>
+    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro II annuale</string>
+    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro III mensile</string>
+    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro III annuale</string>
+    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Rimuovi come host</string>
     <!-- Title message of existing subscription dialog -->
@@ -3984,19 +3944,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Riconnessione fallita</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">La chiamata terminerà tra %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -4130,7 +4090,7 @@
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
     <string name="calls_call_screen_waiting_for_participants">In attesa che si uniscano altre persone</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_favourites">[B]Nessun[/B] [A]preferito[/A] [B]trovato[/B]</string>
     <!--Action text to start a meeting from Meeting screen empty view-->
     <string name="meetings_list_empty_action">Inizia un meeting</string>
     <!--Description text from Meeting screen empty view-->

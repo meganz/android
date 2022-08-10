@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
-    <string name="prolite_account">Pro Lite</string>
+    <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF 뷰어</string>
     <!-- Answer for confirmation dialog. -->
@@ -443,21 +443,9 @@
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d개의 폴더에서 성공적으로 떠나지 못했습니다</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent">File sent to %d contacts successfully</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent">File was not sent to %d contacts</string>
-    <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent_multifile">%d files sent successfully</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent_multifile">%d files failed to send</string>
-    <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d개의 항목이 잘 복사되었습니다</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d개의 항목이 복사되지 않았습니다</string>
-    <!-- success message when removing several contacts -->
-    <string name="number_contact_removed">%d개의 연락처가 잘 제거되었습니다</string>
-    <!-- error message when removing several contacts -->
-    <string name="number_contact_not_removed">%d개의 연락처가 제거되지 않았습니다</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">휴지통이 성공적으로 비워졌습니다</string>
     <!-- error message when emptying the RB -->
@@ -770,13 +758,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">무료 계정</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro I 계정</string>
+    <string name="my_account_pro1">Pro&#160;I Account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro II 계정</string>
+    <string name="my_account_pro2">Pro&#160;II Account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro III 계정</string>
+    <string name="my_account_pro3">Pro&#160;III Account</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro Lite 계정</string>
+    <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
     <!--  -->
     <string name="backup_title">복구 키를 백업하세요</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -897,16 +885,6 @@
     <string name="edit_link_option">링크 관리</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">입력하신 현재 암호가 맞지 않습니다.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_reinvite_contact_request">%d reinvite requests sent successfully.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_delete_contact_request">%d requests deleted successfully.</string>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_delete_contact_request">%1$d개의 요청은 성공적으로 삭제되었지만 %2$d개의 요청은 삭제되지 않았습니다.</string>
-    <!-- success message when replying to multiple received request -->
-    <string name="number_correctly_invitation_reply_sent">%d request replies sent.</string>
-    <!-- error message when replying to multiple received request -->
-    <string name="number_incorrectly_invitation_reply_sent">%1$d request replies successfully sent but %2$d were not sent.</string>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="other">폴더가 %1$d개의 연락처와 공유되어 있습니다. 모든 공유를 제거할까요?</item>
@@ -1097,8 +1075,6 @@
     <string name="number_correctly_add_participant">%d명의 참여자가 올바르게 초대되었습니다</string>
     <!-- error message when inviting multiple contacts to a group chat -->
     <string name="number_no_add_participant_request">참여자 %1$d명은 성공적으로 초대되었지만 %2$d명은 초대되지 않았습니다.</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="message_permissions_changed">[A]%1$s[/A][B] was changed to [/B][C]%2$s[/C][D] by [/D][E]%3$s[/E]</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A]님이 [C]%2$s[/C][B]님의 초대에 의해 그룹 대화에 참가하였습니다[/B]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1127,8 +1103,6 @@
     <string name="history_cleared_message">대화 기록이 삭제되었습니다</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">%1$s님에 의해 기록이 삭제되었습니다</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="non_format_message_permissions_changed">%1$s was changed to %2$s by %3$s</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="non_format_message_add_participant">%1$s님이 %2$s님의 초대에 의해 이 그룹 대화에 추가되었습니다</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1302,8 +1276,6 @@
     <string name="add_to_cloud_node_chat">클라우드 드라이브에 추가</string>
     <!-- Menu option -->
     <string name="general_view_contacts">연락처 보기</string>
-    <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">클라우드 드라이브에 성공적으로 추가되었습니다</string>
     <!-- Menu option -->
     <string name="import_success_error">오류. 클라우드 드라이브에 추가되지 않았습니다</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1548,8 +1520,8 @@
     <string name="general_incorrect_names">진행하기 전에 파일 이름을 고치세요</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">잘못된 글자</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">The following characters are not allowed: ” * / : &lt; &gt; ? \\ |</string>
+    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
+    <string name="invalid_characters_defined">다음의 문자는 허용되지 않습니다: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">파일 이름은 비워둘 수 없습니다.</item>
@@ -1715,7 +1687,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">파일 불러오는 중</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s B</string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1975,8 +1947,6 @@
     <string name="play_store_label">Play 스토어</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">MEGA에서 2단계 인증을 활성화하려면 인증기 앱이 필요합니다. 당신의 휴대 전화 또는 태블릿용 Google 인증기, Duo Mobile, Authy 또는 Microsoft 인증기 앱을 다운로드하고 설치할 수 있습니다.</string>
-    <!-- success message when importing multiple files from -->
-    <string name="number_correctly_imported_from_chat">%d개의 파일이 성공적으로 공유됨</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d개의 파일이 공유되지 않음</string>
     <!-- button’s text to open a full screen image -->
@@ -2369,10 +2339,6 @@
     <string name="title_compress_video">동영상 압축중 %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">잘못된 폴더 선택됨</string>
-    <!-- Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_one_file">1개의 폴더 · 1개의 파일</string>
-    <!-- Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_several_files">1개의 폴더 · %1$d개의 파일</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d개의 파일</item>
@@ -2703,12 +2669,6 @@
     <plurals name="title_media_bucket_images_and_videos">
         <item quantity="other">이미지 %1$d개&#160;</item>
     </plurals>
-    <!-- Title of a media recents bucket that contains some images and a video -->
-    <string name="title_media_bucket_images_and_video">이미지 %d개와 동영상 1개</string>
-    <!-- Title of a media recents bucket that contains an image and some videos -->
-    <string name="title_media_bucket_image_and_videos">이미지 1개와 동영상 %d개</string>
-    <!-- Title of a media recents bucket that contains an image and a video -->
-    <string name="title_media_bucket_image_and_video">이미지 1개와 동영상 1개</string>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]생성인[/A] %s</string>
     <!-- Label that indicates who updated a file into a recents bucket -->
@@ -3574,23 +3534,23 @@
     <!-- Button to proceed with a payment -->
     <string name="proceed">진행</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">%1$s 구독을 해주셔서 고맙습니다!</string>
+    <string name="successful_upgrade">%1$s 구독을 해주셔서 고맙습니다</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro Lite 월간</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro Lite 연간</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro I 월간</string>
+    <string name="pro_i_monthly">Pro&#160;I monthly</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro I 연간</string>
+    <string name="pro_i_yearly">Pro&#160;I yearly</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro II 월간</string>
+    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro II 연간</string>
+    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro III 월간</string>
+    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro III 연간</string>
+    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">주최자에서 해임</string>
     <!-- Title message of existing subscription dialog -->
@@ -3782,19 +3742,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">다시 연결할 수 없습니다</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]B</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]KB</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]MB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]GB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]TB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]PB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]EB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">%s 내에 통화 종료</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->

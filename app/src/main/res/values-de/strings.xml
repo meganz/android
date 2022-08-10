@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
-    <string name="prolite_account">Pro Lite</string>
+    <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF Viewer</string>
     <!-- Answer for confirmation dialog. -->
@@ -453,21 +453,9 @@
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d Ordnerfreigaben konnten nicht storniert werden</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent">Datei an %d Kontakte versandt</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent">Datei konnte an %d Kontakte nicht versendet werden</string>
-    <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent_multifile">%d Dateien gesendet</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent_multifile">%d Dateien konnten nicht gesendet werden</string>
-    <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d Elemente wurden erfolgreich kopiert</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d Elemente wurden nicht kopiert</string>
-    <!-- success message when removing several contacts -->
-    <string name="number_contact_removed">%d Kontakte erfolgreich entfernt</string>
-    <!-- error message when removing several contacts -->
-    <string name="number_contact_not_removed">%d Kontakte wurden nicht entfernt</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Der Papierkorb wurde erfolgreich geleert</string>
     <!-- error message when emptying the RB -->
@@ -782,13 +770,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Gratisaccount</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro-I-Account</string>
+    <string name="my_account_pro1">Pro&#160;I Account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro-II-Account</string>
+    <string name="my_account_pro2">Pro&#160;II Account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro-III-Account</string>
+    <string name="my_account_pro3">Pro&#160;III Account</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro-Lite-Account</string>
+    <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
     <!--  -->
     <string name="backup_title">Rettungsschlüssel sichern</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -909,16 +897,6 @@
     <string name="edit_link_option">Link bearbeiten</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">Das aktuelle Passwort, das Sie eingegeben haben, ist nicht korrekt.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_reinvite_contact_request">%d Einladungen wurden wiederholt.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_delete_contact_request">%d Anfragen gelöscht.</string>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_delete_contact_request">%1$d Einladungen storniert. %2$d Einladungen konnten nicht storniert werden.</string>
-    <!-- success message when replying to multiple received request -->
-    <string name="number_correctly_invitation_reply_sent">%d Anfragen beantwortet.</string>
-    <!-- error message when replying to multiple received request -->
-    <string name="number_incorrectly_invitation_reply_sent">%1$d Anfragen erfolgreich beantwortet, %2$d fehlgeschlagen.</string>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">Der Ordner ist an %1$d Kontakt freigegeben. Freigabe entfernen?</item>
@@ -1116,8 +1094,6 @@
     <string name="number_correctly_add_participant">%d Teilnehmer wurden eingeladen</string>
     <!-- error message when inviting multiple contacts to a group chat -->
     <string name="number_no_add_participant_request">%1$d Teilnehmer wurden eingeladen. %2$d Teilnehmer konnten nicht eingeladen werden.</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="message_permissions_changed">[A]%1$s[/A][B] wurde von [/D][E]%3$s[/E] auf [/B][C]%2$s[/C][D] gesetzt</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] ist dem Gruppenchat auf Einladung von [/B][C]%2$s[/C] beigetreten</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1146,8 +1122,6 @@
     <string name="history_cleared_message">Chatverlauf gelöscht</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">Der Chatverlauf wurde von %1$s gelöscht</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="non_format_message_permissions_changed">%1$s wurde von %3$s auf %2$s geändert</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="non_format_message_add_participant">%1$s wurde dem Gruppenchat von %2$s hinzugefügt</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1333,8 +1307,6 @@
     <string name="add_to_cloud_node_chat">In Cloud Drive kopieren</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Kontakte anzeigen</string>
-    <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">Erfolgreich im Cloud Drive gespeichert</string>
     <!-- Menu option -->
     <string name="import_success_error">Fehler. Nicht im Cloud Drive gespeichert</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1584,8 +1556,8 @@
     <string name="general_incorrect_names">Bitte korrigieren Sie die Dateinamen, bevor Sie fortfahren</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Ungültige Zeichen</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Die folgenden Zeichen sind nicht zulässig: ” * / : &lt; &gt; ? \\ |</string>
+    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
+    <string name="invalid_characters_defined">Die folgenden Zeichen sind nicht zulässig: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Der Dateiname darf nicht leer sein.</item>
@@ -1752,7 +1724,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Dateien werden geladen</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s B</string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1845,7 +1817,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Android-[A]Einstellungen[/A] öffnen</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Open [A]Apps and notifications[/A]</string>
+    <string name="turn_on_notifications_second_step">[A]Apps und Benachrichtigungen[/A] öffnen</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">[A]MEGA[/A] auswählen</string>
     <!-- Fourth step to turn on notifications -->
@@ -2022,8 +1994,6 @@
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Sie benötigen eine Authenticator-App, um 2FA auf MEGA zu nutzen. Installieren Sie den Google Authenticator, Due Mobile, Authy oder den Microsoft Authenticator auf Ihrem Mobilgerät.</string>
-    <!-- success message when importing multiple files from -->
-    <string name="number_correctly_imported_from_chat">%d Dateien erfolgreich importiert</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d Dateien konnten nicht importiert werden</string>
     <!-- button’s text to open a full screen image -->
@@ -2420,10 +2390,6 @@
     <string name="title_compress_video">Videokomprimierung %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Der gewählte Ordner ist ungültig</string>
-    <!-- Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_one_file">1 Ordner · 1 Datei</string>
-    <!-- Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_several_files">1 Ordner · %1$d Dateien</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d Datei</item>
@@ -2776,12 +2742,6 @@
         <item quantity="one">%1$d Bild&#160;</item>
         <item quantity="other">%1$d Bilder&#160;</item>
     </plurals>
-    <!-- Title of a media recents bucket that contains some images and a video -->
-    <string name="title_media_bucket_images_and_video">%d Bilder und 1 Video</string>
-    <!-- Title of a media recents bucket that contains an image and some videos -->
-    <string name="title_media_bucket_image_and_videos">1 Bild und %d Videos</string>
-    <!-- Title of a media recents bucket that contains an image and a video -->
-    <string name="title_media_bucket_image_and_video">1 Bild und 1 Video</string>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]erstellt von [/A]%s</string>
     <!-- Label that indicates who updated a file into a recents bucket -->
@@ -3673,23 +3633,23 @@
     <!-- Button to proceed with a payment -->
     <string name="proceed">Fortfahren</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Vielen Dank, dass Sie %1$s abonniert haben!</string>
+    <string name="successful_upgrade">Vielen Dank, dass Sie %1$s abonniert haben</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro Lite monatlich</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro Lite jährlich</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro I monatlich</string>
+    <string name="pro_i_monthly">Pro&#160;I monthly</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro I jährlich</string>
+    <string name="pro_i_yearly">Pro&#160;I yearly</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro II monatlich</string>
+    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro II jährlich</string>
+    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro III monatlich</string>
+    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro III jährlich</string>
+    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Gastgeberstatus entziehen</string>
     <!-- Title message of existing subscription dialog -->
@@ -4025,13 +3985,13 @@
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
     <string name="calls_call_screen_waiting_for_participants">Warten auf weitere Teilnehmer</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_favourites">[B]Keine[/B] [A]Favoriten[/A] [B]gefunden[/B]</string>
     <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Start a meeting</string>
+    <string name="meetings_list_empty_action">Meeting starten</string>
     <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Talk securely and privately on audio or video calls with friends and colleagues around the world.</string>
+    <string name="meetings_list_empty_description">Führen Sie sichere und private Audio- oder Videogespräche mit Freunden und Kollegen auf der ganzen Welt.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_action">Start chatting now</string>
+    <string name="chat_recent_list_empty_action">Jetzt chatten</string>
     <!--Description text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_description">Chat securely and privately, with anyone and on any device, knowing that no one can read your chats, not even MEGA.</string>
+    <string name="chat_recent_list_empty_description">Chatten Sie sicher und privat mit jedem und auf jedem Gerät, im Bewusstsein, dass niemand Ihre Chats lesen kann – nicht einmal MEGA.</string>
 </resources>
