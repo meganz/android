@@ -97,6 +97,6 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
     }
 
     override fun showSnackbar(message: String?) {
-        super.showSnackbar(binding.root, message)
+        super.showSnackbar(binding.root, message ?: return)
     }
 }

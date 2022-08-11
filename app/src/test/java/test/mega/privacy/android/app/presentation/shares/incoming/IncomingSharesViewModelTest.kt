@@ -56,10 +56,11 @@ class IncomingSharesViewModelTest {
     fun `test that initial state is returned`() = runTest {
         underTest.state.test {
             val initial = awaitItem()
-            assertThat(initial.incomingParentHandle).isEqualTo(-1L)
+            assertThat(initial.incomingHandle).isEqualTo(-1L)
             assertThat(initial.incomingTreeDepth).isEqualTo(0)
             assertThat(initial.nodes).isEmpty()
-            assertThat(initial.isInvalidParentHandle).isEqualTo(true)
+            assertThat(initial.isInvalidHandle).isEqualTo(true)
+            assertThat(initial.incomingParentHandle).isEqualTo(null)
         }
     }
 
@@ -131,11 +132,11 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that incoming parent handle is updated when increase incoming tree depth`() =
+    fun `test that incoming handle is updated when increase incoming tree depth`() =
         runTest {
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
 
-            underTest.state.map { it.incomingParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.incomingHandle }.distinctUntilChanged()
                 .test {
                     val newValue = 123456789L
                     assertThat(awaitItem()).isEqualTo(-1L)
@@ -145,11 +146,11 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that incoming parent handle is updated when decrease incoming tree depth`() =
+    fun `test that incoming handle is updated when decrease incoming tree depth`() =
         runTest {
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
 
-            underTest.state.map { it.incomingParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.incomingHandle }.distinctUntilChanged()
                 .test {
                     val newValue = 123456789L
                     assertThat(awaitItem()).isEqualTo(-1L)
@@ -159,11 +160,11 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that incoming parent handle is updated when set incoming tree depth`() =
+    fun `test that incoming handle is updated when set incoming tree depth`() =
         runTest {
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
 
-            underTest.state.map { it.incomingParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.incomingHandle }.distinctUntilChanged()
                 .test {
                     val newValue = 123456789L
                     assertThat(awaitItem()).isEqualTo(-1L)
@@ -173,12 +174,12 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that incoming parent handle is reset to default if fails to get node list when calling set incoming tree depth`() =
+    fun `test that incoming handle is reset to default if fails to get node list when calling set incoming tree depth`() =
         runTest {
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
             underTest.setIncomingTreeDepth(any(), 123456789L)
 
-            underTest.state.map { it.incomingParentHandle }
+            underTest.state.map { it.incomingHandle }
                 .test {
                     assertThat(awaitItem()).isEqualTo(123456789L)
                     whenever(getIncomingSharesChildrenNode(any())).thenReturn(null)
@@ -188,11 +189,11 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that incoming parent handle is set to -1L when reset incoming tree depth`() =
+    fun `test that incoming handle is set to -1L when reset incoming tree depth`() =
         runTest {
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
 
-            underTest.state.map { it.incomingParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.incomingHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(-1L)
                     underTest.increaseIncomingTreeDepth(123456789L)
@@ -203,12 +204,12 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that is invalid parent handle is set to false when call set incoming tree depth with valid parent handle`() =
+    fun `test that is invalid handle is set to false when call set incoming tree depth with valid handle`() =
         runTest {
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
-            underTest.state.map { it.isInvalidParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.isInvalidHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(true)
                     underTest.setIncomingTreeDepth(any(), 123456789L)
@@ -217,12 +218,12 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that is invalid parent handle is set to true when call set incoming tree depth with invalid parent handle`() =
+    fun `test that is invalid handle is set to true when call set incoming tree depth with invalid handle`() =
         runTest {
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
-            underTest.state.map { it.isInvalidParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.isInvalidHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(true)
                     underTest.setIncomingTreeDepth(any(), 123456789L)
@@ -234,12 +235,12 @@ class IncomingSharesViewModelTest {
 
 
     @Test
-    fun `test that is invalid parent handle is set to true when cannot retrieve node`() =
+    fun `test that is invalid handle is set to true when cannot retrieve node`() =
         runTest {
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
-            underTest.state.map { it.isInvalidParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.isInvalidHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(true)
                     underTest.setIncomingTreeDepth(any(), 123456789L)
@@ -255,25 +256,25 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that getIncomingSharesNode executes when calling increaseIncomingTreeDepth`() =
         runTest {
-            val parentHandle = 123456789L
-            underTest.increaseIncomingTreeDepth(parentHandle)
-            verify(getIncomingSharesChildrenNode).invoke(parentHandle)
+            val handle = 123456789L
+            underTest.increaseIncomingTreeDepth(handle)
+            verify(getIncomingSharesChildrenNode).invoke(handle)
         }
 
     @Test
     fun `test that getIncomingSharesNode executes when calling decreaseIncomingTreeDepth`() =
         runTest {
-            val parentHandle = 123456789L
-            underTest.decreaseIncomingTreeDepth(parentHandle)
-            verify(getIncomingSharesChildrenNode).invoke(parentHandle)
+            val handle = 123456789L
+            underTest.decreaseIncomingTreeDepth(handle)
+            verify(getIncomingSharesChildrenNode).invoke(handle)
         }
 
     @Test
     fun `test that getIncomingSharesNode executes when set incoming tree depth`() =
         runTest {
-            val parentHandle = 123456789L
-            underTest.setIncomingTreeDepth(any(), parentHandle)
-            verify(getIncomingSharesChildrenNode).invoke(parentHandle)
+            val handle = 123456789L
+            underTest.setIncomingTreeDepth(any(), handle)
+            verify(getIncomingSharesChildrenNode).invoke(handle)
         }
 
     @Test
@@ -289,14 +290,14 @@ class IncomingSharesViewModelTest {
         runTest {
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
 
-            val parentHandle = 123456789L
-            val job = underTest.increaseIncomingTreeDepth(parentHandle)
+            val handle = 123456789L
+            val job = underTest.increaseIncomingTreeDepth(handle)
             job.invokeOnCompletion {
-                assertThat(underTest.state.value.incomingParentHandle).isEqualTo(parentHandle)
+                assertThat(underTest.state.value.incomingHandle).isEqualTo(handle)
                 underTest.refreshIncomingSharesNode()
             }
-            // increaseOutgoingTreeDepth call + refreshOutgoingSharesNode call
-            verify(getIncomingSharesChildrenNode, times(2)).invoke(parentHandle)
+            // increaseIncomingTreeDepth call + refreshIncomingSharesNode call
+            verify(getIncomingSharesChildrenNode, times(2)).invoke(handle)
         }
 
     @Test
@@ -338,12 +339,45 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that get parent node handle returns the result of get parent node handle use case`() =
+    fun `test that getParentNodeHandle is called when setIncomingTreeDepth`() =
         runTest {
-            val expected = 123456789L
-            whenever(getParentNodeHandle(any())).thenReturn(expected)
+            val handle = 123456789L
+            underTest.increaseIncomingTreeDepth(handle)
+            verify(getParentNodeHandle).invoke(handle)
+        }
 
-            assertThat(underTest.getParentNodeHandle()).isEqualTo(expected)
+    @Test
+    fun `test that parent handle is set with result of getParentNodeHandle`() =
+        runTest {
+            val expected = 111111111L
+            whenever(getParentNodeHandle(any())).thenReturn(expected)
+            whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getNodeByHandle(any())).thenReturn(mock())
+
+            underTest.state.map { it.incomingParentHandle }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(null)
+                    underTest.increaseIncomingTreeDepth(123456789L)
+                    assertThat(awaitItem()).isEqualTo(expected)
+                }
+        }
+
+    @Test
+    fun `test that parent handle is set to null when refreshNodes fails`() =
+        runTest {
+            whenever(getParentNodeHandle(any())).thenReturn(111111111L)
+            whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getNodeByHandle(any())).thenReturn(mock())
+
+            underTest.state.map { it.incomingParentHandle }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(null)
+                    underTest.increaseIncomingTreeDepth(123456789L)
+                    assertThat(awaitItem()).isEqualTo(111111111L)
+                    whenever(getIncomingSharesChildrenNode(any())).thenReturn(null)
+                    underTest.increaseIncomingTreeDepth(123456789L)
+                    assertThat(awaitItem()).isEqualTo(null)
+                }
         }
 
     @Test
@@ -358,7 +392,7 @@ class IncomingSharesViewModelTest {
             whenever(authorizeNode(any())).thenReturn(null)
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
 
-            underTest.state.map { it.incomingParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.incomingHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(-1L)
                     underTest.setIncomingTreeDepth(any(), handle)
@@ -378,7 +412,7 @@ class IncomingSharesViewModelTest {
             }
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
 
-            underTest.state.map { it.incomingParentHandle }.distinctUntilChanged()
+            underTest.state.map { it.incomingHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(-1L)
                     underTest.setIncomingTreeDepth(any(), handle)
@@ -397,6 +431,6 @@ class IncomingSharesViewModelTest {
         verify(
             getIncomingSharesChildrenNode,
             times(2)
-        ).invoke(underTest.state.value.incomingParentHandle)
+        ).invoke(underTest.state.value.incomingHandle)
     }
 }

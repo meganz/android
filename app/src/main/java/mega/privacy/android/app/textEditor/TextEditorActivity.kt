@@ -219,7 +219,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
+        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
         if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
             binding.contentEditText.hideKeyboard()
             showDiscardChangesConfirmationDialog()
@@ -272,32 +272,32 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     }
 
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
 
-        if (nodeAttacher.handleActivityResult(requestCode, resultCode, data, this)) {
+        if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
             return
         }
 
-        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, data)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return
         }
 
         when (requestCode) {
             REQUEST_CODE_SELECT_IMPORT_FOLDER -> {
-                val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
+                val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
                     ?: return
 
                 viewModel.copyNode(toHandle)
             }
             REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
-                val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+                val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
                     ?: return
 
                 viewModel.moveNode(toHandle)
             }
             REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
-                val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+                val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
                     ?: return
 
                 viewModel.copyNode(toHandle)
@@ -513,7 +513,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             showSnackbar(message)
         }
         viewModel.getCollision().observe(this) { collision ->
-            nameCollisionActivityContract.launch(arrayListOf(collision))
+            nameCollisionActivityContract?.launch(arrayListOf(collision))
         }
         viewModel.onExceptionThrown().observe(this, ::manageException)
         viewModel.onFatalError().observe(this) {

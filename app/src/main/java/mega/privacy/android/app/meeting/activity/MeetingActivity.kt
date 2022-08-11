@@ -180,9 +180,7 @@ class MeetingActivity : BaseActivity() {
                 false
             )
 
-            if ((isGuest && shouldRefreshSessionDueToMegaApiIsNull()) ||
-                (!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere()
-            ) {
+            if (isGuest || shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
                 meetingViewModel.currentChatId.value?.let { currentChatId ->
                     if (currentChatId != MEGACHAT_INVALID_HANDLE) {
                         //Notification of this call should be displayed again
@@ -403,14 +401,14 @@ class MeetingActivity : BaseActivity() {
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         return when (event.keyCode) {
             KeyEvent.KEYCODE_VOLUME_UP -> {
-                if (app.isAnIncomingCallRinging) {
-                    app.muteOrUnmute(false)
+                if (app?.isAnIncomingCallRinging == true) {
+                    app?.muteOrUnmute(false)
                 }
                 false
             }
             KeyEvent.KEYCODE_VOLUME_DOWN -> {
-                if (app.isAnIncomingCallRinging) {
-                    app.muteOrUnmute(true)
+                if (app?.isAnIncomingCallRinging == true) {
+                    app?.muteOrUnmute(true)
                 }
                 false
             }

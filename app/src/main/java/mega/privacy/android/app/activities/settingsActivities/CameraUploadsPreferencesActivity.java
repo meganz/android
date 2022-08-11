@@ -18,31 +18,21 @@ import static mega.privacy.android.app.utils.Constants.EXTRA_NODE_HANDLE;
 import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
 import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
 import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_ACCESS_MEDIA_LOCATION;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_UPLOAD;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsCameraUploadsFragment;
-import mega.privacy.android.app.utils.Util;
 import timber.log.Timber;
 
 public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
 
     private SettingsCameraUploadsFragment settingsFragment;
-    private AlertDialog businessCUAlert;
 
     private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
@@ -164,72 +154,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
                 new IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE));
 
         registerReceiver(reEnableCameraUploadsPreferenceReceiver, new IntentFilter(BROADCAST_ACTION_REENABLE_CU_PREFERENCE));
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CAMERA_UPLOAD) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                checkIfShouldShowBusinessCUAlert();
-            } else {
-                Util.showSnackbar(this, getString(R.string.on_refuse_storage_permission));
-            }
-        } else if (requestCode == REQUEST_ACCESS_MEDIA_LOCATION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                enableCameraUploadsWithLocation();
-            } else {
-                Util.showSnackbar(this, getString(R.string.on_refuse_storage_permission));
-            }
-        }
-    }
-
-    /**
-     * Method for enabling Camera Uploads Location data.
-     */
-    private void enableCameraUploadsWithLocation() {
-        if (settingsFragment != null) {
-            settingsFragment.enableCameraUploadsWithLocation();
-        }
-    }
-
-    /**
-     * Method for enabling Camera Uploads.
-     */
-    private void enableCU() {
-        if (settingsFragment != null) {
-            settingsFragment.enableCameraUpload();
-        }
-    }
-
-    /**
-     * Method to check if Business alert needs to be displayed before enabling Camera Uploads.
-     */
-    public void checkIfShouldShowBusinessCUAlert() {
-        if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
-            showBusinessCUAlert();
-        } else {
-            enableCU();
-        }
-    }
-
-    /**
-     * Method for displaying the Business alert.
-     */
-    private void showBusinessCUAlert() {
-        if (businessCUAlert != null && businessCUAlert.isShowing()) {
-            return;
-        }
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-        builder.setTitle(R.string.section_photo_sync)
-                .setMessage(R.string.camera_uploads_business_alert)
-                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {
-                })
-                .setPositiveButton(R.string.general_enable, (dialog, which) -> enableCU())
-                .setCancelable(false);
-        businessCUAlert = builder.create();
-        businessCUAlert.show();
     }
 
     @Override

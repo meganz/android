@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.activity
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -649,7 +650,7 @@ class MeetingActivityViewModel @Inject constructor(
             Timber.w("Intent is null")
             return
         }
-        if (requestCode == REQUEST_ADD_PARTICIPANTS && resultCode == BaseActivity.RESULT_OK) {
+        if (requestCode == REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
             Timber.d("Participants successfully added")
             val contactsData: List<String>? =
                 intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
