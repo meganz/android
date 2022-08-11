@@ -43,7 +43,7 @@
                 android:id="@+id/txt_empty_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawablePadding="10dp"
+                android:drawablePadding="12dp"
                 android:drawableTint="@color/grey_100_grey_600"
                 android:gravity="center"
                 android:text="@string/meetings_list_empty_action"
