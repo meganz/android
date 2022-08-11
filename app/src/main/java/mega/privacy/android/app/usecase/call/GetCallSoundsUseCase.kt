@@ -192,8 +192,8 @@ class GetCallSoundsUseCase @Inject constructor(
             getCallStatusChangesUseCase.getCallStatus()
                 .subscribeBy(
                     onNext = { status ->
-                        if (status == MegaChatCall.CALL_STATUS_DESTROYED) {
-                            Timber.d("Call destroyed")
+                        if (status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
+                            Timber.d("Terminating user participation")
                             removeWaitingForOthersCountDownTimer()
                             MegaApplication.getChatManagement().stopCounterToFinishCall()
                             MegaApplication.getInstance()
