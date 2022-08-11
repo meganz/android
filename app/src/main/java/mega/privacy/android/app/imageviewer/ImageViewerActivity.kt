@@ -419,7 +419,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             manageCopyMoveException(error)
         }
         viewModel.onCollision().observe(this) { collision ->
-            nameCollisionActivityContract.launch(arrayListOf(collision))
+            nameCollisionActivityContract?.launch(arrayListOf(collision))
         }
         viewModel.onActionBarMessage().observe(this) { message ->
             bottomSheet?.dismissAllowingStateLoss()
