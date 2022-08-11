@@ -39,14 +39,14 @@ class FavouriteAlbumRepository @Inject constructor(
         order: Int,
         zoom: Int,
         dbHandler: DatabaseHandler,
-    ): GalleryBaseFetcher {
+    ): FavouriteAlbumFetcher {
         return FavouriteAlbumFetcher(
-            context,
-            megaApi,
-            selectedNodesMap,
-            order,
-            zoom,
-            dbHandler
+            order = order,
+            dbHandler = dbHandler,
+            context = context,
+            megaApi = megaApi,
+            selectedNodesMap = selectedNodesMap,
+            zoom = zoom
         )
     }
 
@@ -54,7 +54,7 @@ class FavouriteAlbumRepository @Inject constructor(
     var galleryItems: LiveData<List<GalleryItem>> = MutableLiveData()
 
     /** Current effective NodeFetcher */
-    lateinit var nodesFetcher: GalleryBaseFetcher
+    lateinit var nodesFetcher: FavouriteAlbumFetcher
 
     /** The selected nodes in action mode */
     private val selectedNodesMap: java.util.LinkedHashMap<Any, GalleryItem> =
@@ -80,12 +80,12 @@ class FavouriteAlbumRepository @Inject constructor(
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
         // Then the result of any previous NodesFetcher will be ignored
         nodesFetcher = initGalleryNodeFetcher(
-            context,
-            megaApi,
-            selectedNodesMap,
-            order,
-            zoom,
-            dbHandler,
+            order = order,
+            dbHandler = dbHandler,
+            context = context,
+            megaApi = megaApi,
+            selectedNodesMap = selectedNodesMap,
+            zoom = zoom,
         )
         @Suppress("UNCHECKED_CAST")
         galleryItems = nodesFetcher.result as MutableLiveData<List<GalleryItem>>
