@@ -37,7 +37,7 @@ class CallsPreferencesDataStore @Inject constructor(
     private val callsSoundNotificationsPreferenceKey =
         stringPreferencesKey("CALLS_SOUND_NOTIFICATIONS")
 
-    override fun getCallSoundNotificationsPreference(): Flow<CallsSoundNotifications> =
+    override fun getCallsSoundNotificationsPreference(): Flow<CallsSoundNotifications> =
         context.callsDataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -52,7 +52,7 @@ class CallsPreferencesDataStore @Inject constructor(
                 )
             }
 
-    override suspend fun setCallSoundNotificationsPreference(soundNotifications: CallsSoundNotifications) {
+    override suspend fun setCallsSoundNotificationsPreference(soundNotifications: CallsSoundNotifications) {
         withContext(ioDispatcher) {
             context.callsDataStore.edit {
                 it[callsSoundNotificationsPreferenceKey] = soundNotifications.name

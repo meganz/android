@@ -222,7 +222,7 @@ class GetCallSoundsUseCase @Inject constructor(
                         sharingScope.launch {
                             CallsPreferencesDataStore(MegaApplication.getInstance().applicationContext,
                                 Dispatchers.IO)
-                                .getCallSoundNotificationsPreference()
+                                .getCallsSoundNotificationsPreference()
                                 .collectLatest { soundNotifications ->
                                     val isEnabled =
                                         soundNotifications == CallsSoundNotifications.Enabled

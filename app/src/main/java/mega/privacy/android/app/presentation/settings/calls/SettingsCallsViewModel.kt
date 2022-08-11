@@ -25,8 +25,8 @@ class SettingsCallsViewModel @Inject constructor(
     private val setCallsSoundNotifications: SetCallsSoundNotifications,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(SettingsCallsState())
-    val state: StateFlow<SettingsCallsState> = _state
+    private val _uiState = MutableStateFlow(SettingsCallsState())
+    val uiState: StateFlow<SettingsCallsState> = _uiState
 
 
     init {
@@ -34,7 +34,7 @@ class SettingsCallsViewModel @Inject constructor(
             getCallsSoundNotifications().map { result ->
                 { state: SettingsCallsState -> state.copy(soundNotifications = result) }
             }.collect {
-                _state.update(it)
+                _uiState.update(it)
             }
         }
     }

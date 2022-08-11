@@ -44,7 +44,7 @@ class SettingsCallsFragment : Fragment() {
 
     @Composable
     private fun CallsSettingBody() {
-        val uiState by viewModel.state.collectAsState()
+        val uiState by viewModel.uiState.collectAsState()
         SettingsCallsView(
             settingsCallsState = uiState,
             onCheckedChange = viewModel::setNewCallsSoundNotifications

@@ -185,11 +185,11 @@ class DefaultSettingsRepository @Inject constructor(
         withContext(ioDispatcher) { chatPreferencesGateway.setChatImageQualityPreference(quality) }
 
     override fun getCallsSoundNotifications(): Flow<CallsSoundNotifications> =
-        callsPreferencesGateway.getCallSoundNotificationsPreference()
+        callsPreferencesGateway.getCallsSoundNotificationsPreference()
 
     override suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundNotifications) =
         withContext(ioDispatcher) {
-            callsPreferencesGateway.setCallSoundNotificationsPreference(soundNotifications)
+            callsPreferencesGateway.setCallsSoundNotificationsPreference(soundNotifications)
         }
 
     override suspend fun setStringPreference(key: String?, value: String?) =

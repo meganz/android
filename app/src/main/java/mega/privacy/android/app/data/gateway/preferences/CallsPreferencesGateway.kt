@@ -9,14 +9,14 @@ interface CallsPreferencesGateway {
      *
      * @return If notification sounds are enabled or disabled.
      */
-    fun getCallSoundNotificationsPreference(): Flow<CallsSoundNotifications>
+    fun getCallsSoundNotificationsPreference(): Flow<CallsSoundNotifications>
 
     /**
      * Enable or disable notification sounds are enabled when there are changes in participants in group calls or meetings.
      *
      * @param soundNotifications True, if must be enabled. False, if must be disabled.
      */
-    suspend fun setCallSoundNotificationsPreference(soundNotifications: CallsSoundNotifications)
+    suspend fun setCallsSoundNotificationsPreference(soundNotifications: CallsSoundNotifications)
 
     /**
      * Clears calls preferences.
