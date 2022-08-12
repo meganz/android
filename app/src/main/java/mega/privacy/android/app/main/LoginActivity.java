@@ -23,6 +23,7 @@ import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 import static mega.privacy.android.app.utils.Util.getCustomAlertBuilder;
 import static mega.privacy.android.app.utils.Util.getScaleH;
 import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.isTablet;
 import static mega.privacy.android.app.utils.Util.setAppFontSize;
 import static mega.privacy.android.app.utils.Util.setDrawUnderStatusBar;
 
@@ -32,6 +33,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
@@ -260,6 +262,9 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     public void showFragment(int visibleFragment) {
         Timber.d("visibleFragment: %s", visibleFragment);
         this.visibleFragment = visibleFragment;
+
+        restrictOrientation();
+
         switch (visibleFragment) {
             case LOGIN_FRAGMENT: {
                 Timber.d("Show LOGIN_FRAGMENT");
@@ -332,6 +337,23 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
         if (((MegaApplication) getApplication()).isEsid()) {
             showAlertLoggedOut();
+        }
+    }
+
+    /**
+     * Restrict to portrait mode always for mobile devices and tablets (already restricted via Manifest).
+     * Allow the landscape mode only for tablets and only for TOUR_FRAGMENT.
+     */
+    @SuppressLint("SourceLockedOrientationActivity")
+    private void restrictOrientation() {
+        if (isTablet(this)) {
+            if (visibleFragment == TOUR_FRAGMENT) {
+                Timber.d("Tablet landscape mode allowed");
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
+            } else {
+                Timber.d("Tablet landscape mode restricted");
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
         }
     }
 
