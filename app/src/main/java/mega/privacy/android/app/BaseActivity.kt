@@ -1327,14 +1327,17 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         builder.setView(v)
         val text = v.findViewById<TextView>(R.id.confirmation_text)
         text.setText(R.string.confirmation_download_location)
-        val cancelButton = v.findViewById<Button>(R.id.negative_button)
-        cancelButton.setText(R.string.general_negative_button)
         val confirmationButton = v.findViewById<Button>(R.id.positive_button)
         confirmationButton.setText(R.string.general_yes)
         confirmationButton.setOnClickListener {
             setDownloadLocationDialog?.dismiss()
             dbH.setStorageAskAlways(false)
             dbH.setStorageDownloadLocation(path)
+        }
+        val cancelButton = v.findViewById<Button>(R.id.negative_button)
+        cancelButton.setText(R.string.general_negative_button)
+        cancelButton.setOnClickListener {
+            setDownloadLocationDialog?.dismiss()
         }
         val checkBox = v.findViewById<CheckBox>(R.id.confirmation_checkbox)
         checkBox.isChecked = confirmationChecked
