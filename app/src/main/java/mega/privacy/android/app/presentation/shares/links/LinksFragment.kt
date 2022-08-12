@@ -27,7 +27,6 @@ import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -156,18 +155,14 @@ class LinksFragment : MegaNodeBaseFragment() {
 
     }
 
-    override fun updateContact(contactHandle: Long) {}
-
     override fun showSortByPanel() {
         managerActivity?.showNewSortByPanel(ORDER_CLOUD)
     }
 
-    override val viewerFrom: Int
-        get() = Constants.VIEWER_FROM_LINKS
-    override val intentOrder: Int
+    override val viewerFrom: Int = Constants.VIEWER_FROM_LINKS
+    override val currentSharesTab: SharesTab = SharesTab.LINKS_TAB
+    override val sortOrder: Int
         get() = state().sortOrder
-    override val currentSharesTab: SharesTab
-        get() = SharesTab.LINKS_TAB
     override val parentHandle: Long
         get() = state().linksHandle
 
@@ -263,8 +258,8 @@ class LinksFragment : MegaNodeBaseFragment() {
     }
 
     private inner class ActionBarCallBack(currentTab: Tab) : BaseActionBarCallBack(currentTab) {
-        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            super.onPrepareActionMode(mode, menu)
+        override fun onPrepareActionMode(actionMode: ActionMode, menu: Menu): Boolean {
+            super.onPrepareActionMode(actionMode, menu)
             val control = CloudStorageOptionControlUtil.Control()
             val areAllNotTakenDown = selected.areAllNotTakenDown()
             if (areAllNotTakenDown) {

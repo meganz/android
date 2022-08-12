@@ -176,15 +176,6 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         }
     }
 
-    /**
-     * Method to update an item when a nickname is added, updated or removed from a contact.
-     *
-     * @param contactHandle Contact ID.
-     */
-    override fun updateContact(contactHandle: Long) {
-        adapter?.updateItem(contactHandle)
-    }
-
     override fun showSortByPanel() {
         val orderType = when (state().outgoingTreeDepth) {
             0 -> ORDER_OTHERS
@@ -193,12 +184,10 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         managerActivity?.showNewSortByPanel(orderType)
     }
 
-    override val viewerFrom: Int
-        get() = Constants.VIEWER_FROM_OUTGOING_SHARES
-    override val intentOrder: Int
+    override val viewerFrom: Int = Constants.VIEWER_FROM_OUTGOING_SHARES
+    override val currentSharesTab: SharesTab = SharesTab.OUTGOING_TAB
+    override val sortOrder: Int
         get() = state().sortOrder
-    override val currentSharesTab: SharesTab
-        get() = SharesTab.OUTGOING_TAB
     override val parentHandle: Long
         get() = state().outgoingHandle
 
@@ -302,8 +291,8 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     }
 
     private inner class ActionBarCallBack(currentTab: Tab) : BaseActionBarCallBack(currentTab) {
-        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            super.onPrepareActionMode(mode, menu)
+        override fun onPrepareActionMode(actionMode: ActionMode, menu: Menu): Boolean {
+            super.onPrepareActionMode(actionMode, menu)
             val control = CloudStorageOptionControlUtil.Control()
             if (selected.size == 1 && !selected[0].isTakenDown) {
                 if (megaApi.checkAccessErrorExtended(selected[0], MegaShare.ACCESS_OWNER).errorCode

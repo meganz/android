@@ -1873,24 +1873,24 @@ public class ManagerActivity extends TransfersManagementActivity
                 SharesTab selectedTab = SharesTab.Companion.fromPosition(position);
                 switch (selectedTab) {
                     case INCOMING_TAB:
-                        if (isOutgoingAdded() && outgoingSharesFragment.isMultipleSelect()) {
-                            outgoingSharesFragment.getActionMode().finish();
-                        } else if (isLinksAdded() && linksFragment.isMultipleSelect()) {
-                            linksFragment.getActionMode().finish();
+                        if (isOutgoingAdded()) {
+                            outgoingSharesFragment.hideActionMode();
+                        } else if (isLinksAdded()) {
+                            linksFragment.hideActionMode();
                         }
                         break;
                     case OUTGOING_TAB:
-                        if (isIncomingAdded() && incomingSharesFragment.isMultipleSelect()) {
-                            incomingSharesFragment.getActionMode().finish();
-                        } else if (isLinksAdded() && linksFragment.isMultipleSelect()) {
-                            linksFragment.getActionMode().finish();
+                        if (isIncomingAdded()) {
+                            incomingSharesFragment.hideActionMode();
+                        } else if (isLinksAdded()) {
+                            linksFragment.hideActionMode();
                         }
                         break;
                     case LINKS_TAB:
-                        if (isIncomingAdded() && incomingSharesFragment.isMultipleSelect()) {
-                            incomingSharesFragment.getActionMode().finish();
-                        } else if (isOutgoingAdded() && outgoingSharesFragment.isMultipleSelect()) {
-                            outgoingSharesFragment.getActionMode().finish();
+                        if (isIncomingAdded()) {
+                            incomingSharesFragment.hideActionMode();
+                        } else if (isOutgoingAdded()) {
+                            outgoingSharesFragment.hideActionMode();
                         }
                         break;
                 }
