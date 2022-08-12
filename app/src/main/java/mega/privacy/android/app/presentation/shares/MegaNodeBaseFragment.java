@@ -79,7 +79,6 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
-import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
@@ -121,7 +120,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected TextView emptyTextViewFirst;
 
     protected SortByHeaderViewModel sortByHeaderViewModel;
-    public ManagerViewModel managerViewModel;
 
     public abstract int onBackPressed();
 
@@ -142,7 +140,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
 
         sortByHeaderViewModel = new ViewModelProvider(this).get(SortByHeaderViewModel.class);
 
