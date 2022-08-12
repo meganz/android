@@ -118,7 +118,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:background="@null"
-                    android:src="@drawable/ic_mute_list"
+                    android:src="@drawable/ic_mute"
                     app:tint="?attr/textColorHint"
                     tools:ignore="ContentDescription" />
 
