@@ -31,6 +31,7 @@ public class SettingsConstants {
     public static final String KEY_AUDIO_BACKGROUND_PLAY_ENABLED = "settings_audio_background_play_enabled";
     public static final String KEY_AUDIO_SHUFFLE_ENABLED = "settings_audio_shuffle_enabled";
     public static final String KEY_AUDIO_REPEAT_MODE = "settings_audio_repeat_mode";
+    public static final String KEY_FEATURES_CALLS = "settings_features_calls";
 
     /* CU settings */
     public static final String KEY_CAMERA_UPLOAD_ON_OFF = "settings_camera_upload_on_off";
