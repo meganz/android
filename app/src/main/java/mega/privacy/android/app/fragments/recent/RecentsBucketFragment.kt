@@ -1,10 +1,19 @@
 package mega.privacy.android.app.fragments.recent
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageView
+import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -21,10 +30,13 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.fragments.offline.OfflineAdapter
+import mega.privacy.android.app.fragments.offline.OfflineListViewHolder
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MultipleBucketAdapter
+import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -37,7 +49,9 @@ import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VIEWER_FROM_RECETS_BUCKET
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
@@ -53,8 +67,11 @@ import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Fragment class for the Recents Bucket
+ */
 @AndroidEntryPoint
-class RecentsBucketFragment : Fragment() {
+class RecentsBucketFragment : Fragment(), ActionMode.Callback {
 
     @Inject
     @MegaApi
@@ -70,13 +87,15 @@ class RecentsBucketFragment : Fragment() {
 
     private var adapter: MultipleBucketAdapter? = null
 
+    private var actionMode: ActionMode? = null
+
     private lateinit var bucket: BucketSaved
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         binding = FragmentRecentBucketBinding.inflate(inflater, container, false)
         listView = binding.multipleBucketView
         return binding.root
@@ -103,6 +122,29 @@ class RecentsBucketFragment : Fragment() {
             setupToolbar()
             checkScroll()
         }
+
+        viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
+            val actionModeVal = actionMode
+
+            if (visible) {
+                if (actionModeVal == null) {
+                    callManager {
+                        actionMode = it.startSupportActionMode(this)
+                        it.setTextSubmitted()
+                    }
+                }
+
+                actionMode?.title = viewModel.getSelectedNodesCount().toString()
+                actionMode?.invalidate()
+            } else {
+                if (actionModeVal != null) {
+                    actionModeVal.finish()
+                    actionMode = null
+                }
+            }
+        }
+
+//        observeAnimatedItems()
 
         observeDragSupportEvents(viewLifecycleOwner, listView, VIEWER_FROM_RECETS_BUCKET)
     }
@@ -228,6 +270,10 @@ class RecentsBucketFragment : Fragment() {
         }
     }
 
+    fun onNodeLongClicked(position: Int, node: MegaNode) {
+        viewModel.onNodeLongClicked(position, node)
+    }
+
     private fun openPdf(
         index: Int,
         node: MegaNode,
@@ -339,5 +385,190 @@ class RecentsBucketFragment : Fragment() {
 
     private fun download(handle: Long) {
         callManager { it.saveHandlesToDevice(listOf(handle), true, false, false, false) }
+    }
+
+    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        Timber.d("ActionBarCallBack::onCreateActionMode")
+        val inflater = mode!!.menuInflater
+
+        inflater.inflate(R.menu.recents_bucket_action, menu)
+        checkScroll()
+
+        return true
+    }
+
+    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        Timber.d("ActionBarCallBack::onPrepareActionMode")
+
+        menu!!.findItem(R.id.cab_menu_select_all).isVisible =
+            (viewModel.getSelectedNodesCount() < viewModel.getNodesCount())
+
+        return true
+    }
+
+    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+        Timber.d("ActionBarCallBack::onActionItemClicked")
+        val selectedNodes = viewModel.getSelectedNodes()
+        val nodesHandles = ArrayList(selectedNodes.map { it.handle })
+        when (item!!.itemId) {
+            R.id.cab_menu_download -> {
+                callManager {
+                    it.saveNodesToDevice(selectedNodes,
+                        false,
+                        false,
+                        false,
+                        false)
+                }
+                viewModel.clearSelection()
+            }
+            R.id.cab_menu_share_link -> {
+                callManager {
+                    LinksUtil.showGetLinkActivity(
+                        it,
+                        nodesHandles.toLongArray()
+                    )
+                }
+            }
+            R.id.cab_menu_send_to_chat -> {
+                callManager {
+                    it.attachNodesToChats(selectedNodes)
+                }
+            }
+
+            R.id.cab_menu_share_out -> {
+                callManager {
+                    MegaNodeUtil.shareNodes(it, selectedNodes)
+                }
+                viewModel.clearSelection()
+            }
+            R.id.cab_menu_select_all -> {
+                viewModel.selectAll()
+            }
+            R.id.cab_menu_clear_selection -> {
+                viewModel.clearSelection()
+            }
+            R.id.cab_menu_move -> {
+                callManager {
+                    NodeController(it).chooseLocationToMoveNodes(nodesHandles)
+                }
+            }
+            R.id.cab_menu_copy -> {
+                callManager {
+                    NodeController(it).chooseLocationToCopyNodes(nodesHandles)
+                }
+            }
+            R.id.cab_menu_trash -> {
+                callManager {
+                    it.askConfirmationMoveToRubbish(nodesHandles)
+                }
+            }
+        }
+
+        return false
+    }
+
+    override fun onDestroyActionMode(mode: ActionMode?) {
+        Timber.d("ActionBarCallBack::onDestroyActionMode")
+
+        viewModel.clearSelection()
+        checkScroll()
+    }
+
+//    private fun observeAnimatedItems() {
+//        var animatorSet: AnimatorSet? = null
+//
+//        viewModel.nodesToAnimate.observe(viewLifecycleOwner) {
+//            val rvAdapter = adapter ?: return@observe
+//
+//            animatorSet?.run {
+//                // End the started animation if any, or the view may show messy as its property
+//                // would be wrongly changed by multiple animations running at the same time
+//                // via contiguous quick clicks on the item
+//                if (isStarted) {
+//                    end()
+//                }
+//            }
+//
+//            // Must create a new AnimatorSet, or it would keep all previous
+//            // animation and play them together
+//            animatorSet = AnimatorSet()
+//            val animatorList = mutableListOf<Animator>()
+//
+//            animatorSet?.addListener(object : Animator.AnimatorListener {
+//                override fun onAnimationRepeat(animation: Animator) {
+//                }
+//
+//                override fun onAnimationEnd(animation: Animator) {
+//                    viewModel.items.value?.let { newList ->
+//                        rvAdapter.(ArrayList(newList))
+//                    }
+//                }
+//
+//                override fun onAnimationCancel(animation: Animator) {
+//                }
+//
+//                override fun onAnimationStart(animation: Animator) {
+//                }
+//            })
+//
+//            it.forEach { pos ->
+//                recyclerView?.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
+//                    val itemView = viewHolder.itemView
+//
+//                    val imageView: ImageView? = when (rvAdapter.getItemViewType(pos)) {
+//                        OfflineAdapter.TYPE_LIST -> {
+//                            val thumbnail = itemView.findViewById<ImageView>(R.id.thumbnail)
+//                            val param = thumbnail.layoutParams as FrameLayout.LayoutParams
+//                            param.width = Util.dp2px(
+//                                OfflineListViewHolder.LARGE_IMAGE_WIDTH,
+//                                resources.displayMetrics
+//                            )
+//                            param.height = param.width
+//                            param.marginStart = Util.dp2px(
+//                                OfflineListViewHolder.LARGE_IMAGE_MARGIN_LEFT,
+//                                resources.displayMetrics
+//                            )
+//                            thumbnail.layoutParams = param
+//                            thumbnail
+//                        }
+//                        OfflineAdapter.TYPE_GRID_FOLDER -> {
+//                            itemView.background = ContextCompat.getDrawable(
+//                                requireContext(), R.drawable.background_item_grid_selected
+//                            )
+//                            itemView.findViewById(R.id.icon)
+//                        }
+//                        OfflineAdapter.TYPE_GRID_FILE -> {
+//                            itemView.background = ContextCompat.getDrawable(
+//                                requireContext(), R.drawable.background_item_grid_selected
+//                            )
+//                            itemView.findViewById(R.id.ic_selected)
+//                        }
+//                        else -> null
+//                    }
+//
+//                    imageView?.run {
+//                        setImageResource(R.drawable.ic_select_folder)
+//                        visibility = View.VISIBLE
+//
+//                        val animator =
+//                            AnimatorInflater.loadAnimator(context, R.animator.icon_select)
+//                        animator.setTarget(this)
+//                        animatorList.add(animator)
+//                    }
+//                }
+//            }
+//
+//            animatorSet?.playTogether(animatorList)
+//            animatorSet?.start()
+//        }
+//    }
+
+    fun handleItemClick(position: Int, node: MegaNode, isMedia: Boolean) {
+        if (actionMode == null) {
+            openFile(position, node, isMedia)
+        } else {
+            viewModel.onNodeLongClicked(position, node)
+        }
+
     }
 }

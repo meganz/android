@@ -47,7 +47,10 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
-public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAdapter.ViewHolderMultipleBucket> implements View.OnClickListener, SectionTitleProvider, DragThumbnailGetter {
+public class MultipleBucketAdapter
+        extends RecyclerView.Adapter<MultipleBucketAdapter.ViewHolderMultipleBucket>
+        implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, DragThumbnailGetter
+{
 
     Context context;
     Object fragment;
@@ -152,6 +155,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         holder.multipleBucketLayout = v.findViewById(R.id.multiple_bucket_layout);
         holder.multipleBucketLayout.setTag(holder);
         holder.multipleBucketLayout.setOnClickListener(this);
+        holder.multipleBucketLayout.setOnLongClickListener(this);
         holder.mediaView = v.findViewById(R.id.media_layout);
         holder.thumbnailMedia = v.findViewById(R.id.thumbnail_media);
         holder.videoLayout = v.findViewById(R.id.video_layout);
@@ -293,11 +297,31 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             }
             case R.id.multiple_bucket_layout: {
                 if (fragment instanceof RecentsBucketFragment) {
-                    ((RecentsBucketFragment) fragment).openFile(holder.getAdapterPosition(), node, true);
+                    ((RecentsBucketFragment) fragment).handleItemClick(holder.getAdapterPosition(), node, true);
                 }
                 break;
             }
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean onLongClick(View v) {
+        Timber.d("onClick");
+        MultipleBucketAdapter.ViewHolderMultipleBucket holder = (MultipleBucketAdapter.ViewHolderMultipleBucket) v.getTag();
+        if (holder == null) return false;
+
+        MegaNode node = getItemAtPosition(holder.getAbsoluteAdapterPosition());
+        if (node == null) return false;
+
+        if (fragment instanceof RecentsBucketFragment) {
+            ((RecentsBucketFragment) fragment).onNodeLongClicked(
+                    holder.getAdapterPosition(),
+                    node
+            );
+        }
+
+        return true;
     }
 
     @Override

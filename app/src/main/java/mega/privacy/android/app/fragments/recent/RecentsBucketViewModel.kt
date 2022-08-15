@@ -1,13 +1,28 @@
 package mega.privacy.android.app.fragments.recent
 
-import androidx.lifecycle.*
+import androidx.collection.SparseArrayCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import mega.privacy.android.app.di.DefaultDispatcher
+import mega.privacy.android.app.di.MainDispatcher
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.fragments.offline.OfflineNode
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.domain.usecase.GetThumbnail
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
@@ -16,8 +31,18 @@ import javax.inject.Inject
 @HiltViewModel
 class RecentsBucketViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val recentsBucketRepository: RecentsBucketRepository
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+    private val getThumbnail: GetThumbnail,
+    private val recentsBucketRepository: RecentsBucketRepository,
 ) : ViewModel() {
+    private val _actionMode = MutableLiveData<Boolean>()
+    private val _nodesToAnimate = MutableLiveData<Set<Int>>()
+
+    val actionMode: LiveData<Boolean> = _actionMode
+    val nodesToAnimate: LiveData<Set<Int>> = _nodesToAnimate
+
+    private val selectedNodes: MutableSet<MegaNode> = mutableSetOf()
 
     var bucket: MutableLiveData<MegaRecentActionBucket> = MutableLiveData()
 
@@ -32,6 +57,8 @@ class RecentsBucketViewModel @Inject constructor(
 
         recentsBucketRepository.nodes
     }
+
+    var loadNodesJob: Job? = null
 
     fun getItemPositionByHandle(handle: Long): Int {
         var index = INVALID_POSITION
@@ -48,7 +75,7 @@ class RecentsBucketViewModel @Inject constructor(
 
     private fun isSameBucket(
         selected: MegaRecentActionBucket,
-        other: MegaRecentActionBucket
+        other: MegaRecentActionBucket,
     ): Boolean {
         return selected.isMedia == other.isMedia &&
                 selected.isUpdate == other.isUpdate &&
@@ -102,6 +129,82 @@ class RecentsBucketViewModel @Inject constructor(
     override fun onCleared() {
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
             .removeObserver(nodesChangeObserver)
+    }
+
+    fun getSelectedNodes(): List<MegaNode> {
+        return selectedNodes.toList()
+    }
+
+    fun getSelectedNodesCount(): Int {
+        return selectedNodes.size
+    }
+
+    fun getNodesCount(): Int {
+        return items.value?.size ?: 0
+    }
+
+    fun clearSelection() {
+        _actionMode.value = false
+        selectedNodes.clear()
+
+        val animNodeIndices = mutableSetOf<Int>()
+        val nodeList = items.value ?: return
+
+        for ((position, node) in nodeList.withIndex()) {
+            if (node in selectedNodes) {
+                animNodeIndices.add(position)
+            }
+//            node.selected = false
+//            node.uiDirty = true
+        }
+
+        _nodesToAnimate.value = animNodeIndices
+    }
+
+    fun onNodeLongClicked(position: Int, node: MegaNode) {
+        val nodeList = items.value
+
+        if (nodeList == null || position < 0 || position >= nodeList.size
+            || nodeList[position].hashCode() != node.hashCode()
+        ) {
+            return
+        }
+
+//        nodeList[position].selected = !nodeList[position].selected
+
+        if (nodeList[position] !in selectedNodes) {
+            selectedNodes.add(node)
+        } else {
+            selectedNodes.remove(node)
+        }
+
+//        nodeList[position].uiDirty = true
+        _actionMode.value = selectedNodes.isNotEmpty()
+
+        _nodesToAnimate.value = hashSetOf(position)
+    }
+
+
+    fun selectAll() {
+        val nodeList = items.value ?: return
+
+        val animNodeIndices = mutableSetOf<Int>()
+
+        for ((position, node) in nodeList.withIndex()) {
+            if (node !in selectedNodes) {
+                animNodeIndices.add(position)
+            }
+//            node.selected = true
+//            node.uiDirty = true
+            selectedNodes.add(node)
+        }
+
+        _nodesToAnimate.value = animNodeIndices
+        _actionMode.value = true
+    }
+
+    fun addOrRemoveSelectedItems(position: Int, node: MegaNode) {
+        TODO("Not yet implemented")
     }
 }
 
