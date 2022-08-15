@@ -731,7 +731,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     long lastTimeOnTransferUpdate = Calendar.getInstance().getTimeInMillis();
 
-    boolean firstLogin = false;
     private boolean askPermissions = false;
 
     boolean megaContacts = true;
@@ -1185,7 +1184,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
             }
             case REQUEST_WRITE_STORAGE: {
-                if (firstLogin) {
+                if (getFirstLogin()) {
                     Timber.d("The first time");
                     if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                         if (typesCameraPermission == TAKE_PICTURE_OPTION) {
@@ -1290,7 +1289,6 @@ public class ManagerActivity extends TransfersManagementActivity
         outState.putSerializable("drawerItem", drawerItem);
         outState.putInt(BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE,
                 bottomItemBeforeOpenFullscreenOffline);
-        outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
         outState.putBoolean(STATE_KEY_SMS_DIALOG, isSMSDialogShowing);
 
         outState.putString("pathNavigationOffline", pathNavigationOffline);
@@ -1460,7 +1458,6 @@ public class ManagerActivity extends TransfersManagementActivity
         if (savedInstanceState != null) {
             Timber.d("Bundle is NOT NULL");
             isSMSDialogShowing = savedInstanceState.getBoolean(STATE_KEY_SMS_DIALOG, false);
-            firstLogin = savedInstanceState.getBoolean(EXTRA_FIRST_LOGIN);
             askPermissions = savedInstanceState.getBoolean(EXTRA_ASK_PERMISSIONS);
             drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
             bottomItemBeforeOpenFullscreenOffline = savedInstanceState.getInt(BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE);
@@ -1476,7 +1473,7 @@ public class ManagerActivity extends TransfersManagementActivity
             comesFromNotificationsLevel = savedInstanceState.getInt("comesFromNotificationsLevel", 0);
             comesFromNotificationHandle = savedInstanceState.getLong("comesFromNotificationHandle", INVALID_VALUE);
             comesFromNotificationHandleSaved = savedInstanceState.getLong("comesFromNotificationHandleSaved", INVALID_VALUE);
-            if(savedInstanceState.getSerializable(COMES_FROM_NOTIFICATIONS_SHARED_INDEX) != null)
+            if (savedInstanceState.getSerializable(COMES_FROM_NOTIFICATIONS_SHARED_INDEX) != null)
                 comesFromNotificationSharedIndex = (SharesTab) savedInstanceState.getSerializable(COMES_FROM_NOTIFICATIONS_SHARED_INDEX);
             else
                 comesFromNotificationSharedIndex = SharesTab.NONE;
@@ -1861,7 +1858,8 @@ public class ManagerActivity extends TransfersManagementActivity
         viewPagerShares = findViewById(R.id.shares_tabs_pager);
         viewPagerShares.setOffscreenPageLimit(3);
         // Set an empty page transformer to override default animation when notifying the adapter
-        viewPagerShares.setPageTransformer((page, position) -> { });
+        viewPagerShares.setPageTransformer((page, position) -> {
+        });
 
         viewPagerShares.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
@@ -2449,7 +2447,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     boolean upgradeAccount = getIntent().getBooleanExtra(EXTRA_UPGRADE_ACCOUNT, false);
                     newAccount = getIntent().getBooleanExtra(EXTRA_NEW_ACCOUNT, false);
                     newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
-                    firstLogin = getIntent().getBooleanExtra(EXTRA_FIRST_LOGIN, firstLogin);
+                    boolean firstLogin = getIntent().getBooleanExtra(EXTRA_FIRST_LOGIN, false);
+                    viewModel.setIsFirstLogin(firstLogin);
                     askPermissions = getIntent().getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
 
                     //reset flag to fix incorrect view loaded when orientation changes
@@ -2485,7 +2484,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     //reset flag to fix incorrect view loaded when orientation changes
                     getIntent().removeExtra(EXTRA_NEW_ACCOUNT);
                     getIntent().removeExtra(EXTRA_UPGRADE_ACCOUNT);
-                    firstLogin = intentRec.getBooleanExtra(EXTRA_FIRST_LOGIN, firstLogin);
+                    boolean firstLogin = intentRec.getBooleanExtra(EXTRA_FIRST_LOGIN, false);
+                    viewModel.setIsFirstLogin(firstLogin);
                     askPermissions = intentRec.getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
                     if (upgradeAccount) {
                         drawerLayout.closeDrawer(Gravity.LEFT);
@@ -2614,7 +2614,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 drawerItem = DrawerItem.ASK_PERMISSIONS;
                 askForAccess();
             }
-        } else if (firstLogin && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
+        } else if (getFirstLogin() && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
             askForSMSVerification();
         }
     }
@@ -2643,7 +2643,7 @@ public class ManagerActivity extends TransfersManagementActivity
             return false;
         }
 
-        if (firstLogin && myAccountInfo.wasNotBusinessAlertShownYet()) {
+        if (getFirstLogin() && myAccountInfo.wasNotBusinessAlertShownYet()) {
             int status = megaApi.getBusinessStatus();
 
             if (status == BUSINESS_STATUS_EXPIRED) {
@@ -2941,7 +2941,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
             drawerItem = DrawerItem.CLOUD_DRIVE;
         } else {
-            firstLogin = true;
+            viewModel.setIsFirstLogin(true);
             drawerItem = DrawerItem.PHOTOS;
         }
 
@@ -3568,10 +3568,6 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             Timber.w("Fragment == NULL. Not refresh");
         }
-    }
-
-    public boolean isFirstLogin() {
-        return firstLogin;
     }
 
     public void selectDrawerItemCloudDrive() {
@@ -4807,7 +4803,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isLinksAdded() {
         if (sharesPageAdapter == null) return false;
 
-        linksFragment = (MegaNodeBaseFragment)  sharesPageAdapter.getFragment(SharesTab.LINKS_TAB.getPosition());
+        linksFragment = (MegaNodeBaseFragment) sharesPageAdapter.getFragment(SharesTab.LINKS_TAB.getPosition());
 
         return linksFragment != null && linksFragment.isAdded();
     }
@@ -6083,8 +6079,8 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     void isFirstTimeCam() {
-        if (firstLogin) {
-            firstLogin = false;
+        if (getFirstLogin()) {
+            viewModel.setIsFirstLogin(false);
             dbH.setCamSyncEnabled(false);
             bottomNavigationCurrentItem = CLOUD_DRIVE_BNV;
         }
@@ -7331,7 +7327,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void skipInitialCUSetup() {
-        setFirstLogin(false);
+        viewModel.setIsFirstLogin(false);
         drawerItem = getStartDrawerItem(this);
         selectDrawerItem(drawerItem);
     }
@@ -7702,7 +7698,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 drawerItem = DrawerItem.TRANSFERS;
                 if (intent.getSerializableExtra(TRANSFERS_TAB) != null)
-                    viewModel.setTransfersTab( (TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
+                    viewModel.setTransfersTab((TransfersTab) intent.getSerializableExtra(TRANSFERS_TAB));
                 else
                     viewModel.setTransfersTab(TransfersTab.NONE);
                 selectDrawerItem(drawerItem);
@@ -10101,11 +10097,11 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public boolean getFirstLogin() {
-        return firstLogin;
+        return viewModel.getState().getValue().isFirstLogin();
     }
 
-    public void setFirstLogin(boolean flag) {
-        firstLogin = flag;
+    public void setFirstLogin(boolean firstLogin) {
+        viewModel.setIsFirstLogin(firstLogin);
     }
 
     public boolean getAskPermissions() {
