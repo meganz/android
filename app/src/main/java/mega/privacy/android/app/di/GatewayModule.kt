@@ -21,11 +21,13 @@ import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
+import mega.privacy.android.app.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.app.data.preferences.AppPreferencesDatastore
+import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.app.data.preferences.LoggingPreferencesDataStore
@@ -67,6 +69,9 @@ abstract class GatewayModule {
 
     @Binds
     abstract fun bindChatPreferencesGateway(implementation: ChatPreferencesDataStore): ChatPreferencesGateway
+
+    @Binds
+    abstract fun bindCallsPreferencesGateway(implementation: CallsPreferencesDataStore): CallsPreferencesGateway
 
     @Binds
     abstract fun bindLoggingPreferencesGateway(implementation: LoggingPreferencesDataStore): LoggingPreferencesGateway

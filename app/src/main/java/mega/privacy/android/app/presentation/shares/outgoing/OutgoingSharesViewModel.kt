@@ -46,8 +46,8 @@ class OutgoingSharesViewModel @Inject constructor(
         viewModelScope.launch {
             refreshNodes()?.let { setNodes(it) }
             monitorNodeUpdates().collect {
-                // Uncomment this line once LinksFragment is decoupled from ManagerActivity
-                //refreshNodes()?.let { setNodes(it) }
+                Timber.d("Received node update")
+                refreshNodes()?.let { setNodes(it) }
             }
         }
     }

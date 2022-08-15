@@ -358,6 +358,19 @@ class OutgoingSharesViewModelTest {
         }
 
     @Test
+    fun `test that refresh nodes is called when receiving a node update`() = runTest {
+        val node = mock<MegaNode> {
+            on { this.handle }.thenReturn(987654321L)
+        }
+        monitorNodeUpdates.emit(listOf(node))
+        // initialization call + receiving a node update call
+        verify(
+            getOutgoingSharesChildrenNode,
+            times(2)
+        ).invoke(underTest.state.value.outgoingHandle)
+    }
+
+    @Test
     fun `test that sort order is set with result of getOthersSortOrder if depth is equals to 0 when call setIncomingTreeDepth`() =
         runTest {
             val expected = 5

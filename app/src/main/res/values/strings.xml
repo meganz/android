@@ -1752,7 +1752,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Loading files</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s B</string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3673,7 +3673,7 @@
     <!-- Button to proceed with a payment -->
     <string name="proceed">Proceed</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Thank you for your %1$s subscription!</string>
+    <string name="successful_upgrade">Thank you for your %1$s subscription</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro Lite monthly</string>
     <!-- Pro Lite yearly subscription -->
@@ -3883,19 +3883,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Unable to reconnect</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">Call will end in %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -4034,6 +4034,12 @@
     <string name="chat_recent_list_empty_action">Start chatting now</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chat securely and privately, with anyone and on any device, knowing that no one can read your chats, not even MEGA.</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">Calls</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">Sound notifications</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">Hear a sound when someone joins or leaves a call.</string>
     <!-- Title of the option on the meeting list to archive a meeting -->
     <string name="archive_meeting_option">Archive meeting</string>
     <!-- Action to indicate immediate meeting creation -->

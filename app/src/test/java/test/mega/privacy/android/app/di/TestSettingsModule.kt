@@ -18,6 +18,7 @@ import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.GetStartScreen
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.ResetSdkLogger
+import mega.privacy.android.domain.usecase.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
@@ -67,6 +69,9 @@ object TestSettingsModule {
     val getChatImageQuality = mock<GetChatImageQuality> { on { invoke() }.thenReturn(emptyFlow()) }
     val setChatImageQuality = mock<SetChatImageQuality>()
     val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
+
+    val getCallsSoundNotifications = mock<GetCallsSoundNotifications> { on { invoke() }.thenReturn(emptyFlow()) }
+    val setCallsSoundNotifications = mock<SetCallsSoundNotifications>()
 
     @Provides
     fun provideGetAccountDetails(): GetAccountDetails = getAccountDetails
@@ -147,6 +152,12 @@ object TestSettingsModule {
 
     @Provides
     fun provideSetChatImageQuality(): SetChatImageQuality = setChatImageQuality
+
+    @Provides
+    fun provideGetCallsSoundNotifications(): GetCallsSoundNotifications = getCallsSoundNotifications
+
+    @Provides
+    fun provideSetCallsSoundNotifications(): SetCallsSoundNotifications = setCallsSoundNotifications
 
     @Provides
     fun providePutStringPreference(): PutPreference<String> =
