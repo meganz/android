@@ -44,6 +44,7 @@ class IncomingSharesViewModel @Inject constructor(
         viewModelScope.launch {
             refreshNodes()?.let { setNodes(it) }
             monitorNodeUpdates().collect { list ->
+                Timber.d("Received node update")
                 // If the current incoming handle is the node that was updated,
                 // check if the current user still has access to it,
                 // if not redirect to root incoming shares
@@ -57,9 +58,7 @@ class IncomingSharesViewModel @Inject constructor(
                                 resetIncomingTreeDepth()
                             }
                     }
-
-                // Uncomment this line once LinksFragment is decoupled from ManagerActivity
-                //refreshNodes()?.let { setNodes(it) }
+                refreshNodes()?.let { setNodes(it) }
             }
         }
     }
