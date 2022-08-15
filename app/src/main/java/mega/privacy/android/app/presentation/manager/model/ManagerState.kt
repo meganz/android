@@ -17,4 +17,5 @@ data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
     var sharesTab: SharesTab = SharesTab.INCOMING_TAB,
     var transfersTab: TransfersTab = TransfersTab.NONE,
+    var isFirstLogin: Boolean = false
 )
