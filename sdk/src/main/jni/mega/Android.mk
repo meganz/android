@@ -11,7 +11,7 @@ local_c_includes := \
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/Makefile.inc
 LOCAL_MODULE    := megasdk
-LOCAL_CFLAGS := -fvisibility=hidden -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -DDEBUG -DENABLE_CHAT -DENABLE_CRASHLYTICS -DMEGA_USE_C_ARES
+LOCAL_CFLAGS := -fvisibility=hidden -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -DDEBUG -DENABLE_CHAT -DENABLE_CRASHLYTICS -DMEGA_USE_C_ARES -DUSE_POLL
 LOCAL_SRC_FILES := $(CPP_SOURCES) $(C_SOURCES) $(C_WRAPPER_SOURCES)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_EXPORT_C_INCLUDES += $(local_c_includes)
