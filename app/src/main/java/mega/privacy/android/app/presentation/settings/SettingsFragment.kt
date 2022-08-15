@@ -77,7 +77,6 @@ import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
