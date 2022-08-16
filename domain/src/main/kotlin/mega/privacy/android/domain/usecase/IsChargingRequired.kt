@@ -11,5 +11,5 @@ interface IsChargingRequired {
      *
      * @return is charging required
      */
-    operator fun invoke(queueSize: Long): Boolean
+    suspend operator fun invoke(queueSize: Long): Boolean
 }

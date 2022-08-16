@@ -15,5 +15,5 @@ interface IsLocalSecondaryFolderSet {
      *
      * @return whether local secondary folder is set
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }

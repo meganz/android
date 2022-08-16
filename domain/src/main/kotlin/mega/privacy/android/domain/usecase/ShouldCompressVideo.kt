@@ -11,5 +11,5 @@ interface ShouldCompressVideo {
      *
      * @return whether should compress video
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }

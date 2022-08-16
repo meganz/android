@@ -13,5 +13,5 @@ fun interface SaveSyncRecord {
      *
      * @return
      */
-    operator fun invoke(syncRecord: SyncRecord)
+    suspend operator fun invoke(syncRecord: SyncRecord)
 }

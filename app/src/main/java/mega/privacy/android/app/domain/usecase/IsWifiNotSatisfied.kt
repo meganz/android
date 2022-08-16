@@ -12,5 +12,5 @@ interface IsWifiNotSatisfied {
      *
      * @return if camera upload can execute
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }

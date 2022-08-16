@@ -27,6 +27,9 @@ import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleService
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
@@ -36,6 +39,7 @@ import mega.privacy.android.app.VideoCompressor
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.constants.SettingsConstants
+import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
@@ -120,7 +124,6 @@ import java.io.File
 import java.io.IOException
 import java.util.LinkedList
 import java.util.Queue
-import java.util.concurrent.ThreadPoolExecutor
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -426,16 +429,17 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var isChargingRequired: IsChargingRequired
 
     /**
-     * ThreadPoolExecutor
-     */
-    @Inject
-    lateinit var megaThreadPoolExecutor: ThreadPoolExecutor
-
-    /**
      * DatabaseHandler
      */
     @Inject
     lateinit var tempDbHandler: DatabaseHandler
+
+    /**
+     * Coroutine scope for service
+     */
+    @ApplicationScope
+    @Inject
+    lateinit var sharingScope: CoroutineScope
 
     private var app: MegaApplication? = null
     private var megaApi: MegaApiAndroid? = null
@@ -488,9 +492,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private val chargingStopReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (isChargingRequired((videoCompressor?.totalInputSize ?: 0) / (1024 * 1024))) {
-                Timber.d("Detected device stops charging.")
-                videoCompressor?.stop()
+            sharingScope.launch {
+                if (isChargingRequired((videoCompressor?.totalInputSize ?: 0) / (1024 * 1024))) {
+                    Timber.d("Detected device stops charging.")
+                    videoCompressor?.stop()
+                }
             }
         }
     }
@@ -563,12 +569,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     override fun onTypeChanges(type: Int) {
         Timber.d("Network type change to: %s", type)
-        megaThreadPoolExecutor.execute {
+        sharingScope.launch {
             stopByNetworkStateChange =
                 type == NetworkTypeChangeReceiver.MOBILE && isCameraUploadByWifi()
             if (stopByNetworkStateChange) {
                 for (transfer in cuTransfers) {
-                    megaApi?.cancelTransfer(transfer, this)
+                    megaApi?.cancelTransfer(transfer, this@CameraUploadsService)
                 }
                 stopped = true
                 finish()
@@ -612,8 +618,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             ignoreAttr = intent.getBooleanExtra(EXTRA_IGNORE_ATTR_CHECK, false)
         }
 
-        Timber.d("Start service here, creating new working thread.")
-        startWorkerThread()
+        Timber.d("Start Service - Create Coroutine")
+        startWorkerCoroutine()
         return START_NOT_STICKY
     }
 
@@ -642,71 +648,66 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         registerReceiver(receiver, IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"))
     }
 
-    private fun startWorkerThread() {
-        try {
-            val task = createWorkerThread()
-            task.start()
-        } catch (ex: Exception) {
-            Timber.e(ex)
+    private fun startWorkerCoroutine() = sharingScope.launch {
+        runCatching {
+            if (!hasCredentials()) {
+                Timber.w("There are no user credentials")
+                finish()
+                return@launch
+            }
+            if (!hasPreferences()) {
+                Timber.w("Preferences not defined, so not enabled")
+                finish()
+                return@launch
+            }
+            if (!isCameraUploadSyncEnabled()) {
+                Timber.w("Sync enabled not defined or not enabled")
+                finish()
+                return@launch
+            }
+            if (!Util.isOnline(applicationContext)) {
+                Timber.w("Not online")
+                finish()
+                return@launch
+            }
+            if (isDeviceLowOnBattery(batteryIntent)) {
+                finish()
+                return@launch
+            }
+            if (TextUtil.isTextEmpty(localPath())) {
+                Timber.w("LocalPath is not defined, so not enabled")
+                finish()
+                return@launch
+            }
+            if (isWifiNotSatisfied()) {
+                Timber.w("Cannot start, WiFi required")
+                finish()
+                return@launch
+            }
+            val result = shouldRun()
+            Timber.d("Should run result: %s", result)
+            when (result) {
+                0 -> startCameraUploads()
+                LOGIN_IN, CHECKING_USER_ATTRIBUTE, TARGET_FOLDER_NOT_EXIST, SETTING_USER_ATTRIBUTE ->
+                    Timber.d("Wait for login or check user attribute.")
+                else -> finish()
+            }
+        }.onFailure { exception ->
+            Timber.e(exception)
+            handler?.removeCallbacksAndMessages(null)
+            releaseLocks()
+            if (isOverQuota) {
+                showStorageOverQuotaNotification()
+            }
+            canceled = true
+            running = false
+            stopForeground(true)
+            cancelNotification()
             finish()
         }
     }
 
-    private fun createWorkerThread(): Thread {
-        return object : Thread() {
-            override fun run() {
-                try {
-                    if (!hasCredentials()) {
-                        Timber.w("There are no user credentials")
-                        finish()
-                        return
-                    }
-                    if (!hasPreferences()) {
-                        Timber.w("Preferences not defined, so not enabled")
-                        finish()
-                        return
-                    }
-                    if (!isCameraUploadSyncEnabled()) {
-                        Timber.w("Sync enabled not defined or not enabled")
-                        finish()
-                        return
-                    }
-                    if (!Util.isOnline(applicationContext)) {
-                        Timber.w("Not online")
-                        finish()
-                        return
-                    }
-                    if (isDeviceLowOnBattery(batteryIntent)) {
-                        finish()
-                        return
-                    }
-                    if (TextUtil.isTextEmpty(localPath())) {
-                        Timber.w("LocalPath is not defined, so not enabled")
-                        finish()
-                        return
-                    }
-                    if (isWifiNotSatisfied()) {
-                        Timber.w("Cannot start, WiFi required")
-                        finish()
-                        return
-                    }
-                    val result = shouldRun()
-                    Timber.d("Should run result: %s", result)
-                    when (result) {
-                        0 -> startCameraUploads()
-                        LOGIN_IN, CHECKING_USER_ATTRIBUTE, TARGET_FOLDER_NOT_EXIST, SETTING_USER_ATTRIBUTE ->
-                            Timber.d("Wait for login or check user attribute.")
-                        else -> finish()
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    handleException(e)
-                }
-            }
-        }
-    }
-
-    private fun startCameraUploads() {
+    private suspend fun startCameraUploads() {
         showNotification(getString(R.string.section_photo_sync),
             getString(R.string.settings_camera_notif_checking_title),
             pendingIntent,
@@ -715,7 +716,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         filesFromMediaStore()
     }
 
-    private fun extractMedia(cursor: Cursor, isSecondary: Boolean, isVideo: Boolean) {
+    private suspend fun extractMedia(cursor: Cursor, isSecondary: Boolean, isVideo: Boolean) {
         try {
             Timber.d("Extract %d media from cursor, is video: %s, is secondary: %s",
                 cursor.count,
@@ -766,7 +767,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
-    private fun filesFromMediaStore() {
+    private suspend fun filesFromMediaStore() {
         Timber.d("Get pending files from media store database.")
         cameraUploadNode = megaApi?.getNodeByHandle(cameraUploadHandle)
         if (cameraUploadNode == null) {
@@ -898,7 +899,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             secondaryEnabled)
     }
 
-    private fun prepareUpload(
+    private suspend fun prepareUpload(
         primaryList: Queue<Media>,
         secondaryList: Queue<Media>,
         primaryVideoList: Queue<Media>,
@@ -966,7 +967,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
-    private fun startParallelUpload(finalList: List<SyncRecord>, isCompressedVideo: Boolean) {
+    private suspend fun startParallelUpload(
+        finalList: List<SyncRecord>,
+        isCompressedVideo: Boolean,
+    ) {
         startActiveHeartbeat(finalList)
         for (file in finalList) {
             if (!running) break
@@ -985,7 +989,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                         counter--
                         try {
                             Timber.d("Waiting for disk space to process")
-                            Thread.sleep(1000)
+                            delay(1000)
                         } catch (e: InterruptedException) {
                             e.printStackTrace()
                         }
@@ -1090,7 +1094,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         return source?.lastModified() ?: 0
     }
 
-    private fun saveDataToDB(list: List<SyncRecord>) {
+    private suspend fun saveDataToDB(list: List<SyncRecord>) {
         for (file in list) {
             run {
                 Timber.d("Handle with local file which timestamp is: %s", file.timestamp)
@@ -1187,7 +1191,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         finish()
     }
 
-    private fun getPendingList(
+    private suspend fun getPendingList(
         mediaList: Queue<Media>,
         isSecondary: Boolean,
         isVideo: Boolean,
@@ -1280,7 +1284,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private fun checkFile(media: Media, path: String?): Boolean =
         media.filePath != null && !path.isNullOrBlank() && media.filePath!!.startsWith(path)
 
-    private fun shouldRun(): Int {
+    private suspend fun shouldRun(): Int {
         if (!isLocalPrimaryFolderSet()) {
             localFolderUnavailableNotification(R.string.camera_notif_primary_local_unavailable,
                 LOCAL_FOLDER_REMINDER_PRIMARY)
@@ -1361,7 +1365,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * TARGET_FOLDER_NOT_EXIST, CU or MU folder is deleted, will create new folder. CU process will launch after the creation completes.
      * SETTING_USER_ATTRIBUTE, set CU attributes with valid handle. CU process will launch after the setting completes.
      */
-    private fun checkTargetFolders(): Int {
+    private suspend fun checkTargetFolders(): Int {
         var primaryToSet = MegaApiJava.INVALID_HANDLE
         // If CU folder in local setting is deleted, then need to reset.
         val needToSetPrimary = isNodeInRubbishOrDeleted(cameraUploadHandle)
@@ -1497,7 +1501,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         intent?.putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
         pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
-        megaThreadPoolExecutor.execute {
+        sharingScope.launch {
             tempRoot = "${File(cacheDir, CU_CACHE_FOLDER).absolutePath}${File.separator}"
             val root = tempRoot?.let { File(it) }
             if (root?.exists() == false) {
@@ -1505,20 +1509,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
             clearSyncRecords()
         }
-    }
-
-    private fun handleException(e: Exception) {
-        Timber.e(e)
-        handler?.removeCallbacksAndMessages(null)
-        releaseLocks()
-        if (isOverQuota) {
-            showStorageOverQuotaNotification()
-        }
-
-        canceled = true
-        running = false
-        stopForeground(true)
-        cancelNotification()
     }
 
     private fun finish() {
@@ -1570,15 +1560,16 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish: %s", request.requestString)
         try {
-            requestFinished(request, e)
+            sharingScope.launch {
+                requestFinished(request, e)
+            }
         } catch (th: Throwable) {
             Timber.e(th)
             th.printStackTrace()
         }
     }
 
-    @Synchronized
-    private fun requestFinished(request: MegaRequest, e: MegaError) {
+    private suspend fun requestFinished(request: MegaRequest, e: MegaError) {
         if (request.type == MegaRequest.TYPE_LOGIN) {
             if (e.errorCode == MegaError.API_OK) {
                 Timber.d("Logged in. Setting account auth token for folder links.")
@@ -1598,7 +1589,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 Timber.d("fetch nodes ok")
                 MegaApplication.setLoggingIn(false)
                 Timber.d("Start service here MegaRequest.TYPE_FETCH_NODES")
-                startWorkerThread()
+                startWorkerCoroutine()
             } else {
                 Timber.d("ERROR: %s", e.errorString)
                 MegaApplication.setLoggingIn(false)
@@ -1650,11 +1641,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             isPrimaryHandleSynced = true
             if (cameraUploadHandle != handle) cameraUploadHandle = handle
             if (shouldStart) {
-                Timber.d("On get primary, start work thread.")
-                startWorkerThread()
+                Timber.d("On Get Primary - Start Coroutine")
+                startWorkerCoroutine()
             }
         } else {
-            Timber.w("Get primary handle failed, finish process.")
+            Timber.w("On Get Primary - Failed")
             finish()
         }
     }
@@ -1669,10 +1660,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         if (errorCode == MegaError.API_OK || errorCode == MegaError.API_ENOENT) {
             if (handle != secondaryUploadHandle) secondaryUploadHandle = handle
             // Start to upload. Unlike onGetPrimaryFolderAttribute needs to wait for getting MU folder handle completes.
-            Timber.d("On get secondary, start work thread.")
-            startWorkerThread()
+            Timber.d("On Get Secondary - Start Coroutine")
+            startWorkerCoroutine()
         } else {
-            Timber.w("Get secondary handle failed, finish process.")
+            Timber.w("On Get Secondary - Failed")
             finish()
         }
     }
@@ -1681,8 +1672,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * Set attributes for folder
      */
     fun onSetFolderAttribute() {
-        Timber.d("On set CU folder, start work thread.")
-        startWorkerThread()
+        Timber.d("On Set Camera Upload Folder - Start Coroutine")
+        startWorkerCoroutine()
     }
 
     /**
@@ -1753,15 +1744,16 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             transfer.transferredBytes)
         try {
             LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(MegaTransfer.TYPE_UPLOAD)
-            transferFinished(transfer, e)
+            sharingScope.launch {
+                transferFinished(transfer, e)
+            }
         } catch (th: Throwable) {
             Timber.e(th)
             th.printStackTrace()
         }
     }
 
-    @Synchronized
-    private fun transferFinished(transfer: MegaTransfer, e: MegaError) {
+    private suspend fun transferFinished(transfer: MegaTransfer, e: MegaError) {
         val path = transfer.path
         if (isOverQuota) {
             return
@@ -1800,22 +1792,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     val thumb = File(thumbDir,
                         MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION)
                     if (FileUtil.isVideoFile(transfer.path)) {
-                        megaThreadPoolExecutor.execute {
-                            val img = record.localPath?.let { File(it) }
-                            if (!preview.exists()) {
-                                ImageProcessor.createVideoPreview(this@CameraUploadsService,
-                                    img,
-                                    preview)
-                            }
-                            ImageProcessor.createThumbnail(img, thumb)
+                        val img = record.localPath?.let { File(it) }
+                        if (!preview.exists()) {
+                            ImageProcessor.createVideoPreview(this@CameraUploadsService,
+                                img,
+                                preview)
                         }
+                        ImageProcessor.createThumbnail(img, thumb)
                     } else if (MimeTypeList.typeForName(transfer.path).isImage) {
-                        megaThreadPoolExecutor.execute {
-                            if (!preview.exists()) {
-                                ImageProcessor.createImagePreview(src, preview)
-                            }
-                            ImageProcessor.createThumbnail(src, thumb)
+                        if (!preview.exists()) {
+                            ImageProcessor.createImagePreview(src, preview)
                         }
+                        ImageProcessor.createThumbnail(src, thumb)
                     }
                 }
                 // delete database record
@@ -1842,7 +1830,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         updateUpload()
     }
 
-    private fun updateUpload() {
+    private suspend fun updateUpload() {
         if (!canceled) {
             updateProgressNotification()
         }
@@ -1875,7 +1863,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private fun isCompressorAvailable() = !(videoCompressor?.isRunning ?: false)
 
-    private fun startVideoCompression() {
+    private suspend fun startVideoCompression() {
         val fullList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS)
         @Suppress("DEPRECATION")
         if ((megaApi?.numPendingUploads ?: 1) <= 0) {
@@ -1893,11 +1881,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             totalPendingSizeInMB)
 
         if (shouldStartVideoCompression(totalPendingSizeInMB)) {
-            val thread = Thread {
+            sharingScope.launch {
                 Timber.d("Starting compressor")
                 videoCompressor?.start()
             }
-            thread.start()
         } else {
             Timber.d("Compression queue bigger than setting, show notification to user.")
             finish()
@@ -1913,7 +1900,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
-    private fun shouldStartVideoCompression(queueSize: Long): Boolean {
+    private suspend fun shouldStartVideoCompression(queueSize: Long): Boolean {
         if (isChargingRequired(queueSize) && !Util.isCharging(this)) {
             Timber.d("Should not start video compression.")
             return false
@@ -1953,8 +1940,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Synchronized
     override fun onCompressSuccessful(record: SyncRecord) {
-        Timber.d("Compression successfully for file with timestamp: %s", record.timestamp)
-        setSyncRecordPendingByPath(record.localPath, record.isSecondary)
+        sharingScope.launch {
+            Timber.d("Compression successfully for file with timestamp: %s", record.timestamp)
+            setSyncRecordPendingByPath(record.localPath, record.isSecondary)
+        }
     }
 
     /**
@@ -1983,7 +1972,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     Timber.d("Can not compress but got enough disk space, so should be un-supported format issue")
                     val newPath = record.newPath
                     val temp = newPath?.let { File(it) }
-                    setSyncRecordPendingByPath(localPath, isSecondary)
+                    sharingScope.launch {
+                        setSyncRecordPendingByPath(localPath, isSecondary)
+                    }
                     if (newPath != null && tempRoot?.let { newPath.startsWith(it) } == true && temp != null && temp.exists()) {
                         temp.delete()
                     }
@@ -1994,9 +1985,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 Timber.e(ex)
             }
         } else {
-            Timber.w("Compressed video not exists, remove from DB")
-            localPath?.let {
-                deleteSyncRecordByLocalPath(localPath, isSecondary)
+            sharingScope.launch {
+                Timber.w("Compressed video not exists, remove from DB")
+                localPath?.let {
+                    deleteSyncRecordByLocalPath(localPath, isSecondary)
+                }
             }
         }
     }
@@ -2005,17 +1998,19 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * Compression finished
      */
     override fun onCompressFinished(currentIndexString: String) {
-        if (!canceled) {
-            Timber.d("Preparing to upload compressed video.")
-            val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
-            if (compressedList.isNotEmpty()) {
-                Timber.d("Start to upload %d compressed videos.", compressedList.size)
-                startParallelUpload(compressedList, true)
+        sharingScope.launch {
+            if (!canceled) {
+                Timber.d("Preparing to upload compressed video.")
+                val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
+                if (compressedList.isNotEmpty()) {
+                    Timber.d("Start to upload %d compressed videos.", compressedList.size)
+                    startParallelUpload(compressedList, true)
+                } else {
+                    onQueueComplete()
+                }
             } else {
-                onQueueComplete()
+                Timber.d("Compress finished, but process is canceled.")
             }
-        } else {
-            Timber.d("Compress finished, but process is canceled.")
         }
     }
 

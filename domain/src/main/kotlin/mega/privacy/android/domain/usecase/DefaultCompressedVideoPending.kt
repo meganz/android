@@ -13,7 +13,7 @@ class DefaultCompressedVideoPending @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
 ) : CompressedVideoPending {
 
-    override fun invoke(): Boolean {
+    override suspend fun invoke(): Boolean {
         return cameraUploadRepository.getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS.value)
             .isNotEmpty() && VideoQuality.ORIGINAL.toString() != cameraUploadRepository.getVideoQuality()
     }

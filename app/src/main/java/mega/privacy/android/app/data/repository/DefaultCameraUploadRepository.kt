@@ -1,6 +1,9 @@
 package mega.privacy.android.app.data.repository
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.repository.CameraUploadRepository
@@ -10,145 +13,229 @@ import javax.inject.Inject
  * Default implementation of [CameraUploadRepository]
  *
  * @property localStorageGateway MegaLocalStorageGateway
+ * @property ioDispatcher CoroutineDispatcher
  */
 class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CameraUploadRepository {
 
-    override fun isSyncByWifi() = localStorageGateway.isSyncByWifi()
+    override suspend fun isSyncByWifi() = withContext(ioDispatcher) {
+        localStorageGateway.isSyncByWifi()
+    }
 
-    override fun isSyncByWifiDefault() = localStorageGateway.isSyncByWifiDefault()
+    override suspend fun isSyncByWifiDefault() = withContext(ioDispatcher) {
+        localStorageGateway.isSyncByWifiDefault()
+    }
 
-    override fun getPendingSyncRecords(): List<SyncRecord> =
+    override suspend fun getPendingSyncRecords(): List<SyncRecord> = withContext(ioDispatcher) {
         localStorageGateway.getPendingSyncRecords()
+    }
 
-    override fun setPhotosSyncFileUpload() = localStorageGateway.setPhotosSyncUpload()
+    override suspend fun setPhotosSyncFileUpload() = withContext(ioDispatcher) {
+        localStorageGateway.setPhotosSyncUpload()
+    }
 
-    override fun getSyncFileUpload(): String? = localStorageGateway.getCameraSyncFileUpload()
+    override suspend fun getSyncFileUpload(): String? = withContext(ioDispatcher) {
+        localStorageGateway.getCameraSyncFileUpload()
+    }
 
-    override fun getVideoQuality(): String = localStorageGateway.getVideoQuality()
+    override suspend fun getVideoQuality(): String = withContext(ioDispatcher) {
+        localStorageGateway.getVideoQuality()
+    }
 
-    override fun deleteAllSyncRecords(syncRecordType: Int) =
+    override suspend fun deleteAllSyncRecords(syncRecordType: Int) = withContext(ioDispatcher) {
         localStorageGateway.deleteAllSyncRecords(syncRecordType)
+    }
 
-    override fun deleteSyncRecord(path: String?, isSecondary: Boolean) =
-        localStorageGateway.deleteSyncRecordByPath(path, isSecondary)
+    override suspend fun deleteSyncRecord(path: String?, isSecondary: Boolean) =
+        withContext(ioDispatcher) {
+            localStorageGateway.deleteSyncRecordByPath(path, isSecondary)
+        }
 
-    override fun deleteSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean) =
-        localStorageGateway.deleteSyncRecordByLocalPath(localPath, isSecondary)
+    override suspend fun deleteSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean) =
+        withContext(ioDispatcher) {
+            localStorageGateway.deleteSyncRecordByLocalPath(localPath, isSecondary)
+        }
 
-    override fun deleteSyncRecordByFingerprint(
+    override suspend fun deleteSyncRecordByFingerprint(
         originalPrint: String,
         newPrint: String,
         isSecondary: Boolean,
-    ) = localStorageGateway.deleteSyncRecordByFingerPrint(originalPrint, newPrint, isSecondary)
+    ) =
+        withContext(ioDispatcher) {
+            localStorageGateway.deleteSyncRecordByFingerPrint(originalPrint,
+                newPrint,
+                isSecondary)
+        }
 
-    override fun getSyncRecordByFingerprint(
+    override suspend fun getSyncRecordByFingerprint(
         fingerprint: String?,
         isSecondary: Boolean,
         isCopy: Boolean,
     ): SyncRecord? =
-        localStorageGateway.getSyncRecordByFingerprint(fingerprint, isSecondary, isCopy)
+        withContext(ioDispatcher) {
+            localStorageGateway.getSyncRecordByFingerprint(fingerprint, isSecondary, isCopy)
+        }
 
-    override fun getSyncRecordByNewPath(path: String): SyncRecord? =
-        localStorageGateway.getSyncRecordByNewPath(path)
+    override suspend fun getSyncRecordByNewPath(path: String): SyncRecord? =
+        withContext(ioDispatcher) {
+            localStorageGateway.getSyncRecordByNewPath(path)
+        }
 
-    override fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord? =
-        localStorageGateway.getSyncRecordByLocalPath(path, isSecondary)
+    override suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord? =
+        withContext(ioDispatcher) {
+            localStorageGateway.getSyncRecordByLocalPath(path, isSecondary)
+        }
 
-    override fun shouldClearSyncRecords(clearSyncRecords: Boolean) =
-        localStorageGateway.shouldClearSyncRecords(clearSyncRecords)
+    override suspend fun shouldClearSyncRecords(clearSyncRecords: Boolean) =
+        withContext(ioDispatcher) {
+            localStorageGateway.shouldClearSyncRecords(clearSyncRecords)
+        }
 
-    override fun doesFileNameExist(
+    override suspend fun doesFileNameExist(
         fileName: String,
         isSecondary: Boolean,
         type: Int,
-    ): Boolean = localStorageGateway.doesFileNameExist(fileName, isSecondary, type)
+    ): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.doesFileNameExist(fileName, isSecondary, type)
+    }
 
-    override fun doesLocalPathExist(
+    override suspend fun doesLocalPathExist(
         fileName: String,
         isSecondary: Boolean,
         type: Int,
-    ): Boolean = localStorageGateway.doesLocalPathExist(fileName, isSecondary, type)
+    ): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.doesLocalPathExist(fileName, isSecondary, type)
+    }
 
-    override fun saveSyncRecord(record: SyncRecord) = localStorageGateway.saveSyncRecord(record)
+    override suspend fun saveSyncRecord(record: SyncRecord) = withContext(ioDispatcher) {
+        localStorageGateway.saveSyncRecord(record)
+    }
 
-    override fun getSyncTimeStamp(type: SyncTimeStamp): Long {
-        return when (type) {
-            SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.getPhotoTimeStamp()
-            SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.getVideoTimeStamp()
-            SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.getSecondaryPhotoTimeStamp()
-            SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.getSecondaryVideoTimeStamp()
+    override suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long {
+        return withContext(ioDispatcher) {
+            when (type) {
+                SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.getPhotoTimeStamp()
+                SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.getVideoTimeStamp()
+                SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.getSecondaryPhotoTimeStamp()
+                SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.getSecondaryVideoTimeStamp()
+            }
         }
     }
 
-    override fun setSyncTimeStamp(timeStamp: Long, type: SyncTimeStamp) {
-        when (type) {
-            SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.setPhotoTimeStamp(timeStamp)
-            SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.setVideoTimeStamp(timeStamp)
-            SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.setSecondaryPhotoTimeStamp(
-                timeStamp)
-            SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.setSecondaryVideoTimeStamp(
-                timeStamp)
+    override suspend fun setSyncTimeStamp(timeStamp: Long, type: SyncTimeStamp) {
+        withContext(ioDispatcher) {
+            when (type) {
+                SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.setPhotoTimeStamp(timeStamp)
+                SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.setVideoTimeStamp(timeStamp)
+                SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.setSecondaryPhotoTimeStamp(
+                    timeStamp)
+                SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.setSecondaryVideoTimeStamp(
+                    timeStamp)
+            }
         }
     }
 
-    override fun doCredentialsExist(): Boolean = localStorageGateway.doCredentialsExist()
+    override suspend fun doCredentialsExist(): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.doCredentialsExist()
+    }
 
-    override fun doPreferencesExist(): Boolean = localStorageGateway.doPreferencesExist()
+    override suspend fun doPreferencesExist(): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.doPreferencesExist()
+    }
 
-    override fun isSyncEnabled(): Boolean = localStorageGateway.isSyncEnabled()
+    override suspend fun isSyncEnabled(): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.isSyncEnabled()
+    }
 
-    override fun getSyncLocalPath(): String? = localStorageGateway.getSyncLocalPath()
+    override suspend fun getSyncLocalPath(): String? = withContext(ioDispatcher) {
+        localStorageGateway.getSyncLocalPath()
+    }
 
-    override fun setSyncLocalPath(localPath: String) =
+    override suspend fun setSyncLocalPath(localPath: String) = withContext(ioDispatcher) {
         localStorageGateway.setSyncLocalPath(localPath)
+    }
 
-    override fun setSecondaryFolderPath(secondaryFolderPath: String) =
-        localStorageGateway.setSecondaryFolderPath(secondaryFolderPath)
+    override suspend fun setSecondaryFolderPath(secondaryFolderPath: String) =
+        withContext(ioDispatcher) {
+            localStorageGateway.setSecondaryFolderPath(secondaryFolderPath)
+        }
 
-    override fun setSecondaryEnabled(secondaryCameraUpload: Boolean) =
-        localStorageGateway.setSecondaryEnabled(secondaryCameraUpload)
+    override suspend fun setSecondaryEnabled(secondaryCameraUpload: Boolean) =
+        withContext(ioDispatcher) {
+            localStorageGateway.setSecondaryEnabled(secondaryCameraUpload)
+        }
 
-    override fun getSecondaryFolderPath(): String? = localStorageGateway.getSecondaryFolderPath()
+    override suspend fun getSecondaryFolderPath(): String? = withContext(ioDispatcher) {
+        localStorageGateway.getSecondaryFolderPath()
+    }
 
-    override fun getRemoveGpsDefault(): Boolean = localStorageGateway.getRemoveGpsDefault()
+    override suspend fun getRemoveGpsDefault(): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.getRemoveGpsDefault()
+    }
 
-    override fun getUploadVideoQuality(): String? = localStorageGateway.getUploadVideoQuality()
+    override suspend fun getUploadVideoQuality(): String? = withContext(ioDispatcher) {
+        localStorageGateway.getUploadVideoQuality()
+    }
 
-    override fun getKeepFileNames(): Boolean = localStorageGateway.getKeepFileNames()
+    override suspend fun getKeepFileNames(): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.getKeepFileNames()
+    }
 
-    override fun isFolderExternalSd(): Boolean = localStorageGateway.isFolderExternalSd()
+    override suspend fun isFolderExternalSd(): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.isFolderExternalSd()
+    }
 
-    override fun getUriExternalSd(): String = localStorageGateway.getUriExternalSd()
+    override suspend fun getUriExternalSd(): String = withContext(ioDispatcher) {
+        localStorageGateway.getUriExternalSd()
+    }
 
-    override fun isSecondaryMediaFolderEnabled() =
+    override suspend fun isSecondaryMediaFolderEnabled() = withContext(ioDispatcher) {
         localStorageGateway.isSecondaryMediaFolderEnabled()
+    }
 
-    override fun isMediaFolderExternalSd() = localStorageGateway.isMediaFolderExternalSd()
+    override suspend fun isMediaFolderExternalSd() = withContext(ioDispatcher) {
+        localStorageGateway.isMediaFolderExternalSd()
+    }
 
-    override fun getUriMediaFolderExternalSd(): String =
+    override suspend fun getUriMediaFolderExternalSd(): String = withContext(ioDispatcher) {
         localStorageGateway.getUriMediaFolderExternalSd()
+    }
 
-    override fun shouldClearSyncRecords() = localStorageGateway.shouldClearSyncRecords()
+    override suspend fun shouldClearSyncRecords() = withContext(ioDispatcher) {
+        localStorageGateway.shouldClearSyncRecords()
+    }
 
-    override fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long =
-        localStorageGateway.getMaxTimestamp(isSecondary, syncRecordType)
+    override suspend fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long =
+        withContext(ioDispatcher) {
+            localStorageGateway.getMaxTimestamp(isSecondary, syncRecordType)
+        }
 
-    override fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord> =
-        localStorageGateway.getVideoSyncRecordsByStatus(syncStatusType)
+    override suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord> =
+        withContext(ioDispatcher) {
+            localStorageGateway.getVideoSyncRecordsByStatus(syncStatusType)
+        }
 
-    override fun getChargingOnSizeString(): String = localStorageGateway.getChargingOnSizeString()
+    override suspend fun getChargingOnSizeString(): String = withContext(ioDispatcher) {
+        localStorageGateway.getChargingOnSizeString()
+    }
 
-    override fun getChargingOnSize() = localStorageGateway.getChargingOnSizeString().toInt()
+    override suspend fun getChargingOnSize() = withContext(ioDispatcher) {
+        localStorageGateway.getChargingOnSizeString().toInt()
+    }
 
-    override fun convertOnCharging() = localStorageGateway.convertOnCharging()
+    override suspend fun convertOnCharging() = withContext(ioDispatcher) {
+        localStorageGateway.convertOnCharging()
+    }
 
-    override fun updateSyncRecordStatusByLocalPath(
+    override suspend fun updateSyncRecordStatusByLocalPath(
         syncStatusType: Int,
         localPath: String?,
         isSecondary: Boolean,
-    ) = localStorageGateway.updateSyncRecordStatusByLocalPath(syncStatusType,
-        localPath,
-        isSecondary)
+    ) = withContext(ioDispatcher) {
+        localStorageGateway.updateSyncRecordStatusByLocalPath(syncStatusType,
+            localPath,
+            isSecondary)
+    }
 }

@@ -13,5 +13,5 @@ fun interface GetPendingSyncRecords {
      *
      * @return pending sync records
      */
-    operator fun invoke(): List<SyncRecord>
+    suspend operator fun invoke(): List<SyncRecord>
 }
