@@ -14,5 +14,5 @@ fun interface GetVideoSyncRecordsByStatus {
      *
      * @return video sync records
      */
-    operator fun invoke(syncStatus: SyncStatus): List<SyncRecord>
+    suspend operator fun invoke(syncStatus: SyncStatus): List<SyncRecord>
 }

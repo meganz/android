@@ -11,5 +11,5 @@ interface CompressedVideoPending {
      *
      * @return if compressed video is pending
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }

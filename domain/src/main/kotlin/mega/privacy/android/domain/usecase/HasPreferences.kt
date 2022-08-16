@@ -10,5 +10,5 @@ fun interface HasPreferences {
      *
      * @return do preferences exist
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }

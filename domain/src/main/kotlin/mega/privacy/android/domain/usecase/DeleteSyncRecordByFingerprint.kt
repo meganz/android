@@ -11,5 +11,5 @@ fun interface DeleteSyncRecordByFingerprint {
      *
      * @return
      */
-    operator fun invoke(originalPrint: String, newPrint: String, isSecondary: Boolean)
+    suspend operator fun invoke(originalPrint: String, newPrint: String, isSecondary: Boolean)
 }

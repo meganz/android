@@ -11,5 +11,5 @@ fun interface SetSyncLocalPath {
      *
      * @return
      */
-    operator fun invoke(localPath: String)
+    suspend operator fun invoke(localPath: String)
 }

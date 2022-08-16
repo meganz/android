@@ -23,7 +23,7 @@ class DefaultIsLocalPrimaryFolderSet @Inject constructor(
     private val getDocumentFileWrapper: GetDocumentFileWrapper,
     @ApplicationContext private val context: Context,
 ) : IsLocalPrimaryFolderSet {
-    override fun invoke(): Boolean {
+    override suspend fun invoke(): Boolean {
         return if (cameraUploadRepository.isFolderExternalSd()) {
             val uri = Uri.parse(cameraUploadRepository.getUriExternalSd())
             val file = getDocumentFileWrapper.getDocumentFileFromTreeUri(context, uri)
