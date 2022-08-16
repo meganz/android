@@ -13,14 +13,16 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.ui.PlayerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
-import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 
@@ -41,7 +43,10 @@ class MiniAudioPlayerController constructor(
     private val artistName = playerView.findViewById<TextView>(R.id.artist_name)
 
     private var serviceBound = false
-    private var playerService: MediaPlayerService? = null
+    private var serviceGateway: MediaPlayerServiceGateway? = null
+
+    private var metadataChangedJob: Job? = null
+    private var sharingScope: CoroutineScope? = null
 
     /**
      * The parameter that determine the player view whether should be visible
@@ -54,7 +59,7 @@ class MiniAudioPlayerController constructor(
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
-            playerService = null
+            serviceGateway = null
         }
 
         /**
@@ -62,11 +67,21 @@ class MiniAudioPlayerController constructor(
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is MediaPlayerServiceBinder) {
-                playerService = service.service
+                serviceGateway = service.serviceGateway
 
-                setupPlayerView(service.service.mediaPlayerServiceGateway)
-                service.service.metadata.observeForever(metadataObserver)
+                metadataChangedJob = sharingScope?.launch {
+                    serviceGateway?.metadataUpdate()?.collect {
+                        trackName.text = it.title ?: it.nodeName
 
+                        if (it.artist != null) {
+                            artistName.text = it.artist
+                            artistName.isVisible = true
+                        } else {
+                            artistName.isVisible = false
+                        }
+                    }
+                }
+                setupPlayerView()
                 if (visible()) {
                     onPlayerVisibilityChanged?.invoke()
                 }
@@ -86,22 +101,11 @@ class MiniAudioPlayerController constructor(
         }
     }
 
-    private val metadataObserver = Observer<Metadata> {
-        trackName.text = it.title ?: it.nodeName
-
-        if (it.artist != null) {
-            artistName.text = it.artist
-            artistName.isVisible = true
-        } else {
-            artistName.isVisible = false
-        }
-    }
-
     init {
         audioPlayerPlaying.observeForever(audioPlayerPlayingObserver)
 
         playerView.findViewById<ImageButton>(R.id.close).setOnClickListener {
-            playerService?.stopAudioPlayer()
+            serviceGateway?.stopAudioPlayer()
         }
 
         playerView.setOnClickListener {
@@ -115,25 +119,46 @@ class MiniAudioPlayerController constructor(
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
-            Lifecycle.Event.ON_RESUME -> onResume()
+            Lifecycle.Event.ON_RESUME -> onResume(source)
             Lifecycle.Event.ON_PAUSE -> onPause()
             Lifecycle.Event.ON_DESTROY -> onDestroy()
             else -> return
         }
     }
 
-    fun onResume() {
-        val service = playerService
-        if (service != null) {
-            setupPlayerView(service.mediaPlayerServiceGateway)
+    /**
+     * The onResume function is called when Lifecycle event ON_RESUME
+     *
+     * @param owner LifecycleOwner
+     */
+    fun onResume(owner: LifecycleOwner) {
+        if (sharingScope == null) {
+            sharingScope = owner.lifecycleScope
         }
+        metadataChangedJob?.run {
+            if (isCancelled) {
+                start()
+            }
+        }
+        setupPlayerView()
         playerView.onResume()
     }
 
+    /**
+     * The onPause function is called when Lifecycle event ON_PAUSE
+     */
     fun onPause() {
+        metadataChangedJob?.run {
+            if (isActive) {
+                cancel()
+            }
+        }
         playerView.onPause()
     }
 
+    /**
+     * The onDestroy function is called when Lifecycle event ON_DESTROY
+     */
     fun onDestroy() {
         audioPlayerPlaying.removeObserver(audioPlayerPlayingObserver)
         onAudioPlayerServiceStopped()
@@ -154,12 +179,13 @@ class MiniAudioPlayerController constructor(
     fun visible() = playerView.isVisible
 
     private fun updatePlayerViewVisibility() {
-        playerView.isVisible = playerService != null && shouldVisible
+        playerView.isVisible = serviceGateway?.run {
+            shouldVisible
+        } ?: false
     }
 
     private fun onAudioPlayerServiceStopped() {
-        playerService?.metadata?.removeObserver(metadataObserver)
-        playerService = null
+        serviceGateway = null
 
         updatePlayerViewVisibility()
 
@@ -171,9 +197,9 @@ class MiniAudioPlayerController constructor(
         onPlayerVisibilityChanged?.invoke()
     }
 
-    private fun setupPlayerView(mediaPlayerServiceGateway: MediaPlayerServiceGateway) {
+    private fun setupPlayerView() {
         updatePlayerViewVisibility()
-        mediaPlayerServiceGateway.setupPlayerView(playerView = playerView)
+        serviceGateway?.setupPlayerView(playerView = playerView)
     }
 
     companion object {
@@ -188,6 +214,4 @@ class MiniAudioPlayerController constructor(
             audioPlayerPlaying.value = playing
         }
     }
-
-
 }

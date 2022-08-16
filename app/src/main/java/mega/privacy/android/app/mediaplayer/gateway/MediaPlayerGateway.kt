@@ -3,6 +3,7 @@ package mega.privacy.android.app.mediaplayer.gateway
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.ShuffleOrder
+import com.google.android.exoplayer2.ui.PlayerView
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
@@ -156,4 +157,30 @@ interface MediaPlayerGateway {
      * Clear player of player notification
      */
     fun clearPlayerForNotification()
+
+    /**
+     * Add the listener for player
+     *
+     * @param listener Player.Listener
+     */
+    fun addPlayerListener(listener: Player.Listener)
+
+    /**
+     * Setup player view
+     *
+     * @param playerView PlayerView
+     * @param useController useController
+     * @param controllerShowTimeoutMs controllerShowTimeoutMs
+     * @param repeatToggleModes repeatToggleModes
+     * @param controllerHideOnTouch controllerHideOnTouch
+     * @param showShuffleButton showShuffleButton
+     */
+    fun setupPlayerView(
+        playerView: PlayerView,
+        useController: Boolean = true,
+        controllerShowTimeoutMs: Int = 0,
+        controllerHideOnTouch: Boolean = false,
+        repeatToggleModes: Int? = null,
+        showShuffleButton: Boolean? = null,
+    )
 }
