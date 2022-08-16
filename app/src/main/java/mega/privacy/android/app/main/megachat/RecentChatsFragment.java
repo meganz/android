@@ -2,9 +2,7 @@ package mega.privacy.android.app.main.megachat;
 
 import static android.app.Activity.RESULT_OK;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
-import static mega.privacy.android.app.utils.CallUtil.hintShown;
 import static mega.privacy.android.app.utils.CallUtil.returnActiveCall;
-import static mega.privacy.android.app.utils.CallUtil.shouldShowMeetingHint;
 import static mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsChatAlertDialog;
 import static mega.privacy.android.app.utils.ChatUtil.getPositionFromChatId;
 import static mega.privacy.android.app.utils.ChatUtil.isEnableChatNotifications;
@@ -14,7 +12,6 @@ import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
-import static mega.privacy.android.app.utils.Constants.KEY_HINT_IS_SHOWING;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_CHAT;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA;
@@ -109,7 +106,6 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.usecase.chat.SearchChatsUseCase;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
-import mega.privacy.android.app.utils.HighLightHintHelper;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
@@ -211,11 +207,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     private AskForDisplayOverDialog askForDisplayOverDialog;
 
-    private static final String SP_KEY_IS_HINT_SHOWN_RECENT_CHATS = "is_hint_shown_recent_chats";
-    private boolean isHintShowing;
-
-    private HighLightHintHelper highLightHintHelper;
-
     private final Observer<MegaChatCall> callRingingStatusObserver = call -> {
         if (megaChatApi.getNumCalls() == 0 || adapter == null) {
             Timber.e("Calls not found");
@@ -278,8 +269,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         contactGetter.setMegaContactUpdater(this);
 
         askForDisplayOverDialog = new AskForDisplayOverDialog(context);
-
-        highLightHintHelper = new HighLightHintHelper(requireActivity());
     }
 
     @Override
@@ -489,30 +478,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observe(this, callRingingStatusObserver);
 
-        // Workaround: wait for R.id.action_menu_open_meeting initialized.
-        new Handler().postDelayed(() -> {
-            if (shouldShowMeetingHint(context, SP_KEY_IS_HINT_SHOWN_RECENT_CHATS) || isHintShowing) {
-                highLightHintHelper.showHintForMeetingIcon(R.id.action_menu_open_meeting, () -> {
-                    hintShown(context, SP_KEY_IS_HINT_SHOWN_RECENT_CHATS);
-                    highLightHintHelper.dismissPopupWindow();
-                    isHintShowing = false;
-                    askForDisplayOver();
-                    return null;
-                });
-
-                isHintShowing = true;
-            } else {
-                askForDisplayOver();
-            }
-        }, 300);
-
         return v;
-    }
-
-    private void askForDisplayOver() {
-        if (askForDisplayOverDialog != null) {
-            askForDisplayOverDialog.showDialog();
-        }
     }
 
     private boolean showInviteBanner() {
@@ -1326,7 +1292,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
         }
         outState.putBoolean(KEY_DIALOG_IS_SHOWING, isExplanationDialogShowing);
-        outState.putBoolean(KEY_HINT_IS_SHOWING, isHintShowing);
     }
 
     @Override
@@ -1354,9 +1319,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         if (context instanceof ManagerActivity) {
             ((ManagerActivity) context).setSearchQuery("");
         }
-
-        // Avoid window leak.
-        highLightHintHelper.dismissPopupWindow();
     }
 
     @Override
@@ -1418,8 +1380,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             if (isExplanationDialogShowing) {
                 showExplanationDialog();
             }
-
-            isHintShowing = savedInstanceState.getBoolean(KEY_HINT_IS_SHOWING);
         }
     }
 

@@ -26,7 +26,7 @@
             android:text="@string/chat_recent_list_empty_action"
             android:textAllCaps="false"
             android:textAppearance="@style/TextAppearance.Mega.Body1"
-            app:drawableTopCompat="@drawable/empty_chat_message_portrait" />
+            app:drawableTopCompat="@drawable/ic_zero_chat" />
 
         <TextView
             android:id="@+id/txt_empty_description"

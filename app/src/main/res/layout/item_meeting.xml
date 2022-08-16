@@ -72,6 +72,34 @@
         app:layout_goneMarginEnd="16dp"
         tools:text="@tools:sample/full_names" />
 
+    <ImageView
+        android:id="@+id/img_private"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="8dp"
+        android:background="@null"
+        android:src="@drawable/ic_private_chat"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/txt_title"
+        app:layout_constraintStart_toEndOf="@id/txt_title"
+        app:layout_constraintTop_toTopOf="@id/txt_title"
+        app:tint="?android:attr/textColorPrimary"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/img_mute"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="8dp"
+        android:background="@null"
+        android:src="@drawable/ic_mute"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/img_private"
+        app:layout_constraintStart_toEndOf="@id/img_private"
+        app:layout_constraintTop_toTopOf="@id/img_private"
+        app:tint="?android:attr/textColorPrimary"
+        tools:visibility="visible" />
+
     <androidx.emoji.widget.EmojiAppCompatTextView
         android:id="@+id/txt_last_message"
         android:layout_width="wrap_content"
