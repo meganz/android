@@ -13,11 +13,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.lifecycleScope
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.ui.PlayerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
@@ -26,6 +30,7 @@ import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
@@ -49,22 +54,38 @@ import javax.inject.Inject
  */
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
-abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
+abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
+    MediaPlayerServiceGateway {
 
+    /**
+     * MegaApiAndroid for megaApi
+     */
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
+    /**
+     * MegaApiAndroid for megaApiFolder
+     */
     @MegaApiFolder
     @Inject
     lateinit var megaApiFolder: MegaApiAndroid
 
+    /**
+     * DatabaseHandler
+     */
     @Inject
     lateinit var dbHandler: DatabaseHandler
 
+    /**
+     * GetOfflineThumbnailFileWrapper
+     */
     @Inject
     lateinit var offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper
 
+    /**
+     * GetGlobalTransferUseCase
+     */
     @Inject
     lateinit var getGlobalTransferUseCase: GetGlobalTransferUseCase
 
@@ -74,16 +95,13 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
     abstract var mediaPlayerGateway: MediaPlayerGateway
 
     /**
-     * MediaPlayerServiceGateway
+     * ServiceViewModelGateway
      */
-    abstract var mediaPlayerServiceGateway: MediaPlayerServiceGateway
+    lateinit var viewModelGateway: PlayerServiceViewModelGateway
 
-    private val binder by lazy { MediaPlayerServiceBinder(this) }
+    private val binder by lazy { MediaPlayerServiceBinder(this, viewModelGateway) }
 
-    lateinit var viewModel: MediaPlayerServiceViewModel
-
-    private val _metadata = MutableLiveData<Metadata>()
-    val metadata: LiveData<Metadata> = _metadata
+    private val metadata = MutableLiveData<Metadata>()
 
     private var needPlayWhenGoForeground = false
     private var needPlayWhenReceiveResumeCommand = false
@@ -121,158 +139,101 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
             val currentPosition = mediaPlayerGateway.getCurrentPosition()
             // Up the frequency of refresh, keeping in sync with Exoplayer.
             positionUpdateHandler.postDelayed(this, 500)
-            viewModel.setCurrentPosition(currentPosition)
+            viewModelGateway.setCurrentPosition(currentPosition)
         }
     }
 
     override fun onCreate() {
         super.onCreate()
 
-        viewModel = MediaPlayerServiceViewModel(
-            this,
-            megaApi,
-            megaApiFolder,
-            dbHandler,
-            offlineThumbnailFileWrapper,
-            getGlobalTransferUseCase
+        viewModelGateway = MediaPlayerServiceViewModel(
+            context = this,
+            megaApi = megaApi,
+            megaApiFolder = megaApiFolder,
+            dbHandler = dbHandler,
+            offlineThumbnailFileWrapper = offlineThumbnailFileWrapper,
+            getGlobalTransferUseCase = getGlobalTransferUseCase
         )
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
         audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
-
         createPlayer()
-        observeLiveData()
+        observeData()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
 
     private fun createPlayer() {
-        mediaPlayerGateway.createPlayer(
-            shuffleEnabled = viewModel.shuffleEnabled(),
-            shuffleOrder = viewModel.shuffleOrder,
-            repeatMode = viewModel.repeatMode(),
-            nameChangeCallback = { title, artist, album ->
-                val nodeName =
-                    viewModel.getPlaylistItem(mediaPlayerGateway.getCurrentMediaItem()?.mediaId)?.nodeName
-                        ?: ""
+        with(viewModelGateway) {
+            mediaPlayerGateway.createPlayer(
+                shuffleEnabled = shuffleEnabled(),
+                shuffleOrder = getShuffleOrder(),
+                repeatMode = repeatMode(),
+                nameChangeCallback = { title, artist, album ->
+                    val nodeName = getPlaylistItem(getCurrentMediaItem()?.mediaId)?.nodeName ?: ""
 
-                if (!(title.isNullOrEmpty() && artist.isNullOrEmpty()
-                            && album.isNullOrEmpty() && nodeName.isEmpty())
-                ) {
-                    _metadata.value = Metadata(title, artist, album, nodeName)
-
-                    mediaPlayerGateway.invalidatePlayerNotification()
-                }
-            },
-            mediaPlayerCallback = object : MediaPlayerCallback {
-                override fun onMediaItemTransitionCallback(handle: String?, isUpdateName: Boolean) {
-                    handle?.run {
-                        viewModel.playingHandle = this.toLong()
-                        if (isUpdateName) {
-                            val nodeName = viewModel.getPlaylistItem(this)?.nodeName ?: ""
-                            _metadata.value = Metadata(null, null, null, nodeName)
+                    if (!(title.isNullOrEmpty() && artist.isNullOrEmpty()
+                                && album.isNullOrEmpty() && nodeName.isEmpty())
+                    ) {
+                        metadata.value = Metadata(title, artist, album, nodeName)
+                        mediaPlayerGateway.invalidatePlayerNotification()
+                    }
+                },
+                mediaPlayerCallback = object : MediaPlayerCallback {
+                    override fun onMediaItemTransitionCallback(
+                        handle: String?,
+                        isUpdateName: Boolean,
+                    ) {
+                        handle?.run {
+                            setCurrentPlayingHandle(this.toLong())
+                            if (isUpdateName) {
+                                val nodeName = getPlaylistItem(this)?.nodeName ?: ""
+                                metadata.value = Metadata(null, null, null, nodeName)
+                            }
                         }
                     }
 
-                }
+                    override fun onIsPlayingChangedCallback(isPlaying: Boolean) {
+                        if (isPlaying) {
+                            positionUpdateHandler.post(positionUpdateRunnable)
+                        } else {
+                            positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
+                        }
+                    }
 
-                override fun onIsPlayingChangedCallback(isPlaying: Boolean) {
-                    if (isPlaying) {
-                        positionUpdateHandler.post(positionUpdateRunnable)
-                    } else {
+                    override fun onShuffleModeEnabledChangedCallback(shuffleModeEnabled: Boolean) {
+                        setShuffleEnabled(shuffleModeEnabled)
+
+                        if (shuffleModeEnabled) {
+                            mediaPlayerGateway.setShuffleOrder(newShuffleOrder())
+                        }
+                    }
+
+                    override fun onRepeatModeChangedCallback(repeatMode: Int) {
+                        setRepeatMode(repeatMode)
+                    }
+
+                    override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean) {
+                        setPaused(!playWhenReady, mediaPlayerGateway.getCurrentPosition())
+                    }
+
+                    override fun onPlaybackStateChangedCallback(state: Int) {
+                        when {
+                            state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> {
+                                setPaused(true, mediaPlayerGateway.getCurrentPosition())
+                            }
+                            state == MEDIA_PLAYER_STATE_READY && isPaused() && mediaPlayerGateway.getPlayWhenReady() -> {
+                                setPaused(false, mediaPlayerGateway.getCurrentPosition())
+                            }
+                        }
+                    }
+
+                    override fun onPlayerErrorCallback() {
+                        onPlayerError()
                         positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
                     }
                 }
-
-                override fun onShuffleModeEnabledChangedCallback(shuffleModeEnabled: Boolean) {
-                    viewModel.setShuffleEnabled(shuffleModeEnabled)
-
-                    if (shuffleModeEnabled) {
-                        mediaPlayerGateway.setShuffleOrder(viewModel.newShuffleOrder())
-                    }
-                }
-
-                override fun onRepeatModeChangedCallback(repeatMode: Int) {
-                    viewModel.setRepeatMode(repeatMode)
-                }
-
-                override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean) {
-                    viewModel.setPaused(!playWhenReady, mediaPlayerGateway.getCurrentPosition())
-                }
-
-                override fun onPlaybackStateChangedCallback(state: Int) {
-                    when {
-                        state == MEDIA_PLAYER_STATE_ENDED && !viewModel.paused -> {
-                            viewModel.setPaused(true, mediaPlayerGateway.getCurrentPosition())
-                        }
-                        state == MEDIA_PLAYER_STATE_READY && viewModel.paused && mediaPlayerGateway.getPlayWhenReady() -> {
-                            viewModel.setPaused(false, mediaPlayerGateway.getCurrentPosition())
-                        }
-                    }
-                }
-
-                override fun onPlayerErrorCallback() {
-                    viewModel.onPlayerError()
-                    positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
-                }
-            },
-//            listener = object : Player.Listener {
-//                override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-//                    val handle = mediaItem?.mediaId ?: return
-//                    viewModel.playingHandle = handle.toLong()
-//
-//                    if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
-//                        val nodeName = viewModel.getPlaylistItem(handle)?.nodeName ?: ""
-//                        _metadata.value = Metadata(null, null, null, nodeName)
-//                    }
-//                }
-//
-//                override fun onIsPlayingChanged(isPlaying: Boolean) {
-//                    super.onIsPlayingChanged(isPlaying)
-//                    if (isPlaying) {
-//                        positionUpdateHandler.post(positionUpdateRunnable)
-//                    } else {
-//                        positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
-//                    }
-//                }
-//
-//                override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-//                    viewModel.setShuffleEnabled(shuffleModeEnabled)
-//
-//                    if (shuffleModeEnabled) {
-//                        mediaPlayerGateway.setShuffleOrder(viewModel.newShuffleOrder())
-//                    }
-//                }
-//
-//                override fun onRepeatModeChanged(repeatMode: Int) {
-//                    viewModel.setRepeatMode(repeatMode)
-//                }
-//
-//                override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-//                    viewModel.setPaused(!playWhenReady, mediaPlayerGateway.getCurrentPosition())
-//
-//                    if (playWhenReady && notificationDismissed) {
-//                        mediaPlayerGateway.setPlayerForNotification()
-//                        notificationDismissed = false
-//                    }
-//                }
-//
-//                override fun onPlaybackStateChanged(state: Int) {
-//                    when {
-//                        state == Player.STATE_ENDED && !viewModel.paused -> {
-//                            viewModel.setPaused(true, mediaPlayerGateway.getCurrentPosition())
-//                        }
-//                        state == Player.STATE_READY && viewModel.paused && mediaPlayerGateway.getPlayWhenReady() -> {
-//                            viewModel.setPaused(false, mediaPlayerGateway.getCurrentPosition())
-//                        }
-//                    }
-//                }
-//
-//                override fun onPlayerError(error: PlaybackException) {
-//                    viewModel.onPlayerError()
-//                    positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
-//                }
-//            }
-        )
+            )
+        }
     }
 
     private fun createPlayerControlNotification() {
@@ -290,7 +251,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
                     },
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 ),
-                thumbnail = viewModel.playingThumbnail,
+                thumbnail = viewModelGateway.getPlayingThumbnail(),
                 smallIcon = R.drawable.ic_stat_notify,
                 onNotificationPostedCallback = { notificationId, notification, ongoing ->
                     if (ongoing) {
@@ -331,8 +292,8 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
                     createPlayerControlNotification()
                 }
 
-                if (viewModel.buildPlayerSource(intent)) {
-                    if (viewModel.audioPlayer) {
+                if (viewModelGateway.buildPlayerSource(intent)) {
+                    if (viewModelGateway.isAudioPlayer()) {
                         MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
                     }
                 }
@@ -341,30 +302,34 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun observeLiveData() {
-        viewModel.playerSource.observe(this) { mediaPlaySources ->
-            playSource(mediaPlaySources)
-        }
+    private fun observeData() {
+        lifecycleScope.launch {
+            viewModelGateway.run {
+                playerSourceUpdate().collect { mediaPlaySources ->
+                    playSource(mediaPlaySources)
+                }
 
-        viewModel.mediaItemToRemove.observe(this) { index ->
-            mediaPlayerGateway.mediaItemRemoved(index)?.let { handle ->
-                val nodeName = viewModel.getPlaylistItem(handle)?.nodeName ?: ""
-                _metadata.value = Metadata(null, null, null, nodeName)
+                mediaItemToRemoveUpdate().collect { index ->
+                    mediaPlayerGateway.mediaItemRemoved(index)?.let { handle ->
+                        val nodeName = getPlaylistItem(handle)?.nodeName ?: ""
+                        metadata.value = Metadata(null, null, null, nodeName)
+                    }
+                }
+
+                nodeNameUpdate().collect { name ->
+                    metadata.value?.let {
+                        metadata.value = it.copy(nodeName = name)
+                    }
+                }
+
+                getPlayingThumbnail().observe(this@MediaPlayerService) {
+                    mediaPlayerGateway.invalidatePlayerNotification()
+                }
+
+                retryUpdate().collect { isRetry ->
+                    mediaPlayerGateway.mediaPlayerRetry(isRetry)
+                }
             }
-        }
-
-        viewModel.nodeNameUpdate.observe(this) {
-            _metadata.value?.let { (title, artist, album) ->
-                _metadata.value = Metadata(title, artist, album, it)
-            }
-        }
-
-        viewModel.playingThumbnail.observe(this) {
-            mediaPlayerGateway.invalidatePlayerNotification()
-        }
-
-        viewModel.retry.observe(this) { isRetry ->
-            mediaPlayerGateway.mediaPlayerRetry(isRetry)
         }
     }
 
@@ -379,12 +344,12 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
             )
         }
         mediaPlaySources.nameToDisplay?.run {
-            _metadata.value = Metadata(title = null, artist = null, album = null, nodeName = this)
+            metadata.value = Metadata(title = null, artist = null, album = null, nodeName = this)
         }
 
         mediaPlayerGateway.buildPlaySources(mediaPlaySources)
 
-        if (!viewModel.paused) {
+        if (!viewModelGateway.isPaused()) {
             setPlayWhenReady(true)
         }
 
@@ -393,34 +358,28 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.cancelSearch()
+        viewModelGateway.cancelSearch()
         mainHandler.removeCallbacks(resumePlayRunnable)
         positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
 
         if (audioManager != null) {
             abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
         }
-        viewModel.clear()
+        viewModelGateway.clear()
         mediaPlayerGateway.clearPlayerForNotification()
         mediaPlayerGateway.playerRelease()
     }
 
-    /**
-     * Close video player UI
-     */
-    fun mainPlayerUIClosed() {
-        if (!viewModel.audioPlayer) {
+    override fun mainPlayerUIClosed() {
+        if (!viewModelGateway.isAudioPlayer()) {
             stopAudioPlayer()
         }
     }
 
-    /**
-     * Stop audio player
-     */
-    fun stopAudioPlayer() {
+    override fun stopAudioPlayer() {
         mediaPlayerGateway.playerStop()
 
-        if (viewModel.audioPlayer) {
+        if (viewModelGateway.isAudioPlayer()) {
             MiniAudioPlayerController.notifyAudioPlayerPlaying(false)
         }
 
@@ -432,7 +391,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
      *
      * @param playWhenReady true is play when ready, otherwise is false.
      */
-    fun setPlayWhenReady(playWhenReady: Boolean) {
+    override fun setPlayWhenReady(playWhenReady: Boolean) {
         if (!playWhenReady) {
             mediaPlayerGateway.setPlayWhenReady(false)
         } else if (CallUtil.participatingInACall()) {
@@ -448,9 +407,9 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
      *
      * @param index the index that is sought to
      */
-    fun seekTo(index: Int) {
+    override fun seekTo(index: Int) {
         mediaPlayerGateway.playerSeekTo(index)
-        viewModel.resetRetryState()
+        viewModelGateway.resetRetryState()
     }
 
     /**
@@ -467,18 +426,47 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
      * Service is moved to background
      */
     fun onMoveToBackground() {
-        if ((!viewModel.backgroundPlayEnabled() || !viewModel.audioPlayer) && playing()) {
-            setPlayWhenReady(false)
-            needPlayWhenGoForeground = true
+        with(viewModelGateway) {
+            if ((!backgroundPlayEnabled() || !isAudioPlayer()) && playing()) {
+                setPlayWhenReady(false)
+                needPlayWhenGoForeground = true
+            }
         }
     }
 
-    /**
-     * Judge the player whether is playing
-     *
-     * @return true is playing, otherwise is false.
-     */
-    fun playing() = mediaPlayerGateway.mediaPlayerIsPlaying()
+    override fun metadataUpdate() = metadata.asFlow()
+
+    override fun removeListener(listener: Player.Listener) {
+        mediaPlayerGateway.removeListener(listener)
+    }
+
+    override fun addPlayerListener(listener: Player.Listener) {
+        mediaPlayerGateway.addPlayerListener(listener)
+    }
+
+    override fun getCurrentMediaItem() = mediaPlayerGateway.getCurrentMediaItem()
+
+    override fun getPlaybackState() = mediaPlayerGateway.getPlaybackState()
+
+    override fun setupPlayerView(
+        playerView: PlayerView,
+        useController: Boolean,
+        controllerShowTimeoutMs: Int,
+        controllerHideOnTouch: Boolean,
+        repeatToggleModes: Int?,
+        showShuffleButton: Boolean?,
+    ) {
+        mediaPlayerGateway.setupPlayerView(
+            playerView = playerView,
+            useController = useController,
+            controllerShowTimeoutMs = controllerShowTimeoutMs,
+            controllerHideOnTouch = controllerHideOnTouch,
+            repeatToggleModes = repeatToggleModes,
+            showShuffleButton = showShuffleButton,
+        )
+    }
+
+    override fun playing() = mediaPlayerGateway.mediaPlayerIsPlaying()
 
     companion object {
         private const val PLAYBACK_NOTIFICATION_ID = 1

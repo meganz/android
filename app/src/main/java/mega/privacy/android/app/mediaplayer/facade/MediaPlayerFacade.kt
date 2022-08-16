@@ -24,11 +24,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
-import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
+import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
-import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import timber.log.Timber
 
@@ -37,7 +36,7 @@ import timber.log.Timber
  */
 class MediaPlayerFacade constructor(
     @ApplicationContext private val context: Context,
-) : MediaPlayerGateway, MediaPlayerServiceGateway {
+) : MediaPlayerGateway {
 
     private lateinit var exoPlayer: ExoPlayer
     private lateinit var player: MediaMegaPlayer
@@ -124,17 +123,14 @@ class MediaPlayerFacade constructor(
                 .setChannelDescriptionResourceId(channelDescriptionResourceId)
                 .setMediaDescriptionAdapter(object :
                     PlayerNotificationManager.MediaDescriptionAdapter {
-                    override fun getCurrentContentTitle(player: Player): String {
-                        return metadata.value?.title ?: metadata.value?.nodeName ?: ""
-                    }
+                    override fun getCurrentContentTitle(player: Player): String =
+                        metadata.value?.title ?: metadata.value?.nodeName ?: ""
 
-                    override fun createCurrentContentIntent(player: Player): PendingIntent? {
-                        return pendingIntent
-                    }
+                    override fun createCurrentContentIntent(player: Player): PendingIntent? =
+                        pendingIntent
 
-                    override fun getCurrentContentText(player: Player): String {
-                        return metadata.value?.artist ?: ""
-                    }
+                    override fun getCurrentContentText(player: Player): String =
+                        metadata.value?.artist ?: ""
 
                     override fun getCurrentLargeIcon(
                         player: Player,
@@ -285,8 +281,6 @@ class MediaPlayerFacade constructor(
         controllerHideOnTouch: Boolean,
         repeatToggleModes: Int?,
         showShuffleButton: Boolean?,
-        visibilityCallback: ((visibility: Int) -> Unit)?,
-        clickedCallback: (() -> Unit)?,
     ) {
         with(playerView) {
             player = this@MediaPlayerFacade.player
@@ -298,16 +292,6 @@ class MediaPlayerFacade constructor(
             }
             showShuffleButton?.run {
                 setShowShuffleButton(this)
-            }
-            visibilityCallback?.run {
-                setControllerVisibilityListener { visibility ->
-                    this(visibility)
-                }
-            }
-            clickedCallback?.run {
-                setOnClickListener {
-                    this()
-                }
             }
             showController()
         }
