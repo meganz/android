@@ -10,5 +10,5 @@ fun interface IsCameraUploadSyncEnabled {
      *
      * @return sync is enabled
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }

@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.data.repository
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
@@ -25,7 +26,10 @@ class DefaultCameraUploadRepositoryTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultCameraUploadRepository(localStorageGateway)
+        underTest = DefaultCameraUploadRepository(
+            localStorageGateway = localStorageGateway,
+            ioDispatcher = UnconfinedTestDispatcher()
+        )
     }
 
     @Test

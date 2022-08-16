@@ -11,5 +11,5 @@ fun interface GetVideoQuality {
      *
      * @return video quality setting
      */
-    operator fun invoke(): Int
+    suspend operator fun invoke(): Int
 }

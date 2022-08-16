@@ -1721,7 +1721,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                                             filePreparedInfos = null;
                                             Timber.d("finish!!!");
                                             finishActivity();
-                                        });
+                                        }, Timber::e);
                             }
                         }
                     });
@@ -1997,7 +1997,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                                             Timber.d("After UPLOAD click - back to Cloud");
                                             this.backToCloud(parentNode.getHandle(), 1, null);
                                             finishActivity();
-                                        });
+                                        }, Timber::e);
                             }
                         });
     }

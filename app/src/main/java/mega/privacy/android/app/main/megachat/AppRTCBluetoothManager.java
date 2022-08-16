@@ -437,8 +437,7 @@ public class AppRTCBluetoothManager {
     Log.d(TAG, "BluetoothAdapter: "
             + "enabled=" + localAdapter.isEnabled() + ", "
             + "state=" + stateToString(localAdapter.getState()) + ", "
-            + "name=" + localAdapter.getName() + ", "
-            + "address=" + localAdapter.getAddress());
+            + "name=" + localAdapter.getName());
     // Log the set of BluetoothDevice objects that are bonded (paired) to the local adapter.
     Set<BluetoothDevice> pairedDevices = localAdapter.getBondedDevices();
     if (!pairedDevices.isEmpty()) {

@@ -29,8 +29,8 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
@@ -47,7 +47,8 @@ class MediaPlayerFragment : Fragment() {
     private var audioPlayerVH: AudioPlayerViewHolder? = null
     private var videoPlayerVH: VideoPlayerViewHolder? = null
 
-    private var playerService: MediaPlayerService? = null
+    private var serviceGateway: MediaPlayerServiceGateway? = null
+    private var playerServiceViewModelGateway: PlayerServiceViewModelGateway? = null
 
     private var playlistObserved = false
     private var videoPlayerPausedForPlaylist = false
@@ -56,8 +57,12 @@ class MediaPlayerFragment : Fragment() {
 
     private var videoPlayerView: PlayerView? = null
 
+    private var isAudioPlayer = false
+
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
+            serviceGateway = null
+            playerServiceViewModelGateway = null
         }
 
         /**
@@ -65,9 +70,10 @@ class MediaPlayerFragment : Fragment() {
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is MediaPlayerServiceBinder) {
-                playerService = service.service
+                serviceGateway = service.serviceGateway
+                playerServiceViewModelGateway = service.playerServiceViewModelGateway
 
-                setupPlayer(service.service)
+                setupPlayer()
                 tryObservePlaylist()
             }
         }
@@ -111,13 +117,11 @@ class MediaPlayerFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        isAudioPlayer = MediaPlayerActivity.isAudioPlayer(requireActivity().intent)
         if (savedInstanceState != null) {
             videoPlayerPausedForPlaylist =
                 savedInstanceState.getBoolean(KEY_VIDEO_PAUSED_FOR_PLAYLIST, false)
         }
-
-        val isAudioPlayer = MediaPlayerActivity.isAudioPlayer(requireActivity().intent)
         val playerServiceIntent = Intent(
             requireContext(),
             if (isAudioPlayer) AudioPlayerService::class.java else VideoPlayerService::class.java
@@ -129,10 +133,7 @@ class MediaPlayerFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        val service = playerService
-        if (service != null) {
-            setupPlayer(service)
-        }
+        setupPlayer()
 
         if (!toolbarVisible) {
             showToolbar()
@@ -147,8 +148,8 @@ class MediaPlayerFragment : Fragment() {
     override fun onPause() {
         super.onPause()
 
-        if (isVideoPlayer() && playerService?.playing() == true) {
-            playerService?.setPlayWhenReady(false)
+        if (isVideoPlayer() && serviceGateway?.playing() == true) {
+            serviceGateway?.setPlayWhenReady(false)
             videoPlayerPausedForPlaylist = true
         }
     }
@@ -168,8 +169,8 @@ class MediaPlayerFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
 
-        playerService?.mediaPlayerGateway?.removeListener(playerListener)
-        playerService = null
+        serviceGateway?.removeListener(playerListener)
+        serviceGateway = null
         requireContext().unbindService(connection)
     }
 
@@ -177,83 +178,106 @@ class MediaPlayerFragment : Fragment() {
      * Observe playlist LiveData when view is created and service is connected.
      */
     private fun tryObservePlaylist() {
-        val service = playerService
-        if (!playlistObserved && service != null && view != null) {
-            playlistObserved = true
+        playerServiceViewModelGateway?.run {
+            if (!playlistObserved && view != null) {
+                playlistObserved = true
 
-            service.viewModel.playlist.observe(viewLifecycleOwner) {
-                Timber.d("MediaPlayerService observed playlist ${it.first.size} items")
+                playlistUpdate().flowWithLifecycle(
+                    viewLifecycleOwner.lifecycle,
+                    Lifecycle.State.RESUMED
+                ).onEach {
+                    Timber.d("MediaPlayerService observed playlist ${it.first.size} items")
 
-                audioPlayerVH?.togglePlaylistEnabled(it.first)
-                videoPlayerVH?.togglePlaylistEnabled(it.first)
-            }
+                    audioPlayerVH?.togglePlaylistEnabled(it.first)
+                    videoPlayerVH?.togglePlaylistEnabled(it.first)
+                }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-            service.viewModel.retry.observe(viewLifecycleOwner) {
-                when {
-                    !it && retryFailedDialog == null -> {
-                        retryFailedDialog = MaterialAlertDialogBuilder(requireContext())
-                            .setCancelable(false)
-                            .setMessage(
-                                StringResourcesUtils.getString(
-                                    if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
-                                    else R.string.error_fail_to_open_file_no_network
+                retryUpdate().flowWithLifecycle(
+                    viewLifecycleOwner.lifecycle,
+                    Lifecycle.State.RESUMED
+                ).onEach { isRetry ->
+                    when {
+                        !isRetry && retryFailedDialog == null -> {
+                            retryFailedDialog = MaterialAlertDialogBuilder(requireContext())
+                                .setCancelable(false)
+                                .setMessage(
+                                    StringResourcesUtils.getString(
+                                        if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
+                                        else R.string.error_fail_to_open_file_no_network
+                                    )
                                 )
-                            )
-                            .setPositiveButton(
-                                StringResourcesUtils.getString(R.string.general_ok)
-                            ) { _, _ ->
-                                playerService?.stopAudioPlayer()
-                                requireActivity().finish()
-                            }
-                            .show()
+                                .setPositiveButton(
+                                    StringResourcesUtils.getString(R.string.general_ok)
+                                ) { _, _ ->
+                                    serviceGateway?.stopAudioPlayer()
+                                    requireActivity().finish()
+                                }
+                                .show()
+                        }
+                        isRetry -> {
+                            retryFailedDialog?.dismiss()
+                            retryFailedDialog = null
+                        }
                     }
-                    it -> {
-                        retryFailedDialog?.dismiss()
-                        retryFailedDialog = null
-                    }
-                }
-            }
+                }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-            service.viewModel.mediaPlaybackState.flowWithLifecycle(
-                viewLifecycleOwner.lifecycle,
-                Lifecycle.State.RESUMED
-            ).onEach { isPaused ->
-                if (isVideoPlayer()) {
-                    // The keepScreenOn is true when the video is playing, otherwise it's false.
-                    videoPlayerView?.keepScreenOn = !isPaused
-                }
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
+                mediaPlaybackUpdate().flowWithLifecycle(
+                    viewLifecycleOwner.lifecycle,
+                    Lifecycle.State.RESUMED
+                ).onEach { isPaused ->
+                    if (isVideoPlayer()) {
+                        // The keepScreenOn is true when the video is playing, otherwise it's false.
+                        videoPlayerView?.keepScreenOn = !isPaused
+                    }
+                }.launchIn(viewLifecycleOwner.lifecycleScope)
+            }
         }
     }
 
-    private fun setupPlayer(service: MediaPlayerService) {
-        if (MediaPlayerActivity.isAudioPlayer(activity?.intent)) {
+    private fun setupPlayer() {
+        if (isAudioPlayer) {
             val viewHolder = audioPlayerVH ?: return
 
-            setupPlayerView(service.mediaPlayerServiceGateway, viewHolder.binding.playerView, false)
-            viewHolder.layoutArtwork()
-            service.metadata.observe(viewLifecycleOwner, viewHolder::displayMetadata)
+            serviceGateway?.run {
+                setupPlayerView(this, viewHolder.binding.playerView, false)
+                viewHolder.layoutArtwork()
+                metadataUpdate().flowWithLifecycle(
+                    viewLifecycleOwner.lifecycle,
+                    Lifecycle.State.RESUMED
+                ).onEach { metadata ->
+                    viewHolder.displayMetadata(metadata)
+                }.launchIn(viewLifecycleOwner.lifecycleScope)
+            }
 
-            viewHolder.setupPlaylistButton(service.viewModel.playlist.value?.first) {
-                findNavController().navigate(R.id.action_player_to_playlist)
+            playerServiceViewModelGateway?.run {
+                viewHolder.setupPlaylistButton(getPlaylistItems()) {
+                    findNavController().navigate(R.id.action_player_to_playlist)
+                }
             }
         } else {
             val viewHolder = videoPlayerVH ?: return
             videoPlayerView = viewHolder.binding.playerView
-            setupPlayerView(service.mediaPlayerServiceGateway, viewHolder.binding.playerView, true)
-            service.metadata.observe(viewLifecycleOwner, viewHolder::displayMetadata)
 
-            // we need setup control buttons again, because reset player would reset
-            // PlayerControlView
-            viewHolder.setupPlaylistButton(service.viewModel.playlist.value?.first) {
-                (requireActivity() as MediaPlayerActivity).setDraggable(false)
+            serviceGateway?.run {
+                setupPlayerView(this, viewHolder.binding.playerView, true)
+                metadataUpdate().flowWithLifecycle(
+                    viewLifecycleOwner.lifecycle,
+                    Lifecycle.State.RESUMED
+                ).onEach { metadata ->
+                    viewHolder.displayMetadata(metadata)
+                }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-                findNavController().navigate(R.id.action_player_to_playlist)
+                if (videoPlayerPausedForPlaylist) {
+                    setPlayWhenReady(true)
+                    videoPlayerPausedForPlaylist = false
+                }
             }
-
-            if (videoPlayerPausedForPlaylist) {
-                service.setPlayWhenReady(true)
-                videoPlayerPausedForPlaylist = false
+            playerServiceViewModelGateway?.run {
+                // we need setup control buttons again, because reset player would reset PlayerControlView
+                viewHolder.setupPlaylistButton(getPlaylistItems()) {
+                    (requireActivity() as MediaPlayerActivity).setDraggable(false)
+                    findNavController().navigate(R.id.action_player_to_playlist)
+                }
             }
         }
     }
@@ -272,20 +296,20 @@ class MediaPlayerFragment : Fragment() {
             },
             controllerHideOnTouch = isVideoPlayer,
             showShuffleButton = !isVideoPlayer,
-            visibilityCallback = { visibility ->
-                if (visibility == View.VISIBLE && !toolbarVisible) {
-                    playerView.hideController()
-                }
-            },
-            clickedCallback = {
-                if (toolbarVisible) {
-                    hideToolbar()
-                } else {
-                    delayHideToolbarCanceled = true
-                    showToolbar()
-                }
-            }
         )
+        playerView.setControllerVisibilityListener { visibility ->
+            if (visibility == View.VISIBLE && !toolbarVisible) {
+                playerView.hideController()
+            }
+        }
+        playerView.setOnClickListener {
+            if (toolbarVisible) {
+                hideToolbar()
+            } else {
+                delayHideToolbarCanceled = true
+                showToolbar()
+            }
+        }
         updateLoadingAnimation(mediaPlayerServiceGateway.getPlaybackState())
         mediaPlayerServiceGateway.addPlayerListener(playerListener)
     }
@@ -368,7 +392,7 @@ class MediaPlayerFragment : Fragment() {
         videoPlayerVH?.binding?.root?.setBackgroundColor(Color.TRANSPARENT)
     }
 
-    private fun isVideoPlayer() = playerService?.viewModel?.audioPlayer == false
+    private fun isVideoPlayer() = playerServiceViewModelGateway?.isAudioPlayer() == false
 
     companion object {
         private const val KEY_VIDEO_PAUSED_FOR_PLAYLIST = "VIDEO_PAUSED_FOR_PLAYLIST"

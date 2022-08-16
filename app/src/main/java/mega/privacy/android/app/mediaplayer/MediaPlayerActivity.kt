@@ -21,11 +21,16 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
@@ -44,6 +49,8 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileInfoActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
@@ -128,13 +135,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, ActivityLauncher {
 
-    @MegaApi
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
-
-    @Inject
-    lateinit var megaChatApi: MegaChatApiAndroid
-
     private val viewModel: MediaPlayerViewModel by viewModels()
 
     private lateinit var binding: ActivityMediaPlayerBinding
@@ -148,7 +148,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
 
     private var serviceBound = false
-    private var playerService: MediaPlayerService? = null
+    private var serviceGateway: MediaPlayerServiceGateway? = null
+    private var playerServiceViewModelGateway: PlayerServiceViewModelGateway? = null
 
     private var takenDownDialog: AlertDialog? = null
 
@@ -167,6 +168,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
+            serviceGateway = null
+            playerServiceViewModelGateway = null
         }
 
         /**
@@ -174,17 +177,20 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is MediaPlayerServiceBinder) {
-                playerService = service.service
+                serviceGateway = service.serviceGateway
+                playerServiceViewModelGateway = service.playerServiceViewModelGateway
 
                 refreshMenuOptionsVisibility()
 
-                service.service.metadata.observe(this@MediaPlayerActivity) {
-                    dragToExit.nodeChanged(service.service.viewModel.playingHandle)
-                }
+                service.serviceGateway.metadataUpdate()
+                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).onEach {
+                        dragToExit.nodeChanged(service.playerServiceViewModelGateway.getCurrentPlayingHandle())
+                    }.launchIn(lifecycleScope)
 
-                service.service.viewModel.error.observe(
-                    this@MediaPlayerActivity, this@MediaPlayerActivity::onError
-                )
+                service.playerServiceViewModelGateway.errorUpdate()
+                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).onEach { errorCode ->
+                        this@MediaPlayerActivity.onError(errorCode)
+                    }.launchIn(lifecycleScope)
             }
         }
     }
@@ -249,7 +255,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         serviceBound = true
 
         viewModel.getCollision().observe(this) { collision ->
-            nameCollisionActivityContract.launch(arrayListOf(collision))
+            nameCollisionActivityContract?.launch(arrayListOf(collision))
         }
 
         viewModel.onSnackbarMessage().observe(this) { message ->
@@ -258,8 +264,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
         viewModel.onExceptionThrown().observe(this, ::manageException)
 
-        viewModel.itemToRemove.observe(this) {
-            playerService?.viewModel?.removeItem(it)
+        viewModel.itemToRemove.observe(this) { handle ->
+            playerServiceViewModelGateway?.removeItem(handle)
         }
 
         if (savedInstanceState == null && !isAudioPlayer) {
@@ -313,7 +319,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     private fun stopPlayer() {
-        playerService?.stopAudioPlayer()
+        serviceGateway?.stopAudioPlayer()
         finish()
     }
 
@@ -332,7 +338,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
+        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
         if (!navController.navigateUp()) {
             finish()
         }
@@ -367,11 +373,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         super.onDestroy()
 
         if (isFinishing) {
-            playerService?.mainPlayerUIClosed()
+            serviceGateway?.mainPlayerUIClosed()
             dragToExit.showPreviousHiddenThumbnail()
         }
 
-        playerService = null
+        serviceGateway = null
         if (serviceBound) {
             unbindService(connection)
         }
@@ -403,7 +409,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 }
 
                 override fun onQueryTextChange(newText: String): Boolean {
-                    playerService?.viewModel?.playlistSearchQuery = newText
+                    playerServiceViewModelGateway?.searchQueryUpdate(newText)
                     return true
                 }
 
@@ -416,7 +422,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             }
 
             override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                playerService?.viewModel?.playlistSearchQuery = null
+                playerServiceViewModelGateway?.searchQueryUpdate(null)
                 return true
             }
         })
@@ -439,172 +445,178 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             return
         }
 
-        val service = playerService
-        if (service == null) {
+        playerServiceViewModelGateway?.run {
+            val adapterType =
+                getCurrentIntent()?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
+
+            adapterType?.run {
+                when (currentFragment) {
+                    R.id.playlist -> {
+                        menu.toggleAllMenuItemsVisibility(false)
+                        searchMenuItem?.isVisible = true
+                        // Display the select option
+                        menu.findItem(R.id.select).isVisible = true
+                    }
+                    R.id.main_player, R.id.track_info -> {
+                        if (adapterType == OFFLINE_ADAPTER) {
+                            menu.toggleAllMenuItemsVisibility(false)
+
+                            menu.findItem(R.id.properties).isVisible =
+                                currentFragment == R.id.main_player
+
+                            menu.findItem(R.id.share).isVisible =
+                                currentFragment == R.id.main_player
+
+                            return
+                        }
+
+                        if (adapterType == RUBBISH_BIN_ADAPTER
+                            || megaApi.isInRubbish(megaApi.getNodeByHandle(getCurrentPlayingHandle()))
+                        ) {
+                            menu.toggleAllMenuItemsVisibility(false)
+
+                            menu.findItem(R.id.properties).isVisible =
+                                currentFragment == R.id.main_player
+
+                            val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
+                            moveToTrash.isVisible = true
+                            moveToTrash.title =
+                                StringResourcesUtils.getString(R.string.context_remove)
+
+                            return
+                        }
+
+                        if (adapterType == FROM_CHAT) {
+                            menu.toggleAllMenuItemsVisibility(false)
+
+                            menu.findItem(R.id.save_to_device).isVisible = true
+                            menu.findItem(R.id.chat_import).isVisible = true
+                            menu.findItem(R.id.chat_save_for_offline).isVisible = true
+
+                            // TODO: share option will be added in AND-12831
+                            menu.findItem(R.id.share).isVisible = false
+
+                            val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
+
+                            val pair = getChatMessage()
+                            val message = pair.second
+
+                            val canRemove = message != null &&
+                                    message.userHandle == megaChatApi.myUserHandle && message.isDeletable
+
+                            if (!canRemove) {
+                                moveToTrash.isVisible = false
+                                return
+                            }
+
+                            moveToTrash.isVisible = true
+                            moveToTrash.title =
+                                StringResourcesUtils.getString(R.string.context_remove)
+
+                            return
+                        }
+
+                        if (adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER) {
+                            menu.toggleAllMenuItemsVisibility(false)
+
+                            menu.findItem(R.id.save_to_device).isVisible = true
+                            menu.findItem(R.id.share).isVisible = true
+
+                            return
+                        }
+
+                        if (adapterType == FOLDER_LINK_ADAPTER || adapterType == FROM_IMAGE_VIEWER || adapterType == VERSIONS_ADAPTER) {
+                            menu.toggleAllMenuItemsVisibility(false)
+                            menu.findItem(R.id.save_to_device).isVisible = true
+
+                            return
+                        }
+
+                        val node = megaApi.getNodeByHandle(getCurrentPlayingHandle())
+                        if (node == null) {
+                            Timber.d("refreshMenuOptionsVisibility node is null")
+
+                            menu.toggleAllMenuItemsVisibility(false)
+                            return
+                        }
+
+                        menu.toggleAllMenuItemsVisibility(true)
+                        searchMenuItem?.isVisible = false
+
+                        menu.findItem(R.id.save_to_device).isVisible = true
+                        // Hide the select, select all, and clear options
+                        menu.findItem(R.id.select).isVisible = false
+                        menu.findItem(R.id.remove).isVisible = false
+
+                        menu.findItem(R.id.properties).isVisible =
+                            currentFragment == R.id.main_player
+
+                        menu.findItem(R.id.share).isVisible =
+                            currentFragment == R.id.main_player && showShareOption(
+                                adapterType = adapterType,
+                                isFolderLink = adapterType == FOLDER_LINK_ADAPTER,
+                                handle = node.handle
+                            )
+
+                        menu.findItem(R.id.send_to_chat).isVisible = true
+
+                        if (megaApi.getAccess(node) == MegaShare.ACCESS_OWNER) {
+                            if (node.isExported) {
+                                menu.findItem(R.id.get_link).isVisible = false
+                                menu.findItem(R.id.remove_link).isVisible = true
+                            } else {
+                                menu.findItem(R.id.get_link).isVisible = true
+                                menu.findItem(R.id.remove_link).isVisible = false
+                            }
+                        } else {
+                            menu.findItem(R.id.get_link).isVisible = false
+                            menu.findItem(R.id.remove_link).isVisible = false
+                        }
+
+                        menu.findItem(R.id.chat_import).isVisible = false
+                        menu.findItem(R.id.chat_save_for_offline).isVisible = false
+
+                        val access = megaApi.getAccess(node)
+                        when (access) {
+                            MegaShare.ACCESS_READWRITE,
+                            MegaShare.ACCESS_READ,
+                            MegaShare.ACCESS_UNKNOWN,
+                            -> {
+                                menu.findItem(R.id.rename).isVisible = false
+                                menu.findItem(R.id.move).isVisible = false
+                            }
+                            MegaShare.ACCESS_FULL,
+                            MegaShare.ACCESS_OWNER,
+                            -> {
+                                menu.findItem(R.id.rename).isVisible = true
+                                menu.findItem(R.id.move).isVisible = true
+                            }
+                        }
+
+                        menu.findItem(R.id.move_to_trash).isVisible =
+                            node.parentHandle != megaApi.rubbishNode.handle
+                                    && (access == MegaShare.ACCESS_FULL || access == MegaShare.ACCESS_OWNER)
+
+                        menu.findItem(R.id.copy).isVisible = adapterType != FOLDER_LINK_ADAPTER
+                    }
+                }
+            } ?: run {
+                Timber.d("refreshMenuOptionsVisibility null adapterType")
+
+                menu.toggleAllMenuItemsVisibility(false)
+            }
+
+        } ?: run {
             Timber.d("refreshMenuOptionsVisibility null service")
 
             menu.toggleAllMenuItemsVisibility(false)
-            return
-        }
-
-        val adapterType = service.viewModel.currentIntent
-            ?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
-
-        if (adapterType == null) {
-            Timber.d("refreshMenuOptionsVisibility null adapterType")
-
-            menu.toggleAllMenuItemsVisibility(false)
-            return
-        }
-
-        when (currentFragment) {
-            R.id.playlist -> {
-                menu.toggleAllMenuItemsVisibility(false)
-                searchMenuItem?.isVisible = true
-                // Display the select option
-                menu.findItem(R.id.select).isVisible = true
-            }
-            R.id.main_player, R.id.track_info -> {
-                if (adapterType == OFFLINE_ADAPTER) {
-                    menu.toggleAllMenuItemsVisibility(false)
-
-                    menu.findItem(R.id.properties).isVisible =
-                        currentFragment == R.id.main_player
-
-                    menu.findItem(R.id.share).isVisible =
-                        currentFragment == R.id.main_player
-
-                    return
-                }
-
-                if (adapterType == RUBBISH_BIN_ADAPTER
-                    || megaApi.isInRubbish(megaApi.getNodeByHandle(service.viewModel.playingHandle))
-                ) {
-                    menu.toggleAllMenuItemsVisibility(false)
-
-                    menu.findItem(R.id.properties).isVisible =
-                        currentFragment == R.id.main_player
-
-                    val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
-                    moveToTrash.isVisible = true
-                    moveToTrash.title = StringResourcesUtils.getString(R.string.context_remove)
-
-                    return
-                }
-
-                if (adapterType == FROM_CHAT) {
-                    menu.toggleAllMenuItemsVisibility(false)
-
-                    menu.findItem(R.id.save_to_device).isVisible = true
-                    menu.findItem(R.id.chat_import).isVisible = true
-                    menu.findItem(R.id.chat_save_for_offline).isVisible = true
-
-                    // TODO: share option will be added in AND-12831
-                    menu.findItem(R.id.share).isVisible = false
-
-                    val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
-
-                    val pair = getChatMessage()
-                    val message = pair.second
-
-                    val canRemove = message != null &&
-                            message.userHandle == megaChatApi.myUserHandle && message.isDeletable
-
-                    if (!canRemove) {
-                        moveToTrash.isVisible = false
-                        return
-                    }
-
-                    moveToTrash.isVisible = true
-                    moveToTrash.title = StringResourcesUtils.getString(R.string.context_remove)
-
-                    return
-                }
-
-                if (adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER) {
-                    menu.toggleAllMenuItemsVisibility(false)
-
-                    menu.findItem(R.id.save_to_device).isVisible = true
-                    menu.findItem(R.id.share).isVisible = true
-
-                    return
-                }
-
-                if (adapterType == FOLDER_LINK_ADAPTER || adapterType == FROM_IMAGE_VIEWER || adapterType == VERSIONS_ADAPTER) {
-                    menu.toggleAllMenuItemsVisibility(false)
-
-                    menu.findItem(R.id.save_to_device).isVisible = true
-
-                    return
-                }
-
-                val node = megaApi.getNodeByHandle(service.viewModel.playingHandle)
-                if (node == null) {
-                    Timber.d("refreshMenuOptionsVisibility node is null")
-
-                    menu.toggleAllMenuItemsVisibility(false)
-                    return
-                }
-
-                menu.toggleAllMenuItemsVisibility(true)
-                searchMenuItem?.isVisible = false
-
-                menu.findItem(R.id.save_to_device).isVisible = true
-                // Hide the select, select all, and clear options
-                menu.findItem(R.id.select).isVisible = false
-                menu.findItem(R.id.remove).isVisible = false
-
-                menu.findItem(R.id.properties).isVisible = currentFragment == R.id.main_player
-
-                menu.findItem(R.id.share).isVisible =
-                    currentFragment == R.id.main_player && showShareOption(
-                        adapterType, adapterType == FOLDER_LINK_ADAPTER, node.handle
-                    )
-
-                menu.findItem(R.id.send_to_chat).isVisible = true
-
-                if (megaApi.getAccess(node) == MegaShare.ACCESS_OWNER) {
-                    if (node.isExported) {
-                        menu.findItem(R.id.get_link).isVisible = false
-                        menu.findItem(R.id.remove_link).isVisible = true
-                    } else {
-                        menu.findItem(R.id.get_link).isVisible = true
-                        menu.findItem(R.id.remove_link).isVisible = false
-                    }
-                } else {
-                    menu.findItem(R.id.get_link).isVisible = false
-                    menu.findItem(R.id.remove_link).isVisible = false
-                }
-
-                menu.findItem(R.id.chat_import).isVisible = false
-                menu.findItem(R.id.chat_save_for_offline).isVisible = false
-
-                val access = megaApi.getAccess(node)
-                when (access) {
-                    MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ, MegaShare.ACCESS_UNKNOWN -> {
-                        menu.findItem(R.id.rename).isVisible = false
-                        menu.findItem(R.id.move).isVisible = false
-                    }
-                    MegaShare.ACCESS_FULL, MegaShare.ACCESS_OWNER -> {
-                        menu.findItem(R.id.rename).isVisible = true
-                        menu.findItem(R.id.move).isVisible = true
-                    }
-                }
-
-                menu.findItem(R.id.move_to_trash).isVisible =
-                    node.parentHandle != megaApi.rubbishNode.handle
-                            && (access == MegaShare.ACCESS_FULL || access == MegaShare.ACCESS_OWNER)
-
-                menu.findItem(R.id.copy).isVisible = adapterType != FOLDER_LINK_ADAPTER
-            }
         }
     }
 
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val service = playerService ?: return false
-        val launchIntent = service.viewModel.currentIntent ?: return false
-        val playingHandle = service.viewModel.playingHandle
+        val launchIntent = playerServiceViewModelGateway?.getCurrentIntent() ?: return false
+        val playingHandle = playerServiceViewModelGateway?.getCurrentPlayingHandle() ?: return false
         val adapterType = launchIntent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
         val isFolderLink = adapterType == FOLDER_LINK_ADAPTER
 
@@ -613,11 +625,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 when (adapterType) {
                     OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(playingHandle, true)
                     ZIP_ADAPTER -> {
-                        val mediaItem = service.mediaPlayerServiceGateway.getCurrentMediaItem()
+                        val mediaItem = serviceGateway?.getCurrentMediaItem()
                         val uri = mediaItem?.localConfiguration?.uri ?: return false
                         val playlistItem =
-                            service.viewModel.getPlaylistItem(mediaItem.mediaId) ?: return false
-
+                            playerServiceViewModelGateway?.getPlaylistItem(mediaItem.mediaId)
+                                ?: return false
                         nodeSaver.saveUri(uri, playlistItem.nodeName, playlistItem.size, true)
                     }
                     FROM_CHAT -> {
@@ -657,7 +669,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             R.id.properties -> {
                 if (isAudioPlayer()) {
                     val uri =
-                        service.mediaPlayerServiceGateway.getCurrentMediaItem()?.localConfiguration?.uri
+                        serviceGateway?.getCurrentMediaItem()?.localConfiguration?.uri
                             ?: return true
                     navController.navigate(
                         MediaPlayerFragmentDirections.actionPlayerToTrackInfo(
@@ -716,9 +728,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             R.id.share -> {
                 when (adapterType) {
                     OFFLINE_ADAPTER, ZIP_ADAPTER -> {
-                        val mediaItem = service.mediaPlayerServiceGateway.getCurrentMediaItem()
+                        val mediaItem = serviceGateway?.getCurrentMediaItem()
                         val nodeName =
-                            service.viewModel.getPlaylistItem(mediaItem?.mediaId)?.nodeName
+                            playerServiceViewModelGateway?.getPlaylistItem(mediaItem?.mediaId)?.nodeName
                                 ?: return false
                         val uri = mediaItem?.localConfiguration?.uri ?: return false
 
@@ -728,7 +740,10 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                         shareLink(this, launchIntent.getStringExtra(URL_FILE_LINK))
                     }
                     else -> {
-                        shareNode(this, megaApi.getNodeByHandle(service.viewModel.playingHandle))
+                        playerServiceViewModelGateway?.run {
+                            shareNode(this@MediaPlayerActivity,
+                                megaApi.getNodeByHandle(getCurrentPlayingHandle()))
+                        }
                     }
                 }
                 return true
@@ -786,7 +801,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 val node = megaApi.getNodeByHandle(playingHandle) ?: return true
                 showRenameNodeDialog(this, node, this, object : ActionNodeCallback {
                     override fun finishRenameActionWithSuccess(newName: String) {
-                        playerService?.viewModel?.updateItemName(node.handle, newName)
+                        playerServiceViewModelGateway?.updateItemName(node.handle, newName)
                         updateTrackInfoNodeNameIfNeeded(node.handle, newName)
                     }
                 })
@@ -879,14 +894,14 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
 
-        if (nodeAttacher.handleActivityResult(requestCode, resultCode, data, this)) {
+        if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
             return
         }
 
-        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, data)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return
         }
 
@@ -894,22 +909,22 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             REQUEST_CODE_SELECT_IMPORT_FOLDER -> {
                 val node = getChatMessageNode() ?: return
 
-                val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
+                val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
                     ?: return
 
                 viewModel.copyNode(node = node, newParentHandle = toHandle)
             }
             REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
-                val moveHandles = data?.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)
+                val moveHandles = intent?.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)
                     ?: return
-                val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+                val toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
 
                 viewModel.moveNode(moveHandles[0], toHandle)
             }
             REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
-                val copyHandles = data?.getLongArrayExtra(Constants.INTENT_EXTRA_KEY_COPY_HANDLES)
+                val copyHandles = intent?.getLongArrayExtra(Constants.INTENT_EXTRA_KEY_COPY_HANDLES)
                     ?: return
-                val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+                val toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
 
                 viewModel.copyNode(nodeHandle = copyHandles[0], newParentHandle = toHandle)
             }

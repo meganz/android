@@ -11,5 +11,5 @@ fun interface DeleteSyncRecord {
      *
      * @return
      */
-    operator fun invoke(path: String, isSecondary: Boolean)
+    suspend operator fun invoke(path: String, isSecondary: Boolean)
 }

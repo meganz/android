@@ -51,6 +51,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CANCEL_ACCOUNT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHANGE_PASSWORD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_SETTINGS
+import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CALLS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CAMERA_UPLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CHAT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_CENTRE
@@ -67,10 +68,11 @@ import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.main.ChangePasswordActivity
 import mega.privacy.android.app.main.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.main.VerifyTwoFactorActivity
+import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.presentation.extensions.hideKeyboard
+import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivity
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY
@@ -92,14 +94,15 @@ class SettingsFragment :
 
     private val viewModel: SettingsViewModel by viewModels()
 
-    private var playerService: MediaPlayerService? = null
+    private var playerServiceViewModelGateway: PlayerServiceViewModelGateway? = null
     private val mediaServiceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            playerService = (service as? MediaPlayerServiceBinder)?.service
+            playerServiceViewModelGateway =
+                (service as? MediaPlayerServiceBinder)?.playerServiceViewModelGateway
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            playerService = null
+            playerServiceViewModelGateway = null
         }
     }
 
@@ -142,6 +145,7 @@ class SettingsFragment :
                     findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled =
                         state.cameraUploadEnabled
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
+                    findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
 
                     findPreference<SwitchPreferenceCompat>(KEY_2FA)?.apply {
                         isVisible = state.multiFactorVisible
@@ -168,7 +172,7 @@ class SettingsFragment :
                         ?.let { it.isChecked = state.hideRecentActivityChecked }
 
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
-
+                    findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
                 }
             }
         }
@@ -229,12 +233,21 @@ class SettingsFragment :
                     CameraUploadsPreferencesActivity::class.java
                 )
             )
-            KEY_FEATURES_CHAT -> startActivity(
-                Intent(
-                    context,
-                    ChatPreferencesActivity::class.java
+            KEY_FEATURES_CHAT ->
+                startActivity(
+                    Intent(
+                        context,
+                        ChatPreferencesActivity::class.java
+                    )
                 )
-            )
+
+            KEY_FEATURES_CALLS ->
+                startActivity(
+                    Intent(
+                        context,
+                        SettingsCallsActivity::class.java
+                    )
+                )
             KEY_STORAGE_DOWNLOAD -> startActivity(
                 Intent(
                     context,
@@ -337,9 +350,7 @@ class SettingsFragment :
                     CookiePreferencesActivity::class.java
                 )
             )
-            KEY_AUDIO_BACKGROUND_PLAY_ENABLED -> if (playerService != null) {
-                playerService?.viewModel?.toggleBackgroundPlay()
-            }
+            KEY_AUDIO_BACKGROUND_PLAY_ENABLED -> playerServiceViewModelGateway?.toggleBackgroundPlay()
             KEY_START_SCREEN -> startActivity(
                 Intent(
                     context,

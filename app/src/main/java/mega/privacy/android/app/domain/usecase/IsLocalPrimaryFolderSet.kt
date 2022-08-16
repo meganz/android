@@ -15,5 +15,5 @@ interface IsLocalPrimaryFolderSet {
      *
      * @return whether local primary folder is set
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }

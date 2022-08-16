@@ -1,11 +1,14 @@
 package mega.privacy.android.app.presentation.manager
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,12 +21,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.data.model.GlobalUpdate
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
@@ -32,6 +37,7 @@ import mega.privacy.android.domain.entity.ContactRequest
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
+import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
@@ -60,6 +66,9 @@ class ManagerViewModel @Inject constructor(
     private val getRootFolder: GetRootFolder,
     private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
     private val hasInboxChildren: HasInboxChildren,
+    private val sendStatisticsMediaDiscovery: SendStatisticsMediaDiscovery,
+    savedStateHandle: SavedStateHandle,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     /**
@@ -71,6 +80,24 @@ class ManagerViewModel @Inject constructor(
      * public UI State
      */
     val state: StateFlow<ManagerState> = _state
+
+    internal val isFirstLoginKey = "EXTRA_FIRST_LOGIN"
+
+    private val isFirstLogin = savedStateHandle.getStateFlow(
+        viewModelScope,
+        isFirstLoginKey,
+        false
+    )
+
+    init {
+        viewModelScope.launch(ioDispatcher) {
+            isFirstLogin.map {
+                { state: ManagerState -> state.copy(isFirstLogin = it) }
+            }.collect {
+                _state.update(it)
+            }
+        }
+    }
 
     /**
      * Monitor all global updates
@@ -185,15 +212,6 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Set the current links parent handle to the UI state
-     *
-     * @param handle the id of the current links parent handle to set
-     */
-    fun setLinksParentHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(linksParentHandle = handle) }
-    }
-
-    /**
      * Set the current inbox parent handle to the UI state
      *
      * @param handle the id of the current inbox parent handle to set
@@ -209,27 +227,6 @@ class ManagerViewModel @Inject constructor(
      */
     fun setIsFirstNavigationLevel(isFirstNavigationLevel: Boolean) = viewModelScope.launch {
         _state.update { it.copy(isFirstNavigationLevel = isFirstNavigationLevel) }
-    }
-
-    /**
-     * Decrease by 1 the links tree depth
-     */
-    fun decreaseLinksTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(linksTreeDepth = it.linksTreeDepth - 1) }
-    }
-
-    /**
-     * Increase by 1 the links tree depth
-     */
-    fun increaseLinksTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(linksTreeDepth = it.linksTreeDepth + 1) }
-    }
-
-    /**
-     * Reset links tree depth to initial value
-     */
-    fun resetLinksTreeDepth() = viewModelScope.launch {
-        _state.update { it.copy(linksTreeDepth = 0) }
     }
 
     /**
@@ -286,4 +283,21 @@ class ManagerViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Fire a Media Discovery stats event
+     */
+    fun onMediaDiscoveryOpened(mediaHandle: Long) {
+        viewModelScope.launch {
+            sendStatisticsMediaDiscovery(mediaHandle)
+        }
+    }
+
+    /**
+     * Set first login status
+     */
+    fun setIsFirstLogin(newIsFirstLogin: Boolean) {
+        isFirstLogin.update {
+            newIsFirstLogin
+        }
+    }
 }

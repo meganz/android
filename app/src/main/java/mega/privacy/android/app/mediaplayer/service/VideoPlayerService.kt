@@ -19,12 +19,4 @@ class VideoPlayerService : MediaPlayerService() {
     @VideoPlayer
     @Inject
     override lateinit var mediaPlayerGateway: MediaPlayerGateway
-
-
-    /**
-     * MediaPlayerServiceGateway for audio player
-     */
-    @VideoPlayer
-    @Inject
-    override lateinit var mediaPlayerServiceGateway: MediaPlayerServiceGateway
 }

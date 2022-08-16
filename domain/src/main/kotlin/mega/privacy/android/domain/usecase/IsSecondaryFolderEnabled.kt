@@ -12,5 +12,5 @@ fun interface IsSecondaryFolderEnabled {
      *
      * @return if secondary is enabled
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }

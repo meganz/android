@@ -37,8 +37,6 @@ import static mega.privacy.android.app.utils.CameraUploadUtil.resetMUTimestampsA
 import static mega.privacy.android.app.utils.CameraUploadUtil.restorePrimaryTimestampsAndSyncRecordProcess;
 import static mega.privacy.android.app.utils.CameraUploadUtil.restoreSecondaryTimestampsAndSyncRecordProcess;
 import static mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_ACCESS_MEDIA_LOCATION;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_UPLOAD;
 import static mega.privacy.android.app.utils.FileUtil.isBasedOnFileStorage;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
@@ -53,19 +51,17 @@ import static mega.privacy.android.app.utils.Util.isOffline;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
 import static nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS;
 import static nz.mega.sdk.MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -81,17 +77,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
@@ -99,6 +98,7 @@ import mega.privacy.android.app.main.FileStorageActivity;
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardUtils;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.domain.entity.SyncStatus;
 import mega.privacy.android.domain.entity.VideoQuality;
 import nz.mega.sdk.MegaNode;
@@ -119,6 +119,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     private Preference secondaryMediaFolderOn;
     private Preference localSecondaryFolder;
     private Preference megaSecondaryFolder;
+    private AlertDialog businessCameraUploadsAlertDialog;
 
     private boolean cameraUpload = false;
     private boolean cameraUploadSettingsChanged = false;
@@ -126,7 +127,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     private boolean charging = false;
     private boolean includeGPS;
     private boolean fileNames = false;
-    private Handler handler = new Handler();
 
     private String wifi = "";
     private String camSyncLocalPath = "";
@@ -149,6 +149,44 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     public SettingsCameraUploadsFragment() {
         super();
     }
+
+    /**
+     * An ActivityResultLauncher that is launched when the user attempts to enable Camera Uploads
+     * without granting the READ_EXTERNAL_STORAGE permission
+     */
+    private final ActivityResultLauncher<String> readExternalPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), result -> {
+                if (result) {
+                    // If the permission is granted, check the user Business Account status
+                    Timber.d("Permission READ_EXTERNAL_STORAGE granted");
+                    checkIfShouldShowBusinessCUAlert();
+                } else {
+                    Timber.d("Permission READ_EXTERNAL_STORAGE denied");
+                    // Otherwise, display a Snackbar explaining that permission READ_EXTERNAL_PERMISSION should be
+                    // granted before enabling Camera Uploads
+                    Util.showSnackbar(requireContext(), getString(R.string.on_refuse_storage_permission));
+                }
+            }
+    );
+
+    /**
+     * An ActivityResultLauncher that is launched when the user attempts to enable Camera Uploads
+     * with location tags without granting the ACCESS_MEDIA_LOCATION permission
+     */
+    private final ActivityResultLauncher<String> accessMediaLocationLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), result -> {
+                if (result) {
+                    // If the permission is granted, then enable Camera Uploads with location tags
+                    Timber.d("Permission ACCESS_MEDIA_LOCATION granted");
+                    enableCameraUploadsWithLocation();
+                } else {
+                    // Otherwise, display a Snackbar explaining that permission ACCESS_MEDIA_LOCATION should be
+                    // granted before enabling Camera Uploads
+                    Timber.d("Permission ACCESS_MEDIA_LOCATION denied");
+                    Util.showSnackbar(requireContext(), getString(R.string.on_refuse_storage_permission));
+                }
+            }
+    );
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -474,17 +512,47 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             Timber.d("Disable CU.");
             disableCameraUpload();
         } else {
-            Timber.d("Enable CU.");
-            String[] PERMISSIONS = {
-                    android.Manifest.permission.READ_EXTERNAL_STORAGE
-            };
+            // Check if the necessary permissions to enable Camera Uploads have been granted
+            Timber.d("Checking if READ_EXTERNAL_PERMISSION is granted");
 
-            if (!hasPermissions(context, PERMISSIONS)) {
-                requestPermission((CameraUploadsPreferencesActivity) context, REQUEST_CAMERA_UPLOAD, PERMISSIONS);
+            if (hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                Timber.d("READ_EXTERNAL_PERMISSION granted");
+                checkIfShouldShowBusinessCUAlert();
             } else {
-                ((CameraUploadsPreferencesActivity) context).checkIfShouldShowBusinessCUAlert();
+                Timber.d("READ_EXTERNAL_PERMISSION not granted. Launching permission window");
+                readExternalPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
             }
         }
+    }
+
+    /**
+     * Method to check if Business alert needs to be displayed before enabling Camera Uploads.
+     */
+    private void checkIfShouldShowBusinessCUAlert() {
+        if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
+            showBusinessCUAlert();
+        } else {
+            enableCameraUpload();
+        }
+    }
+
+    /**
+     * Method for displaying the Business alert.
+     */
+    private void showBusinessCUAlert() {
+        if (businessCameraUploadsAlertDialog != null && businessCameraUploadsAlertDialog.isShowing()) {
+            return;
+        }
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog);
+        builder.setTitle(R.string.section_photo_sync)
+                .setMessage(R.string.camera_uploads_business_alert)
+                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {
+                })
+                .setPositiveButton(R.string.general_enable, (dialog, which) -> enableCameraUpload())
+                .setCancelable(false);
+        businessCameraUploadsAlertDialog = builder.create();
+        businessCameraUploadsAlertDialog.show();
     }
 
     /**
@@ -514,24 +582,31 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                     break;
                 }
 
-                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                    // Devices whose Android OS is below Android 10 do not need to request for the
+                    // ACCESS_MEDIA_LOCATION permission. Enable Camera Uploads with Location Tags immediately
+                    Timber.d("Device OS is below Android 10. Enable Camera Uploads with Location Tags");
                     dbH.setRemoveGPS(false);
                     rescheduleCameraUpload(context);
-                    break;
+                } else {
+                    // Otherwise if the device is running on Android 10 above, check whether the
+                    // ACCESS_MEDIA_LOCATION permission is granted or not
+                    Timber.d("Device OS is Android 10 above. Checking if ACCESS_MEDIA_LOCATION is granted");
+                    if (hasPermissions(context, Manifest.permission.ACCESS_MEDIA_LOCATION)) {
+                        // ACCESS_MEDIA_LOCATION permission is granted. Enable Camera Uploads with Location Tags
+                        Timber.d("ACCESS_MEDIA_LOCATION permission granted. Enable Camera Uploads with Location Tags");
+                        dbH.setRemoveGPS(false);
+                        rescheduleCameraUpload(context);
+                    } else {
+                        // ACCESS_MEDIA_LOCATION permission is denied. Request to enable the
+                        // ACCESS_MEDIA_LOCATION permission
+                        Timber.d("ACCESS_MEDIA_LOCATION permission denied. Launching permission window");
+                        includeGPS = false;
+                        dbH.setRemoveGPS(true);
+                        cameraUploadIncludeGPS.setChecked(includeGPS);
+                        accessMediaLocationLauncher.launch(Manifest.permission.ACCESS_MEDIA_LOCATION);
+                    }
                 }
-
-                @SuppressLint("InlinedApi") String[] PERMISSIONS = {Manifest.permission.ACCESS_MEDIA_LOCATION};
-                if (hasPermissions(context, PERMISSIONS)) {
-                    dbH.setRemoveGPS(false);
-                    rescheduleCameraUpload(context);
-                    break;
-                }
-
-                // user enabled location data, is on >= Android 10, but has not enabled required permissions
-                includeGPS = false;
-                dbH.setRemoveGPS(true);
-                cameraUploadIncludeGPS.setChecked(includeGPS);
-                requestPermission((CameraUploadsPreferencesActivity) context, REQUEST_ACCESS_MEDIA_LOCATION, PERMISSIONS);
                 break;
 
             case KEY_CAMERA_UPLOAD_CHARGING:

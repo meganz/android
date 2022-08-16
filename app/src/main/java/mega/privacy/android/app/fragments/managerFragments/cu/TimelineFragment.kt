@@ -275,7 +275,7 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
         viewModel.setEnableCUShown(false)
         viewModel.setCamSyncEnabled(false)
         mManagerActivity.isFirstNavigationLevel = false
-        if (mManagerActivity.isFirstLogin) {
+        if (mManagerActivity.firstLogin) {
             mManagerActivity.skipInitialCUSetup()
         } else {
             mManagerActivity.refreshTimelineFragment()
@@ -298,7 +298,7 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
             binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked,
             requireContext(),
         )
-        mManagerActivity.isFirstLogin = false
+        mManagerActivity.firstLogin = false
         viewModel.setEnableCUShown(false)
         callManager {
             it.refreshTimelineFragment()

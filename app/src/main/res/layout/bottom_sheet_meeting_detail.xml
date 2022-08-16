@@ -78,7 +78,7 @@
                 style="@style/BottomSheetOption"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="@string/general_archive"
+                android:text="@string/archive_meeting_option"
                 app:drawableStartCompat="@drawable/ic_archive"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

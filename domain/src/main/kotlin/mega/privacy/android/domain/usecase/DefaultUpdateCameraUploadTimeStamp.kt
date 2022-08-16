@@ -15,7 +15,7 @@ class DefaultUpdateCameraUploadTimeStamp @Inject constructor(
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
 ) :
     UpdateCameraUploadTimeStamp {
-    override fun invoke(
+    override suspend fun invoke(
         timestamp: Long?,
         timestampType: SyncTimeStamp,
     ) {
@@ -52,7 +52,7 @@ class DefaultUpdateCameraUploadTimeStamp @Inject constructor(
         }
     }
 
-    private fun updateTimeStamp(
+    private suspend fun updateTimeStamp(
         newTimeStamp: Long,
         timestampType: SyncTimeStamp,
     ) {

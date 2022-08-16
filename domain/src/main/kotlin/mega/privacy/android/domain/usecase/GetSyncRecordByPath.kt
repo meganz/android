@@ -13,5 +13,5 @@ interface GetSyncRecordByPath {
      *
      * @return sync record if found
      */
-    operator fun invoke(path: String, isSecondary: Boolean): SyncRecord?
+    suspend operator fun invoke(path: String, isSecondary: Boolean): SyncRecord?
 }
