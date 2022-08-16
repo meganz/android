@@ -25,7 +25,7 @@ class DefaultIsLocalSecondaryFolderSet @Inject constructor(
     private val getDocumentFileWrapper: GetDocumentFileWrapper,
     @ApplicationContext private val context: Context,
 ) : IsLocalSecondaryFolderSet {
-    override fun invoke(): Boolean {
+    override suspend fun invoke(): Boolean {
         return if (isSecondaryFolderEnabled()) {
             if (cameraUploadRepository.isMediaFolderExternalSd()) {
                 val uri = Uri.parse(cameraUploadRepository.getUriMediaFolderExternalSd())

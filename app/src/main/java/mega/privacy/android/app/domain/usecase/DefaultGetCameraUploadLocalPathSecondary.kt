@@ -20,7 +20,7 @@ class DefaultGetCameraUploadLocalPathSecondary @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : GetCameraUploadLocalPathSecondary {
 
-    override fun invoke(): String? {
+    override suspend fun invoke(): String? {
         var localPath = if (cameraUploadRepository.isMediaFolderExternalSd()) {
             val uri = Uri.parse(cameraUploadRepository.getUriMediaFolderExternalSd())
             getFullPathFileWrapper.getFullPathFromTreeUri(uri, context)

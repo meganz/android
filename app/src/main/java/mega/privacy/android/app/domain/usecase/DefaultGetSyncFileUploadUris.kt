@@ -14,7 +14,7 @@ import javax.inject.Inject
 class DefaultGetSyncFileUploadUris @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
 ) : GetSyncFileUploadUris {
-    override fun invoke(): List<Uri> {
+    override suspend fun invoke(): List<Uri> {
 
         val uris = mutableListOf<Uri>()
         val fileUpload = cameraUploadRepository.getSyncFileUpload()

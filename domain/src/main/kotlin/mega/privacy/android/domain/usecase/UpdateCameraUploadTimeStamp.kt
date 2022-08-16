@@ -12,5 +12,5 @@ interface UpdateCameraUploadTimeStamp {
      *
      * @return
      */
-    operator fun invoke(timestamp: Long? = null, timestampType: SyncTimeStamp)
+    suspend operator fun invoke(timestamp: Long? = null, timestampType: SyncTimeStamp)
 }

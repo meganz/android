@@ -13,5 +13,5 @@ interface GetSyncFileUploadUris {
      *
      * @return list of sync file upload uris
      */
-    operator fun invoke(): List<Uri>
+    suspend operator fun invoke(): List<Uri>
 }

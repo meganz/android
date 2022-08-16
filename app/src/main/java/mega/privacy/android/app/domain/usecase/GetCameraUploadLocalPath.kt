@@ -9,5 +9,5 @@ interface GetCameraUploadLocalPath {
      *
      * @return local path or null
      */
-    operator fun invoke(): String?
+    suspend operator fun invoke(): String?
 }

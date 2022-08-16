@@ -11,5 +11,5 @@ fun interface GetRemoveGps {
      *
      * @return remove GPS setting
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }

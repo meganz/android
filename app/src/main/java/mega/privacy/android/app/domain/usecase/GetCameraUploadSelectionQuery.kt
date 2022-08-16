@@ -12,5 +12,5 @@ interface GetCameraUploadSelectionQuery {
      *
      * @return selection query or null
      */
-    operator fun invoke(timestampType: SyncTimeStamp): String?
+    suspend operator fun invoke(timestampType: SyncTimeStamp): String?
 }

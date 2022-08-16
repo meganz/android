@@ -10,5 +10,5 @@ fun interface IsCameraUploadByWifi {
      *
      * @return sync is by wifi
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }

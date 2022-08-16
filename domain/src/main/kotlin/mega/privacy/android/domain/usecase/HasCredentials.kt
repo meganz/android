@@ -10,5 +10,5 @@ fun interface HasCredentials {
      *
      * @return do credentials exist
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }
