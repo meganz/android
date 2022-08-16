@@ -12,7 +12,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import androidx.appcompat.view.ActionMode
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -30,7 +33,6 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.fragments.offline.OfflineAdapter
 import mega.privacy.android.app.fragments.offline.OfflineListViewHolder
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -144,7 +146,7 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
             }
         }
 
-//        observeAnimatedItems()
+        observeAnimatedItems()
 
         observeDragSupportEvents(viewLifecycleOwner, listView, VIEWER_FROM_RECETS_BUCKET)
     }
@@ -474,94 +476,84 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
         checkScroll()
     }
 
-//    private fun observeAnimatedItems() {
-//        var animatorSet: AnimatorSet? = null
-//
-//        viewModel.nodesToAnimate.observe(viewLifecycleOwner) {
-//            val rvAdapter = adapter ?: return@observe
-//
-//            animatorSet?.run {
-//                // End the started animation if any, or the view may show messy as its property
-//                // would be wrongly changed by multiple animations running at the same time
-//                // via contiguous quick clicks on the item
-//                if (isStarted) {
-//                    end()
-//                }
-//            }
-//
-//            // Must create a new AnimatorSet, or it would keep all previous
-//            // animation and play them together
-//            animatorSet = AnimatorSet()
-//            val animatorList = mutableListOf<Animator>()
-//
-//            animatorSet?.addListener(object : Animator.AnimatorListener {
-//                override fun onAnimationRepeat(animation: Animator) {
-//                }
-//
-//                override fun onAnimationEnd(animation: Animator) {
+    private fun observeAnimatedItems() {
+        var animatorSet: AnimatorSet? = null
+
+        viewModel.nodesToAnimate.observe(viewLifecycleOwner) {
+            val rvAdapter = adapter ?: return@observe
+
+            animatorSet?.run {
+                // End the started animation if any, or the view may show messy as its property
+                // would be wrongly changed by multiple animations running at the same time
+                // via contiguous quick clicks on the item
+                if (isStarted) {
+                    end()
+                }
+            }
+
+            // Must create a new AnimatorSet, or it would keep all previous
+            // animation and play them together
+            animatorSet = AnimatorSet()
+            val animatorList = mutableListOf<Animator>()
+
+            animatorSet?.addListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(animation: Animator) {
+                }
+
+                override fun onAnimationEnd(animation: Animator) {
 //                    viewModel.items.value?.let { newList ->
 //                        rvAdapter.(ArrayList(newList))
 //                    }
-//                }
-//
-//                override fun onAnimationCancel(animation: Animator) {
-//                }
-//
-//                override fun onAnimationStart(animation: Animator) {
-//                }
-//            })
-//
-//            it.forEach { pos ->
-//                recyclerView?.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
-//                    val itemView = viewHolder.itemView
-//
-//                    val imageView: ImageView? = when (rvAdapter.getItemViewType(pos)) {
-//                        OfflineAdapter.TYPE_LIST -> {
-//                            val thumbnail = itemView.findViewById<ImageView>(R.id.thumbnail)
-//                            val param = thumbnail.layoutParams as FrameLayout.LayoutParams
-//                            param.width = Util.dp2px(
-//                                OfflineListViewHolder.LARGE_IMAGE_WIDTH,
-//                                resources.displayMetrics
-//                            )
-//                            param.height = param.width
-//                            param.marginStart = Util.dp2px(
-//                                OfflineListViewHolder.LARGE_IMAGE_MARGIN_LEFT,
-//                                resources.displayMetrics
-//                            )
-//                            thumbnail.layoutParams = param
-//                            thumbnail
-//                        }
-//                        OfflineAdapter.TYPE_GRID_FOLDER -> {
-//                            itemView.background = ContextCompat.getDrawable(
-//                                requireContext(), R.drawable.background_item_grid_selected
-//                            )
-//                            itemView.findViewById(R.id.icon)
-//                        }
-//                        OfflineAdapter.TYPE_GRID_FILE -> {
-//                            itemView.background = ContextCompat.getDrawable(
-//                                requireContext(), R.drawable.background_item_grid_selected
-//                            )
-//                            itemView.findViewById(R.id.ic_selected)
-//                        }
-//                        else -> null
-//                    }
-//
-//                    imageView?.run {
-//                        setImageResource(R.drawable.ic_select_folder)
-//                        visibility = View.VISIBLE
-//
-//                        val animator =
-//                            AnimatorInflater.loadAnimator(context, R.animator.icon_select)
-//                        animator.setTarget(this)
-//                        animatorList.add(animator)
-//                    }
-//                }
-//            }
-//
-//            animatorSet?.playTogether(animatorList)
-//            animatorSet?.start()
-//        }
-//    }
+                }
+
+                override fun onAnimationCancel(animation: Animator) {
+                }
+
+                override fun onAnimationStart(animation: Animator) {
+                }
+            })
+
+            it.forEach { pos ->
+                listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
+                    val itemView = viewHolder.itemView
+
+                    val imageView: ImageView = if (!bucket.isMedia) {
+                        val thumbnail = itemView.findViewById<ImageView>(R.id.thumbnail_list)
+                        val param = thumbnail?.layoutParams as RelativeLayout.LayoutParams
+                        param.width = Util.dp2px(
+                            48f,
+                            resources.displayMetrics
+                        )
+                        param.height = param.width
+                        param.marginStart = Util.dp2px(
+                            12f,
+                            resources.displayMetrics
+                        )
+                        thumbnail.layoutParams = param
+                        thumbnail
+                    } else {
+                        itemView.background = ContextCompat.getDrawable(
+                            requireContext(), R.drawable.background_item_grid_selected
+                        )
+                        itemView.findViewById(R.id.icon_selected)
+                    }
+
+                    imageView.run {
+                        setImageResource(R.drawable.ic_select_folder)
+                        visibility = View.VISIBLE
+
+                        val animator =
+                            AnimatorInflater.loadAnimator(context, R.animator.icon_select)
+                        animator.setTarget(this)
+                        animatorList.add(animator)
+                    }
+                }
+            }
+
+            animatorSet?.playTogether(animatorList)
+            animatorSet?.start()
+        }
+    }
 
     fun handleItemClick(position: Int, node: MegaNode, isMedia: Boolean) {
         if (actionMode == null) {

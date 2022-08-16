@@ -81,6 +81,7 @@ public class MultipleBucketAdapter
         private RelativeLayout videoLayout;
         private TextView videoDuration;
         private RelativeLayout listView;
+        private ImageView selectedIcon;
         private ImageView thumbnailList;
         private TextView nameText;
         private TextView infoText;
@@ -137,7 +138,7 @@ public class MultipleBucketAdapter
 
     @Nullable
     @Override
-    public View getThumbnail(@NonNull RecyclerView.ViewHolder viewHolder) {
+    public ImageView getThumbnail(@NonNull RecyclerView.ViewHolder viewHolder) {
         if (viewHolder instanceof ViewHolderMultipleBucket) {
             return isMedia ? ((ViewHolderMultipleBucket) viewHolder).thumbnailMedia
                     : ((ViewHolderMultipleBucket) viewHolder).thumbnailList;
@@ -166,6 +167,7 @@ public class MultipleBucketAdapter
         holder.infoText = v.findViewById(R.id.info_text);
         holder.imgLabel = v.findViewById(R.id.img_label);
         holder.imgFavourite = v.findViewById(R.id.img_favourite);
+        holder.selectedIcon = v.findViewById(R.id.icon_selected);
         holder.threeDots = v.findViewById(R.id.three_dots);
         holder.threeDots.setTag(holder);
         holder.threeDots.setOnClickListener(this);
@@ -203,6 +205,7 @@ public class MultipleBucketAdapter
             holder.listView.setVisibility(View.GONE);
             holder.imgLabel.setVisibility(View.GONE);
             holder.imgFavourite.setVisibility(View.GONE);
+            holder.selectedIcon.setVisibility(View.GONE);
 
             if (isAudioOrVideo(node)) {
                 holder.videoLayout.setVisibility(View.VISIBLE);
