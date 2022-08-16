@@ -21,14 +21,6 @@ class AudioPlayerService : MediaPlayerService() {
     @Inject
     override lateinit var mediaPlayerGateway: MediaPlayerGateway
 
-
-    /**
-     * MediaPlayerServiceGateway for audio player
-     */
-    @AudioPlayer
-    @Inject
-    override lateinit var mediaPlayerServiceGateway: MediaPlayerServiceGateway
-
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         //Stop audio player when app is killed.
