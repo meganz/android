@@ -23,6 +23,7 @@ import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTI
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED
 import mega.privacy.android.app.utils.Constants.EXTRA_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.GO_OFFLINE
+import mega.privacy.android.app.utils.Constants.GO_ONLINE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
@@ -40,9 +41,17 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
                 return
             }
 
-            Timber.d("Network Broadcast Event Received")
-            settingsFragment?.setOnlineOptions(intent.getIntExtra(ACTION_TYPE,
-                INVALID_VALUE) == GO_OFFLINE)
+            settingsFragment?.let {
+                val actionType = intent.getIntExtra(ACTION_TYPE, INVALID_VALUE)
+
+                if (actionType == GO_OFFLINE) {
+                    Timber.d("Offline Network Broadcast Event Received")
+                    it.setOnlineOptions(false)
+                } else if (actionType == GO_ONLINE) {
+                    Timber.d("Online Network Broadcast Event Received")
+                    it.setOnlineOptions(true)
+                }
+            }
         }
     }
 
@@ -116,18 +125,6 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
         }
     }
 
-    private val reEnableCameraUploadsPreferenceReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent != null && intent.action.equals(BROADCAST_ACTION_REENABLE_CU_PREFERENCE) &&
-                settingsFragment != null
-            ) {
-                Timber.d("Re-Enable Camera Uploads Preference Event Received")
-                settingsFragment?.reEnableCameraUploadsPreference(intent.getIntExtra(
-                    KEY_REENABLE_WHICH_PREFERENCE, 0))
-            }
-        }
-    }
-
     /**
      * Sets the Camera Uploads destination folder when the receiver Camera Uploads
      * attribute has changed in a synchronized manner
@@ -139,6 +136,18 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
         val handleInUserAttr = intent.getLongExtra(EXTRA_NODE_HANDLE, INVALID_HANDLE)
         val isSecondaryFolder = intent.getBooleanExtra(EXTRA_IS_CU_SECONDARY_FOLDER, false)
         settingsFragment?.setCUDestinationFolder(isSecondaryFolder, handleInUserAttr)
+    }
+
+    private val reEnableCameraUploadsPreferenceReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent != null && intent.action.equals(BROADCAST_ACTION_REENABLE_CU_PREFERENCE) &&
+                settingsFragment != null
+            ) {
+                Timber.d("Re-Enable Camera Uploads Preference Event Received")
+                settingsFragment?.reEnableCameraUploadsPreference(intent.getIntExtra(
+                    KEY_REENABLE_WHICH_PREFERENCE, 0))
+            }
+        }
     }
 
     /**
