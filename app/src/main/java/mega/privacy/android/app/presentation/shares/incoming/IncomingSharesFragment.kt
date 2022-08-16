@@ -208,6 +208,8 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
     override fun getParentHandle(): Long = state().incomingHandle
 
+    override fun getIntentOrder(): Int = state().sortOrder
+
     /**
      * Observe viewModel
      */
