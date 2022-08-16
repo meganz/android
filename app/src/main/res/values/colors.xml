@@ -41,6 +41,7 @@
     <color name="grey_010">#FAFAFA</color>
     <color name="grey_020">#F5F5F5</color>
     <color name="grey_050">#EEEEEE</color>
+    <color name="grey_070">#A1A2A5</color>
     <color name="grey_100">#E0E0E0</color>
     <color name="grey_200">#BDBDBD</color>
     <color name="grey_300">#9E9E9E</color>
@@ -51,6 +52,7 @@
     <color name="grey_800">#2E2E2E</color>
     <color name="grey_900">#212121</color>
 
+    <color name="grey_050_alpha_038">#61EEEEEE</color>
     <color name="grey_100_alpha_060">#99E0E0E0</color>
     <color name="grey_300_alpha_026">#429E9E9E</color>
     <color name="grey_600_alpha_085">#D96C6C6C</color>
@@ -243,6 +245,15 @@
 
     <!-- chat unread message background -->
     <color name="grey_020_grey_700">@color/grey_020</color>
+
+    <!-- Thumb of deactivated switch in settings -->
+    <color name="grey_020_grey_100">@color/grey_020</color>
+
+    <!-- Track of deactivated switch in settings -->
+    <color name="grey_700_grey_050_038">@color/grey_700</color>
+
+    <!-- Track of activated switch in settings -->
+    <color name="teal_100_teal_200_038">@color/teal_100</color>
 
     <!-- chat room voice clip SeekBar progressBackgroundTint -->
     <color name="white_018_white_038">@color/white_alpha_018</color>
