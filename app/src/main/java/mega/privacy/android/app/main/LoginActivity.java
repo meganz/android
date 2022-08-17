@@ -89,8 +89,6 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     ActionBar aB;
     int visibleFragment;
 
-    static LoginActivity loginActivity;
-
     Intent intentReceived = null;
 
     public String accountBlocked = null;
@@ -169,8 +167,6 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     protected void onCreate(Bundle savedInstanceState) {
         Timber.d("onCreate");
         super.onCreate(savedInstanceState);
-
-        loginActivity = this;
 
         app.setIsLoggingRunning(true);
 
@@ -540,7 +536,6 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
             loginFragment.numberOfClicksKarere = 0;
         }
 
-        loginActivity = this;
         super.showConfirmationEnableLogsKarere();
     }
 
@@ -550,7 +545,6 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
             loginFragment.numberOfClicksSDK = 0;
         }
 
-        loginActivity = this;
         super.showConfirmationEnableLogsSDK();
     }
 

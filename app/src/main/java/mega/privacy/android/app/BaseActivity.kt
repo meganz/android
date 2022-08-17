@@ -602,6 +602,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         unregisterReceiver(transferFinishedReceiver)
         unregisterReceiver(showSnackbarReceiver)
         unregisterReceiver(resumeTransfersReceiver)
+        unregisterReceiver(cookieSettingsReceiver)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
         dismissAlertDialogIfExists(resumeTransfersWarning)
