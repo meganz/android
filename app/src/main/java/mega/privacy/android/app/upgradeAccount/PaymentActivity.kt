@@ -3,6 +3,7 @@ package mega.privacy.android.app.upgradeAccount
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View.INVISIBLE
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -27,17 +28,28 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isPaymentMethodAvailable
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
-import java.util.Locale
 
+/**
+ * Activity for managing upgrade account payments.
+ */
 class PaymentActivity : PasscodeActivity(), Scrollable {
 
     companion object {
+        /**
+         * Const defining upgrade type.
+         */
         const val UPGRADE_TYPE = "UPGRADE_TYPE"
         private const val NOT_SUBSCRIBED_ALPHA = 0.36f
     }
 
     private lateinit var binding: ActivityPaymentBinding
     private val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            finish()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -262,7 +274,7 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> onBackPressed()
+            android.R.id.home -> onBackPressedCallback.handleOnBackPressed()
         }
 
         return super.onOptionsItemSelected(item)
