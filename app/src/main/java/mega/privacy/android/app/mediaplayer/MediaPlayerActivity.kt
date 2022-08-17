@@ -692,12 +692,14 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
      * @param menu The Options Menu
      */
     private fun checkIfShouldApplyReadOnlyState(menu: Menu) {
-        megaApi.getNodeByHandle(playerServiceViewModelGateway?.getCurrentPlayingHandle())?.let {
-            if (megaApi.isInInbox(it)) {
-                with(menu) {
-                    findItem(R.id.move_to_trash).isVisible = false
-                    findItem(R.id.move).isVisible = false
-                    findItem(R.id.rename).isVisible = false
+        playerServiceViewModelGateway?.getCurrentPlayingHandle()?.let { playingHandle ->
+            megaApi.getNodeByHandle(playingHandle)?.let { node ->
+                if (megaApi.isInInbox(node)) {
+                    with(menu) {
+                        findItem(R.id.move_to_trash).isVisible = false
+                        findItem(R.id.move).isVisible = false
+                        findItem(R.id.rename).isVisible = false
+                    }
                 }
             }
         }
