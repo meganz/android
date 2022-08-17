@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.Divider
 import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -72,16 +73,30 @@ fun CallSoundNotificationsItem(
                 color = colorResource(id = R.color.grey_054_white_054)
             )
         }
-        Switch(checked = checked, onCheckedChange = null)
+
+        Switch(
+            checked = checked,
+            onCheckedChange = null,
+            colors = switchColors()
+        )
     }
     Divider(color = colorResource(id = R.color.grey_012_white_012), thickness = 1.dp)
 }
+
+
+@Composable
+private fun switchColors() = SwitchDefaults.colors(
+    checkedThumbColor = colorResource(id = R.color.teal_300_teal_200),
+    checkedTrackColor = colorResource(id = R.color.teal_100_teal_200_038),
+    uncheckedThumbColor = colorResource(id = R.color.grey_020_grey_100),
+    uncheckedTrackColor = colorResource(id = R.color.grey_700_grey_050_038),
+)
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewSettingsCallsView")
 @Preview
 @Composable
 fun PreviewSettingsCallsView() {
-    val checked by remember { mutableStateOf(CallsSoundNotifications.Enabled) }
+    val checked by remember { mutableStateOf(CallsSoundNotifications.Disabled) }
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         SettingsCallsView(
             settingsCallsState = SettingsCallsState(
