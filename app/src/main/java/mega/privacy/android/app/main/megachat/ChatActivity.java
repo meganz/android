@@ -855,8 +855,6 @@ public class ChatActivity extends PasscodeActivity
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                     cancelRecording();
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
-                    hideDialogCall();
-
                     if (dialogCall != null) {
                         dialogCall.dismiss();
                     }
@@ -1516,27 +1514,6 @@ public class ChatActivity extends PasscodeActivity
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observe(this, callStatusObserver);
         LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall.class).observe(this, callCompositionChangeObserver);
         LiveEventBus.get(EVENT_UPDATE_WAITING_FOR_OTHERS, Pair.class).observe(this, waitingForOthersBannerObserver);
-
-        getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result) -> {
-                    long chatId = result.component1();
-                    if (chatRoom != null && chatId == chatRoom.getChatId()) {
-                        boolean onlyMeInTheCall = result.component2();
-                        boolean waitingForOthers = result.component3();
-                        long millisecondsOnlyMeInCallDialog =
-                                TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog);
-
-                        boolean hideDialogCall = MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored || !onlyMeInTheCall || (waitingForOthers && millisecondsOnlyMeInCallDialog <=0);
-
-                        if (hideDialogCall) {
-                            hideDialogCall();
-                        } else {
-                            showOnlyMeInTheCallDialog();
-                        }
-                    }
-                });
 
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observe(this, callOnHoldObserver);
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observe(this, sessionOnHoldObserver);
@@ -4259,6 +4236,10 @@ public class ChatActivity extends PasscodeActivity
      * Dialogue to allow you to end or stay on a group call or meeting when you are left alone on the call
      */
     private void showOnlyMeInTheCallDialog() {
+        if (AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall)) {
+            return;
+        }
+
         boolean isRequestSent = false;
         if (chatRoom != null) {
             MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
@@ -4291,7 +4272,6 @@ public class ChatActivity extends PasscodeActivity
                     hideDialogCall();
                 })
                 .setCancelable(false)
-                .setOnDismissListener(dialog -> MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true)
                 .create();
 
         dialogOnlyMeInCall.show();
@@ -4301,7 +4281,7 @@ public class ChatActivity extends PasscodeActivity
      * Hide dialog related to calls
      */
     private void hideDialogCall() {
-        if (dialogOnlyMeInCall != null) {
+        if (AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall)) {
             dialogOnlyMeInCall.dismiss();
         }
     }
@@ -8370,7 +8350,6 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     protected void onDestroy() {
-        Timber.d("onDestroy()");
         destroySpeakerAudioManger();
         cleanBuffers();
         if (handlerEmojiKeyboard != null) {
@@ -8703,8 +8682,10 @@ public class ChatActivity extends PasscodeActivity
         outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
         outState.putBoolean(ERROR_REACTION_DIALOG, errorReactionsDialogIsShown);
         outState.putLong(TYPE_ERROR_REACTION, typeErrorReaction);
-        outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall));
         outState.putBoolean(END_CALL_FOR_ALL_DIALOG, AlertDialogUtil.isAlertDialogShown(endCallForAllDialog));
+        isOnlyMeInCallDialogShown = AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall);
+        outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, isOnlyMeInCallDialogShown);
+        hideDialogCall();
     }
 
     /**
@@ -8795,6 +8776,28 @@ public class ChatActivity extends PasscodeActivity
         setKeyboardVisibilityListener();
 
         if (idChat != -1 && chatRoom != null) {
+
+            getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((result) -> {
+                            long chatId = result.component1();
+                            if (chatRoom != null && chatId == chatRoom.getChatId()) {
+                                boolean onlyMeInTheCall = result.component2();
+                                boolean waitingForOthers = result.component3();
+                                long millisecondsOnlyMeInCallDialog =
+                                        TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog);
+
+                                boolean hideDialogCall = MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored || !onlyMeInTheCall || (waitingForOthers && millisecondsOnlyMeInCallDialog <= 0);
+
+                                if (hideDialogCall) {
+                                    hideDialogCall();
+                                } else {
+                                    showOnlyMeInTheCallDialog();
+                                }
+                            }
+
+                    }, Timber::e);
 
             setNodeAttachmentVisible();
 
