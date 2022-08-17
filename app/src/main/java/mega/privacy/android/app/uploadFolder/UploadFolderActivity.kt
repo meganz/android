@@ -167,10 +167,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         return super.onOptionsItemSelected(item)
     }
 
-    /**
-     * Sets view.
-     */
-    fun setupView() {
+    private fun setupView() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setHomeButtonEnabled(true)
@@ -239,10 +236,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         checkScroll()
     }
 
-    /**
-     * Sets observers.
-     */
-    fun setupObservers() {
+    private fun setupObservers() {
         viewModel.getCurrentFolder().observe(this, ::showCurrentFolder)
         viewModel.getFolderItems().observe(this, ::showFolderContent)
         viewModel.getSelectedItems().observe(this, ::updateActionMode)
