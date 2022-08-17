@@ -256,7 +256,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Slideshow
-            optionSlideshow.isVisible = imageItem.shouldShowSlideshowOption() && viewModel.getImagesSize() > 1
+            optionSlideshow.isVisible = imageItem.shouldShowSlideshowOption() && viewModel.getImagesSize(false) > 1
             optionSlideshow.setOnClickListener {
                 findNavController().navigate(ImageViewerFragmentDirections.actionViewerToSlideshow())
                 dismissAllowingStateLoss()

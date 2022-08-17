@@ -18,6 +18,7 @@ import mega.privacy.android.app.databinding.FragmentImageSlideshowBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
+import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.NEXT
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STARTED
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STOPPED
 import mega.privacy.android.app.imageviewer.util.FadeOutPageTransformer
@@ -39,7 +40,7 @@ class ImageSlideshowFragment : Fragment() {
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                if (shouldReportPosition) viewModel.updateCurrentPosition(position)
+                if (shouldReportPosition) viewModel.updateCurrentImage(position, true)
             }
         }
     }
@@ -116,7 +117,7 @@ class ImageSlideshowFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.onAdapterImagesOnly().observe(viewLifecycleOwner) { items ->
+        viewModel.onAdapterImages(true).observe(viewLifecycleOwner) { items ->
             if (items.isNullOrEmpty()) {
                 Timber.e("Null or empty image items")
                 activity?.finish()
@@ -125,9 +126,9 @@ class ImageSlideshowFragment : Fragment() {
                     binding.progress.hide()
 
                     if (!shouldReportPosition) {
-                        binding.viewPager.setCurrentItem(viewModel.getCurrentPosition(), false)
+                        val currentPosition = viewModel.getCurrentPosition(true)
+                        binding.viewPager.setCurrentItem(currentPosition, false)
                         binding.viewPager.waitForLayout {
-                            viewModel.onCurrentPosition().observe(viewLifecycleOwner, ::updateCurrentPosition)
                             shouldReportPosition = true
                             true
                         }
@@ -136,17 +137,8 @@ class ImageSlideshowFragment : Fragment() {
             }
         }
 
-        viewModel.onSlideshowState().observe(viewLifecycleOwner, ::updateSlideshowButtons)
+        viewModel.onSlideshowState().observe(viewLifecycleOwner, ::updateSlideshowState)
         viewModel.onShowToolbar().observe(viewLifecycleOwner, ::changeBottomBarVisibility)
-    }
-
-    private fun updateCurrentPosition(newPosition: Int) {
-        if (newPosition >= pagerAdapter.itemCount) {
-            Timber.w("Wrong position: $newPosition")
-            return
-        }
-
-        binding.viewPager.setCurrentItem(newPosition, true)
     }
 
     /**
@@ -174,12 +166,22 @@ class ImageSlideshowFragment : Fragment() {
         }
     }
 
-    private fun updateSlideshowButtons(state: ImageSlideshowState) {
+    private fun updateSlideshowState(state: ImageSlideshowState) {
         when (state) {
             STARTED -> {
                 binding.btnPlay.isVisible = false
                 binding.btnPause.isVisible = true
                 viewModel.switchToolbar(false)
+            }
+            NEXT -> {
+                binding.btnPlay.isVisible = false
+                binding.btnPause.isVisible = true
+                val newPosition = binding.viewPager.currentItem + 1
+                if (newPosition <= pagerAdapter.itemCount - 1) {
+                    binding.viewPager.currentItem = newPosition
+                } else {
+                    viewModel.stopSlideshow()
+                }
             }
             STOPPED -> {
                 binding.btnPause.isVisible = false

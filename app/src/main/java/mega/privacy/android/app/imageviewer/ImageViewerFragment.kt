@@ -36,7 +36,7 @@ class ImageViewerFragment : Fragment() {
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                if (shouldReportPosition) viewModel.updateCurrentPosition(position)
+                if (shouldReportPosition) viewModel.updateCurrentImage(position, false)
             }
         }
     }
@@ -99,7 +99,7 @@ class ImageViewerFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.onAdapterImages().observe(viewLifecycleOwner) { items ->
+        viewModel.onAdapterImages(false).observe(viewLifecycleOwner) { items ->
             if (items.isNullOrEmpty()) {
                 Timber.e("Null or empty image items")
                 activity?.finish()
@@ -107,11 +107,10 @@ class ImageViewerFragment : Fragment() {
                 pagerAdapter.submitList(items) {
                     binding.progress.hide()
 
-                    val currentPosition = viewModel.getCurrentPosition()
+                    val currentPosition = viewModel.getCurrentPosition(false)
                     if (!shouldReportPosition) {
                         binding.viewPager.setCurrentItem(currentPosition, false)
                         binding.viewPager.waitForLayout {
-                            viewModel.onCurrentPosition().observe(viewLifecycleOwner, ::updateCurrentPosition)
                             shouldReportPosition = true
                             true
                         }
@@ -134,32 +133,24 @@ class ImageViewerFragment : Fragment() {
         viewModel.onShowToolbar().observe(viewLifecycleOwner, ::changeBottomBarVisibility)
     }
 
-    private fun updateCurrentPosition(newPosition: Int) {
-        if (newPosition >= pagerAdapter.itemCount) {
-            Timber.w("Wrong position: $newPosition")
-            return
-        }
-
-        binding.viewPager.setCurrentItem(newPosition, true)
-
-        val imagesSize = viewModel.getImagesSize()
-        binding.txtPageCount.apply {
-            text = StringResourcesUtils.getString(
-                R.string.wizard_steps_indicator,
-                newPosition + 1,
-                imagesSize
-            )
-            isVisible = imagesSize > 1
-        }
-    }
-
     /**
      * Populate current image information to bottom texts and toolbar options.
      *
      * @param imageItem  Image item to show
      */
     private fun showCurrentImageInfo(imageItem: ImageItem?) {
+        val imagesSize = viewModel.getImagesSize(false)
+        val position = viewModel.getCurrentPosition(false)
         binding.txtTitle.text = imageItem?.name
+        binding.txtPageCount.apply {
+            text = StringResourcesUtils.getString(
+                R.string.wizard_steps_indicator,
+                position + 1,
+                imagesSize
+            )
+            isVisible = imagesSize > 1
+        }
+
         activity?.invalidateOptionsMenu()
     }
 

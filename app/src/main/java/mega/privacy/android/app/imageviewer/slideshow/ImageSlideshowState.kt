@@ -1,3 +1,3 @@
 package mega.privacy.android.app.imageviewer.slideshow
 
-enum class ImageSlideshowState { STARTED, STOPPED }
+enum class ImageSlideshowState { STARTED, NEXT, STOPPED }

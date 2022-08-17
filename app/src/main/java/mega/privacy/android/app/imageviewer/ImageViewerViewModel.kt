@@ -25,6 +25,7 @@ import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState
+import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.NEXT
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STARTED
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STOPPED
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
@@ -52,6 +53,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.usecase.AreTransfersPaused
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -103,7 +105,7 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     private val images = MutableLiveData<List<ImageItem>?>()
-    private val currentPosition = MutableLiveData<Int>()
+    private val currentImageId = MutableLiveData<Long?>()
     private val showToolbar = MutableLiveData<Boolean>()
     private val snackBarMessage = SingleLiveEvent<String>()
     private val actionBarMessage = SingleLiveEvent<Int>()
@@ -125,35 +127,39 @@ class ImageViewerViewModel @Inject constructor(
         super.onCleared()
     }
 
-    fun onAdapterImages(): LiveData<List<ImageAdapterItem>?> =
-        images.map { items -> items?.map { ImageAdapterItem(it.id, it.hashCode()) } }
-
-    fun onAdapterImagesOnly(): LiveData<List<ImageAdapterItem>?> =
+    fun onAdapterImages(filterVideos: Boolean): LiveData<List<ImageAdapterItem>?> =
         images.map { items ->
-            items?.filter { it.imageResult?.isVideo != true }
-                ?.map { ImageAdapterItem(it.id, it.hashCode()) }
+            if (filterVideos) {
+                items?.filter { it.imageResult?.isVideo != true }
+                    ?.map { ImageAdapterItem(it.id, it.hashCode()) }
+            } else {
+                items?.map { ImageAdapterItem(it.id, it.hashCode()) }
+            }
         }
 
-    fun onImage(itemId: Long): LiveData<ImageItem?> =
+    fun onImage(itemId: Long?): LiveData<ImageItem?> =
         images.map { items -> items?.firstOrNull { it.id == itemId } }
 
-    fun onImage(position: Int): LiveData<ImageItem?> =
-        images.map { items -> items?.getOrNull(position) }
+    fun getImagesSize(filterVideos: Boolean): Int =
+        if (filterVideos) {
+            images.value?.count { it.imageResult?.isVideo != true } ?: 0
+        } else {
+            images.value?.size ?: 0
+        }
 
-    fun getImagesSize(): Int =
-        images.value?.size ?: 0
-
-    fun onCurrentPosition(): LiveData<Int> =
-        currentPosition
-
-    fun getCurrentPosition(): Int =
-        currentPosition.value ?: 0
-
-    fun onCurrentImageItem(): LiveData<ImageItem?> =
-        currentPosition.switchMap { onImage(it) }
+    fun getCurrentPosition(filterVideos: Boolean): Int =
+        if (filterVideos) {
+            images.value?.filter { it.imageResult?.isVideo != true }
+                ?.indexOfFirst { it.id == currentImageId.value } ?: 0
+        } else {
+            images.value?.indexOfFirst { it.id == currentImageId.value } ?: 0
+        }
 
     fun getCurrentImageItem(): ImageItem? =
-        currentPosition.value?.let { images.value?.getOrNull(it) }
+        currentImageId.value?.let { imageId -> images.value?.find { it.id == imageId } }
+
+    fun onCurrentImageItem(): LiveData<ImageItem?> =
+        currentImageId.switchMap(::onImage)
 
     fun getImageItem(itemId: Long): ImageItem? =
         images.value?.find { it.id == itemId }
@@ -473,27 +479,26 @@ class ImageViewerViewModel @Inject constructor(
      * @param newItems  New ImageItems to calculate new position from
      */
     private fun calculateNewPosition(newItems: List<ImageItem>) {
-        val items = images.value?.toMutableList()
-        val newPosition =
-            if (items.isNullOrEmpty()) {
-                0
-            } else {
-                val currentPositionNewIndex =
-                    newItems.indexOfFirst { it.id == getCurrentImageItem()?.id }
-                val currentItemPosition = currentPosition.value ?: 0
-                when {
-                    currentPositionNewIndex != INVALID_POSITION ->
-                        currentPositionNewIndex
-                    currentItemPosition >= items.size ->
-                        items.size - 1
-                    currentItemPosition == 0 ->
-                        currentItemPosition + 1
-                    else ->
-                        currentItemPosition
-                }
+        val existingItems = images.value?.toMutableList()
+        val existingImageId = currentImageId.value
+        if (existingItems.isNullOrEmpty() || existingImageId == null) {
+            currentImageId.value = null
+        } else if (existingItems.size == newItems.size) {
+            return // Nothing to update
+        } else {
+            val currentItemPosition = images.value?.indexOfFirst { it.id == existingImageId }
+            val newCurrentItemPosition = newItems.indexOfFirst { it.id == existingImageId }
+            when {
+                currentItemPosition == newCurrentItemPosition ->
+                    return // Nothing to update
+                newCurrentItemPosition != INVALID_POSITION ->
+                    currentImageId.notifyObserver()
+                newCurrentItemPosition >= existingItems.size ->
+                    currentImageId.value = newItems.last().id
+                currentItemPosition == 0 ->
+                    currentImageId.value = newItems.first().id
             }
-
-        updateCurrentPosition(newPosition)
+        }
     }
 
     fun showTransfersAction() {
@@ -661,9 +666,16 @@ class ImageViewerViewModel @Inject constructor(
         }
     }
 
-    fun updateCurrentPosition(position: Int) {
-        if (position != currentPosition.value) {
-            currentPosition.value = position
+    fun updateCurrentImage(position: Int, filterVideos: Boolean) {
+        if (filterVideos) {
+            currentImageId.value = images.value
+                ?.filter { it.imageResult?.isVideo != true }
+                ?.getOrNull(position)
+                ?.id
+        } else {
+            currentImageId.value = images.value
+                ?.getOrNull(position)
+                ?.id
         }
     }
 
@@ -713,13 +725,10 @@ class ImageViewerViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { items ->
-                    val position = items.indexOfFirst {
+                    items.find {
                         currentNodeHandle == it.getNodeHandle() || currentNodeHandle == it.id
-                    }
-                    if (position != INVALID_POSITION) {
-                        updateCurrentPosition(position)
-                    } else {
-                        updateCurrentPosition(0)
+                    }?.let {
+                        currentImageId.value = it.id
                     }
                     images.value = items.toList()
                 },
@@ -757,19 +766,7 @@ class ImageViewerViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { slideShowState.value = STARTED }
             .subscribeBy(
-                onNext = {
-                    val imagePosition = getCurrentPosition()
-                    when {
-                        imagePosition + 1 == getImagesSize() - 1 -> {
-                            updateCurrentPosition(imagePosition + 1)
-                            stopSlideshow()
-                        }
-                        imagePosition < getImagesSize() - 1 ->
-                            updateCurrentPosition(imagePosition + 1)
-                        else ->
-                            stopSlideshow()
-                    }
-                },
+                onNext = { slideShowState.value = NEXT },
                 onComplete = { slideShowState.value = STOPPED },
                 onError = { error ->
                     Timber.e(error)

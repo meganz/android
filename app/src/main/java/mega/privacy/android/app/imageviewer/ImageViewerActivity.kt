@@ -445,7 +445,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         val imageItem = viewModel.getCurrentImageItem() ?: return super.onPrepareOptionsMenu(menu)
         menu?.apply {
             findItem(R.id.action_slideshow)?.isVisible =
-                imageItem.shouldShowSlideshowOption() && viewModel.getImagesSize() > 1
+                imageItem.shouldShowSlideshowOption() && viewModel.getImagesSize(false) > 1
             findItem(R.id.action_forward)?.isVisible =
                 imageItem.shouldShowForwardOption() && !isFileVersion
             findItem(R.id.action_share)?.isVisible =
