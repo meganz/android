@@ -1515,6 +1515,28 @@ public class ChatActivity extends PasscodeActivity
         LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall.class).observe(this, callCompositionChangeObserver);
         LiveEventBus.get(EVENT_UPDATE_WAITING_FOR_OTHERS, Pair.class).observe(this, waitingForOthersBannerObserver);
 
+        getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result) -> {
+                    long chatId = result.component1();
+                    if (chatRoom != null && chatId == chatRoom.getChatId()) {
+                        boolean onlyMeInTheCall = result.component2();
+                        boolean waitingForOthers = result.component3();
+                        long millisecondsOnlyMeInCallDialog =
+                                TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog);
+
+                        boolean hideDialogCall = MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored || !onlyMeInTheCall || (waitingForOthers && millisecondsOnlyMeInCallDialog <= 0);
+
+                        if (hideDialogCall) {
+                            hideDialogCall();
+                        } else {
+                            showOnlyMeInTheCallDialog();
+                        }
+                    }
+
+                }, Timber::e);
+
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observe(this, callOnHoldObserver);
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observe(this, sessionOnHoldObserver);
 
@@ -8776,29 +8798,6 @@ public class ChatActivity extends PasscodeActivity
         setKeyboardVisibilityListener();
 
         if (idChat != -1 && chatRoom != null) {
-
-            getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe((result) -> {
-                            long chatId = result.component1();
-                            if (chatRoom != null && chatId == chatRoom.getChatId()) {
-                                boolean onlyMeInTheCall = result.component2();
-                                boolean waitingForOthers = result.component3();
-                                long millisecondsOnlyMeInCallDialog =
-                                        TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog);
-
-                                boolean hideDialogCall = MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored || !onlyMeInTheCall || (waitingForOthers && millisecondsOnlyMeInCallDialog <= 0);
-
-                                if (hideDialogCall) {
-                                    hideDialogCall();
-                                } else {
-                                    showOnlyMeInTheCallDialog();
-                                }
-                            }
-
-                    }, Timber::e);
-
             setNodeAttachmentVisible();
 
             passcodeManagement.setShowPasscodeScreen(true);
