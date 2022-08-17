@@ -3471,7 +3471,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         dbH.removeSentPendingMessages();
 
-        if (megaApi != null && megaApi.getRootNode() != null) {
+        if (megaApi != null) {
             megaApi.removeTransferListener(this);
             megaApi.removeRequestListener(this);
         }
@@ -3496,6 +3496,7 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
         LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
         LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).removeObserver(fileBackupChangedObserver);
+        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
 
         destroyPayments();
 
