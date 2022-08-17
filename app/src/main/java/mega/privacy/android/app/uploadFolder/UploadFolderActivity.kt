@@ -11,6 +11,7 @@ import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -85,8 +86,18 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
 
     private lateinit var collisionsForResult: ActivityResultLauncher<Intent>
 
+    private var onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            when {
+                viewModel.back() -> finish()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        onBackPressedDispatcher.addCallback(onBackPressedCallback)
 
         collisionsForResult =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -150,18 +161,15 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> onBackPressed()
+            android.R.id.home -> onBackPressedCallback.handleOnBackPressed()
         }
 
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
-        when {
-            viewModel.back() -> super.onBackPressed()
-        }
-    }
-
+    /**
+     * Sets view.
+     */
     fun setupView() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
@@ -231,6 +239,9 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         checkScroll()
     }
 
+    /**
+     * Sets observers.
+     */
     fun setupObservers() {
         viewModel.getCurrentFolder().observe(this, ::showCurrentFolder)
         viewModel.getFolderItems().observe(this, ::showFolderContent)
