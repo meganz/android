@@ -14,6 +14,8 @@ package mega.privacy.android.app.components;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+
+import androidx.annotation.StyleableRes;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
@@ -48,7 +50,7 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 
 	private void init(Context context, AttributeSet attrs) {
 		if (attrs != null) {
-			int[] attrsArray = {
+			@StyleableRes int[] attrsArray = new int[]{
 					android.R.attr.columnWidth
 			};
 			TypedArray array = context.obtainStyledAttributes(attrs, attrsArray);

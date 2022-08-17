@@ -7,6 +7,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 
+import androidx.annotation.StyleableRes;
 import androidx.recyclerview.widget.RecyclerView;
 
 import timber.log.Timber;
@@ -42,7 +43,7 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
 
     private void init(Context context, AttributeSet attrs) {
         if (attrs != null) {
-            int[] attrsArray = {
+            @StyleableRes int[] attrsArray = new int[]{
                     android.R.attr.columnWidth,
             };
             TypedArray array = context.obtainStyledAttributes(attrs, attrsArray);

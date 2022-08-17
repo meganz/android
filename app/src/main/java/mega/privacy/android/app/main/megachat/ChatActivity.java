@@ -5029,14 +5029,10 @@ public class ChatActivity extends PasscodeActivity
             StringBuilder builder = new StringBuilder();
 
             for (int i = 0; i < messagesSelected.size(); i++) {
-                AndroidMegaChatMessage messageSelected = messagesSelected.get(i);
-                builder.append("[");
-                String timestamp = formatShortDateTime(messageSelected.getMessage().getTimestamp());
-                builder.append(timestamp);
-                builder.append("] ");
-                String messageString = chatC.createManagementString(messageSelected, chatRoom);
-                builder.append(messageString);
-                builder.append("\n");
+                if (builder.length() > 0) {
+                    builder.append("\n");
+                }
+                builder.append(chatC.createSingleManagementString(messagesSelected.get(i), chatRoom));
             }
             return builder.toString();
         }

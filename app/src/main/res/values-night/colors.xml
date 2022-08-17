@@ -32,6 +32,15 @@
     <!-- chat unread message background -->
     <color name="grey_020_grey_700">@color/grey_700</color>
 
+    <!-- Thumb of deactivated switch in settings -->
+    <color name="grey_020_grey_100">@color/grey_100</color>
+
+    <!-- Track of deactivated switch in settings -->
+    <color name="grey_700_grey_050_038">@color/grey_050_alpha_038</color>
+
+    <!-- Track of activated switch in settings -->
+    <color name="teal_100_teal_200_038">@color/teal_200_alpha_038</color>
+
     <!-- chat room voice clip SeekBar progressBackgroundTint -->
     <color name="white_018_white_038">@color/white_alpha_038</color>
 

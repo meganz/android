@@ -43,19 +43,6 @@ class LinksFragment : MegaNodeBaseFragment() {
 
     private fun state() = viewModel.state.value
 
-    companion object {
-        @JvmStatic
-        fun getLinksOrderCloud(orderCloud: Int, isFirstNavigationLevel: Boolean): Int {
-            return if (!isFirstNavigationLevel) {
-                orderCloud
-            } else when (orderCloud) {
-                MegaApiJava.ORDER_MODIFICATION_ASC -> MegaApiJava.ORDER_LINK_CREATION_ASC
-                MegaApiJava.ORDER_MODIFICATION_DESC -> MegaApiJava.ORDER_LINK_CREATION_DESC
-                else -> orderCloud
-            }
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -177,6 +164,8 @@ class LinksFragment : MegaNodeBaseFragment() {
     }
 
     override fun viewerFrom(): Int = Constants.VIEWER_FROM_LINKS
+
+    override fun getIntentOrder(): Int = state().sortOrder
 
     override fun getParentHandle(): Long = state().linksHandle
 
