@@ -8,6 +8,9 @@ lint {
     xmlOutput = file("build/reports/lint-results.xml")
 }
 
+apply plugin: 'jacoco'
+apply from: "$project.rootDir/tools/jacoco.gradle"
+
 compileKotlin {
     kotlinOptions {
         jvmTarget = "11"
