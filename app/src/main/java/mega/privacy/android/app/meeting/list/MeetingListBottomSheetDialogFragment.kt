@@ -60,78 +60,87 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.signalChatPresence()
-        viewModel.getMeeting(chatId).observe(viewLifecycleOwner) { meeting ->
-            requireNotNull(meeting) { "Meeting not found" }
-
-            binding.header.txtTitle.text = meeting.title
-            binding.header.txtTimestamp.text = meeting.formattedTimestamp
-
-            val firstUserPlaceholder = meeting.firstUser.getImagePlaceholder(requireContext())
-            if (meeting.isSingleMeeting() || meeting.lastUser == null) {
-                binding.header.imgThumbnail.hierarchy.setPlaceholderImage(
-                    firstUserPlaceholder,
-                    ScalingUtils.ScaleType.FIT_CENTER
-                )
-                binding.header.imgThumbnail.setImageRequestFromUri(meeting.firstUser.avatar)
-                binding.header.groupThumbnails.isVisible = false
-                binding.header.imgThumbnail.isVisible = true
-            } else {
-                val lastUserPlaceholder = meeting.lastUser.getImagePlaceholder(requireContext())
-                binding.header.imgThumbnailGroupFirst.hierarchy.setPlaceholderImage(
-                    firstUserPlaceholder,
-                    ScalingUtils.ScaleType.FIT_CENTER
-                )
-                binding.header.imgThumbnailGroupLast.hierarchy.setPlaceholderImage(
-                    lastUserPlaceholder,
-                    ScalingUtils.ScaleType.FIT_CENTER
-                )
-                binding.header.imgThumbnailGroupFirst.setImageRequestFromUri(meeting.firstUser.avatar)
-                binding.header.imgThumbnailGroupLast.setImageRequestFromUri(meeting.lastUser.avatar)
-                binding.header.groupThumbnails.isVisible = true
-                binding.header.imgThumbnail.isVisible = false
-            }
-
-            binding.btnInfo.setOnClickListener {
-                val intent = Intent(context, GroupChatInfoActivity::class.java).apply {
-                    putExtra(Constants.HANDLE, chatId)
-                    putExtra(Constants.ACTION_CHAT_OPEN, true)
-                }
-                activity?.startActivity(intent)
-                dismissAllowingStateLoss()
-            }
-
-            if (meeting.isMuted) {
-                binding.btnMute.text = StringResourcesUtils.getString(R.string.general_unmute)
-                binding.btnMute.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_unmute, 0, 0, 0)
-            } else {
-                binding.btnMute.text = StringResourcesUtils.getString(R.string.general_mute)
-                binding.btnMute.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_mute, 0, 0, 0)
-            }
-            binding.btnMute.setOnClickListener {
-                if (meeting.isMuted) {
-                    MegaApplication.getPushNotificationSettingManagement()
-                        .controlMuteNotificationsOfAChat(
-                            requireContext(),
-                            Constants.NOTIFICATIONS_ENABLED,
-                            chatId)
-                } else {
-                    ChatUtil.createMuteNotificationsAlertDialogOfAChat(requireActivity(), chatId)
-                }
-                dismissAllowingStateLoss()
-            }
-
-            binding.btnArchive.setOnClickListener {
-                viewModel.archiveChat(chatId)
-                dismissAllowingStateLoss()
-            }
-
-            binding.btnLeave.setOnClickListener {
-                showLeaveChatDialog()
-                dismissAllowingStateLoss()
-            }
-        }
         super.onViewCreated(view, savedInstanceState)
+        binding.header.txtTimestamp.text = StringResourcesUtils.getString(R.string.context_meeting)
+
+        viewModel.signalChatPresence()
+        viewModel.getMeeting(chatId).observe(viewLifecycleOwner, ::showMeeting)
+    }
+
+    private fun showMeeting(meeting: MeetingItem?) {
+        requireNotNull(meeting) { "Meeting not found" }
+
+        binding.header.txtTitle.text = meeting.title
+
+        val firstUserPlaceholder = meeting.firstUser.getImagePlaceholder(requireContext())
+        if (meeting.isSingleMeeting() || meeting.lastUser == null) {
+            binding.header.imgThumbnail.hierarchy.setPlaceholderImage(
+                firstUserPlaceholder,
+                ScalingUtils.ScaleType.FIT_CENTER
+            )
+            binding.header.imgThumbnail.setImageRequestFromUri(meeting.firstUser.avatar)
+            binding.header.groupThumbnails.isVisible = false
+            binding.header.imgThumbnail.isVisible = true
+        } else {
+            val lastUserPlaceholder = meeting.lastUser.getImagePlaceholder(requireContext())
+            binding.header.imgThumbnailGroupFirst.hierarchy.setPlaceholderImage(
+                firstUserPlaceholder,
+                ScalingUtils.ScaleType.FIT_CENTER
+            )
+            binding.header.imgThumbnailGroupLast.hierarchy.setPlaceholderImage(
+                lastUserPlaceholder,
+                ScalingUtils.ScaleType.FIT_CENTER
+            )
+            binding.header.imgThumbnailGroupFirst.setImageRequestFromUri(meeting.firstUser.avatar)
+            binding.header.imgThumbnailGroupLast.setImageRequestFromUri(meeting.lastUser.avatar)
+            binding.header.groupThumbnails.isVisible = true
+            binding.header.imgThumbnail.isVisible = false
+        }
+
+        binding.btnInfo.setOnClickListener {
+            val intent = Intent(context, GroupChatInfoActivity::class.java).apply {
+                putExtra(Constants.HANDLE, chatId)
+                putExtra(Constants.ACTION_CHAT_OPEN, true)
+            }
+            activity?.startActivity(intent)
+            dismissAllowingStateLoss()
+        }
+
+        if (meeting.isMuted) {
+            binding.btnMute.text = StringResourcesUtils.getString(R.string.general_unmute)
+            binding.btnMute.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_unmute,
+                0,
+                0,
+                0)
+        } else {
+            binding.btnMute.text = StringResourcesUtils.getString(R.string.general_mute)
+            binding.btnMute.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_mute,
+                0,
+                0,
+                0)
+        }
+        binding.btnMute.setOnClickListener {
+            if (meeting.isMuted) {
+                MegaApplication.getPushNotificationSettingManagement()
+                    .controlMuteNotificationsOfAChat(
+                        requireContext(),
+                        Constants.NOTIFICATIONS_ENABLED,
+                        chatId)
+            } else {
+                ChatUtil.createMuteNotificationsAlertDialogOfAChat(requireActivity(), chatId)
+            }
+            dismissAllowingStateLoss()
+        }
+
+        binding.btnArchive.setOnClickListener {
+            viewModel.archiveChat(chatId)
+            dismissAllowingStateLoss()
+        }
+
+        binding.btnLeave.setOnClickListener {
+            showLeaveChatDialog()
+            dismissAllowingStateLoss()
+        }
     }
 
     /**

@@ -114,7 +114,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
         }
 
-        viewModel.pushToLastPositionState(lastFirstVisiblePosition)
+        viewModel.pushToLastPositionStack(lastFirstVisiblePosition)
         viewModel.increaseOutgoingTreeDepth(node.handle)
         recyclerView.scrollToPosition(0)
         checkScroll()
@@ -151,7 +151,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             state().outgoingTreeDepth > 1 -> {
                 Timber.d("deepTree>1")
 
-                viewModel.getParentNodeHandle()?.let { parentHandle ->
+                state().outgoingParentHandle?.let { parentHandle ->
                     recyclerView.visibility = View.VISIBLE
                     emptyImageView.visibility = View.GONE
                     emptyLinearLayout.visibility = View.GONE
@@ -197,7 +197,9 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
     override fun viewerFrom(): Int = Constants.VIEWER_FROM_OUTGOING_SHARES
 
-    override fun getParentHandle(): Long = state().outgoingParentHandle
+    override fun getParentHandle(): Long = state().outgoingHandle
+
+    override fun getIntentOrder(): Int = state().sortOrder
 
     /**
      * Observe viewModel
@@ -224,7 +226,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
                     visibilityFastScroller()
                     hideActionMode()
-                    setEmptyView(it.isInvalidParentHandle)
+                    setEmptyView(it.isInvalidHandle)
 
                 }
             }
@@ -250,7 +252,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 requireActivity(),
                 this,
                 state().nodes,
-                state().outgoingParentHandle,
+                state().outgoingHandle,
                 recyclerView,
                 Constants.OUTGOING_SHARES_ADAPTER,
                 if (managerActivity.isList) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
@@ -258,7 +260,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 sortByHeaderViewModel
             )
         } else {
-            adapter.parentHandle = state().outgoingParentHandle
+            adapter.parentHandle = state().outgoingHandle
             adapter.setListFragment(recyclerView)
         }
 
@@ -280,14 +282,14 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     }
 
     /**
-     * Set the empty view and message depending if the parent handle is valid or not
+     * Set the empty view and message depending if the handle is valid or not
      *
-     * @param isInvalidParentHandle true if the parent handle is invalid
+     * @param isInvalidHandle true if the handle is invalid
      */
-    private fun setEmptyView(isInvalidParentHandle: Boolean) {
+    private fun setEmptyView(isInvalidHandle: Boolean) {
         var textToShow: String? = null
 
-        if (isInvalidParentHandle) {
+        if (isInvalidHandle) {
             if (Util.isScreenInPortrait(requireContext())) {
                 emptyImageView.setImageResource(R.drawable.empty_outgoing_portrait)
             } else {
@@ -324,7 +326,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             }
             val areAllNotTakenDown = selected.areAllNotTakenDown()
             if (areAllNotTakenDown) {
-                if (state().outgoingParentHandle == INVALID_HANDLE) {
+                if (state().outgoingHandle == INVALID_HANDLE) {
                     control.removeShare().setVisible(true).showAsAction =
                         MenuItem.SHOW_AS_ACTION_ALWAYS
                 }

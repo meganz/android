@@ -11,5 +11,5 @@ interface ClearSyncRecords {
      *
      * @return
      */
-    operator fun invoke()
+    suspend operator fun invoke()
 }

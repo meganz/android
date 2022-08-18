@@ -11,5 +11,5 @@ fun interface DeleteSyncRecordByLocalPath {
      *
      * @return
      */
-    operator fun invoke(localPath: String, isSecondary: Boolean)
+    suspend operator fun invoke(localPath: String, isSecondary: Boolean)
 }

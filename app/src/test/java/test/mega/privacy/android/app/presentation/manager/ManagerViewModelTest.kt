@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.manager
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
@@ -8,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -51,6 +53,7 @@ class ManagerViewModelTest {
     private val hasInboxChildren = mock<HasInboxChildren>()
     private val monitorContactRequestUpdates = mock<MonitorContactRequestUpdates>()
     private val sendStatisticsMediaDiscovery = mock<SendStatisticsMediaDiscovery>()
+    private val savedStateHandle = SavedStateHandle(mapOf())
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -75,6 +78,8 @@ class ManagerViewModelTest {
             getNumUnreadUserAlerts = getNumUnreadUserAlerts,
             hasInboxChildren = hasInboxChildren,
             sendStatisticsMediaDiscovery = sendStatisticsMediaDiscovery,
+            savedStateHandle = savedStateHandle,
+            ioDispatcher = StandardTestDispatcher()
         )
     }
 
@@ -102,12 +107,11 @@ class ManagerViewModelTest {
             val initial = awaitItem()
             assertThat(initial.browserParentHandle).isEqualTo(-1L)
             assertThat(initial.rubbishBinParentHandle).isEqualTo(-1L)
-            assertThat(initial.linksParentHandle).isEqualTo(-1L)
             assertThat(initial.inboxParentHandle).isEqualTo(-1L)
             assertThat(initial.isFirstNavigationLevel).isTrue()
-            assertThat(initial.linksTreeDepth).isEqualTo(0)
             assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
             assertThat(initial.transfersTab).isEqualTo(TransfersTab.NONE)
+            assertThat(initial.isFirstLogin).isFalse()
         }
     }
 
@@ -138,19 +142,6 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that links parent handle is updated if new value provided`() = runTest {
-        setUnderTest()
-
-        underTest.state.map { it.linksParentHandle }.distinctUntilChanged()
-            .test {
-                val newValue = 123456789L
-                assertThat(awaitItem()).isEqualTo(-1L)
-                underTest.setLinksParentHandle(newValue)
-                assertThat(awaitItem()).isEqualTo(newValue)
-            }
-    }
-
-    @Test
     fun `test that inbox parent handle is updated if new value provided`() = runTest {
         setUnderTest()
 
@@ -175,46 +166,6 @@ class ManagerViewModelTest {
                 assertThat(awaitItem()).isEqualTo(newValue)
             }
     }
-
-    @Test
-    fun `test that links tree depth is increased when calling increaseLinksTreeDepth`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.linksTreeDepth }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isEqualTo(0)
-                    underTest.increaseLinksTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(1)
-                }
-        }
-
-    @Test
-    fun `test that links tree depth is decreased when calling decreaseLinksTreeDepth`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.linksTreeDepth }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isEqualTo(0)
-                    underTest.increaseLinksTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(1)
-                    underTest.decreaseLinksTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(0)
-                }
-        }
-
-    @Test
-    fun `test that links tree depth equals 0 if resetLinksTreeDepth`() =
-        runTest {
-            setUnderTest()
-
-            underTest.state.map { it.linksTreeDepth }.distinctUntilChanged()
-                .test {
-                    underTest.resetLinksTreeDepth()
-                    assertThat(awaitItem()).isEqualTo(0)
-                }
-        }
 
     @Test
     fun `test that shares tab is updated if new value provided`() = runTest {
@@ -448,4 +399,29 @@ class ManagerViewModelTest {
                 underTest.updateContactsRequests.test().assertNoValue()
             }
         }
+
+    @Test
+    fun `test that saved state values are returned`() = runTest {
+        setUnderTest()
+
+        savedStateHandle.set(underTest.isFirstLoginKey, true)
+
+        underTest.state.filter {
+            it.isFirstLogin
+        }.test(200) {
+            val latest = awaitItem()
+            assertThat(latest.isFirstLogin).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that is first login is updated if new boolean is provided`() = runTest {
+        setUnderTest()
+        underTest.state.map { it.isFirstLogin }.distinctUntilChanged()
+            .test {
+                assertThat(awaitItem()).isFalse()
+                underTest.setIsFirstLogin(true)
+                assertThat(awaitItem()).isTrue()
+            }
+    }
 }

@@ -36,9 +36,6 @@ import javax.inject.Inject
 class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
 
     @Inject
-    lateinit var myAccountInfo: MyAccountInfo
-
-    @Inject
     lateinit var getUserDataUseCase: GetUserDataUseCase
 
     private var timer: CountDownTimer? = null
@@ -102,8 +99,8 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
                 Timber.i("Over Disk Quota Paywall warning dismissed")
                 if (isTaskRoot) {
                     var askPermissions: Boolean? = true
-                    if (dbH?.preferences?.firstTime != null) {
-                        askPermissions = dbH?.preferences?.firstTime?.toBoolean()
+                    if (dbH.preferences?.firstTime != null) {
+                        askPermissions = dbH.preferences?.firstTime?.toBoolean()
                     }
                     val intent = Intent(applicationContext, ManagerActivity::class.java)
                         .putExtra(EXTRA_ASK_PERMISSIONS, askPermissions)

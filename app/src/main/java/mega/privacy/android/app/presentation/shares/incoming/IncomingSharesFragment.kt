@@ -119,7 +119,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
         }
 
-        viewModel.pushToLastPositionState(lastFirstVisiblePosition)
+        viewModel.pushToLastPositionStack(lastFirstVisiblePosition)
         viewModel.increaseIncomingTreeDepth(node.handle)
         recyclerView.scrollToPosition(0)
         checkScroll()
@@ -160,7 +160,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             state().incomingTreeDepth > 1 -> {
                 Timber.d("deepTree>1")
 
-                viewModel.getParentNodeHandle()?.let { parentHandle ->
+                state().incomingParentHandle?.let { parentHandle ->
                     recyclerView.visibility = View.VISIBLE
                     emptyImageView.visibility = View.GONE
                     emptyLinearLayout.visibility = View.GONE
@@ -206,7 +206,9 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
     override fun viewerFrom() = Constants.VIEWER_FROM_INCOMING_SHARES
 
-    override fun getParentHandle(): Long = state().incomingParentHandle
+    override fun getParentHandle(): Long = state().incomingHandle
+
+    override fun getIntentOrder(): Int = state().sortOrder
 
     /**
      * Observe viewModel
@@ -233,7 +235,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
                     visibilityFastScroller()
                     hideActionMode()
-                    setEmptyView(it.isInvalidParentHandle)
+                    setEmptyView(it.isInvalidHandle)
 
                 }
             }
@@ -259,7 +261,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 requireActivity(),
                 this,
                 state().nodes,
-                state().incomingParentHandle,
+                state().incomingHandle,
                 recyclerView,
                 Constants.INCOMING_SHARES_ADAPTER,
                 if (managerActivity.isList) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
@@ -267,7 +269,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 sortByHeaderViewModel
             )
         } else {
-            adapter.parentHandle = state().incomingParentHandle
+            adapter.parentHandle = state().incomingHandle
             adapter.setListFragment(recyclerView)
         }
 
@@ -310,14 +312,14 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     }
 
     /**
-     * Set the empty view and message depending if the parent handle is valid or not
+     * Set the empty view and message depending if the handle is valid or not
      *
-     * @param isInvalidParentHandle true if the parent handle is invalid
+     * @param isInvalidHandle true if the handle is invalid
      */
-    private fun setEmptyView(isInvalidParentHandle: Boolean) {
+    private fun setEmptyView(isInvalidHandle: Boolean) {
         var textToShow: String? = null
 
-        if (isInvalidParentHandle) {
+        if (isInvalidHandle) {
             setImageViewAlphaIfDark(requireContext(), emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
             if (Util.isScreenInPortrait(requireContext())) {
                 emptyImageView.setImageResource(R.drawable.incoming_shares_empty)

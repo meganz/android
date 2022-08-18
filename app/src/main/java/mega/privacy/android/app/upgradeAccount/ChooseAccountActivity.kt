@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.text.Spanned
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -34,7 +35,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
 import timber.log.Timber
-import java.util.Locale
 
 open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
@@ -48,6 +48,12 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             manageUpdateReceiver(intent.getIntExtra(ACTION_TYPE, INVALID_ACTION))
+        }
+    }
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            onFreeClick()
         }
     }
 
@@ -66,6 +72,8 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
         binding = ActivityChooseUpgradeAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         viewModel.refreshAccountInfo()
         setupView()
@@ -86,14 +94,10 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         destroyPayments()
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        onFreeClick()
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            onFreeClick()
         }
 
         return super.onOptionsItemSelected(item)

@@ -7,11 +7,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -27,6 +28,8 @@ class OutgoingSharesViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getParentNodeHandle: GetParentNodeHandle,
     private val getOutgoingSharesChildrenNode: GetOutgoingSharesChildrenNode,
+    private val getCloudSortOrder: GetCloudSortOrder,
+    private val getOthersSortOrder: GetOthersSortOrder,
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
@@ -43,8 +46,8 @@ class OutgoingSharesViewModel @Inject constructor(
         viewModelScope.launch {
             refreshNodes()?.let { setNodes(it) }
             monitorNodeUpdates().collect {
-                // Uncomment this line once LinksFragment is decoupled from ManagerActivity
-                //refreshNodes()?.let { setNodes(it) }
+                Timber.d("Received node update")
+                refreshNodes()?.let { setNodes(it) }
             }
         }
     }
@@ -59,7 +62,7 @@ class OutgoingSharesViewModel @Inject constructor(
     /**
      * Decrease by 1 the outgoing tree depth
      *
-     * @param handle the id of the current outgoing parent handle to set
+     * @param handle the id of the current outgoing handle to set
      */
     fun decreaseOutgoingTreeDepth(handle: Long) = viewModelScope.launch {
         setOutgoingTreeDepth(_state.value.outgoingTreeDepth - 1, handle)
@@ -68,7 +71,7 @@ class OutgoingSharesViewModel @Inject constructor(
     /**
      * Increase by 1 the outgoing tree depth
      *
-     * @param handle the id of the current outgoing parent handle to set
+     * @param handle the id of the current outgoing handle to set
      */
     fun increaseOutgoingTreeDepth(handle: Long) = viewModelScope.launch {
         setOutgoingTreeDepth(_state.value.outgoingTreeDepth + 1, handle)
@@ -83,17 +86,19 @@ class OutgoingSharesViewModel @Inject constructor(
 
     /**
      * Set outgoing tree depth with given value
-     * If refresh nodes return null,  else display empty list
+     * If refresh nodes return null, else display empty list
      *
      * @param depth the tree depth value to set
-     * @param handle the id of the current outgoing parent handle to set
+     * @param handle the id of the current outgoing handle to set
      */
     private fun setOutgoingTreeDepth(depth: Int, handle: Long) = viewModelScope.launch {
         _state.update {
             it.copy(
                 isLoading = true,
                 outgoingTreeDepth = depth,
-                outgoingParentHandle = handle
+                outgoingHandle = handle,
+                outgoingParentHandle = getParentNodeHandle(handle),
+                sortOrder = if (depth == 0) getOthersSortOrder() else getCloudSortOrder()
             )
         }
 
@@ -102,17 +107,19 @@ class OutgoingSharesViewModel @Inject constructor(
                 it.copy(
                     nodes = nodes,
                     outgoingTreeDepth = depth,
-                    outgoingParentHandle = handle,
-                    isInvalidParentHandle = isInvalidParentHandle(handle),
+                    outgoingHandle = handle,
+                    isInvalidHandle = isInvalidHandle(handle),
                     isLoading = false
                 )
             } ?: run {
                 it.copy(
                     nodes = emptyList(),
                     outgoingTreeDepth = 0,
-                    outgoingParentHandle = -1L,
-                    isInvalidParentHandle = true,
-                    isLoading = false
+                    outgoingHandle = -1L,
+                    isInvalidHandle = true,
+                    isLoading = false,
+                    outgoingParentHandle = null,
+                    sortOrder = getOthersSortOrder()
                 )
             }
         }
@@ -131,16 +138,7 @@ class OutgoingSharesViewModel @Inject constructor(
      * @param position the scroll position of the recyclerView for the current depth
      * @return the position saved
      */
-    fun pushToLastPositionState(position: Int): Int = lastPositionStack.push(position)
-
-    /**
-     * Get the parent node handle of current node
-     *
-     * @return the parent node handle of current node
-     */
-    fun getParentNodeHandle(): Long? = runBlocking {
-        return@runBlocking getParentNodeHandle(_state.value.outgoingParentHandle)
-    }
+    fun pushToLastPositionStack(position: Int): Int = lastPositionStack.push(position)
 
     /**
      * Set the current nodes displayed
@@ -156,18 +154,18 @@ class OutgoingSharesViewModel @Inject constructor(
      *
      * @param handle
      */
-    private suspend fun refreshNodes(handle: Long = _state.value.outgoingParentHandle): List<MegaNode>? {
+    private suspend fun refreshNodes(handle: Long = _state.value.outgoingHandle): List<MegaNode>? {
         Timber.d("refreshOutgoingSharesNodes")
         return getOutgoingSharesChildrenNode(handle)
     }
 
     /**
-     * Check if the parent handle is valid
+     * Check if the handle is valid or not
      *
      * @param handle
-     * @return true if the parent handle is valid
+     * @return true if the handle is invalid
      */
-    private suspend fun isInvalidParentHandle(handle: Long = _state.value.outgoingParentHandle): Boolean {
+    private suspend fun isInvalidHandle(handle: Long = _state.value.outgoingHandle): Boolean {
         return handle
             .takeUnless { it == -1L || it == MegaApiJava.INVALID_HANDLE }
             ?.let { getNodeByHandle(it) == null }

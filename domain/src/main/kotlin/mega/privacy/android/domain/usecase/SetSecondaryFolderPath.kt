@@ -11,5 +11,5 @@ fun interface SetSecondaryFolderPath {
      *
      * @return
      */
-    operator fun invoke(folderPath: String)
+    suspend operator fun invoke(folderPath: String)
 }

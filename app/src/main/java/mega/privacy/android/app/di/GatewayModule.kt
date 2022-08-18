@@ -21,11 +21,13 @@ import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
+import mega.privacy.android.app.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.app.data.preferences.AppPreferencesDatastore
+import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.app.data.preferences.LoggingPreferencesDataStore
@@ -34,7 +36,6 @@ import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
-import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import javax.inject.Singleton
 
 /**
@@ -67,6 +68,9 @@ abstract class GatewayModule {
 
     @Binds
     abstract fun bindChatPreferencesGateway(implementation: ChatPreferencesDataStore): ChatPreferencesGateway
+
+    @Binds
+    abstract fun bindCallsPreferencesGateway(implementation: CallsPreferencesDataStore): CallsPreferencesGateway
 
     @Binds
     abstract fun bindLoggingPreferencesGateway(implementation: LoggingPreferencesDataStore): LoggingPreferencesGateway
@@ -103,27 +107,10 @@ abstract class GatewayModule {
     abstract fun bindsAudioPlayerGateway(@AudioPlayer mediaPlayerFacade: MediaPlayerFacade): MediaPlayerGateway
 
     /**
-     * Provide MediaPlayerServiceGateway implementation
-     */
-    @AudioPlayer
-    @Binds
-    @Singleton
-    abstract fun bindsAudioPlayerServiceGateway(@AudioPlayer mediaPlayerFacade: MediaPlayerFacade): MediaPlayerServiceGateway
-
-    /**
      * Provide MediaPlayerGateway implementation
      */
     @VideoPlayer
     @Binds
     @Singleton
     abstract fun bindsVideoPlayerGateway(@VideoPlayer mediaPlayerFacade: MediaPlayerFacade): MediaPlayerGateway
-
-    /**
-     * Provide MediaPlayerServiceGateway implementation
-     */
-    @VideoPlayer
-    @Binds
-    @Singleton
-    abstract fun bindsVideoPlayerServiceGateway(@VideoPlayer mediaPlayerFacade: MediaPlayerFacade): MediaPlayerServiceGateway
-
 }

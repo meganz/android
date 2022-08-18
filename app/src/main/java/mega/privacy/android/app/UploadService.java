@@ -431,10 +431,8 @@ public class UploadService extends Service {
             MegaCancelToken cancelToken = transfersManagement
                     .addScanningTransfer(MegaTransfer.TYPE_UPLOAD, file.getAbsolutePath(), parentNode, file.isDirectory());
 
-            if (cancelToken != null) {
-                megaApi.startUpload(file.getAbsolutePath(), parentNode, fileName, mTime, null,
+            megaApi.startUpload(file.getAbsolutePath(), parentNode, fileName, mTime, null,
                         false, false, cancelToken);
-            }
         }
     }
 

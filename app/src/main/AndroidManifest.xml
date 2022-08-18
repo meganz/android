@@ -35,7 +35,6 @@
         android:xlargeScreens="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.LOCAL_MAC_ADDRESS" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
@@ -428,6 +427,10 @@
             android:name=".presentation.settings.chat.imagequality.SettingsChatImageQualityActivity"
             android:exported="false"
             android:label="@string/settings_chat_image_quality" />
+        <activity
+            android:name=".presentation.settings.calls.SettingsCallsActivity"
+            android:label="@string/settings_calls_preferences"
+            android:launchMode="singleTop" />
         <activity
             android:name=".activities.settingsActivities.DownloadPreferencesActivity"
             android:label="@string/download_location"

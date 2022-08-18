@@ -12,7 +12,7 @@ class DefaultShouldCompressVideo @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
 ) : ShouldCompressVideo {
 
-    override fun invoke(): Boolean {
+    override suspend fun invoke(): Boolean {
         val qualitySetting = cameraUploadRepository.getUploadVideoQuality()
         return qualitySetting != null && qualitySetting.toInt() != VideoQuality.ORIGINAL.value
     }

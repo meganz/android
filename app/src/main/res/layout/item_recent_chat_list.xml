@@ -114,12 +114,12 @@
 
                 <ImageView
                     android:id="@+id/recent_chat_list_mute_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:layout_gravity="center_vertical"
                     android:background="@null"
-                    android:src="@drawable/ic_mute_list"
-                    app:tint="?attr/textColorHint"
+                    android:src="@drawable/ic_mute"
+                    app:tint="?android:attr/textColorPrimary"
                     tools:ignore="ContentDescription" />
 
             </LinearLayout>

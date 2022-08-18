@@ -11,5 +11,5 @@ fun interface KeepFileNames {
      *
      * @return whether file name should be kept
      */
-    operator fun invoke(): Boolean
+    suspend operator fun invoke(): Boolean
 }

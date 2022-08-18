@@ -9,6 +9,7 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupUser
  * @property chatId             Chat identifier
  * @property title              Chat title
  * @property lastMessage        Last chat message
+ * @property isPublic           Check if chat is public
  * @property isMuted            Check if chat is muted
  * @property firstUser          First user of the chat
  * @property lastUser           Last user of the chat
@@ -19,6 +20,7 @@ data class MeetingItem constructor(
     val chatId: Long,
     val title: String,
     val lastMessage: String?,
+    val isPublic: Boolean,
     val isMuted: Boolean,
     val firstUser: ContactGroupUser,
     val lastUser: ContactGroupUser?,
