@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.recent
 
-import androidx.collection.SparseArrayCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -9,20 +8,12 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import mega.privacy.android.app.di.DefaultDispatcher
-import mega.privacy.android.app.di.MainDispatcher
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.fragments.offline.OfflineNode
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
-import mega.privacy.android.domain.usecase.GetThumbnail
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
@@ -31,9 +22,6 @@ import javax.inject.Inject
 @HiltViewModel
 class RecentsBucketViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
-    private val getThumbnail: GetThumbnail,
     private val recentsBucketRepository: RecentsBucketRepository,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
@@ -42,7 +30,7 @@ class RecentsBucketViewModel @Inject constructor(
     val actionMode: LiveData<Boolean> = _actionMode
     val nodesToAnimate: LiveData<Set<Int>> = _nodesToAnimate
 
-    private val selectedNodes: MutableSet<MegaNode> = mutableSetOf()
+    private val selectedNodes: MutableSet<NodeItem> = mutableSetOf()
 
     var bucket: MutableLiveData<MegaRecentActionBucket> = MutableLiveData()
 
@@ -50,7 +38,7 @@ class RecentsBucketViewModel @Inject constructor(
 
     var shouldCloseFragment: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    var items: LiveData<List<MegaNode>> = bucket.switchMap {
+    var items: LiveData<List<NodeItem>> = bucket.switchMap {
         viewModelScope.launch {
             recentsBucketRepository.getNodes(it)
         }
@@ -63,8 +51,8 @@ class RecentsBucketViewModel @Inject constructor(
     fun getItemPositionByHandle(handle: Long): Int {
         var index = INVALID_POSITION
 
-        items.value?.forEachIndexed { i, megaNode ->
-            if (megaNode.handle == handle) {
+        items.value?.forEachIndexed { i, nodeItem ->
+            if (nodeItem.node?.handle == handle) {
                 index = i
                 return@forEachIndexed
             }
@@ -131,7 +119,7 @@ class RecentsBucketViewModel @Inject constructor(
             .removeObserver(nodesChangeObserver)
     }
 
-    fun getSelectedNodes(): List<MegaNode> {
+    fun getSelectedNodes(): List<NodeItem> {
         return selectedNodes.toList()
     }
 
@@ -154,14 +142,14 @@ class RecentsBucketViewModel @Inject constructor(
             if (node in selectedNodes) {
                 animNodeIndices.add(position)
             }
-//            node.selected = false
-//            node.uiDirty = true
+            node.selected = false
+            node.uiDirty = true
         }
 
         _nodesToAnimate.value = animNodeIndices
     }
 
-    fun onNodeLongClicked(position: Int, node: MegaNode) {
+    fun onNodeLongClicked(position: Int, node: NodeItem) {
         val nodeList = items.value
 
         if (nodeList == null || position < 0 || position >= nodeList.size
@@ -170,7 +158,7 @@ class RecentsBucketViewModel @Inject constructor(
             return
         }
 
-//        nodeList[position].selected = !nodeList[position].selected
+        nodeList[position].selected = !nodeList[position].selected
 
         if (nodeList[position] !in selectedNodes) {
             selectedNodes.add(node)
@@ -178,7 +166,7 @@ class RecentsBucketViewModel @Inject constructor(
             selectedNodes.remove(node)
         }
 
-//        nodeList[position].uiDirty = true
+        nodeList[position].uiDirty = true
         _actionMode.value = selectedNodes.isNotEmpty()
 
         _nodesToAnimate.value = hashSetOf(position)
@@ -191,11 +179,11 @@ class RecentsBucketViewModel @Inject constructor(
         val animNodeIndices = mutableSetOf<Int>()
 
         for ((position, node) in nodeList.withIndex()) {
-            if (node !in selectedNodes) {
+            if (!node.selected) {
                 animNodeIndices.add(position)
             }
-//            node.selected = true
-//            node.uiDirty = true
+            node.selected = true
+            node.uiDirty = true
             selectedNodes.add(node)
         }
 

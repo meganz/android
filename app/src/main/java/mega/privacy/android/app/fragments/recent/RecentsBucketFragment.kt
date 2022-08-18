@@ -33,6 +33,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.offline.OfflineListViewHolder
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -100,6 +101,8 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
     ): View {
         binding = FragmentRecentBucketBinding.inflate(inflater, container, false)
         listView = binding.multipleBucketView
+        listView.layoutManager = LinearLayoutManager(requireContext())
+        listView.itemAnimator = null
         return binding.root
     }
 
@@ -151,9 +154,15 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
         observeDragSupportEvents(viewLifecycleOwner, listView, VIEWER_FROM_RECETS_BUCKET)
     }
 
-    private fun setupListView(nodes: List<MegaNode>) {
+    private fun setupListView(nodes: List<NodeItem>) {
         if (adapter == null) {
-            adapter = MultipleBucketAdapter(activity, this, nodes, bucket.isMedia)
+            adapter = MultipleBucketAdapter(
+                activity,
+                this,
+                nodes,
+                bucket.isMedia,
+                RecentsBucketDiffCallback()
+            )
             listView.adapter = adapter
 
             if (bucket.isMedia) {
@@ -184,7 +193,7 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
         }
     }
 
-    private fun setupFastScroller(nodes: List<MegaNode>) {
+    private fun setupFastScroller(nodes: List<NodeItem>) {
         if (nodes.size >= MIN_ITEMS_SCROLLBAR) {
             binding.fastscroll.visibility = View.VISIBLE
             binding.fastscroll.setRecyclerView(listView)
@@ -226,11 +235,11 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
     private fun getNodesHandles(isImageViewerValid: Boolean): LongArray? =
         viewModel.items.value?.filter {
             if (isImageViewerValid) {
-                it.isValidForImageViewer()
+                it.node!!.isValidForImageViewer()
             } else {
-                FileUtil.isAudioOrVideo(it) && FileUtil.isInternalIntent(it)
+                FileUtil.isAudioOrVideo(it.node!!) && FileUtil.isInternalIntent(it.node!!)
             }
-        }?.map { it.handle }?.toLongArray()
+        }?.map { it.node!!.handle }?.toLongArray()
 
     fun openFile(
         index: Int,
@@ -272,7 +281,7 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
         }
     }
 
-    fun onNodeLongClicked(position: Int, node: MegaNode) {
+    fun onNodeLongClicked(position: Int, node: NodeItem) {
         viewModel.onNodeLongClicked(position, node)
     }
 
@@ -411,11 +420,13 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         Timber.d("ActionBarCallBack::onActionItemClicked")
         val selectedNodes = viewModel.getSelectedNodes()
-        val nodesHandles = ArrayList(selectedNodes.map { it.handle })
+        val nodesHandles = ArrayList(selectedNodes.map { it.node!!.handle })
+        val selectedMegaNodes = selectedNodes.map { it.node!! }
         when (item!!.itemId) {
             R.id.cab_menu_download -> {
                 callManager {
-                    it.saveNodesToDevice(selectedNodes,
+                    it.saveNodesToDevice(
+                        selectedMegaNodes,
                         false,
                         false,
                         false,
@@ -433,13 +444,13 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
             }
             R.id.cab_menu_send_to_chat -> {
                 callManager {
-                    it.attachNodesToChats(selectedNodes)
+                    it.attachNodesToChats(selectedMegaNodes)
                 }
             }
 
             R.id.cab_menu_share_out -> {
                 callManager {
-                    MegaNodeUtil.shareNodes(it, selectedNodes)
+                    MegaNodeUtil.shareNodes(it, selectedMegaNodes)
                 }
                 viewModel.clearSelection()
             }
@@ -501,9 +512,9 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
-//                    viewModel.items.value?.let { newList ->
-//                        rvAdapter.(ArrayList(newList))
-//                    }
+                    viewModel.items.value?.let { newList ->
+                        rvAdapter.submitList(ArrayList(newList))
+                    }
                 }
 
                 override fun onAnimationCancel(animation: Animator) {
@@ -532,9 +543,10 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
                         thumbnail.layoutParams = param
                         thumbnail
                     } else {
-                        itemView.background = ContextCompat.getDrawable(
-                            requireContext(), R.drawable.background_item_grid_selected
-                        )
+                        itemView.findViewById<ImageView>(R.id.thumbnail_media).background =
+                            ContextCompat.getDrawable(
+                                requireContext(), R.drawable.background_item_grid_selected
+                            )
                         itemView.findViewById(R.id.icon_selected)
                     }
 
@@ -555,9 +567,9 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
         }
     }
 
-    fun handleItemClick(position: Int, node: MegaNode, isMedia: Boolean) {
+    fun handleItemClick(position: Int, node: NodeItem, isMedia: Boolean) {
         if (actionMode == null) {
-            openFile(position, node, isMedia)
+            openFile(position, node.node ?: return, isMedia)
         } else {
             viewModel.onNodeLongClicked(position, node)
         }
