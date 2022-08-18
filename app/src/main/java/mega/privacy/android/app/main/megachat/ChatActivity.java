@@ -4291,7 +4291,6 @@ public class ChatActivity extends PasscodeActivity
                     hideDialogCall();
                 })
                 .setCancelable(false)
-                .setOnDismissListener(dialog -> MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true)
                 .create();
 
         dialogOnlyMeInCall.show();
