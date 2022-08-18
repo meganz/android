@@ -758,13 +758,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">免费帐户</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro&#160;I Account</string>
+    <string name="my_account_pro1">Pro&#160;I帐户</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro&#160;II Account</string>
+    <string name="my_account_pro2">Pro&#160;II帐户</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro&#160;III Account</string>
+    <string name="my_account_pro3">Pro&#160;III帐户</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
+    <string name="my_account_prolite_feedback_email">Pro&#160;Lite帐户</string>
     <!--  -->
     <string name="backup_title">备份您的恢复密钥</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -860,7 +860,7 @@
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK_title">恢复密钥无效</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
-    <string name="recovering_info">正在获取信息...</string>
+    <string name="recovering_info">正在获取信息&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
     <string name="email_verification_text_change_mail">您的新电子邮件地址需要经过验证。请检查您的电子邮件以继续。</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
@@ -940,7 +940,7 @@
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">无法更新%d个联系人的权限</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
-    <string name="contacts_list_empty_text_loading">正在从手机加载联系人...</string>
+    <string name="contacts_list_empty_text_loading">正在从手机加载联系人&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">已发送%d个请求。</string>
     <!-- success message when inviting multiple contacts -->
@@ -1840,7 +1840,7 @@
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit -->
     <string name="login_API_rate">请求过多。请稍候。</string>
     <!-- Message when previous login is being cancelled -->
-    <string name="login_in_progress">正在取消登录。请稍候...</string>
+    <string name="login_in_progress">正在取消登录。请稍候&#8230;</string>
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">发生错误。文件已损坏或不存在。</string>
     <!-- Menu option to print the recovery key from Offline section -->
@@ -3536,21 +3536,21 @@
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
     <string name="successful_upgrade">感谢您订阅%1$s</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite月度会员方案</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite年度会员方案</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I monthly</string>
+    <string name="pro_i_monthly">Pro&#160;I月度会员方案</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I yearly</string>
+    <string name="pro_i_yearly">Pro&#160;I年度会员方案</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
+    <string name="pro_ii_monthly">Pro&#160;II月度会员方案</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
+    <string name="pro_ii_yearly">Pro&#160;II年度会员方案</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
+    <string name="pro_iii_monthly">Pro&#160;III月度会员方案</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
+    <string name="pro_iii_yearly">Pro&#160;III年度会员方案</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">移除主持人权限</string>
     <!-- Title message of existing subscription dialog -->

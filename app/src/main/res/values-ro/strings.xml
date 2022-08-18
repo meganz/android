@@ -781,13 +781,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Cont gratuit</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro&#160;I Account</string>
+    <string name="my_account_pro1">Cont Pro&#160;I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro&#160;II Account</string>
+    <string name="my_account_pro2">Cont Pro&#160;II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro&#160;III Account</string>
+    <string name="my_account_pro3">Cont Pro&#160;III</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
+    <string name="my_account_prolite_feedback_email">Cont Pro&#160;Lite</string>
     <!--  -->
     <string name="backup_title">Fă backup cheii de recuperare</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -1590,7 +1590,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caractere nevalide</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">The following characters are not allowed: %1$s</string>
+    <string name="invalid_characters_defined">Următoarele caractere nu sunt permise: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">File name cannot be empty.</item>

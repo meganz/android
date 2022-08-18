@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">外部ストレージが検出されませんでした</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">ログアウト</string>
+    <string name="action_logout">ログ&#160;アウト</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">アップロード</string>
     <!-- Menu item -->
@@ -127,7 +127,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">現在のログインプロセスをキャンセルしてもよろしいですか？</string>
     <!-- Login button -->
-    <string name="login_text">ログイン</string>
+    <string name="login_text">ログ&#160;イン</string>
     <!-- email label -->
     <string name="email_text">メール</string>
     <!-- password label -->
@@ -758,13 +758,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">無料アカウント</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro&#160;I Account</string>
+    <string name="my_account_pro1">Pro&#160;I アカウント</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro&#160;II Account</string>
+    <string name="my_account_pro2">Pro&#160;II アカウント</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro&#160;III Account</string>
+    <string name="my_account_pro3">Pro&#160;III アカウント</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
+    <string name="my_account_prolite_feedback_email">Pro&#160;Lite アカウント</string>
     <!--  -->
     <string name="backup_title">回復キーをバックアップ</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -1144,7 +1144,7 @@
         <item quantity="other">%1$s [A]さんが入力しています&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
-    <string name="more_users_typing">%1$s [A]さんたちが入力しています[/A]</string>
+    <string name="more_users_typing">%1$s [A]さんたちが入力しています&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">詳細</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
@@ -2636,7 +2636,7 @@
     <!-- Title of popup when user click ‘Share’ button on invite contact page -->
     <string name="invite_contact_chooser_title">以下を通じて友だちを招待</string>
     <!-- Action button label -->
-    <string name="invite_contact_action_button">以下を通じて友だちを招待</string>
+    <string name="invite_contact_action_button">以下を通じて友だちを招待&#8230;</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
         <item quantity="other">%d個のファイルがすでにダウンロードされました。</item>
@@ -3536,21 +3536,21 @@
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
     <string name="successful_upgrade">%1$sをご契約いただきありがとうございます</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite 月間</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite 年間</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I monthly</string>
+    <string name="pro_i_monthly">Pro&#160;I 月間</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I yearly</string>
+    <string name="pro_i_yearly">Pro&#160;I 年間</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
+    <string name="pro_ii_monthly">Pro&#160;II 月間</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
+    <string name="pro_ii_yearly">Pro&#160;II 年間</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
+    <string name="pro_iii_monthly">Pro&#160;III 月間</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
+    <string name="pro_iii_yearly">Pro&#160;III 年間</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">主催者として削除</string>
     <!-- Title message of existing subscription dialog -->

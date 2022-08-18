@@ -364,7 +364,7 @@
     <!-- menu item -->
     <string name="context_delete_from_mega">Remove from MEGA</string>
     <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Folder Name</string>
+    <string name="context_new_folder_name">Folder name</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Creating folder</string>
     <!-- Menu option title -->
@@ -768,13 +768,13 @@
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
     <string name="servers_busy">This process is taking longer than expected. Please wait.</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_free">Free Account</string>
+    <string name="my_account_free">Free account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro&#160;I Account</string>
+    <string name="my_account_pro1">Pro&#160;I account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro&#160;II Account</string>
+    <string name="my_account_pro2">Pro&#160;II account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro&#160;III Account</string>
+    <string name="my_account_pro3">Pro&#160;III account</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
     <!--  -->

@@ -758,13 +758,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">免費帳戶</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro&#160;I Account</string>
+    <string name="my_account_pro1">Pro&#160;I帳戶</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro&#160;II Account</string>
+    <string name="my_account_pro2">Pro&#160;II帳戶</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro&#160;III Account</string>
+    <string name="my_account_pro3">Pro&#160;III帳戶</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
+    <string name="my_account_prolite_feedback_email">Pro&#160;Lite帳戶</string>
     <!--  -->
     <string name="backup_title">備份您的還原金鑰</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -2800,7 +2800,7 @@
     <!-- Title of a screen to browse files -->
     <string name="browse_files_label">瀏覽檔案</string>
     <!-- Title of the File Provider activity -->
-    <string name="file_provider_title">附加自⋯</string>
+    <string name="file_provider_title">附加自&#8230;</string>
     <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
     <string name="inactive_chat_title_2">對話已建立%s</string>
     <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
@@ -3536,21 +3536,21 @@
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
     <string name="successful_upgrade">感謝您訂閱%1$s</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite月方案</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite年方案</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I monthly</string>
+    <string name="pro_i_monthly">Pro&#160;I月方案</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I yearly</string>
+    <string name="pro_i_yearly">Pro&#160;I年方案</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
+    <string name="pro_ii_monthly">Pro&#160;II月方案</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
+    <string name="pro_ii_yearly">Pro&#160;II年方案</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
+    <string name="pro_iii_monthly">Pro&#160;III月方案</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
+    <string name="pro_iii_yearly">Pro&#160;III年方案</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">移除主持人權限</string>
     <!-- Title message of existing subscription dialog -->

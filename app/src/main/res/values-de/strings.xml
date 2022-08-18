@@ -770,13 +770,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Gratisaccount</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro&#160;I Account</string>
+    <string name="my_account_pro1">Pro&#160;I-Account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro&#160;II Account</string>
+    <string name="my_account_pro2">Pro&#160;II-Account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro&#160;III Account</string>
+    <string name="my_account_pro3">Pro&#160;III-Account</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
+    <string name="my_account_prolite_feedback_email">Pro&#160;Lite-Account</string>
     <!--  -->
     <string name="backup_title">Rettungsschlüssel sichern</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -3635,21 +3635,21 @@
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
     <string name="successful_upgrade">Vielen Dank, dass Sie %1$s abonniert haben</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite monatlich</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite jährlich</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I monthly</string>
+    <string name="pro_i_monthly">Pro&#160;I monatlich</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I yearly</string>
+    <string name="pro_i_yearly">Pro&#160;I jährlich</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
+    <string name="pro_ii_monthly">Pro&#160;II monatlich</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
+    <string name="pro_ii_yearly">Pro&#160;II jährlich</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
+    <string name="pro_iii_monthly">Pro&#160;III monatlich</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
+    <string name="pro_iii_yearly">Pro&#160;III jährlich</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Gastgeberstatus entziehen</string>
     <!-- Title message of existing subscription dialog -->

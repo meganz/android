@@ -153,7 +153,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">No hay conexión de red</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">Se ha cerrado la sesión de este dispositivo desde otra ubicación.</string>
+    <string name="error_server_expired_session">Se ha cerrado la sesión de este dispositivo desde otra ubicación</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">Generando las claves de cifrado</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -373,7 +373,7 @@
     <!-- menu item -->
     <string name="context_delete_from_mega">Eliminar de MEGA</string>
     <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Nombre de Carpeta</string>
+    <string name="context_new_folder_name">Nombre de carpeta</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Creando carpeta</string>
     <!-- Menu option title -->
@@ -445,7 +445,7 @@
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Compartido correctamente</string>
     <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">No se han podido completar %d comparticiones</string>
+    <string name="context_no_shared_number">Error. No se han podido completar %d comparticiones</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Error. No se ha podido eliminar la compartición</string>
     <!-- success message when removing a node from MEGA -->
@@ -469,7 +469,7 @@
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">La Papelera se ha vaciado correctamente</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">No se ha podido vaciar la Papelera</string>
+    <string name="rubbish_bin_no_emptied">Se ha producido un error. No se ha podido vaciar la Papelera</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Estás a punto de cancelar tu suscripción MEGA. Por favor, dinos si hay algo que podamos hacer que pueda hacerte cambiar de opinión.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -511,7 +511,7 @@
         <item quantity="other">Procesando archivos</item>
     </plurals>
     <!-- error message when downloading a file -->
-    <string name="error_temporary_unavaible">Recurso no disponible temporalmente. Por favor, inténtalo de nuevo más tarde</string>
+    <string name="error_temporary_unavaible">Recurso no disponible temporalmente, por favor inténtalo de nuevo más tarde</string>
     <!-- Error message when the selected file cannot be opened -->
     <string name="upload_can_not_open">El archivo seleccionado no se puede abrir</string>
     <!-- when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file -->
@@ -782,13 +782,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Cuenta gratuita</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro&#160;I Account</string>
+    <string name="my_account_pro1">Cuenta Pro&#160;I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro&#160;II Account</string>
+    <string name="my_account_pro2">Cuenta Pro&#160;II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro&#160;III Account</string>
+    <string name="my_account_pro3">Cuenta Pro&#160;III</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
+    <string name="my_account_prolite_feedback_email">Cuenta Pro&#160;Lite</string>
     <!--  -->
     <string name="backup_title">Guarda tu Clave de recuperación</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -800,7 +800,7 @@
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">Un atacante externo no puede acceder a tu cuenta solo con tu clave. Para restablecer la contraseña necesitaría tanto la clave como el acceso a tu correo electrónico.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Copia la Clave de recuperación en el portapapeles o guárdala como archivo de texto</string>
+    <string name="backup_action">Copia la Clave de recuperación en el portapapeles o guárdala como archivo de texto.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Guardar</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
@@ -990,7 +990,7 @@
     <!-- Title of the dialogue to mute the general chat notifications. -->
     <string name="title_dialog_mute_chat_notifications">No molestar</string>
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
-    <string name="subtitle_dialog_mute_chat_notifications">Silenciar las notificaciones del chat durante:</string>
+    <string name="subtitle_dialog_mute_chat_notifications">Silenciar las notificaciones del chat durante</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
     <string name="title_dialog_mute_chatroom_notifications">Silenciar notificaciones</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
@@ -1040,7 +1040,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">Se ha limpiado el historial del chat</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">No se ha podido limpiar el historial del chat</string>
+    <string name="clear_history_error">Se ha producido un error. No se ha podido limpiar el historial del chat</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Añadir participantes</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1126,13 +1126,13 @@
     <!-- Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="manual_resume_alert">Las transferencias están pausadas. Toca para reanudar.</string>
     <!-- message shown when the status of the user coudn’t be changed -->
-    <string name="changing_status_error">No se ha podido actualizar el estado</string>
+    <string name="changing_status_error">Error. No se ha podido actualizar el estado</string>
     <!-- message shown when a chat has not been created -->
     <string name="create_chat_error">No se ha podido crear el chat</string>
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibración</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Cierra sesión[/A] para usar otra cuenta de MEGA.</string>
+    <string name="sms_logout">[A]Cierra sesión[/A] para usar otra cuenta de MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">¿Quieres cerrar sesión y salir de tu cuenta?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1339,7 +1339,7 @@
     <!-- Menu option -->
     <string name="general_view_contacts">Ver contactos</string>
     <!-- Menu option -->
-    <string name="import_success_error">No se ha podido añadir a la Nube</string>
+    <string name="import_success_error">Error. No se ha podido añadir a la Nube</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Conectando&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
@@ -1405,11 +1405,11 @@
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Participante añadido</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
-    <string name="add_participant_error">No se ha podido añadir el participante</string>
+    <string name="add_participant_error">Error. No se ha podido añadir el participante</string>
     <!-- Message show when a participant has been successfully removed from a group chat -->
     <string name="remove_participant_success">Participante eliminado</string>
     <!-- Message show when a participant hasn’t been successfully removed from a group chat -->
-    <string name="remove_participant_error">No se ha podido eliminar el participante</string>
+    <string name="remove_participant_error">Error. No se ha podido eliminar el participante</string>
     <!--  -->
     <string name="no_files_selected_warning">Ningún archivo seleccionado</string>
     <!--  -->
@@ -1459,7 +1459,7 @@
     <!-- messages string in chat notification -->
     <string name="messages_chat_notification">mensajes</string>
     <!-- part of the string in incoming shared folder notification -->
-    <string name="incoming_folder_notification">Desde</string>
+    <string name="incoming_folder_notification">desde</string>
     <!-- title of incoming shared folder notification -->
     <string name="title_incoming_folder_notification">Nueva carpeta compartida</string>
     <!-- title of the notification for a new incoming contact request -->
@@ -1497,7 +1497,7 @@
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s de almacenamiento. Válido durante 365 días.</string>
     <!-- title of the section for unlocked rewards -->
-    <string name="unlocked_rewards_title">Bonos desbloqueados:</string>
+    <string name="unlocked_rewards_title">Bonos desbloqueados</string>
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">Almacenamiento</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
@@ -1525,7 +1525,7 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bono de almacenamiento gratuito aplicable solo a usuarios nuevos que instalen la aplicación móvil o de escritorio de MEGA.</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Invitación enviada.</string>
+    <string name="subtitle_confirmation_invite_friends">Invitación enviada</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Correo electrónico no válido</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1653,7 +1653,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">No se ha podido eliminar el código QR. Inténtalo de nuevo.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">Invitación enviada.</string>
+    <string name="invite_sent">Invitación enviada</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">El usuario ha sido invitado y aparecerá en tu lista de contactos en cuanto acepte la invitación.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1843,9 +1843,9 @@
     <string name="messages_forwarded_success">Mensajes reenviados</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="one">No se ha podido reenviar %1$d mensaje</item>
-        <item quantity="many">No se han podido reenviar %1$d de mensajes</item>
-        <item quantity="other">No se han podido reenviar %1$d mensajes</item>
+        <item quantity="one">Error. No se ha podido reenviar %1$d mensaje</item>
+        <item quantity="many">Error. No se han podido reenviar %1$d de mensajes</item>
+        <item quantity="other">Error. No se han podido reenviar %1$d mensajes</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -2154,11 +2154,11 @@
     <!-- Title of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_title">Control de versiones</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
-    <string name="settings_enable_file_versioning_subtitle">Activa o desactiva el control de versiones de archivos para toda tu cuenta.\nDesactivar el control de versiones no impedirá que tus contactos creen nuevas versiones en carpetas compartidas</string>
+    <string name="settings_enable_file_versioning_subtitle">Activa o desactiva el control de versiones de archivos para toda tu cuenta.\nDesactivar el control de versiones no impedirá que tus contactos creen nuevas versiones en carpetas compartidas.</string>
     <!-- Hint shown to guide user on activity add contacts -->
     <string name="type_mail">Toca, introduce el nombre o el correo electrónico</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
-    <string name="confirmation_invite_contact">Añadir a %s a tus contactos?</string>
+    <string name="confirmation_invite_contact">¿Añadir a %s a tus contactos?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
     <string name="confirmation_not_invite_contact">Ya has añadido al contacto %s.</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2174,7 +2174,7 @@
     <!-- Text shown to indicate user that his account has already been confirmed -->
     <string name="account_confirmed">Tu cuenta está activa. Por favor, inicia sesión.</string>
     <!-- Text shown to indicate user that his account should be confirmed typing his password -->
-    <string name="confirm_account">Por favor, introduce tu contraseña para confirmar tu cuenta.</string>
+    <string name="confirm_account">Por favor, introduce tu contraseña para confirmar tu cuenta</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
     <string name="error_own_email_as_contact">No hace falta que añadas tu propio correo electrónico</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -2236,7 +2236,7 @@
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
     <string name="staging_api_url_text">¿Estás seguro de que quieres cambiar a un servidor de prueba? Tu cuenta podría sufrir daños irreparables.</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
-    <string name="title_confirmation_open_camera_on_chat">Abrir cámara?</string>
+    <string name="title_confirmation_open_camera_on_chat">¿Abrir cámara?</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="confirmation_open_camera_on_chat">Si abres la cámara, la transmisión de video se pausará durante esta llamada.</string>
     <!-- Content of the notification when there is unknown activity on the Chat -->
@@ -2302,7 +2302,7 @@
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A][B] ha activado la rotación de la clave de cifrado.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
-    <string name="invalid_chat_link">Esta conversación ya no está disponible.</string>
+    <string name="invalid_chat_link">Esta conversación ya no está disponible</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Rotación de la clave de cifrado</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -2312,7 +2312,7 @@
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">La invitación para %s se ha enviado anteriormente y se puede consultar en la pestaña Solicitudes enviadas.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
-    <string name="save_qr_cloud_drive">Guardando %s en la Nube</string>
+    <string name="save_qr_cloud_drive">Guardando %s en la Nube&#8230;</string>
     <!-- General label for files -->
     <string name="general_files">Archivos</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2430,7 +2430,7 @@
     <!-- message will be shown when there is not enough space to perform camera upload. -->
     <string name="message_out_of_space">No hay suficiente espacio de almacenamiento local para comprimir el vídeo.</string>
     <!-- the title of the notification that displays when compression larger than setting -->
-    <string name="title_compression_size_over_limit">El tamaño es demasiado grande para efectuar la compresión.</string>
+    <string name="title_compression_size_over_limit">El tamaño es demasiado grande para efectuar la compresión</string>
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
     <string name="message_compression_size_over_limit">El tamaño total de los videos a comprimir excede de %s, por favor deja tu dispositivo cargando para continuar.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
@@ -2888,7 +2888,7 @@
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
     <string name="my_chat_files_folder">Mis archivos de chat</string>
     <!-- Error shown when it was not possible to create a folder for any reason -->
-    <string name="error_creating_folder">No se ha podido crear la carpeta %1$s</string>
+    <string name="error_creating_folder">Error. No se ha podido crear la carpeta %1$s</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
     <string name="verify_email_label">Verifica tu dirección de email</string>
     <!-- Text informing user that their account has been suspended -->
@@ -3076,7 +3076,7 @@
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">Reanuda las transferencias para continuar con las subidas.</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
-    <string name="progress_size_indicator">%1$d%% de %2$s</string>
+    <string name="progress_size_indicator">%1$d&#160;%% de %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Información de depuración del chat activada</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
@@ -3412,7 +3412,7 @@
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: 15GB / 20GB. The placeholders are for warning the user and set used storage in red if is in storage over quota.-->
     <string name="used_storage_transfer">[A]%1$s[/A] / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
-    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <string name="used_storage_transfer_percentage">%1$s&#160;%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3538,7 +3538,7 @@
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Toca el enlace de la reunión que se te ha enviado o pégalo aquí</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
-    <string name="meeting_has_ended">La reunión ha terminado.</string>
+    <string name="meeting_has_ended">La reunión ha terminado</string>
     <!-- error message shown when a meeting link is not well formed-->
     <string name="invalid_meeting_link_args">Enlace de la reunión inválido</string>
     <!-- Warning show to the user when the app needs permissions to start a meeting.-->
@@ -3734,21 +3734,21 @@
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
     <string name="successful_upgrade">Gracias por su suscripción %1$s</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite mensual</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite anual</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I monthly</string>
+    <string name="pro_i_monthly">Pro&#160;I mensual</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I yearly</string>
+    <string name="pro_i_yearly">Pro&#160;I anual</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
+    <string name="pro_ii_monthly">Pro&#160;II mensual</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
+    <string name="pro_ii_yearly">Pro&#160;II anual</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
+    <string name="pro_iii_monthly">Pro&#160;III mensual</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
+    <string name="pro_iii_yearly">Pro&#160;III anual</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Desasignar como anfitrión</string>
     <!-- Title message of existing subscription dialog -->
@@ -3794,7 +3794,7 @@
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">Has introducido tu contraseña actual</string>
     <!-- Title of pop-up error message for taken down file -->
-    <string name="error_file_not_available">El archivo ya no está disponible.</string>
+    <string name="error_file_not_available">El archivo ya no está disponible</string>
     <!-- Body of pop-up error message for taken down file. -->
     <string name="error_takendown_file">El archivo ha sido eliminado por infringir nuestros Términos de servicio.</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
@@ -3986,7 +3986,7 @@
     <!-- Success message when submit issue succeeded-->
     <string name="settings_help_report_issue_success">Hemos recibido el reporte. Estudiaremos el problema y nos pondremos en contacto contigo.</string>
     <!-- Message shown during log file upload-->
-    <string name="settings_help_report_issue_uploading_log_file">Subir archivo con logs.</string>
+    <string name="settings_help_report_issue_uploading_log_file">Subir archivo con logs</string>
     <!-- Message shown if user tries to leave report screen without submitting their report-->
     <string name="settings_help_report_issue_discard_dialog_title">¿Descartar reporte?</string>
     <!-- Button text for discard dialog option-->

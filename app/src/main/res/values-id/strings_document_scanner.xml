@@ -47,5 +47,5 @@
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">Menyiapkan %1$s. Harap tunggu&#8230;</string>
     <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->
-    <string name="scan_snackbar_invalid_characters">The following characters are not allowed: %1$s</string>
+    <string name="scan_snackbar_invalid_characters">Karakter berikut tidak diperbolehkan: %1$s</string>
 </resources>

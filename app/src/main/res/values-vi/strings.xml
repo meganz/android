@@ -61,7 +61,7 @@
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MAPHUCHOI-MEGA</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
-    <string name="secondary_media_service_error_local_folder">Lỗi. Không tìm thấy thư mục secondary media, xin chọn một thư mục mới</string>
+    <string name="secondary_media_service_error_local_folder">Không tìm thấy thư mục secondary media, xin chọn một thư mục mới</string>
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Không phát hiện bộ lưu trữ ngoài</string>
     <!-- Button where the user can sign off or logout -->
@@ -756,15 +756,15 @@
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
     <string name="servers_busy">Quý trình hiện diễn ra lâu hơn dự đoán. Xin chờ.</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_free">Tài Khoản Miễn Phí</string>
+    <string name="my_account_free">Tài khoản miễn phí</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro&#160;I Account</string>
+    <string name="my_account_pro1">Tài khoản hạng Pro&#160;I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro&#160;II Account</string>
+    <string name="my_account_pro2">Tài khoản hạng Pro&#160;II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro&#160;III Account</string>
+    <string name="my_account_pro3">Tài khoản hạng Pro&#160;II</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
+    <string name="my_account_prolite_feedback_email">Tài Khoản Pro&#160;Lite</string>
     <!--  -->
     <string name="backup_title">Sao lưu dự phòng Mã Phục Hồi</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -1116,7 +1116,7 @@
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Chát lỗi</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Lỗi. Không mở được cuộc chát</string>
+    <string name="chat_error_open_message">Không mở được cuộc chát</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d tên liên lạc</item>
@@ -1369,7 +1369,7 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Xem và sửa</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
-    <string name="attachment_uploading_state_paused">Phiên truyền tải bị dừng!</string>
+    <string name="attachment_uploading_state_paused">Phiên truyền tải bị dừng</string>
     <!-- label to indicate the state of an upload in chat -->
     <string name="attachment_uploading_state_uploading">Đang tải lên&#8230;</string>
     <!--  -->
@@ -1383,7 +1383,7 @@
     <!-- Menu option -->
     <string name="general_view_with_revoke">Xem các tệp tin (%1$d đã xóa)</string>
     <!-- Error message when the attachment cannot be sent -->
-    <string name="error_attaching_node_from_cloud">Lỗi, Tệp tin chưa gửi được</string>
+    <string name="error_attaching_node_from_cloud">Lỗi. Tệp tin chưa gửi được</string>
     <!-- Error message when the attachment cannot be revoked -->
     <string name="error_revoking_node">Phát sinh lỗi. Không tháo bỏ được tệp đính kèm</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
@@ -1463,7 +1463,7 @@
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Sau khi cài đặt MEGA trên máy tính, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, có hạn sử dụng là 365 ngày. MEGA còn có apps dành cho Windows, macOS và đa số các máy Linux distros.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Sau khi cài đặt App MEGA cho Di Động, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, hạn sử dụng là 365 ngày. MEGA còn có ứng dụng di động dành cho iOS và Android..</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Sau khi cài đặt App MEGA cho Di Động, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, hạn sử dụng là 365 ngày. MEGA còn có ứng dụng di động dành cho iOS và Android.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Sau khi xác thực số điện thoại bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, hạn sử dụng là 365 ngày.</string>
     <!-- info paragraph about the completed achievement install megasync -->
@@ -1482,7 +1482,7 @@
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
-        <item quantity="other">Nếu bạn quyết định rời khỏi các thư mục này, bạn sẽ không thể truy cập lại được nữa. Bạn có chắc không?</item>
+        <item quantity="other">Nếu bạn quyết định rời khỏi các thư mục này, bạn sẽ không thể truy cập lại được nữa.</item>
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Trợ Giúp</string>
@@ -2320,7 +2320,7 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">tên tệp tin</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">Hiện “Lần thấy cuối&#8230;“</string>
+    <string name="option_enable_last_green_chat">Hiện Lần thấy cuối&#8230;</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
     <string name="subtitle_option_enable_last_green_chat">Cho phép các tên trong liên lạc biết được lần thấy cuối bạn ở MEGA.</string>
     <!-- title of notification when device is out of storage during camera upload -->
@@ -3160,7 +3160,7 @@
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
     <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
     <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B],%3$s</string>
+    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B], %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="other">Việc tải lên đang được thực hiện, %1$d tệp đang chờ</item>
@@ -3536,21 +3536,21 @@
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
     <string name="successful_upgrade">Cảm ơn quý khách đã mua gói đăng ký dịch vụ %1$s</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite hằng tháng</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite thường niên</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I monthly</string>
+    <string name="pro_i_monthly">Pro&#160;I hằng tháng</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I yearly</string>
+    <string name="pro_i_yearly">Pro&#160;I thường niên</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
+    <string name="pro_ii_monthly">Pro&#160;II hằng tháng</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
+    <string name="pro_ii_yearly">Pro&#160;II thường niên</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
+    <string name="pro_iii_monthly">Pro&#160;III hằng tháng</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
+    <string name="pro_iii_yearly">Pro&#160;III thường niên</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Loại bỏ chức người chủ trì</string>
     <!-- Title message of existing subscription dialog -->
