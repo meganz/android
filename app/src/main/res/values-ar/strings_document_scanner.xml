@@ -46,6 +46,6 @@
     <string name="scan_snackbar_incorrect_name">يرجى تصحيح اسم الملف الخاص بك قبل المتابعة</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">جاري التحضير%1$s. يرجى الانتظار&#8230;</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="scan_snackbar_invalid_characters">الأحرف التالية غير مسموح بها: ” * / : &lt; &gt; ? \ |</string>
+    <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->
+    <string name="scan_snackbar_invalid_characters">المحارف التالية غير مسموح بها: %1$s</string>
 </resources>

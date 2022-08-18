@@ -5284,7 +5284,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         doNotDisturbMenuItem.setVisible(true);
                         openLinkMenuItem.setVisible(true);
 
-                        if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible() && getRecentChatsFragment().getItemCount() > 0) {
+                        if (getRecentChatsFragment() != null && getRecentChatsFragment().isVisible()) {
                             searchMenuItem.setVisible(true);
                         }
                     }

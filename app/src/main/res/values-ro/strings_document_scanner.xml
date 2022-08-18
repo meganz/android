@@ -46,6 +46,6 @@
     <string name="scan_snackbar_incorrect_name">Te rugăm să corectezi numele fișierului înainte de a continua</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">Se pregătește%1$s. Te rugăm să aștepți&#8230;</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="scan_snackbar_invalid_characters">Următoarele caractere nu sunt permise: ” * / : &lt; &gt; ? \ |</string>
+    <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->
+    <string name="scan_snackbar_invalid_characters">Următoarele caractere nu sunt permise: %1$s</string>
 </resources>

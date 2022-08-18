@@ -13,5 +13,5 @@
     <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
     <string name="error_unknown">Неизвестная ошибка</string>
     <!-- Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation. -->
-    <string name="error_toomany">Слишком много пользователей для этого ресурса</string>
+    <string name="error_toomany">Слишком много пользователей для этого ресурса.</string>
 </resources>
