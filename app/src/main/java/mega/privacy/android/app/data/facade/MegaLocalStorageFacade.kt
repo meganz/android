@@ -157,7 +157,7 @@ class MegaLocalStorageFacade @Inject constructor(
     override fun getUriExternalSd(): String = dbHandler.preferences.uriExternalSDCard
 
     override fun isSecondaryMediaFolderEnabled(): Boolean =
-        dbHandler.preferences.keepFileNames.toBoolean()
+        dbHandler.preferences.secondaryMediaFolderEnabled.toBoolean()
 
     override fun isMediaFolderExternalSd(): Boolean = dbHandler.mediaFolderExternalSdCard
 
