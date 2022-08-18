@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+
+import androidx.annotation.StyleableRes;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import mega.privacy.android.app.components.RtlGridLayoutManager;
@@ -46,7 +48,7 @@ public class AutoFitRecyclerView extends RecyclerView {
     private void initialization(Context context, AttributeSet attrs, boolean isReverse) {
         try{
             if (attrs != null) {
-                int[] attrsArray = {
+                @StyleableRes int[] attrsArray = new int[]{
                         android.R.attr.columnWidth,
                 };
 

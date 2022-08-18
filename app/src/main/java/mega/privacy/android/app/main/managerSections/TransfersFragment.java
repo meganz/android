@@ -182,25 +182,18 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
     }
 
     private void setTransfers() {
-        // Here is a workaround to solve the ANR, will refactor based on clean architecture in the future.
-        new Thread(() -> {
-            tL.clear();
+        tL.clear();
 
-            for (int i = 0; i < managerActivity.transfersInProgress.size(); i++) {
-                MegaTransfer transfer = megaApi.getTransferByTag(managerActivity.transfersInProgress.get(i));
-                if (transfer != null && !transfer.isStreamingTransfer() && !isBackgroundTransfer(transfer)) {
-                    tL.add(transfer);
-                }
+        for (int i = 0; i < managerActivity.transfersInProgress.size(); i++) {
+            MegaTransfer transfer = megaApi.getTransferByTag(managerActivity.transfersInProgress.get(i));
+            if (transfer != null && !transfer.isStreamingTransfer() && !isBackgroundTransfer(transfer)) {
+                tL.add(transfer);
             }
+        }
 
-            orderTransfersByDescendingPriority();
+        orderTransfersByDescendingPriority();
 
-            Timber.d("setTransfers");
-            requireActivity().runOnUiThread(() -> {
-                setEmptyView(tL.size());
-                Timber.d("TransfersFragment setTransfers is called, size is %s", tL.size());
-            });
-        }).start();
+        setEmptyView(tL.size());
     }
 
     /**
@@ -245,7 +238,6 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
         return INVALID_POSITION;
     }
 
-    private int indexStatusChanged = 0;
     /**
      * Changes the status (play/pause) of the button of a transfer.
      *
@@ -254,30 +246,24 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
     public void changeStatusButton(int tag) {
         Timber.d("tag: %s", tag);
 
-        ListIterator<MegaTransfer> li = tL.listIterator();
-        indexStatusChanged = 0;
+        ListIterator li = tL.listIterator();
+        int index = 0;
         while (li.hasNext()) {
             MegaTransfer next = (MegaTransfer) li.next();
             if (next == null) continue;
 
             if (next.getTag() == tag) {
-                indexStatusChanged = li.previousIndex();
+                index = li.previousIndex();
                 break;
             }
         }
-        // Here is a workaround to solve the ANR, will refactor based on clean architecture in the future.
-        new Thread(() -> {
-            MegaTransfer transfer = megaApi.getTransferByTag(tag);
-            if (transfer != null) {
-                tL.set(indexStatusChanged, transfer);
-                Timber.d("The transfer with index : %dhas been paused/resumed, left: %d", indexStatusChanged, tL.size());
+        MegaTransfer transfer = megaApi.getTransferByTag(tag);
+        if (transfer != null) {
+            tL.set(index, transfer);
+            Timber.d("The transfer with index : %dhas been paused/resumed, left: %d", index, tL.size());
 
-                requireActivity().runOnUiThread(() -> {
-                    adapter.notifyItemChanged(indexStatusChanged);
-                });
-
-            }
-        }).start();
+            adapter.notifyItemChanged(index);
+        }
     }
 
     /**
@@ -506,39 +492,34 @@ public class TransfersFragment extends TransfersBaseFragment implements MegaTran
      * @param transferTag Identifier of the transfer.
      */
     private void finishMovement(boolean success, int transferTag) {
-        // Here is a workaround to solve the ANR, will refactor based on clean architecture in the future.
-        new Thread(() -> {
-            MegaTransfer transfer = megaApi.getTransferByTag(transferTag);
-            if (transfer == null || transfer.getState() >= STATE_COMPLETING) {
-                Timber.w("The transfer doesn't exist, finished or is finishing.");
-                return;
+        MegaTransfer transfer = megaApi.getTransferByTag(transferTag);
+        if (transfer == null || transfer.getState() >= STATE_COMPLETING) {
+            Timber.w("The transfer doesn't exist, finished or is finishing.");
+            return;
+        }
+
+        int transferPosition = tryToUpdateTransfer(transfer);
+        if (transferPosition == INVALID_POSITION) {
+            Timber.w("The transfer doesn't exist.");
+            return;
+        }
+
+        if (success) {
+            if (adapter != null) {
+                adapter.notifyItemChanged(transferPosition);
             }
 
-            int transferPosition = tryToUpdateTransfer(transfer);
-            if (transferPosition == INVALID_POSITION) {
-                Timber.w("The transfer doesn't exist.");
-                return;
-            }
+            return;
+        }
 
-            requireActivity().runOnUiThread(() -> {
-                if (success) {
-                    if (adapter != null) {
-                        adapter.notifyItemChanged(transferPosition);
-                    }
+        reorderTransfersAfterFailedMovement();
+        managerActivity.showSnackbar(SNACKBAR_TYPE,
+                getString(R.string.change_of_transfer_priority_failed, transfer.getFileName()),
+                MEGACHAT_INVALID_HANDLE);
 
-                    return;
-                }
-
-                reorderTransfersAfterFailedMovement();
-                managerActivity.showSnackbar(SNACKBAR_TYPE,
-                        getString(R.string.change_of_transfer_priority_failed, transfer.getFileName()),
-                        MEGACHAT_INVALID_HANDLE);
-
-                if (adapter != null) {
-                    adapter.setTransfers(tL);
-                }
-            });
-        }).start();
+        if (adapter != null) {
+            adapter.setTransfers(tL);
+        }
     }
 
     public void checkSelectModeAfterChangeTabOrDrawerItem() {

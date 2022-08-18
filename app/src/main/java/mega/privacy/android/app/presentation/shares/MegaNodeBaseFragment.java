@@ -4,17 +4,12 @@ import static mega.privacy.android.app.components.dragger.DragToExitSupport.obse
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID;
 import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
-import static mega.privacy.android.app.presentation.shares.MegaNodeBaseFragmentExtensionsKt.managerState;
-import static mega.privacy.android.app.presentation.shares.links.LinksFragment.getLinksOrderCloud;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
-import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
-import static mega.privacy.android.app.utils.Constants.LINKS_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
-import static mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
@@ -84,7 +79,6 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
-import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
@@ -126,7 +120,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected TextView emptyTextViewFirst;
 
     protected SortByHeaderViewModel sortByHeaderViewModel;
-    public ManagerViewModel managerViewModel;
 
     public abstract int onBackPressed();
 
@@ -147,7 +140,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
 
         sortByHeaderViewModel = new ViewModelProvider(this).get(SortByHeaderViewModel.class);
 
@@ -475,7 +467,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent = ImageViewerActivity.getIntentForParentNode(
                     requireContext(),
                     getParentHandle(),
-                    getIntentOrder(fragmentAdapter),
+                    getIntentOrder(),
                     node.getHandle()
             );
 
@@ -495,7 +487,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("position", position);
             intent.putExtra("placeholder", adapter.getPlaceholderCount());
             intent.putExtra("parentNodeHandle", getParentHandle());
-            intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
+            intent.putExtra("orderGetChildren", getIntentOrder());
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("HANDLE", node.getHandle());
             intent.putExtra("FILENAME", node.getName());
@@ -630,22 +622,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
     protected abstract int viewerFrom();
 
-    private int getIntentOrder(int fragmentAdapter) {
-        switch (fragmentAdapter) {
-            case LINKS_ADAPTER:
-                return getLinksOrderCloud(sortOrderManagement.getOrderCloud(),
-                        managerState(this).isFirstNavigationLevel());
-
-            case INCOMING_SHARES_ADAPTER:
-            case OUTGOING_SHARES_ADAPTER:
-                if (managerState(this).isFirstNavigationLevel()) {
-                    return sortOrderManagement.getOrderOthers();
-                }
-
-            default:
-                return sortOrderManagement.getOrderCloud();
-        }
-    }
+    protected abstract int getIntentOrder();
 
     protected View getListView(LayoutInflater inflater, ViewGroup container) {
         View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);

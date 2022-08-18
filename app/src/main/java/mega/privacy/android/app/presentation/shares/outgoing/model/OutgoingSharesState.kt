@@ -11,6 +11,7 @@ import nz.mega.sdk.MegaNode
  * @param nodes current list of nodes
  * @param isInvalidHandle true if handle is invalid
  * @param isLoading true if the nodes are loading
+ * @param sortOrder current sort order
  */
 data class OutgoingSharesState(
     val outgoingHandle: Long = -1L,
@@ -19,6 +20,7 @@ data class OutgoingSharesState(
     val nodes: List<MegaNode> = emptyList(),
     val isInvalidHandle: Boolean = true,
     val isLoading: Boolean = false,
+    val sortOrder: Int = 0,
 ) {
 
     /**

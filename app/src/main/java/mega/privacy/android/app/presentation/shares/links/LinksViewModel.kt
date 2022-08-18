@@ -11,6 +11,8 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.shares.links.model.LinksState
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -26,6 +28,8 @@ class LinksViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getParentNodeHandle: GetParentNodeHandle,
     private val getPublicLinks: GetPublicLinks,
+    private val getCloudSortOrder: GetCloudSortOrder,
+    private val getLinksSortOrder: GetLinksSortOrder,
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
@@ -93,7 +97,8 @@ class LinksViewModel @Inject constructor(
                 isLoading = true,
                 linksTreeDepth = depth,
                 linksHandle = handle,
-                linksParentHandle = getParentNodeHandle(handle)
+                linksParentHandle = getParentNodeHandle(handle),
+                sortOrder = if (depth == 0) getLinksSortOrder() else getCloudSortOrder()
             )
         }
 
@@ -111,7 +116,8 @@ class LinksViewModel @Inject constructor(
                     linksHandle = -1L,
                     isInvalidHandle = true,
                     isLoading = false,
-                    linksParentHandle = null
+                    linksParentHandle = null,
+                    sortOrder = getLinksSortOrder()
                 )
             }
         }
