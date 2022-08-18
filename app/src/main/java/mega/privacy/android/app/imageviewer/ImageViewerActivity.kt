@@ -16,7 +16,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
@@ -82,6 +81,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     companion object {
         const val IMAGE_OFFSCREEN_PAGE_LIMIT = 2
         private const val EXTRA_SHOW_SLIDESHOW = "EXTRA_SHOW_SLIDESHOW"
+        private const val EXTRA_IS_TIMELINE = "EXTRA_IS_TIMELINE"
 
         /**
          * Get Image Viewer intent to show a single image node.
@@ -197,6 +197,29 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
 
         /**
+         * Get Image Viewer intent to show Timeline image nodes.
+         *
+         * @param context           Required to build the Intent.
+         * @param childOrder        Node search order.
+         * @param currentNodeHandle Current node handle to show.
+         * @return                  Image Viewer Intent.
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun getIntentForTimeline(
+            context: Context,
+            childOrder: Int = ORDER_PHOTO_ASC,
+            currentNodeHandle: Long? = null,
+            showSlideshow: Boolean = false,
+        ): Intent =
+            Intent(context, ImageViewerActivity::class.java).apply {
+                putExtra(EXTRA_IS_TIMELINE, true)
+                putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, childOrder)
+                putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
+            }
+
+        /**
          * Get Image Viewer intent to show a list of image nodes from chat messages.
          *
          * @param context           Required to build the Intent.
@@ -279,10 +302,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val imageFileUri: Uri? by extra(INTENT_EXTRA_KEY_URI)
     private val showNearbyFiles: Boolean? by extra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES)
     private val showSlideshow: Boolean by extraNotNull(EXTRA_SHOW_SLIDESHOW, false)
-    private val isFileVersion by lazy {
-        intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_FILE_VERSION,
-            false)
-    }
+    private val isTimeline: Boolean by extraNotNull(EXTRA_IS_TIMELINE, false)
+    private val isFileVersion by lazy { intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_FILE_VERSION, false) }
 
     private val viewModel by viewModels<ImageViewerViewModel>()
     private val appBarConfiguration by lazy {
@@ -364,6 +385,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private fun setupObservers(requestImagesData: Boolean) {
         if (requestImagesData) {
             when {
+                isTimeline ->
+                    viewModel.retrieveImagesFromTimeline(childOrder, nodeHandle)
                 parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE ->
                     viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder, nodeHandle)
                 childrenHandles?.isNotEmpty() == true ->
