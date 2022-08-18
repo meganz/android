@@ -108,10 +108,15 @@
         android:layout_height="wrap_content"
         android:layout_margin="1dp">
 
-        <ImageView
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/thumbnail_media"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="@dimen/grid_node_item_width"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="1dp"
+            android:paddingTop="1dp"
+            android:paddingRight="1dp"
+            app:actualImageScaleType="centerCrop"/>
 
         <ImageView
             android:id="@+id/icon_selected"

@@ -15,7 +15,6 @@ import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
 import javax.inject.Inject
 
@@ -189,10 +188,6 @@ class RecentsBucketViewModel @Inject constructor(
 
         _nodesToAnimate.value = animNodeIndices
         _actionMode.value = true
-    }
-
-    fun addOrRemoveSelectedItems(position: Int, node: MegaNode) {
-        TODO("Not yet implemented")
     }
 }
 

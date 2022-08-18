@@ -10,12 +10,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import androidx.appcompat.view.ActionMode
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -24,6 +21,8 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.drawee.generic.RoundingParams
+import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BucketSaved
 import mega.privacy.android.app.MimeTypeList
@@ -34,7 +33,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.fragments.offline.OfflineListViewHolder
+import mega.privacy.android.app.fragments.homepage.getRoundingParams
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
@@ -543,10 +542,9 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
                         thumbnail.layoutParams = param
                         thumbnail
                     } else {
-                        itemView.findViewById<ImageView>(R.id.thumbnail_media).background =
-                            ContextCompat.getDrawable(
-                                requireContext(), R.drawable.background_item_grid_selected
-                            )
+                        val thumbnail =
+                            itemView.findViewById<SimpleDraweeView>(R.id.thumbnail_media)
+                        thumbnail.hierarchy.roundingParams = getRoundingParams(requireContext())
                         itemView.findViewById(R.id.icon_selected)
                     }
 
@@ -555,7 +553,7 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
                         visibility = View.VISIBLE
 
                         val animator =
-                            AnimatorInflater.loadAnimator(context, R.animator.icon_select)
+                            AnimatorInflater.loadAnimator(requireContext(), R.animator.icon_select)
                         animator.setTarget(this)
                         animatorList.add(animator)
                     }

@@ -24,26 +24,18 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.facebook.drawee.generic.RoundingParams;
-import com.facebook.drawee.view.DraweeView;
 import com.facebook.drawee.view.SimpleDraweeView;
-
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -67,7 +59,7 @@ public class MultipleBucketAdapter
     Object fragment;
     MegaApiAndroid megaApi;
 
-    private DisplayMetrics outMetrics;
+    private final DisplayMetrics outMetrics;
 
     List<NodeItem> nodes;
     boolean isMedia;
@@ -89,7 +81,7 @@ public class MultipleBucketAdapter
         private LinearLayout multipleBucketLayout;
         private long document;
         private RelativeLayout mediaView;
-        private ImageView thumbnailMedia;
+        private SimpleDraweeView thumbnailMedia;
         private RelativeLayout videoLayout;
         private TextView videoDuration;
         private RelativeLayout listView;
@@ -189,7 +181,7 @@ public class MultipleBucketAdapter
     }
 
     @Override
-    public void onBindViewHolder(ViewHolderMultipleBucket holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolderMultipleBucket holder, int position) {
         Timber.d("onBindViewHolder");
         NodeItem node = getItemAtPosition(position);
         MegaNode megaNode = node.getNode();
@@ -247,6 +239,9 @@ public class MultipleBucketAdapter
             }
 
             if (node.getSelected()) {
+                holder.thumbnailMedia.getHierarchy().setRoundingParams(
+                    RoundingParams.fromCornersRadius((float) R.dimen.cu_fragment_selected_round_corner_radius)
+                );
                 holder.thumbnailMedia.setBackground(ContextCompat.getDrawable(
                     holder.thumbnailMedia.getContext(),
                     R.drawable.background_item_grid_selected
@@ -254,10 +249,10 @@ public class MultipleBucketAdapter
                 holder.selectedIcon.setVisibility(View.VISIBLE);
             } else {
                 holder.selectedIcon.setVisibility(View.GONE);
-                holder.thumbnailMedia.setBackground(ContextCompat.getDrawable(
-                        holder.thumbnailMedia.getContext(),
-                        R.drawable.background_item_grid
-                ));
+                holder.thumbnailMedia.getHierarchy().setRoundingParams(
+                    RoundingParams.fromCornersRadius((float) 0)
+                );
+                holder.thumbnailMedia.setBackground(null);
             }
         } else {
             holder.mediaView.setVisibility(View.GONE);
