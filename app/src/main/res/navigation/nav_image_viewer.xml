@@ -19,10 +19,5 @@
         android:id="@+id/image_slideshow"
         android:name="mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowFragment"
         android:label="@string/action_slideshow"
-        tools:layout="@layout/fragment_image_slideshow">
-
-        <action
-            android:id="@+id/action_slideshow_to_viewer"
-            app:destination="@id/image_viewer" />
-    </fragment>
+        tools:layout="@layout/fragment_image_slideshow" />
 </navigation>

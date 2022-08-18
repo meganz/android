@@ -58,6 +58,11 @@ class ImageViewerFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        if (!shouldReportPosition && pagerAdapter.itemCount > 0 && viewModel.getImagesSize(false) > 0) {
+            val currentPosition = viewModel.getCurrentPosition(false)
+            binding.viewPager.setCurrentItem(currentPosition, false)
+            shouldReportPosition = true
+        }
         binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 

@@ -28,7 +28,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageResult
-import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowFragmentDirections
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
@@ -300,7 +299,7 @@ class ImageViewerPageFragment : Fragment() {
 
     private fun navigateToViewer() {
         if (!findNavController().popBackStack()) {
-            findNavController().navigate(ImageSlideshowFragmentDirections.actionSlideshowToViewer())
+            findNavController().navigate(R.id.image_viewer)
         }
     }
 

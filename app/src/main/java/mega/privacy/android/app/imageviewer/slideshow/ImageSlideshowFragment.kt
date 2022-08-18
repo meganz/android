@@ -62,6 +62,11 @@ class ImageSlideshowFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        if (!shouldReportPosition && pagerAdapter.itemCount > 0 && viewModel.getImagesSize(true) > 0) {
+            val currentPosition = viewModel.getCurrentPosition(true)
+            binding.viewPager.setCurrentItem(currentPosition, false)
+            shouldReportPosition = true
+        }
         binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 
