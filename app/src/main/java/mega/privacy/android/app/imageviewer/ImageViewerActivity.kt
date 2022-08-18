@@ -25,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.attacher.MegaAttacher
+import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
@@ -297,6 +298,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private var bottomSheet: ImageBottomSheetDialogFragment? = null
     private var nodeSaver: NodeSaver? = null
     private var nodeAttacher: MegaAttacher? = null
+    private var dragToExit: DragToExitSupport? = null
 
     private lateinit var binding: ActivityImageViewerBinding
 
@@ -306,14 +308,19 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         setupAttachers(savedInstanceState)
 
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(dragToExit?.wrapContentView(binding.root) ?: binding.root)
 
         setupView()
         setupNavigation()
         setupObservers(savedInstanceState == null)
 
-        if (!Fresco.hasBeenInitialized()) {
-            Fresco.initialize(this)
+        if (savedInstanceState == null) {
+            if (!Fresco.hasBeenInitialized()) Fresco.initialize(this)
+            binding.root.post {
+                dragToExit?.runEnterAnimation(intent, binding.root) { startAnimation ->
+                    changeToolbarVisibility(!startAnimation)
+                }
+            }
         }
     }
 
@@ -329,6 +336,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     override fun onDestroy() {
+        if (isFinishing) dragToExit?.showPreviousHiddenThumbnail()
+        dragToExit = null
         nodeSaver?.destroy()
         nodeSaver = null
         nodeAttacher = null
@@ -414,6 +423,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     private fun setupAttachers(savedInstanceState: Bundle?) {
+        dragToExit = DragToExitSupport(this, { changeToolbarVisibility(!it) }) {
+            finish()
+            overridePendingTransition(0, android.R.anim.fade_out)
+        }
+
         nodeAttacher = MegaAttacher(this).apply {
             savedInstanceState?.let(::restoreState)
         }
