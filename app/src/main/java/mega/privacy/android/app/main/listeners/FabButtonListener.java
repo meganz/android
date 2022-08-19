@@ -64,7 +64,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener {
                                 if (((ManagerActivity) context).isMeetingTabShown()) {
                                     ((ManagerActivity) context).showMeetingOptionsPanel(true);
                                 } else {
-                                    ((ManagerActivity) context).fabMainClickCallback();
+                                    ((ManagerActivity) context).chooseAddContactDialog();
                                 }
                             }
                             break;
