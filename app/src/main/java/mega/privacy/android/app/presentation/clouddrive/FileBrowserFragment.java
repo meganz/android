@@ -688,15 +688,12 @@ public class FileBrowserFragment extends RotatableFragment {
 
         selectNewlyAddedNodes();
 
-        // adding feature flag (isVisibleAnimation) for designers review and user test
-        if (((ManagerActivity) context).viewInFolderNode != null && isVisibleAnimation) {
+        if (((ManagerActivity) context).viewInFolderNode != null) {
             animateNode(nodes);
         }
 
         return v;
     }
-    // boolean variable to add feature flag for new function animateNode()
-    private boolean isVisibleAnimation = false;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -1477,7 +1474,7 @@ public class FileBrowserFragment extends RotatableFragment {
                 nodePosition = i;
             }
         }
-        //Scroll the position to the 3td position before of the target position.
+        //Scroll the position to the 3rd position before of the target position.
         recyclerView.scrollToPosition(nodePosition - 3);
 
         recyclerView.postDelayed(() -> {
