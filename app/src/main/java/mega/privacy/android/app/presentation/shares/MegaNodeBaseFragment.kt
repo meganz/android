@@ -630,10 +630,9 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             Timber.d("onActionItemClicked")
-            val handleList = ArrayList<Long>()
-            for (node in selected) {
-                handleList.add(node.handle)
-            }
+
+            val handleList = ArrayList<Long>().apply { addAll(selected.map { it.handle }) }
+
             val nC = NodeController(requireActivity())
             when (item.itemId) {
                 R.id.cab_menu_download -> {
