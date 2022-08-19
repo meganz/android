@@ -104,11 +104,8 @@ open class TransfersManagementActivity : PasscodeActivity() {
             )
             .addTo(composite)
 
-        LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java)
-            .observe(this, ::updateTransfersWidget)
-
-        transfersViewModel.onTransfersInfoUpdate().observe(this) { (transferType, transfersInfo) ->
-            transfersWidget?.update(transferType = transferType, transfersInfo = transfersInfo)
+        transfersViewModel.onTransfersInfoUpdate().observe(this) { transfersInfo ->
+            transfersWidget?.update(transfersInfo = transfersInfo)
         }
 
         transfersViewModel.onGetTransfersState().observe(this) { areAllTransfersPaused ->
