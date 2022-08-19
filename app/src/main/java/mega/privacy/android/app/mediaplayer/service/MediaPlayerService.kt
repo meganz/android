@@ -166,7 +166,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         with(viewModelGateway) {
             mediaPlayerGateway.createPlayer(
                 shuffleEnabled = shuffleEnabled(),
-                shuffleOrder = getShuffleOrder(),
                 repeatMode = repeatMode(),
                 nameChangeCallback = { title, artist, album ->
                     val nodeName = getPlaylistItem(getCurrentMediaItem()?.mediaId)?.nodeName ?: ""

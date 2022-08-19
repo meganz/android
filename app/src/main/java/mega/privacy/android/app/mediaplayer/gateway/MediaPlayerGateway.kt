@@ -18,14 +18,12 @@ interface MediaPlayerGateway {
      * Create player
      *
      * @param shuffleEnabled true is shuffle enable, otherwise is false
-     * @param shuffleOrder ShuffleOrder
      * @param repeatMode repeat mode
      * @param nameChangeCallback the callback when name is changed
      * @param mediaPlayerCallback MediaPlayerCallback
      */
     fun createPlayer(
         shuffleEnabled: Boolean,
-        shuffleOrder: ShuffleOrder,
         repeatMode: Int,
         nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit,
         mediaPlayerCallback: MediaPlayerCallback,
