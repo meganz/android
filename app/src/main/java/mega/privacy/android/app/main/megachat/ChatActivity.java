@@ -845,7 +845,6 @@ public class ChatActivity extends PasscodeActivity
             updateCallBanner();
             return;
         }
-        Timber.d("******************* Call status "+CallUtil.callStatusToString(call.getStatus()));
 
         switch (call.getStatus()) {
             case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
