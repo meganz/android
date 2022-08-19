@@ -560,8 +560,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
         recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                val tab = currentSharesTab
-                if (managerActivity?.tabItemShares === tab) {
+                if (managerActivity?.tabItemShares == currentSharesTab) {
                     checkScroll()
                 }
             }
