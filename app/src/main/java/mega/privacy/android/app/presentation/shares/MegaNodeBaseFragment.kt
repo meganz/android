@@ -355,14 +355,14 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                     if (localPath != null) {
 
                         val mediaFile = File(localPath)
-                        data =
+                        setDataAndType(
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 FileProvider.getUriForFile(requireContext(),
                                     Constants.AUTHORITY_STRING_FILE_PROVIDER,
                                     mediaFile)
-                            } else Uri.fromFile(mediaFile)
-                        type = MimeTypeList.typeForName(node.name).type
-
+                            } else Uri.fromFile(mediaFile),
+                            MimeTypeList.typeForName(node.name).type
+                        )
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
                     } else {
@@ -389,14 +389,15 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
 
                         val url = megaApi.httpServerGetLocalLink(node)
 
-                        data = url?.let { Uri.parse(it) } ?: run {
+                        url?.let { Uri.parse(it) }?.let {
+                            setDataAndType(it, mimeTypeType)
+                        } ?: run {
                             Timber.e("ERROR:httpServerGetLocalLink")
                             managerActivity?.showSnackbar(Constants.SNACKBAR_TYPE,
                                 getString(R.string.general_text_error),
                                 MegaApiJava.INVALID_HANDLE)
                             return
                         }
-                        type = mimeTypeType
                     }
 
                     if (opusFile) {
@@ -422,15 +423,14 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                     val localPath = FileUtil.getLocalFile(node)
                     if (localPath != null) {
                         val mediaFile = File(localPath)
-                        data =
+                        setDataAndType(
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 FileProvider.getUriForFile(requireContext(),
                                     Constants.AUTHORITY_STRING_FILE_PROVIDER,
                                     mediaFile)
-                            } else {
-                                Uri.fromFile(mediaFile)
-                            }
-                        type = mimeTypeType
+                            } else Uri.fromFile(mediaFile),
+                            mimeTypeType
+                        )
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     } else {
                         if (megaApi.httpServerIsRunning() == 0) {
@@ -449,14 +449,16 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                             megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
                         }
                         val url = megaApi.httpServerGetLocalLink(node)
-                        data = url?.let { Uri.parse(url) } ?: run {
+
+                        url?.let { Uri.parse(it) }?.let {
+                            setDataAndType(it, mimeTypeType)
+                        } ?: run {
                             Timber.e("ERROR:httpServerGetLocalLink")
                             managerActivity?.showSnackbar(Constants.SNACKBAR_TYPE,
                                 getString(R.string.general_text_error),
                                 MegaApiJava.INVALID_HANDLE)
                             return
                         }
-                        type = mimeTypeType
                     }
                 }
 
