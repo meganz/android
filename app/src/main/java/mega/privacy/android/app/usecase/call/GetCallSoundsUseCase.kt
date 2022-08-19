@@ -187,6 +187,9 @@ class GetCallSoundsUseCase @Inject constructor(
 
                                 waitingForOthersCountDownTimer?.start(
                                     SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL)
+                            } else {
+                                MegaApplication.getChatManagement()
+                                    .startCounterToFinishCall(chatId)
                             }
                         } else {
                             MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = false
