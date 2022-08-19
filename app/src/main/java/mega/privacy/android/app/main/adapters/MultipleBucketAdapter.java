@@ -34,6 +34,9 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
+
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import mega.privacy.android.app.MegaApplication;
@@ -105,9 +108,10 @@ public class MultipleBucketAdapter
             if (isMedia) {
                 this.thumbnailMedia.setImageBitmap(image);
             } else {
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.thumbnailList.getLayoutParams();
-                params.width = params.height = dp2px(36, outMetrics);
-                int margin = dp2px(18, outMetrics);
+                RelativeLayout.LayoutParams params =
+                        (RelativeLayout.LayoutParams) this.thumbnailList.getLayoutParams();
+                params.width = params.height = dp2px(48, outMetrics);
+                int margin = dp2px(12, outMetrics);
                 params.setMargins(margin, margin, margin, 0);
 
                 this.thumbnailList.setLayoutParams(params);
@@ -232,27 +236,27 @@ public class MultipleBucketAdapter
             holder.thumbnailMedia.getLayoutParams().width = size;
             holder.thumbnailMedia.getLayoutParams().height = size;
 
-            if (thumbnail != null) {
-                holder.setImageThumbnail(thumbnail);
-            } else {
-                holder.thumbnailMedia.setImageResource(MimeTypeList.typeForName(megaNode.getName()).getIconResourceId());
-            }
-
             if (node.getSelected()) {
                 holder.thumbnailMedia.getHierarchy().setRoundingParams(
-                    RoundingParams.fromCornersRadius((float) R.dimen.cu_fragment_selected_round_corner_radius)
+                        RoundingParams.fromCornersRadius((float) R.dimen.cu_fragment_selected_round_corner_radius)
                 );
                 holder.thumbnailMedia.setBackground(ContextCompat.getDrawable(
-                    holder.thumbnailMedia.getContext(),
-                    R.drawable.background_item_grid_selected
+                        holder.thumbnailMedia.getContext(),
+                        R.drawable.background_item_grid_selected
                 ));
                 holder.selectedIcon.setVisibility(View.VISIBLE);
             } else {
                 holder.selectedIcon.setVisibility(View.GONE);
                 holder.thumbnailMedia.getHierarchy().setRoundingParams(
-                    RoundingParams.fromCornersRadius((float) 0)
+                        RoundingParams.fromCornersRadius((float) 0)
                 );
                 holder.thumbnailMedia.setBackground(null);
+            }
+
+            if (thumbnail != null) {
+                holder.setImageThumbnail(thumbnail);
+            } else {
+                holder.thumbnailMedia.setImageResource(MimeTypeList.typeForName(megaNode.getName()).getIconResourceId());
             }
         } else {
             holder.mediaView.setVisibility(View.GONE);
