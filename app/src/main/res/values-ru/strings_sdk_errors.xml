@@ -31,11 +31,11 @@
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
     <string name="api_eincomplete">Неполная</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">Неверный ключ/Ошибка расшифровки</string>
+    <string name="api_ekey">Неверный ключ или oшибка расшифровки</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">Неверный идентификатор сессии</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="api_eblocked_ec_import_ec_download">Недоступно из-за нарушения наших условий использования.</string>
+    <string name="api_eblocked_ec_import_ec_download">Недоступно из-за нарушения наших условий использования</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Заблокировано</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->

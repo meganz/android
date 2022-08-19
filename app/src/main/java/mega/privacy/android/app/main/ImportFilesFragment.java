@@ -22,6 +22,7 @@ import mega.privacy.android.app.main.adapters.ImportFilesAdapter;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 
 import static android.text.TextUtils.isEmpty;
+import static mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS;
 import static mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX;
 import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 
@@ -119,7 +120,7 @@ public class ImportFilesFragment extends Fragment implements ImportFilesAdapter.
             } else if (emptyNames > 0) {
                 warning = StringResourcesUtils.getQuantityString(R.plurals.empty_names, emptyNames);
             } else {
-                warning = StringResourcesUtils.getString(R.string.invalid_characters_defined);
+                warning = StringResourcesUtils.getString(R.string.invalid_characters_defined, INVALID_CHARACTERS);
             }
 
             ((FileExplorerActivity) requireActivity()).showSnackbar(warning);

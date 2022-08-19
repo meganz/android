@@ -2,12 +2,17 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet
 
 import android.Manifest
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
 import mega.privacy.android.app.main.megachat.usecase.GetGalleryFilesUseCase
 import mega.privacy.android.app.utils.FileUtil
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -121,8 +126,14 @@ class ChatRoomToolbarViewModel @Inject constructor(
      */
     private fun loadGallery() {
         if (_hasReadStoragePermissionsGranted.value && filesGallery.value.isEmpty()) {
-            val files: MutableList<FileGalleryItem> = getGalleryFilesUseCase.get().blockingGet()
-            addTakePicture(files)
+            getGalleryFilesUseCase.get()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = ::addTakePicture,
+                    onError = Timber::e
+                )
+                .addTo(composite)
         }
     }
 

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.settings.chat.imagequality
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -28,7 +29,6 @@ import mega.privacy.android.app.presentation.settings.chat.imagequality.model.Se
 import mega.privacy.android.app.presentation.theme.AndroidTheme
 import mega.privacy.android.app.presentation.theme.Typography
 import mega.privacy.android.domain.entity.ChatImageQuality
-import mega.privacy.android.domain.entity.ThemeMode
 
 @Composable
 fun ChatImageQualityView(
@@ -84,7 +84,7 @@ fun ChatImageQualityItem(
 @Composable
 fun PreviewChatImageQualityView() {
     var selected by remember { mutableStateOf(ChatImageQuality.Original) }
-    AndroidTheme(ThemeMode.System) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         ChatImageQualityView(
             settingsChatImageQualityState = SettingsChatImageQualityState(
                 selectedQuality = selected,

@@ -46,10 +46,6 @@ public class SettingsConstants {
     public static final String KEY_SECONDARY_MEDIA_FOLDER_ON = "settings_secondary_media_folder_on";
     public static final String KEY_LOCAL_SECONDARY_MEDIA_FOLDER = "settings_local_secondary_media_folder";
     public static final String KEY_MEGA_SECONDARY_MEDIA_FOLDER = "settings_mega_secondary_media_folder";
-    public static final int VIDEO_QUALITY_LOW = 0;
-    public static final int VIDEO_QUALITY_MEDIUM = 1;
-    public static final int VIDEO_QUALITY_HIGH = 2;
-    public static final int VIDEO_QUALITY_ORIGINAL = 3;
     public static final int DEFAULT_CONVENTION_QUEUE_SIZE = 200;
     public static final int COMPRESSION_QUEUE_SIZE_MIN = 100;
     public static final int COMPRESSION_QUEUE_SIZE_MAX = 1000;

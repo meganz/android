@@ -171,6 +171,12 @@ class MegaApiFacade @Inject constructor(
         else
             megaApi.getOutShares(order)
 
+    override suspend fun getPublicLinks(order: Int?): List<MegaNode> =
+        if (order == null)
+            megaApi.publicLinks
+        else
+            megaApi.getPublicLinks(order)
+
 
     override fun getNumChildFolders(node: MegaNode): Int = megaApi.getNumChildFolders(node)
 
@@ -255,6 +261,11 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getContact(email: String): MegaUser? = megaApi.getContact(email)
 
     override suspend fun getUserAlerts(): List<MegaUserAlert> = megaApi.userAlerts
+
+    @Suppress("DEPRECATION")
+    override suspend fun sendEvent(eventID: Int, message: String) =
+        megaApi.sendEvent(eventID, message)
+
 
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10

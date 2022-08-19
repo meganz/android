@@ -22,10 +22,10 @@ import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.reaction.*;
-import mega.privacy.android.app.components.twemoji.EmojiImageView;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtils;
 import mega.privacy.android.app.main.megachat.ChatActivity;
@@ -34,6 +34,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaStringList;
+import timber.log.Timber;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -110,11 +111,20 @@ public class InfoReactionsBottomSheet extends BottomSheetDialogFragment implemen
         list = getReactionsList(listReactions, false);
         reactionTabs = new ArrayList<>();
         int indexToStart = 0;
+        boolean result = true;
         for (int i = 0; i < list.size(); i++) {
-            addReaction(i, list.get(i));
+            result = addReaction(i, list.get(i));
+            if (!result)
+                break;
+
             if (reactionSelected.equals(list.get(i))) {
                 indexToStart = i;
             }
+        }
+
+        if(!result) {
+          dismissAllowingStateLoss();
+          return;
         }
 
         if (reactionsPageAdapter == null) {
@@ -208,9 +218,14 @@ public class InfoReactionsBottomSheet extends BottomSheetDialogFragment implemen
      * @param position The reaction position.
      * @param reaction The reaction String.
      */
-    private void addReaction(int position, String reaction) {
-        reactionTabs.add(position, inflateButton(context, reaction, infoReactionsTab));
+    private boolean addReaction(int position, String reaction) {
+        RelativeLayout layout = inflateButton(context, reaction, infoReactionsTab);
+        if (layout == null)
+            return false;
+
+        reactionTabs.add(position, layout);
         reactionTabs.get(position).setOnClickListener(new ReactionsTabsClickListener(infoReactionsPager, position));
+        return true;
     }
 
     /**
@@ -239,14 +254,30 @@ public class InfoReactionsBottomSheet extends BottomSheetDialogFragment implemen
      */
     private RelativeLayout inflateButton(final Context context, String reaction, final ViewGroup parent) {
         final RelativeLayout button = (RelativeLayout) LayoutInflater.from(context).inflate(R.layout.reaction_view, parent, false);
-        final EmojiImageView reactionImage = button.findViewById(R.id.reaction_image);
+        final ReactionImageView reactionImage = button.findViewById(R.id.reaction_image);
         final TextView reactionText = button.findViewById(R.id.reaction_text);
+        final EmojiTextView reactionImageText = button.findViewById(R.id.reaction_image_text);
 
-        List<EmojiRange> emojis = EmojiUtils.emojis(reaction);
-        Emoji emoji = emojis.get(0).emoji;
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
-        if (numUsers > 0 && emoji != null) {
-            reactionImage.setEmoji(emoji, true);
+        if (numUsers > 0) {
+            List<EmojiRange> emojis = EmojiUtils.emojis(reaction);
+            Emoji emoji = null;
+            if (emojis != null && !emojis.isEmpty() && emojis.get(0) != null) {
+                emoji = emojis.get(0).emoji;
+            }
+
+            if (emoji == null) {
+                reactionImage.setVisibility(View.GONE);
+                reactionImageText.setVisibility(View.VISIBLE);
+                reactionImageText.setText(reaction);
+            } else {
+                reactionImage.setVisibility(View.VISIBLE);
+                reactionImageText.setVisibility(View.GONE);
+                if (reactionImage.getEmoji() == null || !reactionImage.getEmoji().equals(emoji)) {
+                    reactionImage.addEmojiReaction(emoji);
+                }
+            }
+
             reactionText.setText(String.valueOf(numUsers));
             reactionText.setTextColor(ContextCompat.getColor(context,
                     isMyOwnReaction(chatId, messageId, reaction)
@@ -275,8 +306,14 @@ public class InfoReactionsBottomSheet extends BottomSheetDialogFragment implemen
         }
 
         reactionTabs.get(i).setSelected(true);
-        EmojiImageView reactionImage = infoReactionsTab.getChildAt(i).findViewById(R.id.reaction_image);
-        infoShortCode.setText(EmojiUtilsShortcodes.shortCodify(reactionImage.getEmoji().getUnicode()));
+        ReactionImageView reactionImage = infoReactionsTab.getChildAt(i).findViewById(R.id.reaction_image);
+        if(reactionImage.getEmoji() == null) {
+            Timber.d("The emoji does not exist in mega emojis");
+            infoShortCode.setVisibility(View.GONE);
+        } else {
+            infoShortCode.setVisibility(View.VISIBLE);
+            infoShortCode.setText(EmojiUtilsShortcodes.shortCodify(reactionImage.getEmoji().getUnicode()));
+        }
 
         if (reactionTabs.get(i).getChildCount() == 1) {
             if (separator.getParent() != null) {
@@ -342,11 +379,13 @@ public class InfoReactionsBottomSheet extends BottomSheetDialogFragment implemen
             }
 
             if (position == INVALID_POSITION) {
-                addReaction(reactionTabs.size(), reaction);
-                list.add(reaction);
-                if (reactionsPageAdapter != null) {
-                    addView(reaction);
-                    return;
+                boolean result = addReaction(reactionTabs.size(), reaction);
+                if (result) {
+                    list.add(reaction);
+                    if (reactionsPageAdapter != null) {
+                        addView(reaction);
+                        return;
+                    }
                 }
             } else if (reactionsPageAdapter != null) {
                 reactionsPageAdapter.updatePage(position, reaction);

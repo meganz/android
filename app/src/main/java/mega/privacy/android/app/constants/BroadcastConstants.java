@@ -74,6 +74,7 @@ public class BroadcastConstants {
     public static final String TRANSFER_TYPE = "TRANSFER_TYPE";
     public static final String DOWNLOAD_TRANSFER = "DOWNLOAD_TRANSFER";
     public static final String DOWNLOAD_TRANSFER_OPEN = "DOWNLOAD_TRANSFER_OPEN";
+    public static final String DOWNLOAD_MS_FILE_AND_OPEN = "DOWNLOAD_MS_FILE_AND_OPEN";
     public static final String UPLOAD_TRANSFER = "UPLOAD_TRANSFER";
     public static final String EXTRA_IS_CU_SECONDARY_FOLDER = "EXTRA_IS_CU_SECONDARY_FOLDER";
     public static final String UPDATE_PROXIMITY_SENSOR_STATUS= "UPDATE_PROXIMITY_SENSOR_STATUS";

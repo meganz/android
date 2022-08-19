@@ -6,14 +6,17 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultGetAlbums
 import mega.privacy.android.domain.entity.Album
+import mega.privacy.android.domain.entity.FavouriteFile
 import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.repository.AlbumsRepository
 import mega.privacy.android.domain.usecase.GetAlbums
 import mega.privacy.android.domain.usecase.GetAllFavorites
@@ -22,11 +25,11 @@ import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.times
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.io.File
 
 @OptIn(FlowPreview::class)
@@ -76,7 +79,7 @@ class DefaultGetAlbumsTest {
     @Test
     fun `test that only image or video thumbnails are used for the favourite album cover`() =
         runTest {
-            val nonImageFavouriteItem = createFavouriteItem()
+            val nonImageFavouriteItem = createFavouriteItem(isImage = false)
             val thumbnail = File("NotExpectedThumbnail")
 
             whenever(getAllFavorites()).thenReturn(flowOf(listOf(nonImageFavouriteItem)))
@@ -114,7 +117,7 @@ class DefaultGetAlbumsTest {
             val parentId = cameraUploadFolderId
             val favouriteImage = createFavouriteItem(
                 parentId = parentId,
-                isVideo = true
+                isImage = false
             )
             val thumbnail = File("ExpectedThumbnail")
 
@@ -136,7 +139,7 @@ class DefaultGetAlbumsTest {
             val parentId = mediaUploadFolderId
             val favouriteImage = createFavouriteItem(
                 parentId = parentId,
-                isVideo = true
+                isImage = false
             )
             val thumbnail = File("ExpectedThumbnail")
 
@@ -156,7 +159,7 @@ class DefaultGetAlbumsTest {
     fun `test that video is not used for the thumbnail if not in camera upload or media folder`() =
         runTest {
             val favouriteImage = createFavouriteItem(
-                isVideo = true
+                isImage = false
             )
             val thumbnail = File("NotExpectedThumbnail")
 
@@ -285,10 +288,9 @@ class DefaultGetAlbumsTest {
         id: Long = 1L,
         parentId: Long = 2L,
         lastModified: Long = 3L,
-        isImage: Boolean = false,
-        isVideo: Boolean = false,
+        isImage: Boolean,
     ): FavouriteInfo {
-        return FavouriteInfo(
+        return FavouriteFile(
             id = id,
             name = "testName",
             size = 1000L,
@@ -297,14 +299,10 @@ class DefaultGetAlbumsTest {
             base64Id = "",
             modificationTime = lastModified,
             hasVersion = false,
-            numChildFolders = 0,
-            numChildFiles = 0,
-            isImage = isImage,
-            isVideo = isVideo,
-            isFolder = true,
             isFavourite = true,
             isExported = false,
             isTakenDown = false,
+            type = if (isImage) StaticImageFileTypeInfo("", "") else VideoFileTypeInfo("", "")
         )
     }
 

@@ -1,8 +1,5 @@
 package mega.privacy.android.app;
 
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_HIGH;
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaCodec;
@@ -24,6 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.main.megachat.ChatUploadService;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
+import mega.privacy.android.domain.entity.VideoQuality;
 import timber.log.Timber;
 
 public class VideoDownsampling {
@@ -194,7 +192,7 @@ public class VideoDownsampling {
             resultHeight = mHeight;
 
             int bitrate = Integer.parseInt(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
-            int shortSideByQuality = quality == VIDEO_QUALITY_MEDIUM
+            int shortSideByQuality = quality == VideoQuality.MEDIUM.getValue()
                     ? SHORT_SIDE_SIZE_MEDIUM
                     : SHORT_SIDE_SIZE_LOW;
 
@@ -206,8 +204,8 @@ public class VideoDownsampling {
             Timber.d("Video original width: " + mWidth + ", original height: " + mHeight
                     + ", average bitrate: " + bitrate + ", frame rate: " + frameRate);
 
-            if (quality != VIDEO_QUALITY_HIGH) {
-                bitrate = quality == VIDEO_QUALITY_MEDIUM
+            if (quality != VideoQuality.HIGH.getValue()) {
+                bitrate = quality == VideoQuality.MEDIUM.getValue()
                         ? bitrate / 2
                         : bitrate / 3;
 
@@ -244,7 +242,7 @@ public class VideoDownsampling {
                 }
             }
 
-            if (!supported && quality == VIDEO_QUALITY_MEDIUM) {
+            if (!supported && quality == VideoQuality.MEDIUM.getValue()) {
                 Timber.w("Sizes still not supported. Second try.");
                 shortSideByQuality--;
 

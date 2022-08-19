@@ -2799,39 +2799,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             return
         }
 
-        val dialogLayout = layoutInflater.inflate(R.layout.join_call_dialog, null)
-        val firstButton = dialogLayout.findViewById<Button>(R.id.first_button)
-        val secondButton = dialogLayout.findViewById<Button>(R.id.second_button)
-        firstButton.isVisible = true
-        secondButton.isVisible = true
-
-        firstButton.text =
-            StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call)
-
-        secondButton.text =
-            StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call)
-
-        firstButton.setOnClickListener {
-            inMeetingViewModel.checkEndCall()
-        }
-
-        secondButton.setOnClickListener {
-            inMeetingViewModel.checkStayCall()
-        }
-
         onlyMeDialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_title_only_you_in_the_call))
             .setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call))
-            .setView(dialogLayout)
+            .setPositiveButton(R.string.calls_call_screen_button_to_end_call) { _, _ ->
+                inMeetingViewModel.checkEndCall()
+            }
+            .setNegativeButton(R.string.calls_call_screen_button_to_stay_alone_in_call) { _, _ ->
+                inMeetingViewModel.checkStayCall()
+            }
             .setCancelable(false)
+            .setOnDismissListener {
+                MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
+            }
             .create()
-
         onlyMeDialog?.show()
 
-        onlyMeDialog?.setOnDismissListener {
-            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
-            it.dismiss()
-        }
     }
 
     /**

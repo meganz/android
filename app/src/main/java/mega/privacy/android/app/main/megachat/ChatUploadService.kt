@@ -43,7 +43,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.VideoDownsampling
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.di.ApplicationScope
@@ -71,6 +70,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.VideoQuality
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -438,7 +438,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
             if (pendingMsg != null) {
                 sendOriginalAttachments =
-                    dbH.chatVideoQuality == SettingsConstants.VIDEO_QUALITY_ORIGINAL
+                    dbH.chatVideoQuality == VideoQuality.ORIGINAL.value
                 Timber.d("sendOriginalAttachments is $sendOriginalAttachments")
 
                 if (chatId != -1L) {

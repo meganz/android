@@ -55,9 +55,17 @@ class FavouriteFolderViewModel @Inject constructor(
 
     private val _childrenNodesState =
         MutableStateFlow<ChildrenNodesLoadState>(ChildrenNodesLoadState.Loading)
+
+    /**
+     * The state regarding children nodes
+     */
     val childrenNodesState = _childrenNodesState.asStateFlow()
 
     private val _favouritesEventState = MutableSharedFlow<FavouritesEventState>(replay = 0)
+
+    /**
+     * The state regarding events
+     */
     val favouritesEventState = _favouritesEventState.asSharedFlow()
 
     private var currentFavouriteFolderInfo: FavouriteFolderInfo? = null
@@ -90,7 +98,7 @@ class FavouriteFolderViewModel @Inject constructor(
                             children.isEmpty() -> {
                                 ChildrenNodesLoadState.Empty(folderInfo.name)
                             }
-                            children.isNotEmpty() -> getData(name, children)
+                            children.isNotEmpty() -> getData(name, children, folderInfo)
                             else -> {
                                 ChildrenNodesLoadState.Loading
                             }
@@ -104,6 +112,7 @@ class FavouriteFolderViewModel @Inject constructor(
     private suspend fun getData(
         name: String,
         children: List<FavouriteInfo>,
+        folderInfo: FavouriteFolderInfo
     ): ChildrenNodesLoadState {
         return withContext(ioDispatcher) {
             ChildrenNodesLoadState.Success(
@@ -123,26 +132,21 @@ class FavouriteFolderViewModel @Inject constructor(
                             MimeTypeList.typeForName(name).iconResourceId
                         }
                     )
-                })
+                },
+                // If current handle is not current root handle, enable onBackPressedCallback
+                isBackPressedEnable = folderInfo.currentHandle != currentRootHandle
+            )
         }
     }
 
 
     /**
-     * Whether handle back press
-     * @return true is handle back pressed
+     * Back to previous level page
      */
-    fun shouldHandleBackPressed(): Boolean {
+    fun backToPreviousPage() {
         currentFavouriteFolderInfo?.run {
-            if (currentHandle == currentRootHandle) {
-                return true
-            } else {
-                getChildrenNodes(parentHandle)
-            }
-        } ?: run {
-            return true
+            getChildrenNodes(parentHandle)
         }
-        return false
     }
 
     /**
@@ -176,6 +180,10 @@ class FavouriteFolderViewModel @Inject constructor(
     }
 
     companion object {
+
+        /**
+         * The key of parent handle argument
+         */
         const val KEY_ARGUMENT_PARENT_HANDLE = "parentHandle"
     }
 }

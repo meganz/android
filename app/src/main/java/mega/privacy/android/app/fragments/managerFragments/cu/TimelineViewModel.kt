@@ -13,7 +13,6 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -23,6 +22,7 @@ import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
@@ -33,6 +33,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
@@ -41,17 +42,25 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * TimelineViewModel works with TimelineFragment
+ * [ViewModel] associated with [TimelineFragment]
+ *
+ * @param repository Photos Repository
+ * @param mDbHandler Database
+ * @param getCameraSortOrder Get camera sort order use case
+ * @param jobUtilWrapper Job util wrapper
+ * @param ioDispatcher Coroutine dispatcher for the [ViewModel]
+ * @param savedStateHandle Saved state handle
+ * @param monitorNodeUpdates Monitor global node updates
  */
 @HiltViewModel
 class TimelineViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val repository: PhotosItemRepository,
     private val mDbHandler: DatabaseHandler,
     private val getCameraSortOrder: GetCameraSortOrder,
     private val jobUtilWrapper: JobUtilWrapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle? = null,
+    monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
     companion object {
@@ -202,6 +211,13 @@ class TimelineViewModel @Inject constructor(
         LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
             .observeForever(nodesChangeObserver)
         loadPhotos(true)
+
+        viewModelScope.launch {
+            // Whenever the app detects MegaNode updates, load the photos
+            monitorNodeUpdates().collect {
+                loadPhotos(true)
+            }
+        }
     }
 
 
@@ -328,13 +344,8 @@ class TimelineViewModel @Inject constructor(
             pendingLoad = false
             loadInProgress = true
             // Trigger data load.
-            triggerDataLoad()
+            liveDataRoot.value = Unit
         }
-    }
-
-    private fun triggerDataLoad() {
-        // Trigger data load.
-        liveDataRoot.value = liveDataRoot.value
     }
 
     /**
@@ -457,7 +468,7 @@ class TimelineViewModel @Inject constructor(
         mDbHandler.setCamSyncFileUpload(
             if (syncVideo) MegaPreferences.PHOTOS_AND_VIDEOS else MegaPreferences.ONLY_PHOTOS
         )
-        mDbHandler.setCameraUploadVideoQuality(SettingsConstants.VIDEO_QUALITY_ORIGINAL)
+        mDbHandler.setCameraUploadVideoQuality(VideoQuality.ORIGINAL.value)
         mDbHandler.setConversionOnCharging(true)
         mDbHandler.setChargingOnSize(SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE)
         // After target and local folder setup, then enable CU.

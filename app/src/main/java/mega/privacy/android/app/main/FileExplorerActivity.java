@@ -884,14 +884,14 @@ public class FileExplorerActivity extends TransfersManagementActivity
                         int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
                         tB.setBackgroundColor(toolbarElevationColor);
                     } else {
-                        tB.setBackgroundColor(android.R.color.transparent);
+                        tB.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
                     }
                 } else {
                     if (elevate) {
-                        tB.setBackgroundColor(android.R.color.transparent);
+                        tB.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
                         abL.setElevation(elevation);
                     } else {
-                        tB.setBackgroundColor(android.R.color.transparent);
+                        tB.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
                         abL.setElevation(0);
                     }
                 }
@@ -1721,7 +1721,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                                             filePreparedInfos = null;
                                             Timber.d("finish!!!");
                                             finishActivity();
-                                        });
+                                        }, Timber::e);
                             }
                         }
                     });
@@ -1997,7 +1997,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                                             Timber.d("After UPLOAD click - back to Cloud");
                                             this.backToCloud(parentNode.getHandle(), 1, null);
                                             finishActivity();
-                                        });
+                                        }, Timber::e);
                             }
                         });
     }

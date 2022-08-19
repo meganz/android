@@ -6,11 +6,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
+import mega.privacy.android.app.data.facade.CacheFolderFacade
 import mega.privacy.android.app.data.facade.MegaApiFacade
 import mega.privacy.android.app.data.facade.MegaApiFolderFacade
 import mega.privacy.android.app.data.facade.MegaChatApiFacade
 import mega.privacy.android.app.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.app.data.gateway.AndroidDeviceGateway
+import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.DeviceGateway
 import mega.privacy.android.app.data.gateway.FileCompressionGateway
 import mega.privacy.android.app.data.gateway.ZipFileCompressionGateway
@@ -22,10 +24,12 @@ import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
+import mega.privacy.android.app.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.app.data.preferences.AppPreferencesDatastore
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.app.data.preferences.LoggingPreferencesDataStore
+import mega.privacy.android.app.data.preferences.StatisticsPreferencesDataStore
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
@@ -74,10 +78,21 @@ abstract class GatewayModule {
     abstract fun bindFeatureFlagPreferencesGateway(implementation: FeatureFlagPreferencesDataStore): FeatureFlagPreferencesGateway
 
     @Binds
+    abstract fun bindStatisticsPreferencesGateway(implementation: StatisticsPreferencesDataStore): StatisticsPreferencesGateway
+
+    @Binds
     abstract fun bindDeviceGateway(implementation: AndroidDeviceGateway): DeviceGateway
 
     @Binds
     abstract fun bindFileCompressionGateway(implementation: ZipFileCompressionGateway): FileCompressionGateway
+
+    /**
+     * Provides @CacheFolderGateway
+     * @param implementation : @CacheFolderFacade
+     * @return CacheFolderGateway : @CacheFolderGateway
+     */
+    @Binds
+    abstract fun bindCacheFolderGateway(implementation: CacheFolderFacade): CacheFolderGateway
 
     /**
      * Provide MediaPlayerGateway implementation

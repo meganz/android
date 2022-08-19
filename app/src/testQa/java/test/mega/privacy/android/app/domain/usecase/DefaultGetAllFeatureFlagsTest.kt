@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.entity.FeatureFlag
-import mega.privacy.android.app.domain.repository.FeatureFlagRepository
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
+import mega.privacy.android.domain.entity.FeatureFlag
+import mega.privacy.android.domain.repository.FeatureFlagRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock

@@ -24,6 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.app.presentation.settings.reportissue.view.ReportIssueView
 import mega.privacy.android.app.presentation.theme.AndroidTheme
@@ -48,7 +49,9 @@ class ReportIssueFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireContext()).apply {
         setContent {
-            AndroidTheme(mode = getThemeMode().collectAsState(initial = ThemeMode.System).value) {
+            val themeMode by getThemeMode()
+                .collectAsState(initial = ThemeMode.System)
+            AndroidTheme(isDark = themeMode.isDarkMode()) {
                 ReportIssueView(viewModel)
             }
         }

@@ -159,6 +159,7 @@ object PaymentUtils {
         )
 
         if (myAccountInfo.levelInventory > myAccountInfo.levelAccountDetails) {
+            Timber.d("megaApi.submitPurchaseReceipt is invoked")
             if (lastPublicHandle == MegaApiJava.INVALID_HANDLE) {
                 megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)
             } else {

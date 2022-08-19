@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
-    <string name="prolite_account">Pro Lite</string>
+    <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF檢視器</string>
     <!-- Answer for confirmation dialog. -->
@@ -443,21 +443,9 @@
     <!-- error message when moving a node -->
     <string name="number_no_leaved">未成功保留%d個資料夾</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent">已成功發送檔案給%d個聯絡人</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent">未能發送檔案給%d個聯絡人</string>
-    <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent_multifile">已成功發送%d個檔案</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent_multifile">發送%d個檔案失敗</string>
-    <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">已成功複製%d個項目</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">未能複製%d個項目</string>
-    <!-- success message when removing several contacts -->
-    <string name="number_contact_removed">已成功移除%d個聯絡人</string>
-    <!-- error message when removing several contacts -->
-    <string name="number_contact_not_removed">未能移除%d個聯絡人</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">已成功清空垃圾筒</string>
     <!-- error message when emptying the RB -->
@@ -770,13 +758,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">免費帳戶</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro I 帳戶</string>
+    <string name="my_account_pro1">Pro&#160;I帳戶</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro II 帳戶</string>
+    <string name="my_account_pro2">Pro&#160;II帳戶</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro III 帳戶</string>
+    <string name="my_account_pro3">Pro&#160;III帳戶</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro Lite 帳戶</string>
+    <string name="my_account_prolite_feedback_email">Pro&#160;Lite帳戶</string>
     <!--  -->
     <string name="backup_title">備份您的還原金鑰</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -897,16 +885,6 @@
     <string name="edit_link_option">管理連結</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">您提供的現有密碼不正確。</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_reinvite_contact_request">%d個重新邀請已成功發送。</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_delete_contact_request">已成功刪除%d個邀請。</string>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_delete_contact_request">已成功刪除%1$d個邀請，但有%2$d個未被刪除。</string>
-    <!-- success message when replying to multiple received request -->
-    <string name="number_correctly_invitation_reply_sent">已回覆%d個聯絡人邀請。</string>
-    <!-- error message when replying to multiple received request -->
-    <string name="number_incorrectly_invitation_reply_sent">已成功回覆%1$d個聯絡人邀請，但有%2$d個尚無法送出。</string>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="other">此資料夾正與%1$d個聯絡人共享中。請問要取消所有的共享嗎？</item>
@@ -1097,8 +1075,6 @@
     <string name="number_correctly_add_participant">已成功邀請%d個與會者</string>
     <!-- error message when inviting multiple contacts to a group chat -->
     <string name="number_no_add_participant_request">已成功邀請%1$d位與會者，但%2$d位未成功受邀。</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="message_permissions_changed">[A]%1$s[/A][D]已被[/D][E]%3$s[/E][B]修改為[/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A]已受[C]%2$s[/C][B]邀請加入對話群組[/B]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1127,8 +1103,6 @@
     <string name="history_cleared_message">對話紀錄已清空</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">對話記錄已被%1$s清除</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="non_format_message_permissions_changed">%1$s已被%3$s更改為%2$s</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="non_format_message_add_participant">%1$s已被%2$s邀請並加入此對話群組中</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1302,8 +1276,6 @@
     <string name="add_to_cloud_node_chat">新增至雲端硬碟</string>
     <!-- Menu option -->
     <string name="general_view_contacts">檢視聯絡人</string>
-    <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">已成功新增至雲端硬碟</string>
     <!-- Menu option -->
     <string name="import_success_error">發生錯誤，無法新增至雲端硬碟</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1548,8 +1520,8 @@
     <string name="general_incorrect_names">在繼續操作前，請更正您的檔案名稱</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">無效字元</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">不允許使用以下字元：” * / : &lt; &gt; ? \\ |</string>
+    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
+    <string name="invalid_characters_defined">不允許使用以下字元：%1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">檔案名稱不能空白。</item>
@@ -1715,7 +1687,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">檔案載入中</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s B</string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1975,8 +1947,6 @@
     <string name="play_store_label">Play商店</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">您需要身份驗證應用程式才能在MEGA上啟用2FA雙重驗證。您可以在手機或平板電腦裡下載並安裝Google Authenticator、Duo Mobile，Authy或Microsoft Authenticator應用程式。</string>
-    <!-- success message when importing multiple files from -->
-    <string name="number_correctly_imported_from_chat">已成功共享%d個檔案</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">未能共享%d個檔案</string>
     <!-- button’s text to open a full screen image -->
@@ -2369,10 +2339,6 @@
     <string name="title_compress_video">壓縮影片%1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">選擇的資料夾無效</string>
-    <!-- Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_one_file">1個資料夾 · 1個檔案</string>
-    <!-- Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_several_files">1個資料夾 · %1$d個檔案</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d個檔案</item>
@@ -2703,12 +2669,6 @@
     <plurals name="title_media_bucket_images_and_videos">
         <item quantity="other">%1$d張圖片&#160;</item>
     </plurals>
-    <!-- Title of a media recents bucket that contains some images and a video -->
-    <string name="title_media_bucket_images_and_video">%d張圖片與1個影片</string>
-    <!-- Title of a media recents bucket that contains an image and some videos -->
-    <string name="title_media_bucket_image_and_videos">1張圖片與%d個影片</string>
-    <!-- Title of a media recents bucket that contains an image and a video -->
-    <string name="title_media_bucket_image_and_video">1張圖片與1個影片</string>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">由%s[A]建立[/A]</string>
     <!-- Label that indicates who updated a file into a recents bucket -->
@@ -2840,7 +2800,7 @@
     <!-- Title of a screen to browse files -->
     <string name="browse_files_label">瀏覽檔案</string>
     <!-- Title of the File Provider activity -->
-    <string name="file_provider_title">附加自⋯</string>
+    <string name="file_provider_title">附加自&#8230;</string>
     <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
     <string name="inactive_chat_title_2">對話已建立%s</string>
     <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
@@ -3574,23 +3534,23 @@
     <!-- Button to proceed with a payment -->
     <string name="proceed">繼續</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">感謝您訂閱%1$s！</string>
+    <string name="successful_upgrade">感謝您訂閱%1$s</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro Lite 月方案</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite月方案</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro Lite 年方案</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite年方案</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro I 月方案</string>
+    <string name="pro_i_monthly">Pro&#160;I月方案</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro I 年方案</string>
+    <string name="pro_i_yearly">Pro&#160;I年方案</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro II 月方案</string>
+    <string name="pro_ii_monthly">Pro&#160;II月方案</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro II 年方案</string>
+    <string name="pro_ii_yearly">Pro&#160;II年方案</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro III 月方案</string>
+    <string name="pro_iii_monthly">Pro&#160;III月方案</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro III 年方案</string>
+    <string name="pro_iii_yearly">Pro&#160;III年方案</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">移除主持人權限</string>
     <!-- Title message of existing subscription dialog -->
@@ -3782,19 +3742,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">無法重新連線</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">通話將於%s後結束</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -3864,7 +3824,7 @@
     <!-- Title of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_title_end_call_for_all">是否結束所有人的通話？</string>
     <!-- Description of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen. Allows to end call for all participants -->
-    <string name="meetings_chat_screen_dialog_description_end_call_for_all">這將結束所有參與者的通話。</string>
+    <string name="meetings_chat_screen_dialog_description_end_call_for_all">這將結束所有與會者的通話。</string>
     <!-- Positive button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">是</string>
     <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
