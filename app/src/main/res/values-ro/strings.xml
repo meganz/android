@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
-    <string name="prolite_account">Pro Lite</string>
+    <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">Vizualizator PDF MEGA</string>
     <!-- Answer for confirmation dialog. -->
@@ -462,21 +462,9 @@
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d foldere nu au fost lăsate cu succes</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent">Fișiere trimise cu succes către %d contacte</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent">Fișierul nu a fost trimis către %d contacte</string>
-    <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent_multifile">%d fișiere trimise cu succes</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent_multifile">%d fișiere au eșuat la trimitere</string>
-    <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d elemente copiate cu succes</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d elemente nu au fost copiate</string>
-    <!-- success message when removing several contacts -->
-    <string name="number_contact_removed">%d contacte eliminate cu succes</string>
-    <!-- error message when removing several contacts -->
-    <string name="number_contact_not_removed">%d contacte nu au fost eliminate</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Coșul de gunoi golit cu succes</string>
     <!-- error message when emptying the RB -->
@@ -793,13 +781,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Cont gratuit</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Cont Pro I</string>
+    <string name="my_account_pro1">Cont Pro&#160;I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Cont Pro II</string>
+    <string name="my_account_pro2">Cont Pro&#160;II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Cont Pro III</string>
+    <string name="my_account_pro3">Cont Pro&#160;III</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Cont Pro Lite</string>
+    <string name="my_account_prolite_feedback_email">Cont Pro&#160;Lite</string>
     <!--  -->
     <string name="backup_title">Fă backup cheii de recuperare</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -920,16 +908,6 @@
     <string name="edit_link_option">Gestionează linkul</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">Parola actuală furnizată este incorectă.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_reinvite_contact_request">%d cereri de reinvitație trimise cu succes.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_delete_contact_request">%d cereri șterse cu succes.</string>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_delete_contact_request">%1$d cereri șterse cu succes, însă %2$d cereri nu au fost șterse.</string>
-    <!-- success message when replying to multiple received request -->
-    <string name="number_correctly_invitation_reply_sent">%d răspunsuri ale cererilor trimise.</string>
-    <!-- error message when replying to multiple received request -->
-    <string name="number_incorrectly_invitation_reply_sent">%1$d răspunsuri ale cererilor trimise cu succes, însă %2$d nu au fost trimise.</string>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">Folderul este partajat cu %1$d contact. Elimini partajarea?</item>
@@ -1117,7 +1095,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">Standard</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
-    <string name="administrator_permission_label_participants_panel">Host</string>
+    <string name="administrator_permission_label_participants_panel">Gazdă</string>
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">(editat)</string>
     <!-- Option in menu to change title of a chat group. -->
@@ -1132,8 +1110,6 @@
     <string name="number_correctly_add_participant">%d participanți au fost invitați cu succes</string>
     <!-- error message when inviting multiple contacts to a group chat -->
     <string name="number_no_add_participant_request">%1$d participanți au fost invitați cu succes, însă %2$d participanți nu au fost invitați.</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="message_permissions_changed">[A]%1$s[/A][B] a fost schimbat în [/B][C]%2$s[/C][D] de către [/D][E]%3$s[/E]</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] s-a alăturat chatului de grup prin invitație de la [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1162,8 +1138,6 @@
     <string name="history_cleared_message">Istoricul chatului a fost șters</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">Istoricul chatului a fost șters de către %1$s</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="non_format_message_permissions_changed">%1$s a fost schimbat în %2$s de către %3$s</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="non_format_message_add_participant">%1$s a fost adăugat în acest chat de grup prin invitație de la %2$s</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1361,8 +1335,6 @@
     <string name="add_to_cloud_node_chat">Adaugă în unitatea cloud</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Vezi contactele</string>
-    <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">Adăugat cu succes în unitatea cloud</string>
     <!-- Menu option -->
     <string name="import_success_error">Eroare. Nu a fost adăugat în unitatea cloud</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1617,8 +1589,8 @@
     <string name="general_incorrect_names">Te rugăm să corectezi numele fișierelor înainte de a continua</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caractere nevalide</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Următoarele caractere nu sunt permise: ” * / : &lt; &gt; ? \\ |</string>
+    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
+    <string name="invalid_characters_defined">Următoarele caractere nu sunt permise: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">File name cannot be empty.</item>
@@ -1785,7 +1757,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Se încarcă fișierele</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s B</string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2065,8 +2037,6 @@
     <string name="play_store_label">Magazin Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Ai nevoie de o aplicație de autentificare pentru a activa 2FA pe MEGA. Poți descărca și instala aplicația Google Authenticator, Duo Mobile, Authy sau Microsoft Authenticator pentru telefon sau tabletă.</string>
-    <!-- success message when importing multiple files from -->
-    <string name="number_correctly_imported_from_chat">%d fișiere partajate cu succes</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d fișiere nu au fost partajate</string>
     <!-- button’s text to open a full screen image -->
@@ -2467,10 +2437,6 @@
     <string name="title_compress_video">Se comprimă videoclipurile %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Folder nevalid selectat</string>
-    <!-- Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_one_file">1 folder · 1 fișier</string>
-    <!-- Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_several_files">1 folder · %1$d fișiere</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d fișier</item>
@@ -2841,12 +2807,6 @@
         <item quantity="one">%1$d image&#160;</item>
         <item quantity="other">%1$d images&#160;</item>
     </plurals>
-    <!-- Title of a media recents bucket that contains some images and a video -->
-    <string name="title_media_bucket_images_and_video">%d imagini și 1 videoclip</string>
-    <!-- Title of a media recents bucket that contains an image and some videos -->
-    <string name="title_media_bucket_image_and_videos">1 imagine și %d videoclipuri</string>
-    <!-- Title of a media recents bucket that contains an image and a video -->
-    <string name="title_media_bucket_image_and_video">1 imagine și 1 videoclip</string>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]creat de [/A]%s</string>
     <!-- Label that indicates who updated a file into a recents bucket -->
@@ -3763,23 +3723,23 @@
     <!-- Button to proceed with a payment -->
     <string name="proceed">Continuă</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Thank you for your %1$s subscription!</string>
+    <string name="successful_upgrade">Thank you for your %1$s subscription</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro Lite monthly</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro Lite yearly</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro I monthly</string>
+    <string name="pro_i_monthly">Pro&#160;I monthly</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro I yearly</string>
+    <string name="pro_i_yearly">Pro&#160;I yearly</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro II monthly</string>
+    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro II yearly</string>
+    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro III monthly</string>
+    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro III yearly</string>
+    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Remove as host</string>
     <!-- Title message of existing subscription dialog -->
@@ -3829,17 +3789,17 @@
     <!-- Body of pop-up error message for taken down file. -->
     <string name="error_takendown_file">File removed as it violated our Terms of Service.</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
-    <string name="error_download_takendown_file">Violated Terms of Service</string>
+    <string name="error_download_takendown_file">A încălcat Termenii de utilizare a serviciului</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_warning_no_picker">This device doesn’t have an app to select folders.</string>
+    <string name="general_warning_no_picker">Acest dispozitiv nu are o aplicație care să selecteze foldere.</string>
     <!-- Next audios to be played in the audio playlist -->
-    <string name="media_player_audio_playlist_next">Înainte</string>
+    <string name="media_player_audio_playlist_next">Următorul fișier audio</string>
     <!-- Previous audios have been already played in the audio playlist -->
-    <string name="media_player_audio_playlist_previous">Anterior</string>
+    <string name="media_player_audio_playlist_previous">Anteriorul fișier audio</string>
     <!-- Next videos to be played in the video playlist -->
-    <string name="media_player_video_playlist_next">Înainte</string>
+    <string name="media_player_video_playlist_next">Următorul fișier video</string>
     <!-- Previous videos have been already played in the video playlist -->
-    <string name="media_player_video_playlist_previous">Anterior</string>
+    <string name="media_player_video_playlist_previous">Anteriorul fișier video</string>
     <!-- Setting option available to choose for the preferred start screen. -->
     <string name="settings_start_screen_photos_option">Fotografii</string>
     <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
@@ -3849,25 +3809,25 @@
     <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
     <string name="settings_chat_image_quality">Calitatea imaginilor</string>
     <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="automatic_image_quality">Automat</string>
+    <string name="automatic_image_quality">Automată</string>
     <!-- Text for the automatic option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="automatic_image_quality_text">Send optimised images when on mobile data but original size images when on Wi-Fi.</string>
+    <string name="automatic_image_quality_text">Trimite imagini optimizate când folosești datele mobile, însă imagini la dimensiunea originală când folosești Wi-Fi-ul.</string>
     <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="high_image_quality">Original</string>
+    <string name="high_image_quality">Originală</string>
     <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="high_image_quality_text">Always send original size images.</string>
+    <string name="high_image_quality_text">Trimite întotdeauna imagini la dimensiunea originală.</string>
     <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
     <string name="optimised_image_quality">Optimizată</string>
     <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="optimised_image_quality_text">Always send optimised images.</string>
+    <string name="optimised_image_quality_text">Trimite întotdeauna imagini optimizate.</string>
     <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_joined_call">%1$s joined</string>
+    <string name="meeting_call_screen_one_participant_joined_call">%1$s s-a alăturat</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
-    <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
+    <string name="meeting_call_screen_two_participants_joined_call">%1$s și %2$s s-au alăturat</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s a părăsit apelul</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s și %2$s au părăsit apelul</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="one">%1$s and 1 other joined</item>
@@ -3883,25 +3843,25 @@
     <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
     <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Șterge</string>
     <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
-    <string name="account_info_renews_on">[A]Se reînnoiește în[/A] [B]%s[/B]</string>
+    <string name="account_info_renews_on">[A]Se reînnoiește [/A] [B]%s[/B]</string>
     <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
-    <string name="account_info_expires_on">[A]Expiră pe[/A] [B]%s[/B]</string>
+    <string name="account_info_expires_on">[A]Expiră [/A] [B]%s[/B]</string>
     <!-- Title of favourite category. -->
     <string name="favourites_category_title">Favorite</string>
     <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
-    <string name="settings_passcode_forgot_passcode_button">Forgot your passcode?</string>
+    <string name="settings_passcode_forgot_passcode_button">Ți-ai uitat codul de acces?</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Introdu parola</string>
     <!-- Resume to paused transfers snack bar description text -->
     <string name="resume_paused_transfers_text">Transfers have been paused. Resume them to proceed with the download.</string>
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
-    <string name="warning_scanning_transfers">Please do not close the application.</string>
+    <string name="warning_scanning_transfers">Te rugăm să nu închizi aplicația.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
-    <string name="scanning_transfers">Scanning&#8230;</string>
+    <string name="scanning_transfers">Se scanează&#8230;</string>
     <!-- Label cancel transfers. -->
     <string name="cancel_transfers">Anulează transferurile</string>
     <!-- Warning informing what will happen if proceed on cancelling transfers. -->
-    <string name="warning_cancel_transfers">Transfers not yet processed will be cancelled.</string>
+    <string name="warning_cancel_transfers">Transferurile neprocesate încă vor fi anulate.</string>
     <!-- Button which dismisses the warning and proceeds with the cancel transfers action. -->
     <string name="button_proceed">Continuă</string>
     <!-- Warning informing transfers were cancelled. -->
@@ -3973,19 +3933,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Unable to reconnect</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] MB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">Call will end in %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->

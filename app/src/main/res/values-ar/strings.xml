@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
-    <string name="prolite_account">برو لايت Pro Lite</string>
+    <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">عارض ملفات بي دي إف PDF في ميغا MEGA</string>
     <!-- Answer for confirmation dialog. -->
@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">لم يتم العثور على وحدة تخزين خارجية</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">تسجيل خروج</string>
+    <string name="action_logout">تسجيل &#160;خروج</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">رفع</string>
     <!-- Menu item -->
@@ -493,21 +493,9 @@
     <!-- error message when moving a node -->
     <string name="number_no_leaved">لم يتم مغادرة %d مجلدات بنجاح</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent">لم يتم إرسال الملف إلى %d جهات الاتصال بنجاح</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent">لم يتم إرسال الملف إلى %d جهات الاتصال</string>
-    <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent_multifile">%d ملفات أرسلت بنجاح</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent_multifile">%d ملفات فشلت في الارسال</string>
-    <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d عناصر تم نسخها بنجاح</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d عناصر لم يتم نسخها</string>
-    <!-- success message when removing several contacts -->
-    <string name="number_contact_removed">%d جهات اتصال تمت إزالتها بنجاح</string>
-    <!-- error message when removing several contacts -->
-    <string name="number_contact_not_removed">%d جهات اتصال لم يتم إزالتها</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">تم إفراغ سلة المحذوفات بنجاح</string>
     <!-- error message when emptying the RB -->
@@ -830,13 +818,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">حساب مجاني</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">حساب برو 1 Pro I</string>
+    <string name="my_account_pro1">حساب برو Pro&#160;I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">حساب برو 2 Pro II</string>
+    <string name="my_account_pro2">حساب برو Pro&#160;II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">حساب برو 3 Pro III</string>
+    <string name="my_account_pro3">حساب برو Pro&#160;III</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">حساب برو لايت Pro Lite</string>
+    <string name="my_account_prolite_feedback_email">حساب برو لايت Pro&#160;Lite</string>
     <!--  -->
     <string name="backup_title">انسخ مفتاح الاستعادة احتياطياً</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -957,16 +945,6 @@
     <string name="edit_link_option">إدارة الرابط</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">كلمة المرور الحالية التى أدخلتها غير صحيحة.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_reinvite_contact_request">%d طلبات لإعادة دعوة أرسلت بنجاح.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_delete_contact_request">%d طلبات تم حذفهم بنجاح.</string>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_delete_contact_request">%1$d طلبات حذفت بنجاح لكن هناك %2$d طلبات لم تحذف.</string>
-    <!-- success message when replying to multiple received request -->
-    <string name="number_correctly_invitation_reply_sent">%d طلب رد تم إرساله.</string>
-    <!-- error message when replying to multiple received request -->
-    <string name="number_incorrectly_invitation_reply_sent">%1$d طلب رد تم إرسالهم بنجاح ولكن %2$d لم يتم إرسالهم.</string>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="zero">هذا المجلد مشارك من قبل %1$d جهة اتصال. هل تود إزالة كل المشاركات؟</item>
@@ -1192,8 +1170,6 @@
     <string name="number_correctly_add_participant">تمت دعوة %d مشاركين بنجاح</string>
     <!-- error message when inviting multiple contacts to a group chat -->
     <string name="number_no_add_participant_request">تمت دعوة %1$d مشاركين بنجاح ولكن لم تتم دعوة  %2$d مشاركين.</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="message_permissions_changed">[A]%1$s[/A][B] تم تغييرها إلى [/B][C]%2$s[/C][D] من قبل [/D][E]%3$s[/E]</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] انضم للمجموعة عبر دعوة من [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1222,8 +1198,6 @@
     <string name="history_cleared_message">تم محو سجل المحادثة</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">تم مسح سجل المحادثات من قبل %1$s</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="non_format_message_permissions_changed">%1$s تم تغييره إلى %2$s من قبل %3$s</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="non_format_message_add_participant">%1$s تم إضافتهم لهذه المجموعة عن طريق دعوتهم من قبل %2$s</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1457,8 +1431,6 @@
     <string name="add_to_cloud_node_chat">أضف إلى السواقة السحابية</string>
     <!-- Menu option -->
     <string name="general_view_contacts">عرض جهات الاتصال</string>
-    <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">تمت الإضافة إلى السواقة السحابية بنجاح</string>
     <!-- Menu option -->
     <string name="import_success_error">خطأ. لم تمت الإضافة إلى السواقة السحابية</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1728,12 +1700,16 @@
     <string name="general_incorrect_names">صحح أسماء الملفات قبل المتابعة</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">محارف غير صالحة</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">المحارف التالية غير مسموح بها: ” * / : &lt; &gt; ? \\ |</string>
+    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
+    <string name="invalid_characters_defined">المحارف التالية غير مسموح بها: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">File name cannot be empty.</item>
-        <item quantity="other">File names cannot be empty.</item>
+        <item quantity="zero">لا يمكن أن يكون اسم الملف فارغ.</item>
+        <item quantity="one">لا يمكن أن يكون اسم الملف فارغ.</item>
+        <item quantity="two">لا يمكن أن تكون أسماء الملفات فارغة.</item>
+        <item quantity="few">لا يمكن أن تكون أسماء الملفات فارغة.</item>
+        <item quantity="many">لا يمكن أن تكون أسماء الملفات فارغة.</item>
+        <item quantity="other">لا يمكن أن تكون أسماء الملفات فارغة.</item>
     </plurals>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">خطأ: ملف pdf غير صالح أو غير موجود.</string>
@@ -1808,7 +1784,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">لم يتم ارسال الدعوة. %s موجود بقائمة الاتصال الخاصة بك.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
+    <string name="invite_not_sent_text_error">حدث خطأ ولم يتم إرسال الدعوة.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">جاري توليد رمز الاستجابة السريعة QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -1896,7 +1872,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">تحميل الملفات</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s بايت</string>
+    <string name="label_file_size_byte">%s&#160;بايت</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;كيلوبايت</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2013,7 +1989,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">افتح [A]اعدادات[/A] جهاز اندرويد</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Open [A]Apps and notifications[/A]</string>
+    <string name="turn_on_notifications_second_step">افتح [A]التطبيقات والإشعارات[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">اختر [A]ميغا MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -2206,14 +2182,12 @@
     <string name="play_store_label">متجر بلاي Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">تحتاج الى تطبيق مصادقة لتفعيل المصادقة المزدوجة 2FA على ميغا MEGA. يمكنك تنزيل وتثبيت أحد التطبيقات Google Authenticator، Duo Mobile أو Microsoft Authenticator app على موبايلك أو جهازك اللوحي.</string>
-    <!-- success message when importing multiple files from -->
-    <string name="number_correctly_imported_from_chat">تمت مشاركة %d ملف بنجاح</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">لم تنجح مشاركة %d ملف</string>
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">عرض المحتوى</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
+    <string name="no_network_connection_on_play_file">لا يوجد اتصال شبكة. لم يتم تنزيل الملف ولا يمكن بثه.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">غير قادر على فتح ملف.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2620,10 +2594,6 @@
     <string name="title_compress_video">ضغط الفيديو %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">تم تحديد مجلد غير صالح</string>
-    <!-- Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_one_file">1 مجلد · 1 ملف</string>
-    <!-- Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_several_files">1 مجلد · %1$d ملفات</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="zero">%d ملف</item>
@@ -2644,8 +2614,12 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="zero">%1$d مجلد&#160;.&#160;</item>
+        <item quantity="one">%1$d مجلد&#160;.&#160;</item>
+        <item quantity="two">%1$d مجلدان&#160;.&#160;</item>
+        <item quantity="few">%1$d المجلدات&#160;.&#160;</item>
+        <item quantity="many">%1$d مجلداً&#160;.&#160;</item>
+        <item quantity="other">%1$d مجلد&#160;.&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] أضاف %2$s و %3$s[/B]</string>
@@ -2785,7 +2759,7 @@
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">حدث خطأ ولا يمكن فتح الملف باستخدام هذا التطبيق.</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
-    <string name="outgoing_call_starting">جار الاتصال</string>
+    <string name="outgoing_call_starting">جار الاتصال&#8230;</string>
     <!-- Content of a invalid meta message -->
     <string name="error_meta_message_invalid">تحتوي الرسالة على بيانات وصفية غير صالحة</string>
     <!-- Title of the activity that sends a location -->
@@ -3053,15 +3027,13 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="zero">%1$dصورة&#160;</item>
+        <item quantity="one">%1$dصورة&#160;</item>
+        <item quantity="two">%1$dصورتان&#160;</item>
+        <item quantity="few">%1$dصور&#160;</item>
+        <item quantity="many">%1$dصورة&#160;</item>
+        <item quantity="other">%1$dصورة&#160;</item>
     </plurals>
-    <!-- Title of a media recents bucket that contains some images and a video -->
-    <string name="title_media_bucket_images_and_video">%d الصور و 1 فيديو</string>
-    <!-- Title of a media recents bucket that contains an image and some videos -->
-    <string name="title_media_bucket_image_and_videos">1 الصور و %d فيديو</string>
-    <!-- Title of a media recents bucket that contains an image and a video -->
-    <string name="title_media_bucket_image_and_video">1 صورة و 1 فيديو</string>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]انشأ من قبل [/A]%s</string>
     <!-- Label that indicates who updated a file into a recents bucket -->
@@ -3439,7 +3411,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">حدد عمليات تراسل المعطيات</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Unable to change priority of the transfer “%1$s”</string>
+    <string name="change_of_transfer_priority_failed">يتعذر تغيير أولوية التراسل ”%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">أرسل مفتاح فك التشفير بشكل منفصل</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -4057,21 +4029,21 @@
     <!-- Button to proceed with a payment -->
     <string name="proceed">تابع</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">شكرا لاشتراكك في %1$s!</string>
+    <string name="successful_upgrade">شكرا لاشتراكك في %1$s</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">برو لايت Pro Lite شهرياً</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite شهرياً</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">برو لايت Pro Lite سنوياً</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite سنوياً</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro I شهرياً</string>
+    <string name="pro_i_monthly">Pro&#160;I شهرياً</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro I سنوياً</string>
+    <string name="pro_i_yearly">Pro&#160;I سنوياً</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro II شهرياً</string>
+    <string name="pro_ii_monthly">Pro&#160;II شهرياً</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro II سنوياً</string>
+    <string name="pro_ii_yearly">Pro&#160;II سنوياً</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro III شهرياً</string>
+    <string name="pro_iii_monthly">Pro&#160;III شهرياً</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III سنوياً</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
@@ -4275,19 +4247,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">غير قادر على إعادة الاتصال</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] بايت</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;بايت</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] كيلوبايت</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;كيلوبايت</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A] ميغابايت</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;ميغابايت</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] غيغابايت</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;غيغابايت</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] تيرابايت</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;تيرابايت</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] بيتابايت</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;بيتابايت</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] إكسابايت</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;إكسابايت</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">ستنتهي المكالمة خلال %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -4421,25 +4393,25 @@
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] قد تم تغييره للقراءة فقط من قبل [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to standard role by [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B]   تغيير دوره إلى عادي من قبل [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] تم تغيير دوره إلى مُضيف من قبل [/B][A]%2$s[/A]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s قد تم تغييره للقراءة فقط من قبل %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to standard role by %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s تغيير دوره إلى عادي من قبل %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s تم تغيير دوره إلى مُضيف من قبل %2$s</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
-    <string name="calls_call_screen_waiting_for_participants">Waiting for others to join</string>
+    <string name="calls_call_screen_waiting_for_participants">في انتظار انضمام الآخرين&#8230;</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_favourites">[B]لم يتم [/B] [B]العثور على أي [/B] [A]مفضلات[/A]</string>
     <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Start a meeting</string>
+    <string name="meetings_list_empty_action">ابدأ اجتماع</string>
     <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Talk securely and privately on audio or video calls with friends and colleagues around the world.</string>
+    <string name="meetings_list_empty_description">تحدث بأمان وخصوصية في مكالمات الصوت أو الفيديو مع الأصدقاء والزملاء في جميع أنحاء العالم.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_action">Start chatting now</string>
+    <string name="chat_recent_list_empty_action">ابدأ المحادثة الآن</string>
     <!--Description text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_description">Chat securely and privately, with anyone and on any device, knowing that no one can read your chats, not even MEGA.</string>
+    <string name="chat_recent_list_empty_description">تقوم بالمحادثة مع أي شخص وعلى أي جهاز بأمان وخصوصية مع معرفة أنه لا يمكن لأحد قراءة محادثاتك ولا حتى ميغا MEGA.</string>
 </resources>

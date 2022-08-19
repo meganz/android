@@ -45,7 +45,6 @@ class MediaPlayerFacade constructor(
 
     override fun createPlayer(
         shuffleEnabled: Boolean,
-        shuffleOrder: ShuffleOrder,
         repeatMode: Int,
         nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit,
         mediaPlayerCallback: MediaPlayerCallback,
@@ -73,7 +72,7 @@ class MediaPlayerFacade constructor(
                     }
 
                     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-                        mediaPlayerCallback.onShuffleModeEnabledChangedCallback(shuffleEnabled)
+                        mediaPlayerCallback.onShuffleModeEnabledChangedCallback(shuffleModeEnabled)
                     }
 
                     override fun onRepeatModeChanged(repeatMode: Int) {
@@ -106,10 +105,9 @@ class MediaPlayerFacade constructor(
                         Timber.e(msg)
                     }
                 })
-                shuffleModeEnabled = shuffleEnabled
-                this.repeatMode = repeatMode
-                setShuffleOrder(shuffleOrder)
             }
+        exoPlayer.repeatMode = repeatMode
+        exoPlayer.shuffleModeEnabled = shuffleEnabled
         player = MediaMegaPlayer(exoPlayer)
     }
 
