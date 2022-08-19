@@ -9342,6 +9342,11 @@ public class ChatActivity extends PasscodeActivity
                             R.string.join_call_layout);
 
                     if (chatRoom.isGroup()) {
+                        if (callInThisChat.getNumParticipants() == 0 || (callInThisChat.getPeeridParticipants().size() == 1 && callInThisChat.getPeeridParticipants().get(0) == megaChatApi.getMyUserHandle())) {
+                            hideCallBar(callInThisChat);
+                            break;
+                        }
+
                         long callerHandle = callInThisChat.getCaller();
                         String callerFullName = chatC.getParticipantFullName(callerHandle);
                         if (callerHandle != MEGACHAT_INVALID_HANDLE && !isTextEmpty(callerFullName)) {
