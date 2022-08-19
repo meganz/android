@@ -4293,6 +4293,7 @@ public class ChatActivity extends PasscodeActivity
                     MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true;
                     hideDialogCall();
                 })
+                .setOnDismissListener(dialog -> isOnlyMeInCallDialogShown = false)
                 .setCancelable(false)
                 .create();
 
