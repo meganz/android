@@ -891,6 +891,7 @@ class MediaPlayerServiceViewModel(
         for ((index, item) in playlistItems.withIndex()) {
             if (item.nodeHandle == playingHandle) {
                 playingIndex = index
+                playingPosition = playingIndex
                 break
             }
         }
@@ -947,7 +948,6 @@ class MediaPlayerServiceViewModel(
         }
 
         val hasPrevious = playingIndex > 0
-        val hasNext = playingIndex < playlistItems.size - 1
 
         var scrollPosition = playingIndex
 
@@ -956,9 +956,6 @@ class MediaPlayerServiceViewModel(
         }
 
         items[playingIndex].headerIsVisible = true
-        if (hasNext) {
-            playingPosition = playingIndex
-        }
         Timber.d("doPostPlaylistItems post ${items.size} items")
         if (!isScroll) {
             scrollPosition = -1
@@ -1030,21 +1027,26 @@ class MediaPlayerServiceViewModel(
     override fun actionModeUpdate() = actionMode.asFlow()
 
     override fun removeItem(handle: Long) {
-        for ((index, item) in playlistItems.withIndex()) {
-            if (item.nodeHandle == handle) {
-                playlistItems.removeAt(index)
-                mediaItemToRemove.value = index
-                playSourceChanged.removeAt(index)
-                if (playlistItems.isEmpty()) {
-                    playlist.value = Pair(emptyList(), 0)
-                    error.value = MegaError.API_ENOENT
-                } else {
-                    resetRetryState()
+        initPlayerSourceChanged()
+        removeSingleItem(handle)
+        if (playlistItems.isEmpty()) {
+            playlist.value = Pair(emptyList(), 0)
+            error.value = MegaError.API_ENOENT
+        } else {
+            resetRetryState()
+            postPlaylistItems()
+        }
+    }
 
-                    postPlaylistItems()
-                }
-                return
-            }
+    private fun removeSingleItem(handle: Long) {
+        mediaItemToRemove.value = playlistItems.indexOfFirst { (nodeHandle) ->
+            nodeHandle == handle
+        }
+        playlistItems.removeIf { (nodeHandle) ->
+            nodeHandle == handle
+        }
+        playSourceChanged.removeIf { mediaItem ->
+            mediaItem.mediaId.toLong() == handle
         }
     }
 
@@ -1052,11 +1054,14 @@ class MediaPlayerServiceViewModel(
         if (itemsSelectedMap.isNotEmpty()) {
             initPlayerSourceChanged()
             itemsSelectedMap.forEach {
-                removeItem(it.value.nodeHandle)
+                removeSingleItem(it.value.nodeHandle)
             }
             itemsSelectedMap.clear()
             if (playlistItems.isNotEmpty()) {
-                updatePlaySource()
+                postPlaylistItems()
+            } else {
+                playlist.value = Pair(emptyList(), 0)
+                error.value = MegaError.API_ENOENT
             }
             itemsSelectedCount.value = itemsSelectedMap.size
             actionMode.value = false

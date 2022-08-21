@@ -166,7 +166,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         with(viewModelGateway) {
             mediaPlayerGateway.createPlayer(
                 shuffleEnabled = shuffleEnabled(),
-                shuffleOrder = getShuffleOrder(),
                 repeatMode = repeatMode(),
                 nameChangeCallback = { title, artist, album ->
                     val nodeName = getPlaylistItem(getCurrentMediaItem()?.mediaId)?.nodeName ?: ""
@@ -304,32 +303,36 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     private fun observeData() {
         lifecycleScope.launch {
-            viewModelGateway.run {
-                playerSourceUpdate().collect { mediaPlaySources ->
-                    playSource(mediaPlaySources)
-                }
+            viewModelGateway.playerSourceUpdate().collect { mediaPlaySources ->
+                playSource(mediaPlaySources)
+            }
+        }
 
-                mediaItemToRemoveUpdate().collect { index ->
-                    mediaPlayerGateway.mediaItemRemoved(index)?.let { handle ->
-                        val nodeName = getPlaylistItem(handle)?.nodeName ?: ""
-                        metadata.value = Metadata(null, null, null, nodeName)
-                    }
-                }
-
-                nodeNameUpdate().collect { name ->
-                    metadata.value?.let {
-                        metadata.value = it.copy(nodeName = name)
-                    }
-                }
-
-                getPlayingThumbnail().observe(this@MediaPlayerService) {
-                    mediaPlayerGateway.invalidatePlayerNotification()
-                }
-
-                retryUpdate().collect { isRetry ->
-                    mediaPlayerGateway.mediaPlayerRetry(isRetry)
+        lifecycleScope.launch {
+            viewModelGateway.mediaItemToRemoveUpdate().collect { index ->
+                mediaPlayerGateway.mediaItemRemoved(index)?.let { handle ->
+                    val nodeName = viewModelGateway.getPlaylistItem(handle)?.nodeName ?: ""
+                    metadata.value = Metadata(null, null, null, nodeName)
                 }
             }
+        }
+
+        lifecycleScope.launch {
+            viewModelGateway.nodeNameUpdate().collect { name ->
+                metadata.value?.let {
+                    metadata.value = it.copy(nodeName = name)
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModelGateway.retryUpdate().collect { isRetry ->
+                mediaPlayerGateway.mediaPlayerRetry(isRetry)
+            }
+        }
+
+        viewModelGateway.getPlayingThumbnail().observe(this@MediaPlayerService) {
+            mediaPlayerGateway.invalidatePlayerNotification()
         }
     }
 

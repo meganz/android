@@ -10,7 +10,10 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Surface
 import android.view.View
-import android.widget.*
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.PopupWindow
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
 import org.jetbrains.anko.contentView
@@ -280,7 +283,7 @@ class HighLightHintHelper(private val activity: Activity) {
      */
     private fun getTextHintLayoutParams() = FrameLayout.LayoutParams(
         hintLayoutWidth,
-        hintLayoutHeight
+        FrameLayout.LayoutParams.WRAP_CONTENT
     ).apply {
         val arrowLeft =
             targetLocation.left + (targetLocation.right - targetLocation.left) / 2 - arrowSize / 2
