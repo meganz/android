@@ -34,6 +34,7 @@ import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGatewa
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
+import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
@@ -154,6 +155,8 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
             offlineThumbnailFileWrapper = offlineThumbnailFileWrapper,
             getGlobalTransferUseCase = getGlobalTransferUseCase
         )
+
+        viewModelGateway.setAudioPlayer(this is AudioPlayerService)
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
         audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
         createPlayer()
@@ -164,11 +167,10 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     private fun createPlayer() {
         with(viewModelGateway) {
-            mediaPlayerGateway.createPlayer(
-                shuffleEnabled = shuffleEnabled(),
-                repeatMode = repeatMode(),
-                nameChangeCallback = { title, artist, album ->
-                    val nodeName = getPlaylistItem(getCurrentMediaItem()?.mediaId)?.nodeName ?: ""
+            val nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit =
+                { title, artist, album ->
+                    val nodeName =
+                        getPlaylistItem(getCurrentMediaItem()?.mediaId)?.nodeName ?: ""
 
                     if (!(title.isNullOrEmpty() && artist.isNullOrEmpty()
                                 && album.isNullOrEmpty() && nodeName.isEmpty())
@@ -176,62 +178,82 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                         metadata.value = Metadata(title, artist, album, nodeName)
                         mediaPlayerGateway.invalidatePlayerNotification()
                     }
-                },
-                mediaPlayerCallback = object : MediaPlayerCallback {
-                    override fun onMediaItemTransitionCallback(
-                        handle: String?,
-                        isUpdateName: Boolean,
-                    ) {
-                        handle?.run {
-                            setCurrentPlayingHandle(this.toLong())
-                            if (isUpdateName) {
-                                val nodeName = getPlaylistItem(this)?.nodeName ?: ""
-                                metadata.value = Metadata(null, null, null, nodeName)
-                            }
+                }
+
+            val mediaPlayerCallback: MediaPlayerCallback = object : MediaPlayerCallback {
+                override fun onMediaItemTransitionCallback(
+                    handle: String?,
+                    isUpdateName: Boolean,
+                ) {
+                    handle?.run {
+                        setCurrentPlayingHandle(this.toLong())
+                        if (isUpdateName) {
+                            val nodeName = getPlaylistItem(this)?.nodeName ?: ""
+                            metadata.value = Metadata(null, null, null, nodeName)
                         }
                     }
+                }
 
-                    override fun onIsPlayingChangedCallback(isPlaying: Boolean) {
-                        if (isPlaying) {
-                            positionUpdateHandler.post(positionUpdateRunnable)
-                        } else {
-                            positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
-                        }
-                    }
-
-                    override fun onShuffleModeEnabledChangedCallback(shuffleModeEnabled: Boolean) {
-                        setShuffleEnabled(shuffleModeEnabled)
-
-                        if (shuffleModeEnabled) {
-                            mediaPlayerGateway.setShuffleOrder(newShuffleOrder())
-                        }
-                    }
-
-                    override fun onRepeatModeChangedCallback(repeatMode: Int) {
-                        setRepeatMode(repeatMode)
-                    }
-
-                    override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean) {
-                        setPaused(!playWhenReady, mediaPlayerGateway.getCurrentPosition())
-                    }
-
-                    override fun onPlaybackStateChangedCallback(state: Int) {
-                        when {
-                            state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> {
-                                setPaused(true, mediaPlayerGateway.getCurrentPosition())
-                            }
-                            state == MEDIA_PLAYER_STATE_READY && isPaused() && mediaPlayerGateway.getPlayWhenReady() -> {
-                                setPaused(false, mediaPlayerGateway.getCurrentPosition())
-                            }
-                        }
-                    }
-
-                    override fun onPlayerErrorCallback() {
-                        onPlayerError()
+                override fun onIsPlayingChangedCallback(isPlaying: Boolean) {
+                    if (isPlaying) {
+                        positionUpdateHandler.post(positionUpdateRunnable)
+                    } else {
                         positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
                     }
                 }
-            )
+
+                override fun onShuffleModeEnabledChangedCallback(shuffleModeEnabled: Boolean) {
+                    setShuffleEnabled(shuffleModeEnabled)
+
+                    if (shuffleModeEnabled) {
+                        mediaPlayerGateway.setShuffleOrder(newShuffleOrder())
+                    }
+                }
+
+                override fun onRepeatModeChangedCallback(repeatToggleMode: RepeatToggleMode) {
+                    if (isAudioPlayer()) {
+                        setAudioRepeatMode(repeatToggleMode)
+                    } else {
+                        setVideoRepeatMode(repeatToggleMode)
+                    }
+                }
+
+                override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean) {
+                    setPaused(!playWhenReady, mediaPlayerGateway.getCurrentPosition())
+                }
+
+                override fun onPlaybackStateChangedCallback(state: Int) {
+                    when {
+                        state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> {
+                            setPaused(true, mediaPlayerGateway.getCurrentPosition())
+                        }
+                        state == MEDIA_PLAYER_STATE_READY && isPaused() && mediaPlayerGateway.getPlayWhenReady() -> {
+                            setPaused(false, mediaPlayerGateway.getCurrentPosition())
+                        }
+                    }
+                }
+
+                override fun onPlayerErrorCallback() {
+                    onPlayerError()
+                    positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
+                }
+            }
+
+            if (isAudioPlayer()) {
+                mediaPlayerGateway.createPlayer(
+                    shuffleEnabled = shuffleEnabled(),
+                    shuffleOrder = getShuffleOrder(),
+                    repeatToggleMode = audioRepeatToggleMode(),
+                    nameChangeCallback = nameChangeCallback,
+                    mediaPlayerCallback = mediaPlayerCallback
+                )
+            } else {
+                mediaPlayerGateway.createPlayer(
+                    repeatToggleMode = videoRepeatToggleMode(),
+                    nameChangeCallback = nameChangeCallback,
+                    mediaPlayerCallback = mediaPlayerCallback
+                )
+            }
         }
     }
 
@@ -389,6 +411,10 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         stopSelf()
     }
 
+    override fun setRepeatModeForVideo(repeatToggleMode: RepeatToggleMode) {
+        mediaPlayerGateway.setRepeatToggleMode(repeatToggleMode)
+    }
+
     /**
      * Set playWhenReady of player
      *
@@ -456,7 +482,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         useController: Boolean,
         controllerShowTimeoutMs: Int,
         controllerHideOnTouch: Boolean,
-        repeatToggleModes: Int?,
+        isAudioPlayer: Boolean,
         showShuffleButton: Boolean?,
     ) {
         mediaPlayerGateway.setupPlayerView(
@@ -464,7 +490,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
             useController = useController,
             controllerShowTimeoutMs = controllerShowTimeoutMs,
             controllerHideOnTouch = controllerHideOnTouch,
-            repeatToggleModes = repeatToggleModes,
+            isAudioPlayer = isAudioPlayer,
             showShuffleButton = showShuffleButton,
         )
     }
