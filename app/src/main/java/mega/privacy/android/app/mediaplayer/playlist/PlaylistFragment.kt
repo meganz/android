@@ -308,7 +308,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                 (requireActivity() as MediaPlayerActivity).closeSearch()
 
                 if (isVideoPlayer()) {
-                    (requireActivity() as MediaPlayerActivity).onBackPressed()
+                    (requireActivity() as MediaPlayerActivity).onBackPressedDispatcher.onBackPressed()
                 }
             }
         }
