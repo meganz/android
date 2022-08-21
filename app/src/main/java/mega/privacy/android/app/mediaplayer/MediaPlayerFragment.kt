@@ -18,18 +18,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
-import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
-import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.dragger.DragToExitSupport
+import mega.privacy.android.app.constants.SettingsConstants.KEY_VIDEO_REPEAT_MODE
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
+import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
@@ -38,6 +37,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIS
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
+import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
 
 /**
@@ -257,7 +257,6 @@ class MediaPlayerFragment : Fragment() {
         } else {
             val viewHolder = videoPlayerVH ?: return
             videoPlayerView = viewHolder.binding.playerView
-
             serviceGateway?.run {
                 setupPlayerView(this, viewHolder.binding.playerView, true)
                 metadataUpdate().flowWithLifecycle(
@@ -272,11 +271,43 @@ class MediaPlayerFragment : Fragment() {
                     videoPlayerPausedForPlaylist = false
                 }
             }
-            playerServiceViewModelGateway?.run {
-                // we need setup control buttons again, because reset player would reset PlayerControlView
-                viewHolder.setupPlaylistButton(getPlaylistItems()) {
-                    (requireActivity() as MediaPlayerActivity).setDraggable(false)
-                    findNavController().navigate(R.id.action_player_to_playlist)
+            // we need setup control buttons again, because reset player would reset PlayerControlView
+            viewHolder.setupPlaylistButton(playerServiceViewModelGateway?.getPlaylistItems()) {
+                (requireActivity() as MediaPlayerActivity).setDraggable(false)
+                findNavController().navigate(R.id.action_player_to_playlist)
+            }
+
+            initRepeatToggleButtonForVideo(viewHolder)
+        }
+    }
+
+    private fun initRepeatToggleButtonForVideo(viewHolder: VideoPlayerViewHolder) {
+        serviceGateway?.run {
+            val defaultRepeatMode = when (requireContext().defaultSharedPreferences.getInt(
+                KEY_VIDEO_REPEAT_MODE, RepeatToggleMode.REPEAT_NONE.ordinal)) {
+                RepeatToggleMode.REPEAT_NONE.ordinal -> RepeatToggleMode.REPEAT_NONE
+                RepeatToggleMode.REPEAT_ONE.ordinal -> RepeatToggleMode.REPEAT_ONE
+                else -> RepeatToggleMode.REPEAT_ALL
+            }
+
+            setRepeatModeForVideo(
+                if (defaultRepeatMode == RepeatToggleMode.REPEAT_NONE) {
+                    RepeatToggleMode.REPEAT_NONE
+                } else {
+                    RepeatToggleMode.REPEAT_ONE
+                }
+            )
+            viewHolder.setupRepeatToggleButton(defaultRepeatMode) { repeatToggleButton ->
+                val repeatToggleMode =
+                    playerServiceViewModelGateway?.videoRepeatToggleMode()
+                        ?: RepeatToggleMode.REPEAT_NONE
+
+                if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
+                    setRepeatModeForVideo(RepeatToggleMode.REPEAT_ONE)
+                    repeatToggleButton.setImageResource(R.drawable.exo_controls_repeat_all)
+                } else {
+                    setRepeatModeForVideo(RepeatToggleMode.REPEAT_NONE)
+                    repeatToggleButton.setImageResource(R.drawable.exo_controls_repeat_off)
                 }
             }
         }
@@ -289,11 +320,7 @@ class MediaPlayerFragment : Fragment() {
     ) {
         mediaPlayerServiceGateway.setupPlayerView(
             playerView = playerView,
-            repeatToggleModes = if (isVideoPlayer) {
-                REPEAT_TOGGLE_MODE_NONE
-            } else {
-                REPEAT_TOGGLE_MODE_ONE or REPEAT_TOGGLE_MODE_ALL
-            },
+            isAudioPlayer = isAudioPlayer,
             controllerHideOnTouch = isVideoPlayer,
             showShuffleButton = !isVideoPlayer,
         )
@@ -333,13 +360,11 @@ class MediaPlayerFragment : Fragment() {
 
     private fun hideToolbar(animate: Boolean = true) {
         toolbarVisible = false
-
         (requireActivity() as MediaPlayerActivity).hideToolbar(animate)
     }
 
     private fun showToolbar() {
         toolbarVisible = true
-
         (requireActivity() as MediaPlayerActivity).showToolbar()
     }
 
