@@ -175,7 +175,7 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun incrementAttempts() {
         attempts++
-        dbH.setAttrAttemps(attempts)
+        dbH.setAttrAttempts(attempts)
     }
 
     /**
@@ -183,7 +183,7 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun resetAttempts() {
         attempts = 0
-        dbH.setAttrAttemps(attempts)
+        dbH.setAttrAttempts(attempts)
     }
 
     /**
