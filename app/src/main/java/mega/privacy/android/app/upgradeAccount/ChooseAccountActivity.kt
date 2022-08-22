@@ -42,8 +42,8 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         private const val BILLING_WARNING_SHOWN = "BILLING_WARNING_SHOWN"
     }
 
-    protected lateinit var binding: ActivityChooseUpgradeAccountBinding
-    protected val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
+    private lateinit var binding: ActivityChooseUpgradeAccountBinding
+    private val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
 
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -57,7 +57,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         }
     }
 
-    protected open fun manageUpdateReceiver(action: Int) {
+    private fun manageUpdateReceiver(action: Int) {
         if (isFinishing) {
             return
         }
@@ -304,7 +304,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
      *
      * @param upgradeType Selected payment plan.
      */
-    protected open fun onUpgradeClick(upgradeType: Int) {
+    private fun onUpgradeClick(upgradeType: Int) {
         val intent = Intent(this, ManagerActivity::class.java)
             .putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
             .putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
