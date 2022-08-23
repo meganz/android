@@ -20,6 +20,18 @@ interface ChatPreferencesGateway {
     suspend fun setChatImageQualityPreference(quality: ChatImageQuality)
 
     /**
+     * Get last contact permission requested time
+     */
+    fun getLastContactPermissionRequestedTime(): Flow<Long>
+
+    /**
+     * Set last contact permission requested time
+     *
+     * @param time
+     */
+    suspend fun setLastContactPermissionRequestedTime(time: Long)
+
+    /**
      * Clears chat preferences.
      */
     suspend fun clearPreferences()

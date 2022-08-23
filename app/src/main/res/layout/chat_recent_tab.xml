@@ -104,7 +104,7 @@
                             android:layout_alignParentEnd="true"
                             android:layout_marginEnd="122dp"
                             android:layout_marginBottom="16dp"
-                            android:text="@string/general_dismiss" />
+                            android:text="@string/chat_recent_chat_not_now_btn" />
 
                         <Button
                             android:id="@+id/allow_button"
