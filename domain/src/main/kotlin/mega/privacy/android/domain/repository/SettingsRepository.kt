@@ -223,4 +223,16 @@ interface SettingsRepository {
      * @return current preference and future updates as a flow
      */
     fun monitorBooleanPreference(key: String?, defaultValue: Boolean): Flow<Boolean>
+
+    /**
+     * Get last contact permission dismissed time
+     */
+    fun getLastContactPermissionDismissedTime(): Flow<Long>
+
+    /**
+     * Set last contact permission dismissed time
+     *
+     * @param time
+     */
+    suspend fun setLastContactPermissionDismissedTime(time: Long)
 }
