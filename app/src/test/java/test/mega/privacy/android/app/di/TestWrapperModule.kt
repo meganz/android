@@ -15,6 +15,7 @@ import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnlineWrapper
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import org.mockito.kotlin.mock
 
 @Module
@@ -34,6 +35,7 @@ object TestWrapperModule {
     val permissionUtilWrapper = mock<PermissionUtilWrapper>()
     val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
     val fetchNodeWrapper = mock<FetchNodeWrapper>()
+    val timeWrapper = mock<TimeWrapper>()
 
     @Provides
     fun provideIsOnlineWrapper(): IsOnlineWrapper = isOnlineWrapper
@@ -68,4 +70,7 @@ object TestWrapperModule {
 
     @Provides
     fun provideFetchNodeWrapper(): FetchNodeWrapper = fetchNodeWrapper
+
+    @Provides
+    fun provideTimeWrapper(): TimeWrapper = timeWrapper
 }

@@ -24,6 +24,7 @@ import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnlineWrapper
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import mega.privacy.android.app.utils.wrapper.TimeWrapper
 
 /**
  * Util wrapper module
@@ -100,5 +101,14 @@ class UtilWrapperModule {
             override fun getThumbnailFile(context: Context, handle: String) =
                 OfflineUtils.getThumbnailFile(context, handle, megaApiGateway)
         }
+    }
+
+    /**
+     * provide time manager
+     */
+    @Provides
+    fun provideTimeWrapper() = object : TimeWrapper {
+        override val now: Long
+            get() = System.currentTimeMillis()
     }
 }
