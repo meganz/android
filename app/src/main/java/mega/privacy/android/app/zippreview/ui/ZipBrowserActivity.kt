@@ -2,7 +2,6 @@ package mega.privacy.android.app.zippreview.ui
 
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -10,6 +9,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
@@ -55,7 +55,6 @@ import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
-import java.util.Locale
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import javax.inject.Inject
@@ -80,11 +79,20 @@ class ZipBrowserActivity : PasscodeActivity() {
 
     private val zipBrowserViewModel by viewModels<ZipBrowserViewModel>()
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (zipBrowserViewModel.backOnPress()) {
+                finish()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initData()
         initView()
         setupViewModel()
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         zipAdapter = ZipListAdapter { zipInfoUIO, position ->
             zipBrowserViewModel.onZipFileClicked(zipInfoUIO, position)
         }
@@ -159,16 +167,10 @@ class ZipBrowserActivity : PasscodeActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        if (zipBrowserViewModel.backOnPress()) {
-            super.onBackPressed()
-        }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Timber.d("OnOptionsItemSelected")
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
             return true
         }
         return true

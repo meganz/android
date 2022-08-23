@@ -260,7 +260,6 @@ class InMeetingViewModel @Inject constructor(
                                 if (waitingForOthers || !isReceivedChange) {
                                     _showOnlyMeBanner.value = true
                                 }
-
                             }
                         } else {
                             _showWaitingForOthersBanner.value = false
@@ -419,9 +418,7 @@ class InMeetingViewModel @Inject constructor(
         MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
         if (_showOnlyMeBanner.value) {
             _showOnlyMeBanner.value = false
-            if (isRequestSent()) {
-                _showWaitingForOthersBanner.value = true
-            }
+            _showWaitingForOthersBanner.value = true
         }
     }
 
@@ -1929,7 +1926,7 @@ class InMeetingViewModel @Inject constructor(
             .removeObserver(noOutgoingCallObserver)
 
         @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EventConstants.EVENT_SESSION_STATUS_CHANGE)
+        LiveEventBus.get(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
             .removeObserver(waitingForOthersBannerObserver as Observer<Any>)
     }
 

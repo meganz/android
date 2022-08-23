@@ -17,6 +17,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewPropertyAnimator
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -109,6 +110,12 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         binding.fileEditorScrollView.scrollY = scrollY
     }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            handleGoBack()
+        }
+    }
+
     private var originalContentTextSize: Float = 0f
     private var originalNameTextSize: Float = 0f
 
@@ -117,6 +124,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         getOriginalTextSize()
 
         setSupportActionBar(binding.fileEditorToolbar)
@@ -218,7 +226,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         super.onDestroy()
     }
 
-    override fun onBackPressed() {
+    private fun handleGoBack() {
         if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
         if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
             binding.contentEditText.hideKeyboard()
@@ -229,6 +237,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             } else if (viewModel.isReadingContent()) {
                 viewModel.finishBeforeClosing()
             }
+            onBackPressedCallback.isEnabled = false
 
             super.onBackPressed()
         }

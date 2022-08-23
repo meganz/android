@@ -7,6 +7,7 @@ import com.google.android.exoplayer2.ui.PlayerView
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
+import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 
 /**
@@ -18,13 +19,15 @@ interface MediaPlayerGateway {
      * Create player
      *
      * @param shuffleEnabled true is shuffle enable, otherwise is false
-     * @param repeatMode repeat mode
+     * @param shuffleOrder ShuffleOrder
+     * @param repeatToggleMode RepeatToggleMode
      * @param nameChangeCallback the callback when name is changed
      * @param mediaPlayerCallback MediaPlayerCallback
      */
     fun createPlayer(
-        shuffleEnabled: Boolean,
-        repeatMode: Int,
+        shuffleEnabled: Boolean? = null,
+        shuffleOrder: ShuffleOrder? = null,
+        repeatToggleMode: RepeatToggleMode,
         nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit,
         mediaPlayerCallback: MediaPlayerCallback,
     )
@@ -157,6 +160,13 @@ interface MediaPlayerGateway {
     fun clearPlayerForNotification()
 
     /**
+     * Set repeat mode
+     *
+     * @param repeatToggleMode RepeatToggleMode
+     */
+    fun setRepeatToggleMode(repeatToggleMode: RepeatToggleMode)
+
+    /**
      * Add the listener for player
      *
      * @param listener Player.Listener
@@ -169,7 +179,7 @@ interface MediaPlayerGateway {
      * @param playerView PlayerView
      * @param useController useController
      * @param controllerShowTimeoutMs controllerShowTimeoutMs
-     * @param repeatToggleModes repeatToggleModes
+     * @param isAudioPlayer true is audio player, otherwise is false
      * @param controllerHideOnTouch controllerHideOnTouch
      * @param showShuffleButton showShuffleButton
      */
@@ -178,7 +188,7 @@ interface MediaPlayerGateway {
         useController: Boolean = true,
         controllerShowTimeoutMs: Int = 0,
         controllerHideOnTouch: Boolean = false,
-        repeatToggleModes: Int? = null,
+        isAudioPlayer: Boolean = true,
         showShuffleButton: Boolean? = null,
     )
 }
