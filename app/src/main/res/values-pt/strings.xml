@@ -4099,4 +4099,16 @@
     <string name="chat_recent_list_empty_action">Comece já a usar o chat</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Converse com segurança e privacidade, com qualquer pessoa e em qualquer dispositivo, sabendo que ninguém pode ler os seus chats, nem mesmo o MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Arquivar reunião</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">Fazer uma reunião agora</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">Chamadas</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">Notificações sonoras</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">Ouvir um som quando alguém entra ou sai de uma chamada.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">Agora não</string>
 </resources>

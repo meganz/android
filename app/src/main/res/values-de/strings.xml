@@ -2163,9 +2163,9 @@
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">Link senden an&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
-    <string name="title_chat_explorer">Zielchat wählen</string>
+    <string name="title_chat_explorer">Senden an&#8230;</string>
     <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">Uploadziel wählen</string>
+    <string name="title_cloud_explorer">Upload an&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">Weitere</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -3994,4 +3994,16 @@
     <string name="chat_recent_list_empty_action">Jetzt chatten</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chatten Sie sicher und privat mit jedem und auf jedem Gerät, im Bewusstsein, dass niemand Ihre Chats lesen kann – nicht einmal MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Meeting archivieren</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">Meeting jetzt starten</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">Anrufe</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">Benachrichtigungstöne</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">Lassen Sie sich durch einen Ton benachrichtigen, wenn jemand einer Konferenz beitritt oder sie verlässt.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">Jetzt nicht</string>
 </resources>

@@ -1128,7 +1128,7 @@
     <!-- message shown when the status of the user coudn’t be changed -->
     <string name="changing_status_error">Error. No se ha podido actualizar el estado</string>
     <!-- message shown when a chat has not been created -->
-    <string name="create_chat_error">No se ha podido crear el chat</string>
+    <string name="create_chat_error">Se ha producido un error. No se ha podido crear el chat</string>
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibración</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
@@ -1399,7 +1399,7 @@
     <!-- Message when an error ocurred when deleting an user avatar -->
     <string name="error_deleting_user_avatar">No se ha podido eliminar la imagen del perfil</string>
     <!-- Message when an error ocurred when changing an user attribute -->
-    <string name="error_changing_user_attributes">No se ha podido cambiar el nombre</string>
+    <string name="error_changing_user_attributes">Se ha producido un error. No se ha podido cambiar el nombre</string>
     <!-- Message when an user attribute has been changed successfully -->
     <string name="success_changing_user_attributes">Tu nombre ha sido actualizado</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
@@ -1611,7 +1611,7 @@
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">Reconectando al chat</string>
     <!-- Message show when a call cannot be established -->
-    <string name="call_error">No se ha podido establecer la llamada.</string>
+    <string name="call_error">Se ha producido un error y no se ha podido establecer la llamada.</string>
     <!-- Title of dialog to evaluate the app -->
     <string name="title_evaluate_the_app_panel">¿Te gusta esta aplicación?</string>
     <!-- Label to show rate the app -->
@@ -1659,11 +1659,11 @@
     <!-- Text of dialog shown when multiple contacts request has been sent -->
     <string name="invite_sent_text_multi">Los usuarios han sido invitados y aparecerán en tu lista de contactos en cuanto acepten la invitación.</string>
     <!-- Text shown when it tries to share the QR and occurs an error to process the action -->
-    <string name="error_share_qr">No se ha podido compartir el archivo del QR. Es posible que el archivo no exista. Inténtalo de nuevo más tarde.</string>
+    <string name="error_share_qr">Se ha producido un error. No se ha podido compartir el archivo del QR. Es posible que el archivo no exista. Inténtalo de nuevo más tarde.</string>
     <!-- Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action -->
-    <string name="error_upload_qr">No se ha podido subir el archivo del QR. Es posible que el archivo no exista. Inténtalo de nuevo más tarde.</string>
+    <string name="error_upload_qr">Se ha producido un error. No se ha podido subir el archivo del QR. Es posible que el archivo no exista. Inténtalo de nuevo más tarde.</string>
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
-    <string name="error_download_qr">archivo no exista. Inténtalo de nuevo más tarde.</string>
+    <string name="error_download_qr">Se ha producido un error. No se ha podido descargar el archivo del QR. Es posible que el archivo no exista. Inténtalo de nuevo más tarde.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">El código QR se ha descargado en el %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
@@ -1673,7 +1673,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">La invitación no ha sido enviada. %s ya está en tu lista de contactos.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">No se ha podido enviar la invitación.</string>
+    <string name="invite_not_sent_text_error">Se ha producido un error y no se ha podido enviar la invitación.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Generando código QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -1996,7 +1996,7 @@
     <!-- Text button -->
     <string name="general_next">Siguiente</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
-    <string name="qr_seed_text_error">No se ha podido generar la clave o el código QR, inténtalo de nuevo.</string>
+    <string name="qr_seed_text_error">Se ha producido un error. No se ha podido generar la clave o el código QR, inténtalo de nuevo.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Autenticación de dos factores activada</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
@@ -2018,9 +2018,9 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">Desactivar</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_disable_2fa">No se ha podido desactivar la Autenticación de dos factores. Inténtalo de nuevo.</string>
+    <string name="error_disable_2fa">Se ha producido un error. No se ha podido desactivar la Autenticación de dos factores. Inténtalo de nuevo.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_enable_2fa">No se ha podido activar la Autenticación de dos factores. Inténtalo de nuevo.</string>
+    <string name="error_enable_2fa">Se ha producido un error. No se ha podido activar la Autenticación de dos factores. Inténtalo de nuevo.</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
     <string name="title_enable_2fa">Activar la autenticación de dos factores</string>
     <!-- Label shown when it disables the Two-Factor Authentication -->
@@ -2080,13 +2080,13 @@
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_invalid_signature">La firma del mensaje no es válida</string>
     <!-- When the user tries to reproduce a file through streaming and ocurred an error creating it -->
-    <string name="error_streaming">No se ha podido crear el streaming</string>
+    <string name="error_streaming">Se ha producido un error. No se ha podido crear el streaming</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
     <string name="context_restore">Restaurar</string>
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Restaurado a %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">El elemento no se ha podido restaurar.</string>
+    <string name="context_no_restored">Se ha producido un error. El elemento no se ha podido restaurar.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Enviar mensaje</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2150,7 +2150,7 @@
     <!-- success message when deleting all the versions of the account -->
     <string name="success_delete_versions">Las versiones de los archivos han sido eliminadas</string>
     <!-- error message when deleting all the versions of the account -->
-    <string name="error_delete_versions">No se han podido eliminar las versiones anteriores de tus archivos, inténtalo más tarde.</string>
+    <string name="error_delete_versions">Se ha producido un error. No se han podido eliminar las versiones anteriores de tus archivos, inténtalo más tarde.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_title">Control de versiones</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
@@ -2574,7 +2574,7 @@
     <!-- Message show when a user cannot put the call on hold -->
     <string name="call_error_call_on_hold">No se puede poner la llamada en espera.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">No se ha podido abrir el archivo con esta aplicación.</string>
+    <string name="error_open_file_with">Se ha producido un error y no se ha podido abrir el archivo con esta aplicación.</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
     <string name="outgoing_call_starting">Llamando&#8230;</string>
     <!-- Content of a invalid meta message -->
@@ -4099,4 +4099,16 @@
     <string name="chat_recent_list_empty_action">Empieza a chatear</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chatea de forma segura y privada, con cualquier persona y en cualquier dispositivo, sabiendo que nadie puede leer tus chats, ni siquiera MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Archivar reunión</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">Empieza la reunión</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">Llamadas</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">Sonido de las notificaciones</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">Cuando alguien se une o abandona una llamada se emitirá un sonido.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">Ahora no</string>
 </resources>

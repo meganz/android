@@ -3889,4 +3889,16 @@
     <string name="chat_recent_list_empty_action">Bắt đầu trò chuyện ngay</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chát an toàn và riêng tư, với bất kỳ ai và bất kỳ thiết bị, và an tâm sẽ không có ai có thể đọc tin nhắn của bạn, ngay cả MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Archive meeting</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">Start meeting now</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">Gọi Điện</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">Âm thanh thông báo</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">Nghe âm báo khi có người tham gia hoặc rời khỏi cuộc gọi.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">Không phải lúc này</string>
 </resources>

@@ -860,7 +860,7 @@
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK_title">無效的還原金鑰</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
-    <string name="recovering_info">取得資訊中&#8230;</string>
+    <string name="recovering_info">取得資訊中⋯</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
     <string name="email_verification_text_change_mail">您的新電子郵件地址需要驗證確認。請至您的電子信箱收信並進行驗證。</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
@@ -880,7 +880,7 @@
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="hint_confirm_password_protection_dialog">確認密碼</string>
     <!-- Status text at the beginning of getting a link -->
-    <string name="link_request_status">處理中&#8230;</string>
+    <string name="link_request_status">處理中⋯</string>
     <!-- Option of the sliding panel to edit the link of a node -->
     <string name="edit_link_option">管理連結</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
@@ -940,7 +940,7 @@
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">無法更新%d個聯絡人權限</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
-    <string name="contacts_list_empty_text_loading">從手機載入聯絡人資料中&#8230;</string>
+    <string name="contacts_list_empty_text_loading">從手機載入聯絡人資料中⋯</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d個請求已發送過。</string>
     <!-- success message when inviting multiple contacts -->
@@ -1141,10 +1141,10 @@
     <string name="no_conversation_history">沒有對話記錄</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="other">%1$s [A]正在打字&#8230;[/A]</item>
+        <item quantity="other">%1$s [A]正在打字⋯[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
-    <string name="more_users_typing">%1$s [A]和其他人正在打字&#8230;[/A]</string>
+    <string name="more_users_typing">%1$s [A]和其他人正在打字⋯[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">更多</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
@@ -1279,7 +1279,7 @@
     <!-- Menu option -->
     <string name="import_success_error">發生錯誤，無法新增至雲端硬碟</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
-    <string name="chat_connecting">正在連線中&#8230;</string>
+    <string name="chat_connecting">正在連線中⋯</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s已經被邀請了。請與他聯絡以確認成為聯絡人。</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
@@ -1371,9 +1371,9 @@
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">傳輸已暫停</string>
     <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state_uploading">正在上傳&#8230;</string>
+    <string name="attachment_uploading_state_uploading">正在上傳⋯</string>
     <!--  -->
-    <string name="attachment_uploading_state_compressing">正在壓縮&#8230;</string>
+    <string name="attachment_uploading_state_compressing">正在壓縮⋯</string>
     <!--  -->
     <string name="attachment_uploading_state_error">發生錯誤，未送出。</string>
     <!--  -->
@@ -1601,7 +1601,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">發生錯誤，尚未發送邀請。</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">正在生成二維條碼&#8230;</string>
+    <string name="generatin_qr">正在生成二維條碼⋯</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">掃描二維條碼</string>
     <!-- get the contact link and copy it -->
@@ -1631,7 +1631,7 @@
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]沒有[/A] [B]對話[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[A]載入[/A] [B]對話中&#8230;[/B]</string>
+    <string name="recent_chat_loading_conversations">[A]載入[/A] [B]對話中⋯[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]沒有人[/B][A]共享資料夾給你[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -1651,7 +1651,7 @@
     <!-- Error message shown when user tries to open a not valid MEGA link -->
     <string name="open_link_not_valid_link">您嘗試打開的連結不是有效的MEGA連結。</string>
     <!-- Message shown when a link is being processing -->
-    <string name="processing_link">連結處理中&#8230;</string>
+    <string name="processing_link">連結處理中⋯</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
     <string name="passwd_weak">您的密碼太容易被猜到了。請使用更長的密碼。結合大小寫字母，或加入特殊字元。請避免使用名字或字典中的單字。</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
@@ -1824,7 +1824,7 @@
         <item quantity="other">%1$d則未讀對話訊息</item>
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
-    <string name="chat_loading_messages">[A]正在載入[/A][B]訊息&#8230;[/B]</string>
+    <string name="chat_loading_messages">[A]正在載入[/A][B]訊息⋯[/B]</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">安全性</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -1840,7 +1840,7 @@
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit -->
     <string name="login_API_rate">太多程序進行中。請稍候。</string>
     <!-- Message when previous login is being cancelled -->
-    <string name="login_in_progress">取消登入中。請稍候&#8230;</string>
+    <string name="login_in_progress">取消登入中。請稍候⋯</string>
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">錯誤。檔案已損毀或不存在。</string>
     <!-- Menu option to print the recovery key from Offline section -->
@@ -1878,9 +1878,9 @@
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[B]空[/B][A]資料夾[/A]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
-    <string name="type_message_hint_with_customized_title">寫訊息給“%s”&#8230;</string>
+    <string name="type_message_hint_with_customized_title">寫訊息給“%s”⋯</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
-    <string name="type_message_hint_with_default_title">寫訊息給“%s”&#8230;</string>
+    <string name="type_message_hint_with_default_title">寫訊息給“%s”⋯</string>
     <!-- Title of setting Two-Factor Authentication -->
     <string name="settings_2fa">雙重驗證</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
@@ -2026,7 +2026,7 @@
     <!-- Label shown when the user wants to share something with other contacts -->
     <string name="share_with">與&#8230;共享</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
-    <string name="contacts_list_empty_text_loading_share">載入聯絡人&#8230;</string>
+    <string name="contacts_list_empty_text_loading_share">載入聯絡人⋯</string>
     <!-- Title of the screen New Group -->
     <string name="title_new_group">新群組</string>
     <!-- Subtitle of the screen New Group -->
@@ -2112,11 +2112,11 @@
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="video_button">影片</string>
     <!-- Title of file explorer to send a link -->
-    <string name="title_file_explorer_send_link">發送連結到&#8230;</string>
+    <string name="title_file_explorer_send_link">發送連結到⋯</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
-    <string name="title_chat_explorer">寄到&#8230;</string>
+    <string name="title_chat_explorer">寄到⋯</string>
     <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">上傳到&#8230;</string>
+    <string name="title_cloud_explorer">上傳到⋯</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">更多</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2212,7 +2212,7 @@
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">給聯絡人%s的邀請之前已發送過，可在已發送請求的頁面中查看。</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
-    <string name="save_qr_cloud_drive">正在將%s儲存到雲端硬碟&#8230;</string>
+    <string name="save_qr_cloud_drive">正在將%s儲存到雲端硬碟⋯</string>
     <!-- General label for files -->
     <string name="general_files">檔案</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2320,7 +2320,7 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">檔案名稱</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">顯示最後上線時間&#8230;</string>
+    <string name="option_enable_last_green_chat">顯示最後上線時間⋯</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
     <string name="subtitle_option_enable_last_green_chat">允許您的聯絡人查看您上次在MEGA上線是什麼時候。</string>
     <!-- title of notification when device is out of storage during camera upload -->
@@ -2454,7 +2454,7 @@
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">發生錯誤，無法使用此應用程式開啟檔案。</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
-    <string name="outgoing_call_starting">撥號中&#8230;</string>
+    <string name="outgoing_call_starting">撥號中⋯</string>
     <!-- Content of a invalid meta message -->
     <string name="error_meta_message_invalid">訊息包含無效元數據</string>
     <!-- Title of the activity that sends a location -->
@@ -2508,7 +2508,7 @@
     <!-- In APP, text used to ask for access to contacts -->
     <string name="grant_mega_access_contacts">授予MEGA存取您通訊錄的權限，以尋找有在使用MEGA的聯絡人。</string>
     <!-- Getting registered contacts -->
-    <string name="get_registered_contacts">正在載入MEGA的聯絡人&#8230;</string>
+    <string name="get_registered_contacts">正在載入MEGA的聯絡人⋯</string>
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">此內容未被傳送至%d個對話中</string>
     <!-- Label shown when a new group chat has been created correctly -->
@@ -2582,7 +2582,7 @@
     <!-- Label that indicates the steps of a wizard -->
     <string name="wizard_steps_indicator">%2$d之%1$d</string>
     <!-- Hint of the Search view -->
-    <string name="hint_action_search">搜尋&#8230;</string>
+    <string name="hint_action_search">搜尋⋯</string>
     <!-- Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason. -->
     <string name="answer_call_incoming">答覆</string>
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
@@ -2636,7 +2636,7 @@
     <!-- Title of popup when user click ‘Share’ button on invite contact page -->
     <string name="invite_contact_chooser_title">邀請朋友</string>
     <!-- Action button label -->
-    <string name="invite_contact_action_button">透過&#8230;邀請朋友</string>
+    <string name="invite_contact_action_button">透過⋯邀請朋友</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
         <item quantity="other">%d個檔案已下載。</item>
@@ -2690,7 +2690,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_title">讀取中</string>
     <!-- The message of progress dialog when loading web content -->
-    <string name="embed_web_browser_loading_message">請等待&#8230;</string>
+    <string name="embed_web_browser_loading_message">請等待⋯</string>
     <!-- Label in My Account section to show user account type -->
     <string name="business_label">商業</string>
     <!-- Business user role -->
@@ -2776,7 +2776,7 @@
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
     <string name="reconnecting_message">正在重新連線</string>
     <!-- Text is displayed while a voice clip is being recorded -->
-    <string name="recording_layout">錄音中&#8230;</string>
+    <string name="recording_layout">錄音中⋯</string>
     <!-- Text shown for the action create new file -->
     <string name="create_new_file_action">建立新檔案</string>
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
@@ -2800,7 +2800,7 @@
     <!-- Title of a screen to browse files -->
     <string name="browse_files_label">瀏覽檔案</string>
     <!-- Title of the File Provider activity -->
-    <string name="file_provider_title">附加自&#8230;</string>
+    <string name="file_provider_title">附加自⋯</string>
     <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
     <string name="inactive_chat_title_2">對話已建立%s</string>
     <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
@@ -2864,9 +2864,9 @@
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
     <string name="already_verifying_credentials">更新憑證中。請稍後再試。</string>
     <!-- Info message displayed when the user is joining a chat conversation -->
-    <string name="joining_label">正在加入&#8230;</string>
+    <string name="joining_label">正在加入⋯</string>
     <!-- Info message displayed when the user is leaving a chat conversation -->
-    <string name="leaving_label">離開中&#8230;</string>
+    <string name="leaving_label">離開中⋯</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">您的手機號碼已成功移除。</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -3666,7 +3666,7 @@
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
     <string name="warning_scanning_transfers">請不要關閉應用程式。</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
-    <string name="scanning_transfers">正在掃描&#8230;</string>
+    <string name="scanning_transfers">正在掃描⋯</string>
     <!-- Label cancel transfers. -->
     <string name="cancel_transfers">取消傳輸</string>
     <!-- Warning informing what will happen if proceed on cancelling transfers. -->
@@ -3889,4 +3889,16 @@
     <string name="chat_recent_list_empty_action">開始對話</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">在任何裝置上與任何人安全而私密的進行對話，沒有人可以讀取您們的對話記錄，即使是MEGA也不行。</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">封存會議</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">立即開始會議</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">通話</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">聲音通知</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">當有人加入或離開通話時播放提示音</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">稍後再說</string>
 </resources>

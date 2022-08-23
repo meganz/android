@@ -238,7 +238,7 @@
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Moje konto</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
-    <string name="section_photo_sync">Wgrywanie zdjęć</string>
+    <string name="section_photo_sync">Przesyłanie zdjęć z kamery</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
     <string name="tab_incoming_shares">Nadchodzące</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
@@ -574,7 +574,7 @@
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Sprawdzanie plików do przesłania</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Inicjalizowanie obrazu z kamery</string>
+    <string name="settings_camera_notif_initializing_title">Inicjalizowanie przesyłania zdjęć z kamery</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Przesyłanie z kamery zostało wyłączone. Twój folder lokalny jest niedostępny.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -664,7 +664,7 @@
         <item>Importuj z urządzenia</item>
     </string-array>
     <!-- settings option -->
-    <string name="settings_camera_upload_on">Włącz wgrwyanie plików z kamery</string>
+    <string name="settings_camera_upload_on">Włącz przesyłanie zdjęć z kamery</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Jak wgrywać zdjęcia</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -4204,4 +4204,16 @@
     <string name="chat_recent_list_empty_action">Zacznij czatować teraz</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Rozmawiaj bezpiecznie i prywatnie z każdym i na każdym urządzeniu, wiedząc, że nikt nie może czytać twoich czatów, nawet MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Archive meeting</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">Start meeting now</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">Połączenia</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">Powiadomienia dźwiękowe</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">Generuj dźwięk, gdy ktoś dołącza do połączenia lub je opuszcza.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">Nie teraz</string>
 </resources>

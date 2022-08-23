@@ -3994,4 +3994,16 @@
     <string name="chat_recent_list_empty_action">Begin nu met chatten</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chat veilig en privé, met iedereen en op elk apparaat, wetende dat niemand uw chats kan lezen, zelfs MEGA niet.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Vergadering archiveren</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">Vergadering nu beginnen</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">Oproepen</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">Geluid notificaties</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">Hoor een geluid wanneer iemand aansluit of de oproep verlaat.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">Niet nu</string>
 </resources>

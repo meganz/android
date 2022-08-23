@@ -3227,7 +3227,7 @@
     <!-- settings title of the Media section -->
     <string name="settings_media_audio_files">Audio files</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="settings_background_play_hint">Playing on the background</string>
+    <string name="settings_background_play_hint">Playing in the background</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
     <string name="photos_empty">[B]No[/B] [A]photos[/A] [B]found[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
