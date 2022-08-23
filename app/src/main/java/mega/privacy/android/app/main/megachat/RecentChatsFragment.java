@@ -1349,6 +1349,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             refreshMegaContactsList();
         }
         setStatus();
+        checkScroll();
         super.onResume();
     }
 
