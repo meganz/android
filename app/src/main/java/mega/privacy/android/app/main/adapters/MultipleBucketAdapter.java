@@ -32,6 +32,9 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.AbstractDraweeController;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.request.ImageRequest;
@@ -236,27 +239,35 @@ public class MultipleBucketAdapter
             holder.thumbnailMedia.getLayoutParams().width = size;
             holder.thumbnailMedia.getLayoutParams().height = size;
 
+            if (thumbnail != null) {
+                ImageRequest request =
+                        ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(node.getThumbnail())).build();
+                AbstractDraweeController controller = Fresco.newDraweeControllerBuilder()
+                        .setImageRequest(request)
+                        .setOldController(holder.thumbnailMedia.getController())
+                        .build();
+                holder.thumbnailMedia.setController(controller);
+            } else {
+                holder.thumbnailMedia.setActualImageResource(R.drawable.ic_image_thumbnail);
+            }
+
             if (node.getSelected()) {
+                holder.selectedIcon.setVisibility(View.VISIBLE);
                 holder.thumbnailMedia.getHierarchy().setRoundingParams(
-                        RoundingParams.fromCornersRadius((float) R.dimen.cu_fragment_selected_round_corner_radius)
+                    RoundingParams.fromCornersRadius((float) context.getResources().getDimensionPixelSize(
+                        R.dimen.cu_fragment_selected_round_corner_radius
+                    ))
                 );
                 holder.thumbnailMedia.setBackground(ContextCompat.getDrawable(
                         holder.thumbnailMedia.getContext(),
                         R.drawable.background_item_grid_selected
                 ));
-                holder.selectedIcon.setVisibility(View.VISIBLE);
             } else {
                 holder.selectedIcon.setVisibility(View.GONE);
                 holder.thumbnailMedia.getHierarchy().setRoundingParams(
-                        RoundingParams.fromCornersRadius((float) 0)
+                        RoundingParams.fromCornersRadius(0f)
                 );
                 holder.thumbnailMedia.setBackground(null);
-            }
-
-            if (thumbnail != null) {
-                holder.setImageThumbnail(thumbnail);
-            } else {
-                holder.thumbnailMedia.setImageResource(MimeTypeList.typeForName(megaNode.getName()).getIconResourceId());
             }
         } else {
             holder.mediaView.setVisibility(View.GONE);

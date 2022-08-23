@@ -116,6 +116,7 @@
             android:paddingLeft="1dp"
             android:paddingTop="1dp"
             android:paddingRight="1dp"
+            android:paddingBottom="1dp"
             app:actualImageScaleType="centerCrop"/>
 
         <ImageView
