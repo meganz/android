@@ -4,6 +4,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.Metadata
 
 /**
@@ -77,12 +78,19 @@ interface MediaPlayerServiceGateway {
     fun getCurrentMediaItem(): MediaItem?
 
     /**
+     * Set repeat mode for video
+     *
+     * @param repeatToggleMode RepeatToggleMode
+     */
+    fun setRepeatModeForVideo(repeatToggleMode: RepeatToggleMode)
+
+    /**
      * Setup player view
      *
      * @param playerView PlayerView
      * @param useController useController
      * @param controllerShowTimeoutMs controllerShowTimeoutMs
-     * @param repeatToggleModes repeatToggleModes
+     * @param isAudioPlayer true is audio player, otherwise is false
      * @param controllerHideOnTouch controllerHideOnTouch
      * @param showShuffleButton showShuffleButton
      */
@@ -91,7 +99,7 @@ interface MediaPlayerServiceGateway {
         useController: Boolean = true,
         controllerShowTimeoutMs: Int = 0,
         controllerHideOnTouch: Boolean = false,
-        repeatToggleModes: Int? = null,
+        isAudioPlayer: Boolean = true,
         showShuffleButton: Boolean? = null,
     )
 }

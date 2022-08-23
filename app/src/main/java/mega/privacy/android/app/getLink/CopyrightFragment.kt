@@ -42,7 +42,7 @@ class CopyrightFragment : Fragment(), Scrollable {
 
         binding.agreeButton.setOnClickListener {
             viewModel.updateShowCopyRight(false)
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.disagreeButton.setOnClickListener {

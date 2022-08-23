@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.ShuffleOrder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -24,9 +23,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND_PLAY_ENABLED
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_REPEAT_MODE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_SHUFFLE_ENABLED
+import mega.privacy.android.app.constants.SettingsConstants.KEY_VIDEO_REPEAT_MODE
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
+import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
@@ -117,7 +118,13 @@ class MediaPlayerServiceViewModel(
     private var backgroundPlayEnabled =
         preferences.getBoolean(KEY_AUDIO_BACKGROUND_PLAY_ENABLED, true)
     private var shuffleEnabled = preferences.getBoolean(KEY_AUDIO_SHUFFLE_ENABLED, false)
-    private var repeatMode = preferences.getInt(KEY_AUDIO_REPEAT_MODE, Player.REPEAT_MODE_OFF)
+    private var videoRepeatToggleMode =
+        convertToRepeatToggleMode(preferences.getInt(KEY_VIDEO_REPEAT_MODE,
+            RepeatToggleMode.REPEAT_NONE.ordinal))
+    private var audioRepeatToggleMode =
+        convertToRepeatToggleMode(preferences.getInt(KEY_AUDIO_REPEAT_MODE,
+            RepeatToggleMode.REPEAT_NONE.ordinal))
+
 
     private val createThumbnailFinished = PublishSubject.create<Boolean>()
     private val createThumbnailRequest = MegaRequestFinishListener({
@@ -1123,6 +1130,9 @@ class MediaPlayerServiceViewModel(
     override fun getPlaylistItems() = playlist.value?.first
 
     override fun isAudioPlayer() = isAudioPlayer
+    override fun setAudioPlayer(isAudioPlayer: Boolean) {
+        this.isAudioPlayer = isAudioPlayer
+    }
 
     override fun backgroundPlayEnabled() = backgroundPlayEnabled
 
@@ -1155,14 +1165,26 @@ class MediaPlayerServiceViewModel(
         return shuffleOrder
     }
 
-    override fun repeatMode() = repeatMode
+    override fun audioRepeatToggleMode() = audioRepeatToggleMode
 
-    override fun setRepeatMode(repeatMode: Int) {
-        this.repeatMode = repeatMode
-        preferences.edit()
-            .putInt(KEY_AUDIO_REPEAT_MODE, repeatMode)
-            .apply()
+    override fun videoRepeatToggleMode() = videoRepeatToggleMode
+
+    override fun setAudioRepeatMode(repeatToggleMode: RepeatToggleMode) {
+        audioRepeatToggleMode = repeatToggleMode
+        preferences.edit().putInt(KEY_AUDIO_REPEAT_MODE, repeatToggleMode.ordinal).apply()
     }
+
+    override fun setVideoRepeatMode(repeatToggleMode: RepeatToggleMode) {
+        videoRepeatToggleMode = repeatToggleMode
+        preferences.edit().putInt(KEY_VIDEO_REPEAT_MODE, repeatToggleMode.ordinal).apply()
+    }
+
+    private fun convertToRepeatToggleMode(ordinal: Int): RepeatToggleMode =
+        when (ordinal) {
+            RepeatToggleMode.REPEAT_NONE.ordinal -> RepeatToggleMode.REPEAT_NONE
+            RepeatToggleMode.REPEAT_ONE.ordinal -> RepeatToggleMode.REPEAT_ONE
+            else -> RepeatToggleMode.REPEAT_ALL
+        }
 
     override fun clear() {
         compositeDisposable.dispose()

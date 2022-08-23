@@ -253,4 +253,12 @@ class DefaultSettingsRepository @Inject constructor(
     } else {
         monitorFunction(key, defaultValue)
     }
+
+    override fun getLastContactPermissionDismissedTime(): Flow<Long> {
+        return chatPreferencesGateway.getLastContactPermissionRequestedTime()
+    }
+
+    override suspend fun setLastContactPermissionDismissedTime(time: Long) {
+        chatPreferencesGateway.setLastContactPermissionRequestedTime(time)
+    }
 }

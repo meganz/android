@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.google.android.exoplayer2.util.RepeatModeUtil
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.R
@@ -283,7 +282,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
     private fun setupPlayerView() {
         serviceGateway?.setupPlayerView(
             playerView = binding.playerView,
-            repeatToggleModes = RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL,
+            isAudioPlayer = isAudioPlayer,
             showShuffleButton = true
         )
     }
@@ -308,7 +307,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                 (requireActivity() as MediaPlayerActivity).closeSearch()
 
                 if (isVideoPlayer()) {
-                    (requireActivity() as MediaPlayerActivity).onBackPressed()
+                    (requireActivity() as MediaPlayerActivity).onBackPressedDispatcher.onBackPressed()
                 }
             }
         }

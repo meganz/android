@@ -1,5 +1,7 @@
 package mega.privacy.android.app.mediaplayer.service
 
+import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
+
 /**
  * For callback from Player.Listener
  */
@@ -29,9 +31,9 @@ interface MediaPlayerCallback {
     /**
      * Callback from onRepeatModeChanged
      *
-     * @param repeatMode repeat mode
+     * @param repeatToggleMode RepeatToggleMode
      */
-    fun onRepeatModeChangedCallback(repeatMode: Int)
+    fun onRepeatModeChangedCallback(repeatToggleMode: RepeatToggleMode)
 
     /**
      * Callback from onPlayWhenReadyChanged
