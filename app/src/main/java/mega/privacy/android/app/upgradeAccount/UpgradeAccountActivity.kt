@@ -30,7 +30,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
 import timber.log.Timber
-import java.util.Locale
 
 class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
 
@@ -88,13 +87,9 @@ class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         destroyPayments()
     }
 
-    override fun onBackPressed() {
-        finish()
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            finish()
         }
 
         return super.onOptionsItemSelected(item)
