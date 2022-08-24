@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -20,6 +21,8 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.drawee.generic.RoundingParams
+import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BucketSaved
 import mega.privacy.android.app.MimeTypeList
@@ -538,6 +541,17 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
                         thumbnail.layoutParams = param
                         thumbnail
                     } else {
+                        val thumbnail =
+                            itemView.findViewById<SimpleDraweeView>(R.id.thumbnail_media)
+
+                        thumbnail.hierarchy.roundingParams = RoundingParams.fromCornersRadius(
+                            context!!.resources.getDimensionPixelSize(
+                                R.dimen.cu_fragment_selected_round_corner_radius
+                            ).toFloat())
+                        thumbnail.background =
+                            ContextCompat.getDrawable(
+                                requireContext(), R.drawable.background_item_grid_selected
+                            )
                         itemView.findViewById(R.id.icon_selected)
                     }
 
