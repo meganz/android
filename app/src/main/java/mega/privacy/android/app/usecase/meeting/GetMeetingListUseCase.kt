@@ -17,7 +17,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result
@@ -53,8 +52,6 @@ class GetMeetingListUseCase @Inject constructor(
     private val getChatChangesUseCase: GetChatChangesUseCase,
     private val getLastMessageUseCase: GetLastMessageUseCase,
 ) {
-
-    private val chatController: ChatController by lazy { ChatController(context) }
 
     /**
      * Get a list of updated MeetingItems
@@ -119,7 +116,7 @@ class GetMeetingListUseCase @Inject constructor(
                                 }
                             }
 
-                            emitter.onNext(meetings.sortedByDescending { it.timeStamp })
+                            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
                         }
                     } else {
                         Timber.w(error.toMegaException())
@@ -136,7 +133,7 @@ class GetMeetingListUseCase @Inject constructor(
                 if (index != Constants.INVALID_POSITION) {
                     val oldItem = meetings[index]
                     meetings[index] = oldItem.copy(isMuted = !oldItem.isMuted)
-                    emitter.onNext(meetings.sortedByDescending { it.timeStamp })
+                    emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
                 }
             }
 
@@ -146,7 +143,7 @@ class GetMeetingListUseCase @Inject constructor(
                     meetings.add(chatRoom.toMeetingItem(userAttrsListener))
                 }
 
-            emitter.onNext(meetings.sortedByDescending { it.timeStamp })
+            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
 
             getChatChangesUseCase.get()
                 .filter { it is Result.OnChatListItemUpdate && it.item != null }
@@ -165,10 +162,10 @@ class GetMeetingListUseCase @Inject constructor(
                             } else {
                                 meetings[index] = updatedChatRoom.toMeetingItem(userAttrsListener)
                             }
-                            emitter.onNext(meetings.sortedByDescending { it.timeStamp })
+                            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
                         } else if (updatedChatRoom.isMeeting && updatedChatRoom.isActive && !updatedChatRoom.isArchived) {
                             meetings.add(updatedChatRoom.toMeetingItem(userAttrsListener))
-                            emitter.onNext(meetings.sortedByDescending { it.timeStamp })
+                            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
                         }
                     },
                     onError = Timber::e
@@ -215,7 +212,7 @@ class GetMeetingListUseCase @Inject constructor(
         }
 
         getLastMessageUseCase.get(chatId, chatListItem.lastMessageId).blockingSubscribeBy(
-            onSuccess = { message -> lastMessageFormatted = message },
+            onSuccess = { lastMessageFormatted = it },
             onError = Timber::w
         )
 

@@ -11,38 +11,30 @@ import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.converterShortCodes
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
-import mega.privacy.android.app.utils.MeetingUtil.getAppropriateStringForCallCancelled
-import mega.privacy.android.app.utils.MeetingUtil.getAppropriateStringForCallEnded
-import mega.privacy.android.app.utils.MeetingUtil.getAppropriateStringForCallFailed
-import mega.privacy.android.app.utils.MeetingUtil.getAppropriateStringForCallNoAnswered
-import mega.privacy.android.app.utils.MeetingUtil.getAppropriateStringForCallRejected
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApi.CHAT_CONNECTION_ONLINE
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_JOINING
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT
-import nz.mega.sdk.MegaChatCall.END_CALL_REASON_BY_MODERATOR
-import nz.mega.sdk.MegaChatCall.END_CALL_REASON_CANCELLED
-import nz.mega.sdk.MegaChatCall.END_CALL_REASON_ENDED
-import nz.mega.sdk.MegaChatCall.END_CALL_REASON_NO_ANSWER
-import nz.mega.sdk.MegaChatCall.END_CALL_REASON_REJECTED
 import nz.mega.sdk.MegaChatListItem
+import nz.mega.sdk.MegaChatMessage.TYPE_ALTER_PARTICIPANTS
 import nz.mega.sdk.MegaChatMessage.TYPE_CALL_ENDED
+import nz.mega.sdk.MegaChatMessage.TYPE_CALL_STARTED
 import nz.mega.sdk.MegaChatMessage.TYPE_CHAT_TITLE
 import nz.mega.sdk.MegaChatMessage.TYPE_CONTACT_ATTACHMENT
+import nz.mega.sdk.MegaChatMessage.TYPE_CONTAINS_META
 import nz.mega.sdk.MegaChatMessage.TYPE_INVALID
+import nz.mega.sdk.MegaChatMessage.TYPE_NORMAL
 import nz.mega.sdk.MegaChatMessage.TYPE_PRIV_CHANGE
 import nz.mega.sdk.MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE
 import nz.mega.sdk.MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE
@@ -52,9 +44,14 @@ import nz.mega.sdk.MegaChatMessage.TYPE_TRUNCATE
 import nz.mega.sdk.MegaChatMessage.TYPE_VOICE_CLIP
 import javax.inject.Inject
 
+/**
+ * Get last message use case to retrieve formatted last message from specific chat
+ *
+ * @property context        Needed to get strings
+ * @property megaChatApi    Needed to retrieve chat messages
+ */
 class GetLastMessageUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
-    @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
 ) {
 
@@ -65,28 +62,34 @@ class GetLastMessageUseCase @Inject constructor(
     private val chatController: ChatController by lazy { ChatController(context) }
     private val chatManagement: ChatManagement by lazy { MegaApplication.getChatManagement() }
 
+    /**
+     * Get a formatted String with the last message
+     *
+     * @param chatId    Chat Id to retrieve chat message
+     * @param msgId     Message Id to retrieve chat message
+     * @return          Single
+     */
     fun get(chatId: Long, msgId: Long): Single<SpannableString> =
         Single.fromCallable {
             val chatMessage = megaChatApi.getMessage(chatId, msgId)
                 ?: return@fromCallable getString(R.string.no_conversation_history).toSpannableString()
 
-            val chatCall = megaChatApi.getChatCall(chatId)
-            if (chatCall != null) {
+            megaChatApi.getChatCall(chatId)?.let { chatCall ->
                 if (megaChatApi.getChatConnectionState(chatId) == CHAT_CONNECTION_ONLINE) {
                     when (chatCall.status) {
                         CALL_STATUS_TERMINATING_USER_PARTICIPATION, CALL_STATUS_USER_NO_PRESENT -> {
-                            if (chatCall.isRinging) {
-                                return@fromCallable getString(R.string.notification_subtitle_incoming).toSpannableString()
+                            return@fromCallable if (chatCall.isRinging) {
+                                getString(R.string.notification_subtitle_incoming).toSpannableString()
                             } else {
-                                return@fromCallable getString(R.string.ongoing_call_messages).toSpannableString()
+                                getString(R.string.ongoing_call_messages).toSpannableString()
                             }
                         }
                         CALL_STATUS_JOINING, CALL_STATUS_IN_PROGRESS -> {
                             val requestSent = chatManagement.isRequestSent(chatCall.callId)
-                            if (requestSent) {
-                                return@fromCallable getString(R.string.outgoing_call_starting).toSpannableString()
+                            return@fromCallable if (requestSent) {
+                                getString(R.string.outgoing_call_starting).toSpannableString()
                             } else {
-                                return@fromCallable getString(R.string.call_started_messages).toSpannableString()
+                                getString(R.string.call_started_messages).toSpannableString()
                             }
                         }
                     }
@@ -97,19 +100,14 @@ class GetLastMessageUseCase @Inject constructor(
             requireNotNull(chatListItem)
             val chatRoom = megaChatApi.getChatRoom(chatId)
             requireNotNull(chatRoom)
-            val lastMessageFormatted = converterShortCodes(chatListItem.lastMessage)
 
             return@fromCallable when (chatMessage.type) {
                 TYPE_INVALID ->
                     getString(R.string.no_conversation_history).toSpannableString()
                 LAST_MSG_LOADING ->
                     getString(R.string.general_loading).toSpannableString()
-                TYPE_PRIV_CHANGE ->
+                TYPE_NORMAL, TYPE_CHAT_TITLE, TYPE_CALL_STARTED, TYPE_CALL_ENDED, TYPE_TRUNCATE, TYPE_ALTER_PARTICIPANTS, TYPE_PRIV_CHANGE, TYPE_CONTAINS_META ->
                     chatController.createManagementString(chatMessage, chatRoom).toSpannableString()
-                TYPE_TRUNCATE ->
-                    String.format(
-                        getString(R.string.history_cleared_by), chatListItem.getSenderName()
-                    ).cleanHtmlText()
                 TYPE_SET_RETENTION_TIME -> {
                     val timeFormatted = ChatUtil.transformSecondsInString(chatRoom.retentionTime)
                     if (timeFormatted.isTextEmpty()) {
@@ -137,34 +135,10 @@ class GetLastMessageUseCase @Inject constructor(
                     String.format(
                         getString(R.string.message_set_chat_private), chatListItem.getSenderName()
                     ).cleanHtmlText()
-                TYPE_CHAT_TITLE ->
-                    String.format(
-                        getString(R.string.change_title_messages),
-                        chatListItem.getSenderName(),
-                        lastMessageFormatted
-                    ).cleanHtmlText()
-                TYPE_CALL_ENDED -> {
-                    if (chatCall == null) {
-                        getString(R.string.error_message_unrecognizable).toSpannableString()
-                    } else
-                    when (chatCall.termCode) {
-                        END_CALL_REASON_BY_MODERATOR, END_CALL_REASON_ENDED ->
-                            getAppropriateStringForCallEnded(chatRoom, chatMessage.duration.toLong()).toSpannableString()
-                        END_CALL_REASON_REJECTED ->
-                            getAppropriateStringForCallRejected().toSpannableString()
-                        END_CALL_REASON_NO_ANSWER ->
-                            getAppropriateStringForCallNoAnswered(chatMessage.userHandle).toSpannableString()
-                        END_CALL_REASON_CANCELLED ->
-                            getAppropriateStringForCallCancelled(chatMessage.userHandle).toSpannableString()
-                        else ->
-                            getAppropriateStringForCallFailed().toSpannableString()
-                    }
-                }
                 TYPE_CONTACT_ATTACHMENT -> {
                     val message = converterShortCodes(
                         getString(R.string.contacts_sent, chatMessage.usersCount.toString())
                     ).toSpannableString()
-
                     when {
                         chatListItem.lastMessageSender == megaChatApi.myUserHandle ->
                             message.getColoredMessage(getString(R.string.word_me))
@@ -191,23 +165,22 @@ class GetLastMessageUseCase @Inject constructor(
                 }
 
                 else -> {
+                    val lastMessageFormatted = converterShortCodes(chatListItem.lastMessage).toSpannableString()
                     when {
                         chatListItem.lastMessage.isNullOrBlank() ->
                             getString(R.string.error_message_unrecognizable).toSpannableString()
                         chatListItem.lastMessageSender == megaChatApi.myUserHandle ->
-                            lastMessageFormatted.toSpannableString().getColoredMessage(getString(R.string.word_me))
+                            lastMessageFormatted.getColoredMessage(getString(R.string.word_me))
                         chatRoom.isGroup -> {
                             val senderName = chatListItem.getSenderName()
                             if (chatRoom.unreadCount == 0) {
-                                lastMessageFormatted.toSpannableString()
-                                    .getColoredMessage(senderName, android.R.attr.textColorSecondary)
+                                lastMessageFormatted.getColoredMessage(senderName, android.R.attr.textColorSecondary)
                             } else {
-                                lastMessageFormatted.toSpannableString()
-                                    .getColoredMessage(senderName, R.attr.colorSecondary)
+                                lastMessageFormatted.getColoredMessage(senderName, R.attr.colorSecondary)
                             }
                         }
                         else ->
-                            lastMessageFormatted.toSpannableString()
+                            lastMessageFormatted
                     }
                 }
             }
@@ -238,9 +211,6 @@ class GetLastMessageUseCase @Inject constructor(
             .toSpannedHtmlText()
             .toSpannableString()
 
-    private fun String.toSpannableString(): SpannableString =
-        SpannableString(this)
-
     private fun SpannableString.getColoredMessage(
         senderName: String,
         textColor: Int = android.R.attr.textColorSecondary,
@@ -263,6 +233,9 @@ class GetLastMessageUseCase @Inject constructor(
 
         return "$senderMessage $this".toSpannableString()
     }
+
+    private fun String.toSpannableString(): SpannableString =
+        SpannableString(this)
 
     private fun Spanned.toSpannableString(): SpannableString =
         SpannableString(this)
