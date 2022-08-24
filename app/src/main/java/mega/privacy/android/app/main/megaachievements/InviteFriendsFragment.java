@@ -110,9 +110,8 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener
         if (details == null || getContext() == null) return;
 
         long referralsStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
-        long referralsTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
 
-        titleCard.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue), getSizeString(referralsTransferValue)));
+        titleCard.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue)));
     }
 
     @Override
