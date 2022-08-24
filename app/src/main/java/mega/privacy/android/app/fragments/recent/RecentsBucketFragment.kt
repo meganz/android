@@ -439,11 +439,13 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
                         nodesHandles.toLongArray()
                     )
                 }
+                viewModel.clearSelection()
             }
             R.id.cab_menu_send_to_chat -> {
                 callManager {
                     it.attachNodesToChats(selectedMegaNodes)
                 }
+                viewModel.clearSelection()
             }
 
             R.id.cab_menu_share_out -> {
@@ -462,16 +464,19 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
                 callManager {
                     NodeController(it).chooseLocationToMoveNodes(nodesHandles)
                 }
+                viewModel.clearSelection()
             }
             R.id.cab_menu_copy -> {
                 callManager {
                     NodeController(it).chooseLocationToCopyNodes(nodesHandles)
                 }
+                viewModel.clearSelection()
             }
             R.id.cab_menu_trash -> {
                 callManager {
                     it.askConfirmationMoveToRubbish(nodesHandles)
                 }
+                viewModel.clearSelection()
             }
         }
 
