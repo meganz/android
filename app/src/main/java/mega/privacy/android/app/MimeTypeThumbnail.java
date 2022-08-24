@@ -29,7 +29,7 @@ public class MimeTypeThumbnail {
 		resources.put(R.drawable.database_thumbnail, new String[] {"accdb", "db", "dbf", "mdb", "pdb", "sql", });
 		resources.put(R.drawable.ic_dmg_thumbnail, new String[]{"dmg", });
 		resources.put(R.drawable.dreamweaver_thumbnail, new String[] {"dwt", });
-		resources.put(R.drawable.ic_excel_thumbnail, new String[] {"xls", "xlsx", "xlt", "xltm", "xltx", });
+		resources.put(R.drawable.ic_excel_thumbnail, new String[] {"xla", "xlam", "xll", "xlm", "xls", "xlsm", "xlsx", "xlt", "xltm", "xltx",});
 		resources.put(R.drawable.ic_executabe_thumbnail, new String[] {"apk", "app", "bat", "com", "exe", "gadget", "msi", "pif", "vb", "wsf", });
 		resources.put(R.drawable.ic_web_lang_thumbnail, new String[] {"as", "asc", "ascs", });
 		resources.put(R.drawable.flash_thumbnail, new String[] {"fla", });
@@ -45,7 +45,7 @@ public class MimeTypeThumbnail {
 		resources.put(R.drawable.ic_photoshop_thumbnail, new String[] {"abr", "csh", "psb", "psd", });
 		resources.put(R.drawable.playlist_thumbnail, new String[] {"asx", "m3u", "pls", });
 		resources.put(R.drawable.podcast_thumbnail, new String[] {"pcast", });
-		resources.put(R.drawable.ic_powerpoint_thumbnail, new String[] {"ppc", "ppt", "pptx", "pps",  });
+		resources.put(R.drawable.ic_powerpoint_thumbnail, new String[] {"pot", "potm", "potx", "ppam", "ppc", "pps", "ppsm", "ppsx", "ppt", "pptm", "pptx", });
 		resources.put(R.drawable.ic_premiere_thumbnail, new String[] {"plb", "ppj", "prproj", "prtpset", });
 		resources.put(R.drawable.ic_raw_thumbnail, new String[] {"3fr", "mef", "arw", "bay", "cr2", "dcr", "dng", "erf", "fff", "mrw", "nef", "orf", "pef", "rw2", "rwl", "srf", });
 		resources.put(R.drawable.real_audio_thumbnail, new String[] {"ra", "ram", "rm", });
@@ -60,7 +60,7 @@ public class MimeTypeThumbnail {
 		resources.put(R.drawable.ic_video_thumbnail, new String[] {"3g2", "3gp", "asf", "avi", "mkv", "mov", "mpeg", "mpg", "wmv", "3gpp", "h261", "h263", "h264", "jpgv", "jpm", "jpgm", "mp4", "mp4v", "mpg4", "mpe", "m1v", "m2v", "ogv", "qt", "m4u", "webm", "f4v", "fli", "m4v", "mkv", "mk3d", "vob", "movie", });
 		resources.put(R.drawable.video_vob_thumbnail, new String[]{"vob", });
 		resources.put(R.drawable.ic_web_data_thumbnail, new String[] {"asp", "aspx", "php", "php3", "php4", "php5", "phtml", "css", "inc", "js", "xml", });
-		resources.put(R.drawable.ic_word_thumbnail, new String[] {"doc", "docx", "dotx", "wps", });
+		resources.put(R.drawable.ic_word_thumbnail, new String[] {"doc", "docm", "docx", "dot", "dotx", "wps",});
 		resources.put(R.drawable.ic_pages_thumbnail, new String[] {"pages", });
 		resources.put(R.drawable.ic_experiencedesign_thumbnail, new String[] {"Xd", });
 		resources.put(R.drawable.ic_keynote_thumbnail, new String[] {"key", });
