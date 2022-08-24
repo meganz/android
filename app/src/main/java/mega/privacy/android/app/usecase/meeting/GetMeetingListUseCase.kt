@@ -1,18 +1,18 @@
 package mega.privacy.android.app.usecase.meeting
 
 import android.content.Context
+import android.text.SpannableString
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.app.di.MegaApi
@@ -25,7 +25,6 @@ import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -36,7 +35,6 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import java.io.File
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -46,12 +44,14 @@ import javax.inject.Inject
  * @property megaApi                MegaApi
  * @property megaChatApi            MegaChatApi
  * @property getChatChangesUseCase  Use case needed to get latest changes from Mega Api
+ * @property getChatChangesUseCase  Use case needed to get last chat message formatted
  */
 class GetMeetingListUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val getChatChangesUseCase: GetChatChangesUseCase,
+    private val getLastMessageUseCase: GetLastMessageUseCase,
 ) {
 
     private val chatController: ChatController by lazy { ChatController(context) }
@@ -196,12 +196,7 @@ class GetMeetingListUseCase @Inject constructor(
             context,
             chatListItem.lastTimestamp,
             TimeUtils.DATE_LONG_FORMAT)
-        val lastMessage = megaChatApi.getMessage(chatId, chatListItem.lastMessageId)
-        val lastMessageFormatted = if (lastMessage != null) {
-            chatController.createManagementString(lastMessage, this)
-        } else {
-            StringResourcesUtils.getString(R.string.no_conversation_history)
-        }
+        var lastMessageFormatted: SpannableString? = null
         val firstUser: ContactGroupUser
         var lastUser: ContactGroupUser? = null
 
@@ -218,6 +213,11 @@ class GetMeetingListUseCase @Inject constructor(
                 lastUser = getGroupUserFromHandle(getPeerHandle(peerCount - 1), listener)
             }
         }
+
+        getLastMessageUseCase.get(chatId, chatListItem.lastMessageId).blockingSubscribeBy(
+            onSuccess = { message -> lastMessageFormatted = message },
+            onError = Timber::w
+        )
 
         return MeetingItem(
             chatId = chatId,

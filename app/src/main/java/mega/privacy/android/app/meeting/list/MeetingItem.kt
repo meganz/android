@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.list
 
+import android.text.SpannableString
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 
@@ -19,7 +20,7 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 data class MeetingItem constructor(
     val chatId: Long,
     val title: String,
-    val lastMessage: String?,
+    val lastMessage: SpannableString?,
     val isPublic: Boolean,
     val isMuted: Boolean,
     val firstUser: ContactGroupUser,
