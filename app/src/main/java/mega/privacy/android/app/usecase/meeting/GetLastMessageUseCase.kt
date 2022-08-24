@@ -15,7 +15,6 @@ import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.converterShortCodes
-import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -42,6 +41,7 @@ import nz.mega.sdk.MegaChatMessage.TYPE_SET_PRIVATE_MODE
 import nz.mega.sdk.MegaChatMessage.TYPE_SET_RETENTION_TIME
 import nz.mega.sdk.MegaChatMessage.TYPE_TRUNCATE
 import nz.mega.sdk.MegaChatMessage.TYPE_VOICE_CLIP
+import nz.mega.sdk.MegaChatRoom
 import javax.inject.Inject
 
 /**
@@ -107,7 +107,8 @@ class GetLastMessageUseCase @Inject constructor(
                 LAST_MSG_LOADING ->
                     getString(R.string.general_loading).toSpannableString()
                 TYPE_NORMAL, TYPE_CHAT_TITLE, TYPE_CALL_STARTED, TYPE_CALL_ENDED, TYPE_TRUNCATE, TYPE_ALTER_PARTICIPANTS, TYPE_PRIV_CHANGE, TYPE_CONTAINS_META ->
-                    chatController.createManagementString(chatMessage, chatRoom).toSpannableString()
+                    chatController.createManagementString(chatMessage, chatRoom)
+                        .colorUnreadIfNeeded(chatRoom)
                 TYPE_SET_RETENTION_TIME -> {
                     val timeFormatted = ChatUtil.transformSecondsInString(chatRoom.retentionTime)
                     if (timeFormatted.isTextEmpty()) {
@@ -136,22 +137,11 @@ class GetLastMessageUseCase @Inject constructor(
                         getString(R.string.message_set_chat_private), chatListItem.getSenderName()
                     ).cleanHtmlText()
                 TYPE_CONTACT_ATTACHMENT -> {
-                    val message = converterShortCodes(
-                        getString(R.string.contacts_sent, chatMessage.usersCount.toString())
-                    ).toSpannableString()
-                    when {
-                        chatListItem.lastMessageSender == megaChatApi.myUserHandle ->
-                            message.getColoredMessage(getString(R.string.word_me))
-                        chatRoom.isGroup -> {
-                            val senderName = chatListItem.getSenderName()
-                            if (chatRoom.unreadCount == 0) {
-                                message.getColoredMessage(senderName, android.R.attr.textColorSecondary)
-                            } else {
-                                message.getColoredMessage(senderName, R.attr.colorSecondary)
-                            }
-                        }
-                        else ->
-                            message
+                    val message = converterShortCodes(getString(R.string.contacts_sent, chatMessage.usersCount.toString()))
+                    if (chatListItem.lastMessageSender == megaChatApi.myUserHandle) {
+                        "${getString(R.string.word_me)}: $message".toSpannableString()
+                    } else {
+                        message.colorUnreadIfNeeded(chatRoom)
                     }
                 }
                 TYPE_VOICE_CLIP -> {
@@ -165,22 +155,14 @@ class GetLastMessageUseCase @Inject constructor(
                 }
 
                 else -> {
-                    val lastMessageFormatted = converterShortCodes(chatListItem.lastMessage).toSpannableString()
+                    val message = converterShortCodes(chatListItem.lastMessage)
                     when {
                         chatListItem.lastMessage.isNullOrBlank() ->
                             getString(R.string.error_message_unrecognizable).toSpannableString()
                         chatListItem.lastMessageSender == megaChatApi.myUserHandle ->
-                            lastMessageFormatted.getColoredMessage(getString(R.string.word_me))
-                        chatRoom.isGroup -> {
-                            val senderName = chatListItem.getSenderName()
-                            if (chatRoom.unreadCount == 0) {
-                                lastMessageFormatted.getColoredMessage(senderName, android.R.attr.textColorSecondary)
-                            } else {
-                                lastMessageFormatted.getColoredMessage(senderName, R.attr.colorSecondary)
-                            }
-                        }
+                            "${getString(R.string.word_me)}: $message".toSpannableString()
                         else ->
-                            lastMessageFormatted
+                            message.colorUnreadIfNeeded(chatRoom)
                     }
                 }
             }
@@ -211,28 +193,17 @@ class GetLastMessageUseCase @Inject constructor(
             .toSpannedHtmlText()
             .toSpannableString()
 
-    private fun SpannableString.getColoredMessage(
-        senderName: String,
-        textColor: Int = android.R.attr.textColorSecondary,
-    ): SpannableString {
-        val senderMessage = SpannableString("$senderName ").apply {
-            setSpan(
-                ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)),
-                0,
-                senderName.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+    private fun String.colorUnreadIfNeeded(chatRoom: MegaChatRoom): SpannableString =
+        toSpannableString().apply {
+            if (chatRoom.isGroup && chatRoom.unreadCount > 0) {
+                setSpan(
+                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.teal_300_teal_200)),
+                    0,
+                    length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
         }
-
-        setSpan(
-            ForegroundColorSpan(getThemeColor(context, textColor)),
-            0,
-            length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-
-        return "$senderMessage $this".toSpannableString()
-    }
 
     private fun String.toSpannableString(): SpannableString =
         SpannableString(this)
