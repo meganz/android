@@ -3,7 +3,6 @@ package mega.privacy.android.app.upgradeAccount
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View.INVISIBLE
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -44,12 +43,6 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
 
     private lateinit var binding: ActivityPaymentBinding
     private val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
-
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            finish()
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -274,7 +267,7 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> onBackPressedCallback.handleOnBackPressed()
+            android.R.id.home -> onBackPressedDispatcher.onBackPressed()
         }
 
         return super.onOptionsItemSelected(item)
