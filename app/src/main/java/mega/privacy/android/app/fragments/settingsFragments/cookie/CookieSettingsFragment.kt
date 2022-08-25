@@ -14,7 +14,9 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.TwoButtonsPreference
-import mega.privacy.android.app.constants.SettingsConstants.*
+import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ACCEPT
+import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_ANALYTICS
+import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_POLICIES
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType.ANALYTICS

@@ -39,7 +39,7 @@ class LogFlowTree(
 
     private val ignoredClasses = listOf(
         Timber::class.java.name,
-        Timber::class.java.name,
+        Timber.Forest::class.java.name,
         Timber.Tree::class.java.name,
         Timber.DebugTree::class.java.name,
         LogFlowTree::class.java.name,

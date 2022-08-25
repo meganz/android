@@ -3627,16 +3627,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public void setAttrAttemps(int attemp) {
+    public void setAttrAttempts(int attempt) {
         String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
         ContentValues values = new ContentValues();
         try (Cursor cursor = db.rawQuery(selectQuery, null)) {
             if (cursor != null && cursor.moveToFirst()) {
-                String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_INTENTS + "='" + encrypt(Integer.toString(attemp) + "") + "' WHERE " + KEY_ID + " ='1'";
+                String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_INTENTS + "='" + encrypt(Integer.toString(attempt) + "") + "' WHERE " + KEY_ID + " ='1'";
                 db.execSQL(UPDATE_ATTRIBUTES_TABLE);
                 Timber.d("UPDATE_ATTRIBUTES_TABLE : %s", UPDATE_ATTRIBUTES_TABLE);
             } else {
-                values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attemp) + ""));
+                values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attempt) + ""));
                 db.insert(TABLE_ATTRIBUTES, null, values);
             }
         } catch (Exception e) {

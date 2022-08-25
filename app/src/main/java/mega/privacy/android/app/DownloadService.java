@@ -604,9 +604,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
             MegaCancelToken token = transfersManagement.addScanningTransfer(TYPE_DOWNLOAD,
                     localPath, currentDocument, currentDocument.isFolder());
 
-            if (token != null) {
-                megaApi.startDownload(currentDocument, localPath, currentDocument.getName(), appData, highPriority, token);
-            }
+            megaApi.startDownload(currentDocument, localPath, currentDocument.getName(), appData, highPriority, token);
         } else {
             Timber.w("currentDir is not a directory");
         }
@@ -1619,9 +1617,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
                 MegaCancelToken token = transfersManagement.addScanningTransfer(TYPE_DOWNLOAD,
                         localPath, currentDocument, currentDocument.isFolder());
 
-                if (token != null) {
-                    megaApi.startDownload(currentDocument, localPath, currentDocument.getName(), appData, false, token);
-                }
+                megaApi.startDownload(currentDocument, localPath, currentDocument.getName(), appData, false, token);
             }
         }
     }

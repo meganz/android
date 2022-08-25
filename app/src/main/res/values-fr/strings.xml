@@ -463,21 +463,9 @@
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d dossiers n’ont pas été quittés avec succès</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent">Le fichier a été envoyé avec succès à %d contacts</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent">Le fichier n’a pas été envoyé à %d contacts</string>
-    <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent_multifile">%d fichiers ont été envoyés avec succès</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent_multifile">L’envoi de %d fichiers a échoué</string>
-    <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d éléments ont été copiés avec succès</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d éléments n’ont pas été copiés</string>
-    <!-- success message when removing several contacts -->
-    <string name="number_contact_removed">%d contacts ont été supprimés avec succès</string>
-    <!-- error message when removing several contacts -->
-    <string name="number_contact_not_removed">%d contacts n’ont pas été supprimés</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">La Corbeille a été vidée avec succès</string>
     <!-- error message when emptying the RB -->
@@ -792,15 +780,15 @@
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
     <string name="servers_busy">Ce processus prend plus de temps que prévu. Veuillez patienter.</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_free">Compte Gratuit</string>
+    <string name="my_account_free">Compte gratuit</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Compte&#160;Pro I</string>
+    <string name="my_account_pro1">Compte Pro&#160;I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Compte&#160;Pro II</string>
+    <string name="my_account_pro2">Compte Pro&#160;II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Compte&#160;Pro III</string>
+    <string name="my_account_pro3">Compte Pro&#160;III</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Compte&#160;Pro&#160;Lite</string>
+    <string name="my_account_prolite_feedback_email">Compte Pro&#160;Lite</string>
     <!--  -->
     <string name="backup_title">Sauvegarder votre Clé de récupération</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -921,16 +909,6 @@
     <string name="edit_link_option">Gérer le lien</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">Le mot de passe actuel que vous avez saisi est incorrect.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_reinvite_contact_request">%d demandes de réinvitation envoyées avec succès.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_delete_contact_request">%d demandes ont été supprimées avec succès.</string>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_delete_contact_request">%1$d réponses ont été supprimées avec succès, mais %2$d n’ont pas été supprimées.</string>
-    <!-- success message when replying to multiple received request -->
-    <string name="number_correctly_invitation_reply_sent">%d réponses à une demande ont été envoyées.</string>
-    <!-- error message when replying to multiple received request -->
-    <string name="number_incorrectly_invitation_reply_sent">%1$d réponses à une demande ont été envoyées avec succès mais %2$d n’ont pas été envoyées.</string>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">Le dossier est partagé avec %1$d contact. Supprimer le partage ?</item>
@@ -1135,8 +1113,6 @@
     <string name="number_correctly_add_participant">%d participants ont été invités avec succès</string>
     <!-- error message when inviting multiple contacts to a group chat -->
     <string name="number_no_add_participant_request">%1$d participants ont été invités avec succès, mais %2$d participants n’ont pas été invités.</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="message_permissions_changed">[A]%1$s[/A][B] a été changé en [/B][C]%2$s[/C][D] par [/D][E]%3$s[/E]</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] s’est joint à la conversation de groupe sur invitation de [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1165,8 +1141,6 @@
     <string name="history_cleared_message">L’historique de la conversation a été effacé</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">L’historique de la conversation a été effacé par %1$s</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="non_format_message_permissions_changed">Le droit de %1$s a été changé à %2$s par %3$s</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="non_format_message_add_participant">%1$s a été ajouté à cette conversation de groupe sur invitation de %2$s</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1364,8 +1338,6 @@
     <string name="add_to_cloud_node_chat">Ajouter au Disque nuagique</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Visualiser les contacts</string>
-    <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">A été ajouté avec succès au Disque nuagique</string>
     <!-- Menu option -->
     <string name="import_success_error">Erreur. N’a pas été ajouté au Disque nuagique</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1620,8 +1592,8 @@
     <string name="general_incorrect_names">Veuillez corriger les noms de vos fichiers avant de poursuivre</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Certains caractères sont invalides</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">Les caractères suivants ne sont pas autorisés&#160;: ” * / : &lt; &gt; ? \\ |</string>
+    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
+    <string name="invalid_characters_defined">Les caractères suivants ne sont pas autorisés&#160;: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Le nom de fichier ne peut pas être vide.</item>
@@ -1789,7 +1761,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Chargement des fichiers</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s o</string>
+    <string name="label_file_size_byte">%s&#160;o</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;Ko</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2069,8 +2041,6 @@
     <string name="play_store_label">Magasin Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Il vous faut une appli d’authentification pour activer l’A2F avec MEGA. Vous pouvez télécharger et installer l’appli Google Authenticator, Duo Mobile, Authy ou Microsoft Authenticator pour votre téléphone ou votre tablette.</string>
-    <!-- success message when importing multiple files from -->
-    <string name="number_correctly_imported_from_chat">%d fichiers ont été partagés avec succès</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d fichiers n’ont pas été partagés</string>
     <!-- button’s text to open a full screen image -->
@@ -2471,10 +2441,6 @@
     <string name="title_compress_video">Compression des vidéos %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Un dossier invalide a été sélectionné</string>
-    <!-- Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_one_file">1 dossier · 1 fichier</string>
-    <!-- Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_several_files">1 dossier · %1$d fichiers</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d fichier</item>
@@ -2849,12 +2815,6 @@
         <item quantity="many">%1$d d’images&#160;</item>
         <item quantity="other">%1$d&#160;images&#160;</item>
     </plurals>
-    <!-- Title of a media recents bucket that contains some images and a video -->
-    <string name="title_media_bucket_images_and_video">%d images et 1 vidéo</string>
-    <!-- Title of a media recents bucket that contains an image and some videos -->
-    <string name="title_media_bucket_image_and_videos">1 image et %d vidéos</string>
-    <!-- Title of a media recents bucket that contains an image and a video -->
-    <string name="title_media_bucket_image_and_video">1 image et 1 vidéo</string>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]créé par [/A]%s</string>
     <!-- Label that indicates who updated a file into a recents bucket -->
@@ -3774,21 +3734,21 @@
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
     <string name="successful_upgrade">Nous vous remercions pour votre abonnement %1$s</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">mensuel Pro Lite</string>
+    <string name="pro_lite_monthly">mensuel Pro&#160;Lite</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">annuel Pro Lite</string>
+    <string name="pro_lite_yearly">annuel Pro&#160;Lite</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">mensuel Pro I</string>
+    <string name="pro_i_monthly">mensuel Pro&#160;I</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">annuel Pro I</string>
+    <string name="pro_i_yearly">annuel Pro&#160;I</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">mensuel Pro II</string>
+    <string name="pro_ii_monthly">mensuel Pro&#160;II</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">annuel Pro II</string>
+    <string name="pro_ii_yearly">annuel Pro&#160;II</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">mensuel Pro III</string>
+    <string name="pro_iii_monthly">mensuel Pro&#160;III</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">annuel Pro III</string>
+    <string name="pro_iii_yearly">annuel Pro&#160;III</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Supprimer comme hôte</string>
     <!-- Title message of existing subscription dialog -->

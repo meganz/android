@@ -133,7 +133,6 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Fetch SDK Submodules'
-                    cleanOldSdkOutput()
                 }
                 withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
                     script {
@@ -880,22 +879,6 @@ private String artifactoryUploadPath() {
     return "v${versionName}/${versionCode}"
 }
 
-// TODO this method is to migrate to new SDK module.
-// TODO: it should deleted after all existing MRs have merged new SDK module
-private void cleanOldSdkOutput() {
-    println("cleanOldSdkOutput")
-    sh """
-    cd $WORKSPACE
-    git checkout -- .gitmodules
-    rm -fr app/src/main/java/nz/mega/sdk/*.java  || true
-    rm -fr app/src/main/jni || true
-    rm -fr app/src/main/obj/*  || true
-    rm -fr app/src/main/libs/arm64-v8a || true
-    rm -fr app/src/main/libs/armeabi-v7a || true
-    rm -fr app/src/main/libs/x86 || true
-    rm -fr app/src/main/libs/x86_64 || true
-    """
-}
 
 /**
  * clean SDK

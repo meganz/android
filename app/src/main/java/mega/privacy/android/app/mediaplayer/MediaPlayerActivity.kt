@@ -6,10 +6,14 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
+import android.view.WindowInsets
+import android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
@@ -20,6 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -39,7 +44,6 @@ import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityMediaPlayerBinding
-import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -117,17 +121,14 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.getFragmentFromNavHost
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Media player Activity
@@ -195,8 +196,23 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
     }
 
+    /**
+     * Handle events when a Back Press is detected
+     */
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
+            if (!navController.navigateUp()) {
+                finish()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Setup the Back Press dispatcher to receive Back Press events
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         val extras = intent.extras
         if (extras == null) {
@@ -333,14 +349,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         actionBar.title = ""
 
         binding.toolbar.setNavigationOnClickListener {
-            onBackPressed()
-        }
-    }
-
-    override fun onBackPressed() {
-        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
-        if (!navController.navigateUp()) {
-            finish()
+            onBackPressedDispatcher.onBackPressed()
         }
     }
 
@@ -962,6 +971,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             binding.toolbar.animate().cancel()
             binding.toolbar.translationY = -binding.toolbar.measuredHeight.toFloat()
         }
+        if (!isAudioPlayer()) {
+            hideSystemUI()
+        }
     }
 
     /**
@@ -979,6 +991,36 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             binding.toolbar.animate().cancel()
             binding.toolbar.translationY = 0F
         }
+        if (!isAudioPlayer()) {
+            showSystemUI()
+        }
+    }
+
+    private fun hideSystemUI() {
+        @Suppress("DEPRECATION")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.hide(WindowInsets.Type.statusBars())
+        } else {
+            window.setFlags(FLAG_FULLSCREEN, FLAG_FULLSCREEN)
+        }
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, binding.root).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+    }
+
+    private fun showSystemUI() {
+        @Suppress("DEPRECATION")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.show(WindowInsets.Type.statusBars())
+        } else {
+            window.clearFlags(FLAG_FULLSCREEN)
+        }
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+        WindowInsetsControllerCompat(window,
+            binding.root).show(WindowInsetsCompat.Type.systemBars())
     }
 
     /**

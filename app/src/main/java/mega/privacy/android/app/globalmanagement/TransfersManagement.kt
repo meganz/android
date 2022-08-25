@@ -445,7 +445,13 @@ class TransfersManagement @Inject constructor(
             LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java).post(true)
         }
 
-        scanningTransfers.add(ScanningTransferData(type, localPath, node, isFolder))
+        try {
+            scanningTransfers.add(ScanningTransferData(type, localPath, node, isFolder))
+        } catch (e: ArrayIndexOutOfBoundsException) {
+            Timber.w(e)
+            return null
+        }
+
         return getScanningTransfersToken()
     }
 

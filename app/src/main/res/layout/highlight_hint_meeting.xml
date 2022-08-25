@@ -1,30 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:background="@drawable/background_button_corner_without_border">
 
     <TextView
         android:id="@+id/tv_tip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="11dp"
-        android:layout_marginStart="12.89dp"
-        android:layout_marginEnd="12.89dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         android:textAppearance="?attr/textAppearanceSubtitle2"
         android:textColor="@color/grey_alpha_054" />
 
     <Button
         android:id="@+id/bt_ok"
         style="?attr/borderlessButtonStyle"
-        android:layout_below="@id/tv_tip"
-        android:layout_marginTop="-15dp"
-        android:layout_marginBottom="-15dp"
+        android:layout_gravity="end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
         android:text="@string/button_permission_info" />
 
-</RelativeLayout>
+</LinearLayout>
