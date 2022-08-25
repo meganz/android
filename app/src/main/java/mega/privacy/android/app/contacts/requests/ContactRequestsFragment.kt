@@ -15,6 +15,7 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs
 import mega.privacy.android.app.databinding.FragmentContactRequestsBinding
+import mega.privacy.android.app.utils.ColorUtils.setElevationWithColor
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.Util
@@ -97,7 +98,7 @@ class ContactRequestsFragment : Fragment() {
      * @param show  Flag to either show or hide toolbar elevation
      */
     fun showElevation(show: Boolean) {
-        binding.tabs.elevation = if (show) toolbarElevation else 0F
+        binding.tabs.setElevationWithColor(if (show) toolbarElevation else 0F)
         if (Util.isDarkMode(requireContext())) {
             (activity as ContactsActivity?)?.showElevation(show)
         }
