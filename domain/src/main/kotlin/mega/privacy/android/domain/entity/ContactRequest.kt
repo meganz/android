@@ -17,7 +17,7 @@ data class ContactRequest(
     val handle: Long,
     val sourceEmail: String,
     val sourceMessage: String?,
-    val targetEmail: String,
+    val targetEmail: String?,
     val creationTime: Long,
     val modificationTime: Long,
     val status: ContactRequestStatus,

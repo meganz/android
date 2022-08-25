@@ -5,4 +5,7 @@
     <string name="settings_qa_compose_ui_browser_title">Compose UI browser</string>
     <string name="settings_qa_compose_check_for_updates">Check for updates</string>
     <string name="qa_feature_flag_title">Feature Flags</string>
+    <string name="settings_qa_export_logs">Send logs</string>
+    <string name="settings_qa_logs">Logs</string>
+    <string name="settings_qa_save_logs">Open logs</string>
 </resources>
