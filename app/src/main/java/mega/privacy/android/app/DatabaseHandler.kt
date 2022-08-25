@@ -21,12 +21,13 @@ import mega.privacy.android.app.main.megachat.NonContactInfo
 import mega.privacy.android.app.main.megachat.PendingMessageSingle
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.Backup
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removePrimaryBackup
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removeSecondaryBackup
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.setPrimaryBackup
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.setSecondaryBackup
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryTargetNode
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryTargetNode
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryFolderTargetNode
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryFolderTargetNode
 import mega.privacy.android.app.sync.deleteSQL
 import mega.privacy.android.app.sync.updateSQL
 import mega.privacy.android.app.utils.Constants
@@ -2855,8 +2856,8 @@ open class DatabaseHandler(
                     db.insert(TABLE_PREFERENCES, null, values)
                 }
                 Timber.d("Set new primary handle: %s", handle)
-                //Update CU backup when CU target folder changed.
-                updatePrimaryTargetNode(handle)
+                // Update CU backup when CU target folder changed.
+                updatePrimaryFolderTargetNode(handle)
             }
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")
@@ -2878,8 +2879,8 @@ open class DatabaseHandler(
                     db.insert(TABLE_PREFERENCES, null, values)
                 }
                 Timber.d("Set new secondary handle: %s", handle)
-                //Update MU backup when MU target folder changed.
-                updateSecondaryTargetNode(handle)
+                // Update MU backup when MU target folder changed.
+                updateSecondaryFolderTargetNode(handle)
             }
         } catch (e: Exception) {
             Timber.e(e, "Exception opening or managing DB cursor")

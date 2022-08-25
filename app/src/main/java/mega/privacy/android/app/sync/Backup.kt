@@ -29,7 +29,7 @@ data class Backup(
      * Valid value definitions
      * @see MegaApiJava
      */
-    var state: Int = CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE,
+    var state: Int = CameraUploadSyncManager.BackupState.ACTIVE.value,
     /**
      * Valid value definitions
      * @see MegaError

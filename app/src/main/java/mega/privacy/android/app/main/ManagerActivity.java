@@ -9381,12 +9381,12 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
 
                 // Update CU backup state.
-                int newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-                        ? CameraUploadSyncManager.State.CU_SYNC_STATE_PAUSE_UP
-                        : CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE;
+                CameraUploadSyncManager.BackupState newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+                        ? CameraUploadSyncManager.BackupState.PAUSE_UPLOADS
+                        : CameraUploadSyncManager.BackupState.ACTIVE;
 
-                CameraUploadSyncManager.INSTANCE.updatePrimaryBackupState(newBackupState);
-                CameraUploadSyncManager.INSTANCE.updateSecondaryBackupState(newBackupState);
+                CameraUploadSyncManager.INSTANCE.updatePrimaryFolderBackupState(newBackupState);
+                CameraUploadSyncManager.INSTANCE.updateSecondaryFolderBackupState(newBackupState);
             }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
             Timber.d("One MegaRequest.TYPE_PAUSE_TRANSFER");
