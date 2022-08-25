@@ -155,13 +155,13 @@ object ColorUtils {
     @JvmStatic
     @RequiresApi(VERSION_CODES.LOLLIPOP)
     fun View.setElevationWithColor(elevation: Float) {
-        MaterialShapeUtils.setElevation(this, elevation)
-        setElevation(elevation)
         if (elevation != 0F) {
             setBackgroundColor(getColorForElevation(context, elevation))
         } else {
             setBackgroundColor(android.R.color.transparent)
         }
+        MaterialShapeUtils.setElevation(this, elevation)
+        setElevation(elevation)
     }
 
     /**

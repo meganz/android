@@ -100,7 +100,7 @@ class MeetingListFragment : Fragment() {
     private fun checkElevation() {
         if (binding.list.canScrollVertically(RecyclerView.NO_POSITION)) {
             (activity as? ManagerActivity?)?.changeAppBarElevation(Util.isDarkMode(context))
-            (parentFragment as? ChatTabsFragment?)?.showElevation(Util.isDarkMode(context))
+            (parentFragment as? ChatTabsFragment?)?.showElevation(true)
         } else {
             (activity as? ManagerActivity?)?.changeAppBarElevation(false)
             (parentFragment as? ChatTabsFragment?)?.showElevation(false)
