@@ -21,6 +21,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -427,6 +428,12 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         }
     }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            handleGoBack()
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -437,6 +444,8 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE)
                 }
             }
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         registerReceiver(sslErrorReceiver,
             IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED))
@@ -703,10 +712,12 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         }
     }
 
-    override fun onBackPressed() {
-        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
+    private fun handleGoBack() {
         retryConnectionsAndSignalPresence()
+        // we should disable and enable again in case BaseActivity has many fragments it should listen onBackPressed again
+        onBackPressedCallback.isEnabled = false
         super.onBackPressed()
+        onBackPressedCallback.isEnabled = true
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {

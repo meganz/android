@@ -855,8 +855,6 @@ public class ChatActivity extends PasscodeActivity
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                     cancelRecording();
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
-                    hideDialogCall();
-
                     if (dialogCall != null) {
                         dialogCall.dismiss();
                     }
@@ -1528,7 +1526,7 @@ public class ChatActivity extends PasscodeActivity
                         long millisecondsOnlyMeInCallDialog =
                                 TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog);
 
-                        boolean hideDialogCall = MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored || !onlyMeInTheCall || (waitingForOthers && millisecondsOnlyMeInCallDialog <=0);
+                        boolean hideDialogCall = MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored || !onlyMeInTheCall || (waitingForOthers && millisecondsOnlyMeInCallDialog <= 0);
 
                         if (hideDialogCall) {
                             hideDialogCall();
@@ -1536,7 +1534,8 @@ public class ChatActivity extends PasscodeActivity
                             showOnlyMeInTheCallDialog();
                         }
                     }
-                });
+
+                }, Timber::e);
 
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observe(this, callOnHoldObserver);
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observe(this, sessionOnHoldObserver);
@@ -4259,6 +4258,10 @@ public class ChatActivity extends PasscodeActivity
      * Dialogue to allow you to end or stay on a group call or meeting when you are left alone on the call
      */
     private void showOnlyMeInTheCallDialog() {
+        if (AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall)) {
+            return;
+        }
+
         boolean isRequestSent = false;
         if (chatRoom != null) {
             MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
@@ -4290,8 +4293,8 @@ public class ChatActivity extends PasscodeActivity
                     MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true;
                     hideDialogCall();
                 })
+                .setOnDismissListener(dialog -> isOnlyMeInCallDialogShown = false)
                 .setCancelable(false)
-                .setOnDismissListener(dialog -> MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true)
                 .create();
 
         dialogOnlyMeInCall.show();
@@ -4301,7 +4304,7 @@ public class ChatActivity extends PasscodeActivity
      * Hide dialog related to calls
      */
     private void hideDialogCall() {
-        if (dialogOnlyMeInCall != null) {
+        if (AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall)) {
             dialogOnlyMeInCall.dismiss();
         }
     }
@@ -8370,7 +8373,6 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     protected void onDestroy() {
-        Timber.d("onDestroy()");
         destroySpeakerAudioManger();
         cleanBuffers();
         if (handlerEmojiKeyboard != null) {
@@ -8703,8 +8705,10 @@ public class ChatActivity extends PasscodeActivity
         outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
         outState.putBoolean(ERROR_REACTION_DIALOG, errorReactionsDialogIsShown);
         outState.putLong(TYPE_ERROR_REACTION, typeErrorReaction);
-        outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall));
         outState.putBoolean(END_CALL_FOR_ALL_DIALOG, AlertDialogUtil.isAlertDialogShown(endCallForAllDialog));
+        isOnlyMeInCallDialogShown = AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall);
+        outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, isOnlyMeInCallDialogShown);
+        hideDialogCall();
     }
 
     /**
@@ -8795,7 +8799,6 @@ public class ChatActivity extends PasscodeActivity
         setKeyboardVisibilityListener();
 
         if (idChat != -1 && chatRoom != null) {
-
             setNodeAttachmentVisible();
 
             passcodeManagement.setShowPasscodeScreen(true);
@@ -9339,6 +9342,11 @@ public class ChatActivity extends PasscodeActivity
                             R.string.join_call_layout);
 
                     if (chatRoom.isGroup()) {
+                        if (callInThisChat.getNumParticipants() == 0 || (callInThisChat.getPeeridParticipants().size() == 1 && callInThisChat.getPeeridParticipants().get(0) == megaChatApi.getMyUserHandle())) {
+                            hideCallBar(callInThisChat);
+                            break;
+                        }
+
                         long callerHandle = callInThisChat.getCaller();
                         String callerFullName = chatC.getParticipantFullName(callerHandle);
                         if (callerHandle != MEGACHAT_INVALID_HANDLE && !isTextEmpty(callerFullName)) {

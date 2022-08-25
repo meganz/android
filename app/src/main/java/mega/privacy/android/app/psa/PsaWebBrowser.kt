@@ -1,6 +1,7 @@
 package mega.privacy.android.app.psa
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +13,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
@@ -31,7 +33,7 @@ class PsaWebBrowser : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentPsaWebBrowserBinding.inflate(inflater, container, false)
         return binding.root
@@ -49,7 +51,7 @@ class PsaWebBrowser : Fragment() {
         binding.webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(
                 view: WebView,
-                request: WebResourceRequest
+                request: WebResourceRequest,
             ): Boolean {
                 return false
             }
@@ -98,9 +100,16 @@ class PsaWebBrowser : Fragment() {
 
         uiHandler.post {
             binding.webView.visibility = View.VISIBLE
-                if (psaId != Constants.INVALID_VALUE) {
-                    dismissPsa(psaId)
-                }
+            onBackPressedCallback.isEnabled = true
+            if (psaId != Constants.INVALID_VALUE) {
+                dismissPsa(psaId)
+            }
+        }
+    }
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            hidePSA()
         }
     }
 
@@ -115,25 +124,21 @@ class PsaWebBrowser : Fragment() {
             val currentActivity = activity
             if (currentActivity is BaseActivity && binding.webView.visibility == View.VISIBLE) {
                 binding.webView.visibility = View.INVISIBLE
+                onBackPressedCallback.isEnabled = false
             }
         }
     }
 
-    /**
-     * Whether the PSA web browser consumes the back key event or not
-     * If consumed, the parent container (e.g. Activity) should not respond to the back key
-     * event for this time
-     * @return true if consumed, false otherwise
-     */
-    fun consumeBack(): Boolean {
-        if (binding.webView.visibility == View.VISIBLE) {
-            hidePSA()
-            return true
-        }
-
-        return false
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this, onBackPressedCallback
+        )
     }
 
+    @Deprecated("All activities and fragments should handle their own " +
+            "onBackPressedDispatcher callbacks independent from any other fragments or activities.")
+    fun consumeBack() = onBackPressedCallback.isEnabled
 
     companion object {
         const val ARGS_URL_KEY = "URL"

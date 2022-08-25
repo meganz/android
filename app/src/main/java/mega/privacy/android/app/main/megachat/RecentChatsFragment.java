@@ -60,6 +60,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -103,6 +104,7 @@ import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatAdapter;
 import mega.privacy.android.app.meeting.chats.ChatTabsFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.chat.recent.RecentChatsViewModel;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.usecase.chat.SearchChatsUseCase;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
@@ -139,6 +141,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     SearchChatsUseCase searchChatsUseCase;
 
     private SearchViewModel searchViewModel;
+    private RecentChatsViewModel recentChatsViewModel;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -181,8 +184,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     private AppBarLayout appBarLayout;
 
-    private static boolean isExpand;
-    private static boolean isFirstTime = true;
+    protected static boolean isExpand;
 
     private boolean grantedContactPermission;
 
@@ -305,11 +307,10 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         });
     }
 
-    private void expandContainer() {
-        if (isExpand || isFirstTime) {
+    protected void expandContainer() {
+        if (isExpand) {
             invitationContainer.setVisibility(View.VISIBLE);
             collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
-            isFirstTime = false;
             isExpand = true;
         } else {
             invitationContainer.setVisibility(View.GONE);
@@ -392,6 +393,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         display.getMetrics(outMetrics);
         density = getResources().getDisplayMetrics().density;
 
+        recentChatsViewModel = new ViewModelProvider(this).get(RecentChatsViewModel.class);
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
 
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
@@ -479,6 +481,12 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observe(this, callRingingStatusObserver);
 
         return v;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        RecentChatsFragmentExtensionKt.observer(this, recentChatsViewModel);
     }
 
     private boolean showInviteBanner() {
@@ -694,6 +702,9 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             case R.id.invite_title:
             case R.id.dismiss_button:
             case R.id.collapse_btn:
+                if (v.getId() == R.id.dismiss_button) {
+                    recentChatsViewModel.setLastDismissedRequestContactTime();
+                }
                 if (moreContactsTitle.getVisibility() == View.VISIBLE) {
                     startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 } else {

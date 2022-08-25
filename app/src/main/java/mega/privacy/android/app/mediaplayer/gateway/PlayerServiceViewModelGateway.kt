@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import com.google.android.exoplayer2.source.ShuffleOrder
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
+import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import java.io.File
 
@@ -83,6 +84,13 @@ interface PlayerServiceViewModelGateway {
      * @return true is audio player, otherwise is false
      */
     fun isAudioPlayer(): Boolean
+
+    /**
+     * Set the current player whether is audio player
+     *
+     * @param isAudioPlayer true is audio player, otherwise is false
+     */
+    fun setAudioPlayer(isAudioPlayer: Boolean)
 
     /**
      * Update when media playback is changed
@@ -222,11 +230,32 @@ interface PlayerServiceViewModelGateway {
     fun getShuffleOrder(): ShuffleOrder
 
     /**
-     * Get repeat Mode
+     * Get audio repeat Mode
      *
-     * @return repeat mode
+     * @return RepeatToggleMode
      */
-    fun repeatMode(): Int
+    fun audioRepeatToggleMode(): RepeatToggleMode
+
+    /**
+     * Get video repeat Mode
+     *
+     * @return RepeatToggleMode
+     */
+    fun videoRepeatToggleMode(): RepeatToggleMode
+
+    /**
+     * Set repeat mode for audio
+     *
+     * @param repeatToggleMode RepeatToggleMode
+     */
+    fun setAudioRepeatMode(repeatToggleMode: RepeatToggleMode)
+
+    /**
+     * Set repeat mode for video
+     *
+     * @param repeatToggleMode RepeatToggleMode
+     */
+    fun setVideoRepeatMode(repeatToggleMode: RepeatToggleMode)
 
     /**
      * Set shuffle enable
@@ -241,13 +270,6 @@ interface PlayerServiceViewModelGateway {
      * @return new shuffle order
      */
     fun newShuffleOrder(): ShuffleOrder
-
-    /**
-     * Set repeat mode
-     *
-     * @param repeatMode repeat mode
-     */
-    fun setRepeatMode(repeatMode: Int)
 
     /**
      * Set paused

@@ -46,6 +46,6 @@
     <string name="scan_snackbar_incorrect_name">Xin sửa lại tên tệp tin cho phù hợp trước khi tiếp tục</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">Đang chuẩn bị %1$s. Xin chờ&#8230;</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="scan_snackbar_invalid_characters">Các ký tự không được phép sử dụng: ” * / : &lt; &gt; ? \ |</string>
+    <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->
+    <string name="scan_snackbar_invalid_characters">Các ký tự này không được phép sử dụng: %1$s</string>
 </resources>

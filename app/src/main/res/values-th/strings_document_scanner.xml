@@ -46,6 +46,6 @@
     <string name="scan_snackbar_incorrect_name">กรุณาแก้ไขชื่อไฟล์ของคุณก่อนดำเนินการต่อ</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">กำลังเตรียม %1$s กรุณารอสักครู่&#8230;</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="scan_snackbar_invalid_characters">ไม่อนุญาตให้ใช้อักขระต่อไปนี้: ” * / : &lt; &gt; ? \ |</string>
+    <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->
+    <string name="scan_snackbar_invalid_characters">ไม่อนุญาตให้ใช้อักขระต่อไปนี้: %1$s</string>
 </resources>

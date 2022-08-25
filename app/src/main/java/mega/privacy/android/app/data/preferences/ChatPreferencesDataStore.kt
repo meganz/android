@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -35,6 +36,8 @@ class ChatPreferencesDataStore @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ChatPreferencesGateway {
     private val chatImageQualityPreferenceKey = stringPreferencesKey("CHAT_IMAGE_QUALITY")
+    private val lastContactPermissionRequestedTimePreferenceKey =
+        longPreferencesKey("LAST_CONTACT_PERMISSION_REQUESTED_TIME")
 
     override fun getChatImageQualityPreference(): Flow<ChatImageQuality> =
         context.chatDataStore.data
@@ -55,6 +58,19 @@ class ChatPreferencesDataStore @Inject constructor(
         withContext(ioDispatcher) {
             context.chatDataStore.edit {
                 it[chatImageQualityPreferenceKey] = quality.name
+            }
+        }
+    }
+
+    override fun getLastContactPermissionRequestedTime(): Flow<Long> =
+        context.chatDataStore.data.map { preferences ->
+            preferences[lastContactPermissionRequestedTimePreferenceKey] ?: 0L
+        }
+
+    override suspend fun setLastContactPermissionRequestedTime(time: Long) {
+        withContext(ioDispatcher) {
+            context.chatDataStore.edit {
+                it[lastContactPermissionRequestedTimePreferenceKey] = time
             }
         }
     }

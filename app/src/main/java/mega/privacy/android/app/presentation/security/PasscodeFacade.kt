@@ -9,14 +9,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.savedstate.SavedStateRegistry
+import androidx.savedstate.SavedStateRegistryOwner
 import dagger.hilt.android.qualifiers.ActivityContext
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
 import mega.privacy.android.app.utils.Constants.CHAT_ID
-import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.Util.setAppFontSize
 import nz.mega.sdk.MegaApiAndroid
@@ -43,7 +42,7 @@ class PasscodeFacade @Inject constructor(
     private val passcodeManagement: PasscodeManagement,
     @MegaApi private val megaApi: MegaApiAndroid,
     @ActivityContext private val context: Context,
-): LifecycleEventObserver, SavedStateRegistry.SavedStateProvider, PasscodeCheck {
+) : LifecycleEventObserver, SavedStateRegistry.SavedStateProvider, PasscodeCheck {
 
     companion object {
         private const val SCREEN_ORIENTATION = "SCREEN_ORIENTATION"
@@ -73,15 +72,14 @@ class PasscodeFacade @Inject constructor(
     private var ignoringDueToChatNotification = false
 
     init {
-        if (context is AppCompatActivity) {
-            context.lifecycle.addObserver(this)
-        } else{
-            throw InvalidParameterException("PasscodeFacade can only be injected into AppCompatActivities")
-        }
+        val lifecycle = (context as? LifecycleOwner)?.lifecycle
+            ?: throw InvalidParameterException("PasscodeFacade can only be injected into LifecycleOwner")
+
+        lifecycle.addObserver(this)
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        when(event){
+        when (event) {
             Lifecycle.Event.ON_CREATE -> onCreate()
             Lifecycle.Event.ON_RESUME -> onResume()
             Lifecycle.Event.ON_PAUSE -> onPause()
@@ -90,7 +88,7 @@ class PasscodeFacade @Inject constructor(
     }
 
     private fun onCreate() {
-        val registry = (context as AppCompatActivity).savedStateRegistry
+        val registry = (context as? SavedStateRegistryOwner)?.savedStateRegistry ?: return
         registry.registerSavedStateProvider(PROVIDER, this)
         val state = registry.consumeRestoredStateForKey(PROVIDER)
         if (state != null &&
@@ -99,8 +97,6 @@ class PasscodeFacade @Inject constructor(
             isScreenRotation = true
         }
     }
-
-
 
     fun onPause() {
         if (isDisabled || ignoringDueToChatNotification) {
@@ -154,9 +150,6 @@ class PasscodeFacade @Inject constructor(
     private fun shouldIgnoreDueToChatNotification(): Boolean =
         context is ManagerActivity
                 && ACTION_CHAT_NOTIFICATION_MESSAGE == context.intent?.action
-                && MEGACHAT_INVALID_HANDLE != context.intent?.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
-
-
-
-
+                && MEGACHAT_INVALID_HANDLE != context.intent?.getLongExtra(CHAT_ID,
+            MEGACHAT_INVALID_HANDLE)
 }

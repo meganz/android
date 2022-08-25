@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
-    <string name="prolite_account">Pro-Lite</string>
+    <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF Weergave</string>
     <!-- Answer for confirmation dialog. -->
@@ -364,7 +364,7 @@
     <!-- menu item -->
     <string name="context_delete_from_mega">Verwijderen van MEGA</string>
     <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Map Naam</string>
+    <string name="context_new_folder_name">Map naam</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Map creëren</string>
     <!-- Menu option title -->
@@ -453,21 +453,9 @@
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d mappen waren niet succesvol verlaten</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent">Bestand succesvol verzonden naar %d contacten</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent">Bestand was niet verzonden naar %d contacten</string>
-    <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent_multifile">%d bestanden succesvol verstuurd</string>
-    <!-- error message when sending multiple files -->
-    <string name="number_no_sent_multifile">%d bestanden mislukt te versturen</string>
-    <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d items succesvol gekopieerd</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d items waren niet gekopieerd</string>
-    <!-- success message when removing several contacts -->
-    <string name="number_contact_removed">%d contacten waren succesvol verwijderd</string>
-    <!-- error message when removing several contacts -->
-    <string name="number_contact_not_removed">%d contacten waren niet verwijderd</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Prullenbak is succesvol geleegd</string>
     <!-- error message when emptying the RB -->
@@ -780,15 +768,15 @@
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
     <string name="servers_busy">Dit process duurt langer dan verwacht. Wacht alstublieft.</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_free">Gratis Account</string>
+    <string name="my_account_free">Gratis account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro-I Account</string>
+    <string name="my_account_pro1">Pro&#160;I account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro-II Account</string>
+    <string name="my_account_pro2">Pro&#160;II account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro-III Account</string>
+    <string name="my_account_pro3">Pro&#160;III account</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro-Lite Account</string>
+    <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
     <!--  -->
     <string name="backup_title">Uw Herstelsleutel opslaan</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -909,16 +897,6 @@
     <string name="edit_link_option">Link beheren</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
     <string name="old_password_provided_incorrect">Het opgegeven huidige wachtwoord is onjuist.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_reinvite_contact_request">%d herhaalde verzoeken succesvol verzonden.</string>
-    <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_delete_contact_request">%d verzoeken succesvol verwijderd.</string>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_delete_contact_request">%1$d verzoeken succesvol verwijderd, maar %2$d verzoeken werden niet verwijderd.</string>
-    <!-- success message when replying to multiple received request -->
-    <string name="number_correctly_invitation_reply_sent">%d verzoek antwoorden verzonden.</string>
-    <!-- error message when replying to multiple received request -->
-    <string name="number_incorrectly_invitation_reply_sent">%1$d verzoek antwoorden succesvol verzonden maar %2$d waren niet verzonden.</string>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">De map is gedeeld met %1$d contact. Delen verwijderen?</item>
@@ -1116,8 +1094,6 @@
     <string name="number_correctly_add_participant">%d deelnemers werden succesvol uitgenodigd</string>
     <!-- error message when inviting multiple contacts to a group chat -->
     <string name="number_no_add_participant_request">%1$d deelnemers werden succesvol uitgenodigd maar %2$d deelnemers werden niet uitgenodigd.</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="message_permissions_changed">[A]%1$s[/A][B]werd gewijzigd naar [/B][C]%2$s[/C][D]door[/D][E]%3$s[/E]</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B]heeft zich aangesloten bij de groepsoproep door uitnodiging van[/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1146,8 +1122,6 @@
     <string name="history_cleared_message">Gespreksgeschiedenis is gewist</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="non_format_history_cleared_by">Gespreksgeschiedenis gewist door %1$s</string>
-    <!-- chat message when the permissions for a user has been changed -->
-    <string name="non_format_message_permissions_changed">%1$s werd gewijzigd naar %2$s door %3$s</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="non_format_message_add_participant">%1$s was toegevoegd bij dit groepsgesprek door uitnodiging van %2$s</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1333,8 +1307,6 @@
     <string name="add_to_cloud_node_chat">Toevoegen aan Cloud Schijf</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Contacten weergeven</string>
-    <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">Succesvol toegevoegd tot de Cloud Schijf</string>
     <!-- Menu option -->
     <string name="import_success_error">Fout. Niet toegevoegd aan de Cloud Schijf</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1584,8 +1556,8 @@
     <string name="general_incorrect_names">Corrigeer uw bestandsnamen voordat u verder gaat</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Ongeldige tekens</string>
-    <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">De volgende tekens zijn niet toegestaan: ” * / : &lt; &gt; ? \\ |</string>
+    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
+    <string name="invalid_characters_defined">De volgende karakters zijn niet toegestaan: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Bestandnaam kan niet leeg zijn.</item>
@@ -1752,7 +1724,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Bestanden laden</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s B</string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2022,8 +1994,6 @@
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">U heeft een authenticatie applicatie nodig om 2FA in te schakelen op MEGA. U kunt de applicatie Google Authenticator, Duo Mobile, Authy of Microsoft Authenticator downloaden en installeren voor uw telefoon of tablet.</string>
-    <!-- success message when importing multiple files from -->
-    <string name="number_correctly_imported_from_chat">%d bestanden succesvol gedeeld</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d bestanden waren niet gedeeld</string>
     <!-- button’s text to open a full screen image -->
@@ -2420,10 +2390,6 @@
     <string name="title_compress_video">Video’s Comprimeren %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Ongeldige map geselecteerd</string>
-    <!-- Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_one_file">1 map · 1 bestand</string>
-    <!-- Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_several_files">1 map ·%1$d bestanden</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d bestand</item>
@@ -2776,12 +2742,6 @@
         <item quantity="one">%1$d afbeelding&#160;</item>
         <item quantity="other">%1$d afbeeldingen&#160;</item>
     </plurals>
-    <!-- Title of a media recents bucket that contains some images and a video -->
-    <string name="title_media_bucket_images_and_video">%d Afbeeldingen en 1 Video</string>
-    <!-- Title of a media recents bucket that contains an image and some videos -->
-    <string name="title_media_bucket_image_and_videos">1 Afbeelding en %d Video’s</string>
-    <!-- Title of a media recents bucket that contains an image and a video -->
-    <string name="title_media_bucket_image_and_video">1 Afbeelding en 1 Video</string>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]gecreëerd door [/A]%s</string>
     <!-- Label that indicates who updated a file into a recents bucket -->
@@ -3673,23 +3633,23 @@
     <!-- Button to proceed with a payment -->
     <string name="proceed">Doorgaan</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Bedankt voor uw %1$s abonnement!</string>
+    <string name="successful_upgrade">Bedankt voor uw %1$s abonnement</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro-Lite maandelijks</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite maandelijks</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro-Lite jaarlijks</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite jaarlijks</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro-I maandelijks</string>
+    <string name="pro_i_monthly">Pro&#160;I maandelijks</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro-I jaarlijks</string>
+    <string name="pro_i_yearly">Pro&#160;I jaarlijks</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro-II maandelijks</string>
+    <string name="pro_ii_monthly">Pro&#160;II maandelijks</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro-II jaarlijks</string>
+    <string name="pro_ii_yearly">Pro&#160;II jaarlijks</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro-III maandelijks</string>
+    <string name="pro_iii_monthly">Pro&#160;III maandelijks</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro-III jaarlijks</string>
+    <string name="pro_iii_yearly">Pro&#160;III jaarlijks</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Verwijderen als gastvrouw/gastheer</string>
     <!-- Title message of existing subscription dialog -->
@@ -3883,19 +3843,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Kan niet opnieuw verbinden</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A] B</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A] KB</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">%1$s[/A][A] MB</string>
+    <string name="account_achievements_storage_quota_mega_byte">%1$s[/A][A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A] GB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A] TB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A] PB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A] EB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">Oproep eindigt over %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
