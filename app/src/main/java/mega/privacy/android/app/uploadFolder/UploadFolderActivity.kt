@@ -88,8 +88,9 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
 
     private var onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            when {
-                viewModel.back() -> finish()
+            if (viewModel.back()) {
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
             }
         }
     }
