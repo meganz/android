@@ -14,6 +14,7 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupUser
  * @property isMuted            Check if chat is muted
  * @property firstUser          First user of the chat
  * @property lastUser           Last user of the chat
+ * @property unreadCount        Unread messages count
  * @property timeStamp          Last timestamp of the chat
  * @property formattedTimestamp Last timestamp of the chat formatted
  */
@@ -25,6 +26,7 @@ data class MeetingItem constructor(
     val isMuted: Boolean,
     val firstUser: ContactGroupUser,
     val lastUser: ContactGroupUser?,
+    val unreadCount: Int,
     val timeStamp: Long,
     val formattedTimestamp: String,
 ) {

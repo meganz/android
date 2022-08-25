@@ -224,6 +224,7 @@ class GetMeetingListUseCase @Inject constructor(
             isMuted = isMuted,
             firstUser = firstUser,
             lastUser = lastUser,
+            unreadCount = unreadCount,
             timeStamp = chatListItem.lastTimestamp,
             formattedTimestamp = formattedDate)
     }
