@@ -80,4 +80,8 @@ class DefaultNotificationsRepository @Inject constructor(
         megaApiGateway.getContact(email)?.let {
             Contact(it.visibility == MegaUser.VISIBILITY_VISIBLE)
         }
+
+    override suspend fun acknowledgeUserAlerts() {
+        megaApiGateway.acknowledgeUserAlerts()
+    }
 }

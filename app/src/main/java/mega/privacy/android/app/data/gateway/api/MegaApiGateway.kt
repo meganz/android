@@ -425,4 +425,9 @@ interface MegaApiGateway {
      * @param message
      */
     suspend fun sendEvent(eventID: Int, message: String)
+
+    /**
+     * Acknowledge user alerts
+     */
+    suspend fun acknowledgeUserAlerts()
 }
