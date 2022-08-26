@@ -6,8 +6,6 @@ import android.animation.AnimatorSet
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -32,13 +30,11 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MultipleBucketAdapter
-import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -51,9 +47,7 @@ import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VIEWER_FROM_RECETS_BUCKET
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
@@ -460,7 +454,7 @@ class RecentsBucketFragment : Fragment() {
                             itemView.findViewById<SimpleDraweeView>(R.id.thumbnail_media)
 
                         thumbnail.hierarchy.roundingParams = RoundingParams.fromCornersRadius(
-                            context!!.resources.getDimensionPixelSize(
+                            requireContext().resources.getDimensionPixelSize(
                                 R.dimen.cu_fragment_selected_round_corner_radius
                             ).toFloat())
                         thumbnail.background =

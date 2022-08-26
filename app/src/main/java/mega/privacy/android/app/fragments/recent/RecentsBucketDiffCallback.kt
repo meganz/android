@@ -7,6 +7,5 @@ class RecentsBucketDiffCallback : DiffUtil.ItemCallback<NodeItem>() {
     override fun areItemsTheSame(oldItem: NodeItem, newItem: NodeItem) =
         oldItem.node?.handle == newItem.node?.handle
 
-    override fun areContentsTheSame(oldItem: NodeItem, newItem: NodeItem) =
-        oldItem == newItem && !newItem.uiDirty
+    override fun areContentsTheSame(oldItem: NodeItem, newItem: NodeItem) = !newItem.uiDirty
 }

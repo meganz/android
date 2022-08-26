@@ -11,6 +11,9 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 
+/**
+ * A action mode callback class for RecentsBucket
+ */
 class RecentsBucketActionModeCallback constructor(
     private val managerActivity: ManagerActivity,
     private val viewModel: RecentsBucketViewModel,
@@ -21,7 +24,6 @@ class RecentsBucketActionModeCallback constructor(
         val inflater = mode!!.menuInflater
 
         inflater.inflate(R.menu.recents_bucket_action, menu)
-//        checkScroll()
 
         return true
     }
@@ -97,6 +99,5 @@ class RecentsBucketActionModeCallback constructor(
         Timber.d("ActionBarCallBack::onDestroyActionMode")
 
         viewModel.clearSelection()
-//        checkScroll()
     }
 }
