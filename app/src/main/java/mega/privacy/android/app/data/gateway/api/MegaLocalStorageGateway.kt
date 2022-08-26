@@ -262,7 +262,7 @@ interface MegaLocalStorageGateway {
     /**
      * Get external SD card URI
      */
-    suspend fun getUriExternalSd(): String
+    suspend fun getUriExternalSd(): String?
 
     /**
      * Is secondary media folder enabled
@@ -277,7 +277,7 @@ interface MegaLocalStorageGateway {
     /**
      * Get media folder external SD card URI
      */
-    suspend fun getUriMediaFolderExternalSd(): String
+    suspend fun getUriMediaFolderExternalSd(): String?
 
     /**
      * Should clear sync records

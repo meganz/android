@@ -1,6 +1,21 @@
 package mega.privacy.android.app.sync
 
-import mega.privacy.android.app.DatabaseHandler.*
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_DEL
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_EX
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_EXTRA_DATA
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_ID
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_LAST_TIME
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_LOCAL_FOLDER
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_NAME
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_OUTDATED
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_START_TIME
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_STATE
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_SUB_STATE
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_TARGET_NODE
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_TARGET_NODE_PATH
+import mega.privacy.android.app.DatabaseHandler.Companion.KEY_BACKUP_TYPE
+import mega.privacy.android.app.DatabaseHandler.Companion.TABLE_BACKUPS
+import mega.privacy.android.app.DatabaseHandler.Companion.encrypt
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.utils.CameraUploadUtil
