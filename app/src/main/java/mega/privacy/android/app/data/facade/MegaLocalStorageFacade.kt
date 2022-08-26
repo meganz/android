@@ -2,10 +2,12 @@ package mega.privacy.android.app.data.facade
 
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
+import mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.main.megachat.NonContactInfo
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.VideoQuality
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_DESC
@@ -63,7 +65,8 @@ class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getCameraSyncFileUpload(): String? =
         dbHandler.preferences?.camSyncFileUpload
 
-    override suspend fun getVideoQuality(): String = dbHandler.preferences.uploadVideoQuality
+    override suspend fun getVideoQuality(): String =
+        dbHandler.preferences?.uploadVideoQuality ?: VideoQuality.ORIGINAL.value.toString()
 
     override suspend fun deleteAllSyncRecords(syncRecordType: Int) =
         dbHandler.deleteAllSyncRecords(syncRecordType)
@@ -140,10 +143,10 @@ class MegaLocalStorageFacade @Inject constructor(
     override suspend fun doPreferencesExist(): Boolean = dbHandler.preferences != null
 
     override suspend fun isSyncEnabled(): Boolean =
-        dbHandler.preferences.camSyncEnabled.toBoolean()
+        dbHandler.preferences?.camSyncEnabled.toBoolean()
 
     override suspend fun getSyncLocalPath(): String? =
-        dbHandler.preferences.camSyncLocalPath
+        dbHandler.preferences?.camSyncLocalPath
 
     override suspend fun setSyncLocalPath(localPath: String) =
         dbHandler.setCamSyncLocalPath(localPath)
@@ -155,27 +158,28 @@ class MegaLocalStorageFacade @Inject constructor(
         dbHandler.setSecondaryUploadEnabled(secondaryCameraUpload)
 
     override suspend fun getSecondaryFolderPath(): String? =
-        dbHandler.preferences.localPathSecondaryFolder
+        dbHandler.preferences?.localPathSecondaryFolder
 
     override suspend fun getRemoveGpsDefault(): Boolean =
-        dbHandler.preferences.removeGPS?.toBoolean() ?: true
+        dbHandler.preferences?.removeGPS?.toBoolean() ?: true
 
-    override suspend fun getUploadVideoQuality(): String? = dbHandler.preferences.uploadVideoQuality
+    override suspend fun getUploadVideoQuality(): String? =
+        dbHandler.preferences?.uploadVideoQuality
 
     override suspend fun getKeepFileNames(): Boolean =
-        dbHandler.preferences.keepFileNames.toBoolean()
+        dbHandler.preferences?.keepFileNames.toBoolean()
 
     override suspend fun isFolderExternalSd(): Boolean =
-        dbHandler.preferences.cameraFolderExternalSDCard.toBoolean()
+        dbHandler.preferences?.cameraFolderExternalSDCard.toBoolean()
 
-    override suspend fun getUriExternalSd(): String = dbHandler.preferences.uriExternalSDCard
+    override suspend fun getUriExternalSd(): String? = dbHandler.preferences?.uriExternalSDCard
 
     override suspend fun isSecondaryMediaFolderEnabled(): Boolean =
-        dbHandler.preferences.secondaryMediaFolderEnabled.toBoolean()
+        dbHandler.preferences?.secondaryMediaFolderEnabled.toBoolean()
 
     override suspend fun isMediaFolderExternalSd(): Boolean = dbHandler.mediaFolderExternalSdCard
 
-    override suspend fun getUriMediaFolderExternalSd(): String = dbHandler.uriMediaExternalSdCard
+    override suspend fun getUriMediaFolderExternalSd(): String? = dbHandler.uriMediaExternalSdCard
 
     override suspend fun shouldClearSyncRecords(): Boolean = dbHandler.shouldClearCamsyncRecords()
 
@@ -185,10 +189,11 @@ class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord> =
         dbHandler.findVideoSyncRecordsByState(syncStatusType)
 
-    override suspend fun getChargingOnSizeString(): String = dbHandler.preferences.chargingOnSize
+    override suspend fun getChargingOnSizeString(): String =
+        dbHandler.preferences?.chargingOnSize ?: DEFAULT_CONVENTION_QUEUE_SIZE.toString()
 
     override suspend fun convertOnCharging(): Boolean =
-        doPreferencesExist() && dbHandler.preferences.conversionOnCharging.toBoolean()
+        doPreferencesExist() && dbHandler.preferences?.conversionOnCharging.toBoolean()
 
     override suspend fun updateSyncRecordStatusByLocalPath(
         syncStatusType: Int,

@@ -590,7 +590,7 @@ class NodeSaver(
             return
         }
 
-        if (TextUtils.equals(dbHandler.attributes.askSizeDownload, false.toString())
+        if (TextUtils.equals(dbHandler.attributes?.askSizeDownload, false.toString())
             || saving.totalSize() < CONFIRM_SIZE_MIN_BYTES
         ) {
             checkInstalledAppBeforeDownload(parentPath)
@@ -612,7 +612,7 @@ class NodeSaver(
     }
 
     private fun checkInstalledAppBeforeDownload(parentPath: String) {
-        if (TextUtils.equals(dbHandler.attributes.askNoAppDownload, false.toString())) {
+        if (TextUtils.equals(dbHandler.attributes?.askNoAppDownload, false.toString())) {
             download(parentPath)
             return
         }
