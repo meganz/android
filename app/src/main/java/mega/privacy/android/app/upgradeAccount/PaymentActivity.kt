@@ -27,11 +27,16 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isPaymentMethodAvailable
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
-import java.util.Locale
 
+/**
+ * Activity for managing upgrade account payments.
+ */
 class PaymentActivity : PasscodeActivity(), Scrollable {
 
     companion object {
+        /**
+         * Const defining upgrade type.
+         */
         const val UPGRADE_TYPE = "UPGRADE_TYPE"
         private const val NOT_SUBSCRIBED_ALPHA = 0.36f
     }
@@ -262,7 +267,7 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> onBackPressed()
+            android.R.id.home -> onBackPressedDispatcher.onBackPressed()
         }
 
         return super.onOptionsItemSelected(item)
