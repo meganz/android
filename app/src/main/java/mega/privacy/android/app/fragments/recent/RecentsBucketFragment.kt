@@ -32,6 +32,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -72,7 +73,7 @@ import javax.inject.Inject
  * Fragment class for the Recents Bucket
  */
 @AndroidEntryPoint
-class RecentsBucketFragment : Fragment(), ActionMode.Callback {
+class RecentsBucketFragment : Fragment() {
 
     @Inject
     @MegaApi
@@ -89,6 +90,8 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
     private var adapter: MultipleBucketAdapter? = null
 
     private var actionMode: ActionMode? = null
+
+    private lateinit var actionModeCallback: RecentsBucketActionModeCallback
 
     private lateinit var bucket: BucketSaved
 
@@ -119,6 +122,10 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
         }
 
         viewModel.items.observe(viewLifecycleOwner) {
+            callManager { activity ->
+                actionModeCallback =
+                    RecentsBucketActionModeCallback(activity, viewModel)
+            }
             setupListView(it)
             setupHeaderView()
             setupFastScroller(it)
@@ -127,21 +134,18 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
         }
 
         viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
-            val actionModeVal = actionMode
-
-            if (visible) {
-                if (actionModeVal == null) {
-                    callManager {
-                        actionMode = it.startSupportActionMode(this)
-                        it.setTextSubmitted()
-                    }
+            if (visible && actionMode == null) {
+                callManager { activity ->
+                    actionMode = activity.startSupportActionMode(actionModeCallback)
+                    activity.setTextSubmitted()
                 }
-
-                actionMode?.title = viewModel.getSelectedNodesCount().toString()
-                actionMode?.invalidate()
-            } else {
-                if (actionModeVal != null) {
-                    actionModeVal.finish()
+            }
+            actionMode?.let {
+                if (visible) {
+                    it.title = viewModel.getSelectedNodesCount().toString()
+                    it.invalidate()
+                } else {
+                    it.finish()
                     actionMode = null
                 }
             }
@@ -233,11 +237,11 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
     private fun getNodesHandles(isImageViewerValid: Boolean): LongArray? =
         viewModel.items.value?.filter {
             if (isImageViewerValid) {
-                it.node!!.isValidForImageViewer()
+                it.node?.isValidForImageViewer() ?: false
             } else {
-                FileUtil.isAudioOrVideo(it.node!!) && FileUtil.isInternalIntent(it.node!!)
+                FileUtil.isAudioOrVideo(it.node) && FileUtil.isInternalIntent(it.node)
             }
-        }?.map { it.node!!.handle }?.toLongArray()
+        }?.map { it.node?.handle ?: 0L }?.toLongArray()
 
     fun openFile(
         index: Int,
@@ -394,100 +398,6 @@ class RecentsBucketFragment : Fragment(), ActionMode.Callback {
 
     private fun download(handle: Long) {
         callManager { it.saveHandlesToDevice(listOf(handle), true, false, false, false) }
-    }
-
-    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        Timber.d("ActionBarCallBack::onCreateActionMode")
-        val inflater = mode!!.menuInflater
-
-        inflater.inflate(R.menu.recents_bucket_action, menu)
-        checkScroll()
-
-        return true
-    }
-
-    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        Timber.d("ActionBarCallBack::onPrepareActionMode")
-
-        menu!!.findItem(R.id.cab_menu_select_all).isVisible =
-            (viewModel.getSelectedNodesCount() < viewModel.getNodesCount())
-
-        return true
-    }
-
-    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-        Timber.d("ActionBarCallBack::onActionItemClicked")
-        val selectedNodes = viewModel.getSelectedNodes()
-        val nodesHandles = ArrayList(selectedNodes.map { it.node!!.handle })
-        val selectedMegaNodes = selectedNodes.map { it.node!! }
-        when (item!!.itemId) {
-            R.id.cab_menu_download -> {
-                callManager {
-                    it.saveNodesToDevice(
-                        selectedMegaNodes,
-                        false,
-                        false,
-                        false,
-                        false)
-                }
-                viewModel.clearSelection()
-            }
-            R.id.cab_menu_share_link -> {
-                callManager {
-                    LinksUtil.showGetLinkActivity(
-                        it,
-                        nodesHandles.toLongArray()
-                    )
-                }
-                viewModel.clearSelection()
-            }
-            R.id.cab_menu_send_to_chat -> {
-                callManager {
-                    it.attachNodesToChats(selectedMegaNodes)
-                }
-                viewModel.clearSelection()
-            }
-
-            R.id.cab_menu_share_out -> {
-                callManager {
-                    MegaNodeUtil.shareNodes(it, selectedMegaNodes)
-                }
-                viewModel.clearSelection()
-            }
-            R.id.cab_menu_select_all -> {
-                viewModel.selectAll()
-            }
-            R.id.cab_menu_clear_selection -> {
-                viewModel.clearSelection()
-            }
-            R.id.cab_menu_move -> {
-                callManager {
-                    NodeController(it).chooseLocationToMoveNodes(nodesHandles)
-                }
-                viewModel.clearSelection()
-            }
-            R.id.cab_menu_copy -> {
-                callManager {
-                    NodeController(it).chooseLocationToCopyNodes(nodesHandles)
-                }
-                viewModel.clearSelection()
-            }
-            R.id.cab_menu_trash -> {
-                callManager {
-                    it.askConfirmationMoveToRubbish(nodesHandles)
-                }
-                viewModel.clearSelection()
-            }
-        }
-
-        return false
-    }
-
-    override fun onDestroyActionMode(mode: ActionMode?) {
-        Timber.d("ActionBarCallBack::onDestroyActionMode")
-
-        viewModel.clearSelection()
-        checkScroll()
     }
 
     private fun observeAnimatedItems() {

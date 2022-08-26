@@ -16,4 +16,8 @@ open class NodeItem(
     override fun toString(): String {
         return "NodeItem(node=$node, index=$index, isVideo=$isVideo, modifiedDate='$modifiedDate', thumbnail=$thumbnail, selected=$selected, uiDirty=$uiDirty)"
     }
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other)
+    }
 }

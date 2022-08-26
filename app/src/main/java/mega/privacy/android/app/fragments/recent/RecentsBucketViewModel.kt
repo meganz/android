@@ -118,17 +118,11 @@ class RecentsBucketViewModel @Inject constructor(
             .removeObserver(nodesChangeObserver)
     }
 
-    fun getSelectedNodes(): List<NodeItem> {
-        return selectedNodes.toList()
-    }
+    fun getSelectedNodes(): List<NodeItem> = selectedNodes.toList()
 
-    fun getSelectedNodesCount(): Int {
-        return selectedNodes.size
-    }
+    fun getSelectedNodesCount(): Int = selectedNodes.size
 
-    fun getNodesCount(): Int {
-        return items.value?.size ?: 0
-    }
+    fun getNodesCount(): Int = items.value?.size ?: 0
 
     fun clearSelection() {
         _actionMode.value = false

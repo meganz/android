@@ -113,8 +113,8 @@ public class MultipleBucketAdapter
             } else {
                 RelativeLayout.LayoutParams params =
                         (RelativeLayout.LayoutParams) this.thumbnailList.getLayoutParams();
-                params.width = params.height = dp2px(48, outMetrics);
-                int margin = dp2px(12, outMetrics);
+                params.width = params.height = dp2px(ITEM_WIDTH, outMetrics);
+                int margin = dp2px(ITEM_MARGIN, outMetrics);
                 params.setMargins(margin, margin, margin, 0);
 
                 this.thumbnailList.setLayoutParams(params);
@@ -291,8 +291,8 @@ public class MultipleBucketAdapter
                 holder.setImageThumbnail(thumbnail);
             } else {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.thumbnailList.getLayoutParams();
-                params.width = params.height = dp2px(48, outMetrics);
-                int margin = dp2px(12, outMetrics);
+                params.width = params.height = dp2px(ITEM_WIDTH, outMetrics);
+                int margin = dp2px(ITEM_MARGIN, outMetrics);
                 params.setMargins(margin, margin, margin, 0);
                 holder.thumbnailList.setLayoutParams(params);
                 holder.thumbnailList.setImageResource(MimeTypeList.typeForName(megaNode.getName()).getIconResourceId());
@@ -393,4 +393,7 @@ public class MultipleBucketAdapter
 
         return "";
     }
+
+    private static final int ITEM_WIDTH = 48;
+    private static final int ITEM_MARGIN = 12;
 }
