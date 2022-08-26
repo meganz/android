@@ -148,8 +148,9 @@ object PaymentUtils {
         val json = highestGooglePlaySubscription.receipt
         Timber.d("ORIGINAL JSON:$json") //Print JSON in logs to help debug possible payments issues
 
-        val attributes: MegaAttributes = dbH.attributes
-        val lastPublicHandle = attributes.lastPublicHandle
+        val attributes: MegaAttributes? = dbH.attributes
+
+        val lastPublicHandle: Long = attributes?.lastPublicHandle ?: -1
         val listener = OptionalMegaRequestListenerInterface(
             onRequestFinish = { _, error ->
                 if (error.errorCode != MegaError.API_OK) {
@@ -163,9 +164,12 @@ object PaymentUtils {
             if (lastPublicHandle == MegaApiJava.INVALID_HANDLE) {
                 megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)
             } else {
-                megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, lastPublicHandle,
-                    attributes.lastPublicHandleType, attributes.lastPublicHandleTimeStamp, listener
-                )
+                attributes?.run {
+                    megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, lastPublicHandle,
+                        lastPublicHandleType, lastPublicHandleTimeStamp, listener
+                    )
+                }
+
             }
         }
     }

@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
@@ -96,6 +97,44 @@ class MeetingActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Handle events when a Back Press is detected
+     */
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            val currentFragment = getCurrentFragment()
+
+            when (currentFragment) {
+                is CreateMeetingFragment -> {
+                    currentFragment.releaseVideoAndHideKeyboard()
+                    removeRTCAudioManager()
+                }
+                is JoinMeetingFragment -> {
+                    currentFragment.releaseVideoDeviceAndRemoveChatVideoListener()
+                    removeRTCAudioManager()
+                }
+                is JoinMeetingAsGuestFragment -> {
+                    currentFragment.releaseVideoAndHideKeyboard()
+                    removeRTCAudioManager()
+                }
+                is InMeetingFragment -> {
+                    // Prevent guest from quitting the call by pressing back
+                    if (!isGuest) {
+                        currentFragment.removeUI()
+                    }
+                }
+                is MakeModeratorFragment -> {
+                    currentFragment.cancel()
+                }
+            }
+
+            if (currentFragment !is MakeModeratorFragment && (currentFragment !is InMeetingFragment || !isGuest)) {
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
+    }
+
     private fun View.setMarginTop(marginTop: Int) {
         val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
         menuLayoutParams.setMargins(0, marginTop, 0, 0)
@@ -113,6 +152,9 @@ class MeetingActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Setup the Back Press dispatcher to receive Back Press events
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         initIntent()
 
@@ -306,7 +348,7 @@ class MeetingActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -354,38 +396,6 @@ class MeetingActivity : BaseActivity() {
         val currentFragment = getCurrentFragment()
         if (currentFragment is InMeetingFragment) {
             currentFragment.sendEnterCallEvent()
-        }
-    }
-
-    override fun onBackPressed() {
-        val currentFragment = getCurrentFragment()
-
-        when (currentFragment) {
-            is CreateMeetingFragment -> {
-                currentFragment.releaseVideoAndHideKeyboard()
-                removeRTCAudioManager()
-            }
-            is JoinMeetingFragment -> {
-                currentFragment.releaseVideoDeviceAndRemoveChatVideoListener()
-                removeRTCAudioManager()
-            }
-            is JoinMeetingAsGuestFragment -> {
-                currentFragment.releaseVideoAndHideKeyboard()
-                removeRTCAudioManager()
-            }
-            is InMeetingFragment -> {
-                // Prevent guest from quitting the call by pressing back
-                if (!isGuest) {
-                    currentFragment.removeUI()
-                }
-            }
-            is MakeModeratorFragment -> {
-                currentFragment.cancel()
-            }
-        }
-
-        if (currentFragment !is MakeModeratorFragment && (currentFragment !is InMeetingFragment || !isGuest)) {
-            finish()
         }
     }
 

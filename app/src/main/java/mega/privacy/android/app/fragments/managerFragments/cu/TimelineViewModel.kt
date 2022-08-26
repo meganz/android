@@ -452,7 +452,7 @@ class TimelineViewModel @Inject constructor(
         val localFile = Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_DCIM
         )
-        mDbHandler.setCamSyncLocalPath(localFile?.absolutePath)
+        mDbHandler.setCamSyncLocalPath(localFile.absolutePath)
         mDbHandler.setCameraFolderExternalSDCard(false)
         mDbHandler.setCamSyncWifi(!enableCellularSync)
         mDbHandler.setCamSyncFileUpload(

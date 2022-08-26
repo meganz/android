@@ -75,7 +75,7 @@ class DefaultSettingsRepository @Inject constructor(
     }
 
     override fun isPasscodeLockPreferenceEnabled() =
-        databaseHandler.preferences.passcodeLockEnabled.toBoolean()
+        databaseHandler.preferences?.passcodeLockEnabled.toBoolean()
 
     override fun setPasscodeLockEnabled(enabled: Boolean) {
         databaseHandler.isPasscodeLockEnabled = enabled

@@ -44,7 +44,6 @@ import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboardView
 import timber.log.Timber
 import java.security.KeyStore
-import java.util.Locale
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -240,7 +239,7 @@ class PasscodeLockActivity : BaseActivity() {
         binding.passcodeOptionsButton.isVisible = !secondRound
 
         if (mode == UNLOCK_MODE) {
-            attempts = dbH.attributes.attemps
+            attempts = dbH.attributes?.attempts ?: 0
             binding.passcodeOptionsButton.isVisible = false
         }
 
@@ -547,7 +546,7 @@ class PasscodeLockActivity : BaseActivity() {
      * Shows an error and increments failed attempts if not successful.
      */
     private fun confirmUnlockPasscode() {
-        if (sbFirst.toString() == dbH.preferences.passcodeLockCode) {
+        if (sbFirst.toString() == dbH.preferences?.passcodeLockCode) {
             skipPasscode()
         } else {
             sbFirst.clear()

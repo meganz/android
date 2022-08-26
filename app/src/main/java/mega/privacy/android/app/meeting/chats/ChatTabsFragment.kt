@@ -16,8 +16,8 @@ import mega.privacy.android.app.main.megachat.RecentChatsFragment
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter.Tabs.CHAT
 import mega.privacy.android.app.meeting.list.MeetingListFragment
+import mega.privacy.android.app.utils.ColorUtils.setElevationWithColor
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 
 /**
  * Chat tabs fragment containing Chat and Meeting fragment
@@ -26,8 +26,6 @@ import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 class ChatTabsFragment : Fragment() {
 
     companion object {
-        private const val STATE_PAGER_POSITION = "STATE_PAGER_POSITION"
-
         @JvmStatic
         fun newInstance(): ChatTabsFragment =
             ChatTabsFragment()
@@ -40,8 +38,6 @@ class ChatTabsFragment : Fragment() {
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                showElevation(false)
-                (activity as? ManagerActivity?)?.changeAppBarElevation(false)
                 (activity as? ManagerActivity?)?.closeSearchView()
             }
         }
@@ -117,7 +113,7 @@ class ChatTabsFragment : Fragment() {
      * @param show  Flag to either show or hide toolbar elevation
      */
     fun showElevation(show: Boolean) {
-        binding.tabs.elevation = if (show) toolbarElevation else 0F
+        binding.tabs.setElevationWithColor(if (show) toolbarElevation else 0F)
     }
 
     /**

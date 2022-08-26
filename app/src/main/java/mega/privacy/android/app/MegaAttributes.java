@@ -6,7 +6,7 @@ import timber.log.Timber;
 public class MegaAttributes {
 
     private String online;
-    private int attemps;
+    private int attempts;
     private String askSizeDownload;
     private String askNoAppDownload;
     private String accountDetailsTimeStamp;
@@ -32,7 +32,7 @@ public class MegaAttributes {
                           String lastPublicHandleTimeStamp, int lastPublicHandleType, int storageState,
                           String myChatFilesFolderHandle, String transferQueueStatus) {
         this.online = online;
-        this.attemps = attemps;
+        this.attempts = attemps;
         this.askNoAppDownload = askNoAppDownload;
         this.askSizeDownload = askSizeDownload;
         this.accountDetailsTimeStamp = accountDetailsTimeStamp;
@@ -59,12 +59,12 @@ public class MegaAttributes {
         this.online = online;
     }
 
-    public int getAttemps() {
-        return attemps;
+    public int getAttempts() {
+        return attempts;
     }
 
-    public void setAttemps(int attemps) {
-        this.attemps = attemps;
+    public void setAttempts(int attemps) {
+        this.attempts = attemps;
     }
 
     public String getAskSizeDownload() {

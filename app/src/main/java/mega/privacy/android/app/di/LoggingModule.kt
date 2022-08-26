@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.CreateTraceString
 import mega.privacy.android.domain.usecase.DefaultCreateTraceString
 import mega.privacy.android.domain.usecase.DefaultInitialiseLogging
 import mega.privacy.android.domain.usecase.GetCurrentTimeString
+import mega.privacy.android.domain.usecase.GetLogFile
 import mega.privacy.android.domain.usecase.InitialiseLogging
 import mega.privacy.android.domain.usecase.ResetSdkLogger
 import nz.mega.sdk.MegaChatLoggerInterface
@@ -106,5 +107,9 @@ abstract class LoggingModule {
             areChatLogsEnabled = areChatLogsEnabled,
             coroutineDispatcher = coroutineDispatcher,
         )
+
+        @Provides
+        fun provideGetLogFile(repository: LoggingRepository): GetLogFile =
+            GetLogFile(repository::compressLogs)
     }
 }
