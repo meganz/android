@@ -188,7 +188,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
     public static String ACTION_SELECT_FOLDER_TO_SHARE = "ACTION_SELECT_FOLDER_TO_SHARE";
     public static String ACTION_CHOOSE_MEGA_FOLDER_SYNC = "ACTION_CHOOSE_MEGA_FOLDER_SYNC";
     public static String ACTION_MULTISELECT_FILE = "ACTION_MULTISELECT_FILE";
-    public static String ACTION_UPLOAD_TO_CLOUD = "ACTION_UPLOAD_TO_CLOUD";
     public static String ACTION_UPLOAD_TO_CHAT = "ACTION_UPLOAD_TO_CHAT";
     public static String ACTION_SAVE_TO_CLOUD = "ACTION_SAVE_TO_CLOUD";
 
@@ -684,14 +683,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
                 aB.setTitle(getString(R.string.title_share_folder_explorer));
                 setView(SHOW_TABS, false, CHAT_TAB);
-            } else if ((intent.getAction().equals(ACTION_UPLOAD_TO_CLOUD))) {
-                Timber.d("action = UPLOAD to Cloud Drive");
-                mode = UPLOAD;
-                selectFile = false;
-
-                aB.setTitle(getString(R.string.title_cloud_explorer));
-                setView(CLOUD_TAB, false, -1);
-                tabShown = NO_TABS;
             } else if ((intent.getAction().equals(ACTION_SAVE_TO_CLOUD))) {
                 Timber.d("action = SAVE to Cloud Drive");
                 mode = SAVE;
