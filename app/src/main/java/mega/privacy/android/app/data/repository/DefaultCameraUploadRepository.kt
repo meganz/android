@@ -187,7 +187,7 @@ class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.isFolderExternalSd()
     }
 
-    override suspend fun getUriExternalSd(): String = withContext(ioDispatcher) {
+    override suspend fun getUriExternalSd(): String? = withContext(ioDispatcher) {
         localStorageGateway.getUriExternalSd()
     }
 
@@ -199,7 +199,7 @@ class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.isMediaFolderExternalSd()
     }
 
-    override suspend fun getUriMediaFolderExternalSd(): String = withContext(ioDispatcher) {
+    override suspend fun getUriMediaFolderExternalSd(): String? = withContext(ioDispatcher) {
         localStorageGateway.getUriMediaFolderExternalSd()
     }
 

@@ -1167,8 +1167,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         if (state == MegaChatApi.INIT_ERROR || state == MegaChatApi.INIT_NOT_DONE) {
             Timber.w("MegaChatApi state: %s", state)
 
-            val (_, session) = dbH.credentials
-            state = megaChatApi.init(session)
+            state = megaChatApi.init(dbH.credentials?.session)
             Timber.d("result of init ---> %s", state)
 
             if (state == MegaChatApi.INIT_ERROR) {

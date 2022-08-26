@@ -1318,8 +1318,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             MegaApplication.setLoggingIn(true)
             // TODO Remove DbHandler and Refactor in MegaApi dependency removal with use cases:
             // GetSession, FastLogin, InitMegaChat (already provided)
-            megaApi?.fastLogin(tempDbHandler.credentials.session, this)
-            ChatUtil.initMegaChatApi(tempDbHandler.credentials.session)
+            megaApi?.fastLogin(tempDbHandler.credentials?.session, this)
+            ChatUtil.initMegaChatApi(tempDbHandler.credentials?.session)
             return LOGIN_IN
         }
         cameraUploadHandle = CameraUploadUtil.getPrimaryFolderHandle()

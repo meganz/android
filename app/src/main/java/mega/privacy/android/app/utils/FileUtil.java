@@ -1109,7 +1109,7 @@ public class FileUtil {
                 // Copy to target location on SD card.
                 SDCardOperator sdCardOperator = new SDCardOperator(context);
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                sdCardOperator.initDocumentFileRoot(dbH.getSdCardUri());
                 sdCardOperator.moveFile(path.substring(0, path.lastIndexOf(File.separator)), temp);
 
                 // Delete the temp file.
