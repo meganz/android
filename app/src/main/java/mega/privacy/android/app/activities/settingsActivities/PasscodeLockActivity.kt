@@ -10,6 +10,7 @@ import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.EditorInfo.IME_ACTION_NEXT
 import android.view.inputmethod.EditorInfo.IME_FLAG_NO_FULLSCREEN
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.OnBackPressedCallback
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
@@ -104,6 +105,34 @@ class PasscodeLockActivity : BaseActivity() {
     private var forgetPasscode = false
     private var passwordAlreadyTyped = false
 
+    /**
+     * Handle events when a Back Press is detected
+     */
+    private val onBackPressCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
+
+            if (attempts < MAX_ATTEMPTS) {
+                when (mode) {
+                    UNLOCK_MODE -> {
+                        if (forgetPasscode) {
+                            forgetPasscode = false
+                            initPasscodeScreen()
+                        } else {
+                            return
+                        }
+                    }
+                    RESET_MODE -> passcodeManagement.showPasscodeScreen = false
+                    else -> {
+                        retryConnectionsAndSignalPresence()
+                        finish()
+                    }
+                }
+            }
+            setResult(RESULT_CANCELED)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -147,6 +176,8 @@ class PasscodeLockActivity : BaseActivity() {
 
         binding = ActivityPasscodeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        onBackPressedDispatcher.addCallback(this, onBackPressCallback)
 
         if (mode == UNLOCK_MODE) {
             binding.toolbarPasscode.isVisible = false
@@ -700,31 +731,9 @@ class PasscodeLockActivity : BaseActivity() {
         }, 1000)
     }
 
-    override fun onBackPressed() {
-        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
-
-        if (attempts < MAX_ATTEMPTS) {
-            when (mode) {
-                UNLOCK_MODE -> {
-                    if (forgetPasscode) {
-                        forgetPasscode = false
-                        initPasscodeScreen()
-                    } else {
-                        return
-                    }
-                }
-                RESET_MODE -> passcodeManagement.showPasscodeScreen = false
-                else -> finish()
-            }
-        }
-
-        setResult(RESULT_CANCELED)
-        super.onBackPressed()
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home)
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
 
         return super.onOptionsItemSelected(item)
     }
