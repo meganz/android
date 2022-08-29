@@ -53,7 +53,7 @@
         app:roundAsCircle="true"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
-    <androidx.emoji.widget.EmojiAppCompatTextView
+    <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/txt_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -100,7 +100,7 @@
         app:tint="?android:attr/textColorPrimary"
         tools:visibility="visible" />
 
-    <androidx.emoji.widget.EmojiAppCompatTextView
+    <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/txt_last_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
