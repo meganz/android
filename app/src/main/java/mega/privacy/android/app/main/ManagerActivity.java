@@ -5319,16 +5319,6 @@ public class ManagerActivity extends TransfersManagementActivity
         setSearchDrawerItem();
         selectDrawerItem(drawerItem);
         resetActionBar(aB);
-
-        searchViewModel.performSearch(
-                viewModel.getState().getValue().getBrowserParentHandle(),
-                viewModel.getState().getValue().getRubbishBinParentHandle(),
-                viewModel.getState().getValue().getInboxParentHandle(),
-                incomingSharesState(this).getIncomingHandle(),
-                outgoingSharesState(this).getOutgoingHandle(),
-                linksState(this).getLinksHandle(),
-                viewModel.getState().getValue().isFirstNavigationLevel()
-        );
     }
 
     private void setFullscreenOfflineFragmentSearchQuery(String searchQuery) {
