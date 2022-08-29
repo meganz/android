@@ -219,6 +219,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -1133,6 +1134,13 @@ public class ManagerActivity extends TransfersManagementActivity
         if (finish) finish();
     };
 
+    private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            goBack();
+        }
+    };
+
     private FileBackupManager fileBackupManager;
 
     /**
@@ -1433,6 +1441,8 @@ public class ManagerActivity extends TransfersManagementActivity
         viewModel.onInboxSectionUpdate().observe(this, this::updateInboxSectionVisibility);
 
         getTransfersViewModel().onGetShouldCompletedTab().observe(this, this::updateTransfersTab);
+
+        getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
 
         // This block for solving the issue below:
         // Android is installed for the first time. Press the “Open” button on the system installation dialog, press the home button to switch the app to background,
@@ -5415,7 +5425,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                         //Check media discovery mode
                         if (isInMDMode) {
-                            onBackPressed();
+                            getOnBackPressedDispatcher().onBackPressed();
                         } else {
                             //Cloud Drive
                             if (isCloudAdded()) {
@@ -5447,7 +5457,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             return true;
                         } else if (isInAlbumContent) {
                             // When current fragment is AlbumContentFragment, the photosFragment will be null due to replaceFragment.
-                            onBackPressed();
+                            getOnBackPressedDispatcher().onBackPressed();
                         }
                     } else if (drawerItem == DrawerItem.INBOX) {
                         inboxFragment = (InboxFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
@@ -5457,7 +5467,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                     } else if (drawerItem == DrawerItem.SEARCH) {
                         if (getSearchFragment() != null) {
-                            onBackPressed();
+                            getOnBackPressedDispatcher().onBackPressed();
                             return true;
                         }
                     } else if (drawerItem == DrawerItem.TRANSFERS) {
@@ -5469,12 +5479,12 @@ public class ManagerActivity extends TransfersManagementActivity
                             handleBackPressIfFullscreenOfflineFragmentOpened();
                         } else if (mNavController.getCurrentDestination() != null &&
                                 mNavController.getCurrentDestination().getId() == R.id.favouritesFolderFragment) {
-                            onBackPressed();
+                            getOnBackPressedDispatcher().onBackPressed();
                         } else {
                             mNavController.navigateUp();
                         }
                     } else {
-                        super.onBackPressed();
+                        handleSuperBackPressed();
                     }
                 }
                 return true;
@@ -5858,12 +5868,8 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshSearch();
     }
 
-    @Override
-    public void onBackPressed() {
-        Timber.d("onBackPressed");
-
-        // Let the PSA web browser fragment (if visible) to consume the back key event
-        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
+    private void goBack() {
+        Timber.d("goBack");
 
         retryConnectionsAndSignalPresence();
 
@@ -5886,7 +5892,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (mNavController.getCurrentDestination() != null &&
                 mNavController.getCurrentDestination().getId() == R.id.favouritesFolderFragment) {
-            super.onBackPressed();
+            handleSuperBackPressed();
             return;
         }
 
@@ -6013,7 +6019,7 @@ public class ManagerActivity extends TransfersManagementActivity
             } else {
                 drawerItem = DrawerItem.HOMEPAGE;
             }
-            super.onBackPressed();
+            handleSuperBackPressed();
         }
     }
 
@@ -6117,7 +6123,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case R.id.bottom_navigation_item_homepage: {
                 drawerItem = DrawerItem.HOMEPAGE;
                 if (fullscreenOfflineFragment != null) {
-                    super.onBackPressed();
+                    handleSuperBackPressed();
                     return true;
                 } else {
                     setBottomNavigationMenuItemChecked(HOME_BNV);
@@ -9809,7 +9815,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 setInboxNavigationDrawer();
             }
         }
-        
+
         checkCameraUploadFolder(false, updatedNodes);
 
         LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
@@ -11373,5 +11379,11 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             inboxSection.setVisibility(View.GONE);
         }
+    }
+
+    private void handleSuperBackPressed() {
+        onBackPressedCallback.setEnabled(false);
+        getOnBackPressedDispatcher().onBackPressed();
+        onBackPressedCallback.setEnabled(true);
     }
 }
