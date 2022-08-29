@@ -36,32 +36,33 @@ fun ReportIssueView(
     onDescriptionChanged: (String) -> Unit = {},
     onIncludeLogsChanged: (Boolean) -> Unit = {},
     cancelUpload: () -> Unit = {},
-    onDiscard: () -> Unit = {},
-    onNavigationCancelled: () -> Unit = {},
 ) {
-    HandleDialogs(state, onNavigationCancelled, onDiscard, cancelUpload)
 
+    progressHandler(
+        cancelUpload = cancelUpload,
+        uploadProgress = state.uploadProgress
+    )
+
+    body(
+        modifier = modifier,
+        state = state,
+        onDescriptionChanged = onDescriptionChanged,
+        onIncludeLogsChanged = onIncludeLogsChanged
+    )
+}
+
+@Composable
+private fun body(
+    modifier: Modifier,
+    state: ReportIssueState,
+    onDescriptionChanged: (String) -> Unit,
+    onIncludeLogsChanged: (Boolean) -> Unit,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
         modifier = modifier.padding(all = 8.dp),
     ) {
-
-        if (state.error != null) {
-            ErrorBanner(
-                errorMessage = stringResource(id = state.error),
-                modifier = Modifier
-                    .layout { measurable, constraints ->
-                        val placeable = measurable.measure(
-                            constraints.copy(
-                                maxWidth = constraints.maxWidth + 16.dp.roundToPx()
-                            )
-                        )
-                        layout(placeable.width, placeable.height) {
-                            placeable.place(0, 0)
-                        }
-                    })
-
-        }
+        errorBanner(state.error)
 
         Text(text = stringResource(R.string.settings_help_report_issue_instructions))
         Divider(color = colorResource(id = R.color.grey_alpha_012), thickness = 1.dp)
@@ -87,19 +88,37 @@ fun ReportIssueView(
 }
 
 @Composable
-private fun HandleDialogs(
-    state: ReportIssueState,
-    onNavigationCancelled: () -> Unit,
-    onDiscard: () -> Unit,
+private fun errorBanner(error: Int?) {
+    if (error != null) {
+        ErrorBanner(
+            errorMessage = stringResource(id = error),
+            modifier = Modifier
+                .layout { measurable, constraints ->
+                    val placeable = measurable.measure(
+                        constraints.copy(
+                            maxWidth = constraints.maxWidth + 16.dp.roundToPx()
+                        )
+                    )
+                    layout(placeable.width, placeable.height) {
+                        placeable.place(0, 0)
+                    }
+                })
+    }
+}
+
+
+@Composable
+private fun progressHandler(
     cancelUpload: () -> Unit,
+    uploadProgress: Float?,
 ) {
-    if (state.navigationRequested) {
-        DiscardReportDialog(onNavigationCancelled, onDiscard)
-    } else if (state.uploadProgress != null) ProgressDialog(
-        title = stringResource(id = R.string.settings_help_report_issue_uploading_log_file),
-        progress = state.uploadProgress,
-        onCancel = cancelUpload,
-    )
+    if (uploadProgress != null) {
+        ProgressDialog(
+            title = stringResource(id = R.string.settings_help_report_issue_uploading_log_file),
+            progress = uploadProgress,
+            onCancel = cancelUpload,
+        )
+    }
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")

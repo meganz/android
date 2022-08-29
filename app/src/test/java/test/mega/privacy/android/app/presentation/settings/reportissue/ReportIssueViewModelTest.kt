@@ -320,44 +320,5 @@ class ReportIssueViewModelTest {
         }
     }
 
-    @Test
-    fun `test that interceptNavigation returns false if description is empty`() {
-        val actual = underTest.interceptNavigation()
-
-        assertThat(actual).isFalse()
-    }
-
-    @Test
-    fun `test that interceptNavigation returns true if description is not empty`() {
-        underTest.setDescription("Description")
-
-        val actual = underTest.interceptNavigation()
-
-        assertThat(actual).isTrue()
-    }
-
-    @Test
-    fun `test that navigation requested is set to true when navigation is needed`() = runTest {
-        underTest.setDescription("Not empty")
-        underTest.state.map { it.navigationRequested }.distinctUntilChanged()
-            .test {
-                assertThat(awaitItem()).isFalse()
-                underTest.interceptNavigation()
-                assertThat(awaitItem()).isTrue()
-            }
-    }
-
-    @Test
-    fun `test that navigation requested is set to false when cancelled`() = runTest {
-        underTest.setDescription("Description")
-        underTest.state.map { it.navigationRequested }.test {
-            assertThat(awaitItem()).isFalse()
-            underTest.interceptNavigation()
-            assertThat(awaitItem()).isTrue()
-            underTest.navigationCancelled()
-            assertThat(awaitItem()).isFalse()
-        }
-    }
-
     private fun getProgressFlow() = (0..100).map { Progress(it / 100f) }.asFlow()
 }
