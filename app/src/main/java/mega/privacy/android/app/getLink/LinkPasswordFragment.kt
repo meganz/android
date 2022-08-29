@@ -144,7 +144,7 @@ class LinkPasswordFragment : Fragment(), Scrollable {
 
         binding.buttonCancel.setOnClickListener {
             resetView()
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 
@@ -161,7 +161,7 @@ class LinkPasswordFragment : Fragment(), Scrollable {
         resetView()
         
         if (!password.isNullOrEmpty() && (!args.isReset || alreadyReset)) {
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 
