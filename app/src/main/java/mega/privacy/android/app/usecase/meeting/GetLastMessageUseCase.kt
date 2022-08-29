@@ -71,9 +71,6 @@ class GetLastMessageUseCase @Inject constructor(
      */
     fun get(chatId: Long, msgId: Long): Single<SpannableString> =
         Single.fromCallable {
-            val chatMessage = megaChatApi.getMessage(chatId, msgId)
-                ?: return@fromCallable getString(R.string.no_conversation_history).toSpannableString()
-
             megaChatApi.getChatCall(chatId)?.let { chatCall ->
                 if (megaChatApi.getChatConnectionState(chatId) == CHAT_CONNECTION_ONLINE) {
                     when (chatCall.status) {
@@ -96,12 +93,11 @@ class GetLastMessageUseCase @Inject constructor(
                 }
             }
 
-            val chatListItem = megaChatApi.getChatListItem(chatId)
-            requireNotNull(chatListItem)
-            val chatRoom = megaChatApi.getChatRoom(chatId)
-            requireNotNull(chatRoom)
+            val chatListItem = requireNotNull(megaChatApi.getChatListItem(chatId))
+            val chatRoom by lazy { megaChatApi.getChatRoom(chatId) }
+            val chatMessage by lazy { megaChatApi.getMessage(chatId, msgId) }
 
-            return@fromCallable when (chatMessage.type) {
+            return@fromCallable when (chatListItem.lastMessageType) {
                 TYPE_INVALID ->
                     getString(R.string.no_conversation_history).toSpannableString()
                 LAST_MSG_LOADING ->
@@ -155,14 +151,13 @@ class GetLastMessageUseCase @Inject constructor(
                 }
 
                 else -> {
-                    val message = converterShortCodes(chatListItem.lastMessage)
                     when {
                         chatListItem.lastMessage.isNullOrBlank() ->
                             getString(R.string.error_message_unrecognizable).toSpannableString()
                         chatListItem.lastMessageSender == megaChatApi.myUserHandle ->
-                            "${getString(R.string.word_me)}: $message".toSpannableString()
+                            "${getString(R.string.word_me)}: ${converterShortCodes(chatListItem.lastMessage)}".toSpannableString()
                         else ->
-                            message.colorUnreadIfNeeded(chatRoom)
+                            converterShortCodes(chatListItem.lastMessage).colorUnreadIfNeeded(chatRoom)
                     }
                 }
             }
