@@ -1,7 +1,12 @@
 package mega.privacy.android.app.myAccount
 
 import android.app.NotificationManager
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
@@ -9,14 +14,17 @@ import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -27,26 +35,38 @@ import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.main.ChangePasswordActivity
+import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
 import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.ACTION_CANCEL_ACCOUNT
+import mega.privacy.android.app.utils.Constants.ACTION_CHANGE_MAIL
+import mega.privacy.android.app.utils.Constants.ACTION_PASS_CHANGED
+import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
+import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK
+import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
+import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.NOTIFICATION_STORAGE_OVERQUOTA
+import mega.privacy.android.app.utils.Constants.RESULT
+import mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS
+import mega.privacy.android.app.utils.Constants.UPDATE_CREDIT_CARD_SUBSCRIPTION
+import mega.privacy.android.app.utils.Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Util.isDarkMode
+import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.Util.matchRegexs
+import mega.privacy.android.app.utils.Util.showAlert
+import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError.API_OK
-import java.util.*
-import android.content.Intent
-import android.content.pm.PackageManager
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Locale
 
 class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCallback,
     SnackbarShower {
@@ -76,6 +96,13 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     private var confirmChangeEmailDialog: AlertDialog? = null
     private var confirmResetPasswordDialog: AlertDialog? = null
     private var cancelSubscriptionsFeedback: String? = null
+    private val onBackPressCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!navController.navigateUp()) {
+                finish()
+            }
+        }
+    }
 
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -100,7 +127,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
         binding = ActivityMyAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        onBackPressedDispatcher.addCallback(this, onBackPressCallback)
         setupView()
         setupObservers()
         manageIntentExtras()
@@ -211,12 +238,6 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         viewModel.manageActivityResult(this, requestCode, resultCode, intent, this)
     }
 
-    override fun onBackPressed() {
-        if (!navController.navigateUp()) {
-            finish()
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         app?.refreshAccountInfo()
@@ -246,7 +267,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> onBackPressed()
+            android.R.id.home -> onBackPressedDispatcher.onBackPressed()
             R.id.action_kill_all_sessions -> showConfirmationKillSessions()
             R.id.action_change_pass -> navController.navigate(R.id.action_my_account_to_change_password)
             R.id.action_export_MK -> navController.navigate(R.id.action_my_account_to_export_recovery_key)
@@ -530,10 +551,11 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
      * @param platformInfo The information of current subscription platform
      * @param type The type that which kind of dialog will be shown
      */
-    private fun showExistingSubscriptionDialog(platformInfo: PlatformInfo, type: Int){
+    private fun showExistingSubscriptionDialog(platformInfo: PlatformInfo, type: Int) {
         val message = when (type) {
             TYPE_ANDROID_PLATFORM,
-            TYPE_ANDROID_PLATFORM_NO_NAVIGATION->
+            TYPE_ANDROID_PLATFORM_NO_NAVIGATION,
+            ->
                 StringResourcesUtils.getString(
                     R.string.message_android_platform_subscription,
                     platformInfo.platformName,
@@ -646,7 +668,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         dialogType: Int,
         editLayout: TextInputLayout,
         textField: EditText,
-        errorIcon: ImageView
+        errorIcon: ImageView,
     ) {
         dialog?.apply {
             setOnShowListener {
