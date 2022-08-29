@@ -6,6 +6,7 @@ import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.FileUtil.isAudioOrVideo;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ThumbnailUtils.createThumbnailList;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder;
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder;
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromMegaList;
@@ -41,6 +42,11 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import org.jetbrains.annotations.Nullable;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -193,7 +199,6 @@ public class MultipleBucketAdapter
         NodeItem node = getItemAtPosition(position);
         MegaNode megaNode = node.getNode();
         if (megaNode == null) return;
-        node.setUiDirty(false);
         holder.document = megaNode.getHandle();
 
         Bitmap thumbnail = getThumbnailFromCache(megaNode);
@@ -209,6 +214,11 @@ public class MultipleBucketAdapter
                 } catch (Exception e) {
                     Timber.e(e, "Error getting or creating megaNode thumbnail");
                 }
+            }
+        } else if (node.getThumbnail() == null && (megaNode.hasThumbnail() || isMedia)) {
+            File thumbnailFile = new File(getThumbFolder(context), megaNode.getBase64Handle() + ".jpg");
+            if (thumbnailFile.exists()) {
+                node.setThumbnail(thumbnailFile);
             }
         }
 
@@ -239,7 +249,7 @@ public class MultipleBucketAdapter
             holder.thumbnailMedia.getLayoutParams().width = size;
             holder.thumbnailMedia.getLayoutParams().height = size;
 
-            if (thumbnail != null) {
+            if (node.getThumbnail() != null) {
                 ImageRequest request =
                         ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(node.getThumbnail())).build();
                 AbstractDraweeController controller = Fresco.newDraweeControllerBuilder()
@@ -248,7 +258,9 @@ public class MultipleBucketAdapter
                         .build();
                 holder.thumbnailMedia.setController(controller);
             } else {
-                holder.thumbnailMedia.setActualImageResource(R.drawable.ic_image_thumbnail);
+                holder.thumbnailMedia.setImageResource(
+                    MimeTypeList.typeForName(megaNode.getName()).getIconResourceId()
+                );
             }
 
             if (node.getSelected()) {
@@ -304,7 +316,7 @@ public class MultipleBucketAdapter
                 holder.thumbnailList.setImageDrawable(null);
                 int placeHolderRes = MimeTypeList.typeForName(node.getNode().getName()).getIconResourceId();
 
-                if (node.getThumbnail() != null) {
+                if (thumbnail != null) {
                     holder.thumbnailList.setImageURI(Uri.fromFile(node.getThumbnail()));
                 } else {
                     int imgResource;
@@ -317,6 +329,8 @@ public class MultipleBucketAdapter
                 }
             }
         }
+
+        node.setUiDirty(false);
     }
 
     private NodeItem getItemAtPosition(int pos) {
