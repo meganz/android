@@ -110,8 +110,6 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private val onBackPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
-
             if (attempts < MAX_ATTEMPTS) {
                 when (mode) {
                     UNLOCK_MODE -> {
@@ -123,14 +121,17 @@ class PasscodeLockActivity : BaseActivity() {
                         }
                     }
                     RESET_MODE -> passcodeManagement.showPasscodeScreen = false
-                    else -> {
-                        retryConnectionsAndSignalPresence()
-                        finish()
-                    }
+                    else -> finishActivity()
                 }
             }
             setResult(RESULT_CANCELED)
+            finishActivity()
         }
+    }
+
+    private fun finishActivity() {
+        retryConnectionsAndSignalPresence()
+        finish()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
