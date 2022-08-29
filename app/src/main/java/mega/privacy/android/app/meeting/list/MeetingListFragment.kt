@@ -48,6 +48,11 @@ class MeetingListFragment : Fragment() {
         setupObservers()
     }
 
+    override fun onResume() {
+        super.onResume()
+        checkElevation()
+    }
+
     override fun onDestroyView() {
         binding.list.clearOnScrollListeners()
         super.onDestroyView()
@@ -61,13 +66,7 @@ class MeetingListFragment : Fragment() {
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
-                    if (recyclerView.canScrollVertically(RecyclerView.NO_POSITION)) {
-                        (activity as? ManagerActivity?)?.changeAppBarElevation(Util.isDarkMode(context))
-                        (parentFragment as? ChatTabsFragment?)?.showElevation(Util.isDarkMode(context))
-                    } else {
-                        (activity as? ManagerActivity?)?.changeAppBarElevation(false)
-                        (parentFragment as? ChatTabsFragment?)?.showElevation(false)
-                    }
+                    checkElevation()
                 }
             })
         }
@@ -98,6 +97,19 @@ class MeetingListFragment : Fragment() {
     fun setSearchQuery(query: String?) {
         viewModel.setSearchQuery(query)
         viewModel.signalChatPresence()
+    }
+
+    /**
+     * Check tabs proper elevation given the current RecyclerView's position
+     */
+    private fun checkElevation() {
+        if (binding.list.canScrollVertically(RecyclerView.NO_POSITION)) {
+            (activity as? ManagerActivity?)?.changeAppBarElevation(Util.isDarkMode(context))
+            (parentFragment as? ChatTabsFragment?)?.showElevation(true)
+        } else {
+            (activity as? ManagerActivity?)?.changeAppBarElevation(false)
+            (parentFragment as? ChatTabsFragment?)?.showElevation(false)
+        }
     }
 
     private fun onItemClick(chatId: Long) {

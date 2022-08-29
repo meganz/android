@@ -341,7 +341,7 @@ public class SDCardOperator {
             }
 
             try {
-                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
+                sdCardOperator.initDocumentFileRoot(dbH.getSdCardUri());
             } catch (SDCardOperator.SDCardException e) {
                 Timber.e(e, "SDCardOperator initDocumentFileRoot failed requestSDCardPermission");
                 return null;
@@ -394,7 +394,7 @@ public class SDCardOperator {
 
         MegaApplication app = MegaApplication.getInstance();
         try {
-            initDocumentFileRoot(uri != null ? uri : app.getDbH().getSDCardUri());
+            initDocumentFileRoot(uri != null ? uri : app.getDbH().getSdCardUri());
 
             moveFile(targetPath, downloadedFile);
 

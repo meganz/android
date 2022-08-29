@@ -11,6 +11,7 @@ import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -85,8 +86,19 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
 
     private lateinit var collisionsForResult: ActivityResultLauncher<Intent>
 
+    private var onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (viewModel.back()) {
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        onBackPressedDispatcher.addCallback(onBackPressedCallback)
 
         collisionsForResult =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -150,19 +162,13 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> onBackPressed()
+            android.R.id.home -> onBackPressedCallback.handleOnBackPressed()
         }
 
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
-        when {
-            viewModel.back() -> super.onBackPressed()
-        }
-    }
-
-    fun setupView() {
+    private fun setupView() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setHomeButtonEnabled(true)
@@ -231,7 +237,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         checkScroll()
     }
 
-    fun setupObservers() {
+    private fun setupObservers() {
         viewModel.getCurrentFolder().observe(this, ::showCurrentFolder)
         viewModel.getFolderItems().observe(this, ::showFolderContent)
         viewModel.getSelectedItems().observe(this, ::updateActionMode)

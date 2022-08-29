@@ -2164,8 +2164,6 @@
     <string name="title_file_explorer_send_link">Send link to&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Send to&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">Upload to&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">More</string>
     <!-- Section title to select a file to perform an action, more files -->

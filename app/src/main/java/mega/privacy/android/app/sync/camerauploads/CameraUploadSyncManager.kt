@@ -689,8 +689,7 @@ object CameraUploadSyncManager {
         if (megaApi.rootNode == null && !isLoggingIn) {
             Timber.w("RootNode = null, need to login again")
             val dbH = DatabaseHandler.getDbHandler(megaApplication)
-            val credentials: UserCredentials = dbH.credentials
-            val gSession = credentials.session
+            val gSession = dbH.credentials?.session
             MegaApplication.setLoggingIn(true)
             megaApi.fastLogin(gSession, createOnFinishListener(onSuccess = {
                 saveCredentials()
@@ -752,7 +751,7 @@ object CameraUploadSyncManager {
 
         val muBackup = databaseHandler.muBackup
         if (muBackup != null && CameraUploadUtil.isSecondaryEnabled()) {
-            Timber.d("Sending MediaUploads Heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
+            Timber.d("Sending MediaUploads Heartbeat, backupId = ${cuBackup?.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
                 Status.CU_SYNC_STATUS_UPTODATE,
