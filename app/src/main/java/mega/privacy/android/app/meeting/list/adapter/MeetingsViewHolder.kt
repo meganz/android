@@ -22,18 +22,13 @@ class MeetingsViewHolder(
         binding.imgMute.isVisible = item.isMuted
         binding.imgPrivate.isVisible = !item.isPublic
         binding.txtUnreadCount.text = item.unreadCount.toString()
-
-        val textColor: Int
-        val showUnreadCount: Boolean
-        if (item.unreadCount > 0) {
-            showUnreadCount = true
-            textColor = ContextCompat.getColor(itemView.context, R.color.teal_300_teal_200)
+        binding.txtUnreadCount.isVisible = item.unreadCount > 0
+        val lastMessageColor = if (item.highlight) {
+            ContextCompat.getColor(itemView.context, R.color.teal_300_teal_200)
         } else {
-            showUnreadCount = false
-            textColor = getThemeColor(itemView.context, android.R.attr.textColorSecondary)
+            getThemeColor(itemView.context, android.R.attr.textColorSecondary)
         }
-        binding.txtUnreadCount.isVisible = showUnreadCount
-        binding.txtLastMessage.setTextColor(textColor)
+        binding.txtLastMessage.setTextColor(lastMessageColor)
 
         val firstUserPlaceholder = item.firstUser.getImagePlaceholder(itemView.context)
         if (item.isSingleMeeting() || item.lastUser == null) {

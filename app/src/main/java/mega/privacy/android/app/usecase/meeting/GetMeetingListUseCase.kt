@@ -32,7 +32,6 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
-import nz.mega.sdk.MegaChatRoom.PRIV_STANDARD
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
@@ -209,6 +208,7 @@ class GetMeetingListUseCase @Inject constructor(
         val title = ChatUtil.getTitleChat(this)
         val isMuted = !megaApi.isChatNotifiable(chatId)
         val hasPermissions = chatListItem.ownPrivilege == PRIV_MODERATOR
+        val highlight = unreadCount > 0 || chatListItem.isCallInProgress
         val formattedDate = TimeUtils.formatDateAndTime(
             context,
             chatListItem.lastTimestamp,
@@ -246,6 +246,7 @@ class GetMeetingListUseCase @Inject constructor(
             firstUser = firstUser,
             lastUser = lastUser,
             unreadCount = unreadCount,
+            highlight = highlight,
             timeStamp = chatListItem.lastTimestamp,
             formattedTimestamp = formattedDate)
     }
