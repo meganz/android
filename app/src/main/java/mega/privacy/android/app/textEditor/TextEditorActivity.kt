@@ -112,7 +112,19 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            handleGoBack()
+            if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
+                binding.contentEditText.hideKeyboard()
+                showDiscardChangesConfirmationDialog()
+            } else {
+                if (viewModel.isCreateMode()) {
+                    viewModel.saveFile(this@TextEditorActivity,
+                        intent.getBooleanExtra(FROM_HOME_PAGE, false))
+                } else if (viewModel.isReadingContent()) {
+                    viewModel.finishBeforeClosing()
+                }
+                retryConnectionsAndSignalPresence()
+                finish()
+            }
         }
     }
 
@@ -226,26 +238,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         super.onDestroy()
     }
 
-    private fun handleGoBack() {
-        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
-        if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
-            binding.contentEditText.hideKeyboard()
-            showDiscardChangesConfirmationDialog()
-        } else {
-            if (viewModel.isCreateMode()) {
-                viewModel.saveFile(this, intent.getBooleanExtra(FROM_HOME_PAGE, false))
-            } else if (viewModel.isReadingContent()) {
-                viewModel.finishBeforeClosing()
-            }
-            onBackPressedCallback.isEnabled = false
-
-            super.onBackPressed()
-        }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> onBackPressed()
+            android.R.id.home -> onBackPressedDispatcher.onBackPressed()
             R.id.action_save -> viewModel.saveFile(
                 this,
                 intent.getBooleanExtra(FROM_HOME_PAGE, false)

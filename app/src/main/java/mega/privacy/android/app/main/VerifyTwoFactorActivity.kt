@@ -122,9 +122,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener {
-            if (!onBackPressedCallback.isEnabled) {
-                finish()
-            }
+            onBackPressedDispatcher.onBackPressed()
         }
 
         // Popup soft input.
