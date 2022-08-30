@@ -3890,9 +3890,9 @@
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Ngobrol dengan aman dan pribadi, dengan siapa saja dan di perangkat apa pun, mengetahui bahwa tidak ada yang bisa membaca obrolan anda, bahkan MEGA.</string>
     <!-- Title of the option on the meeting list to archive a meeting -->
-    <string name="archive_meeting_option">Archive meeting</string>
+    <string name="archive_meeting_option">Arsipkan rapat</string>
     <!-- Action to indicate immediate meeting creation -->
-    <string name="action_start_meeting_now">Start meeting now</string>
+    <string name="action_start_meeting_now">Mulai rapat sekarang</string>
     <!-- Label for call option on settings -->
     <string name="settings_calls_preferences">Panggilan</string>
     <!-- Label for the sound notifications option on calls settings -->

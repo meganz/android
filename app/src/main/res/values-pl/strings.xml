@@ -1754,7 +1754,7 @@
     <!-- Title of the received requests tab. Capital letters -->
     <string name="tab_received_requests">Otrzymane zgłoszenia</string>
     <!-- Title dialog overquota error -->
-    <string name="overquota_alert_title">Dostępny limit został przekroczony</string>
+    <string name="overquota_alert_title">Przekroczono limit miejsca</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
     <string name="invalid_link">Link nieprawidłowy, poproś o prawidłowy link</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
@@ -3034,9 +3034,9 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">Twoje transfery zostały przerwane. Uaktualnij swoje konto lub poczekaj %s, aby kontynuować.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">Transfer przekroczony</string>
+    <string name="label_transfer_over_quota">Przekroczono limit transferu</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Dostępny limit został przekroczony</string>
+    <string name="label_storage_over_quota">Przekroczono limit miejsca</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Zwiększ swój transfer</string>
     <!-- Warning show to the user when a folder does not exist -->
@@ -4205,9 +4205,9 @@
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Rozmawiaj bezpiecznie i prywatnie z każdym i na każdym urządzeniu, wiedząc, że nikt nie może czytać twoich czatów, nawet MEGA.</string>
     <!-- Title of the option on the meeting list to archive a meeting -->
-    <string name="archive_meeting_option">Archive meeting</string>
+    <string name="archive_meeting_option">Zarchiwizuj spotkanie</string>
     <!-- Action to indicate immediate meeting creation -->
-    <string name="action_start_meeting_now">Start meeting now</string>
+    <string name="action_start_meeting_now">Rozpocznij spotkanie teraz</string>
     <!-- Label for call option on settings -->
     <string name="settings_calls_preferences">Połączenia</string>
     <!-- Label for the sound notifications option on calls settings -->

@@ -1643,7 +1643,7 @@
     <!-- Title of the received requests tab. Capital letters -->
     <string name="tab_received_requests">받은 요청</string>
     <!-- Title dialog overquota error -->
-    <string name="overquota_alert_title">할당량 초과</string>
+    <string name="overquota_alert_title">저장소 할당량 초과</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
     <string name="invalid_link">잘못된 링크, 새 유효한 링크를 요청하세요</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
@@ -2116,7 +2116,7 @@
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">보내기&#8230;</string>
     <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">업로드&#8230;</string>
+    <string name="title_cloud_explorer">Upload to&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">더 보기</string>
     <!-- Section title to select a file to perform an action, more files -->

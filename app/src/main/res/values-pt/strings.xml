@@ -459,7 +459,7 @@
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">Você saiu de %d pastas compartilhadas.</string>
     <!-- Message shown when a share has been left -->
-    <string name="share_left">esquerda compartilhada</string>
+    <string name="share_left">Saiu do compartilhamento</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d pastas não foram deixadas corretamente</string>
     <!-- success message when sending multiple files -->
@@ -2388,7 +2388,7 @@
     <!-- Subtitle of the historic notification when a contact leaves a shared folder -->
     <string name="notification_left_shared_folder">[A]%s[/A][B] saiu de uma pasta compartilhada.[/B]</string>
     <!-- Subtitle of the historic notification when a contact leaves a shared folder and the name of the folder is known -->
-    <string name="notification_left_shared_folder_with_name">[A]%1$s[/A][B] deixou a pasta compartilhada [/B][A]%2$s.[/A]</string>
+    <string name="notification_left_shared_folder_with_name">[A]%1$s[/A][B] saiu da pasta compartilhada [/B][A]%2$s.[/A]</string>
     <!-- Subtitle of the historic notification for incoming contact request ignored -->
     <string name="subtitle_incoming_contact_request_ignored">[B]A solicitação de contato de [/B][A]%s [/A][B]foi ignorada[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request accepted -->

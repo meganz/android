@@ -1643,7 +1643,7 @@
     <!-- Title of the received requests tab. Capital letters -->
     <string name="tab_received_requests">受信済みの要求</string>
     <!-- Title dialog overquota error -->
-    <string name="overquota_alert_title">ストレージ容量超過</string>
+    <string name="overquota_alert_title">ストレージ容量を超えました</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
     <string name="invalid_link">リンクが無効です。新しい有効なリンクを要求してください</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
