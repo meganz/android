@@ -193,7 +193,6 @@ class GetMeetingListUseCase @Inject constructor(
             context,
             chatListItem.lastTimestamp,
             TimeUtils.DATE_LONG_FORMAT)
-        var lastMessageFormatted: SpannableString? = null
         val firstUser: ContactGroupUser
         var lastUser: ContactGroupUser? = null
 
@@ -211,6 +210,7 @@ class GetMeetingListUseCase @Inject constructor(
             }
         }
 
+        var lastMessageFormatted: String? = null
         getLastMessageUseCase.get(chatId, chatListItem.lastMessageId).blockingSubscribeBy(
             onSuccess = { lastMessageFormatted = it },
             onError = Timber::w
@@ -220,7 +220,7 @@ class GetMeetingListUseCase @Inject constructor(
             chatId = chatId,
             title = title,
             lastMessage = lastMessageFormatted,
-            isPublic = this.isPublic,
+            isPublic = isPublic,
             isMuted = isMuted,
             firstUser = firstUser,
             lastUser = lastUser,

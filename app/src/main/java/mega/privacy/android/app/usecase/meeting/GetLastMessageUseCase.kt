@@ -1,11 +1,6 @@
 package mega.privacy.android.app.usecase.meeting
 
 import android.content.Context
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
-import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.MegaApplication
@@ -41,7 +36,6 @@ import nz.mega.sdk.MegaChatMessage.TYPE_SET_PRIVATE_MODE
 import nz.mega.sdk.MegaChatMessage.TYPE_SET_RETENTION_TIME
 import nz.mega.sdk.MegaChatMessage.TYPE_TRUNCATE
 import nz.mega.sdk.MegaChatMessage.TYPE_VOICE_CLIP
-import nz.mega.sdk.MegaChatRoom
 import javax.inject.Inject
 
 /**
@@ -69,24 +63,24 @@ class GetLastMessageUseCase @Inject constructor(
      * @param msgId     Message Id to retrieve chat message
      * @return          Single
      */
-    fun get(chatId: Long, msgId: Long): Single<SpannableString> =
+    fun get(chatId: Long, msgId: Long): Single<String> =
         Single.fromCallable {
             megaChatApi.getChatCall(chatId)?.let { chatCall ->
                 if (megaChatApi.getChatConnectionState(chatId) == CHAT_CONNECTION_ONLINE) {
                     when (chatCall.status) {
                         CALL_STATUS_TERMINATING_USER_PARTICIPATION, CALL_STATUS_USER_NO_PRESENT -> {
                             return@fromCallable if (chatCall.isRinging) {
-                                getString(R.string.notification_subtitle_incoming).toSpannableString()
+                                getString(R.string.notification_subtitle_incoming)
                             } else {
-                                getString(R.string.ongoing_call_messages).toSpannableString()
+                                getString(R.string.ongoing_call_messages)
                             }
                         }
                         CALL_STATUS_JOINING, CALL_STATUS_IN_PROGRESS -> {
                             val requestSent = chatManagement.isRequestSent(chatCall.callId)
                             return@fromCallable if (requestSent) {
-                                getString(R.string.outgoing_call_starting).toSpannableString()
+                                getString(R.string.outgoing_call_starting)
                             } else {
-                                getString(R.string.call_started_messages).toSpannableString()
+                                getString(R.string.call_started_messages)
                             }
                         }
                     }
@@ -99,12 +93,11 @@ class GetLastMessageUseCase @Inject constructor(
 
             return@fromCallable when (chatListItem.lastMessageType) {
                 TYPE_INVALID ->
-                    getString(R.string.no_conversation_history).toSpannableString()
+                    getString(R.string.no_conversation_history)
                 LAST_MSG_LOADING ->
-                    getString(R.string.general_loading).toSpannableString()
+                    getString(R.string.general_loading)
                 TYPE_NORMAL, TYPE_CHAT_TITLE, TYPE_CALL_STARTED, TYPE_CALL_ENDED, TYPE_TRUNCATE, TYPE_ALTER_PARTICIPANTS, TYPE_PRIV_CHANGE, TYPE_CONTAINS_META ->
                     chatController.createManagementString(chatMessage, chatRoom)
-                        .colorUnreadIfNeeded(chatRoom)
                 TYPE_SET_RETENTION_TIME -> {
                     val timeFormatted = ChatUtil.transformSecondsInString(chatRoom.retentionTime)
                     if (timeFormatted.isTextEmpty()) {
@@ -134,38 +127,43 @@ class GetLastMessageUseCase @Inject constructor(
                     ).cleanHtmlText()
                 TYPE_CONTACT_ATTACHMENT -> {
                     val message = converterShortCodes(getString(R.string.contacts_sent, chatMessage.usersCount.toString()))
-                    if (chatListItem.lastMessageSender == megaChatApi.myUserHandle) {
-                        "${getString(R.string.word_me)}: $message".toSpannableString()
+                    if (chatListItem.isMine()) {
+                        "${getString(R.string.word_me)} $message"
                     } else {
-                        message.colorUnreadIfNeeded(chatRoom)
+                        message
                     }
                 }
                 TYPE_VOICE_CLIP -> {
                     val nodeList = chatMessage.megaNodeList
-                    if ((nodeList?.size() ?: 0) > 0 && ChatUtil.isVoiceClip(nodeList.get(0).name)) {
+                    val message = if ((nodeList?.size() ?: 0) > 0 && ChatUtil.isVoiceClip(nodeList.get(0).name)) {
                         val duration = ChatUtil.getVoiceClipDuration(nodeList.get(0))
-                        CallUtil.milliSecondsToTimer(duration).toSpannableString()
+                        CallUtil.milliSecondsToTimer(duration)
                     } else {
-                        SpannableString("--:--")
+                        "--:--"
+                    }
+
+                    if (chatListItem.isMine()) {
+                        "${getString(R.string.word_me)} $message"
+                    } else {
+                        "${chatListItem.getSenderName()}: $message"
                     }
                 }
 
                 else -> {
                     when {
                         chatListItem.lastMessage.isNullOrBlank() ->
-                            getString(R.string.error_message_unrecognizable).toSpannableString()
-                        chatListItem.lastMessageSender == megaChatApi.myUserHandle ->
-                            "${getString(R.string.word_me)}: ${converterShortCodes(chatListItem.lastMessage)}".toSpannableString()
+                            getString(R.string.error_message_unrecognizable)
+                        chatListItem.isMine() ->
+                            "${getString(R.string.word_me)} ${converterShortCodes(chatListItem.lastMessage)}"
                         else ->
-                            converterShortCodes(chatListItem.lastMessage).colorUnreadIfNeeded(chatRoom)
+                            converterShortCodes(chatListItem.lastMessage)
                     }
                 }
             }
         }
 
     private fun MegaChatListItem.getSenderName(): String {
-        val isMine = lastMessageSender == megaChatApi.myUserHandle
-        val senderName = if (isMine) {
+        val senderName = if (isMine()) {
             megaChatApi.myFullname
                 ?: megaChatApi.myEmail
                 ?: getString(R.string.unknown_name_label)
@@ -177,7 +175,10 @@ class GetLastMessageUseCase @Inject constructor(
         return senderName
     }
 
-    private fun String.cleanHtmlText(): SpannableString =
+    private fun MegaChatListItem.isMine(): Boolean =
+        lastMessageSender == megaChatApi.myUserHandle
+
+    private fun String.cleanHtmlText(): String =
         Util.toCDATA(this)
             .replace("[A]", "")
             .replace("[/A]", "")
@@ -186,24 +187,5 @@ class GetLastMessageUseCase @Inject constructor(
             .replace("[C]", "")
             .replace("[/C]", "")
             .toSpannedHtmlText()
-            .toSpannableString()
-
-    private fun String.colorUnreadIfNeeded(chatRoom: MegaChatRoom): SpannableString =
-        toSpannableString().apply {
-            if (chatRoom.isGroup && chatRoom.unreadCount > 0) {
-                setSpan(
-                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.teal_300_teal_200)),
-                    0,
-                    length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            }
-        }
-
-    private fun String.toSpannableString(): SpannableString =
-        SpannableString(this)
-
-    private fun Spanned.toSpannableString(): SpannableString =
-        SpannableString(this)
+            .toString()
 }
-
