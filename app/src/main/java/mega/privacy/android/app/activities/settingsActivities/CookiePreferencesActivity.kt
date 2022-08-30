@@ -2,6 +2,7 @@ package mega.privacy.android.app.activities.settingsActivities
 
 import android.content.DialogInterface
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,10 +16,17 @@ class CookiePreferencesActivity : PreferencesBaseActivity() {
 
     private val viewModel by viewModels<CookieSettingsViewModel>()
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            showUnsavedDialog()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         unregisterReceiver(cookieSettingsReceiver) // Don't need to show the confirmation snackbar here
 
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         setTitle(R.string.settings_about_cookie_settings)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
@@ -27,15 +35,9 @@ class CookiePreferencesActivity : PreferencesBaseActivity() {
         showSaveButton {
             saveCookieSettings()
         }
-    }
 
-    override fun onBackPressed() {
-        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
-
-        if (!viewModel.areCookiesSaved()) {
-            showUnsavedDialog()
-        } else {
-            super.onBackPressed()
+        viewModel.onEnableBackPressedHandler().observe(this) { isEnable ->
+            onBackPressedCallback.isEnabled = isEnable
         }
     }
 
