@@ -142,6 +142,8 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
                 .show()
         }
+        binding.btnClearHistory.isVisible = meeting.hasPermissions
+        binding.dividerClear.isVisible = meeting.hasPermissions
 
         binding.btnArchive.setOnClickListener {
             viewModel.archiveChat(chatId)

@@ -14,10 +14,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaChatApi.CHAT_CONNECTION_ONLINE
 import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
-import nz.mega.sdk.MegaChatCall.CALL_STATUS_JOINING
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT
 import nz.mega.sdk.MegaChatListItem
@@ -65,28 +62,6 @@ class GetLastMessageUseCase @Inject constructor(
      */
     fun get(chatId: Long, msgId: Long): Single<String> =
         Single.fromCallable {
-            megaChatApi.getChatCall(chatId)?.let { chatCall ->
-                if (megaChatApi.getChatConnectionState(chatId) == CHAT_CONNECTION_ONLINE) {
-                    when (chatCall.status) {
-                        CALL_STATUS_TERMINATING_USER_PARTICIPATION, CALL_STATUS_USER_NO_PRESENT -> {
-                            return@fromCallable if (chatCall.isRinging) {
-                                getString(R.string.notification_subtitle_incoming)
-                            } else {
-                                getString(R.string.ongoing_call_messages)
-                            }
-                        }
-                        CALL_STATUS_JOINING, CALL_STATUS_IN_PROGRESS -> {
-                            val requestSent = chatManagement.isRequestSent(chatCall.callId)
-                            return@fromCallable if (requestSent) {
-                                getString(R.string.outgoing_call_starting)
-                            } else {
-                                getString(R.string.call_started_messages)
-                            }
-                        }
-                    }
-                }
-            }
-
             val chatListItem = requireNotNull(megaChatApi.getChatListItem(chatId))
             val chatRoom by lazy { megaChatApi.getChatRoom(chatId) }
             val chatMessage by lazy { megaChatApi.getMessage(chatId, msgId) }
@@ -96,8 +71,29 @@ class GetLastMessageUseCase @Inject constructor(
                     getString(R.string.no_conversation_history)
                 LAST_MSG_LOADING ->
                     getString(R.string.general_loading)
-                TYPE_NORMAL, TYPE_CHAT_TITLE, TYPE_CALL_STARTED, TYPE_CALL_ENDED, TYPE_TRUNCATE, TYPE_ALTER_PARTICIPANTS, TYPE_PRIV_CHANGE, TYPE_CONTAINS_META ->
+                TYPE_NORMAL, TYPE_CHAT_TITLE, TYPE_CALL_ENDED, TYPE_TRUNCATE, TYPE_ALTER_PARTICIPANTS, TYPE_PRIV_CHANGE, TYPE_CONTAINS_META ->
                     chatController.createManagementString(chatMessage, chatRoom)
+                TYPE_CALL_STARTED -> {
+                    val chatCall = megaChatApi.getChatCall(chatId)
+                        ?: return@fromCallable getString(R.string.call_started_messages)
+                    when (chatCall.status) {
+                        CALL_STATUS_TERMINATING_USER_PARTICIPATION, CALL_STATUS_USER_NO_PRESENT -> {
+                            return@fromCallable if (chatCall.isRinging) {
+                                getString(R.string.notification_subtitle_incoming)
+                            } else {
+                                getString(R.string.ongoing_call_messages)
+                            }
+                        }
+                        else -> {
+                            val requestSent = chatManagement.isRequestSent(chatCall.callId)
+                            return@fromCallable if (requestSent) {
+                                getString(R.string.outgoing_call_starting)
+                            } else {
+                                getString(R.string.call_started_messages)
+                            }
+                        }
+                    }
+                }
                 TYPE_SET_RETENTION_TIME -> {
                     val timeFormatted = ChatUtil.transformSecondsInString(chatRoom.retentionTime)
                     if (timeFormatted.isTextEmpty()) {

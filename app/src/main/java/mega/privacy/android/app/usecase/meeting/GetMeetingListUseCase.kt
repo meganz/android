@@ -1,7 +1,6 @@
 package mega.privacy.android.app.usecase.meeting
 
 import android.content.Context
-import android.text.SpannableString
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
@@ -14,6 +13,8 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
+import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
+import mega.privacy.android.app.constants.EventConstants.EVENT_OUTGOING_CALL
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -30,6 +31,8 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
+import nz.mega.sdk.MegaChatRoom.PRIV_STANDARD
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
@@ -137,6 +140,18 @@ class GetMeetingListUseCase @Inject constructor(
                 }
             }
 
+            val callObserver = Observer<Any> { callId ->
+                if (emitter.isCancelled) return@Observer
+                val chatCall = megaChatApi.getChatCallByCallId(callId as Long)
+
+                val index = meetings.indexOfFirst { it.chatId == chatCall.chatid }
+                if (index != Constants.INVALID_POSITION) {
+                    val chatRoom = megaChatApi.getChatRoom(chatCall.chatid)
+                    meetings[index] = chatRoom.toMeetingItem(userAttrsListener)
+                    emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+                }
+            }
+
             megaChatApi.getChatRoomsByType(MegaChatApi.CHAT_TYPE_MEETING_ROOM)
                 .filter { it.isActive && !it.isArchived }
                 .forEach { chatRoom ->
@@ -172,10 +187,14 @@ class GetMeetingListUseCase @Inject constructor(
                 ).addTo(changesSubscription)
 
             LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).observeForever(muteObserver)
+            LiveEventBus.get(EVENT_OUTGOING_CALL).observeForever(callObserver)
+            LiveEventBus.get(EVENT_NOT_OUTGOING_CALL).observeForever(callObserver)
 
             emitter.setCancellable {
                 changesSubscription.dispose()
                 LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).removeObserver(muteObserver)
+                LiveEventBus.get(EVENT_OUTGOING_CALL).removeObserver(callObserver)
+                LiveEventBus.get(EVENT_NOT_OUTGOING_CALL).removeObserver(callObserver)
             }
         }, BackpressureStrategy.LATEST)
 
@@ -189,6 +208,7 @@ class GetMeetingListUseCase @Inject constructor(
         val chatListItem = megaChatApi.getChatListItem(chatId)
         val title = ChatUtil.getTitleChat(this)
         val isMuted = !megaApi.isChatNotifiable(chatId)
+        val hasPermissions = chatListItem.ownPrivilege == PRIV_MODERATOR
         val formattedDate = TimeUtils.formatDateAndTime(
             context,
             chatListItem.lastTimestamp,
@@ -222,6 +242,7 @@ class GetMeetingListUseCase @Inject constructor(
             lastMessage = lastMessageFormatted,
             isPublic = isPublic,
             isMuted = isMuted,
+            hasPermissions = hasPermissions,
             firstUser = firstUser,
             lastUser = lastUser,
             unreadCount = unreadCount,
