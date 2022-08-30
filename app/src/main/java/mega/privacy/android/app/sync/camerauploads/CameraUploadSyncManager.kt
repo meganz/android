@@ -176,7 +176,7 @@ object CameraUploadSyncManager {
                         targetNode = nodeHandle,
                         localFolder = file,
                         backupName = name,
-                        state = access,
+                        state = BackupState.fromValue(access),
                         subState = numDetails,
                     )
                     Timber.d("Save Backup $backup to local cache.")
@@ -445,7 +445,7 @@ object CameraUploadSyncManager {
         }
 
         val cuSync = databaseHandler.cuBackup
-        if (cuSync != null && backupState.value != cuSync.state) {
+        if (cuSync != null && backupState != cuSync.state) {
             updateBackup(
                 backupId = cuSync.backupId,
                 targetNode = INVALID_HANDLE,
@@ -468,7 +468,7 @@ object CameraUploadSyncManager {
         }
 
         val muSync = databaseHandler.muBackup
-        if (muSync != null && backupState.value != muSync.state) {
+        if (muSync != null && backupState != muSync.state) {
             updateBackup(
                 backupId = muSync.backupId,
                 targetNode = INVALID_HANDLE,
@@ -528,7 +528,7 @@ object CameraUploadSyncManager {
                         backup.apply {
                             if (nodeHandle != INVALID_HANDLE) this.targetNode = nodeHandle
                             if (file != null) this.localFolder = file
-                            if (access != INVALID_VALUE) state = access
+                            if (access != INVALID_VALUE) state = BackupState.fromValue(access)
                             if (name != null) this.backupName = name
                         }
                         databaseHandler.updateBackup(backup)
@@ -628,7 +628,7 @@ object CameraUploadSyncManager {
             .subscribe({
                 val cuBackup = databaseHandler.cuBackup
                 if (CameraUploadUtil.isPrimaryEnabled() && cuBackup != null
-                    && cuTotalUploadBytes != 0L && cuBackup.state != BackupState.PAUSE_UPLOADS.value
+                    && cuTotalUploadBytes != 0L && cuBackup.state != BackupState.PAUSE_UPLOADS
                 ) {
                     Timber.d("Send CU heartbeat.")
                     megaApi.sendBackupHeartbeat(
@@ -645,7 +645,7 @@ object CameraUploadSyncManager {
 
                 val muBackup = databaseHandler.muBackup
                 if (CameraUploadUtil.isSecondaryEnabled() && muBackup != null
-                    && muTotalUploadBytes != 0L && muBackup.state != BackupState.PAUSE_UPLOADS.value
+                    && muTotalUploadBytes != 0L && muBackup.state != BackupState.PAUSE_UPLOADS
                 ) {
                     Timber.d("Send MU heartbeat.")
                     megaApi.sendBackupHeartbeat(

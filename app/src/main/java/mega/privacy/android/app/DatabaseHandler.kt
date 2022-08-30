@@ -21,6 +21,7 @@ import mega.privacy.android.app.main.megachat.NonContactInfo
 import mega.privacy.android.app.main.megachat.PendingMessageSingle
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.Backup
+import mega.privacy.android.app.sync.BackupState
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removePrimaryBackup
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removeSecondaryBackup
@@ -4210,7 +4211,7 @@ open class DatabaseHandler(
         values.put(KEY_BACKUP_TARGET_NODE, encrypt(backup.targetNode.toString()))
         values.put(KEY_BACKUP_LOCAL_FOLDER, encrypt(backup.localFolder))
         values.put(KEY_BACKUP_NAME, encrypt(backup.backupName))
-        values.put(KEY_BACKUP_STATE, backup.state)
+        values.put(KEY_BACKUP_STATE, backup.state.value)
         values.put(KEY_BACKUP_SUB_STATE, backup.subState)
         values.put(KEY_BACKUP_EXTRA_DATA, encrypt(backup.extraData))
         values.put(KEY_BACKUP_START_TIME, encrypt(backup.startTimestamp.toString()))
@@ -4306,7 +4307,7 @@ open class DatabaseHandler(
                 .toLong(),
             localFolder = decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_LOCAL_FOLDER)))!!,
             backupName = decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_NAME)))!!,
-            state = cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_STATE)),
+            state = BackupState.fromValue(cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_STATE))),
             subState = cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_SUB_STATE)),
             extraData = decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_EXTRA_DATA)))!!,
             startTimestamp = decrypt(cursor.getString(cursor.getColumnIndex(

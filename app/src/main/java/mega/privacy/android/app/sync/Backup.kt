@@ -28,7 +28,7 @@ data class Backup(
      * Valid value definitions
      * @see MegaApiJava
      */
-    var state: Int = BackupState.ACTIVE.value,
+    var state: BackupState = BackupState.ACTIVE,
     /**
      * Valid value definitions
      * @see MegaError

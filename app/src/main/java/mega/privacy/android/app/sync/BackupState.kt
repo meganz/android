@@ -51,5 +51,18 @@ enum class BackupState(val value: Int) {
     /**
      * Deleted Backup State, sent when the user wants to delete the Backup via Backup Center
      */
-    DELETED(8),
+    DELETED(8);
+
+    companion object {
+        private val map = values().associateBy(BackupState::value)
+
+        /**
+         * Performs a Reverse Lookup in order to retrieve the correct [BackupState]
+         * depending on the value that was passed
+         *
+         * @param value The [BackupState] value
+         * @return The appropriate [BackupState], or [INVALID] if there is no matching value
+         */
+        fun fromValue(value: Int) = map[value] ?: INVALID
+    }
 }
