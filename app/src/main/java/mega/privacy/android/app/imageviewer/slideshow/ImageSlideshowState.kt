@@ -1,10 +1,15 @@
 package mega.privacy.android.app.imageviewer.slideshow
 
 /**
- * Enum representing Image viewer slideshow states:
- *
- *  - STARTED: Slideshow has been started
- *  - NEXT: Slideshow should show next slide
- *  - STOPPED: Slideshow has been stopped
+ * Enum representing Image viewer slideshow states
  */
-enum class ImageSlideshowState { STARTED, NEXT, STOPPED }
+enum class ImageSlideshowState {
+    /** Slideshow has been started */
+    STARTED,
+
+    /** Slideshow should show next slide */
+    NEXT,
+
+    /** Slideshow has been stopped */
+    STOPPED
+}
