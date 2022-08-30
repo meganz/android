@@ -184,10 +184,10 @@ object CameraUploadSyncManager {
                     reEnableCameraUploadsPreference(totalBytes.toInt())
 
                     // After setting up the Backup folder, immediately send an Unknown Heartbeat
-                    if (backupType == BACKUP_TYPE_CAMERA_UPLOADS) {
-                        sendPrimaryFolderHeartbeat(HeartbeatStatus.UNKNOWN)
-                    } else if (backupType == BACKUP_TYPE_MEDIA_UPLOADS) {
-                        sendSecondaryFolderHeartbeat(HeartbeatStatus.UNKNOWN)
+                    when (backupType) {
+                        BACKUP_TYPE_CAMERA_UPLOADS -> sendPrimaryFolderHeartbeat(HeartbeatStatus.UNKNOWN)
+                        BACKUP_TYPE_MEDIA_UPLOADS -> sendSecondaryFolderHeartbeat(HeartbeatStatus.UNKNOWN)
+                        else -> Unit
                     }
                 }
             } else {
