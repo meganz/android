@@ -388,6 +388,7 @@ import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
+import mega.privacy.android.app.sync.BackupState;
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
@@ -9381,9 +9382,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
 
                 // Update CU backup state.
-                CameraUploadSyncManager.BackupState newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-                        ? CameraUploadSyncManager.BackupState.PAUSE_UPLOADS
-                        : CameraUploadSyncManager.BackupState.ACTIVE;
+                BackupState newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+                        ? BackupState.PAUSE_UPLOADS
+                        : BackupState.ACTIVE;
 
                 CameraUploadSyncManager.INSTANCE.updatePrimaryFolderBackupState(newBackupState);
                 CameraUploadSyncManager.INSTANCE.updateSecondaryFolderBackupState(newBackupState);

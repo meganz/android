@@ -1,0 +1,55 @@
+package mega.privacy.android.app.sync
+
+/**
+ * Enum class that provides different types of Backup States
+ *
+ * @param value The value of the Backup State to be sent to the API
+ */
+enum class BackupState(val value: Int) {
+
+    /**
+     * Invalid Backup State
+     */
+    INVALID(-1),
+
+    /**
+     * Active Backup State (Enabled)
+     */
+    ACTIVE(1),
+
+    /**
+     * Failed Backup State (Permanently Disabled)
+     */
+    FAILED(2),
+
+    /**
+     * Temporarily Disabled Backup State, sent when a transient situation occurs
+     * (e.g. Account Blocked)
+     */
+    TEMPORARILY_DISABLED(3),
+
+    /**
+     * Disabled Backup State
+     */
+    DISABLED(4),
+
+    /**
+     * Pause Uploads Backup State, sent when Upload Transfers are paused in the SDK
+     */
+    PAUSE_UPLOADS(5),
+
+    /**
+     * Pause Downloads Backup State, sent when Download Transfers are paused in the SDK
+     */
+    PAUSE_DOWNLOADS(6),
+
+    /**
+     * Pause All Backup State, sent when both Upload and Download Transfers are paused in the SDK
+     */
+    PAUSE_ALL(7),
+
+    /**
+     * Deleted Backup State, sent when the user wants to delete the Backup via Backup Center
+     */
+    DELETED(8),
+}

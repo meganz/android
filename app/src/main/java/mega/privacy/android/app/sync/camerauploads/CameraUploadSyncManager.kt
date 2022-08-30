@@ -12,6 +12,8 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.sync.Backup
+import mega.privacy.android.app.sync.BackupState
+import mega.privacy.android.app.sync.HeartbeatStatus
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -38,93 +40,6 @@ import java.util.concurrent.TimeUnit.SECONDS
 object CameraUploadSyncManager {
 
     private const val PROGRESS_FINISHED = 100
-
-    /**
-     * Enum class that provides different types of Backup States
-     *
-     * @param value The value of the Backup State to be sent to the API
-     */
-    enum class BackupState(val value: Int) {
-
-        /**
-         * Invalid Backup State
-         */
-        INVALID(-1),
-
-        /**
-         * Active Backup State (Enabled)
-         */
-        ACTIVE(1),
-
-        /**
-         * Failed Backup State (Permanently Disabled)
-         */
-        FAILED(2),
-
-        /**
-         * Temporarily Disabled Backup State, sent when a transient situation occurs
-         * (e.g. Account Blocked)
-         */
-        TEMPORARILY_DISABLED(3),
-
-        /**
-         * Disabled Backup State
-         */
-        DISABLED(4),
-
-        /**
-         * Pause Uploads Backup State, sent when Upload Transfers are paused in the SDK
-         */
-        PAUSE_UPLOADS(5),
-
-        /**
-         * Pause Downloads Backup State, sent when Download Transfers are paused in the SDK
-         */
-        PAUSE_DOWNLOADS(6),
-
-        /**
-         * Pause All Backup State, sent when both Upload and Download Transfers are paused in the SDK
-         */
-        PAUSE_ALL(7),
-
-        /**
-         * Deleted Backup State, sent when the user wants to delete the Backup via Backup Center
-         */
-        DELETED(8),
-    }
-
-    /**
-     * Enum class that provides different types of Heartbeat Statuses
-     *
-     * @param value The value of the Heartbeat Status to be sent to the API
-     */
-    enum class HeartbeatStatus(val value: Int) {
-
-        /**
-         * Up to Date Heartbeat that is sent when the local and remote
-         */
-        UP_TO_DATE(1),
-
-        /**
-         * Syncing Heartbeat, sent when the Transfers are in progress
-         */
-        SYNCING(2),
-
-        /**
-         * Pending Heartbeat, sent when scanning local folders
-         */
-        PENDING(3),
-
-        /**
-         * Inactive Heartbeat, sent when the sync is not active
-         */
-        INACTIVE(4),
-
-        /**
-         * Unknown Heartbeat, sent when a Backup is enabled (CU/MU)
-         */
-        UNKNOWN(5),
-    }
 
     /**
      * While CU process is running, send heartbeat every 30s.
