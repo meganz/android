@@ -15,6 +15,9 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -79,11 +82,9 @@ class ZipBrowserActivity : PasscodeActivity() {
 
     private val zipBrowserViewModel by viewModels<ZipBrowserViewModel>()
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+    private val onBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            if (zipBrowserViewModel.backOnPress()) {
-                finish()
-            }
+            zipBrowserViewModel.handleOnBackPressed()
         }
     }
 
@@ -156,6 +157,12 @@ class ZipBrowserActivity : PasscodeActivity() {
             }
             openFile.observe(this@ZipBrowserActivity) { openFile ->
                 openFile(openFile.second, openFile.first)
+            }
+            lifecycleScope.launchWhenStarted {
+                enableBackPressedHandler.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                    .collect { isEnabled ->
+                        onBackPressedCallback.isEnabled = isEnabled
+                    }
             }
             // Log the zip file path
             crashReporter.log("Path of ZipFile(setupViewModel) is $zipFullPath")

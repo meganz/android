@@ -5,7 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -64,14 +66,12 @@ class ZipBrowserViewModel @Inject constructor(
     val openFile: LiveData<Pair<Int, ZipInfoUIO>>
         get() = _openFile
 
-    private var isException = false
+    private val _deepOfFolder = MutableStateFlow(0)
 
-    private val handler = CoroutineExceptionHandler { _, exception ->
-        Timber.e(exception)
-        if (exception is IllegalArgumentException) {
-            isException = true
-        }
-    }
+    /**
+     * enable back pressed handler, true when deep > 1 otherwise false
+     */
+    val enableBackPressedHandler = _deepOfFolder.asStateFlow().map { deep -> deep > 1 }
 
     /**
      * The type of clicked item
@@ -91,6 +91,7 @@ class ZipBrowserViewModel @Inject constructor(
             }
 
         getTitle(folderPath.ifEmpty { "" })
+        _deepOfFolder.value = _deepOfFolder.value.inc()
     }
 
     /**
@@ -151,7 +152,7 @@ class ZipBrowserViewModel @Inject constructor(
         crashReporter.log("Path of ZipFile(viewModelInit) is $zipFullPath")
         zipFile = ZipFile(zipFullPath)
         rootFolderPath = unzipRootPath.split("/").last()
-        viewModelScope.launch(handler) {
+        viewModelScope.launch {
             zipFileRepository.initZipTreeNode(zipFile)
             updateZipInfoList()
         }
@@ -159,31 +160,26 @@ class ZipBrowserViewModel @Inject constructor(
 
     /**
      * Validation current folder if the root folder when the back button clicked.
-     * @return if true, use super.onBackPress(). If false, return parent directory
      */
-    fun backOnPress(): Boolean {
-        if (isException) {
-            return true
-        }
+    fun handleOnBackPressed() {
         if (zipInfoList.value.isNullOrEmpty()) {
-            return currentZipInfo?.run {
-                backUpdateZipInfoList(this.path, true)
-            } ?: true
+            currentZipInfo?.let {
+                backUpdateZipInfoList(it.path, true)
+            }
         } else {
             _zipInfoList.value?.get(0)?.path?.apply {
-                return backUpdateZipInfoList(this, false)
+                backUpdateZipInfoList(this, false)
             }
-            return true
         }
+        _deepOfFolder.value = _deepOfFolder.value.dec()
     }
 
     /**
      * Update zip info list when the back button is clicked
      * @param parentFolderPath parent folder path
      * @param isEmptyFolder current folder whether is empty folder
-     * @return validation that parent folder content whether is empty, if true close activity
      */
-    private fun backUpdateZipInfoList(parentFolderPath: String, isEmptyFolder: Boolean): Boolean {
+    private fun backUpdateZipInfoList(parentFolderPath: String, isEmptyFolder: Boolean) {
         _zipInfoList.value =
             zipFileRepository.getParentZipInfoList(parentFolderPath, isEmptyFolder).map {
                 zipTreeNodeToZipInfoUIO(it)
@@ -191,7 +187,6 @@ class ZipBrowserViewModel @Inject constructor(
                 val firstNodeParent = it.firstOrNull()?.parent
                 getTitle(if (firstNodeParent.isNullOrEmpty()) "" else firstNodeParent)
             }
-        return zipInfoList.value.isNullOrEmpty()
     }
 
     /**
