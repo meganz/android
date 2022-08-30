@@ -12,6 +12,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.RelativeLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
@@ -40,8 +41,10 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
-import java.util.Locale
 
+/**
+ * Activity for the Giphy picker
+ */
 class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
     companion object {
@@ -54,6 +57,9 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         private const val EMPTY_IMAGE_MARGIN_TOP_LANDSCAPE = 20F
         private const val EMPTY_TEXT_MARGIN_TOP_LANDSCAPE = 0
 
+        /**
+         * To specify GIF data values
+         */
         const val GIF_DATA = "GIF_DATA"
     }
 
@@ -87,8 +93,18 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         }
     }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            setResult(RESULT_CANCELED)
+            retryConnectionsAndSignalPresence()
+            finish()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         ColorUtils.changeStatusBarColorForElevation(this, true)
 
@@ -175,12 +191,6 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         })
     }
 
-    override fun onBackPressed() {
-        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
-        setResult(RESULT_CANCELED)
-        super.onBackPressed()
-    }
-
     override fun onDestroy() {
         cancelPreviousRequests()
         super.onDestroy()
@@ -188,7 +198,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home)
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
 
         return super.onOptionsItemSelected(item)
     }
@@ -214,8 +224,8 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
     private fun updateView() {
         var widthScreen = 0
 
-        var paramsEmptyImage = binding.emptyGiphyImage.layoutParams as RelativeLayout.LayoutParams
-        var paramsEmptyText = binding.emptyGiphyText.layoutParams as RelativeLayout.LayoutParams
+        val paramsEmptyImage = binding.emptyGiphyImage.layoutParams as RelativeLayout.LayoutParams
+        val paramsEmptyText = binding.emptyGiphyText.layoutParams as RelativeLayout.LayoutParams
 
         if (screenOrientation == ORIENTATION_PORTRAIT) {
             numColumns = NUM_COLUMNS_PORTRAIT
@@ -385,7 +395,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
                 binding.giphyList.adapter = giphyAdapter
                 binding.giphyListView.visibility = VISIBLE
             }
-            isChangeOfType || gifsData?.size!! <= DEFAULT_LIMIT -> {
+            isChangeOfType || (gifsData?.size ?: return) <= DEFAULT_LIMIT -> {
                 giphyAdapter?.setGifs(gifsData)
                 binding.giphyList.scrollToPosition(0)
             }
@@ -415,9 +425,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         searchAutoComplete.hint = getString(R.string.search_giphy_title)
 
         searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
-                return true
-            }
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean = true
 
             override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
                 requestTrendingData(false)
