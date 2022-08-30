@@ -1,6 +1,7 @@
 package mega.privacy.android.app.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaLoggerInterface
@@ -128,6 +129,11 @@ interface MegaApiGateway {
      * Global updates
      */
     val globalUpdates: Flow<GlobalUpdate>
+
+    /**
+     * Global transfer
+     */
+    val globalTransfer: Flow<GlobalTransfer>
 
     /**
      * Get favourites

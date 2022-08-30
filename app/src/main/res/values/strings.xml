@@ -2164,6 +2164,8 @@
     <string name="title_file_explorer_send_link">Send link to&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Send to&#8230;</string>
+    <!-- Title of cloud explorer to upload a link or file -->
+    <string name="title_cloud_explorer">Upload to&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">More</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -3196,10 +3198,6 @@
     <string name="file_created">File created</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">File creation failed. Please try again.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">File saved to %1$s</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">File not saved to %1$s. Try again.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">File updated</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -3225,7 +3223,7 @@
     <!-- settings title of the Media section -->
     <string name="settings_media_audio_files">Audio files</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="settings_background_play_hint">Playing on the background</string>
+    <string name="settings_background_play_hint">Playing in the background</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
     <string name="photos_empty">[B]No[/B] [A]photos[/A] [B]found[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
@@ -4004,6 +4002,10 @@
     <string name="settings_calls_preferences_sound_notifications_text">Hear a sound when someone joins or leaves a call.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Not now</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">File saved to Cloud drive.</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">File not saved to Cloud drive. Try again.</string>
     <!-- Action label to start images slideshow -->
     <string name="action_slideshow">Slideshow</string>
 </resources>
