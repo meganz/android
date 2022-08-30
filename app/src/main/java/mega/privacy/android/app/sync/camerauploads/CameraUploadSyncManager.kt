@@ -169,7 +169,7 @@ object CameraUploadSyncManager {
         OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
             if (error.errorCode == MegaError.API_OK) {
                 Timber.d("Request ${request.type}: ${request.requestString} successfully")
-                request.apply {
+                with(request) {
                     val backup = Backup(
                         backupId = parentHandle,
                         backupType = totalBytes.toInt(),
@@ -177,7 +177,7 @@ object CameraUploadSyncManager {
                         localFolder = file,
                         backupName = name,
                         state = access,
-                        subState = numDetails
+                        subState = numDetails,
                     )
                     Timber.d("Save Backup $backup to local cache.")
                     databaseHandler.saveBackup(backup)
