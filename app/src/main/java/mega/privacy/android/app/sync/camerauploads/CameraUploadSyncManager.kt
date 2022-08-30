@@ -521,7 +521,7 @@ object CameraUploadSyncManager {
         OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
             if (error.errorCode == MegaError.API_OK) {
                 // Update local cache
-                request.apply {
+                with(request) {
                     val backup = databaseHandler.getBackupById(parentHandle)
 
                     if (backup != null && !backup.outdated) {
