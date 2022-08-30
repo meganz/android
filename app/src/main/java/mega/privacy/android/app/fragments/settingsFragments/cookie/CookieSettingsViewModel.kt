@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -19,15 +20,31 @@ import javax.inject.Inject
 @HiltViewModel
 class CookieSettingsViewModel @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
-    private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase
+    private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
 ) : BaseRxViewModel() {
 
     private val enabledCookies = MutableLiveData(mutableSetOf(CookieType.ESSENTIAL))
     private val updateResult = MutableLiveData<Boolean>()
-    private var savedCookiesSize = 1
+    private val savedCookiesSize = MutableLiveData(1)
+
+    private val enableBackPressedHandler = MediatorLiveData<Boolean>().also { mediator ->
+        mediator.addSource(enabledCookies) { enabledCookies ->
+            mediator.value = enabledCookies.size != savedCookiesSize.value
+        }
+        mediator.addSource(savedCookiesSize) { savedCookiesSize ->
+            mediator.value = savedCookiesSize != enabledCookies.value?.size
+        }
+    }
 
     fun onEnabledCookies(): LiveData<MutableSet<CookieType>> = enabledCookies
     fun onUpdateResult(): LiveData<Boolean> = updateResult
+
+    /**
+     * On enable back pressed handler
+     *
+     * @return livedata to enable/disable back pressed handler
+     */
+    fun onEnableBackPressedHandler(): LiveData<Boolean> = enableBackPressedHandler
 
     init {
         getCookieSettings()
@@ -64,12 +81,6 @@ class CookieSettingsViewModel @Inject constructor(
     }
 
     /**
-     * Check if current cookie settings are saved
-     */
-    fun areCookiesSaved(): Boolean =
-        savedCookiesSize == enabledCookies.value?.size
-
-    /**
      * Save cookie settings to SDK
      */
     fun saveCookieSettings() {
@@ -101,7 +112,7 @@ class CookieSettingsViewModel @Inject constructor(
                 onSuccess = { settings ->
                     if (!settings.isNullOrEmpty()) {
                         enabledCookies.value = settings.toMutableSet()
-                        savedCookiesSize = settings.size
+                        savedCookiesSize.value = settings.size
                     }
 
                     updateResult.value = true
