@@ -6,7 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_DISABLE_MEDIA_UPLOADS_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING
@@ -67,9 +67,9 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
                         Timber.d("Refresh Camera Uploads Settings Event Received")
                         it.refreshCameraUploadsSettings()
                     }
-                    ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING -> {
-                        Timber.d("Disable Camera Uploads UI Event Received")
-                        it.disableCameraUploadUIProcess()
+                    ACTION_DISABLE_MEDIA_UPLOADS_SETTING -> {
+                        Timber.d("Disable Media Uploads UI Event Received")
+                        it.disableMediaUploadUIProcess()
                     }
                     else -> Unit
                 }
@@ -175,7 +175,7 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
 
         val filterUpdateCUSettings = IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED)
         filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING)
-        filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING)
+        filterUpdateCUSettings.addAction(ACTION_DISABLE_MEDIA_UPLOADS_SETTING)
         registerReceiver(updateCameraUploadsSettingsReceiver, filterUpdateCUSettings)
     }
 
