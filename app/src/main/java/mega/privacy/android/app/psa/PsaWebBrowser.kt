@@ -1,7 +1,6 @@
 package mega.privacy.android.app.psa
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -97,7 +96,9 @@ class PsaWebBrowser : Fragment() {
         // If the activity is no longer the activity sit on the top at the moment
         // then don't show psa on it. Show psa even if the app(activity task) is already on the background.
         if (!Util.isTopActivity(activity?.javaClass?.name, requireContext())) return
-
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this, onBackPressedCallback
+        )
         uiHandler.post {
             binding.webView.visibility = View.VISIBLE
             onBackPressedCallback.isEnabled = true
@@ -125,15 +126,9 @@ class PsaWebBrowser : Fragment() {
             if (currentActivity is BaseActivity && binding.webView.visibility == View.VISIBLE) {
                 binding.webView.visibility = View.INVISIBLE
                 onBackPressedCallback.isEnabled = false
+                onBackPressedCallback.remove()
             }
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        requireActivity().onBackPressedDispatcher.addCallback(
-            this, onBackPressedCallback
-        )
     }
 
     @Deprecated("All activities and fragments should handle their own " +

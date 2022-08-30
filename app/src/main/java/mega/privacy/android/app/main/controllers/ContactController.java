@@ -15,7 +15,6 @@ import java.util.List;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.ShareListener;
@@ -47,7 +46,6 @@ public class ContactController {
     MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi = null;
     DatabaseHandler dbH;
-    MegaPreferences prefs = null;
 
     public ContactController(Context context) {
         Timber.d("ContactController created");
@@ -64,18 +62,6 @@ public class ContactController {
         }
     }
 
-    public static Intent getPickFolderToShareIntent(Context context, List<MegaUser> users) {
-        Timber.d("pickFolderToShare");
-
-        Intent intent = new Intent(context, FileExplorerActivity.class);
-        intent.setAction(FileExplorerActivity.ACTION_SELECT_FOLDER_TO_SHARE);
-        ArrayList<String> longArray = new ArrayList<String>();
-        for (int i = 0; i < users.size(); i++) {
-            longArray.add(users.get(i).getEmail());
-        }
-        intent.putStringArrayListExtra(SELECTED_CONTACTS, longArray);
-        return intent;
-    }
 
     public static Intent getPickFileToSendIntent(Context context, List<MegaUser> users) {
         Timber.d("pickFileToSend");
@@ -128,114 +114,6 @@ public class ContactController {
                     megaChatApi.hangChatCall(call.getCallId(), new HangChatCallListener(context));
                 }
             }
-        }
-    }
-
-
-    public void removeMultipleContacts(final ArrayList<MegaUser> contacts) {
-        if (contacts.size() > 1) {
-            MultipleRequestListener removeMultipleListener = new MultipleRequestListener(-1, context);
-
-            for (MegaUser c : contacts) {
-                checkRemoveContact(c);
-                megaApi.removeContact(c, removeMultipleListener);
-            }
-        } else {
-            removeContact(contacts.get(0));
-        }
-    }
-
-    public void reinviteMultipleContacts(final List<MegaContactRequest> requests) {
-        MultipleRequestListener reinviteMultipleListener = null;
-        if (requests.size() > 1) {
-            Timber.d("Reinvite multiple request");
-            reinviteMultipleListener = new MultipleRequestListener(-1, context);
-            for (int j = 0; j < requests.size(); j++) {
-
-                final MegaContactRequest request = requests.get(j);
-
-                megaApi.inviteContact(request.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_REMIND, reinviteMultipleListener);
-            }
-        } else {
-            Timber.d("Reinvite one request");
-
-            final MegaContactRequest request = requests.get(0);
-
-            reinviteContact(request);
-        }
-    }
-
-    public void deleteMultipleSentRequestContacts(final List<MegaContactRequest> requests) {
-        MultipleRequestListener deleteMultipleListener = null;
-        if (requests.size() > 1) {
-            Timber.d("Delete multiple request");
-            deleteMultipleListener = new MultipleRequestListener(-1, context);
-            for (int j = 0; j < requests.size(); j++) {
-
-                final MegaContactRequest request = requests.get(j);
-
-                megaApi.inviteContact(request.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_DELETE, deleteMultipleListener);
-            }
-        } else {
-            Timber.d("Delete one request");
-
-            final MegaContactRequest request = requests.get(0);
-
-            removeInvitationContact(request);
-        }
-    }
-
-    public void acceptMultipleReceivedRequest(final List<MegaContactRequest> requests) {
-        MultipleRequestListener acceptMultipleListener = null;
-        if (requests.size() > 1) {
-            Timber.d("Accept multiple request");
-            acceptMultipleListener = new MultipleRequestListener(-1, context);
-            for (int j = 0; j < requests.size(); j++) {
-
-                final MegaContactRequest request = requests.get(j);
-                megaApi.replyContactRequest(request, MegaContactRequest.REPLY_ACTION_ACCEPT, acceptMultipleListener);
-            }
-        } else {
-            Timber.d("Accept one request");
-
-            final MegaContactRequest request = requests.get(0);
-            acceptInvitationContact(request);
-        }
-    }
-
-    public void declineMultipleReceivedRequest(final List<MegaContactRequest> requests) {
-        MultipleRequestListener declineMultipleListener = null;
-        if (requests.size() > 1) {
-            Timber.d("Decline multiple request");
-            declineMultipleListener = new MultipleRequestListener(-1, context);
-            for (int j = 0; j < requests.size(); j++) {
-
-                final MegaContactRequest request = requests.get(j);
-                megaApi.replyContactRequest(request, MegaContactRequest.REPLY_ACTION_DENY, declineMultipleListener);
-            }
-        } else {
-            Timber.d("Decline one request");
-
-            final MegaContactRequest request = requests.get(0);
-            declineInvitationContact(request);
-        }
-    }
-
-    public void ignoreMultipleReceivedRequest(final List<MegaContactRequest> requests) {
-        MultipleRequestListener ignoreMultipleListener = null;
-        if (requests.size() > 1) {
-            Timber.d("Ignore multiple request");
-            ignoreMultipleListener = new MultipleRequestListener(-1, context);
-            for (int j = 0; j < requests.size(); j++) {
-
-                final MegaContactRequest request = requests.get(j);
-                megaApi.replyContactRequest(request, MegaContactRequest.REPLY_ACTION_IGNORE, ignoreMultipleListener);
-            }
-        } else {
-            Timber.d("Ignore one request");
-
-            final MegaContactRequest request = requests.get(0);
-            ignoreInvitationContact(request);
         }
     }
 
@@ -379,65 +257,6 @@ public class ContactController {
         megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, listener);
         megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, listener);
         megaApi.getUserAlias(user.getHandle(), listener);
-    }
-
-    public void acceptInvitationContact(MegaContactRequest c) {
-        Timber.d("acceptInvitationContact");
-        megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_ACCEPT, (ManagerActivity) context);
-    }
-
-    public void declineInvitationContact(MegaContactRequest c) {
-        Timber.d("declineInvitationContact");
-        megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_DENY, (ManagerActivity) context);
-    }
-
-    public void ignoreInvitationContact(MegaContactRequest c) {
-        Timber.d("ignoreInvitationContact");
-        megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_IGNORE, (ManagerActivity) context);
-    }
-
-    public void reinviteContact(MegaContactRequest c) {
-        Timber.d("inviteContact");
-        megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_REMIND, (ManagerActivity) context);
-    }
-
-    public void removeInvitationContact(MegaContactRequest c) {
-        Timber.d("removeInvitationContact");
-        megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_DELETE, (ManagerActivity) context);
-    }
-
-    public String getFullName(String name, String lastName, String mail) {
-
-        if (name == null) {
-            name = "";
-        }
-        if (lastName == null) {
-            lastName = "";
-        }
-        String fullName = "";
-
-        if (name.trim().length() <= 0) {
-            fullName = lastName;
-        } else {
-            fullName = name + " " + lastName;
-        }
-
-        if (fullName.trim().length() <= 0) {
-            Timber.w("Full name empty");
-            Timber.d("Put email as fullname");
-
-            if (mail == null) {
-                mail = "";
-            }
-
-            if (mail.trim().length() <= 0) {
-                return "";
-            } else {
-                return mail;
-            }
-        }
-
-        return fullName;
     }
 
     public ArrayList<String> getEmailShares(ArrayList<MegaShare> shares) {

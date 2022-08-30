@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/multiple_bucket_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -107,10 +108,26 @@
         android:layout_height="wrap_content"
         android:layout_margin="1dp">
 
-        <ImageView
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/thumbnail_media"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="@dimen/grid_node_item_width"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="1dp"
+            android:paddingTop="1dp"
+            android:paddingRight="1dp"
+            android:paddingBottom="1dp"
+            app:actualImageScaleType="centerCrop"/>
+
+        <ImageView
+            android:id="@+id/icon_selected"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginTop="7dp"
+            android:src="@drawable/ic_select_folder"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <RelativeLayout
             android:id="@+id/video_layout"

@@ -267,6 +267,10 @@ class MegaApiFacade @Inject constructor(
         megaApi.sendEvent(eventID, message)
 
 
+    override suspend fun acknowledgeUserAlerts() {
+        megaApi.acknowledgeUserAlerts()
+    }
+
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
     }
