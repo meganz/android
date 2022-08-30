@@ -1,10 +1,17 @@
 package mega.privacy.android.app.fragments.recent
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -12,6 +19,8 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.drawee.generic.RoundingParams
+import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BucketSaved
 import mega.privacy.android.app.MimeTypeList
@@ -21,6 +30,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
@@ -53,6 +63,9 @@ import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Fragment class for the Recents Bucket
+ */
 @AndroidEntryPoint
 class RecentsBucketFragment : Fragment() {
 
@@ -70,15 +83,21 @@ class RecentsBucketFragment : Fragment() {
 
     private var adapter: MultipleBucketAdapter? = null
 
+    private var actionMode: ActionMode? = null
+
+    private lateinit var actionModeCallback: RecentsBucketActionModeCallback
+
     private lateinit var bucket: BucketSaved
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         binding = FragmentRecentBucketBinding.inflate(inflater, container, false)
         listView = binding.multipleBucketView
+        listView.layoutManager = LinearLayoutManager(requireContext())
+        listView.itemAnimator = null
         return binding.root
     }
 
@@ -97,6 +116,10 @@ class RecentsBucketFragment : Fragment() {
         }
 
         viewModel.items.observe(viewLifecycleOwner) {
+            callManager { activity ->
+                actionModeCallback =
+                    RecentsBucketActionModeCallback(activity, viewModel)
+            }
             setupListView(it)
             setupHeaderView()
             setupFastScroller(it)
@@ -104,12 +127,38 @@ class RecentsBucketFragment : Fragment() {
             checkScroll()
         }
 
+        viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
+            if (visible && actionMode == null) {
+                callManager { activity ->
+                    actionMode = activity.startSupportActionMode(actionModeCallback)
+                    activity.setTextSubmitted()
+                }
+            }
+            actionMode?.let {
+                if (visible) {
+                    it.title = viewModel.getSelectedNodesCount().toString()
+                    it.invalidate()
+                } else {
+                    it.finish()
+                    actionMode = null
+                }
+            }
+        }
+
+        observeAnimatedItems()
+
         observeDragSupportEvents(viewLifecycleOwner, listView, VIEWER_FROM_RECETS_BUCKET)
     }
 
-    private fun setupListView(nodes: List<MegaNode>) {
+    private fun setupListView(nodes: List<NodeItem>) {
         if (adapter == null) {
-            adapter = MultipleBucketAdapter(activity, this, nodes, bucket.isMedia)
+            adapter = MultipleBucketAdapter(
+                activity,
+                this,
+                nodes,
+                bucket.isMedia,
+                RecentsBucketDiffCallback()
+            )
             listView.adapter = adapter
 
             if (bucket.isMedia) {
@@ -140,7 +189,7 @@ class RecentsBucketFragment : Fragment() {
         }
     }
 
-    private fun setupFastScroller(nodes: List<MegaNode>) {
+    private fun setupFastScroller(nodes: List<NodeItem>) {
         if (nodes.size >= MIN_ITEMS_SCROLLBAR) {
             binding.fastscroll.visibility = View.VISIBLE
             binding.fastscroll.setRecyclerView(listView)
@@ -182,11 +231,11 @@ class RecentsBucketFragment : Fragment() {
     private fun getNodesHandles(isImageViewerValid: Boolean): LongArray? =
         viewModel.items.value?.filter {
             if (isImageViewerValid) {
-                it.isValidForImageViewer()
+                it.node?.isValidForImageViewer() ?: false
             } else {
-                FileUtil.isAudioOrVideo(it) && FileUtil.isInternalIntent(it)
+                FileUtil.isAudioOrVideo(it.node) && FileUtil.isInternalIntent(it.node)
             }
-        }?.map { it.handle }?.toLongArray()
+        }?.map { it.node?.handle ?: 0L }?.toLongArray()
 
     fun openFile(
         index: Int,
@@ -226,6 +275,10 @@ class RecentsBucketFragment : Fragment() {
                 )
             }
         }
+    }
+
+    fun onNodeLongClicked(position: Int, node: NodeItem) {
+        viewModel.onNodeLongClicked(position, node)
     }
 
     private fun openPdf(
@@ -339,5 +392,101 @@ class RecentsBucketFragment : Fragment() {
 
     private fun download(handle: Long) {
         callManager { it.saveHandlesToDevice(listOf(handle), true, false, false, false) }
+    }
+
+    private fun observeAnimatedItems() {
+        var animatorSet: AnimatorSet? = null
+
+        viewModel.nodesToAnimate.observe(viewLifecycleOwner) {
+            val rvAdapter = adapter ?: return@observe
+
+            animatorSet?.run {
+                // End the started animation if any, or the view may show messy as its property
+                // would be wrongly changed by multiple animations running at the same time
+                // via contiguous quick clicks on the item
+                if (isStarted) {
+                    end()
+                }
+            }
+
+            // Must create a new AnimatorSet, or it would keep all previous
+            // animation and play them together
+            animatorSet = AnimatorSet()
+            val animatorList = mutableListOf<Animator>()
+
+            animatorSet?.addListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(animation: Animator) {
+                }
+
+                override fun onAnimationEnd(animation: Animator) {
+                    viewModel.items.value?.let { newList ->
+                        rvAdapter.submitList(ArrayList(newList))
+                    }
+                }
+
+                override fun onAnimationCancel(animation: Animator) {
+                }
+
+                override fun onAnimationStart(animation: Animator) {
+                }
+            })
+
+            it.forEach { pos ->
+                listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
+                    val itemView = viewHolder.itemView
+
+                    val imageView: ImageView = if (!bucket.isMedia) {
+                        val thumbnail = itemView.findViewById<ImageView>(R.id.thumbnail_list)
+                        val param = thumbnail?.layoutParams as RelativeLayout.LayoutParams
+                        param.width = Util.dp2px(
+                            48f,
+                            resources.displayMetrics
+                        )
+                        param.height = param.width
+                        param.marginStart = Util.dp2px(
+                            12f,
+                            resources.displayMetrics
+                        )
+                        thumbnail.layoutParams = param
+                        thumbnail
+                    } else {
+                        val thumbnail =
+                            itemView.findViewById<SimpleDraweeView>(R.id.thumbnail_media)
+
+                        thumbnail.hierarchy.roundingParams = RoundingParams.fromCornersRadius(
+                            requireContext().resources.getDimensionPixelSize(
+                                R.dimen.cu_fragment_selected_round_corner_radius
+                            ).toFloat())
+                        thumbnail.background =
+                            ContextCompat.getDrawable(
+                                requireContext(), R.drawable.background_item_grid_selected
+                            )
+                        itemView.findViewById(R.id.icon_selected)
+                    }
+
+                    imageView.run {
+                        setImageResource(R.drawable.ic_select_folder)
+                        visibility = View.VISIBLE
+
+                        val animator =
+                            AnimatorInflater.loadAnimator(requireContext(), R.animator.icon_select)
+                        animator.setTarget(this)
+                        animatorList.add(animator)
+                    }
+                }
+            }
+
+            animatorSet?.playTogether(animatorList)
+            animatorSet?.start()
+        }
+    }
+
+    fun handleItemClick(position: Int, node: NodeItem, isMedia: Boolean) {
+        if (actionMode == null) {
+            openFile(position, node.node ?: return, isMedia)
+        } else {
+            viewModel.onNodeLongClicked(position, node)
+        }
+
     }
 }
