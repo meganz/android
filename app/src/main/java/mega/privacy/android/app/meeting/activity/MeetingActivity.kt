@@ -222,7 +222,7 @@ class MeetingActivity : BaseActivity() {
                 false
             )
 
-            if (isGuest || shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+            if ((!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere()) {
                 meetingViewModel.currentChatId.value?.let { currentChatId ->
                     if (currentChatId != MEGACHAT_INVALID_HANDLE) {
                         //Notification of this call should be displayed again
