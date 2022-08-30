@@ -3541,6 +3541,7 @@ public class ManagerActivity extends TransfersManagementActivity
         replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
         viewModel.onMediaDiscoveryOpened(mediaHandle);
         isInMDMode = true;
+        viewModel.setIsFirstNavigationLevel(false);
     }
 
     public void skipToAlbumContentFragment(Fragment f) {
@@ -3693,7 +3694,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 MegaNode parentNode = megaApi.getNodeByHandle(viewModel.getState().getValue().getBrowserParentHandle());
                 if (parentNode != null) {
                     if (megaApi.getRootNode() != null) {
-                        if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || viewModel.getState().getValue().getBrowserParentHandle() == -1) {
+                        if ((parentNode.getHandle() == megaApi.getRootNode().getHandle()
+                                || viewModel.getState().getValue().getBrowserParentHandle() == -1)
+                                && !isInMDMode) {
                             aB.setTitle(getString(R.string.section_cloud_drive));
                             viewModel.setIsFirstNavigationLevel(true);
                         } else {
