@@ -58,7 +58,7 @@ class TransfersWidget(
      *                          - MegaTransfer.TYPE_UPLOAD if upload transfer
      * @param transfersInfo Transfers info.
      */
-    fun update(transferType: Int, transfersInfo: TransfersInfo) {
+    fun update(transfersInfo: TransfersInfo) {
         if (context is ManagerActivity) {
             if (context.drawerItem === DrawerItem.TRANSFERS) {
                 transfersManagement.setAreFailedTransfers(false)
@@ -74,9 +74,8 @@ class TransfersWidget(
             transfersInfo.numPendingTransfers > 0 && !transfersManagement.shouldShowNetworkWarning -> {
                 setProgress(
                     transfersInfo = transfersInfo,
-                    progress = getProgress(),
-                    typeTransfer = transferType)
-
+                    typeTransfer = transfersInfo.transferType
+                )
                 updateState(transfersInfo.areTransfersPaused)
             }
             (transfersInfo.numPendingTransfers > 0 && transfersManagement.shouldShowNetworkWarning)
@@ -184,7 +183,10 @@ class TransfersWidget(
             transfersWidget.visibility = View.VISIBLE
         }
 
-        setProgress(transfersInfo = transfersInfo, progress = getProgress(), typeTransfer = NO_TYPE)
+        setProgress(
+            transfersInfo = transfersInfo,
+            typeTransfer = NO_TYPE
+        )
         progressBar.progressDrawable = getDrawable(R.drawable.thin_circular_warning_progress_bar)
         updateStatus(getDrawable(R.drawable.ic_transfers_error))
     }
@@ -205,14 +207,18 @@ class TransfersWidget(
      * Sets the progress of the transfers in the progress bar taking into account the type of transfer.
      *
      * @param transfersInfo Transfers info.
-     * @param progress      the progress of the transfers
      * @param typeTransfer  type of the transfer:
      * - NO_TYPE if no type
      * - MegaTransfer.TYPE_DOWNLOAD if download transfer
      * - MegaTransfer.TYPE_UPLOAD if upload transfer
      */
-    fun setProgress(transfersInfo: TransfersInfo, progress: Int, typeTransfer: Int) {
-        setProgress(progress)
+    fun setProgress(transfersInfo: TransfersInfo, typeTransfer: Int) {
+        setProgress(
+            getProgress(
+                transfersInfo.totalSizePendingTransfer,
+                transfersInfo.totalSizeTransferred
+            )
+        )
         val pendingDownloads = transfersInfo.numPendingDownloadsNonBackground > 0
         val pendingUploads = transfersInfo.numPendingUploads > 0
 
@@ -246,10 +252,7 @@ class TransfersWidget(
      *
      * @return The transfers progress.
      */
-    @Suppress("DEPRECATION")
-    private fun getProgress(): Int {
-        val totalSizePendingTransfer = megaApi.totalDownloadBytes + megaApi.totalUploadBytes
-        val totalSizeTransferred = megaApi.totalDownloadedBytes + megaApi.totalUploadedBytes
+    private fun getProgress(totalSizePendingTransfer: Long, totalSizeTransferred: Long): Int {
         val doubleProgress = totalSizeTransferred.toDouble() / totalSizePendingTransfer * 100
 
         return if (!doubleProgress.isNaN()) doubleProgress.roundToInt() else 0
