@@ -127,6 +127,12 @@ class ImageViewerViewModel @Inject constructor(
         super.onCleared()
     }
 
+    /**
+     * Get an updated LiveData of adapter images filtered
+     *
+     * @param filterVideos  Flag to filter videos and only get images
+     * @return              LiveData
+     */
     fun onAdapterImages(filterVideos: Boolean): LiveData<List<ImageAdapterItem>?> =
         images.map { items ->
             if (filterVideos) {
@@ -137,9 +143,21 @@ class ImageViewerViewModel @Inject constructor(
             }
         }
 
+    /**
+     * Get an updated LiveData of a specific Image
+     *
+     * @param itemId    Item id to find the specific Image
+     * @return          LiveData
+     */
     fun onImage(itemId: Long?): LiveData<ImageItem?> =
         images.map { items -> items?.firstOrNull { it.id == itemId } }
 
+    /**
+     * Get the amount of images
+     *
+     * @param filterVideos  Flag to filter videos and only count images
+     * @return              Number of image items
+     */
     fun getImagesSize(filterVideos: Boolean): Int =
         if (filterVideos) {
             images.value?.count { it.imageResult?.isVideo != true } ?: 0
@@ -147,6 +165,12 @@ class ImageViewerViewModel @Inject constructor(
             images.value?.size ?: 0
         }
 
+    /**
+     * Get current position
+     *
+     * @param filterVideos  Flag to filter videos and get images position only
+     * @return              Current position
+     */
     fun getCurrentPosition(filterVideos: Boolean): Int =
         if (filterVideos) {
             images.value?.filter { it.imageResult?.isVideo != true }
@@ -674,6 +698,12 @@ class ImageViewerViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Update current image being shown based on the current position
+     *
+     * @param position      Position of the current image
+     * @param filterVideos  Flag to filter videos and count images only
+     */
     fun updateCurrentImage(position: Int, filterVideos: Boolean) {
         if (filterVideos) {
             currentImageId.value = images.value
@@ -768,6 +798,9 @@ class ImageViewerViewModel @Inject constructor(
             }
     }
 
+    /**
+     * Start slideshow
+     */
     fun startSlideshow() {
         stopSlideshow()
         Observable.interval(SLIDESHOW_DELAY, SLIDESHOW_DELAY, TimeUnit.SECONDS)
@@ -784,6 +817,9 @@ class ImageViewerViewModel @Inject constructor(
             .addTo(timerComposite)
     }
 
+    /**
+     * Stop slideshow
+     */
     fun stopSlideshow() {
         timerComposite.clear()
         slideShowState.value = STOPPED

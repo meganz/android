@@ -25,7 +25,6 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_DELETE_VERSI
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_FILE_INFO;
 import static mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_INBOX;
 import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest;

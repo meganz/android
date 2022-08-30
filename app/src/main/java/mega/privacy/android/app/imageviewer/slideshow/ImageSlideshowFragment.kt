@@ -26,6 +26,9 @@ import mega.privacy.android.app.utils.ContextUtils.isLowMemory
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import timber.log.Timber
 
+/**
+ * Image Viewer fragment that contains a slideshow to show each Image
+ */
 @AndroidEntryPoint
 class ImageSlideshowFragment : Fragment() {
 
@@ -171,6 +174,11 @@ class ImageSlideshowFragment : Fragment() {
         }
     }
 
+    /**
+     * Update slideshow state UI
+     *
+     * @param state     Current slideshow state
+     */
     private fun updateSlideshowState(state: ImageSlideshowState) {
         when (state) {
             STARTED -> {

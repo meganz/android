@@ -137,6 +137,16 @@ sealed class ImageItem {
     override fun hashCode(): Int =
         super.hashCode() + (nodeItem?.hashCode() ?: 0) + (imageResult?.hashCode() ?: 0)
 
+    override fun equals(other: Any?): Boolean =
+        when (other) {
+            is ImageItem -> {
+                super.equals(other)
+                        && this.nodeItem?.hashCode() == other.nodeItem?.hashCode()
+                        && this.imageResult?.hashCode() == other.imageResult?.hashCode()
+            }
+            else -> false
+        }
+
     /**
      * Get a copy of an existing ImageItem by replacing nodeItem or imageResult fields.
      *

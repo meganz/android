@@ -11,7 +11,7 @@ import mega.privacy.android.app.utils.view.DiffFragmentStateAdapter
  * Image Viewer adapter based on a list of ImageAdapterItems that contains ImageViewerPageFragment.
  */
 class ImageViewerAdapter(
-    val enableZoom: Boolean,
+    private val enableZoom: Boolean,
     fragmentManager: FragmentManager,
     viewLifecycle: Lifecycle,
 ) : DiffFragmentStateAdapter<ImageAdapterItem>

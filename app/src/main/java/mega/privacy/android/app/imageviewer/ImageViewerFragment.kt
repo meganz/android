@@ -22,6 +22,9 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import timber.log.Timber
 
+/**
+ * Image Viewer fragment that contains ViewPager to show each Image
+ */
 @AndroidEntryPoint
 class ImageViewerFragment : Fragment() {
 
