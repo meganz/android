@@ -9546,11 +9546,6 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean.class).post(true);
     }
 
-    public void updateAccountStorageInfo() {
-        Timber.d("updateAccountStorageInfo");
-        megaApi.getFolderInfo(megaApi.getRootNode(), this);
-    }
-
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
                                         MegaError e) {
