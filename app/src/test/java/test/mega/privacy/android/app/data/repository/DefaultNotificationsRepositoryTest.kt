@@ -1,19 +1,23 @@
 package test.mega.privacy.android.app.data.repository
 
 import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.MegaContactDB
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.mapper.ContactRequestMapper
+import mega.privacy.android.app.data.mapper.NodeProvider
 import mega.privacy.android.app.data.mapper.UserAlertContactProvider
-import mega.privacy.android.app.data.mapper.UserAlertEmailProvider
 import mega.privacy.android.app.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.app.main.megachat.NonContactInfo
+import mega.privacy.android.domain.entity.ContactAlert
+import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.repository.NotificationsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -38,10 +42,15 @@ class DefaultNotificationsRepositoryTest {
     private val email = "email"
 
     private val userAlertsMapper: UserAlertMapper =
-        { _: MegaUserAlert, emailProvider: UserAlertEmailProvider, contactProvider: UserAlertContactProvider ->
-            emailProvider(userHandle)
-            contactProvider(email)
-            mock()
+        { alert: MegaUserAlert, contactProvider: UserAlertContactProvider, _: NodeProvider ->
+            val contact = contactProvider(userHandle, alert.email)
+            ContactChangeContactEstablishedAlert(
+                id = 12L,
+                seen = false,
+                createdTime = 1L,
+                isOwnChange = false,
+                contact = contact,
+            )
         }
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
 
@@ -132,11 +141,45 @@ class DefaultNotificationsRepositoryTest {
     }
 
     @Test
-    fun `test that current user alerts are fetched`() = runTest{
+    fun `test that current user alerts are fetched`() = runTest {
         whenever(megaApiGateway.getUserAlerts()).thenReturn(listOf())
 
         underTest.getUserAlerts()
 
         verify(megaApiGateway).getUserAlerts()
+    }
+
+    @Test
+    fun `test that alert email is returned if found on alert`() = runTest {
+        val expectedEmail = "expected@email"
+        val userAlert = mock<MegaUserAlert> { on { email }.thenReturn(expectedEmail) }
+        val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(userAlert))
+        whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
+
+        whenever(megaApiGateway.getContact(any())).thenReturn(mock())
+
+        underTest.monitorUserAlerts().test {
+            cancelAndConsumeRemainingEvents()
+            verify(megaLocalStorageGateway, never()).getNonContactByHandle(any())
+            verify(megaApiGateway).getContact(expectedEmail)
+        }
+    }
+
+    @Test
+    fun `test that nickname is returned with user alert`() = runTest {
+        val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock()))
+        whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
+        val contactInfo = mock<NonContactInfo> { on { email }.thenReturn(email) }
+        whenever(megaLocalStorageGateway.getNonContactByHandle(any())).thenReturn(contactInfo)
+        whenever(megaApiGateway.getContact(any())).thenReturn(mock())
+        val expectedNickname = "An ickname"
+        val contactDB = mock<MegaContactDB> { on { nickname }.thenReturn(expectedNickname) }
+        whenever(megaLocalStorageGateway.getContactByEmail(any())).thenReturn(contactDB)
+
+        underTest.monitorUserAlerts().test {
+            val alert = awaitItem().first() as ContactAlert
+            assertThat(alert.contact.nickname).isEqualTo(expectedNickname)
+            awaitComplete()
+        }
     }
 }
