@@ -523,7 +523,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
         return when (item.itemId) {
             android.R.id.home -> {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
                 true
             }
             R.id.action_forward -> {
