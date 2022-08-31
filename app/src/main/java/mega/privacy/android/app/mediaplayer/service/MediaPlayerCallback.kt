@@ -53,4 +53,12 @@ interface MediaPlayerCallback {
      * Callback from onPlayerError
      */
     fun onPlayerErrorCallback()
+
+    /**
+     * Callback from onVideoSizeChanged
+     *
+     * @param videoWidth video width
+     * @param videoHeight video height
+     */
+    fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int)
 }

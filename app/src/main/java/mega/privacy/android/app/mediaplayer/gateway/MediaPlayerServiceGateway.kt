@@ -19,6 +19,13 @@ interface MediaPlayerServiceGateway {
     fun metadataUpdate(): Flow<Metadata>
 
     /**
+     * video size update
+     *
+     * @return Flow<Pair<Int, Int>> first is video width, second is video height
+     */
+    fun videoSizeUpdate(): Flow<Pair<Int, Int>>
+
+    /**
      * Stop audio player
      */
     fun stopAudioPlayer()

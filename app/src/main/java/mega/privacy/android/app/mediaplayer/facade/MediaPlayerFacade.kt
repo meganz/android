@@ -22,6 +22,7 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
 import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
+import com.google.android.exoplayer2.video.VideoSize
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
@@ -102,6 +103,11 @@ class MediaPlayerFacade @Inject constructor(
 
                     override fun onPlayerError(error: PlaybackException) {
                         mediaPlayerCallback.onPlayerErrorCallback()
+                    }
+
+                    override fun onVideoSizeChanged(videoSize: VideoSize) {
+                        super.onVideoSizeChanged(videoSize)
+                        mediaPlayerCallback.onVideoSizeCallback(videoSize.width, videoSize.height)
                     }
                 })
                 addAnalyticsListener(object :
