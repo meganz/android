@@ -12,7 +12,6 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.repository.NotificationsRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaUser
@@ -41,13 +40,17 @@ class DefaultNotificationsRepository @Inject constructor(
         .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
         .mapNotNull { (userAlerts) ->
             userAlerts?.map {
-                withContext(dispatcher) { userAlertsMapper(it, ::provideEmail, ::provideContact) }
+                withContext(dispatcher) {
+                    userAlertsMapper(it,
+                        ::provideContact,
+                        megaApiGateway::getMegaNodeByHandle)
+                }
             }
         }
 
-    override suspend fun getUserAlerts() = withContext(dispatcher){
+    override suspend fun getUserAlerts() = withContext(dispatcher) {
         megaApiGateway.getUserAlerts().map {
-            userAlertsMapper(it, ::provideEmail, ::provideContact)
+            userAlertsMapper(it, ::provideContact, megaApiGateway::getMegaNodeByHandle)
         }
     }
 
@@ -76,10 +79,28 @@ class DefaultNotificationsRepository @Inject constructor(
     private suspend fun getEmailLocally(userId: Long) =
         localStorageGateway.getNonContactByHandle(userId)?.email
 
-    private suspend fun provideContact(email: String): Contact? =
-        megaApiGateway.getContact(email)?.let {
-            Contact(it.visibility == MegaUser.VISIBILITY_VISIBLE)
-        }
+    private suspend fun provideContact(userId: Long, email: String?): Contact {
+        val emailAddress = email ?: provideEmail(userId)
+        val nickname = localStorageGateway.getContactByEmail(emailAddress)?.nickname
+        val visible = isContactVisible(emailAddress)
+        val hasPendingRequest = emailAddressFoundInPendingRequests(emailAddress)
+
+        return Contact(
+            userId = userId,
+            email = emailAddress,
+            nickname = nickname,
+            isVisible = visible,
+            hasPendingRequest = hasPendingRequest
+        )
+    }
+
+    private suspend fun emailAddressFoundInPendingRequests(emailAddress: String?) =
+        megaApiGateway.getIncomingContactRequests()?.mapNotNull { it.sourceEmail }
+            ?.contains(emailAddress) ?: false
+
+    private suspend fun isContactVisible(emailAddress: String?) = emailAddress?.let {
+        megaApiGateway.getContact(it)?.visibility == MegaUser.VISIBILITY_VISIBLE
+    } ?: false
 
     override suspend fun acknowledgeUserAlerts() {
         megaApiGateway.acknowledgeUserAlerts()

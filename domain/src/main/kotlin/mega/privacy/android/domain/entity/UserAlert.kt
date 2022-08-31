@@ -14,18 +14,31 @@ sealed interface UserAlert {
     val isOwnChange: Boolean
 }
 
+/**
+ * Custom alert
+ *
+ * @property heading
+ */
+sealed interface CustomAlert {
+    val heading: String?
+}
 
 /**
  * Contact alert
  *
- * @property userId
- * @property email
  * @property contact
  */
 interface ContactAlert {
-    val userId: Long
-    val email: String?
-    val contact: Contact?
+    val contact: Contact
+}
+
+/**
+ * Incoming share alert
+ *
+ * @property nodeId
+ */
+sealed interface IncomingShareAlert : ContactAlert {
+    val nodeId: Long?
 }
 
 /**
@@ -41,6 +54,7 @@ data class UnknownAlert(
     override val seen: Boolean,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
+    val title: String?,
 ) : UserAlert
 
 /**
@@ -48,20 +62,16 @@ data class UnknownAlert(
  *
  * @property id
  * @property seen
- * @property userId
  * @property createdTime
  * @property isOwnChange
- * @property email
  * @property contact
  */
 data class IncomingPendingContactRequestAlert(
     override val id: Long,
     override val seen: Boolean,
-    override val userId: Long,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    override val email: String?,
-    override val contact: Contact?,
+    override val contact: Contact,
 ) : UserAlert, ContactAlert {}
 
 /**
@@ -69,20 +79,16 @@ data class IncomingPendingContactRequestAlert(
  *
  * @property id
  * @property seen
- * @property userId
  * @property createdTime
  * @property isOwnChange
- * @property email
  * @property contact
  */
 data class IncomingPendingContactCancelledAlert(
     override val id: Long,
     override val seen: Boolean,
-    override val userId: Long,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    override val email: String?,
-    override val contact: Contact?,
+    override val contact: Contact,
 ) : UserAlert, ContactAlert {}
 
 /**
@@ -90,20 +96,16 @@ data class IncomingPendingContactCancelledAlert(
  *
  * @property id
  * @property seen
- * @property userId
  * @property createdTime
  * @property isOwnChange
- * @property email
  * @property contact
  */
 data class IncomingPendingContactReminderAlert(
     override val id: Long,
     override val seen: Boolean,
-    override val userId: Long,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    override val email: String?,
-    override val contact: Contact?,
+    override val contact: Contact,
 ) : UserAlert, ContactAlert {}
 
 /**
@@ -111,20 +113,16 @@ data class IncomingPendingContactReminderAlert(
  *
  * @property id
  * @property seen
- * @property userId
  * @property createdTime
  * @property isOwnChange
- * @property email
  * @property contact
  */
 data class ContactChangeDeletedYouAlert(
     override val id: Long,
     override val seen: Boolean,
-    override val userId: Long,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    override val email: String?,
-    override val contact: Contact?,
+    override val contact: Contact,
 ) : UserAlert, ContactAlert {}
 
 /**
@@ -132,20 +130,16 @@ data class ContactChangeDeletedYouAlert(
  *
  * @property id
  * @property seen
- * @property userId
  * @property createdTime
  * @property isOwnChange
- * @property email
  * @property contact
  */
 data class ContactChangeContactEstablishedAlert(
     override val id: Long,
     override val seen: Boolean,
-    override val userId: Long,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    override val email: String?,
-    override val contact: Contact?,
+    override val contact: Contact,
 ) : UserAlert, ContactAlert {}
 
 /**
@@ -153,20 +147,16 @@ data class ContactChangeContactEstablishedAlert(
  *
  * @property id
  * @property seen
- * @property userId
  * @property createdTime
  * @property isOwnChange
- * @property email
  * @property contact
  */
 data class ContactChangeAccountDeletedAlert(
     override val id: Long,
     override val seen: Boolean,
-    override val userId: Long,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    override val email: String?,
-    override val contact: Contact?,
+    override val contact: Contact,
 ) : UserAlert, ContactAlert {}
 
 /**
@@ -174,20 +164,16 @@ data class ContactChangeAccountDeletedAlert(
  *
  * @property id
  * @property seen
- * @property userId
  * @property createdTime
  * @property isOwnChange
- * @property email
  * @property contact
  */
 data class ContactChangeBlockedYouAlert(
     override val id: Long,
     override val seen: Boolean,
-    override val userId: Long,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    override val email: String?,
-    override val contact: Contact?,
+    override val contact: Contact,
 ) : UserAlert, ContactAlert {}
 
 /**
@@ -195,20 +181,16 @@ data class ContactChangeBlockedYouAlert(
  *
  * @property id
  * @property seen
- * @property userId
  * @property createdTime
  * @property isOwnChange
- * @property email
  * @property contact
  */
 data class UpdatedPendingContactIncomingIgnoredAlert(
     override val id: Long,
     override val seen: Boolean,
-    override val userId: Long,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    override val email: String?,
-    override val contact: Contact?,
+    override val contact: Contact,
 ) : UserAlert, ContactAlert {}
 
 /**
@@ -216,20 +198,16 @@ data class UpdatedPendingContactIncomingIgnoredAlert(
  *
  * @property id
  * @property seen
- * @property userId
  * @property createdTime
  * @property isOwnChange
- * @property email
  * @property contact
  */
 data class UpdatedPendingContactIncomingAcceptedAlert(
     override val id: Long,
     override val seen: Boolean,
-    override val userId: Long,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    override val email: String?,
-    override val contact: Contact?,
+    override val contact: Contact,
 ) : UserAlert, ContactAlert {}
 
 /**
@@ -246,11 +224,9 @@ data class UpdatedPendingContactIncomingAcceptedAlert(
 data class UpdatedPendingContactIncomingDeniedAlert(
     override val id: Long,
     override val seen: Boolean,
-    override val userId: Long,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    override val email: String?,
-    override val contact: Contact?,
+    override val contact: Contact,
 ) : UserAlert, ContactAlert {}
 
 /**
@@ -258,20 +234,16 @@ data class UpdatedPendingContactIncomingDeniedAlert(
  *
  * @property id
  * @property seen
- * @property userId
  * @property createdTime
  * @property isOwnChange
- * @property email
  * @property contact
  */
 data class UpdatedPendingContactOutgoingAcceptedAlert(
     override val id: Long,
     override val seen: Boolean,
-    override val userId: Long,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    override val email: String?,
-    override val contact: Contact?,
+    override val contact: Contact,
 ) : UserAlert, ContactAlert {}
 
 /**
@@ -279,20 +251,16 @@ data class UpdatedPendingContactOutgoingAcceptedAlert(
  *
  * @property id
  * @property seen
- * @property userId
  * @property createdTime
  * @property isOwnChange
- * @property email
  * @property contact
  */
 data class UpdatedPendingContactOutgoingDeniedAlert(
     override val id: Long,
     override val seen: Boolean,
-    override val userId: Long,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    override val email: String?,
-    override val contact: Contact?,
+    override val contact: Contact,
 ) : UserAlert, ContactAlert {}
 
 /**
@@ -303,16 +271,16 @@ data class UpdatedPendingContactOutgoingDeniedAlert(
  * @property createdTime
  * @property isOwnChange
  * @property nodeId
- * @property email
+ * @property contact
  */
 data class NewShareAlert(
     override val id: Long,
     override val seen: Boolean,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    val nodeId: Long?,
-    val email: String?,
-) : UserAlert {}
+    override val nodeId: Long?,
+    override val contact: Contact,
+) : UserAlert, IncomingShareAlert {}
 
 /**
  * Deleted share alert
@@ -322,14 +290,38 @@ data class NewShareAlert(
  * @property createdTime
  * @property isOwnChange
  * @property nodeId
+ * @property nodeName
+ * @property contact
  */
 data class DeletedShareAlert(
     override val id: Long,
     override val seen: Boolean,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    val nodeId: Long?,
-) : UserAlert {}
+    override val nodeId: Long?,
+    val nodeName: String?,
+    override val contact: Contact,
+) : UserAlert, IncomingShareAlert {}
+
+
+/**
+ * Removed from share by owner alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property nodeId
+ * @property contact
+ */
+data class RemovedFromShareByOwnerAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val nodeId: Long?,
+    override val contact: Contact,
+) : UserAlert, IncomingShareAlert {}
 
 /**
  * New shared nodes alert
@@ -339,6 +331,7 @@ data class DeletedShareAlert(
  * @property createdTime
  * @property isOwnChange
  * @property nodeId
+ * @property contact
  * @property folderCount
  * @property fileCount
  * @property childNodes
@@ -348,11 +341,12 @@ data class NewSharedNodesAlert(
     override val seen: Boolean,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    val nodeId: Long?,
-    val folderCount: Long,
-    val fileCount: Long,
+    override val nodeId: Long?,
+    override val contact: Contact,
+    val folderCount: Int,
+    val fileCount: Int,
     val childNodes: List<Long>,
-) : UserAlert {}
+) : UserAlert, IncomingShareAlert {}
 
 /**
  * Removed shared nodes alert
@@ -362,6 +356,7 @@ data class NewSharedNodesAlert(
  * @property createdTime
  * @property isOwnChange
  * @property nodeId
+ * @property contact
  * @property itemCount
  */
 data class RemovedSharedNodesAlert(
@@ -369,9 +364,10 @@ data class RemovedSharedNodesAlert(
     override val seen: Boolean,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    val nodeId: Long?,
-    val itemCount: Long,
-) : UserAlert {}
+    override val nodeId: Long?,
+    override val contact: Contact,
+    val itemCount: Int,
+) : UserAlert, IncomingShareAlert {}
 
 /**
  * Payment succeeded alert
@@ -388,9 +384,9 @@ data class PaymentSucceededAlert(
     override val seen: Boolean,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    val heading: String?,
+    override val heading: String?,
     val title: String?,
-) : UserAlert {}
+) : UserAlert, CustomAlert {}
 
 /**
  * Payment failed alert
@@ -407,9 +403,9 @@ data class PaymentFailedAlert(
     override val seen: Boolean,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    val heading: String?,
+    override val heading: String?,
     val title: String?,
-) : UserAlert {}
+) : UserAlert, CustomAlert {}
 
 /**
  * Payment reminder alert
@@ -426,9 +422,9 @@ data class PaymentReminderAlert(
     override val seen: Boolean,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    val heading: String?,
+    override val heading: String?,
     val title: String?,
-) : UserAlert {}
+) : UserAlert, CustomAlert {}
 
 /**
  * Take down alert
@@ -437,7 +433,8 @@ data class PaymentReminderAlert(
  * @property seen
  * @property createdTime
  * @property isOwnChange
- * @property nodeId
+ * @property heading
+ * @property rootNodeId
  * @property name
  * @property path
  */
@@ -446,10 +443,11 @@ data class TakeDownAlert(
     override val seen: Boolean,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    val nodeId: Long?,
+    override val heading: String?,
+    val rootNodeId: Long?,
     val name: String?,
     val path: String?,
-) : UserAlert {}
+) : UserAlert, CustomAlert {}
 
 /**
  * Take down reinstated alert
@@ -458,7 +456,8 @@ data class TakeDownAlert(
  * @property seen
  * @property createdTime
  * @property isOwnChange
- * @property nodeId
+ * @property heading
+ * @property rootNodeId
  * @property name
  * @property path
  */
@@ -467,8 +466,9 @@ data class TakeDownReinstatedAlert(
     override val seen: Boolean,
     override val createdTime: Long,
     override val isOwnChange: Boolean,
-    val nodeId: Long?,
+    override val heading: String?,
+    val rootNodeId: Long?,
     val name: String?,
     val path: String?,
-) : UserAlert {}
+) : UserAlert, CustomAlert {}
 

@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.NewSharedNodesAlert
 import mega.privacy.android.domain.entity.PaymentFailedAlert
 import mega.privacy.android.domain.entity.PaymentReminderAlert
 import mega.privacy.android.domain.entity.PaymentSucceededAlert
+import mega.privacy.android.domain.entity.RemovedFromShareByOwnerAlert
 import mega.privacy.android.domain.entity.RemovedSharedNodesAlert
 import mega.privacy.android.domain.entity.TakeDownAlert
 import mega.privacy.android.domain.entity.TakeDownReinstatedAlert
@@ -24,182 +25,144 @@ import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingIgnoredAl
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingAcceptedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingDeniedAlert
 import mega.privacy.android.domain.entity.UserAlert
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUserAlert
 
 /**
  * Map [MegaUserAlert] to [UserAlert]
  */
-typealias UserAlertMapper = @JvmSuppressWildcards suspend (@JvmSuppressWildcards MegaUserAlert, @JvmSuppressWildcards UserAlertEmailProvider, @JvmSuppressWildcards UserAlertContactProvider) -> @JvmSuppressWildcards UserAlert
+typealias UserAlertMapper = @JvmSuppressWildcards suspend (@JvmSuppressWildcards MegaUserAlert, @JvmSuppressWildcards UserAlertContactProvider, @JvmSuppressWildcards NodeProvider) -> @JvmSuppressWildcards UserAlert
+
 
 /**
- * Provide the email address associated with a UserAlert
+ * Provide the [Contact] associated with an alert
  */
-typealias UserAlertEmailProvider = suspend (@JvmSuppressWildcards Long) -> @JvmSuppressWildcards String?
+typealias UserAlertContactProvider = suspend (@JvmSuppressWildcards Long, @JvmSuppressWildcards String?) -> @JvmSuppressWildcards Contact
 
-/**
- * Provide the [Contact] associated with an email address
- */
-typealias UserAlertContactProvider = suspend (@JvmSuppressWildcards String) -> @JvmSuppressWildcards Contact?
 
+typealias NodeProvider = suspend (@JvmSuppressWildcards Long) -> @JvmSuppressWildcards MegaNode?
 
 /**
  * Map [MegaUserAlert] to [UserAlert]
  *
  * @param megaUserAlert
- * @param emailProvider
  * @param contactProvider
  * @return correct [UserAlert]
  */
 internal suspend fun toUserAlert(
     megaUserAlert: MegaUserAlert,
-    emailProvider: UserAlertEmailProvider,
     contactProvider: UserAlertContactProvider,
+    nodeProvider: NodeProvider,
 ): UserAlert {
     val createdTimeIndex: Long = 0
 
     return when (megaUserAlert.type) {
         MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REQUEST -> {
-            val email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle)
             IncomingPendingContactRequestAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
-                userId = megaUserAlert.userHandle,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = email,
-                contact = email?.let { contactProvider(it) },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_CANCELLED -> {
-            val email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle)
             IncomingPendingContactCancelledAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
-                userId = megaUserAlert.userHandle,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = email,
-                contact = email?.let { contactProvider(it) },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REMINDER -> {
-            val email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle)
             IncomingPendingContactReminderAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
-                userId = megaUserAlert.userHandle,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = email,
-                contact = email?.let { contactProvider(it) },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU -> {
-            val email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle)
             ContactChangeDeletedYouAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
-                userId = megaUserAlert.userHandle,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = email,
-                contact = email?.let { contactProvider(it) },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_CONTACTCHANGE_CONTACTESTABLISHED -> {
-            val email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle)
             ContactChangeContactEstablishedAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
-                userId = megaUserAlert.userHandle,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = email,
-                contact = email?.let { contactProvider(it) },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED -> {
-            val email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle)
             ContactChangeAccountDeletedAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
-                userId = megaUserAlert.userHandle,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = email,
-                contact = email?.let { contactProvider(it) },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU -> {
-            val email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle)
             ContactChangeBlockedYouAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
-                userId = megaUserAlert.userHandle,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = email,
-                contact = email?.let { contactProvider(it) },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED -> {
-            val email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle)
             UpdatedPendingContactIncomingIgnoredAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
-                userId = megaUserAlert.userHandle,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = email,
-                contact = email?.let { contactProvider(it) },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED -> {
-            val email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle)
             UpdatedPendingContactIncomingAcceptedAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
-                userId = megaUserAlert.userHandle,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = email,
-                contact = email?.let { contactProvider(it) },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_DENIED -> {
-            val email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle)
             UpdatedPendingContactIncomingDeniedAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
-                userId = megaUserAlert.userHandle,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = email,
-                contact = email?.let { contactProvider(it) },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED -> {
-            val email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle)
             UpdatedPendingContactOutgoingAcceptedAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
-                userId = megaUserAlert.userHandle,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = email,
-                contact = email?.let { contactProvider(it) },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_DENIED -> {
-            val email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle)
             UpdatedPendingContactOutgoingDeniedAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
-                userId = megaUserAlert.userHandle,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = email,
-                contact = email?.let { contactProvider(it) },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_NEWSHARE -> {
@@ -208,25 +171,39 @@ internal suspend fun toUserAlert(
                 seen = megaUserAlert.seen,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                email = megaUserAlert.email ?: emailProvider(megaUserAlert.userHandle),
-                nodeId = megaUserAlert.nodeHandle.takeIf { it.isValid() },
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
             )
         }
         MegaUserAlert.TYPE_DELETEDSHARE -> {
             val deletionReasonIndex: Long = 0
             val removedByOwner: Long = 1
-            DeletedShareAlert(
-                id = megaUserAlert.id,
-                seen = megaUserAlert.seen,
-                createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
-                isOwnChange = megaUserAlert.isOwnChange,
-                nodeId = megaUserAlert.nodeHandle.takeUnless {
-                    !it.isValid() ||
-                            megaUserAlert.getNumber(
-                                deletionReasonIndex
-                            ) == removedByOwner
-                }
-            )
+            if (megaUserAlert.getNumber(
+                    deletionReasonIndex
+                ) == removedByOwner
+            ) {
+                RemovedFromShareByOwnerAlert(
+                    id = megaUserAlert.id,
+                    seen = megaUserAlert.seen,
+                    createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
+                    isOwnChange = megaUserAlert.isOwnChange,
+                    nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
+                    contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                )
+            } else {
+                val validNodeId = megaUserAlert.nodeHandle.takeIf { it.isValid() }
+                DeletedShareAlert(
+                    id = megaUserAlert.id,
+                    seen = megaUserAlert.seen,
+                    createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
+                    isOwnChange = megaUserAlert.isOwnChange,
+                    nodeId = validNodeId,
+                    nodeName = validNodeId?.let { nodeProvider(it) }?.name,
+                    contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                )
+            }
+
+
         }
         MegaUserAlert.TYPE_NEWSHAREDNODES -> {
             val folderIndex: Long = 0
@@ -236,10 +213,11 @@ internal suspend fun toUserAlert(
                 seen = megaUserAlert.seen,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                nodeId = megaUserAlert.nodeHandle.takeIf { it.isValid() },
-                folderCount = megaUserAlert.getNumber(folderIndex),
-                fileCount = megaUserAlert.getNumber(fileIndex),
-                childNodes = getChildNodes(megaUserAlert)
+                nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
+                folderCount = megaUserAlert.getNumber(folderIndex).toInt(),
+                fileCount = megaUserAlert.getNumber(fileIndex).toInt(),
+                childNodes = getChildNodes(megaUserAlert),
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_REMOVEDSHAREDNODES -> {
@@ -249,8 +227,9 @@ internal suspend fun toUserAlert(
                 seen = megaUserAlert.seen,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                nodeId = megaUserAlert.nodeHandle.takeIf { it.isValid() },
-                itemCount = megaUserAlert.getNumber(itemCountIndex),
+                nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
+                itemCount = megaUserAlert.getNumber(itemCountIndex).toInt(),
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
             )
         }
         MegaUserAlert.TYPE_PAYMENT_SUCCEEDED -> {
@@ -289,7 +268,8 @@ internal suspend fun toUserAlert(
                 seen = megaUserAlert.seen,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                nodeId = megaUserAlert.nodeHandle.takeIf { it.isValid() },
+                heading = megaUserAlert.heading,
+                rootNodeId = getRootNodeId(megaUserAlert, nodeProvider),
                 name = megaUserAlert.name,
                 path = megaUserAlert.path,
             )
@@ -300,7 +280,8 @@ internal suspend fun toUserAlert(
                 seen = megaUserAlert.seen,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
-                nodeId = megaUserAlert.nodeHandle.takeIf { it.isValid() },
+                heading = megaUserAlert.heading,
+                rootNodeId = getRootNodeId(megaUserAlert, nodeProvider),
                 name = megaUserAlert.name,
                 path = megaUserAlert.path,
             )
@@ -311,10 +292,27 @@ internal suspend fun toUserAlert(
                 seen = megaUserAlert.seen,
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
+                title = megaUserAlert.title
             )
         }
     }
 }
+
+private suspend fun getNode(
+    megaUserAlert: MegaUserAlert,
+    nodeProvider: NodeProvider,
+) = megaUserAlert.nodeHandle
+    .takeIf { it.isValid() }
+    ?.let { nodeProvider(it) }
+
+private suspend fun getRootNodeId(
+    megaUserAlert: MegaUserAlert,
+    nodeProvider: NodeProvider,
+) = getNode(megaUserAlert, nodeProvider)
+    ?.let {
+        if (it.isFile) it.parentHandle else it.handle
+    }
+
 
 private fun getChildNodes(megaUserAlert: MegaUserAlert) =
     mutableListOf<Long>().apply {
