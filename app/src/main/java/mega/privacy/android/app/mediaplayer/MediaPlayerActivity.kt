@@ -4,11 +4,21 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
+import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+import android.database.ContentObserver
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.provider.Settings
+import android.provider.Settings.System.ACCELEROMETER_ROTATION
+import android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
+import android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
+import android.provider.Settings.System.getUriFor
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowInsets
@@ -128,6 +138,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaShare
+import org.jetbrains.anko.configuration
 import timber.log.Timber
 
 /**
@@ -153,6 +164,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     private var playerServiceViewModelGateway: PlayerServiceViewModelGateway? = null
 
     private var takenDownDialog: AlertDialog? = null
+
+    private var currentOrientation: Int = SCREEN_ORIENTATION_SENSOR_PORTRAIT
 
     private val nodeAttacher by lazy { MegaAttacher(this) }
 
@@ -186,6 +199,26 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 service.serviceGateway.metadataUpdate()
                     .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).onEach {
                         dragToExit.nodeChanged(service.playerServiceViewModelGateway.getCurrentPlayingHandle())
+                    }.launchIn(lifecycleScope)
+
+                service.serviceGateway.videoSizeUpdate()
+                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                    .onEach { (width, height) ->
+                        val rotationMode = Settings.System.getInt(contentResolver,
+                            ACCELEROMETER_ROTATION,
+                            SCREEN_BRIGHTNESS_MODE_MANUAL)
+                        currentOrientation = if (width > height) {
+                            SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                        } else {
+                            SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                        }
+                        requestedOrientation =
+                            if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                                SCREEN_ORIENTATION_SENSOR
+                            } else {
+                                currentOrientation
+
+                            }
                     }.launchIn(lifecycleScope)
 
                 service.playerServiceViewModelGateway.errorUpdate()
@@ -233,6 +266,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
 
         val isAudioPlayer = isAudioPlayer(intent)
+
+        if (!isAudioPlayer) {
+            currentOrientation = configuration.orientation
+            observeRotationSettingsChange()
+        }
 
         binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
 
@@ -302,13 +340,30 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             }
     }
 
+    private fun observeRotationSettingsChange() {
+        contentResolver.registerContentObserver(getUriFor(ACCELEROMETER_ROTATION),
+            true,
+            object : ContentObserver(Handler(mainLooper)) {
+                override fun onChange(selfChange: Boolean) {
+                    val rotationMode = Settings.System.getInt(contentResolver,
+                        ACCELEROMETER_ROTATION,
+                        SCREEN_BRIGHTNESS_MODE_MANUAL)
+                    requestedOrientation =
+                        if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                            SCREEN_ORIENTATION_SENSOR
+                        } else {
+                            currentOrientation
+                        }
+                }
+            })
+    }
+
     private fun showNotAllowPlayAlert() {
         showSnackbar(StringResourcesUtils.getString(R.string.not_allow_play_alert))
     }
 
     override fun onResume() {
         super.onResume()
-
         refreshMenuOptionsVisibility()
     }
 

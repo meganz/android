@@ -103,6 +103,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     private val binder by lazy { MediaPlayerServiceBinder(this, viewModelGateway) }
 
     private val metadata = MutableLiveData<Metadata>()
+    private val orientationUpdate = MutableLiveData<Pair<Int, Int>>()
 
     private var needPlayWhenGoForeground = false
     private var needPlayWhenReceiveResumeCommand = false
@@ -236,6 +237,10 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                 override fun onPlayerErrorCallback() {
                     onPlayerError()
                     positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
+                }
+
+                override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
+                    orientationUpdate.value = Pair(videoWidth, videoHeight)
                 }
             }
 
@@ -464,6 +469,8 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     }
 
     override fun metadataUpdate() = metadata.asFlow()
+
+    override fun videoSizeUpdate() = orientationUpdate.asFlow()
 
     override fun removeListener(listener: Player.Listener) {
         mediaPlayerGateway.removeListener(listener)
