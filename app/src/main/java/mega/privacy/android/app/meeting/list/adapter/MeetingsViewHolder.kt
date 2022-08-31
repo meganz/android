@@ -29,12 +29,6 @@ class MeetingsViewHolder(
             getThemeColor(itemView.context, android.R.attr.textColorSecondary)
         }
         binding.txtLastMessage.setTextColor(lastMessageColor)
-        if (item.lastMessageIcon != null) {
-            binding.imgLastMessage.setImageResource(item.lastMessageIcon)
-            binding.imgLastMessage.isVisible = true
-        } else {
-            binding.imgLastMessage.isVisible = false
-        }
 
         val firstUserPlaceholder = item.firstUser.getImagePlaceholder(itemView.context)
         if (item.isSingleMeeting() || item.lastUser == null) {

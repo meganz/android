@@ -12,10 +12,8 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
-import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
-import mega.privacy.android.app.constants.EventConstants.EVENT_OUTGOING_CALL
+import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -31,7 +29,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatContainsMeta
+import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
@@ -142,13 +140,12 @@ class GetMeetingListUseCase @Inject constructor(
                 }
             }
 
-            val callObserver = Observer<Any> { callId ->
+            val updateCallObserver = Observer<Any> { chatCall ->
                 if (emitter.isCancelled) return@Observer
-                val chatCall = megaChatApi.getChatCallByCallId(callId as Long)
-
-                val index = meetings.indexOfFirst { it.chatId == chatCall.chatid }
+                val updatedChatId = (chatCall as MegaChatCall).chatid
+                val index = meetings.indexOfFirst { it.chatId == updatedChatId }
                 if (index != Constants.INVALID_POSITION) {
-                    val chatRoom = megaChatApi.getChatRoom(chatCall.chatid)
+                    val chatRoom = megaChatApi.getChatRoom(updatedChatId)
                     meetings[index] = chatRoom.toMeetingItem(userAttrsListener)
                     emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
                 }
@@ -189,14 +186,12 @@ class GetMeetingListUseCase @Inject constructor(
                 ).addTo(changesSubscription)
 
             LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).observeForever(muteObserver)
-            LiveEventBus.get(EVENT_OUTGOING_CALL).observeForever(callObserver)
-            LiveEventBus.get(EVENT_NOT_OUTGOING_CALL).observeForever(callObserver)
+            LiveEventBus.get(EVENT_UPDATE_CALL).observeForever(updateCallObserver)
 
             emitter.setCancellable {
                 changesSubscription.dispose()
                 LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).removeObserver(muteObserver)
-                LiveEventBus.get(EVENT_OUTGOING_CALL).removeObserver(callObserver)
-                LiveEventBus.get(EVENT_NOT_OUTGOING_CALL).removeObserver(callObserver)
+                LiveEventBus.get(EVENT_UPDATE_CALL).observeForever(updateCallObserver)
             }
         }, BackpressureStrategy.LATEST)
 
@@ -240,21 +235,11 @@ class GetMeetingListUseCase @Inject constructor(
             onSuccess = { lastMessageFormatted = it },
             onError = Timber::w
         )
-        var lastMessageIcon: Int? = null
-        if (chatListItem.lastMessageType == MegaChatMessage.TYPE_VOICE_CLIP) {
-            lastMessageIcon = R.drawable.ic_voice_clip_feedback
-        } else if (chatListItem.lastMessageType == MegaChatMessage.TYPE_CONTAINS_META) {
-            val metaType = megaChatApi.getMessage(chatId, chatListItem.lastMessageId)?.containsMeta?.type
-            if (metaType == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
-                lastMessageIcon = R.drawable.ic_location_small
-            }
-        }
 
         return MeetingItem(
             chatId = chatId,
             title = title,
             lastMessage = lastMessageFormatted,
-            lastMessageIcon = lastMessageIcon,
             isPublic = isPublic,
             isMuted = isMuted,
             hasPermissions = hasPermissions,

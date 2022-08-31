@@ -66,6 +66,26 @@ class GetLastMessageUseCase @Inject constructor(
             val chatRoom by lazy { megaChatApi.getChatRoom(chatId) }
             val chatMessage by lazy { megaChatApi.getMessage(chatId, msgId) }
 
+            megaChatApi.getChatCall(chatId)?.let { chatCall ->
+                when (chatCall.status) {
+                    CALL_STATUS_TERMINATING_USER_PARTICIPATION, CALL_STATUS_USER_NO_PRESENT -> {
+                        return@fromCallable if (chatCall.isRinging) {
+                            getString(R.string.notification_subtitle_incoming)
+                        } else {
+                            getString(R.string.ongoing_call_messages)
+                        }
+                    }
+                    else -> {
+                        val requestSent = chatManagement.isRequestSent(chatCall.callId)
+                        return@fromCallable if (requestSent) {
+                            getString(R.string.outgoing_call_starting)
+                        } else {
+                            getString(R.string.call_started_messages)
+                        }
+                    }
+                }
+            }
+
             return@fromCallable when (chatListItem.lastMessageType) {
                 TYPE_INVALID ->
                     getString(R.string.no_conversation_history)
