@@ -61,4 +61,11 @@ interface CacheFolderGateway {
      * @param folderName Name of the folder
      */
     fun getOldTempFolder(folderName: String): File
+
+    /**
+     * return the avatar file
+     *
+     * @param fileName name of the file
+     */
+    fun buildAvatarFile(fileName: String?): File?
 }

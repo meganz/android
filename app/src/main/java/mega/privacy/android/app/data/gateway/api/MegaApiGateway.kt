@@ -444,4 +444,21 @@ interface MegaApiGateway {
      * @return all incoming contact requests or null
      */
     suspend fun getIncomingContactRequests(): ArrayList<MegaContactRequest>?
+
+    /**
+     * get user avatar color
+     *
+     * @param megaUser
+     */
+    suspend fun getUserAvatarColor(megaUser: MegaUser): String
+
+    /**
+     * Get user avatar
+     *
+     * @param user
+     * @param dstPath destination path file
+     *
+     * @return true if success
+     */
+    suspend fun getUserAvatar(user: MegaUser, dstPath: String): Boolean
 }
