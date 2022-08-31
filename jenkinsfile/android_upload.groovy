@@ -20,7 +20,7 @@ MEGACHAT_TAG = ""
 REBUILD_SDK = "no"
 
 pipeline {
-    agent { label 'mac-jenkins-slave' }
+    agent { label 'mac-jenkins-slave-android || mac-jenkins-slave' }
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
