@@ -32,5 +32,17 @@ data class MegaNodeItem constructor(
     val isExternalNode: Boolean = false,
     val hasVersions: Boolean = false,
     val isAvailableOffline: Boolean = false,
-    val node: MegaNode? = null
-)
+    val node: MegaNode? = null,
+) {
+    override fun equals(other: Any?): Boolean =
+        when (other) {
+            is MegaNodeItem -> {
+                super.equals(other)
+                        && this.node?.fingerprint == other.node?.fingerprint
+            }
+            else -> false
+        }
+
+    override fun hashCode(): Int =
+        super.hashCode() + (this.node?.fingerprint?.toIntOrNull() ?: 0)
+}

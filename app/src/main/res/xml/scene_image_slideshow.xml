@@ -4,8 +4,8 @@
 
     <Transition
         android:id="@+id/transition"
-        app:constraintSetStart="@+id/start"
         app:constraintSetEnd="@+id/end"
+        app:constraintSetStart="@+id/start"
         app:duration="250" />
 
     <ConstraintSet android:id="@+id/end">
@@ -19,11 +19,13 @@
                 app:layout_constraintStart_toStartOf="parent" />
         </Constraint>
 
-        <Constraint android:id="@id/txt_title">
-            <PropertySet android:alpha="1" />
+        <Constraint android:id="@id/btn_play">
+            <PropertySet
+                android:alpha="1"
+                app:visibilityMode="ignore" />
         </Constraint>
 
-        <Constraint android:id="@id/txt_page_count">
+        <Constraint android:id="@id/btn_pause">
             <PropertySet
                 android:alpha="1"
                 app:visibilityMode="ignore" />
@@ -45,11 +47,13 @@
                 app:layout_constraintTop_toBottomOf="parent" />
         </Constraint>
 
-        <Constraint android:id="@id/txt_title">
-            <PropertySet android:alpha="0" />
+        <Constraint android:id="@id/btn_play">
+            <PropertySet
+                android:alpha="0"
+                app:visibilityMode="ignore" />
         </Constraint>
 
-        <Constraint android:id="@id/txt_page_count">
+        <Constraint android:id="@id/btn_pause">
             <PropertySet
                 android:alpha="0"
                 app:visibilityMode="ignore" />

@@ -986,10 +986,9 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
         listView.findViewHolderForLayoutPosition(nodeItem.index)
             ?.itemView?.findViewById<ImageView>(R.id.thumbnail)?.also {
                 val nodeHandle = nodeItem.node?.handle ?: MegaApiJava.INVALID_HANDLE
-                val childrenNodes = viewModel.getItemsHandle()
-                val intent = ImageViewerActivity.getIntentForChildren(
+                val intent = ImageViewerActivity.getIntentForTimeline(
                     requireContext(),
-                    childrenNodes,
+                    order,
                     nodeHandle
                 )
 

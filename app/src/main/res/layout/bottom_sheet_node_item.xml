@@ -225,6 +225,12 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/option_slideshow"
+                style="@style/BottomSheetOption"
+                android:text="@string/action_slideshow"
+                app:drawableStartCompat="@drawable/ic_slideshow" />
+
+            <TextView
                 android:id="@+id/open_with_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/external_play"

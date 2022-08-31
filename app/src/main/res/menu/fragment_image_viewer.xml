@@ -5,6 +5,15 @@
     tools:ignore="AlwaysShowAction">
 
     <item
+        android:id="@+id/action_slideshow"
+        android:icon="@drawable/ic_slideshow"
+        android:orderInCategory="100"
+        android:title="@string/action_slideshow"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_forward"
         android:icon="@drawable/ic_forward"
         android:orderInCategory="100"

@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.common.RotationOptions
@@ -28,6 +29,7 @@ import mega.privacy.android.app.activities.contract.SelectFolderToImportActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.databinding.BottomSheetImageOptionsBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
+import mega.privacy.android.app.imageviewer.ImageViewerFragmentDirections
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.util.shouldShowChatRemoveOption
@@ -48,6 +50,7 @@ import mega.privacy.android.app.imageviewer.util.shouldShowRestoreOption
 import mega.privacy.android.app.imageviewer.util.shouldShowRubbishBinOption
 import mega.privacy.android.app.imageviewer.util.shouldShowSendToContactOption
 import mega.privacy.android.app.imageviewer.util.shouldShowShareOption
+import mega.privacy.android.app.imageviewer.util.shouldShowSlideshowOption
 import mega.privacy.android.app.main.FileInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
@@ -252,6 +255,13 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 dismissAllowingStateLoss()
             }
 
+            // Slideshow
+            optionSlideshow.isVisible = imageItem.shouldShowSlideshowOption() && viewModel.getImagesSize(false) > 1
+            optionSlideshow.setOnClickListener {
+                findNavController().navigate(ImageViewerFragmentDirections.actionViewerToSlideshow())
+                dismissAllowingStateLoss()
+            }
+
             // Open with
             optionOpenWith.isVisible = imageItem.shouldShowOpenWithOption(isUserLoggedIn)
             optionOpenWith.setOnClickListener {
@@ -392,7 +402,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Separators
             separatorLabel.isVisible = optionLabelLayout.isVisible || optionInfo.isVisible
             separatorDispute.isVisible = optionDispute.isVisible
-            separatorOpen.isVisible = optionOpenWith.isVisible || optionForward.isVisible
+            separatorOpen.isVisible = optionSlideshow.isVisible || optionOpenWith.isVisible
+                    || optionForward.isVisible
             separatorOffline.isVisible = optionOfflineLayout.isVisible || optionShare.isVisible
             separatorShare.isVisible =
                 optionShare.isVisible || optionSendToChat.isVisible || optionManageLink.isVisible

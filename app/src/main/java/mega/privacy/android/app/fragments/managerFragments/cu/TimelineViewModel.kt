@@ -35,7 +35,6 @@ import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -347,15 +346,6 @@ class TimelineViewModel @Inject constructor(
             liveDataRoot.value = Unit
         }
     }
-
-    /**
-     * Get items node handles
-     *
-     * @return  Node handles as LongArray
-     */
-    fun getItemsHandle(): LongArray =
-        items.value?.map { it.node?.handle ?: MegaApiJava.INVALID_HANDLE }?.toLongArray()
-            ?: LongArray(0)
 
     /**
      * Make the list adapter to rebind all item views with data since

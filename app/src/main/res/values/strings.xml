@@ -4006,4 +4006,6 @@
     <string name="text_editor_creation_success">File saved to Cloud drive.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
     <string name="text_editor_creation_error">File not saved to Cloud drive. Try again.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Slideshow</string>
 </resources>

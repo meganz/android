@@ -139,6 +139,12 @@
                 android:background="@color/grey_012_white_012" />
 
             <TextView
+                android:id="@+id/option_slideshow"
+                style="@style/BottomSheetOption"
+                android:text="@string/action_slideshow"
+                app:drawableStartCompat="@drawable/ic_slideshow" />
+
+            <TextView
                 android:id="@+id/option_open_with"
                 style="@style/BottomSheetOption"
                 android:text="@string/external_play"
