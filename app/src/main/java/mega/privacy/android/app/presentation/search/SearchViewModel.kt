@@ -162,9 +162,6 @@ class SearchViewModel @Inject constructor(
             return@launch
         }
 
-        //stop from query for empty string.
-        setTextSubmitted(true)
-
         val query = _state.value.searchQuery
         val parentHandleSearch = _state.value.searchParentHandle
         val drawerItem = _state.value.searchDrawerItem

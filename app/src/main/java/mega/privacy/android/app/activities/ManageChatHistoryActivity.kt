@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.NumberPicker.OnScrollListener
 import android.widget.NumberPicker.OnValueChangeListener
+import androidx.activity.OnBackPressedCallback
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -57,6 +58,13 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
     private var contactHandle = INVALID_HANDLE
     private var isFromContacts = false
     private lateinit var binding: ActivityManageChatHistoryBinding
+
+    private val onBackPressCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            retryConnectionsAndSignalPresence()
+            finish()
+        }
+    }
 
     private val retentionTimeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -111,6 +119,8 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
 
         binding = ActivityManageChatHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        onBackPressedDispatcher.addCallback(this, onBackPressCallback)
 
         setSupportActionBar(binding.manageChatToolbar)
         val actionBar = supportActionBar
@@ -506,7 +516,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home)
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
 
         return super.onOptionsItemSelected(item)
     }

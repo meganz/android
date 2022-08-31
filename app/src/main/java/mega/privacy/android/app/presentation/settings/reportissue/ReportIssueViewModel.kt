@@ -191,21 +191,4 @@ class ReportIssueViewModel @Inject constructor(
         submitReportJob?.cancel()
     }
 
-    /**
-     * Intercept navigation
-     *
-     * @return true if handled by the view model, else false to indicate
-     * that the caller may proceed with the navigation
-     */
-    fun interceptNavigation() = description.value.isNotEmpty()
-        .also { intercept ->
-            _state.update { it.copy(navigationRequested = intercept) }
-        }
-
-    /**
-     * Navigation cancelled
-     *
-     */
-    fun navigationCancelled() = _state.update { it.copy(navigationRequested = false) }
-
 }

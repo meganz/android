@@ -10,6 +10,7 @@ import mega.privacy.android.domain.usecase.AreTransfersPaused
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.GetNumPendingUploads
+import mega.privacy.android.domain.usecase.GetSizeTransferInfo
 import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
 
 /**
@@ -43,4 +44,11 @@ class TransfersModule {
     @Provides
     fun provideAreAllTransfersPaused(transfersRepository: TransfersRepository): AreAllTransfersPaused =
         AreAllTransfersPaused(transfersRepository::areAllTransfersPaused)
+
+    /**
+     * Provide get size transfer info
+     */
+    @Provides
+    fun provideGetSizeTransferInfo(transfersRepository: TransfersRepository) =
+        GetSizeTransferInfo(transfersRepository::getSizeTransfer)
 }

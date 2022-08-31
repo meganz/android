@@ -759,8 +759,9 @@ public class UploadService extends Service {
                     String appData = transfer.getAppData();
 
                     if (!isTextEmpty(appData) && appData.contains(APP_DATA_TXT_FILE)) {
+                        String message = getCreationOrEditorText(appData, error.getErrorCode() == MegaError.API_OK);
                         sendBroadcast(new Intent(BROADCAST_ACTION_SHOW_SNACKBAR)
-                                .putExtra(SNACKBAR_TEXT, getCreationOrEditorText(transfer, error)));
+                                .putExtra(SNACKBAR_TEXT, message));
                     }
 
                     if (transfer.getState() == MegaTransfer.STATE_FAILED) {

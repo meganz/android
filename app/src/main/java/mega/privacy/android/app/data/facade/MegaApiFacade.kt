@@ -6,10 +6,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
@@ -137,6 +141,42 @@ class MegaApiFacade @Inject constructor(
             sharingScope,
             SharingStarted.WhileSubscribed()
         )
+
+    override val globalTransfer: Flow<GlobalTransfer> = callbackFlow {
+        val listener = OptionalMegaTransferListenerInterface(
+            onTransferStart = { transfer ->
+                sharingScope.launch {
+                    send(GlobalTransfer.OnTransferStart(transfer))
+                }
+            },
+            onTransferFinish = { transfer, error ->
+                sharingScope.launch {
+                    send(GlobalTransfer.OnTransferFinish(transfer, error))
+                }
+            },
+            onTransferUpdate = { transfer ->
+                sharingScope.launch {
+                    send(GlobalTransfer.OnTransferUpdate(transfer))
+                }
+            },
+            onTransferTemporaryError = { transfer, error ->
+                sharingScope.launch {
+                    send(GlobalTransfer.OnTransferTemporaryError(transfer, error))
+                }
+            },
+            onTransferData = { transfer, buffer ->
+                sharingScope.launch {
+                    send(GlobalTransfer.OnTransferData(transfer, buffer))
+                }
+            }
+        )
+
+        megaApi.addTransferListener(listener)
+
+        awaitClose {
+            megaApi.removeTransferListener(listener)
+        }
+    }.stateIn(sharingScope, SharingStarted.WhileSubscribed(), GlobalTransfer.None)
 
     override fun getFavourites(
         node: MegaNode?,
@@ -266,6 +306,9 @@ class MegaApiFacade @Inject constructor(
     override suspend fun sendEvent(eventID: Int, message: String) =
         megaApi.sendEvent(eventID, message)
 
+    override suspend fun acknowledgeUserAlerts() {
+        megaApi.acknowledgeUserAlerts()
+    }
 
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10

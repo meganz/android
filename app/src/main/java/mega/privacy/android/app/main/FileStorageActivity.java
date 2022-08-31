@@ -596,7 +596,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
                 isPrimary = setPathAndCheckIfIsPrimary(uri);
 
                 if (!isPrimary) {
-                    dbH.setSDCardUri(uri.toString());
+                    dbH.setSdCardUri(uri.toString());
                 }
 
                 finishPickFolder();

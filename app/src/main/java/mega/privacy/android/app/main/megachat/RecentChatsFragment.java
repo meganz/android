@@ -358,7 +358,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                         || (adapterList != null && adapterList.isMultipleSelect());
                 ((ManagerActivity) context).changeAppBarElevation(showElevation);
                 if (getParentFragment() instanceof ChatTabsFragment)
-                    ((ChatTabsFragment) getParentFragment()).showElevation(showElevation);
+                    ((ChatTabsFragment) getParentFragment()).showElevation(isDarkMode(context));
             } else if (listView.canScrollVertically(-1)
                     || (adapterList != null && adapterList.isMultipleSelect())
                     || contactsListLayout.getVisibility() == View.VISIBLE) {
@@ -1352,6 +1352,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             refreshMegaContactsList();
         }
         setStatus();
+        checkScroll();
         super.onResume();
     }
 
