@@ -1306,7 +1306,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             // disable media upload only
             CameraUploadUtil.disableMediaUploadProcess()
             setSecondaryFolderPath(SettingsConstants.INVALID_PATH)
-            sendBroadcast(Intent(BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING))
+            sendBroadcast(Intent(BroadcastConstants.ACTION_DISABLE_MEDIA_UPLOADS_SETTING))
             return SHOULD_RUN_STATE_FAILED
         } else {
             notificationManager?.cancel(LOCAL_FOLDER_REMINDER_SECONDARY)

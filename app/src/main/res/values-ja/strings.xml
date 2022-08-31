@@ -1643,7 +1643,7 @@
     <!-- Title of the received requests tab. Capital letters -->
     <string name="tab_received_requests">受信済みの要求</string>
     <!-- Title dialog overquota error -->
-    <string name="overquota_alert_title">ストレージ容量超過</string>
+    <string name="overquota_alert_title">ストレージ容量を超えました</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
     <string name="invalid_link">リンクが無効です。新しい有効なリンクを要求してください</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
@@ -2924,7 +2924,7 @@
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">転送の一時停止を解除して、アップロードを続行します。</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
-    <string name="progress_size_indicator">%1$d%% / %2$s</string>
+    <string name="progress_size_indicator">%1$d&#160;%% / %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">チャットメッセージのデバッグ情報が有効になりました</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
@@ -3224,7 +3224,7 @@
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: 15GB / 20GB. The placeholders are for warning the user and set used storage in red if is in storage over quota.-->
     <string name="used_storage_transfer">[A]%1$s[/A] / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
-    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <string name="used_storage_transfer_percentage">%1$s&#160;%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3889,4 +3889,16 @@
     <string name="chat_recent_list_empty_action">今すぐチャットを開始</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">誰とでも、どんな端末でも、安全かつ非公開にチャットができます。誰も、MEGAでさえも、あなたのチャットを読むことはできませんので、ご安心ください。</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">ミーティングをアーカイブ</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">今すぐミーティングを開始</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">通話</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">サウンド通知</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">誰かが通話に参加または退出したときに音を聞きます。</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">今はやめます</string>
 </resources>

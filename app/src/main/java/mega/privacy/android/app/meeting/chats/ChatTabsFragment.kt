@@ -16,6 +16,7 @@ import mega.privacy.android.app.main.megachat.RecentChatsFragment
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter.Tabs.CHAT
 import mega.privacy.android.app.meeting.list.MeetingListFragment
+import mega.privacy.android.app.utils.AskForDisplayOverDialog
 import mega.privacy.android.app.utils.ColorUtils.setElevationWithColor
 import mega.privacy.android.app.utils.StringResourcesUtils
 
@@ -35,6 +36,7 @@ class ChatTabsFragment : Fragment() {
 
     private val viewModel by activityViewModels<ChatTabsViewModel>()
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
+    private val askForDisplayOverDialog by lazy { AskForDisplayOverDialog(requireContext()) }
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -54,6 +56,7 @@ class ChatTabsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
+        view.post { askForDisplayOverDialog.showDialog() }
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -69,6 +72,7 @@ class ChatTabsFragment : Fragment() {
 
     override fun onDestroyView() {
         binding.pager.unregisterOnPageChangeCallback(pageChangeCallback)
+        askForDisplayOverDialog.recycle()
         super.onDestroyView()
     }
 

@@ -107,7 +107,6 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.chat.recent.RecentChatsViewModel;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.usecase.chat.SearchChatsUseCase;
-import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
@@ -207,8 +206,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     private AlertDialog explanationDialog;
     private static final String KEY_DIALOG_IS_SHOWING = "dialog_is_showing";
 
-    private AskForDisplayOverDialog askForDisplayOverDialog;
-
     private final Observer<MegaChatCall> callRingingStatusObserver = call -> {
         if (megaChatApi.getNumCalls() == 0 || adapter == null) {
             Timber.e("Calls not found");
@@ -269,8 +266,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         grantedContactPermission = hasPermissions(context, Manifest.permission.READ_CONTACTS);
         contactGetter = new MegaContactGetter(context);
         contactGetter.setMegaContactUpdater(this);
-
-        askForDisplayOverDialog = new AskForDisplayOverDialog(context);
     }
 
     @Override
@@ -1318,9 +1313,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         super.onDestroy();
         filterDisposable.clear();
 
-        if (askForDisplayOverDialog != null) {
-            askForDisplayOverDialog.recycle();
-        }
         if (explanationDialog != null) {
             explanationDialog.cancel();
         }

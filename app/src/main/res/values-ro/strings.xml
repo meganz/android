@@ -2737,7 +2737,7 @@
     <!-- Title of the dialog shown when you want to join a group call -->
     <string name="title_join_call">Alătură-te apelului</string>
     <!-- Text of the dialog shown when you want to join a group call -->
-    <string name="text_join_call">Pentru a te alătura acestui apel, trebuie să termini apelul actual.</string>
+    <string name="text_join_call">Pentru a te alătura acestui apel, trebuie să închei apelul actual.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Pentru a te alătura acestui apel, trebuie să închei sau să pui în așteptare apelul actual.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
@@ -3741,7 +3741,7 @@
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro&#160;III yearly</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Remove as host</string>
+    <string name="remove_moderator">Elimină ca gazdă</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Buy new subscription?</string>
     <!-- Text of buy new subscription button -->
@@ -3937,7 +3937,7 @@
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;&#160;MB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3947,17 +3947,17 @@
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
-    <string name="calls_call_screen_count_down_timer_to_end_call">Call will end in %s</string>
+    <string name="calls_call_screen_count_down_timer_to_end_call">Apelul se va încheia în %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
     <string name="calls_call_screen_dialog_title_only_you_in_the_call">You’re the only one here</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
     <string name="calls_chat_screen_dialog_title_only_you_in_the_call">You’re still on a call</string>
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
-    <string name="calls_call_screen_dialog_description_only_you_in_the_call">Call will automatically end in 2 mins unless you want to stay on it.</string>
+    <string name="calls_call_screen_dialog_description_only_you_in_the_call">Apelul se va încheia automat în 2 minute dacă nu vrei să rămâi în acesta.</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
-    <string name="calls_call_screen_button_to_end_call">End call now</string>
+    <string name="calls_call_screen_button_to_end_call">Încheie apelul acum</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
-    <string name="calls_call_screen_button_to_stay_alone_in_call">Stay on call</string>
+    <string name="calls_call_screen_button_to_stay_alone_in_call">Rămâi în apel</string>
     <!-- Report issue setting name-->
     <string name="settings_help_report_issue">Raportează o problemă</string>
     <!-- Report issue fragment instructions-->
@@ -4005,17 +4005,17 @@
     <!-- Filter option to show only videos from Camera Uploads -->
     <string name="photos_filter_videos_only">Numai videoclipuri</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
-    <string name="dialog_cannot_open_file_title">Cannot open file</string>
+    <string name="dialog_cannot_open_file_title">Nu se poate deschide fișierul</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
-    <string name="dialog_cannot_open_file_text">This file type isn’t supported. To open the file, download it first.</string>
+    <string name="dialog_cannot_open_file_text">Acest tip de fișiere nu este suportat. Pentru a deschide fișierul, descarcă-l mai întâi.</string>
     <!-- General open action. -->
     <string name="general_confirmation_open">Deschide</string>
     <!-- Option in the chat menu to end call for all participants -->
-    <string name="meetings_chat_screen_menu_option_end_call_for_all">End call for all</string>
+    <string name="meetings_chat_screen_menu_option_end_call_for_all">Încheie apelul pentru toți</string>
     <!-- Title of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen -->
-    <string name="meetings_chat_screen_dialog_title_end_call_for_all">End call for all?</string>
+    <string name="meetings_chat_screen_dialog_title_end_call_for_all">Închei apelul pentru toți?</string>
     <!-- Description of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen. Allows to end call for all participants -->
-    <string name="meetings_chat_screen_dialog_description_end_call_for_all">This will end the call for all participants.</string>
+    <string name="meetings_chat_screen_dialog_description_end_call_for_all">Acest lucru va încheia apelul pentru toți participanții.</string>
     <!-- Positive button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">Da</string>
     <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
@@ -4023,7 +4023,7 @@
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
     <string name="calls_call_screen_bottom_panel_leave_call_option">Părăsește</string>
     <!-- Option in bottom panel to end call for all, displayed on the group call and meeting screen -->
-    <string name="calls_call_screen_bottom_panel_end_call_for_all_option">End for all</string>
+    <string name="calls_call_screen_bottom_panel_end_call_for_all_option">Încheie apelul pentru toți</string>
     <!-- Title of the dialog that indicates you are the only moderator of the meeting, displayed on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_to_assign_another_host">Make host</string>
     <!-- Description of the dialog that indicates you are the only host of the meeting, displayed on meeting screen -->
@@ -4039,8 +4039,9 @@
     </plurals>
     <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
     <plurals name="num_folders_num_files_2">
-        <item quantity="one">1 file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="one">1 fișier</item>
+        <item quantity="few">%1$d fișiere</item>
+        <item quantity="other">%1$d de fișiere</item>
     </plurals>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">[A]%1$s[/A] storage</string>
@@ -4049,16 +4050,18 @@
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">Spațiu de stocare</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
-    <string name="account_choose_free_limited_transfer_quota">[A]Limited[/A] transfer quota</string>
+    <string name="account_choose_free_limited_transfer_quota">Cotă de transferuri [A]limitată[/A]</string>
     <!-- Name of hots or hosts in the meeting info bottom panel -->
     <plurals name="meeting_call_screen_meeting_info_bottom_panel_name_of_moderators">
-        <item quantity="one">Host: %s</item>
-        <item quantity="other">Hosts: %s</item>
+        <item quantity="one">Gazdă: %s</item>
+        <item quantity="few">Gazde: %s</item>
+        <item quantity="other">Gazde: %s</item>
     </plurals>
     <!-- Number of participants in the call in the meeting info bottom panel -->
     <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
         <item quantity="one">Participant: %s</item>
-        <item quantity="other">Participants: %s</item>
+        <item quantity="few">Participanți: %s</item>
+        <item quantity="other">Participanți: %s</item>
     </plurals>
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] was changed to read-only by [/B][A]%2$s[/A]</string>
@@ -4073,15 +4076,27 @@
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s was changed to host role by %2$s</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
-    <string name="calls_call_screen_waiting_for_participants">Waiting for others to join</string>
+    <string name="calls_call_screen_waiting_for_participants">Se așteaptă ca alții să se alăture</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
     <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Start a meeting</string>
+    <string name="meetings_list_empty_action">Începe o întâlnire</string>
     <!--Description text from Meeting screen empty view-->
     <string name="meetings_list_empty_description">Talk securely and privately on audio or video calls with friends and colleagues around the world.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_action">Start chatting now</string>
+    <string name="chat_recent_list_empty_action">Începe să chatuiești acum</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chat securely and privately, with anyone and on any device, knowing that no one can read your chats, not even MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Archive meeting</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">Începe întâlnirea acum</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">Apeluri</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">Sound notifications</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">Hear a sound when someone joins or leaves a call.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">Nu acum</string>
 </resources>

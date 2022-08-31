@@ -501,7 +501,7 @@
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Clé de déchiffrement invalide</string>
     <!-- upload to. Then choose an Audio file -->
-    <string name="upload_to_audio">Son</string>
+    <string name="upload_to_audio">Sons</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Vidéo</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1255,7 +1255,7 @@
     <!-- Possible state of a transfer -->
     <string name="transfer_queued">En attente</string>
     <!-- Possible state of a transfer. When the transfer is finishing -->
-    <string name="transfer_completing">Achèvement</string>
+    <string name="transfer_completing">Finalisation</string>
     <!-- Possible state of a transfer. When the transfer is retrying -->
     <string name="transfer_retrying">Relance</string>
     <!-- Possible state of a transfer. When the transfer was cancelled -->
@@ -4099,4 +4099,16 @@
     <string name="chat_recent_list_empty_action">Commencer à dialoguer maintenant</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Dialoguez en toute sécurité et confidentialité avec n’importe qui et sur n’importe quel appareil en sachant que personne ne peut lire vos conversations, pas même MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Archiver la réunion</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">Commencer la réunion maintenant</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">Appels</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">Notifications sonores</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">Émettre un son si quelqu’un se joint à un appel ou le quitte.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">Pas maintenant</string>
 </resources>

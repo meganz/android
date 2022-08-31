@@ -309,7 +309,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">전송 보기</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">대부분의 장치는 4&#160;GB를 초과하는 파일을 다운로드할 수 없습니다. 다운로드가 실패할 수 있습니다</string>
+    <string name="error_file_size_greater_than_4gb">대부분의 장치는 4GB를 초과하는 파일을 다운로드할 수 없습니다. 다운로드가 실패할 수 있습니다</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">장치에 이 파일을 실행할 앱이 없습니다</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1643,7 +1643,7 @@
     <!-- Title of the received requests tab. Capital letters -->
     <string name="tab_received_requests">받은 요청</string>
     <!-- Title dialog overquota error -->
-    <string name="overquota_alert_title">할당량 초과</string>
+    <string name="overquota_alert_title">저장소 할당량 초과</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
     <string name="invalid_link">잘못된 링크, 새 유효한 링크를 요청하세요</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
@@ -1687,23 +1687,23 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">파일 불러오는 중</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s&#160;B</string>
+    <string name="label_file_size_byte">%sB</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
+    <string name="label_file_size_kilo_byte">%sKB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%s&#160;MB</string>
+    <string name="label_file_size_mega_byte">%sMB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%s&#160;GB</string>
+    <string name="label_file_size_giga_byte">%sGB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s&#160;B/s</string>
+    <string name="label_file_speed_byte">%sB/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
+    <string name="label_file_speed_kilo_byte">%sKB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
+    <string name="label_file_speed_mega_byte">%sMB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
+    <string name="label_file_speed_giga_byte">%sGB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
@@ -2082,15 +2082,15 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">잘못된 코드</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">클라우드 드라이브가 거의 찼습니다. Pro로 업그레이드하고 최대 %1$s&#160;TB의 저장소와 %2$s&#160;TB의 전송 할당량을 받으세요.</string>
+    <string name="text_almost_full_warning">클라우드 드라이브가 거의 찼습니다. Pro로 업그레이드하고 최대 %1$sTB의 저장소와 %2$sTB의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">클라우드 드라이브가 거의 찼습니다. 지금 업그레이드 하고 %1$s&#160;TB의 저장소와 %2$s&#160;TB의 전송 할당량을 받으세요.</string>
+    <string name="text_almost_full_warning_pro_account">클라우드 드라이브가 거의 찼습니다. 지금 업그레이드 하고 %1$sTB의 저장소와 %2$sTB의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
     <string name="text_almost_full_warning_pro3_account">클라우드 드라이브가 거의 찼습니다. 더 많은 저장소가 필요하시면 MEGA 고객 지원에 연락하여 맞춤 요금제를 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">클라우드 드라이브가 가득 찼습니다. Pro로 업그레이드하고 최대 %1$s&#160;TB의 저장소와 %2$s&#160;TB의 전송 할당량을 받으세요.</string>
+    <string name="text_storage_full_warning">클라우드 드라이브가 가득 찼습니다. Pro로 업그레이드하고 최대 %1$sTB의 저장소와 %2$sTB의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">클라우드 드라이브가 가득 찼습니다. 지금 업그레이드하고 최대 %1$s&#160;TB의 저장소와 %2$s&#160;TB의 전송 할당량을 받으세요.</string>
+    <string name="text_storage_full_warning_pro_account">클라우드 드라이브가 가득 찼습니다. 지금 업그레이드하고 최대 %1$sTB의 저장소와 %2$sTB의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
     <string name="text_storage_full_warning_pro3_account">클라우드 드라이브가 가득 찼습니다. 더 많은 저장소가 필요하다면 맞춤 요금제를 위해 MEGA 고객 지원에 연락하세요.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
@@ -2116,7 +2116,7 @@
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">보내기&#8230;</string>
     <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">업로드&#8230;</string>
+    <string name="title_cloud_explorer">Upload to&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">더 보기</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2620,7 +2620,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">지인을 초대하고 MEGA의 암호화된 대화로 안전하게 대화를 시작하세요.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">안녕하세요. 저와 MEGA에서 안전하게 대화하고 20&#160;GB의 무료 저장소를 받으세요. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">안녕하세요. 저와 MEGA에서 안전하게 대화하고 20GB의 무료 저장소를 받으세요. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">사용 가능한 대화 링크 없음.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3380,7 +3380,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">세계에서 가장 큰 안전한 클라우드 저장소와 협업 플랫폼에 가입하세요.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">20&#160;GB를 무료로 받으세요</string>
+    <string name="left_meeting_bonus_title">20GB를 무료로 받으세요</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">지금 가입하고 고급 협업 기능을 무료로 즐기세요.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -3742,13 +3742,13 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">다시 연결할 수 없습니다</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3889,4 +3889,16 @@
     <string name="chat_recent_list_empty_action">지금 대화 시작</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">그 누구도, 심지어는 MEGA도 당신의 대화를 읽을 수 없다는 것을 알고 어느 누구와 어느 기기에서든 안전하고 비밀스럽게 대화하세요.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">회의 보관</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">지금 회의 시작</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">통화</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">소리 알림</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">누군가 통화에 참여하거나 떠날 때 소리를 듣습니다.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">나중에</string>
 </resources>

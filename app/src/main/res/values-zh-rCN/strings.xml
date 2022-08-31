@@ -3889,4 +3889,16 @@
     <string name="chat_recent_list_empty_action">立即开始聊天</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">与他人跨设备进行安全私密交谈，即使是MEGA也无法读取您的聊天记录。</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">归档会议</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">立即发起会议</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">通话</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">提示音通知</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">当有人加入或离开通话时播放提示音。</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">现在不用</string>
 </resources>

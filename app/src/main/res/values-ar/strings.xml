@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">لم يتم العثور على وحدة تخزين خارجية</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">تسجيل &#160;خروج</string>
+    <string name="action_logout">تسجيل&#160;خروج</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">رفع</string>
     <!-- Menu item -->
@@ -137,7 +137,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">هل أنت متأكد من أنك تريد إلغاء عملية تسجيل الدخول الحالية؟</string>
     <!-- Login button -->
-    <string name="login_text">تسجيل الدخول</string>
+    <string name="login_text">تسجيل&#160;دخول</string>
     <!-- email label -->
     <string name="email_text">البريد الإلكتروني</string>
     <!-- password label -->
@@ -3411,7 +3411,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">حدد عمليات تراسل المعطيات</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">يتعذر تغيير أولوية التراسل ”%1$s”</string>
+    <string name="change_of_transfer_priority_failed">يتعذر تغيير أولوية التراسل ”%1$s“</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">أرسل مفتاح فك التشفير بشكل منفصل</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -4031,21 +4031,21 @@
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
     <string name="successful_upgrade">شكرا لاشتراكك في %1$s</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite شهرياً</string>
+    <string name="pro_lite_monthly">برو لايت Pro&#160;Lite شهرياً</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite سنوياً</string>
+    <string name="pro_lite_yearly">برو لايت Pro&#160;Lite سنوياً</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I شهرياً</string>
+    <string name="pro_i_monthly">برو Pro&#160;I شهرياً</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I سنوياً</string>
+    <string name="pro_i_yearly">برو  Pro&#160;I سنوياً</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II شهرياً</string>
+    <string name="pro_ii_monthly">برو Pro&#160;II شهرياً</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II سنوياً</string>
+    <string name="pro_ii_yearly">برو Pro&#160;II سنوياً</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III شهرياً</string>
+    <string name="pro_iii_monthly">برو Pro&#160;III شهرياً</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro III سنوياً</string>
+    <string name="pro_iii_yearly">برو Pro&#160;III سنوياً</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">إزالة كمضيف</string>
     <!-- Title message of existing subscription dialog -->
@@ -4414,4 +4414,16 @@
     <string name="chat_recent_list_empty_action">ابدأ المحادثة الآن</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">تقوم بالمحادثة مع أي شخص وعلى أي جهاز بأمان وخصوصية مع معرفة أنه لا يمكن لأحد قراءة محادثاتك ولا حتى ميغا MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">قم بأرشفة الاجتماع</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">ابدأ الاجتماع الآن</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">مكالمات</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">إشعارات صوتية</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">تسمع صوتًا عندما ينضم شخص ما إلى مكالمة أو يغادرها.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">ليس الآن</string>
 </resources>

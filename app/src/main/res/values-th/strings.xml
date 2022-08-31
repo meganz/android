@@ -3889,4 +3889,16 @@
     <string name="chat_recent_list_empty_action">เริ่มแชทได้เลย</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">คุณสามารถแชทได้อย่างปลอดภัยและเป็นส่วนตัวกับทุกคนบนอุปกรณ์ใดก็ได้ มั่นใจได้ว่าไม่มีใครแม้แต่ MEGA ก็ไม่สามารถอ่านแชทของคุณได้</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">จัดเก็บการประชุม</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">เริ่มการประชุมทันที</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">โทร</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">แจ้งเตือนด้วยเสียง</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">ให้ส่งเสียงเมื่อมีคนเข้าร่วมหรือวางสาย</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">ไม่ใช่ตอนนี้</string>
 </resources>
