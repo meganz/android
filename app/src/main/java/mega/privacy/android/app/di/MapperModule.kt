@@ -12,6 +12,7 @@ import mega.privacy.android.app.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.app.data.mapper.FeatureFlagMapper
 import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.app.data.mapper.MegaTransferMapper
 import mega.privacy.android.app.data.mapper.MimeTypeMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.data.mapper.UserAlertMapper
@@ -26,6 +27,7 @@ import mega.privacy.android.app.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.app.data.mapper.toFavouriteInfo
 import mega.privacy.android.app.data.mapper.toFeatureFlag
 import mega.privacy.android.app.data.mapper.toPushMessage
+import mega.privacy.android.app.data.mapper.toTransferModel
 import mega.privacy.android.app.data.mapper.toUserAlert
 import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
@@ -94,4 +96,10 @@ class MapperModule {
      */
     @Provides
     fun provideRepeatToggleModeMapper(): RepeatToggleModeMapper = ::toRepeatModeMapper
+
+    /**
+     * Provide mega transfer mapper
+     */
+    @Provides
+    fun provideMegaTransferMapper(): MegaTransferMapper = ::toTransferModel
 }
