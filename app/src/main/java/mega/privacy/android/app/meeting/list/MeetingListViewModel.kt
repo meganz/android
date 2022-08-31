@@ -72,7 +72,7 @@ class MeetingListViewModel @Inject constructor(
     fun getMeetings(): LiveData<List<MeetingItem>> =
         meetings.map { items ->
             if (!queryString.isNullOrBlank()) {
-                items.filter { (_, title, lastMessage, _, _, _, firstUser, lastUser, _, _, _) ->
+                items.filter { (_, title, lastMessage, _, _, _, _, firstUser, lastUser, _, _, _) ->
                     title.contains(queryString!!, true)
                             || lastMessage?.contains(queryString!!, true) == true
                             || firstUser.firstName?.contains(queryString!!, true) == true

@@ -12,6 +12,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_OUTGOING_CALL
@@ -30,6 +31,8 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatContainsMeta
+import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
 import nz.mega.sdk.MegaError
@@ -205,10 +208,12 @@ class GetMeetingListUseCase @Inject constructor(
      */
     private fun MegaChatRoom.toMeetingItem(listener: OptionalMegaRequestListenerInterface): MeetingItem {
         val chatListItem = megaChatApi.getChatListItem(chatId)
+
         val title = ChatUtil.getTitleChat(this)
         val isMuted = !megaApi.isChatNotifiable(chatId)
         val hasPermissions = chatListItem.ownPrivilege == PRIV_MODERATOR
         val highlight = unreadCount > 0 || chatListItem.isCallInProgress
+                || chatListItem.lastMessageType == MegaChatMessage.TYPE_CALL_STARTED
         val formattedDate = TimeUtils.formatDateAndTime(
             context,
             chatListItem.lastTimestamp,
@@ -235,11 +240,21 @@ class GetMeetingListUseCase @Inject constructor(
             onSuccess = { lastMessageFormatted = it },
             onError = Timber::w
         )
+        var lastMessageIcon: Int? = null
+        if (chatListItem.lastMessageType == MegaChatMessage.TYPE_VOICE_CLIP) {
+            lastMessageIcon = R.drawable.ic_voice_clip_feedback
+        } else if (chatListItem.lastMessageType == MegaChatMessage.TYPE_CONTAINS_META) {
+            val metaType = megaChatApi.getMessage(chatId, chatListItem.lastMessageId)?.containsMeta?.type
+            if (metaType == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
+                lastMessageIcon = R.drawable.ic_location_small
+            }
+        }
 
         return MeetingItem(
             chatId = chatId,
             title = title,
             lastMessage = lastMessageFormatted,
+            lastMessageIcon = lastMessageIcon,
             isPublic = isPublic,
             isMuted = isMuted,
             hasPermissions = hasPermissions,

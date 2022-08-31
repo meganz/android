@@ -100,11 +100,25 @@
         app:tint="?android:attr/textColorPrimary"
         tools:visibility="visible" />
 
+    <ImageView
+        android:id="@+id/img_last_message"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginBottom="2dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/txt_timestamp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_title"
+        app:tint="?android:attr/textColorSecondary"
+        tools:src="@drawable/ic_voice_clip_feedback"
+        tools:visibility="visible" />
+
     <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/txt_last_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="72dp"
+        android:layout_marginStart="2dp"
         android:layout_marginEnd="16dp"
         android:ellipsize="end"
         android:maxLines="1"
@@ -113,9 +127,10 @@
         app:layout_constraintBottom_toTopOf="@id/txt_timestamp"
         app:layout_constraintEnd_toStartOf="@+id/txt_unread_count"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/img_last_message"
         app:layout_constraintTop_toBottomOf="@id/txt_title"
         app:layout_goneMarginEnd="16dp"
+        app:layout_goneMarginStart="72dp"
         tools:text="Group call ended" />
 
     <TextView

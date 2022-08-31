@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.list
 
+import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 
@@ -9,6 +10,7 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupUser
  * @property chatId             Chat identifier
  * @property title              Chat title
  * @property lastMessage        Last chat message
+ * @property lastMessageIcon    Last chat message icon
  * @property isPublic           Check if chat is public
  * @property isMuted            Check if chat is muted
  * @property hasPermissions     Check if has permissions to clear history
@@ -23,6 +25,7 @@ data class MeetingItem constructor(
     val chatId: Long,
     val title: String,
     val lastMessage: String?,
+    @DrawableRes val lastMessageIcon: Int?,
     val isPublic: Boolean,
     val isMuted: Boolean,
     val hasPermissions: Boolean,

@@ -488,7 +488,7 @@ public class ChatController {
                                 return builder.toString();
                             }
                             case MegaChatContainsMeta.CONTAINS_META_GEOLOCATION: {
-                                String text = message.getContainsMeta().getTextMessage();
+                                String text = getString(R.string.title_geolocation_message);
                                 builder.append(text);
                                 return builder.toString();
                             }
@@ -596,7 +596,7 @@ public class ChatController {
                                 return builder.toString();
                             }
                             case MegaChatContainsMeta.CONTAINS_META_GEOLOCATION: {
-                                String text = message.getContainsMeta().getTextMessage();
+                                String text = getString(R.string.title_geolocation_message);
                                 builder.append(text);
                                 return builder.toString();
                             }
