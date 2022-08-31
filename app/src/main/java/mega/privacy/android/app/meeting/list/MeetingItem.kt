@@ -11,8 +11,11 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupUser
  * @property lastMessage        Last chat message
  * @property isPublic           Check if chat is public
  * @property isMuted            Check if chat is muted
+ * @property hasPermissions     Check if has permissions to clear history
  * @property firstUser          First user of the chat
  * @property lastUser           Last user of the chat
+ * @property unreadCount        Unread messages count
+ * @property highlight          Check if message should be highlighted
  * @property timeStamp          Last timestamp of the chat
  * @property formattedTimestamp Last timestamp of the chat formatted
  */
@@ -22,8 +25,11 @@ data class MeetingItem constructor(
     val lastMessage: String?,
     val isPublic: Boolean,
     val isMuted: Boolean,
+    val hasPermissions: Boolean,
     val firstUser: ContactGroupUser,
     val lastUser: ContactGroupUser?,
+    val unreadCount: Int,
+    val highlight: Boolean,
     val timeStamp: Long,
     val formattedTimestamp: String,
 ) {

@@ -1,4 +1,4 @@
-<androidx.emoji.widget.EmojiAppCompatTextView xmlns:android="http://schemas.android.com/apk/res/android"
+<mega.privacy.android.app.components.twemoji.EmojiTextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/txt_header"
     android:layout_width="match_parent"

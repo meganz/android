@@ -5,6 +5,7 @@ import static android.content.Intent.ACTION_USER_PRESENT;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_JOINED_SUCCESSFULLY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_OUTGOING_CALL;
 import static mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification;
 import static mega.privacy.android.app.utils.CallUtil.existsAnOngoingOrIncomingCall;
 import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
@@ -255,7 +256,9 @@ public class ChatManagement {
             return;
 
         hashMapOutgoingCall.put(callId, isRequestSent);
-        if (!isRequestSent) {
+        if (isRequestSent) {
+            LiveEventBus.get(EVENT_OUTGOING_CALL, Long.class).post(callId);
+        } else {
             LiveEventBus.get(EVENT_NOT_OUTGOING_CALL, Long.class).post(callId);
         }
     }

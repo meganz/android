@@ -79,7 +79,12 @@ class MeetingListFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.getMeetings().observe(viewLifecycleOwner) { items ->
-            meetingsAdapter.submitList(items)
+            val currentFirstChat = meetingsAdapter.currentList.firstOrNull()?.chatId
+            meetingsAdapter.submitList(items) {
+                if (currentFirstChat != items.firstOrNull()?.chatId) {
+                    binding.list.smoothScrollToPosition(0)
+                }
+            }
             binding.viewEmpty.isVisible = items.isNullOrEmpty()
         }
     }

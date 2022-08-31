@@ -481,14 +481,22 @@ public class ChatController {
                 } else if (message.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
                     MegaChatContainsMeta meta = message.getContainsMeta();
                     if (meta != null) {
-                        if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
-                            String text = meta.getRichPreview().getText();
-                            builder.append(text);
-                            return builder.toString();
-                        } else if (isGeolocation(message)) {
-                            String text = message.getContainsMeta().getTextMessage();
-                            builder.append(text);
-                            return builder.toString();
+                        switch (meta.getType()) {
+                            case MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW: {
+                                String text = meta.getRichPreview().getText();
+                                builder.append(text);
+                                return builder.toString();
+                            }
+                            case MegaChatContainsMeta.CONTAINS_META_GEOLOCATION: {
+                                String text = getString(R.string.title_geolocation_message);
+                                builder.append(text);
+                                return builder.toString();
+                            }
+                            case MegaChatContainsMeta.CONTAINS_META_GIPHY: {
+                                String text = message.getContainsMeta().getGiphy().getTitle();
+                                builder.append(text);
+                                return builder.toString();
+                            }
                         }
                     }
 
@@ -580,13 +588,26 @@ public class ChatController {
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
                     MegaChatContainsMeta meta = message.getContainsMeta();
-                    if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
-                        String text = meta.getRichPreview().getText();
-                        builder.append(text);
-                        return builder.toString();
-                    } else {
-                        return "";
+                    if (meta != null) {
+                        switch (meta.getType()) {
+                            case MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW: {
+                                String text = meta.getRichPreview().getText();
+                                builder.append(text);
+                                return builder.toString();
+                            }
+                            case MegaChatContainsMeta.CONTAINS_META_GEOLOCATION: {
+                                String text = getString(R.string.title_geolocation_message);
+                                builder.append(text);
+                                return builder.toString();
+                            }
+                            case MegaChatContainsMeta.CONTAINS_META_GIPHY: {
+                                String text = message.getContainsMeta().getGiphy().getTitle();
+                                builder.append(text);
+                                return builder.toString();
+                            }
+                        }
                     }
+                    return "";
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_STARTED) {
                     String textToShow = MeetingUtil.getAppropriateStringForCallStarted().toString();
                     builder.append(textToShow);

@@ -7,17 +7,16 @@ import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
+import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result
@@ -25,18 +24,19 @@ import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import java.io.File
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -46,15 +46,15 @@ import javax.inject.Inject
  * @property megaApi                MegaApi
  * @property megaChatApi            MegaChatApi
  * @property getChatChangesUseCase  Use case needed to get latest changes from Mega Api
+ * @property getChatChangesUseCase  Use case needed to get last chat message formatted
  */
 class GetMeetingListUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val getChatChangesUseCase: GetChatChangesUseCase,
+    private val getLastMessageUseCase: GetLastMessageUseCase,
 ) {
-
-    private val chatController: ChatController by lazy { ChatController(context) }
 
     /**
      * Get a list of updated MeetingItems
@@ -119,7 +119,7 @@ class GetMeetingListUseCase @Inject constructor(
                                 }
                             }
 
-                            emitter.onNext(meetings.sortedByDescending { it.timeStamp })
+                            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
                         }
                     } else {
                         Timber.w(error.toMegaException())
@@ -136,7 +136,18 @@ class GetMeetingListUseCase @Inject constructor(
                 if (index != Constants.INVALID_POSITION) {
                     val oldItem = meetings[index]
                     meetings[index] = oldItem.copy(isMuted = !oldItem.isMuted)
-                    emitter.onNext(meetings.sortedByDescending { it.timeStamp })
+                    emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+                }
+            }
+
+            val updateCallObserver = Observer<Any> { chatCall ->
+                if (emitter.isCancelled) return@Observer
+                val updatedChatId = (chatCall as MegaChatCall).chatid
+                val index = meetings.indexOfFirst { it.chatId == updatedChatId }
+                if (index != Constants.INVALID_POSITION) {
+                    val chatRoom = megaChatApi.getChatRoom(updatedChatId)
+                    meetings[index] = chatRoom.toMeetingItem(userAttrsListener)
+                    emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
                 }
             }
 
@@ -146,7 +157,7 @@ class GetMeetingListUseCase @Inject constructor(
                     meetings.add(chatRoom.toMeetingItem(userAttrsListener))
                 }
 
-            emitter.onNext(meetings.sortedByDescending { it.timeStamp })
+            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
 
             getChatChangesUseCase.get()
                 .filter { it is Result.OnChatListItemUpdate && it.item != null }
@@ -165,20 +176,22 @@ class GetMeetingListUseCase @Inject constructor(
                             } else {
                                 meetings[index] = updatedChatRoom.toMeetingItem(userAttrsListener)
                             }
-                            emitter.onNext(meetings.sortedByDescending { it.timeStamp })
+                            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
                         } else if (updatedChatRoom.isMeeting && updatedChatRoom.isActive && !updatedChatRoom.isArchived) {
                             meetings.add(updatedChatRoom.toMeetingItem(userAttrsListener))
-                            emitter.onNext(meetings.sortedByDescending { it.timeStamp })
+                            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
                         }
                     },
                     onError = Timber::e
                 ).addTo(changesSubscription)
 
             LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).observeForever(muteObserver)
+            LiveEventBus.get(EVENT_UPDATE_CALL).observeForever(updateCallObserver)
 
             emitter.setCancellable {
                 changesSubscription.dispose()
                 LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).removeObserver(muteObserver)
+                LiveEventBus.get(EVENT_UPDATE_CALL).observeForever(updateCallObserver)
             }
         }, BackpressureStrategy.LATEST)
 
@@ -190,18 +203,16 @@ class GetMeetingListUseCase @Inject constructor(
      */
     private fun MegaChatRoom.toMeetingItem(listener: OptionalMegaRequestListenerInterface): MeetingItem {
         val chatListItem = megaChatApi.getChatListItem(chatId)
+
         val title = ChatUtil.getTitleChat(this)
         val isMuted = !megaApi.isChatNotifiable(chatId)
+        val hasPermissions = chatListItem.ownPrivilege == PRIV_MODERATOR
+        val highlight = unreadCount > 0 || chatListItem.isCallInProgress
+                || chatListItem.lastMessageType == MegaChatMessage.TYPE_CALL_STARTED
         val formattedDate = TimeUtils.formatDateAndTime(
             context,
             chatListItem.lastTimestamp,
             TimeUtils.DATE_LONG_FORMAT)
-        val lastMessage = megaChatApi.getMessage(chatId, chatListItem.lastMessageId)
-        val lastMessageFormatted = if (lastMessage != null) {
-            chatController.createManagementString(lastMessage, this)
-        } else {
-            StringResourcesUtils.getString(R.string.no_conversation_history)
-        }
         val firstUser: ContactGroupUser
         var lastUser: ContactGroupUser? = null
 
@@ -219,14 +230,23 @@ class GetMeetingListUseCase @Inject constructor(
             }
         }
 
+        var lastMessageFormatted: String? = null
+        getLastMessageUseCase.get(chatId, chatListItem.lastMessageId).blockingSubscribeBy(
+            onSuccess = { lastMessageFormatted = it },
+            onError = Timber::w
+        )
+
         return MeetingItem(
             chatId = chatId,
             title = title,
             lastMessage = lastMessageFormatted,
-            isPublic = this.isPublic,
+            isPublic = isPublic,
             isMuted = isMuted,
+            hasPermissions = hasPermissions,
             firstUser = firstUser,
             lastUser = lastUser,
+            unreadCount = unreadCount,
+            highlight = highlight,
             timeStamp = chatListItem.lastTimestamp,
             formattedTimestamp = formattedDate)
     }

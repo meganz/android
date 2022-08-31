@@ -10,6 +10,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.usecase.chat.ArchiveChatUseCase
+import mega.privacy.android.app.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.app.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.app.usecase.chat.SignalChatPresenceUseCase
 import mega.privacy.android.app.usecase.meeting.GetMeetingListUseCase
@@ -26,6 +27,7 @@ import javax.inject.Inject
  * @property archiveChatUseCase         Use case to archive chats
  * @property leaveChatUseCase           Use case to leave chats
  * @property signalChatPresenceUseCase  Use case to signal chat presence
+ * @property clearChatHistoryUseCase    Use case to clear chat history
  */
 @HiltViewModel
 class MeetingListViewModel @Inject constructor(
@@ -33,6 +35,7 @@ class MeetingListViewModel @Inject constructor(
     private val archiveChatUseCase: ArchiveChatUseCase,
     private val leaveChatUseCase: LeaveChatUseCase,
     private val signalChatPresenceUseCase: SignalChatPresenceUseCase,
+    private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -69,7 +72,7 @@ class MeetingListViewModel @Inject constructor(
     fun getMeetings(): LiveData<List<MeetingItem>> =
         meetings.map { items ->
             if (!queryString.isNullOrBlank()) {
-                items.filter { (_, title, lastMessage, _, _, firstUser, lastUser, _, _) ->
+                items.filter { (_, title, lastMessage, _, _, _, firstUser, lastUser, _, _, _) ->
                     title.contains(queryString!!, true)
                             || lastMessage?.contains(queryString!!, true) == true
                             || firstUser.firstName?.contains(queryString!!, true) == true
@@ -120,6 +123,18 @@ class MeetingListViewModel @Inject constructor(
      */
     fun leaveChat(chatId: Long) {
         leaveChatUseCase.leave(chatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onError = Timber::e)
+    }
+
+    /**
+     * Clear chat history
+     *
+     * @param chatId    Chat id to leave
+     */
+    fun clearChatHistory(chatId: Long) {
+        clearChatHistoryUseCase.clear(chatId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onError = Timber::e)

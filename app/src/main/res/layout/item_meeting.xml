@@ -53,7 +53,7 @@
         app:roundAsCircle="true"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
-    <androidx.emoji.widget.EmojiAppCompatTextView
+    <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/txt_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -100,7 +100,7 @@
         app:tint="?android:attr/textColorPrimary"
         tools:visibility="visible" />
 
-    <androidx.emoji.widget.EmojiAppCompatTextView
+    <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/txt_last_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -111,11 +111,12 @@
         android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@id/txt_timestamp"
-        app:layout_constraintEnd_toStartOf="@id/btn_more"
+        app:layout_constraintEnd_toStartOf="@+id/txt_unread_count"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txt_title"
         app:layout_goneMarginEnd="16dp"
+        app:layout_goneMarginStart="72dp"
         tools:text="Group call ended" />
 
     <TextView
@@ -147,5 +148,22 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txt_unread_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/bg_unread_count"
+        android:gravity="center"
+        android:maxLength="2"
+        android:paddingBottom="1dp"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Variant2"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_more"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="2"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
