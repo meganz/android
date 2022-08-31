@@ -1,6 +1,5 @@
 package mega.privacy.android.app.sync
 
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -29,7 +28,7 @@ data class Backup(
      * Valid value definitions
      * @see MegaApiJava
      */
-    var state: Int = CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE,
+    var state: BackupState = BackupState.ACTIVE,
     /**
      * Valid value definitions
      * @see MegaError

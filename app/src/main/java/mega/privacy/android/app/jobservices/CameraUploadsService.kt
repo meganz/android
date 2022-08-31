@@ -56,15 +56,15 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
+import mega.privacy.android.app.sync.BackupState
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.isActive
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.onUploadSuccess
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.reportUploadFinish
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.reportUploadInterrupted
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.startActiveHeartbeat
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.stopActiveHeartbeat
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryBackupState
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryBackupState
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryFolderBackupState
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryFolderBackupState
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
@@ -543,8 +543,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         // Camera Upload process is running, but interrupted.
         if (isActive()) {
             // Update backups' state.
-            updatePrimaryBackupState(CameraUploadSyncManager.State.CU_SYNC_STATE_TEMPORARY_DISABLED)
-            updateSecondaryBackupState(CameraUploadSyncManager.State.CU_SYNC_STATE_TEMPORARY_DISABLED)
+            updatePrimaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
+            updateSecondaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
             // Send failed heartbeat.
             reportUploadInterrupted()
         }
@@ -949,8 +949,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         updateTimeStamp(null, SyncTimeStamp.SECONDARY_VIDEO)
 
         // Reset backup state as active.
-        updatePrimaryBackupState(CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE)
-        updateSecondaryBackupState(CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE)
+        updatePrimaryFolderBackupState(BackupState.ACTIVE)
+        updateSecondaryFolderBackupState(BackupState.ACTIVE)
 
         val finalList = getPendingSyncRecords()
         if (finalList.isEmpty()) {
