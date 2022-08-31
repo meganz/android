@@ -310,6 +310,9 @@ class MegaApiFacade @Inject constructor(
         megaApi.acknowledgeUserAlerts()
     }
 
+    override suspend fun getIncomingContactRequests() =
+        megaApi.incomingContactRequests
+
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
     }

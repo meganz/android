@@ -1,5 +1,6 @@
 package mega.privacy.android.app.data.gateway.api
 
+import mega.privacy.android.app.MegaContactDB
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.main.megachat.NonContactInfo
 import mega.privacy.android.domain.entity.SyncRecord
@@ -327,4 +328,13 @@ interface MegaLocalStorageGateway {
      * @param email
      */
     suspend fun setNonContactEmail(userHandle: Long, email: String)
+
+
+    /**
+     * Get contact by email
+     *
+     * @param email
+     * @return local contact details if found
+     */
+    suspend fun getContactByEmail(email: String?): MegaContactDB?
 }
