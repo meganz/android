@@ -7,6 +7,7 @@ import android.view.View
 import android.view.WindowInsetsController
 import android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
 import android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
@@ -26,10 +27,19 @@ class GiphyViewerActivity : PasscodeActivity() {
 
     private var picking = true
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            setResult(RESULT_CANCELED)
+            retryConnectionsAndSignalPresence()
+            finish()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         window?.statusBarColor = ContextCompat.getColor(this,R.color.black)
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window?.setDecorFitsSystemWindows(true)
@@ -62,6 +72,7 @@ class GiphyViewerActivity : PasscodeActivity() {
 
         if (intent.action.equals(ACTION_PREVIEW_GIPHY)) {
             picking = false
+            onBackPressedCallback.isEnabled = false
             binding.sendFab.visibility = View.GONE
         } else {
             binding.sendFab.setOnClickListener { sendGifToChat() }
@@ -123,13 +134,5 @@ class GiphyViewerActivity : PasscodeActivity() {
             setResult(RESULT_OK, Intent().putExtra(GIF_DATA, gifData))
         }
         finish()
-    }
-
-    override fun onBackPressed() {
-        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
-        if (picking) {
-            setResult(RESULT_CANCELED)
-        }
-        super.onBackPressed()
     }
 }
