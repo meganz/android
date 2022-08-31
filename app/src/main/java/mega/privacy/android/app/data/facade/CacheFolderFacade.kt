@@ -20,6 +20,7 @@ class CacheFolderFacade @Inject constructor(
 
     companion object {
         private const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"
+        private const val AVATAR_FOLDER = "avatarsMEGA"
     }
 
     override fun getCacheFolder(folderName: String): File? {
@@ -120,4 +121,7 @@ class CacheFolderFacade @Inject constructor(
             ContextCompat.getExternalFilesDirs(context, null)
         return File(externalStorageVolumes[0].absolutePath + File.separator + folderName)
     }
+
+    override fun buildAvatarFile(fileName: String?) =
+        getCacheFile(AVATAR_FOLDER, fileName)
 }

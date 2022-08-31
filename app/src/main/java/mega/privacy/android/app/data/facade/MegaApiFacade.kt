@@ -13,15 +13,18 @@ import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
@@ -30,6 +33,8 @@ import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Mega api facade
@@ -90,57 +95,56 @@ class MegaApiFacade @Inject constructor(
 
     override suspend fun getSdkVersion(): String = megaApi.version
 
-    override val globalUpdates: Flow<GlobalUpdate>
-        get() = callbackFlow {
-            val listener = object : MegaGlobalListenerInterface {
-                override fun onUsersUpdate(
-                    api: MegaApiJava?,
-                    users: java.util.ArrayList<MegaUser>?,
-                ) {
-                    trySend(GlobalUpdate.OnUsersUpdate(users))
-                }
-
-                override fun onUserAlertsUpdate(
-                    api: MegaApiJava?,
-                    userAlerts: java.util.ArrayList<MegaUserAlert>?,
-                ) {
-                    trySend(GlobalUpdate.OnUserAlertsUpdate(userAlerts))
-                }
-
-                override fun onNodesUpdate(
-                    api: MegaApiJava?,
-                    nodeList: java.util.ArrayList<MegaNode>?,
-                ) {
-                    trySend(GlobalUpdate.OnNodesUpdate(nodeList))
-                }
-
-                override fun onReloadNeeded(api: MegaApiJava?) {
-                    trySend(GlobalUpdate.OnReloadNeeded)
-                }
-
-                override fun onAccountUpdate(api: MegaApiJava?) {
-                    trySend(GlobalUpdate.OnAccountUpdate)
-                }
-
-                override fun onContactRequestsUpdate(
-                    api: MegaApiJava?,
-                    requests: java.util.ArrayList<MegaContactRequest>?,
-                ) {
-                    trySend(GlobalUpdate.OnContactRequestsUpdate(requests))
-                }
-
-                override fun onEvent(api: MegaApiJava?, event: MegaEvent?) {
-                    trySend(GlobalUpdate.OnEvent(event))
-                }
+    override val globalUpdates: Flow<GlobalUpdate> = callbackFlow {
+        val listener = object : MegaGlobalListenerInterface {
+            override fun onUsersUpdate(
+                api: MegaApiJava?,
+                users: java.util.ArrayList<MegaUser>?,
+            ) {
+                trySend(GlobalUpdate.OnUsersUpdate(users))
             }
 
-            megaApi.addGlobalListener(listener)
+            override fun onUserAlertsUpdate(
+                api: MegaApiJava?,
+                userAlerts: java.util.ArrayList<MegaUserAlert>?,
+            ) {
+                trySend(GlobalUpdate.OnUserAlertsUpdate(userAlerts))
+            }
 
-            awaitClose { megaApi.removeGlobalListener(listener) }
-        }.shareIn(
-            sharingScope,
-            SharingStarted.WhileSubscribed()
-        )
+            override fun onNodesUpdate(
+                api: MegaApiJava?,
+                nodeList: java.util.ArrayList<MegaNode>?,
+            ) {
+                trySend(GlobalUpdate.OnNodesUpdate(nodeList))
+            }
+
+            override fun onReloadNeeded(api: MegaApiJava?) {
+                trySend(GlobalUpdate.OnReloadNeeded)
+            }
+
+            override fun onAccountUpdate(api: MegaApiJava?) {
+                trySend(GlobalUpdate.OnAccountUpdate)
+            }
+
+            override fun onContactRequestsUpdate(
+                api: MegaApiJava?,
+                requests: java.util.ArrayList<MegaContactRequest>?,
+            ) {
+                trySend(GlobalUpdate.OnContactRequestsUpdate(requests))
+            }
+
+            override fun onEvent(api: MegaApiJava?, event: MegaEvent?) {
+                trySend(GlobalUpdate.OnEvent(event))
+            }
+        }
+
+        megaApi.addGlobalListener(listener)
+
+        awaitClose { megaApi.removeGlobalListener(listener) }
+    }.shareIn(
+        sharingScope,
+        SharingStarted.WhileSubscribed()
+    )
 
     override val globalTransfer: Flow<GlobalTransfer> = callbackFlow {
         val listener = OptionalMegaTransferListenerInterface(
@@ -305,6 +309,22 @@ class MegaApiFacade @Inject constructor(
     @Suppress("DEPRECATION")
     override suspend fun sendEvent(eventID: Int, message: String) =
         megaApi.sendEvent(eventID, message)
+
+    override suspend fun getUserAvatarColor(megaUser: MegaUser): String =
+        megaApi.getUserAvatarColor(megaUser)
+
+    override suspend fun getUserAvatar(user: MegaUser, dstPath: String): Boolean {
+        return suspendCoroutine { continuation ->
+            megaApi.getUserAvatar(user,
+                dstPath,
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { _, e ->
+                        continuation.resume(e.errorCode == MegaError.API_OK)
+                    },
+                    onRequestTemporaryError = { _, e -> continuation.resume(e.errorCode == MegaError.API_OK) })
+            )
+        }
+    }
 
     override suspend fun acknowledgeUserAlerts() {
         megaApi.acknowledgeUserAlerts()
