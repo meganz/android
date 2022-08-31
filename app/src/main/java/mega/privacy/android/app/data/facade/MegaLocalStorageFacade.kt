@@ -207,4 +207,7 @@ class MegaLocalStorageFacade @Inject constructor(
     override suspend fun setNonContactEmail(userHandle: Long, email: String) {
         dbHandler.setNonContactEmail(email, userHandle.toString())
     }
+
+    override suspend fun getContactByEmail(email: String?) =
+        dbHandler.findContactByEmail(email)
 }

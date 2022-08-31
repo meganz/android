@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
 import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -436,4 +437,11 @@ interface MegaApiGateway {
      * Acknowledge user alerts
      */
     suspend fun acknowledgeUserAlerts()
+
+    /**
+     * Get incoming contact requests
+     *
+     * @return all incoming contact requests or null
+     */
+    suspend fun getIncomingContactRequests(): ArrayList<MegaContactRequest>?
 }
