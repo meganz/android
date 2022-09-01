@@ -85,7 +85,16 @@ class MeetingListFragment : Fragment() {
                     binding.list.smoothScrollToPosition(0)
                 }
             }
-            binding.viewEmpty.isVisible = items.isNullOrEmpty()
+            if (items.isNullOrEmpty()) {
+                if (viewModel.isSearchQueryEmpty()) {
+                    binding.viewEmpty.isVisible = true
+                } else {
+                    binding.emptySearch.isVisible = true
+                }
+            } else {
+                binding.emptySearch.isVisible = false
+                binding.viewEmpty.isVisible = false
+            }
         }
     }
 

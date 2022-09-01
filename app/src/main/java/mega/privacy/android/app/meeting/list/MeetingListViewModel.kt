@@ -86,6 +86,14 @@ class MeetingListViewModel @Inject constructor(
         }
 
     /**
+     * Check if search query is empty
+     *
+     * @return  true if search query is empty, false otherwise
+     */
+    fun isSearchQueryEmpty(): Boolean =
+        queryString.isNullOrBlank()
+
+    /**
      * Get specific meeting given its chat id
      *
      * @param chatId    Chat id to identify chat
