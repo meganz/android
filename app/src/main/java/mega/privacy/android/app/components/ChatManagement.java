@@ -6,6 +6,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_AC
 import static mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_OUTGOING_CALL;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS;
 import static mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification;
 import static mega.privacy.android.app.utils.CallUtil.existsAnOngoingOrIncomingCall;
 import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
@@ -22,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.CountDownTimer;
+import android.util.Pair;
 
 import androidx.preference.PreferenceManager;
 
@@ -356,6 +358,8 @@ public class ChatManagement {
                 public void onFinish() {
                     MegaChatCall call = app.getMegaChatApi().getChatCall(chatId);
                     if (call != null) {
+                        LiveEventBus.get(EVENT_UPDATE_WAITING_FOR_OTHERS, Pair.class).post(Pair.create(chatId, false));
+
                         endCallUseCase.hangCall(call.getCallId())
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
