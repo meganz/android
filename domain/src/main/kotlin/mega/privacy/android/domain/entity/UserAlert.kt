@@ -37,8 +37,9 @@ interface ContactAlert {
  *
  * @property nodeId
  */
-sealed interface IncomingShareAlert : ContactAlert {
+sealed interface IncomingShareAlert {
     val nodeId: Long?
+    val contact: Contact
 }
 
 /**
