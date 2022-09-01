@@ -234,7 +234,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
      */
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
+            retryConnectionsAndSignalPresence()
             if (!navController.navigateUp()) {
                 finish()
             }
