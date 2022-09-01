@@ -100,7 +100,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
     @Override
     public void onBindViewHolder(ViewHolderTransfer holder, int position) {
-        holder.currentPosition = position;
+        holder.currentPosition = holder.getBindingAdapterPosition();
 
         AndroidCompletedTransfer transfer = getItem(position);
 

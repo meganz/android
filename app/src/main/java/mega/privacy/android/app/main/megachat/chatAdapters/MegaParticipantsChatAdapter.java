@@ -3,6 +3,7 @@ package mega.privacy.android.app.main.megachat.chatAdapters;
 import android.content.Intent;
 import android.graphics.Bitmap;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
@@ -288,7 +289,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     }
 
     @Override
-    public void onBindViewHolder(ViewHolderParticipants holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolderParticipants holder, int position) {
         switch (getItemViewType(position)) {
             case ITEM_VIEW_TYPE_HEADER:
                 ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) holder;
@@ -423,7 +424,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
 
                 long handle = participant.getHandle();
                 holderParticipantsList.userHandle = MegaApiAndroid.userHandleToBase64(handle);
-                holderParticipantsList.currentPosition = position;
+                holderParticipantsList.currentPosition = holder.getBindingAdapterPosition();
                 holderParticipantsList.imageView.setImageBitmap(null);
 
                 Bitmap avatarBitmap = checkParticipant(holderParticipantsList, position, participant);

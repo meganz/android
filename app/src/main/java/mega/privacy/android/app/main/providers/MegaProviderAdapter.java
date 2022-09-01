@@ -162,7 +162,7 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
     public void onBindViewHolder(ViewHolderProvider holder, int position) {
         Timber.d("onBindViewHolder");
 
-        holder.currentPosition = position;
+        holder.currentPosition = holder.getBindingAdapterPosition();
 
         MegaNode node = (MegaNode) getItem(position);
         holder.document = node.getHandle();

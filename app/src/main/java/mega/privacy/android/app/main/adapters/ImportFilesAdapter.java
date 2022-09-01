@@ -249,7 +249,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     onImportFilesAdapterFooterListener.onClickChatButton());
         } else {
             ShareInfo file = (ShareInfo) getItem(position);
-            ((ViewHolderImportFiles) holder).currentPosition = position;
+            ((ViewHolderImportFiles) holder).currentPosition = holder.getBindingAdapterPosition();
             ((ViewHolderImportFiles) holder).name.setText(names.get(file.getTitle()));
             ((ViewHolderImportFiles) holder).name.setOnFocusChangeListener((v1, hasFocus) -> {
                 ((ViewHolderImportFiles) holder).editButton.setVisibility(hasFocus ? GONE : VISIBLE);
@@ -263,7 +263,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                             ((FileExplorerActivity) context).setNameFiles(names);
                             updateNameLayout(((ViewHolderImportFiles) holder).nameLayout, ((ViewHolderImportFiles) holder).name);
                         } else {
-                            positionWithFocus = position;
+                            positionWithFocus = holder.getBindingAdapterPosition();
                         }
                     }
             );

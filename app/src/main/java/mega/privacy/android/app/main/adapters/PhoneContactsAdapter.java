@@ -238,7 +238,7 @@ public class PhoneContactsAdapter extends RecyclerView.Adapter<PhoneContactsAdap
 
         PhoneContactInfo contact = getItem(position);
 
-        holder.currentPosition = position;
+        holder.currentPosition = holder.getBindingAdapterPosition();
         holder.contactMail = contact.getEmail();
         holder.contactName = contact.getName();
         holder.contactId = contact.getId();
