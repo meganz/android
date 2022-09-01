@@ -2,6 +2,7 @@ package mega.privacy.android.app.getLink
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
@@ -12,12 +13,13 @@ import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.HANDLE
+import mega.privacy.android.app.utils.Constants.HANDLE_LIST
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
-import java.util.*
 
 /**
  * Activity which allows create and manage a link of a node
@@ -50,6 +52,15 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
     private var viewType = INVALID_VALUE
 
+    private val backHandler = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            retryConnectionsAndSignalPresence()
+            if (!navController.navigateUp()) {
+                finish()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = GetLinkActivityLayoutBinding.inflate(layoutInflater)
@@ -69,6 +80,8 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
         setupView()
         setupObservers()
+
+        onBackPressedDispatcher.addCallback(this, backHandler)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -189,19 +202,12 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
 
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
-        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
-
-        if (!navController.navigateUp()) {
-            finish()
-        }
-    }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.getLinkCoordinatorLayout, content, chatId)
