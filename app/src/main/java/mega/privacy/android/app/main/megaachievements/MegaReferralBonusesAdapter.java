@@ -29,7 +29,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
 import java.util.ArrayList;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -48,7 +47,6 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
     ArrayList<ReferralBonus> referralBonuses;
     private RecyclerView listFragment;
     private MegaApiAndroid megaApi;
-    DatabaseHandler dbH = null;
     private ReferralBonusesFragment fragment;
 
     private class UserAvatarListenerList implements MegaRequestListenerInterface {
@@ -119,8 +117,6 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
         }
 
         listFragment = _listView;
-
-        dbH = DatabaseHandler.getDbHandler(context);
     }
 
     /*private view holder class*/

@@ -36,7 +36,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
@@ -71,7 +70,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
     RecyclerView listFragment;
 
-    DatabaseHandler dbH = null;
     boolean multipleSelect;
 
     ChatController cC;
@@ -298,8 +296,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         this.context = _context;
         this.messages = _messages;
         this.adapterType = adapterType;
-
-        dbH = DatabaseHandler.getDbHandler(context);
 
         this.listFragment = recyclerView;
 

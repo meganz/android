@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -45,8 +44,6 @@ import timber.log.Timber;
  * Adapter for FilestorageActivity list
  */
 public class PhoneContactsAdapter extends RecyclerView.Adapter<PhoneContactsAdapter.ViewHolderPhoneContacts> implements OnClickListener, SectionTitleProvider {
-
-    DatabaseHandler dbH = null;
 
     @Override
     public String getSectionTitle(int position) {
@@ -206,8 +203,6 @@ public class PhoneContactsAdapter extends RecyclerView.Adapter<PhoneContactsAdap
     }
 
     public ViewHolderPhoneContacts onCreateViewHolder(ViewGroup parentView, int viewType) {
-
-        dbH = DatabaseHandler.getDbHandler(mContext);
 
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
