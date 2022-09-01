@@ -58,6 +58,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -72,6 +75,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class MyCodeFragment extends Fragment implements View.OnClickListener {
 
     final int RELATIVE_WIDTH = 280;
@@ -87,10 +91,13 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener {
      */
     public final static int BORDER_WIDTH = 3;
 
+    @Inject
+    DatabaseHandler dbH;
+
     MegaUser myUser;
     String myEmail;
     MegaApiAndroid megaApi;
-    DatabaseHandler dbH = null;
+
     Handler handler;
 
     long handle = -1;
@@ -136,7 +143,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener {
 
         myEmail = megaApi.getMyUser().getEmail();
         myUser = megaApi.getMyUser();
-        dbH = DatabaseHandler.getDbHandler(context);
         handler = new Handler();
 
         if (savedInstanceState != null) {

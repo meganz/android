@@ -111,6 +111,8 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+    @Inject
+    DatabaseHandler dbH;
 
     private static final String TAG_DECRYPT = "decrypt";
 
@@ -141,7 +143,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
     Button downloadButton;
     Button buttonPreviewContent;
     MegaNode document = null;
-    DatabaseHandler dbH = null;
+
 
     boolean decryptionIntroduced = false;
 
@@ -182,8 +184,6 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
         Intent intentReceived = getIntent();
         if (intentReceived != null) {
@@ -488,9 +488,6 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
                 long handle = document.getHandle();
 
                 Timber.d("DOCUMENTNODEHANDLEPUBLIC: %s", handle);
-                if (dbH == null) {
-                    dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-                }
 
                 if (handle != MegaApiJava.INVALID_HANDLE) {
                     dbH.setLastPublicHandle(handle);

@@ -38,6 +38,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -51,6 +54,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class ScanCodeFragment extends Fragment implements View.OnClickListener {
 
     public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150;
@@ -92,7 +96,6 @@ public class ScanCodeFragment extends Fragment implements View.OnClickListener {
 
     public String myEmail;
     MegaApiAndroid megaApi;
-    DatabaseHandler dbH = null;
     Handler handler;
     long handle = -1;
     long handleContactLink = -1;
@@ -151,7 +154,6 @@ public class ScanCodeFragment extends Fragment implements View.OnClickListener {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
 
-        dbH = DatabaseHandler.getDbHandler(context);
         handler = new Handler();
     }
 

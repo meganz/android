@@ -155,7 +155,7 @@ public class FileBrowserFragment extends RotatableFragment {
     DisplayMetrics outMetrics;
     Display display;
 
-    DatabaseHandler dbH;
+
 
     List<MegaNode> nodes;
     public ActionMode actionMode;
@@ -495,7 +495,6 @@ public class FileBrowserFragment extends RotatableFragment {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
 
-        dbH = DatabaseHandler.getDbHandler(context);
         downloadLocationDefaultPath = getDownloadLocation();
         lastPositionStack = new Stack<>();
 

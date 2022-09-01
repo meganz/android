@@ -172,7 +172,7 @@ public class ContactFileListActivity extends PasscodeActivity
 
     long parentHandle = -1;
 
-    DatabaseHandler dbH;
+
 
     private AlertDialog newFolderDialog;
     DisplayMetrics outMetrics;
@@ -395,7 +395,6 @@ public class ContactFileListActivity extends PasscodeActivity
                 new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
 
         handler = new Handler();
-        dbH = DatabaseHandler.getDbHandler(this);
 
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();

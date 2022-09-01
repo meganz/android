@@ -79,6 +79,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
@@ -101,7 +104,11 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class InviteContactActivity extends PasscodeActivity implements ContactInfoListDialog.OnMultipleSelectedListener, MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
+
+    @Inject
+    DatabaseHandler dbH;
 
     public static final int SCAN_QR_FOR_INVITE_CONTACTS = 1111;
     private static final String KEY_PHONE_CONTACTS = "KEY_PHONE_CONTACTS";
@@ -148,7 +155,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private boolean isGettingLocalContact, isGettingMegaContact, isPermissionGranted, isGetContactCompleted;
     private MegaContactGetter megaContactGetter;
     private String contactLink;
-    private DatabaseHandler dbH;
+
     private ArrayList<String> contactsEmailsSelected, contactsPhoneSelected;
 
     private ContactInfoListDialog listDialog;
@@ -184,7 +191,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dbH = DatabaseHandler.getDbHandler(this);
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);

@@ -196,6 +196,8 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     MoveNodeUseCase moveNodeUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+    @Inject
+    DatabaseHandler dbH;
 
     public static int MAX_WIDTH_FILENAME_LAND = 400;
     public static int MAX_WIDTH_FILENAME_LAND_2 = 400;
@@ -345,8 +347,6 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
     boolean shareIt = true;
     int from;
-
-    DatabaseHandler dbH = null;
 
     AlertDialog permissionsDialog;
 
@@ -580,7 +580,6 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         }
 
         cC = new ContactController(this);
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
         adapterType = getIntent().getIntExtra("adapterType", FILE_BROWSER_ADAPTER);
 

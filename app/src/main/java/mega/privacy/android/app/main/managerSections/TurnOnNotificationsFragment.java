@@ -12,6 +12,9 @@ import android.widget.TextView;
 import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -20,9 +23,12 @@ import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class TurnOnNotificationsFragment extends Fragment implements View.OnClickListener {
 
+    @Inject
     DatabaseHandler dbH;
+
     MegaApiAndroid megaApi;
     Context context;
     TextView firstText;
@@ -45,10 +51,6 @@ public class TurnOnNotificationsFragment extends Fragment implements View.OnClic
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
-
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
         dbH.setShowNotifOff(false);

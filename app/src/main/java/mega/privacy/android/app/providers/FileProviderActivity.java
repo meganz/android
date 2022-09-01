@@ -74,6 +74,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -111,6 +114,7 @@ import timber.log.Timber;
  * This activity is launched by 3rd apps, for example, when compose email pick attachments from MEGA.
  */
 @SuppressLint("NewApi")
+@AndroidEntryPoint
 public class FileProviderActivity extends PasscodeFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
     public static final int INVALID_TAB = -1;
@@ -118,6 +122,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
     public static final int INCOMING_TAB = 1;
 
     public static final String FROM_MEGA_APP = "FROM_MEGA_APP";
+
+    @Inject
+    DatabaseHandler dbH;
 
     private String lastEmail;
     private String lastPassword;
@@ -230,7 +237,6 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         is2FAEnabled = false;
 
         if (savedInstanceState != null) {
@@ -1391,7 +1397,6 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
                     showErrorAlertDialog(errorMessage, false, this);
                 }
 
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
                 if (dbH.getPreferences() != null) {
                     dbH.clearPreferences();
                     dbH.setFirstTime(false);
@@ -1461,7 +1466,6 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
             } else {
 
                 UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "", megaApi.getMyUserHandle());
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
                 dbH.saveCredentials(credentials);
 
                 setContentView(R.layout.activity_file_provider);

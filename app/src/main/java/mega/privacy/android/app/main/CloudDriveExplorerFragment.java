@@ -82,6 +82,8 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
     SortOrderManagement sortOrderManagement;
     @Inject
     SearchNodesUseCase searchNodesUseCase;
+    @Inject
+    DatabaseHandler dbH;
 
     private Context context;
     private MegaApiAndroid megaApi;
@@ -95,7 +97,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
 
     private int modeCloud;
     private boolean selectFile = false;
-    private DatabaseHandler dbH;
+
     private ActionMode actionMode;
 
     private RelativeLayout contentLayout;
@@ -253,7 +255,6 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
         }
 
         parentHandle = -1;
-        dbH = DatabaseHandler.getDbHandler(context);
         lastPositionStack = new Stack<>();
         handler = new Handler();
     }
