@@ -60,7 +60,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
 
     private final DisplayMetrics outMetrics;
 
-    private ArrayList<MegaTransfer> tL;
+    private List<MegaTransfer> tL;
     private final RecyclerView listFragment;
 
     private final SelectModeInterface selectModeInterface;
@@ -69,7 +69,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
 
     private TransfersManagement transfersManagement;
 
-    public MegaTransfersAdapter(Context _context, ArrayList<MegaTransfer> _transfers,
+    public MegaTransfersAdapter(Context _context, List<MegaTransfer> _transfers,
                                 RecyclerView _listView, SelectModeInterface selectModeInterface,
                                 TransfersManagement transfersManagement) {
         this.context = _context;
@@ -107,7 +107,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
     }
 
 
-    public void setTransfers(ArrayList<MegaTransfer> transfers) {
+    public void setTransfers(List<MegaTransfer> transfers) {
         this.tL = transfers;
         notifyDataSetChanged();
     }
@@ -377,7 +377,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
      * @param tL       Updated list of transfers.
      * @param position Position of the transfer in the adapter.
      */
-    public void addItemData(ArrayList<MegaTransfer> tL, int position) {
+    public void addItemData(List<MegaTransfer> tL, int position) {
         this.tL = tL;
         notifyItemInserted(position);
     }
@@ -391,7 +391,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
      * @param tL       Updated list of transfers.
      * @param position Item to remove.
      */
-    public void removeItemData(ArrayList<MegaTransfer> tL, int position) {
+    public void removeItemData(List<MegaTransfer> tL, int position) {
         this.tL = tL;
 
         if (isItemChecked(position)) {
@@ -417,7 +417,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
      * @param oldPosition Old position of the transfer.
      * @param newPosition New position of the transfer.
      */
-    public void moveItemData(ArrayList<MegaTransfer> tL, int oldPosition, int newPosition) {
+    public void moveItemData(List<MegaTransfer> tL, int oldPosition, int newPosition) {
         this.tL = tL;
         notifyItemMoved(oldPosition, newPosition);
     }
@@ -575,7 +575,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
             return null;
         }
 
-        ArrayList<MegaTransfer> selectedTransfers = new ArrayList<>();
+        List<MegaTransfer> selectedTransfers = new ArrayList<>();
 
         for (int i = 0; i < selectedItems.size(); i++) {
             if (!selectedItems.valueAt(i)) {
