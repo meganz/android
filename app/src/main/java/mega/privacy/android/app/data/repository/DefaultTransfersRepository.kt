@@ -64,7 +64,7 @@ class DefaultTransfersRepository @Inject constructor(
         }
     }
 
-    override suspend fun getNumPendingNonBackgroundPausedUploads(): Int =
+    override suspend fun getNumPendingNonBackgroundPausedDownloads(): Int =
         withContext(ioDispatcher) {
             getDownloadTransfers().count { transfer ->
                 !transfer.isFinished && !transfer.isBackgroundTransfer() && transfer.state == MegaTransfer.STATE_PAUSED
@@ -72,7 +72,7 @@ class DefaultTransfersRepository @Inject constructor(
         }
 
     override suspend fun areAllTransfersPaused(): Boolean = withContext(ioDispatcher) {
-        areTransfersPaused() || getNumPendingPausedUploads() + getNumPendingNonBackgroundPausedUploads() == getNumPendingTransfers()
+        areTransfersPaused() || getNumPendingPausedUploads() + getNumPendingNonBackgroundPausedDownloads() == getNumPendingTransfers()
     }
 
     override fun getSizeTransfer(): Flow<TransfersSizeInfo> = megaApiGateway.globalTransfer
