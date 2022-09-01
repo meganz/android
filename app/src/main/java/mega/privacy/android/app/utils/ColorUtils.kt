@@ -158,7 +158,7 @@ object ColorUtils {
         if (elevation != 0F) {
             setBackgroundColor(getColorForElevation(context, elevation))
         } else {
-            setBackgroundColor(android.R.color.transparent)
+            setBackgroundColor(resources.getColor(android.R.color.transparent, null))
         }
         MaterialShapeUtils.setElevation(this, elevation)
         setElevation(elevation)
