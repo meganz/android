@@ -43,6 +43,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.ListIterator;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
@@ -64,6 +67,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class ChatExplorerFragment extends Fragment implements CheckScrollInterface {
 
     private static final int RECENTS_MAX_SIZE = 6;
@@ -73,9 +77,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
-
-    private DatabaseHandler dbH;
-
     private Context context;
     private ActionBar aB;
     private RecyclerView listView;
@@ -124,8 +125,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
-
-        dbH = DatabaseHandler.getDbHandler(getActivity());
 
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();

@@ -219,8 +219,9 @@ public class FileExplorerActivity extends TransfersManagementActivity
     UploadUseCase uploadUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+    @Inject
+    DatabaseHandler dbH;
 
-    private DatabaseHandler dbH;
     private MegaPreferences prefs;
     private AppBarLayout abL;
     private MaterialToolbar tB;
@@ -492,7 +493,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
         fileExplorerActivity = this;
 
-        dbH = DatabaseHandler.getDbHandler(this);
         prefs = dbH.getPreferences();
         if (prefs == null || prefs.getPreferredViewList() == null) {
             isList = true;
@@ -2138,8 +2138,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
 
             if (error.getErrorCode() == MegaError.API_OK) {
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
                 gSession = megaApi.dumpSession();
                 MegaUser myUser = megaApi.getMyUser();
                 String myUserHandle = "";

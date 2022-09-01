@@ -142,6 +142,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
+    @Inject
+    DatabaseHandler dbH;
 
     private static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
     public static final String EXTRA_MEGA_CONTACTS = "mega_contacts";
@@ -156,7 +158,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     public static final String EXTRA_ONLY_CREATE_GROUP = "onlyCreateGroup";
 
     private DisplayMetrics outMetrics;
-    private DatabaseHandler dbH = null;
+
     private int contactType = 0;
     // Determine if open this page from meeting
     private boolean isFromMeeting;
@@ -1598,7 +1600,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
         checkChatChanges();
 
-        dbH = DatabaseHandler.getDbHandler(this);
         setContentView(R.layout.activity_add_contact);
 
         tB = (Toolbar) findViewById(R.id.add_contact_toolbar);

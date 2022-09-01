@@ -54,6 +54,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -93,6 +95,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
     public String accountBlocked = null;
 
+    @Inject
     DatabaseHandler dbH;
 
     Handler handler = new Handler();
@@ -181,7 +184,6 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
         scaleW = getScaleW(outMetrics, density);
         scaleH = getScaleH(outMetrics, density);
 
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         if (megaApi == null) {
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
         }

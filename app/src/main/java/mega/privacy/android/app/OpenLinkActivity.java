@@ -97,8 +97,8 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
     CoroutineScope sharingScope;
     @Inject
     QuerySignupLinkUseCase querySignupLinkUseCase;
-
-    private DatabaseHandler dbH = null;
+    @Inject
+    DatabaseHandler dbH;
 
     private String urlConfirmationLink = null;
 
@@ -132,7 +132,6 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 
         url = decodeURL(url);
 
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         isLoggedIn = dbH != null && dbH.getCredentials() != null;
         needsRefreshSession = megaApi.getRootNode() == null;
 

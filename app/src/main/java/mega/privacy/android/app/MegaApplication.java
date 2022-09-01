@@ -1167,10 +1167,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
     }
 
     public DatabaseHandler getDbH() {
-        if (dbH == null) {
-            DatabaseHandler.getDbHandler(getApplicationContext());
-        }
-
         return dbH;
     }
 

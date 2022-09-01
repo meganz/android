@@ -1592,8 +1592,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         CacheFolderManager.createCacheFolders(this);
 
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
         managerActivity = this;
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
@@ -2993,10 +2991,6 @@ public class ManagerActivity extends TransfersManagementActivity
     void queryIfNotificationsAreOn() {
         Timber.d("queryIfNotificationsAreOn");
 
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-        }
-
         if (megaApi == null) {
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
         }
@@ -3115,8 +3109,7 @@ public class ManagerActivity extends TransfersManagementActivity
         managerActivity = this;
 
         Intent intent = getIntent();
-
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        
         if (dbH.getCredentials() == null) {
             if (!openLink) {
                 return;

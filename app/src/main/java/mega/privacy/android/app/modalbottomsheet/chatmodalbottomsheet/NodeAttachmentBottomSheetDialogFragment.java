@@ -98,7 +98,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
 
         chatRoom = megaChatApi.getChatRoom(chatId);
         chatC = new ChatController(requireActivity());
-        dbH = DatabaseHandler.getDbHandler(getActivity());
 
         return contentView;
     }

@@ -311,7 +311,7 @@ public class ContactInfoActivity extends PasscodeActivity
     float scaleW;
     float scaleH;
 
-    DatabaseHandler dbH = null;
+
 
     Drawable drawableShare;
     Drawable drawableSend;
@@ -528,8 +528,6 @@ public class ContactInfoActivity extends PasscodeActivity
             aB.setDisplayHomeAsUpEnabled(true);
 
             contactPropertiesImage = findViewById(R.id.toolbar_image);
-
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
             appBarLayout.post(new Runnable() {
                 @Override

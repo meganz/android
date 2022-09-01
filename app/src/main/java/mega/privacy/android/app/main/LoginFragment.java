@@ -163,6 +163,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     LegacyLoggingSettings loggingSettings;
     @Inject
     LoginRepository loginRepository;
+    @Inject
+    DatabaseHandler dbH;
 
     private static final long LONG_CLICK_DELAY = 5000;
     private static final int READ_MEDIA_PERMISSION = 109;
@@ -207,7 +209,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     private DisplayMetrics outMetrics;
     private Display display;
 
-    private DatabaseHandler dbH;
     private Handler handler = new Handler();
     private ChatSettings chatSettings;
 
@@ -1530,8 +1531,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
         super.onAttach(context);
         this.context = context;
 
-        dbH = DatabaseHandler.getDbHandler(context);
-
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
@@ -1886,7 +1885,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
                 Timber.d("Logged in with session");
 
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
                 dbH.clearEphemeral();
 
                 megaApi.fetchNodes(this);

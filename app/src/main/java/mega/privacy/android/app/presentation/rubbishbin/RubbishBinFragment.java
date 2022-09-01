@@ -95,6 +95,8 @@ public class RubbishBinFragment extends Fragment {
 
     @Inject
     SortOrderManagement sortOrderManagement;
+    @Inject
+    DatabaseHandler dbH;
 
     private ManagerViewModel managerViewModel;
 
@@ -120,7 +122,7 @@ public class RubbishBinFragment extends Fragment {
 
     Stack<Integer> lastPositionStack;
 
-    DatabaseHandler dbH;
+
     MegaPreferences prefs;
     String downloadLocationDefaultPath;
 
@@ -262,7 +264,6 @@ public class RubbishBinFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         Timber.d("onCreate");
 
-        dbH = DatabaseHandler.getDbHandler(context);
         prefs = dbH.getPreferences();
 
         downloadLocationDefaultPath = getDownloadLocation();

@@ -129,6 +129,8 @@ public class UploadService extends Service {
     GetGlobalTransferUseCase getGlobalTransferUseCase;
     @Inject
     TransfersManagement transfersManagement;
+    @Inject
+    DatabaseHandler dbH;
 
     private boolean isForeground = false;
     private boolean canceled;
@@ -139,7 +141,7 @@ public class UploadService extends Service {
 
     private WifiLock lock;
     private WakeLock wl;
-    private DatabaseHandler dbH = null;
+
 
     private Notification.Builder mBuilder;
     private NotificationCompat.Builder mBuilderCompat;
@@ -183,7 +185,6 @@ public class UploadService extends Service {
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
         mapProgressFileTransfers = new HashMap<>();
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         isForeground = false;
         canceled = false;
         isOverquota = NOT_OVERQUOTA_STATE;

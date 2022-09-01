@@ -139,13 +139,14 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     @Inject
     SearchChatsUseCase searchChatsUseCase;
 
+    @Inject
+    DatabaseHandler dbH;
+
     private SearchViewModel searchViewModel;
     private RecentChatsViewModel recentChatsViewModel;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
-
-    DatabaseHandler dbH;
 
     Context context;
     ActionBar aB;
@@ -256,8 +257,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
-
-        dbH = DatabaseHandler.getDbHandler(getActivity());
 
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();

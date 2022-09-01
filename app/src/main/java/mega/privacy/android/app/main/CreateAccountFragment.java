@@ -41,6 +41,9 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
@@ -56,7 +59,11 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class CreateAccountFragment extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, OnKeyboardVisibilityListener {
+
+    @Inject
+    DatabaseHandler dbH;
 
     private Context context;
 
@@ -492,7 +499,6 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
     private void submitForm() {
         Timber.d("submit form!");
 
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         dbH.clearCredentials();
 
         if (!validateForm()) {
@@ -662,7 +668,6 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                 ((LoginActivity) context).setPasswdTemp(userPassword.getText().toString());
                 ((LoginActivity) context).setWaitingForConfirmAccount(true);
 
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
                 if (dbH != null) {
                     dbH.clearEphemeral();
 

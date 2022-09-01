@@ -169,6 +169,8 @@ public class PdfViewerActivity extends PasscodeActivity
     MoveNodeUseCase moveNodeUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+    @Inject
+    DatabaseHandler dbH;
 
     public ProgressBar progressBar;
 
@@ -181,7 +183,7 @@ public class PdfViewerActivity extends PasscodeActivity
     public ActionBar aB;
     UserCredentials credentials;
     private String lastEmail;
-    DatabaseHandler dbH = null;
+
     boolean isUrl;
     DefaultScrollHandle defaultScrollHandle;
 
@@ -348,10 +350,6 @@ public class PdfViewerActivity extends PasscodeActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
-        }
-
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         }
 
         if (!isOffLine && type != ZIP_ADAPTER) {

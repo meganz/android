@@ -100,6 +100,8 @@ public class InboxFragment extends RotatableFragment {
 
     @Inject
     SortOrderManagement sortOrderManagement;
+    @Inject
+    DatabaseHandler dbH;
 
     Context context;
     RecyclerView recyclerView;
@@ -124,7 +126,7 @@ public class InboxFragment extends RotatableFragment {
     DisplayMetrics outMetrics;
     Display display;
 
-    DatabaseHandler dbH;
+
     MegaPreferences prefs;
 
     private InboxViewModel viewModel;
@@ -380,7 +382,6 @@ public class InboxFragment extends RotatableFragment {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate");
 
-        dbH = DatabaseHandler.getDbHandler(context);
         prefs = dbH.getPreferences();
         downloadLocationDefaultPath = getDownloadLocation();
 

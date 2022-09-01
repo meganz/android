@@ -15,6 +15,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -27,10 +30,14 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class ContactFileBaseFragment extends RotatableFragment {
 
     public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
+
+    @Inject
+    DatabaseHandler dbH;
 
     protected MegaApiAndroid megaApi;
     protected ActionBar aB;
@@ -41,7 +48,7 @@ public class ContactFileBaseFragment extends RotatableFragment {
     protected Stack<Integer> lastPositionStack;
     protected ArrayList<MegaNode> contactNodes;
     protected int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
-    protected DatabaseHandler dbH = null;
+
     protected MegaPreferences prefs = null;
     protected String downloadLocationDefaultPath;
     protected DisplayMetrics outMetrics;
@@ -61,7 +68,6 @@ public class ContactFileBaseFragment extends RotatableFragment {
             aB = ((AppCompatActivity) context).getSupportActionBar();
         }
 
-        dbH = DatabaseHandler.getDbHandler(context);
         prefs = dbH.getPreferences();
 
         downloadLocationDefaultPath = getDownloadLocation();

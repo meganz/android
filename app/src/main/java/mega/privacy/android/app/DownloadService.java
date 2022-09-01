@@ -167,6 +167,8 @@ public class DownloadService extends Service implements MegaRequestListenerInter
     GetGlobalTransferUseCase getGlobalTransferUseCase;
     @Inject
     TransfersManagement transfersManagement;
+    @Inject
+    DatabaseHandler dbH;
 
     private static int errorEBloqued = 0;
     private int errorCount = 0;
@@ -196,7 +198,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
     File currentDir;
     MegaNode currentDocument;
 
-    DatabaseHandler dbH = null;
+
 
     int transfersCount = 0;
     Set<Integer> backgroundTransfers = new HashSet<>();
@@ -258,8 +260,6 @@ public class DownloadService extends Service implements MegaRequestListenerInter
         fromMediaViewers = new HashMap<>();
 
         int wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
-
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
@@ -1357,7 +1357,6 @@ public class DownloadService extends Service implements MegaRequestListenerInter
 
                         if (!isTextEmpty(path) && path.contains(OFFLINE_DIR)) {
                             Timber.d("It is Offline file");
-                            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
                             offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
 
                             if (offlineNode != null) {

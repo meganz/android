@@ -59,7 +59,6 @@ public class NodeController {
 
     Context context;
     MegaApiAndroid megaApi;
-    DatabaseHandler dbH;
 
     boolean isFolderLink = false;
 
@@ -68,9 +67,6 @@ public class NodeController {
         this.context = context;
         if (megaApi == null) {
             megaApi = MegaApplication.getInstance().getMegaApi();
-        }
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(context);
         }
     }
 
@@ -84,9 +80,6 @@ public class NodeController {
             } else {
                 megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
             }
-        }
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(context);
         }
     }
 
