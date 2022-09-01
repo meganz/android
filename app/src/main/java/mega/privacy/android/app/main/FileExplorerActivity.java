@@ -764,6 +764,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
     private void setView(int tab, boolean isChatFirst, int tabToRemove) {
         Timber.d("setView %s", tab);
+        tabShown = SHOW_TABS;
+
         switch (tab) {
             case CLOUD_TAB: {
                 cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
@@ -781,7 +783,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 break;
             }
             case SHOW_TABS: {
-                if (mTabsAdapterExplorer == null) {
+                if (mTabsAdapterExplorer == null || importFileF) {
                     updateAdapterExplorer(isChatFirst, tabToRemove);
                 }
 
@@ -832,21 +834,30 @@ public class FileExplorerActivity extends TransfersManagementActivity
         importFragmentSelected = fragment;
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if (fragment == CLOUD_FRAGMENT) {
-            if (cDriveExplorer == null) {
-                cDriveExplorer = new CloudDriveExplorerFragment();
+            if (cloudDriveFrameLayout != null) {
+                cloudDriveFrameLayout.setVisibility(View.GONE);
             }
-            ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-        } else if (fragment == INCOMING_FRAGMENT) {
-            if (iSharesExplorer == null) {
-                iSharesExplorer = new IncomingSharesExplorerFragment();
-            }
-            ft.replace(R.id.cloudDriveFrameLayout, iSharesExplorer, "iSharesExplorer");
+
+            setView(SHOW_TABS, false, CHAT_TAB);
         } else if (fragment == CHAT_FRAGMENT) {
             if (chatExplorer == null) {
                 chatExplorer = new ChatExplorerFragment();
             }
             ft.replace(R.id.cloudDriveFrameLayout, chatExplorer, "chatExplorer");
         } else if (fragment == IMPORT_FRAGMENT) {
+            tabShown = NO_TABS;
+
+            if (tabLayoutExplorer != null) {
+                tabLayoutExplorer.setVisibility(View.GONE);
+            }
+
+            if (viewPagerExplorer != null) {
+                viewPagerExplorer.setVisibility(View.GONE);
+            }
+
+            if (cloudDriveFrameLayout != null) {
+                cloudDriveFrameLayout.setVisibility(View.VISIBLE);
+            }
             if (importFileFragment == null) {
                 importFileFragment = new ImportFilesFragment();
             }
@@ -1212,27 +1223,19 @@ public class FileExplorerActivity extends TransfersManagementActivity
             aB.setTitle(getString(R.string.title_file_explorer_send_link));
         } else if (mode == SAVE) {
             aB.setTitle(StringResourcesUtils.getString(R.string.section_cloud_drive));
-        } else if (mode == UPLOAD && importFileF) {
+        } else if (mode == UPLOAD) {
             if (importFragmentSelected == -1) {
                 return;
             }
             switch (importFragmentSelected) {
-                case CLOUD_FRAGMENT: {
-                    aB.setTitle(getString(R.string.section_cloud_drive));
-                    break;
-                }
-                case INCOMING_FRAGMENT: {
-                    aB.setTitle(getString(R.string.title_incoming_shares_explorer));
-                    break;
-                }
-                case CHAT_FRAGMENT: {
+                case CHAT_FRAGMENT:
                     aB.setTitle(getString(R.string.title_chat_explorer));
                     break;
-                }
-                case IMPORT_FRAGMENT: {
+
+                case CLOUD_FRAGMENT:
+                case IMPORT_FRAGMENT:
                     aB.setTitle(getString(R.string.title_upload_explorer));
                     break;
-                }
             }
         }
     }
@@ -1425,21 +1428,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
         cDriveExplorer = getCloudExplorerFragment();
         iSharesExplorer = getIncomingExplorerFragment();
 
-        if (importFileF) {
+        if (importFileF && importFragmentSelected != CLOUD_FRAGMENT) {
             switch (importFragmentSelected) {
-                case CLOUD_FRAGMENT: {
-                    if (cDriveExplorer != null && cDriveExplorer.onBackPressed() == 0) {
-                        chooseFragment(IMPORT_FRAGMENT);
-                    }
-                    break;
-                }
-                case INCOMING_FRAGMENT: {
-                    if (iSharesExplorer != null && iSharesExplorer.onBackPressed() == 0) {
-                        iSharesExplorer = null;
-                        chooseFragment(IMPORT_FRAGMENT);
-                    }
-                    break;
-                }
                 case CHAT_FRAGMENT: {
                     if (ACTION_UPLOAD_TO_CHAT.equals(action)) {
                         finishActivity();
@@ -1460,27 +1450,39 @@ public class FileExplorerActivity extends TransfersManagementActivity
             }
         } else if (isCloudVisible()) {
             if (cDriveExplorer.onBackPressed() == 0) {
-                finishActivity();
+                performImportFileBack();
             }
         } else if (isIncomingVisible()) {
             if (iSharesExplorer.onBackPressed() == 0) {
-                finishActivity();
+                performImportFileBack();
             }
         } else {
             super.onBackPressed();
         }
     }
 
+    private void performImportFileBack() {
+        if (importFileF) {
+            chooseFragment(IMPORT_FRAGMENT);
+        } else {
+            finishActivity();
+        }
+    }
+
     private boolean isCloudVisible() {
+        boolean isImportingToCloud = importFileF && importFragmentSelected == CLOUD_FRAGMENT
+                && viewPagerExplorer.getCurrentItem() == CLOUD_TAB;
+
         return cDriveExplorer != null && cDriveExplorer.isVisible()
-                && ((tabShown == CLOUD_TAB || tabShown == NO_TABS) && !importFileF)
-                || (importFileF && importFragmentSelected == CLOUD_FRAGMENT);
+                && ((tabShown == CLOUD_TAB && !importFileF) || isImportingToCloud);
     }
 
     private boolean isIncomingVisible() {
+        boolean isImportingToIncoming = importFileF && importFragmentSelected == CLOUD_FRAGMENT
+                && viewPagerExplorer.getCurrentItem() == INCOMING_TAB;
+
         return iSharesExplorer != null && iSharesExplorer.isVisible()
-                && ((tabShown == INCOMING_TAB && !importFileF)
-                || (importFileF && importFragmentSelected == INCOMING_FRAGMENT));
+                && ((tabShown == INCOMING_TAB && !importFileF) || isImportingToIncoming);
     }
 
     /**
@@ -2603,7 +2605,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
     private CloudDriveExplorerFragment getCloudExplorerFragment() {
         CloudDriveExplorerFragment cD;
 
-        if (importFileF || tabShown == NO_TABS) {
+        if (tabShown == NO_TABS) {
             return (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
         }
 
