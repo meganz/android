@@ -42,7 +42,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
@@ -70,7 +69,6 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
     private boolean multipleSelect;
-    private DatabaseHandler dbH = null;
     private SparseBooleanArray selectedItems;
     private int adapterType;
 
@@ -145,7 +143,6 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        dbH = DatabaseHandler.getDbHandler(context);
         if (viewType == MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_list, parent, false);
 

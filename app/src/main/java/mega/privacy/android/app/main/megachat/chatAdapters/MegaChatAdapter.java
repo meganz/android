@@ -127,7 +127,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
-import androidx.core.text.HtmlCompat;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
@@ -153,7 +152,6 @@ import java.util.Map;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -263,7 +261,8 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private long myUserHandle = -1;
 
     DisplayMetrics outMetrics;
-    DatabaseHandler dbH = null;
+
+
     MegaChatRoom chatRoom;
 
     private EqualSpacingItemDecoration itemDecorationContact = new EqualSpacingItemDecoration(REACTION_SPACE, EqualSpacingItemDecoration.HORIZONTAL);
@@ -942,7 +941,6 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
             outMetrics = new DisplayMetrics();
             display.getMetrics(outMetrics);
-            dbH = DatabaseHandler.getDbHandler(context);
 
             cC = new ChatController(context);
 

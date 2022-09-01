@@ -37,7 +37,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -63,7 +62,6 @@ public class MegaSharedFolderAdapter extends RecyclerView.Adapter<MegaSharedFold
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
-    DatabaseHandler dbH = null;
 
     boolean multipleSelect = false;
 
@@ -217,8 +215,6 @@ public class MegaSharedFolderAdapter extends RecyclerView.Adapter<MegaSharedFold
     public ViewHolderShareList onCreateViewHolder(ViewGroup parent, int viewType) {
 
         listFragment = (RecyclerView) parent;
-
-        dbH = DatabaseHandler.getDbHandler(context);
 
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
