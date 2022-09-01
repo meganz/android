@@ -70,7 +70,7 @@ interface TransfersRepository {
      *
      * @return Number of pending, non-background and paused downloads.
      */
-    suspend fun getNumPendingNonBackgroundPausedUploads(): Int
+    suspend fun getNumPendingNonBackgroundPausedDownloads(): Int
 
     /**
      * Checks if the queue of transfers is paused or if all in progress transfers are individually paused.
