@@ -35,6 +35,7 @@ class ThumbnailViewModel @Inject constructor(
      * @param onFinished the callback after the thumbnail is downloaded
      */
     fun getThumbnail(handle: Long, onFinished: (file: File?) -> Unit) {
+        Timber.v("ThumbnailViewModel start to getThumbnail thumbnail $handle")
         viewModelScope.launch(ioDispatcher) {
             runCatching {
                 flowOf(getThumbnail(handle)).collectLatest { file ->
@@ -43,7 +44,7 @@ class ThumbnailViewModel @Inject constructor(
                     }
                 }
             }.onFailure {
-                Timber.e("getFlowThumbnail error message is ${it.message}")
+                Timber.e("ThumbnailViewModel getFlowThumbnail error message is ${it.message}")
             }
         }
     }

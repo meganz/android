@@ -25,6 +25,11 @@ interface SettingsRepository {
     fun setPasscodeLockEnabled(enabled: Boolean)
 
     /**
+     * Set the passcode lock code
+     */
+    suspend fun setPasscodeLockCode(passcodeLockCode: String)
+
+    /**
      * Fetch contact links option
      *
      * @return true if option is enabled, else false
@@ -73,6 +78,74 @@ interface SettingsRepository {
      * @return
      */
     fun isCameraSyncPreferenceEnabled(): Boolean
+
+    /**
+     * Set camera upload
+     */
+    suspend fun setEnableCameraUpload(enable: Boolean)
+
+    /**
+     * Set camera upload video quality
+     */
+    suspend fun setCameraUploadVideoQuality(quality: Int)
+
+    /**
+     * Set if photos only or photos and videos
+     */
+    suspend fun setCameraUploadFileType(syncVideo: Boolean)
+
+    /**
+     * Set if use wifi only or cellular as well
+     *
+     * @param enableCellularSync
+     */
+    suspend fun setCamSyncWifi(enableCellularSync: Boolean)
+
+    /**
+     * Set the camera upload loca path
+     */
+    suspend fun setCameraUploadLocalPath(path: String?)
+
+    /**
+     * Set if camera folder is in external sd card
+     */
+    suspend fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean)
+
+    /**
+     * Set conversion on charging
+     */
+    suspend fun setConversionOnCharging(onCharging: Boolean)
+
+    /**
+     * Set conversion charging on size
+     */
+    suspend fun setChargingOnSize(size: Int)
+
+    /**
+     * Set to always ask for storage
+     *
+     * @param isStorageAskAlways
+     */
+    suspend fun setStorageAskAlways(isStorageAskAlways: Boolean)
+
+    /**
+     * Set the default storage download location
+     */
+    suspend fun setDefaultStorageDownloadLocation()
+
+    /**
+     * Set Storage download location
+     *
+     * @param storageDownloadLocation
+     */
+    suspend fun setStorageDownloadLocation(storageDownloadLocation: String)
+
+    /**
+     * Set if we want to show copyright notice
+     *
+     * @param showCopyrights
+     */
+    suspend fun setShowCopyright()
 
     /**
      * Is use https preference set

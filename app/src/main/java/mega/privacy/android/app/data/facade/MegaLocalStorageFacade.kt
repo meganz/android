@@ -210,4 +210,62 @@ class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getContactByEmail(email: String?) =
         dbHandler.findContactByEmail(email)
+
+    override suspend fun setUserHasLoggedIn() {
+        dbHandler.setFirstTime(false)
+    }
+
+    override suspend fun setStorageAskAlways(isStorageAskAlways: Boolean) {
+        dbHandler.setStorageAskAlways(isStorageAskAlways)
+    }
+
+    override suspend fun setStorageDownloadLocation(storageDownloadLocation: String) {
+        dbHandler.setStorageDownloadLocation(storageDownloadLocation)
+    }
+
+    override fun setPasscodeLockEnabled(isPasscodeLockEnabled: Boolean) {
+        dbHandler.isPasscodeLockEnabled = isPasscodeLockEnabled
+    }
+
+    override suspend fun setPasscodeLockCode(passcodeLockCode: String) {
+        dbHandler.passcodeLockCode = passcodeLockCode
+    }
+
+    override suspend fun setShowCopyright(showCopyrights: Boolean) {
+        dbHandler.setShowCopyright(showCopyrights)
+    }
+
+    override suspend fun setCamSyncLocalPath(path: String?) {
+        path?.let { it ->
+            dbHandler.setCamSyncLocalPath(it)
+        }
+    }
+
+    override suspend fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean) {
+        dbHandler.setCameraFolderExternalSDCard(cameraFolderExternalSDCard)
+    }
+
+    override suspend fun setCamSyncWifi(enableCellularSync: Boolean) {
+        dbHandler.setCamSyncWifi(enableCellularSync)
+    }
+
+    override suspend fun setCamSyncFileUpload(fileUpload: Int) {
+        dbHandler.setCamSyncFileUpload(fileUpload)
+    }
+
+    override suspend fun setCameraUploadVideoQuality(quality: Int) {
+        dbHandler.setCameraUploadVideoQuality(quality)
+    }
+
+    override suspend fun setConversionOnCharging(onCharging: Boolean) {
+        dbHandler.setConversionOnCharging(onCharging)
+    }
+
+    override suspend fun setChargingOnSize(size: Int) {
+        dbHandler.setChargingOnSize(size)
+    }
+
+    override suspend fun setCamSyncEnabled(enable: Boolean) {
+        dbHandler.setCamSyncEnabled(enable)
+    }
 }

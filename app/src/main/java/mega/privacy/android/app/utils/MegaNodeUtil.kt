@@ -1967,6 +1967,9 @@ object MegaNodeUtil {
     fun MegaNode.getThumbnailFileName(): String =
         "$base64Handle${JPG_EXTENSION}"
 
+    fun MegaNode.getPreviewFileName(): String =
+        "$base64Handle${JPG_EXTENSION}"
+
     fun MegaNode.isImage(): Boolean =
         this.isFile && MimeTypeList.typeForName(name).isImage
 

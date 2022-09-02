@@ -18,14 +18,17 @@ import mega.privacy.android.app.data.repository.DefaultLoginRepository
 import mega.privacy.android.app.data.repository.DefaultNetworkRepository
 import mega.privacy.android.app.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.app.data.repository.DefaultPushesRepository
+import mega.privacy.android.app.data.repository.DefaultPhotosRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
 import mega.privacy.android.app.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.app.data.repository.DefaultSupportRepository
-import mega.privacy.android.app.data.repository.DefaultThumbnailRepository
+import mega.privacy.android.app.data.repository.DefaultImageRepository
 import mega.privacy.android.app.data.repository.DefaultTransfersRepository
 import mega.privacy.android.app.data.repository.TimberLoggingRepository
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.repository.GlobalStatesRepository
+import mega.privacy.android.domain.repository.PhotosRepository
+import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
@@ -43,7 +46,6 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
-import mega.privacy.android.domain.repository.ThumbnailRepository
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
@@ -98,7 +100,7 @@ abstract class RepositoryModule {
     abstract fun bindDeviceRepository(implementation: DefaultEnvironmentRepository): EnvironmentRepository
 
     @Binds
-    abstract fun bindThumbnailRepository(repository: DefaultThumbnailRepository): ThumbnailRepository
+    abstract fun bindGetImageRepository(repository: DefaultImageRepository): ImageRepository
 
     @Binds
     abstract fun bindNotificationsRepository(repository: DefaultNotificationsRepository): NotificationsRepository
@@ -121,4 +123,7 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAvatarRepository(repository: DefaultAvatarRepository): AvatarRepository
+
+    @Binds
+    abstract fun bindPhotosRepository(repository: DefaultPhotosRepository): PhotosRepository
 }

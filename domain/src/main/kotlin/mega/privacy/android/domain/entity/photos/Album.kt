@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.entity
+package mega.privacy.android.domain.entity.photos
 
 import java.io.File
 
@@ -19,5 +19,8 @@ sealed interface Album {
     /**
      * Favourite Album
      */
-    data class FavouriteAlbum(override val thumbnail: File?, override val itemCount: Int) : Album
+    data class FavouriteAlbum(
+        override val thumbnail: File?,
+        override val itemCount: Int,
+    ) : Album
 }

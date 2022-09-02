@@ -11,11 +11,10 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
@@ -35,6 +34,7 @@ class AlbumContentViewModel @Inject constructor(
     private val getCameraSortOrder: GetCameraSortOrder,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle? = null,
+    monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
     companion object {
@@ -259,6 +259,13 @@ class AlbumContentViewModel @Inject constructor(
         // in the PhotosFragment, for fear that an nodes update event would be missed if
         // emitted accidentally between the Fragment's onDestroy and onCreate when rotating screen.
         loadPhotos(true)
+
+        viewModelScope.launch {
+            // Whenever the app detects MegaNode updates, load the photos
+            monitorNodeUpdates().collect {
+                loadPhotos(true)
+            }
+        }
     }
 
     /**
