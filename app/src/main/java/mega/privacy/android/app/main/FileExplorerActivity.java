@@ -1676,9 +1676,15 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 return;
             }
 
-            parentHandle = cDriveExplorer != null
-                    ? cDriveExplorer.getParentHandle()
-                    : parentHandleCloud;
+            if(tabShown == INCOMING_TAB) {
+                parentHandle = iSharesExplorer != null
+                        ? iSharesExplorer.getParentHandle()
+                        : parentHandleCloud;
+            } else {
+                parentHandle = cDriveExplorer != null
+                        ? cDriveExplorer.getParentHandle()
+                        : parentHandleCloud;
+            }
 
             MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
             if (parentNode == null) {
