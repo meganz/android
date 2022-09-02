@@ -29,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ListAdapter;
@@ -43,11 +44,9 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -76,7 +75,13 @@ public class MultipleBucketAdapter
     List<NodeItem> nodes;
     boolean isMedia;
 
-    public MultipleBucketAdapter(Context context, Object fragment, List<NodeItem> nodes, boolean isMedia, RecentsBucketDiffCallback diffCallback) {
+    public MultipleBucketAdapter(
+        Context context,
+        Object fragment,
+        List<NodeItem> nodes,
+        boolean isMedia,
+        RecentsBucketDiffCallback diffCallback
+    ) {
         super(diffCallback);
         this.context = context;
         this.fragment = fragment;
@@ -361,10 +366,14 @@ public class MultipleBucketAdapter
         if (node == null) return;
         switch (v.getId()) {
             case R.id.three_dots: {
+                if (fragment instanceof RecentsBucketFragment) {
+                    ((RecentsBucketFragment) fragment).clearSelection();
+                }
                 if (!isOnline(context)) {
                     ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                     break;
                 }
+
                 ((ManagerActivity) context).showNodeOptionsPanel(node.getNode(), RECENTS_MODE);
                 break;
             }
