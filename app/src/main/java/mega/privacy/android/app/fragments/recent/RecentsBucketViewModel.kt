@@ -2,26 +2,30 @@ package mega.privacy.android.app.fragments.recent
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaRecentActionBucket
+import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * ViewModel associated to [RecentsBucketFragment]
+ */
 @HiltViewModel
 class RecentsBucketViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val recentsBucketRepository: RecentsBucketRepository,
+    monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
     private val _nodesToAnimate = MutableLiveData<Set<Int>>()
@@ -71,51 +75,13 @@ class RecentsBucketViewModel @Inject constructor(
                 selected.userEmail == other.userEmail
     }
 
-    private val nodesChangeObserver = Observer<Boolean> {
-        if (it) {
-            if (bucket.value == null) {
-                return@Observer
-            }
-
-            val recentActions = megaApi.recentActions
-
-            recentActions.forEach { b ->
-                bucket.value?.let { current ->
-                    if (isSameBucket(current, b)) {
-                        bucket.value = b
-                        return@Observer
-                    }
-                }
-            }
-
-            cachedActionList.value?.forEach { b ->
-                val iterator = recentActions.iterator()
-                while (iterator.hasNext()) {
-                    if (isSameBucket(iterator.next(), b)) {
-                        iterator.remove()
-                    }
-                }
-            }
-
-            // The last one is the changed one.
-            if (recentActions.size == 1) {
-                bucket.value = recentActions[0]
-                return@Observer
-            }
-
-            // No nodes contained in the bucket or the action bucket is no loner exists.
-            shouldCloseFragment.value = true
-        }
-    }
-
     init {
-        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-            .observeForever(nodesChangeObserver)
-    }
-
-    override fun onCleared() {
-        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-            .removeObserver(nodesChangeObserver)
+        viewModelScope.launch {
+            monitorNodeUpdates().collectLatest {
+                Timber.d("Received node update")
+                updateBucket()
+            }
+        }
     }
 
     fun getSelectedNodes(): List<NodeItem> = selectedNodes.toList()
@@ -183,5 +149,44 @@ class RecentsBucketViewModel @Inject constructor(
         _nodesToAnimate.value = animNodeIndices
         _actionMode.value = true
     }
+
+    /**
+     * Update the bucket
+     */
+    private fun updateBucket() {
+        if (bucket.value == null) {
+            return
+        }
+
+        val recentActions = megaApi.recentActions
+
+        recentActions.forEach { b ->
+            bucket.value?.let { current ->
+                if (isSameBucket(current, b)) {
+                    bucket.value = b
+                    return
+                }
+            }
+        }
+
+        cachedActionList.value?.forEach { b ->
+            val iterator = recentActions.iterator()
+            while (iterator.hasNext()) {
+                if (isSameBucket(iterator.next(), b)) {
+                    iterator.remove()
+                }
+            }
+        }
+
+        // The last one is the changed one.
+        if (recentActions.size == 1) {
+            bucket.value = recentActions[0]
+            return
+        }
+
+        // No nodes contained in the bucket or the action bucket is no loner exists.
+        shouldCloseFragment.value = true
+    }
+
 }
 
