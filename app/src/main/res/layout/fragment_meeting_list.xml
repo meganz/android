@@ -72,23 +72,9 @@
         </LinearLayout>
     </ScrollView>
 
-    <FrameLayout
-        android:id="@+id/empty_search"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="128dp"
+    <include
+        android:id="@+id/view_empty_search"
+        layout="@layout/layout_empty_search"
         android:visibility="gone"
-        tools:visibility="visible">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:drawablePadding="11dp"
-            android:text="@string/no_results_found"
-            android:textAllCaps="true"
-            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant10"
-            app:drawableTint="@color/grey_300_grey_600"
-            app:drawableTopCompat="@drawable/ic_no_search_results" />
-    </FrameLayout>
+        tools:visibility="visible" />
 </FrameLayout>

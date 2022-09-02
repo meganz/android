@@ -89,11 +89,11 @@ class MeetingListFragment : Fragment() {
                 if (viewModel.isSearchQueryEmpty()) {
                     binding.viewEmpty.isVisible = true
                 } else {
-                    binding.emptySearch.isVisible = true
+                    binding.viewEmptySearch.root.isVisible = true
                 }
             } else {
-                binding.emptySearch.isVisible = false
                 binding.viewEmpty.isVisible = false
+                binding.viewEmptySearch.root.isVisible = false
             }
         }
     }
