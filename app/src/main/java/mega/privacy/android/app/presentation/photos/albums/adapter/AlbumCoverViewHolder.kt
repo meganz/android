@@ -8,9 +8,9 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemAlbumCoverBinding
-import mega.privacy.android.app.presentation.photos.model.titleId
+import mega.privacy.android.app.presentation.photos.albums.model.titleId
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.entity.Album
+import mega.privacy.android.domain.entity.photos.Album
 
 /**
  *  AlbumCoverViewHolder work with  AlbumCoverAdapter

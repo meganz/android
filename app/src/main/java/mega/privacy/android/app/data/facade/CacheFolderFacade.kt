@@ -4,8 +4,11 @@ import android.content.Context
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
+import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
 import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -124,4 +127,19 @@ class CacheFolderFacade @Inject constructor(
 
     override fun buildAvatarFile(fileName: String?) =
         getCacheFile(AVATAR_FOLDER, fileName)
+
+    override suspend fun buildDefaultDownloadDir(): File = FileUtil.buildDefaultDownloadDir(context)
+
+    override fun getThumbnailCacheFilePath(megaNode: MegaNode): String? =
+        getCacheFolder(CacheFolderManager.THUMBNAIL_FOLDER)?.let { thumbnail ->
+            "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
+        }
+            ?.takeUnless { megaNode.isFolder }
+
+    override fun getPreviewCacheFilePath(megaNode: MegaNode): String? =
+        getCacheFolder(CacheFolderManager.PREVIEW_FOLDER)?.let { thumbnail ->
+            "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
+        }
+            ?.takeUnless { megaNode.isFolder }
+
 }

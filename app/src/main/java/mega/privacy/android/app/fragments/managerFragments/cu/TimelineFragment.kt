@@ -278,7 +278,7 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
         if (mManagerActivity.firstLogin) {
             mManagerActivity.skipInitialCUSetup()
         } else {
-            mManagerActivity.refreshTimelineFragment()
+            mManagerActivity.refreshPhotosFragment()
         }
     }
 
@@ -301,7 +301,7 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
         mManagerActivity.firstLogin = false
         viewModel.setEnableCUShown(false)
         callManager {
-            it.refreshTimelineFragment()
+            it.refreshPhotosFragment()
         }
     }
 
@@ -440,7 +440,7 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
         val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
         if (hasPermissions(requireContext(), *permissions)) {
             viewModel.setEnableCUShown(true)
-            mManagerActivity.refreshTimelineFragment()
+            mManagerActivity.refreshPhotosFragment()
         } else {
             requestCameraUploadPermission(permissions, Constants.REQUEST_CAMERA_ON_OFF)
         }

@@ -77,6 +77,10 @@ class DefaultAccountRepository @Inject constructor(
 
     override fun requestAccount() = myAccountInfoFacade.requestAccountDetails()
 
+    override suspend fun setUserHasLoggedIn() {
+        localStorageGateway.setUserHasLoggedIn()
+    }
+
     override fun isMultiFactorAuthAvailable() = megaApiGateway.multiFactorAuthAvailable()
 
     @Throws(MegaException::class)

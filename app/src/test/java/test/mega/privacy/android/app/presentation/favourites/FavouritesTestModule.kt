@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.favourites
+package test.mega.privacy.android.app.di
 
 import dagger.Module
 import dagger.Provides
@@ -10,15 +10,25 @@ import mega.privacy.android.app.di.homepage.favourites.FavouritesUseCases
 import mega.privacy.android.app.di.homepage.favourites.OpenFileModule
 import mega.privacy.android.app.di.photos.PhotosUseCases
 import mega.privacy.android.app.di.sortorder.SortOrderUseCases
-import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
-import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
-import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
-import mega.privacy.android.app.presentation.mapper.FavouriteMapper
+import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.domain.usecase.GetAlbums
 import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.RemoveFavourites
+import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
+import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
+import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
+import mega.privacy.android.app.presentation.mapper.FavouriteMapper
+import mega.privacy.android.domain.usecase.DownloadPreview
+import mega.privacy.android.domain.usecase.DownloadThumbnail
+import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
+import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
+import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
+import mega.privacy.android.domain.usecase.GetPreview
+import mega.privacy.android.domain.usecase.GetTimelinePhotos
+import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
+import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import org.mockito.kotlin.mock
 
 @Module
@@ -60,5 +70,35 @@ object FavouritesTestModule {
     fun provideGetThumbnail(): GetThumbnail = getThumbnail
 
     @Provides
+    fun provideGetPreview(): GetPreview = mock()
+
+    @Provides
     fun provideGetAlbums(): GetAlbums = mock()
+
+    @Provides
+    fun provideDownloadThumbnail(): DownloadThumbnail = mock()
+
+    @Provides
+    fun provideDownloadPreview(): DownloadPreview = mock()
+
+    @Provides
+    fun provideGetTimelinePhotos(): GetTimelinePhotos = mock()
+
+    @Provides
+    fun provideFilterCameraUploadPhotos(): FilterCameraUploadPhotos = mock()
+
+    @Provides
+    fun provideFilterCloudDrivePhotos(): FilterCloudDrivePhotos = mock()
+
+    @Provides
+    fun provideEnableCameraUpload(): EnablePhotosCameraUpload = mock()
+
+    @Provides
+    fun provideSetInitialCUPreferences(): SetInitialCUPreferences = mock()
+
+    @Provides
+    fun provideGetNodeListByIds(): GetNodeListByIds = mock()
+
+    @Provides
+    fun provideIsCameraSyncPreferenceEnabled(): IsCameraSyncPreferenceEnabled = mock()
 }

@@ -16,9 +16,13 @@ import mega.privacy.android.app.data.mapper.MegaTransferMapper
 import mega.privacy.android.app.data.mapper.MimeTypeMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.data.mapper.UserAlertMapper
+import mega.privacy.android.app.data.mapper.ImageMapper
+import mega.privacy.android.app.data.mapper.NodeUpdateMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.mapper.getFileTypeInfo
 import mega.privacy.android.app.data.mapper.getMimeType
+import mega.privacy.android.app.data.mapper.VideoMapper
+import mega.privacy.android.app.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.app.data.mapper.toChatRequest
 import mega.privacy.android.app.data.mapper.toContactRequest
@@ -33,6 +37,8 @@ import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.toRepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.toRepeatToggleModeMapper
+import mega.privacy.android.app.data.mapper.toImage
+import mega.privacy.android.app.data.mapper.toVideo
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.presentation.mapper.toFavourite
 
@@ -102,4 +108,13 @@ class MapperModule {
      */
     @Provides
     fun provideMegaTransferMapper(): MegaTransferMapper = ::toTransferModel
+
+    @Provides
+    fun provideImagesMapper(): ImageMapper = ::toImage
+
+    @Provides
+    fun provideVideosMapper(): VideoMapper = ::toVideo
+
+    @Provides
+    fun provideNodeUpdateMapper(): NodeUpdateMapper = ::mapMegaNodeListToNodeUpdate
 }

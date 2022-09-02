@@ -337,4 +337,102 @@ interface MegaLocalStorageGateway {
      * @return local contact details if found
      */
     suspend fun getContactByEmail(email: String?): MegaContactDB?
+
+    /**
+     * Set first time
+     *
+     * @param isFirstTime
+     */
+    suspend fun setUserHasLoggedIn()
+
+    /**
+     * Set to always ask for storage
+     *
+     * @param isStorageAskAlways
+     */
+    suspend fun setStorageAskAlways(isStorageAskAlways: Boolean)
+
+    /**
+     * Set storage download location
+     *
+     * @param storageDownloadLocation
+     */
+    suspend fun setStorageDownloadLocation(storageDownloadLocation: String)
+
+    /**
+     * Set passcode l ock enabled
+     *
+     * @param isPasscodeLockEnabled
+     */
+    fun setPasscodeLockEnabled(isPasscodeLockEnabled: Boolean)
+
+    /**
+     * Set the passcode lock code
+     *
+     * @param passcodeLockCode
+     */
+    suspend fun setPasscodeLockCode(passcodeLockCode: String)
+
+    /**
+     * Set show copyright
+     *
+     * @param showCopyrights
+     */
+    suspend fun setShowCopyright(showCopyrights: Boolean)
+
+    /**
+     * Set Camera Upload local path
+     *
+     * @param path
+     */
+    suspend fun setCamSyncLocalPath(path: String?)
+
+    /**
+     * Set if camera upload local path folder is on an external sd card
+     *
+     * @param cameraFolderExternalSDCard
+     */
+    suspend fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean)
+
+    /**
+     * Set if camera upload using wifi only or with cellular also
+     *
+     * @param enableCellularSync
+     */
+    suspend fun setCamSyncWifi(enableCellularSync: Boolean)
+
+    /**
+     * Set if camera upload only uploads images or images and videos
+     *
+     * @param fileUpload
+     */
+    suspend fun setCamSyncFileUpload(fileUpload: Int)
+
+    /**
+     * Set Video upload quality
+     *
+     * @param quality
+     */
+    suspend fun setCameraUploadVideoQuality(quality: Int)
+
+    /**
+     * Set Conversion on charging
+     *
+     * @param onCharging
+     */
+    suspend fun setConversionOnCharging(onCharging: Boolean)
+
+    /**
+     * Set the size of Charging on
+     *
+     * @param size
+     */
+    suspend fun setChargingOnSize(size: Int)
+
+    /**
+     * Set camera upload on/off
+     *
+     * @param enable
+     */
+    suspend fun setCamSyncEnabled(enable: Boolean)
 }

@@ -310,7 +310,6 @@ import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
@@ -374,6 +373,8 @@ import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
+import mega.privacy.android.app.presentation.photos.PhotosFragment;
+import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment;
@@ -639,13 +640,15 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isInMDMode = false;
 
     private static final String STATE_KEY_IS_IN_ALBUM_CONTENT = "isInAlbumContent";
+    private static final String STATE_KEY_IS_IN_PHOTOS_FILTER = "isInFilterPage";
+    public boolean isInFilterPage = false;
     private boolean isInAlbumContent;
     public boolean fromAlbumContent = false;
 
     public enum FragmentTag {
         CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SEARCH, TRANSFERS, COMPLETED_TRANSFERS,
         RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
-        LINKS, MEDIA_DISCOVERY, ALBUM_CONTENT;
+        LINKS, MEDIA_DISCOVERY, ALBUM_CONTENT, PHOTOS_FILTER;
 
         public String getTag() {
             switch (this) {
@@ -685,6 +688,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     return "mediaDiscoveryFragment";
                 case ALBUM_CONTENT:
                     return "fragmentAlbumContent";
+                case PHOTOS_FILTER:
+                    return "fragmentPhotosFilter";
             }
             return null;
         }
@@ -760,6 +765,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private SearchFragment searchFragment;
     private PhotosFragment photosFragment;
     private AlbumContentFragment albumContentFragment;
+    private PhotosFilterFragment photosFilterFragment;
     private ChatTabsFragment chatTabsFragment;
     private NotificationsFragment notificationsFragment;
     private TurnOnNotificationsFragment turnOnNotificationsFragment;
@@ -1370,6 +1376,12 @@ public class ManagerActivity extends TransfersManagementActivity
             getSupportFragmentManager().putFragment(outState, FragmentTag.ALBUM_CONTENT.getTag(), albumContentFragment);
         }
 
+        outState.putBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, isInFilterPage);
+        photosFilterFragment = (PhotosFilterFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PHOTOS_FILTER.getTag());
+        if (photosFilterFragment != null) {
+            getSupportFragmentManager().putFragment(outState, FragmentTag.PHOTOS_FILTER.getTag(), photosFilterFragment);
+        }
+
         backupWarningDialog = fileBackupManager.getBackupWarningDialog();
         if (backupWarningDialog != null && backupWarningDialog.isShowing()) {
             backupHandleList = fileBackupManager.getBackupHandleList();
@@ -1509,6 +1521,8 @@ public class ManagerActivity extends TransfersManagementActivity
             isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
             isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false);
             isInAlbumContent = savedInstanceState.getBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, false);
+            isInFilterPage = savedInstanceState.getBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, false);
+
 
             nodeAttacher.restoreState(savedInstanceState);
             nodeSaver.restoreState(savedInstanceState);
@@ -2715,7 +2729,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     private void enableCUClicked() {
         if (getPhotosFragment() != null) {
-            if (photosFragment.isEnablePhotosFragmentShown()) {
+            if (photosFragment.isEnablePhotosViewShown()) {
                 photosFragment.enableCameraUpload();
             } else {
                 photosFragment.enableCameraUploadClick();
@@ -3547,6 +3561,14 @@ public class ManagerActivity extends TransfersManagementActivity
         showHideBottomNavigationView(true);
     }
 
+    public void skipToFilterFragment(Fragment f) {
+        photosFilterFragment = (PhotosFilterFragment) f;
+        replaceFragment(f, FragmentTag.PHOTOS_FILTER.getTag());
+        isInFilterPage = true;
+        viewModel.setIsFirstNavigationLevel(false);
+        showHideBottomNavigationView(true);
+    }
+
     public void changeMDMode(boolean targetMDMode) {
         isInMDMode = targetMDMode;
     }
@@ -3845,17 +3867,19 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case PHOTOS: {
                 aB.setSubtitle(null);
-                if (getPhotosFragment() != null && photosFragment.isEnablePhotosFragmentShown()) {
+                if (isInAlbumContent) {
+                    aB.setTitle(getString(R.string.title_favourites_album));
+                } else if (isInFilterPage) {
+                    aB.setTitle(getString(R.string.photos_action_filter));
+                } else if (getPhotosFragment() != null && photosFragment.shouldUpdateTitle()) {
                     setFirstNavigationLevel(false);
-                    aB.setTitle(getString(R.string.settings_camera_upload_on));
-                } else {
-                    if (isInAlbumContent) {
-                        aB.setTitle(getString(R.string.title_favourites_album));
-                    } else {
-                        setFirstNavigationLevel(true);
-                        aB.setTitle(getString(R.string.sortby_type_photo_first));
-                    }
+                    aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
                 }
+                else {
+                    setFirstNavigationLevel(true);
+                    aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
+                }
+
                 break;
             }
             case HOMEPAGE: {
@@ -3950,6 +3974,10 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (drawerItem == DrawerItem.PHOTOS && isInAlbumContent) {
             aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+        }
+
+        if (drawerItem == DrawerItem.PHOTOS && isInFilterPage) {
+            aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white));
         }
     }
 
@@ -4559,6 +4587,8 @@ public class ManagerActivity extends TransfersManagementActivity
             case PHOTOS: {
                 if (isInAlbumContent) {
                     skipToAlbumContentFragment(AlbumContentFragment.getInstance());
+                } else if (isInFilterPage) {
+                    skipToFilterFragment(PhotosFilterFragment.getInstance());
                 } else {
                     abL.setVisibility(View.VISIBLE);
                     if (getPhotosFragment() == null) {
@@ -5444,7 +5474,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                     } else if (drawerItem == DrawerItem.PHOTOS) {
                         if (getPhotosFragment() != null) {
-                            if (photosFragment.isEnablePhotosFragmentShown()) {
+                            if (photosFragment.isEnablePhotosViewShown()) {
                                 photosFragment.onBackPressed();
                                 return true;
                             }
@@ -5452,7 +5482,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             setToolbarTitle();
                             invalidateOptionsMenu();
                             return true;
-                        } else if (isInAlbumContent) {
+                        } else if (isInAlbumContent || isInFilterPage) {
                             // When current fragment is AlbumContentFragment, the photosFragment will be null due to replaceFragment.
                             getOnBackPressedDispatcher().onBackPressed();
                         }
@@ -5959,6 +5989,13 @@ public class ManagerActivity extends TransfersManagementActivity
                     backToDrawerItem(bottomNavigationCurrentItem);
                 } else {
                     photosFragment.switchToAlbum();
+                }
+            } else if (isInFilterPage) {
+                isInFilterPage = false;
+
+                backToDrawerItem(bottomNavigationCurrentItem);
+                if (photosFragment == null) {
+                    backToDrawerItem(bottomNavigationCurrentItem);
                 }
             } else if (getPhotosFragment() == null || photosFragment.onBackPressed() == 0) {
                 performOnBack();
@@ -7320,7 +7357,7 @@ public class ManagerActivity extends TransfersManagementActivity
     /**
      * Refresh PhotosFragment's UI after CU is enabled.
      */
-    public void refreshTimelineFragment() {
+    public void refreshPhotosFragment() {
         drawerItem = DrawerItem.PHOTOS;
         setBottomNavigationMenuItemChecked(PHOTOS_BNV);
         setToolbarTitle();
