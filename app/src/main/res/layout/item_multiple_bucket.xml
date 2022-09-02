@@ -16,9 +16,9 @@
             android:id="@+id/thumbnail_list"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:layout_alignParentLeft="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"/>
 
         <ImageButton
@@ -29,7 +29,7 @@
             android:background="@android:color/transparent"
             android:padding="16dp"
             android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"/>
+            android:layout_alignParentEnd="true"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -155,10 +155,11 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:paddingRight="4dp"
-                android:paddingBottom="2dp"/>
+                android:paddingEnd="4dp"
+                android:paddingBottom="2dp"
+                tools:ignore="RtlSymmetry" />
 
         </RelativeLayout>
 
