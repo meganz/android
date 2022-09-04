@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.controls
+package mega.privacy.android.presentation.controls
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity

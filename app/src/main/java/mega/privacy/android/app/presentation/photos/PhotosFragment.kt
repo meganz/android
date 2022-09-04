@@ -73,7 +73,6 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomIn
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomOut
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
-import mega.privacy.android.app.presentation.theme.AndroidTheme
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -81,6 +80,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.presentation.theme.AndroidTheme
 import timber.log.Timber
 import javax.inject.Inject
 

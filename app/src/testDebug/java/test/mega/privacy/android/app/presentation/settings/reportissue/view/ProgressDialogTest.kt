@@ -3,17 +3,20 @@ package test.mega.privacy.android.app.presentation.settings.reportissue.view
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertRangeInfoEquals
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.controls.ProgressDialog
+import mega.privacy.android.presentation.controls.ProgressDialog
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import test.mega.privacy.android.app.fromId
 
 @RunWith(AndroidJUnit4::class)
 class ProgressDialogTest {
@@ -25,7 +28,12 @@ class ProgressDialogTest {
     fun test_that_progress_indicator_is_set_to_current_progress_value() {
         val expectedProgress = 0.33f
         composeTestRule.setContent {
-            ProgressDialog(title = "Title", progress = expectedProgress, onCancel = {})
+            ProgressDialog(
+                title = "Title",
+                progress = expectedProgress,
+                onCancel = {},
+                cancelButtonText = "Cancel"
+            )
         }
 
         val progressMatcher =
@@ -38,16 +46,18 @@ class ProgressDialogTest {
     @Test
     fun test_that_clicking_on_cancel_upload_calls_cancel_upload_function() {
         val onCancel = mock<() -> Unit>()
+        val cancelButtonText = "Cancel"
         composeTestRule.setContent {
             ProgressDialog(
                 title = stringResource(id = R.string.settings_help_report_issue_uploading_log_file),
                 progress = 0.5f,
-                onCancel = onCancel
+                onCancel = onCancel,
+                cancelButtonText = cancelButtonText
             )
         }
 
         composeTestRule.onNodeWithText(
-            fromId(R.string.general_cancel),
+            cancelButtonText,
             ignoreCase = true
         ).performClick()
 

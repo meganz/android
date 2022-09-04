@@ -4,6 +4,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 
 
+/**
+ * Android theme
+ *
+ * @param isDark
+ * @param content
+ */
 @Composable
 fun AndroidTheme(
     isDark: Boolean,

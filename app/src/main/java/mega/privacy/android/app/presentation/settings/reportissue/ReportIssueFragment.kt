@@ -31,7 +31,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.app.presentation.settings.reportissue.view.DiscardReportDialog
 import mega.privacy.android.app.presentation.settings.reportissue.view.ReportIssueView
-import mega.privacy.android.app.presentation.theme.AndroidTheme
+import mega.privacy.android.presentation.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
