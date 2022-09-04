@@ -43,7 +43,7 @@ class MeetingListViewModel @Inject constructor(
     }
 
     private var queryString: String? = null
-    private val meetings: MutableLiveData<List<MeetingItem>> = MutableLiveData()
+    private val meetings: MutableLiveData<List<MeetingItem>> = MutableLiveData(emptyList())
 
     init {
         retrieveMeetings()
@@ -71,14 +71,15 @@ class MeetingListViewModel @Inject constructor(
      */
     fun getMeetings(): LiveData<List<MeetingItem>> =
         meetings.map { items ->
-            if (!queryString.isNullOrBlank()) {
+            val searchQuery = queryString
+            if (!searchQuery.isNullOrBlank() && !items.isNullOrEmpty()) {
                 items.filter { (_, title, lastMessage, _, _, _, firstUser, lastUser, _, _, _) ->
-                    title.contains(queryString!!, true)
-                            || lastMessage?.contains(queryString!!, true) == true
-                            || firstUser.firstName?.contains(queryString!!, true) == true
-                            || lastUser?.firstName?.contains(queryString!!, true) == true
-                            || firstUser.email?.contains(queryString!!, true) == true
-                            || lastUser?.email?.contains(queryString!!, true) == true
+                    title.contains(searchQuery, true)
+                            || lastMessage?.contains(searchQuery, true) == true
+                            || firstUser.firstName?.contains(searchQuery, true) == true
+                            || lastUser?.firstName?.contains(searchQuery, true) == true
+                            || firstUser.email?.contains(searchQuery, true) == true
+                            || lastUser?.email?.contains(searchQuery, true) == true
                 }
             } else {
                 items
