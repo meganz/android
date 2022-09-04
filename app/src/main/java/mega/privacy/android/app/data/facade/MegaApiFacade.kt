@@ -24,7 +24,7 @@ import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
@@ -255,8 +255,14 @@ class MegaApiFacade @Inject constructor(
     override fun getThumbnail(
         node: MegaNode,
         thumbnailFilePath: String,
-        listener: MegaRequestListenerInterface,
-    ) = megaApi.getThumbnail(node, thumbnailFilePath, listener)
+        listener: MegaRequestListenerInterface?,
+    ) {
+        if (listener == null) {
+            megaApi.getThumbnail(node, thumbnailFilePath)
+        } else {
+            megaApi.getThumbnail(node, thumbnailFilePath, listener)
+        }
+    }
 
     override fun handleToBase64(handle: Long): String = MegaApiAndroid.handleToBase64(handle)
 
@@ -336,4 +342,25 @@ class MegaApiFacade @Inject constructor(
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
     }
+
+    override suspend fun searchByType(
+        cancelToken: MegaCancelToken,
+        order: Int,
+        type: Int,
+        target: Int,
+    ): List<MegaNode> = megaApi.searchByType(cancelToken, order, type, target)
+
+    override suspend fun getPublicLinks(): List<MegaNode> = megaApi.publicLinks
+
+    override fun getPreview(
+        node: MegaNode,
+        previewFilePath: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getPreview(node, previewFilePath, listener)
+
+    override suspend fun isInRubbish(node: MegaNode): Boolean = megaApi.isInRubbish(node)
+
+    override suspend fun getChildren(parentNodes: MegaNodeList, order: Int): List<MegaNode> =
+        megaApi.getChildren(parentNodes, order)
+
 }

@@ -6,10 +6,10 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.repository.DefaultThumbnailRepository
+import mega.privacy.android.app.data.repository.DefaultImageRepository
+import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.repository.ThumbnailRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -24,8 +24,8 @@ import org.mockito.kotlin.whenever
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultThumbnailRepositoryTest {
-    private lateinit var underTest: ThumbnailRepository
+class DefaultImageRepositoryTest {
+    private lateinit var underTest: ImageRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val cacheFolderGateway = mock<CacheFolderGateway>()
@@ -34,10 +34,10 @@ class DefaultThumbnailRepositoryTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultThumbnailRepository(
-            megaApiGateway = megaApiGateway,
-            ioDispatcher = UnconfinedTestDispatcher(),
-            cacheFolder = cacheFolderGateway
+        underTest = DefaultImageRepository(
+                megaApiGateway = megaApiGateway,
+                ioDispatcher = UnconfinedTestDispatcher(),
+                cacheFolder = cacheFolderGateway
         )
     }
 

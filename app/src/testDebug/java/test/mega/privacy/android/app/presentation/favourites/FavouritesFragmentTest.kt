@@ -37,6 +37,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.di.TestSortOrderUseCases
 import test.mega.privacy.android.app.di.TestWrapperModule
+import test.mega.privacy.android.app.di.FavouritesTestModule
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 import test.mega.privacy.android.app.testFragment
 

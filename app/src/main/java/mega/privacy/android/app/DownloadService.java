@@ -264,7 +264,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
         WifiManager wifiManager = (WifiManager) getApplicationContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaDownloadServicePowerLock");
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Mega:DownloadServicePowerLock");
         mBuilder = new Notification.Builder(DownloadService.this);
         mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

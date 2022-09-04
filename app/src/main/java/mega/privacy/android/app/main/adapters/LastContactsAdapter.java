@@ -1,21 +1,32 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import mega.privacy.android.app.DatabaseHandler;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.listeners.UserAvatarListener;
@@ -25,12 +36,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
 
 public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapter.ViewHolder> {
     
@@ -50,8 +55,6 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     
     private List<MegaUser> lastContacts;
     
-    private DatabaseHandler dbH;
-    
     public LastContactsAdapter(final Activity context,List<MegaUser> data) {
         this.context = context;
         this.lastContacts = subLastContacts(data);
@@ -60,7 +63,6 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         if (megaApi == null) {
             megaApi = ((MegaApplication)context.getApplication()).getMegaApi();
         }
-        dbH = DatabaseHandler.getDbHandler(context);
     }
     
     @Override

@@ -22,12 +22,11 @@
 
                 <ImageView
                     android:id="@+id/empty_image_recents"
-                    android:layout_width="108dp"
-                    android:layout_height="108dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/guideline"
                     android:src="@drawable/ic_recents" />
 
                 <TextView

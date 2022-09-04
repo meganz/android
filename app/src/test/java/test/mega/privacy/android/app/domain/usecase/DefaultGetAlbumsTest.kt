@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.DefaultGetAlbums
-import mega.privacy.android.domain.entity.Album
+import mega.privacy.android.domain.usecase.DefaultGetAlbums
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.FavouriteFile
 import mega.privacy.android.domain.entity.FavouriteInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo

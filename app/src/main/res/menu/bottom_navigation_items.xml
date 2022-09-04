@@ -8,7 +8,7 @@
 
 	<item
 		android:id="@+id/bottom_navigation_item_camera_uploads"
-		android:icon="@drawable/ic_camera_uploads"
+		android:icon="@drawable/ic_bottom_nav_photos"
 		android:title="@string/sortby_type_photo_first"/>
 
 	<item

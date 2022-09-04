@@ -353,7 +353,7 @@
             android:exported="true"
             android:label="@string/pdf_app_name"
             android:launchMode="singleTop">
-            <intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />

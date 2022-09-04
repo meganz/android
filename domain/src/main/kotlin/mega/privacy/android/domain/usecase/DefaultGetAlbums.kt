@@ -1,18 +1,14 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.domain.entity.Album
 import mega.privacy.android.domain.entity.FavouriteFile
 import mega.privacy.android.domain.entity.FavouriteInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.repository.AlbumsRepository
-import mega.privacy.android.domain.usecase.GetAlbums
-import mega.privacy.android.domain.usecase.GetAllFavorites
-import mega.privacy.android.domain.usecase.GetThumbnail
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -70,7 +66,6 @@ class DefaultGetAlbums @Inject constructor(
             try {
                 getThumbnail(it.id)
             } catch (e: Exception) {
-                Timber.e(e)
                 null
             }
         }

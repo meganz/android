@@ -30,6 +30,11 @@ interface AccountRepository {
     fun requestAccount()
 
     /**
+     * Set that the user has logged in
+     */
+    suspend fun setUserHasLoggedIn()
+
+    /**
      * Is multi factor auth available
      *
      * @return true if multi-factor auth is available for the current user, else false

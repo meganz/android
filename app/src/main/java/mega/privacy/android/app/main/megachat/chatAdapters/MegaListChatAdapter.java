@@ -27,7 +27,6 @@ import static mega.privacy.android.app.utils.TimeUtils.formatDate;
 import static mega.privacy.android.app.utils.TimeUtils.formatDateAndTime;
 import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
 import static mega.privacy.android.app.utils.Util.toCDATA;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_JOINING;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION;
@@ -69,7 +68,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -88,7 +86,6 @@ import mega.privacy.android.app.main.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MeetingUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -125,8 +122,6 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 
     DisplayMetrics outMetrics;
     ChatController cC;
-
-    DatabaseHandler dbH = null;
 
     int adapterType;
 
@@ -466,7 +461,6 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
         DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        dbH = DatabaseHandler.getDbHandler(context);
         View v = null;
 
         if (viewType == ITEM_VIEW_TYPE_NORMAL_CHATS) {

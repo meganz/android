@@ -4008,4 +4008,20 @@
     <string name="text_editor_creation_error">File not saved to Cloud drive. Try again.</string>
     <!-- Action label to start images slideshow -->
     <string name="action_slideshow">Slideshow</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">Choose type</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">All media</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">Show items from</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">All locations</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">Cloud drive</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">No [B]Media[/B] found</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">No [B]images[/B] found</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">No [B]videos[/B] found</string>
 </resources>
