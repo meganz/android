@@ -4,33 +4,63 @@ import androidx.compose.ui.graphics.Color
 import com.airbnb.android.showkase.annotation.ShowkaseColor
 
 
+/**
+ * White
+ */
 @ShowkaseColor("white", "white")
 val white = Color(0xFFFFFF)
 
+/**
+ * White_alpha_005
+ */
 @ShowkaseColor("white_alpha_005", "white")
 val white_alpha_005 = Color(0x0DFFFFFF)
 
+/**
+ * White_alpha_007
+ */
 @ShowkaseColor("white_alpha_007", "white")
 val white_alpha_007 = Color(0x12FFFFFF)
 
+/**
+ * White_alpha_008
+ */
 @ShowkaseColor("white_alpha_008", "white")
 val white_alpha_008 = Color(0x14FFFFFF)
 
+/**
+ * White_alpha_009
+ */
 @ShowkaseColor("white_alpha_009", "white")
 val white_alpha_009 = Color(0x17FFFFFF)
 
+/**
+ * White_alpha_012
+ */
 @ShowkaseColor("white_alpha_012", "white")
 val white_alpha_012 = Color(0x1FFFFFFF)
 
+/**
+ * White_alpha_015
+ */
 @ShowkaseColor("white_alpha_015", "white")
 val white_alpha_015 = Color(0x26FFFFFF)
 
+/**
+ * White_alpha_016
+ */
 @ShowkaseColor("white_alpha_016", "white")
 val white_alpha_016 = Color(0x29FFFFFF)
 
+/**
+ * White_alpha_018
+ */
 @ShowkaseColor("white_alpha_018", "white")
 val white_alpha_018 = Color(0x2EFFFFFF)
 
+/**
+ * White_alpha_020
+ */
 @ShowkaseColor("white_alpha_020", "white")
 val white_alpha_020 = Color(0x33FFFFFF)
 

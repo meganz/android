@@ -7,8 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.controls.MegaTextField
-import mega.privacy.android.app.presentation.theme.AndroidTheme
+import mega.privacy.android.presentation.controls.MegaTextField
+import mega.privacy.android.presentation.theme.AndroidTheme
 
 @Composable
 internal fun DescriptionTextField(
