@@ -9512,15 +9512,13 @@ public class ManagerActivity extends TransfersManagementActivity
 
                     pauseTransfersMenuIcon.setVisible(!paused);
                     playTransfersMenuIcon.setVisible(paused);
+
+                    // When the "Pause All" Button is Clicked, newBackupState = PAUSE_UPLOADS
+                    // When the "Resume All" Button is Clicked, newBackupState = ACTIVE
+                    BackupState newBackupState = paused ? BackupState.PAUSE_UPLOADS : BackupState.ACTIVE;
+                    CameraUploadSyncManager.INSTANCE.updatePrimaryFolderBackupState(newBackupState);
+                    CameraUploadSyncManager.INSTANCE.updateSecondaryFolderBackupState(newBackupState);
                 }
-
-                // Update CU backup state.
-                BackupState newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-                        ? BackupState.PAUSE_UPLOADS
-                        : BackupState.ACTIVE;
-
-                CameraUploadSyncManager.INSTANCE.updatePrimaryFolderBackupState(newBackupState);
-                CameraUploadSyncManager.INSTANCE.updateSecondaryFolderBackupState(newBackupState);
             }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
             Timber.d("One MegaRequest.TYPE_PAUSE_TRANSFER");

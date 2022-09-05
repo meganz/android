@@ -203,7 +203,7 @@ object CameraUploadSyncManager {
      *
      * @param heartbeatStatus The heartbeat status
      */
-    private fun sendPrimaryFolderHeartbeat(heartbeatStatus: HeartbeatStatus) {
+    fun sendPrimaryFolderHeartbeat(heartbeatStatus: HeartbeatStatus) {
         val cuBackup = databaseHandler.cuBackup
 
         if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
@@ -226,7 +226,7 @@ object CameraUploadSyncManager {
      *
      * @param heartbeatStatus The heartbeat status
      */
-    private fun sendSecondaryFolderHeartbeat(heartbeatStatus: HeartbeatStatus) {
+    fun sendSecondaryFolderHeartbeat(heartbeatStatus: HeartbeatStatus) {
         val muBackup = databaseHandler.muBackup
 
         if (muBackup != null && CameraUploadUtil.isSecondaryEnabled()) {
