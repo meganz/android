@@ -106,6 +106,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
@@ -854,6 +855,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                         MegaNodeList megaNodeList = messagesSelected.get(i).getMegaNodeList();
                         list.add(megaNodeList);
                     }
+                    PermissionUtils.checkNotificationsPermission(nodeAttachmentHistoryActivity);
                     nodeSaver.saveNodeLists(list, false, false, false, true);
                     break;
                 }
@@ -864,6 +866,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                     break;
                 }
                 case R.id.chat_cab_menu_offline: {
+                    PermissionUtils.checkNotificationsPermission(nodeAttachmentHistoryActivity);
                     clearSelections();
                     hideMultipleSelect();
                     chatC.saveForOfflineWithMessages(messagesSelected,
@@ -1430,6 +1433,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     }
 
     public void downloadNodeList(MegaNodeList nodeList) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true);
     }
 }

@@ -59,9 +59,9 @@ ext {
     versionCode = 462
 
     // Sdk and tools
-    compileSdkVersion = 32
+    compileSdkVersion = 33
     minSdkVersion = 23
-    targetSdkVersion = 31
+    targetSdkVersion = 33
     buildToolsVerion = '31.0.0'
 
     // App dependencies

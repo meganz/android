@@ -53,6 +53,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -480,6 +481,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     Util.showSnackbar(
                             getActivity(), getResources().getString(R.string.file_removed_offline));
                 } else {
+                    PermissionUtils.checkNotificationsPermission(requireActivity());
                     ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                     messages.add(message);
                     chatC.saveForOfflineWithAndroidMessages(messages,

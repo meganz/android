@@ -73,7 +73,7 @@ val body2 = TextStyle(
 @ShowkaseTypography("button", "Default Theme")
 val button = TextStyle(
     fontFamily = FontFamily.SansSerif,
-    fontWeight = FontWeight.Bold,
+    fontWeight = FontWeight.Medium,
     fontSize = 14.sp,
     letterSpacing = 1.50.sp
 )

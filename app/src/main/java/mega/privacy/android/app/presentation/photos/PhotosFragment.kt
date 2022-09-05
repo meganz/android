@@ -224,11 +224,11 @@ class PhotosFragment : Fragment() {
         }
         menu?.findItem(R.id.action_zoom_in)?.let {
             it.isEnabled = state.enableZoomIn
-            it.icon.alpha = if (state.enableZoomIn) 255 else 125
+            it.icon?.alpha = if (state.enableZoomIn) 255 else 125
         }
         menu?.findItem(R.id.action_zoom_out)?.let {
             it.isEnabled = state.enableZoomOut
-            it.icon.alpha = if (state.enableZoomOut) 255 else 125
+            it.icon?.alpha = if (state.enableZoomOut) 255 else 125
         }
         menu?.findItem(R.id.action_photos_sortby)?.let {
             it.isEnabled = state.enableSortOption
@@ -374,11 +374,11 @@ class PhotosFragment : Fragment() {
         val enableSortOption = timelineViewModel.state.value.enableSortOption
         menu.findItem(R.id.action_zoom_in)?.let {
             it.isEnabled = zoomInValid
-            it.icon.alpha = if (zoomInValid) 255 else 125
+            it.icon?.alpha = if (zoomInValid) 255 else 125
         }
         menu.findItem(R.id.action_zoom_out)?.let {
             it.isEnabled = zoomOutValid
-            it.icon.alpha = if (zoomOutValid) 255 else 125
+            it.icon?.alpha = if (zoomOutValid) 255 else 125
         }
         menu.findItem(R.id.action_photos_sortby)?.let {
             val color = if (Util.isDarkMode(requireContext())) {

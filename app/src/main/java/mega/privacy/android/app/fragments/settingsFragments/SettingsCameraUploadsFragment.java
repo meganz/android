@@ -99,6 +99,7 @@ import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.SyncStatus;
 import mega.privacy.android.domain.entity.VideoQuality;
 import nz.mega.sdk.MegaNode;
@@ -152,19 +153,20 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
     /**
      * An ActivityResultLauncher that is launched when the user attempts to enable Camera Uploads
-     * without granting the READ_EXTERNAL_STORAGE permission
+     * without granting the necessary permissions in {@link #refreshCameraUploadsSettings() RefreshCameraUploadsSettings}
      */
-    private final ActivityResultLauncher<String> readExternalPermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(), result -> {
-                if (result) {
-                    // If the permission is granted, check the user Business Account status
-                    Timber.d("Permission READ_EXTERNAL_STORAGE granted");
-                    checkIfShouldShowBusinessCUAlert();
-                } else {
-                    Timber.d("Permission READ_EXTERNAL_STORAGE denied");
-                    // Otherwise, display a Snackbar explaining that permission READ_EXTERNAL_PERMISSION should be
-                    // granted before enabling Camera Uploads
+    private final ActivityResultLauncher<String[]> enableCameraUploadsPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestMultiplePermissions(), permissionsResult -> {
+                if (permissionsResult.containsValue(false)) {
+                    // If at least one permission is not granted, display a Snackbar explaining that
+                    // the necessary permissions should be granted before enabling Camera Uploads
+                    Timber.d("At least one permission in enableCameraUploadsPermissionLauncher denied");
                     Util.showSnackbar(requireContext(), getString(R.string.on_refuse_storage_permission));
+                } else {
+                    // Otherwise if all necessary permissions have been granted, check the user
+                    // Business Account status
+                    Timber.d("All permissions in enableCameraUploadsPermissionLauncher granted");
+                    checkIfShouldShowBusinessCUAlert();
                 }
             }
     );
@@ -172,8 +174,9 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     /**
      * An ActivityResultLauncher that is launched when the user attempts to enable Camera Uploads
      * with location tags without granting the ACCESS_MEDIA_LOCATION permission
+     * in {@link #onPreferenceClick(Preference) OnPreferenceClick}
      */
-    private final ActivityResultLauncher<String> accessMediaLocationLauncher = registerForActivityResult(
+    private final ActivityResultLauncher<String> enableCameraUploadsWithLocationPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(), result -> {
                 if (result) {
                     // If the permission is granted, then enable Camera Uploads with location tags
@@ -512,15 +515,22 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             Timber.d("Disable CU.");
             disableCameraUpload();
         } else {
-            // Check if the necessary permissions to enable Camera Uploads have been granted
-            Timber.d("Checking if READ_EXTERNAL_PERMISSION is granted");
+            // Check if the necessary permissions to enable Camera Uploads have been granted.
+            // The permissions are adaptive depending on the Android SDK version
+            Timber.d("Checking if the necessary permissions have been granted");
 
-            if (hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                Timber.d("READ_EXTERNAL_PERMISSION granted");
+            PermissionUtils.checkNotificationsPermission(requireActivity());
+
+            String[] permissionsList = new String[] {
+                    PermissionUtils.getImagePermissionByVersion(),
+                    PermissionUtils.getVideoPermissionByVersion()
+            };
+            if (hasPermissions(context, permissionsList)) {
+                Timber.d("All necessary permissions have been granted");
                 checkIfShouldShowBusinessCUAlert();
             } else {
-                Timber.d("READ_EXTERNAL_PERMISSION not granted. Launching permission window");
-                readExternalPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                Timber.d("At least one permission was denied. Launching permission window");
+                enableCameraUploadsPermissionLauncher.launch(permissionsList);
             }
         }
     }
@@ -604,7 +614,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                         includeGPS = false;
                         dbH.setRemoveGPS(true);
                         cameraUploadIncludeGPS.setChecked(includeGPS);
-                        accessMediaLocationLauncher.launch(Manifest.permission.ACCESS_MEDIA_LOCATION);
+                        enableCameraUploadsWithLocationPermissionLauncher.launch(Manifest.permission.ACCESS_MEDIA_LOCATION);
                     }
                 }
                 break;

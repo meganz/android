@@ -131,6 +131,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.getFragmentFromNavHost
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatMessage
@@ -338,6 +339,10 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             .observe(this) {
                 showNotAllowPlayAlert()
             }
+
+        if (savedInstanceState == null && isAudioPlayer) {
+            PermissionUtils.checkNotificationsPermission(this)
+        }
     }
 
     private fun observeRotationSettingsChange() {
@@ -850,6 +855,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 return true
             }
             R.id.chat_save_for_offline -> {
+                PermissionUtils.checkNotificationsPermission(this)
+
                 val pair = getChatMessage()
                 val message = pair.second
 

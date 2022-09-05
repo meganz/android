@@ -141,6 +141,7 @@ import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaContactRequest;
@@ -852,6 +853,7 @@ public class PdfViewerActivity extends PasscodeActivity
     }
 
     public void download() {
+        PermissionUtils.checkNotificationsPermission(this);
         if (type == OFFLINE_ADAPTER) {
             MegaOffline node = dbH.findByHandle(handle);
             if (node != null) {
@@ -1351,6 +1353,7 @@ public class PdfViewerActivity extends PasscodeActivity
                     chatC = new ChatController(this);
                 }
                 if (msgChat != null) {
+                    PermissionUtils.checkNotificationsPermission(this);
                     chatC.saveForOffline(msgChat.getMegaNodeList(), megaChatApi.getChatRoom(chatId),
                             true, this);
                 }
