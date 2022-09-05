@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.NotificationState
+import mega.privacy.android.app.presentation.notification.model.mapper.NotificationMapper
 import mega.privacy.android.domain.usecase.AcknowledgeUserAlerts
 import mega.privacy.android.domain.usecase.MonitorUserAlerts
 import javax.inject.Inject
@@ -27,6 +28,7 @@ import javax.inject.Inject
 class NotificationViewModel @Inject constructor(
     private val monitorUserAlerts: MonitorUserAlerts,
     private val acknowledgeUserAlerts: AcknowledgeUserAlerts,
+    private val notificationMapper: NotificationMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NotificationState(emptyList()))
@@ -36,7 +38,7 @@ class NotificationViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             monitorUserAlerts().mapLatest { list ->
-                list.map { Notification(it) }
+                list.map { notificationMapper(it) }
             }.collect() {
                 _state.update { (notifications) ->
                     NotificationState(
@@ -57,7 +59,7 @@ class NotificationViewModel @Inject constructor(
      * On notifications loaded
      *
      */
-    fun onNotificationsLoaded(){
+    fun onNotificationsLoaded() {
         viewModelScope.launch { acknowledgeUserAlerts() }
     }
 }
