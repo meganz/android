@@ -149,29 +149,19 @@ class MegaApiFacade @Inject constructor(
     override val globalTransfer: Flow<GlobalTransfer> = callbackFlow {
         val listener = OptionalMegaTransferListenerInterface(
             onTransferStart = { transfer ->
-                sharingScope.launch {
-                    send(GlobalTransfer.OnTransferStart(transfer))
-                }
+                trySend(GlobalTransfer.OnTransferStart(transfer))
             },
             onTransferFinish = { transfer, error ->
-                sharingScope.launch {
-                    send(GlobalTransfer.OnTransferFinish(transfer, error))
-                }
+                trySend(GlobalTransfer.OnTransferFinish(transfer, error))
             },
             onTransferUpdate = { transfer ->
-                sharingScope.launch {
-                    send(GlobalTransfer.OnTransferUpdate(transfer))
-                }
+                trySend(GlobalTransfer.OnTransferUpdate(transfer))
             },
             onTransferTemporaryError = { transfer, error ->
-                sharingScope.launch {
-                    send(GlobalTransfer.OnTransferTemporaryError(transfer, error))
-                }
+                trySend(GlobalTransfer.OnTransferTemporaryError(transfer, error))
             },
             onTransferData = { transfer, buffer ->
-                sharingScope.launch {
-                    send(GlobalTransfer.OnTransferData(transfer, buffer))
-                }
+                trySend(GlobalTransfer.OnTransferData(transfer, buffer))
             }
         )
 
@@ -180,7 +170,7 @@ class MegaApiFacade @Inject constructor(
         awaitClose {
             megaApi.removeTransferListener(listener)
         }
-    }.stateIn(sharingScope, SharingStarted.WhileSubscribed(), GlobalTransfer.None)
+    }.shareIn(sharingScope, SharingStarted.WhileSubscribed(), 1)
 
     override fun getFavourites(
         node: MegaNode?,
