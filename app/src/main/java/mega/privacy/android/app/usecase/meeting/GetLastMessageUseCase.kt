@@ -25,6 +25,7 @@ import nz.mega.sdk.MegaChatMessage.TYPE_CHAT_TITLE
 import nz.mega.sdk.MegaChatMessage.TYPE_CONTACT_ATTACHMENT
 import nz.mega.sdk.MegaChatMessage.TYPE_CONTAINS_META
 import nz.mega.sdk.MegaChatMessage.TYPE_INVALID
+import nz.mega.sdk.MegaChatMessage.TYPE_NODE_ATTACHMENT
 import nz.mega.sdk.MegaChatMessage.TYPE_NORMAL
 import nz.mega.sdk.MegaChatMessage.TYPE_PRIV_CHANGE
 import nz.mega.sdk.MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE
@@ -141,17 +142,30 @@ class GetLastMessageUseCase @Inject constructor(
                     String.format(
                         getString(R.string.message_set_chat_private), chatListItem.getSenderName()
                     ).cleanHtmlText()
+                TYPE_NODE_ATTACHMENT -> {
+                    val nodeList = chatMessage.megaNodeList
+                    val message = if ((nodeList?.size() ?: 0) > 0) {
+                        nodeList.get(0).name
+                    } else {
+                        converterShortCodes(chatListItem.lastMessage)
+                    }
+                    if (chatListItem.isMine()) {
+                        "${getString(R.string.word_me)} $message"
+                    } else {
+                        "${chatListItem.getSenderName()}: $message"
+                    }
+                }
                 TYPE_CONTACT_ATTACHMENT -> {
                     val message = converterShortCodes(getString(R.string.contacts_sent, chatMessage.usersCount.toString()))
                     if (chatListItem.isMine()) {
                         "${getString(R.string.word_me)} $message"
                     } else {
-                        message
+                        "${chatListItem.getSenderName()}: $message"
                     }
                 }
                 TYPE_VOICE_CLIP -> {
                     val nodeList = chatMessage.megaNodeList
-                    val message = if ((nodeList?.size() ?: 0) > 0 && ChatUtil.isVoiceClip(nodeList.get(0).name)) {
+                    val message = if ((nodeList?.size() ?: 0) > 0&& ChatUtil.isVoiceClip(nodeList.get(0).name)) {
                         val duration = ChatUtil.getVoiceClipDuration(nodeList.get(0))
                         CallUtil.milliSecondsToTimer(duration)
                     } else {
@@ -172,7 +186,7 @@ class GetLastMessageUseCase @Inject constructor(
                         chatListItem.isMine() ->
                             "${getString(R.string.word_me)} ${converterShortCodes(chatListItem.lastMessage)}"
                         else ->
-                            converterShortCodes(chatListItem.lastMessage)
+                            "${chatListItem.getSenderName()}: ${converterShortCodes(chatListItem.lastMessage)}"
                     }
                 }
             }
