@@ -1,5 +1,32 @@
 package mega.privacy.android.app.presentation.notification.model
 
-import mega.privacy.android.domain.entity.UserAlert
+import android.content.Context
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.unit.Dp
 
-data class Notification(val alert: UserAlert)
+/**
+ * Notification
+ *
+ * @property sectionTitle
+ * @property sectionColour
+ * @property sectionIcon
+ * @property title
+ * @property titleTextSize
+ * @property description
+ * @property dateText
+ * @property isNew
+ * @property onClick
+ * @constructor Create empty Notification
+ */
+data class Notification(
+    val sectionTitle: (Context) -> String,
+    @ColorRes val sectionColour: Int,
+    @DrawableRes val sectionIcon: Int?,
+    val title: (Context) -> CharSequence,
+    val titleTextSize: Dp,
+    val description: (Context) -> CharSequence?,
+    val dateText: (Context) -> String,
+    val isNew: Boolean,
+    val onClick: (NotificationNavigationHandler) -> Unit,
+)
