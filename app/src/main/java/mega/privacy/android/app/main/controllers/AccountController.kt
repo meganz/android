@@ -363,7 +363,7 @@ class AccountController(private val context: Context) {
                 .edit().clear().apply()
 
             //clear chat and calls preferences
-            sharingScope.launch {
+            sharingScope.launch(Dispatchers.IO) {
                 ChatPreferencesDataStore(context, Dispatchers.IO).clearPreferences()
                 CallsPreferencesDataStore(context, Dispatchers.IO).clearPreferences()
             }

@@ -4024,4 +4024,10 @@
     <string name="timeline_empty_images">No [B]images[/B] found</string>
     <!-- Timeline: Empty state for No Videos -->
     <string name="timeline_empty_videos">No [B]videos[/B] found</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">Not now</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">Get notified</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA will send you call, chat and file transfer notifications.</string>
 </resources>

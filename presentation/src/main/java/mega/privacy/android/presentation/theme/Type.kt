@@ -7,6 +7,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.airbnb.android.showkase.annotation.ShowkaseTypography
 
+/**
+ * H6
+ */
 @ShowkaseTypography("h6", "Default Theme")
 val h6 = TextStyle(
     fontFamily = FontFamily.SansSerif,
@@ -16,6 +19,9 @@ val h6 = TextStyle(
     letterSpacing = 0.15.sp
 )
 
+/**
+ * Subtitle1
+ */
 @ShowkaseTypography("subtitle1", "Default Theme")
 val subtitle1 = TextStyle(
     fontFamily = FontFamily.SansSerif,
@@ -25,6 +31,9 @@ val subtitle1 = TextStyle(
     letterSpacing = 0.15.sp
 )
 
+/**
+ * Subtitle2
+ */
 @ShowkaseTypography("subtitle2", "Default Theme")
 val subtitle2 = TextStyle(
     fontFamily = FontFamily.SansSerif,
@@ -34,6 +43,9 @@ val subtitle2 = TextStyle(
     letterSpacing = 0.sp
 )
 
+/**
+ * Body1
+ */
 @ShowkaseTypography("body1", "Default Theme")
 val body1 = TextStyle(
     fontFamily = FontFamily.SansSerif,
@@ -43,6 +55,9 @@ val body1 = TextStyle(
     letterSpacing = 0.25.sp
 )
 
+/**
+ * Body2
+ */
 @ShowkaseTypography("body2", "Default Theme")
 val body2 = TextStyle(
     fontFamily = FontFamily.SansSerif,
@@ -52,14 +67,20 @@ val body2 = TextStyle(
     letterSpacing = 0.25.sp
 )
 
+/**
+ * Button
+ */
 @ShowkaseTypography("button", "Default Theme")
 val button = TextStyle(
     fontFamily = FontFamily.SansSerif,
-    fontWeight = FontWeight.Bold,
+    fontWeight = FontWeight.Medium,
     fontSize = 14.sp,
     letterSpacing = 1.50.sp
 )
 
+/**
+ * Caption
+ */
 @ShowkaseTypography("caption", "Default Theme")
 val caption = TextStyle(
     fontFamily = FontFamily.SansSerif,
@@ -69,7 +90,9 @@ val caption = TextStyle(
     letterSpacing = 0.50.sp
 )
 
-// Set of Material typography styles to start with
+/**
+ * Typography
+ */
 val Typography = Typography(
     h6 = h6,
     subtitle1 = subtitle1,

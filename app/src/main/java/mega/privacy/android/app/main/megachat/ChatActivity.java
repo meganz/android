@@ -410,6 +410,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.usecase.GetPushToken;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
@@ -3712,10 +3713,10 @@ public class ChatActivity extends PasscodeActivity
                 }, (error) -> Timber.e("Error " + error));
     }
 
-    private boolean checkPermissions(String permission, int requestCode) {
-        boolean hasPermission = hasPermissions(this, permission);
+    private boolean checkPermissions(int requestCode, String... permissions) {
+        boolean hasPermission = hasPermissions(this, permissions);
         if (!hasPermission) {
-            requestPermission(this, requestCode, permission);
+            requestPermission(this, requestCode, permissions);
             return false;
         }
 
@@ -3724,35 +3725,41 @@ public class ChatActivity extends PasscodeActivity
 
     private boolean checkPermissionsVoiceClip() {
         Timber.d("checkPermissionsVoiceClip()");
-        return checkPermissions(Manifest.permission.RECORD_AUDIO, RECORD_VOICE_CLIP);
+        return checkPermissions(RECORD_VOICE_CLIP, Manifest.permission.RECORD_AUDIO);
     }
 
     private boolean checkPermissionsCall() {
         Timber.d("checkPermissionsCall");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            return checkPermissions(Manifest.permission.CAMERA, REQUEST_CAMERA)
-                    && checkPermissions(Manifest.permission.RECORD_AUDIO, REQUEST_RECORD_AUDIO)
-                    && checkPermissions(Manifest.permission.BLUETOOTH_CONNECT, REQUEST_BT_CONNECT);
+            return checkPermissions(REQUEST_CAMERA, Manifest.permission.CAMERA)
+                    && checkPermissions(REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO)
+                    && checkPermissions(REQUEST_BT_CONNECT, Manifest.permission.BLUETOOTH_CONNECT);
         } else {
-            return checkPermissions(Manifest.permission.CAMERA, REQUEST_CAMERA)
-                    && checkPermissions(Manifest.permission.RECORD_AUDIO, REQUEST_RECORD_AUDIO);
+            return checkPermissions(REQUEST_CAMERA, Manifest.permission.CAMERA)
+                    && checkPermissions(REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO);
         }
     }
 
     private boolean checkPermissionsTakePicture() {
         Timber.d("checkPermissionsTakePicture");
-        return checkPermissions(Manifest.permission.CAMERA, REQUEST_CAMERA_TAKE_PICTURE)
-                && checkPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_WRITE_STORAGE_TAKE_PICTURE);
+        return checkPermissions(REQUEST_CAMERA_TAKE_PICTURE, Manifest.permission.CAMERA)
+                && checkPermissions(REQUEST_WRITE_STORAGE_TAKE_PICTURE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     private boolean checkPermissionsReadStorage() {
         Timber.d("checkPermissionsReadStorage");
-        return checkPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_READ_STORAGE);
+        String[] PERMISSIONS = new String[] {
+                PermissionUtils.getImagePermissionByVersion(),
+                PermissionUtils.getAudioPermissionByVersion(),
+                PermissionUtils.getVideoPermissionByVersion(),
+                PermissionUtils.getReadExternalStoragePermission()
+        };
+        return checkPermissions(REQUEST_READ_STORAGE, PERMISSIONS);
     }
 
     private boolean checkPermissionWriteStorage(int code) {
         Timber.d("checkPermissionsWriteStorage :%s", code);
-        return checkPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, code);
+        return checkPermissions(code, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     @Override
@@ -5009,6 +5016,7 @@ public class ChatActivity extends PasscodeActivity
                         MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
                         list.add(megaNodeList);
                     }
+                    PermissionUtils.checkNotificationsPermission(chatActivity);
                     nodeSaver.saveNodeLists(list, false, false, false, true);
                     break;
 
@@ -5018,6 +5026,7 @@ public class ChatActivity extends PasscodeActivity
                     break;
 
                 case R.id.chat_cab_menu_offline:
+                    PermissionUtils.checkNotificationsPermission(chatActivity);
                     finishMultiselectionMode();
                     chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom,
                             ChatActivity.this);
@@ -5360,6 +5369,7 @@ public class ChatActivity extends PasscodeActivity
     }
 
     public void downloadNodeList(MegaNodeList nodeList) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true);
     }
 
@@ -6746,6 +6756,7 @@ public class ChatActivity extends PasscodeActivity
      * @param node Node to be downloaded.
      */
     public Unit saveNodeByTap(MegaNode node) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, true, true);
         return null;
     }
@@ -8722,6 +8733,7 @@ public class ChatActivity extends PasscodeActivity
             statusDialog.dismiss();
             showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
         } else {
+            PermissionUtils.checkNotificationsPermission(this);
             Timber.d("Launch chat upload with files %s", infos.size());
             for (ShareInfo info : infos) {
                 Intent intent = new Intent(this, ChatUploadService.class);
@@ -9636,6 +9648,7 @@ public class ChatActivity extends PasscodeActivity
 
         Uri finalUri = Uri.fromFile(publicFile);
         galleryAddPic(finalUri);
+        PermissionUtils.checkNotificationsPermission(this);
         uploadPictureOrVoiceClip(publicFile.getPath());
     }
 
@@ -9832,6 +9845,7 @@ public class ChatActivity extends PasscodeActivity
 
     public void startUploadService() {
         if (!isWaitingForMoreFiles && !preservedIntents.isEmpty()) {
+            PermissionUtils.checkNotificationsPermission(this);
             for (Intent intent : preservedIntents) {
                 intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesFolder.serialize());
                 startService(intent);

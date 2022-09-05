@@ -48,6 +48,7 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VIEWER_FROM_RECETS_BUCKET
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
@@ -74,6 +75,8 @@ class RecentsBucketFragment : Fragment() {
     lateinit var megaApi: MegaApiAndroid
 
     private val viewModel by viewModels<RecentsBucketViewModel>()
+
+    var isInShareBucket: Boolean = false
 
     private val selectedBucketModel: SelectedBucketViewModel by activityViewModels()
 
@@ -116,9 +119,13 @@ class RecentsBucketFragment : Fragment() {
         }
 
         viewModel.items.observe(viewLifecycleOwner) {
+
+            isInShareBucket =
+                it[0].node?.let { it1 -> megaApi.getRootParentNode(it1).isInShare } == true
+
             callManager { activity ->
                 actionModeCallback =
-                    RecentsBucketActionModeCallback(activity, viewModel)
+                    RecentsBucketActionModeCallback(activity, viewModel, isInShareBucket)
             }
             setupListView(it)
             setupHeaderView()

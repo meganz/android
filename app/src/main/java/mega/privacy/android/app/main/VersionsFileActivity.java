@@ -77,6 +77,7 @@ import mega.privacy.android.app.main.adapters.VersionsFileAdapter;
 import mega.privacy.android.app.modalbottomsheet.VersionBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -377,6 +378,7 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
     }
 
     public void downloadNodes(List<MegaNode> nodes) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodes(nodes, false, false, false, false);
     }
 

@@ -22,6 +22,7 @@ import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.main.FileStorageActivity;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
@@ -108,6 +109,8 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
                                     showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.error_upload_qr));
                                     return;
                                 }
+
+                                PermissionUtils.checkNotificationsPermission(requireActivity());
 
                                 String text = StringResourcesUtils.getString(R.string.save_qr_cloud_drive, qrFile.getName());
 

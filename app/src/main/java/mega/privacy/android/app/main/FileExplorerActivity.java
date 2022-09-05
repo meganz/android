@@ -109,10 +109,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
-import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.components.CustomViewPager;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -129,6 +128,7 @@ import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
@@ -138,6 +138,7 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -610,6 +611,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
         LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean.class).observe(this, this::refreshViewNodes);
+        PermissionUtils.checkNotificationsPermission(this);
     }
 
     private void afterLoginAndFetch() {
@@ -1516,6 +1518,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
             return;
         }
 
+        PermissionUtils.checkNotificationsPermission(this);
+
         Intent intent = new Intent(this, ChatUploadService.class);
 
         if (notEmptyAttachedNodes) {
@@ -1710,6 +1714,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                             }
 
                             if (!withoutCollisions.isEmpty()) {
+                                PermissionUtils.checkNotificationsPermission(this);
                                 String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
                                 uploadUseCase.uploadInfos(this, infos, nameFiles, finalParentNode.getHandle())
                                         .subscribeOn(Schedulers.io())
@@ -1986,6 +1991,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                             if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
                                 showSnackbar(StringResourcesUtils.getString(R.string.general_text_error));
                             } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+                                PermissionUtils.checkNotificationsPermission(this);
                                 String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, 1, 1);
 
                                 uploadUseCase.upload(this, file, parentNode.getHandle())

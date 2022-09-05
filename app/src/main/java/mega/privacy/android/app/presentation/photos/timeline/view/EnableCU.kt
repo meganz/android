@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
-import mega.privacy.android.app.presentation.theme.AndroidTheme
+import mega.privacy.android.presentation.theme.AndroidTheme
 
 /**
  * Enable Camera Uploads View

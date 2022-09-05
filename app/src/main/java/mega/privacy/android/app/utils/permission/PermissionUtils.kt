@@ -1,7 +1,11 @@
 package mega.privacy.android.app.utils.permission
 
-import android.Manifest
-import android.annotation.TargetApi
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_MEDIA_AUDIO
+import android.Manifest.permission.READ_MEDIA_IMAGES
+import android.Manifest.permission.READ_MEDIA_VIDEO
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -11,24 +15,30 @@ import android.os.Build
 import android.provider.Settings
 import android.view.View
 import androidx.annotation.NonNull
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 import mega.privacy.android.app.utils.Util
 import timber.log.Timber
 
 /**
  * Declare singleton PermissionUtils
  */
-@TargetApi(Build.VERSION_CODES.M)
 object PermissionUtils {
     const val TYPE_REQUIRE_PERMISSION = 0
     const val TYPE_GRANTED = 1
     const val TYPE_DENIED = 2
     const val TYPE_NEVER_ASK_AGAIN = 3
+
+    /**
+     * Request code for requesting notifications permission.
+     */
+    const val REQUEST_NOTIFICATIONS_PERMISSION = 6666
 
     /**
      * Checks all given permissions have been granted.
@@ -81,6 +91,103 @@ object PermissionUtils {
             ) == PermissionChecker.PERMISSION_GRANTED
         } catch (t: RuntimeException) {
             false
+        }
+    }
+
+    /**
+     * Get read permission regarding image based on sdk version
+     *
+     * @return read image permission based on sdk version
+     */
+    @JvmStatic
+    fun getImagePermissionByVersion() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getReadImagePermission()
+    } else {
+        getReadExternalStoragePermission()
+    }
+
+    /**
+     * Get read permission regarding audio based on sdk version
+     *
+     * @return read audio permission based on sdk version
+     */
+    @JvmStatic
+    fun getAudioPermissionByVersion() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getReadAudioPermission()
+    } else {
+        getReadExternalStoragePermission()
+    }
+
+    /**
+     * Get read permission regarding video based on sdk version
+     *
+     * @return read video permission based on sdk version
+     */
+    @JvmStatic
+    fun getVideoPermissionByVersion() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getReadVideoPermission()
+    } else {
+        getReadExternalStoragePermission()
+    }
+
+    /**
+     * Get READ_EXTERNAL_STORAGE
+     *
+     * @return READ_EXTERNAL_STORAGE
+     */
+    @JvmStatic
+    fun getReadExternalStoragePermission() = READ_EXTERNAL_STORAGE
+
+    /**
+     * Get READ_MEDIA_AUDIO
+     *
+     * @return READ_MEDIA_AUDIO
+     */
+    @RequiresApi(33)
+    private fun getReadAudioPermission() = READ_MEDIA_AUDIO
+
+    /**
+     * Get READ_MEDIA_IMAGES
+     *
+     * @return READ_MEDIA_IMAGES
+     */
+    @RequiresApi(33)
+    private fun getReadImagePermission() = READ_MEDIA_IMAGES
+
+    /**
+     * Get READ_MEDIA_VIDEO
+     *
+     * @return READ_MEDIA_VIDEO
+     */
+    @RequiresApi(33)
+    private fun getReadVideoPermission() = READ_MEDIA_VIDEO
+
+    /**
+     * Gets POST_NOTIFICATIONS
+     *
+     * @return POST_NOTIFICATIONS
+     */
+    @RequiresApi(33)
+    private fun getNotificationsPermission() = POST_NOTIFICATIONS
+
+    /**
+     * Checks if should ask for notifications permission.
+     *
+     * @param activity Required Activity for the checks and launch intent.
+     */
+    @JvmStatic
+    fun checkNotificationsPermission(activity: Activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+            && !hasPermissions(activity, getNotificationsPermission())
+        ) {
+            if (shouldShowRequestPermissionRationale(activity, getNotificationsPermission())) {
+                activity.startActivity(Intent(activity,
+                    NotificationsPermissionActivity::class.java))
+            } else {
+                requestPermission(activity,
+                    REQUEST_NOTIFICATIONS_PERMISSION,
+                    getNotificationsPermission())
+            }
         }
     }
 
@@ -181,7 +288,7 @@ object PermissionUtils {
         if (context != null) {
             for (permission in permissions) {
                 // In Android 11+ WRITE_EXTERNAL_STORAGE doesn't grant any addition access so can assume it has been granted
-                if ((Build.VERSION.SDK_INT < Build.VERSION_CODES.R || permission != Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
+                if ((Build.VERSION.SDK_INT < Build.VERSION_CODES.R || permission != WRITE_EXTERNAL_STORAGE) &&
                     ContextCompat.checkSelfPermission(
                         context,
                         permission

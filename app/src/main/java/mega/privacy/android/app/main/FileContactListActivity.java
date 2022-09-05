@@ -84,6 +84,7 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaEvent;
@@ -763,6 +764,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                         }
 
                         if (!withoutCollisions.isEmpty()) {
+                            PermissionUtils.checkNotificationsPermission(this);
                             String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
 
                             uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())

@@ -175,6 +175,7 @@ android {
         qa {
             initWith debug
             debuggable true
+            matchingFallbacks = ['debug', 'release']
         }
     }
 
@@ -190,6 +191,7 @@ android {
         jvmTarget = "11"
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
+
 //    task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
 //        workingDir 'src/main/jni'
 //        commandLine './build.sh', 'all'
@@ -271,6 +273,9 @@ dependencies {
     implementation fileTree(dir: "$rootProject.projectDir/sdk/src/main/jni/ExoPlayer/", include: ['*.aar'])
     implementation project(':domain')
     implementation project(':sdk')
+    implementation project(':presentation')
+
+    qaImplementation project(':screenshot')
 
     // App dependencies
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
@@ -476,20 +481,18 @@ dependencies {
     // Live Data testing
     testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
 
-    //Showkase
-    implementation "com.airbnb.android:showkase-annotation:$showkaseVersion"
+
 
 
     //QA
-    qaImplementation "com.airbnb.android:showkase:$showkaseVersion"
-    kaptQa "com.airbnb.android:showkase-processor:$showkaseVersion"
+
     qaImplementation 'com.google.firebase:firebase-appdistribution:16.0.0-beta03'
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()
 if (taskRequests.contains("Hms")) {
     apply plugin: 'com.huawei.agconnect'
-} else if (taskRequests.contains("Gms")) {
+} else {
     apply plugin: 'com.google.gms.google-services'
 }
 

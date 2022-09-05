@@ -17,6 +17,7 @@ import timber.log.Timber
 class RecentsBucketActionModeCallback constructor(
     private val managerActivity: ManagerActivity,
     private val viewModel: RecentsBucketViewModel,
+    private val isInShareBucket: Boolean,
 ) : ActionMode.Callback {
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
@@ -24,6 +25,14 @@ class RecentsBucketActionModeCallback constructor(
         val inflater = mode!!.menuInflater
 
         inflater.inflate(R.menu.recents_bucket_action, menu)
+
+        if (isInShareBucket) {
+            menu!!.findItem(R.id.cab_menu_share_link).isVisible = false
+            menu.findItem(R.id.cab_menu_send_to_chat).isVisible = false
+            menu.findItem(R.id.cab_menu_share_out).isVisible = false
+            menu.findItem(R.id.cab_menu_move).isVisible = false
+            menu.findItem(R.id.cab_menu_trash).isVisible = false
+        }
 
         return true
     }
