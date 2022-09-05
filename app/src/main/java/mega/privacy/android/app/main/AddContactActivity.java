@@ -2542,18 +2542,22 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     String name = cursor.getString(1);
 
                     String emailAddress = null;
-                    Cursor cursore = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                    Cursor cursor2 = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
                             null,
                             ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
                             new String[]{String.valueOf(id)},
                             ContactsContract.Contacts.SORT_KEY_PRIMARY);
 
-                    if (cursore != null && cursore.moveToFirst()) {
-                        emailAddress = cursore.getString(cursore.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-                        cursore.close();
+                    if (cursor2 != null && cursor2.moveToFirst()) {
+                        try {
+                            emailAddress = cursor2.getString(cursor2.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Email.DATA));
+                        } catch (IllegalArgumentException exception) {
+                            Timber.w(exception, "Exception getting contact email");
+                        }
+                        cursor2.close();
                     }
 
-                    if (emailAddress != null && !emailAddress.isEmpty() && emailAddress.contains("@") && !emailAddress.contains("s.whatsapp.net")) {
+                    if (emailAddress != null && emailAddress.contains("@") && !emailAddress.contains("s.whatsapp.net")) {
                         contactList.add(new PhoneContactInfo(id, name, emailAddress, null));
                     }
                 }
