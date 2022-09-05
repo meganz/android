@@ -494,9 +494,6 @@ class RecentsBucketFragment : Fragment() {
         } else {
             viewModel.onNodeLongClicked(position, node)
         }
-    }
 
-    fun clearSelection() {
-        viewModel.clearSelection()
     }
 }
