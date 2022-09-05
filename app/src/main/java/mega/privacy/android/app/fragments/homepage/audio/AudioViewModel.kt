@@ -56,6 +56,11 @@ class AudioViewModel @Inject constructor(
 
     private var cancelToken: MegaCancelToken? = null
 
+    /**
+     * Sort order used in the search function
+     */
+    private var sortOrder: Int = 1
+
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate || repository.fileNodeItems.value == null) {
             viewModelScope.launch {
@@ -63,7 +68,7 @@ class AudioViewModel @Inject constructor(
                 repository.getFiles(
                     cancelToken!!,
                     MegaApiJava.FILE_TYPE_AUDIO,
-                    getCloudSortOrder()
+                    sortOrder,
                 )
             }
         } else {
@@ -121,9 +126,10 @@ class AudioViewModel @Inject constructor(
                 Timber.d("Received node update")
                 loadAudio(true)
             }
-        }
 
-        loadAudio(true)
+            sortOrder = getCloudSortOrder()
+            loadAudio(true)
+        }
     }
 
     /**
