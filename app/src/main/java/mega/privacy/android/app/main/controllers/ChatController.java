@@ -323,7 +323,6 @@ public class ChatController {
                 Timber.d("Me alter participant");
 
                 StringBuilder builder = new StringBuilder();
-                builder.append(megaChatApi.getMyFullname()).append(": ");
 
                 int privilege = message.getPrivilege();
                 Timber.d("Privilege of me: %s", privilege);
@@ -356,7 +355,6 @@ public class ChatController {
                 String fullNameTitle = getParticipantFullName(message.getHandleOfAction());
 
                 StringBuilder builder = new StringBuilder();
-                builder.append(fullNameTitle).append(": ");
 
                 String textToShow = "";
                 if (privilege != MegaChatRoom.PRIV_RM) {
@@ -400,7 +398,6 @@ public class ChatController {
             StringBuilder builder = new StringBuilder();
             String participantsNameWhoMadeTheAction = message.getHandleOfAction() == megaApi.getMyUser().getHandle() ? megaChatApi.getMyFullname() : getParticipantFullName(message.getHandleOfAction());
             String participantsNameWhosePermissionsWereChanged = message.getUserHandle() == megaApi.getMyUser().getHandle() ? megaChatApi.getMyFullname() : getParticipantFullName(message.getUserHandle());
-            builder.append(participantsNameWhoMadeTheAction).append(": ");
 
             String textToShow = "";
             switch (privilege) {
@@ -424,11 +421,10 @@ public class ChatController {
                 Timber.d("MY message ID: %s", message.getMsgId());
 
                 StringBuilder builder = new StringBuilder();
-                builder.append(megaChatApi.getMyFullname()).append(": ");
-
                 if (message.getType() == MegaChatMessage.TYPE_NORMAL) {
                     Timber.d("Message type NORMAL");
 
+                    builder.append(megaChatApi.getMyFullname()).append(": ");
                     String messageContent = "";
                     if (message.getContent() != null) {
                         messageContent = message.getContent();
@@ -479,6 +475,7 @@ public class ChatController {
                     return builder.toString();
 
                 } else if (message.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
+                    builder.append(megaChatApi.getMyFullname()).append(": ");
                     MegaChatContainsMeta meta = message.getContainsMeta();
                     if (meta != null) {
                         switch (meta.getType()) {
@@ -502,10 +499,12 @@ public class ChatController {
 
                     return "";
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_STARTED) {
+                    builder.append(megaChatApi.getMyFullname()).append(": ");
                     String textToShow = MeetingUtil.getAppropriateStringForCallStarted().toString();
                     builder.append(textToShow);
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
+                    builder.append(megaChatApi.getMyFullname()).append(": ");
                     String textToShow = "";
                     switch (message.getTermCode()) {
                         case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
@@ -539,10 +538,9 @@ public class ChatController {
 
                 String fullNameTitle = getParticipantFullName(userHandle);
                 StringBuilder builder = new StringBuilder();
-                builder.append(fullNameTitle).append(": ");
 
                 if (message.getType() == MegaChatMessage.TYPE_NORMAL) {
-
+                    builder.append(fullNameTitle).append(": ");
                     String messageContent = "";
                     if (message.getContent() != null) {
                         messageContent = message.getContent();
@@ -587,6 +585,7 @@ public class ChatController {
                     builder.append(textToShow);
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
+                    builder.append(fullNameTitle).append(": ");
                     MegaChatContainsMeta meta = message.getContainsMeta();
                     if (meta != null) {
                         switch (meta.getType()) {
@@ -609,10 +608,12 @@ public class ChatController {
                     }
                     return "";
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_STARTED) {
+                    builder.append(fullNameTitle).append(": ");
                     String textToShow = MeetingUtil.getAppropriateStringForCallStarted().toString();
                     builder.append(textToShow);
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
+                    builder.append(fullNameTitle).append(": ");
                     String textToShow = "";
                     switch(message.getTermCode()){
                         case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
