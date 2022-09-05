@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.theme
+package mega.privacy.android.screenshot
 
 import com.airbnb.android.showkase.annotation.ShowkaseRoot
 import com.airbnb.android.showkase.annotation.ShowkaseRootModule

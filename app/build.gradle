@@ -275,6 +275,8 @@ dependencies {
     implementation project(':sdk')
     implementation project(':presentation')
 
+    qaImplementation project(':screenshot')
+
     // App dependencies
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "androidx.cardview:cardview:$cardViewVersion"
@@ -480,11 +482,10 @@ dependencies {
     testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
 
 
-    implementation "com.airbnb.android:showkase-annotation:$showkaseVersion"
+
 
     //QA
-    qaImplementation "com.airbnb.android:showkase:$showkaseVersion"
-    kaptQa "com.airbnb.android:showkase-processor:$showkaseVersion"
+
     qaImplementation 'com.google.firebase:firebase-appdistribution:16.0.0-beta03'
 }
 
