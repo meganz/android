@@ -86,11 +86,9 @@ class MeetingListFragment : Fragment() {
                 }
             }
             if (items.isNullOrEmpty()) {
-                if (viewModel.isSearchQueryEmpty()) {
-                    binding.viewEmpty.isVisible = true
-                } else {
-                    binding.viewEmptySearch.root.isVisible = true
-                }
+                val searchQueryEmpty = viewModel.isSearchQueryEmpty()
+                binding.viewEmpty.isVisible = searchQueryEmpty
+                binding.viewEmptySearch.root.isVisible = !searchQueryEmpty
             } else {
                 binding.viewEmpty.isVisible = false
                 binding.viewEmptySearch.root.isVisible = false
