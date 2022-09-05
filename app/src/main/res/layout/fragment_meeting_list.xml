@@ -71,4 +71,10 @@
                 android:text="@string/new_meeting" />
         </LinearLayout>
     </ScrollView>
+
+    <include
+        android:id="@+id/view_empty_search"
+        layout="@layout/layout_empty_search"
+        android:visibility="gone"
+        tools:visibility="visible" />
 </FrameLayout>

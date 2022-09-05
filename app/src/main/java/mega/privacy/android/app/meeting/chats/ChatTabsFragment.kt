@@ -94,6 +94,7 @@ class ChatTabsFragment : Fragment() {
         binding.root.post {
             (activity as? ManagerActivity?)?.showHideBottomNavigationView(false)
             (activity as? ManagerActivity?)?.showFabButton()
+            (activity as? ManagerActivity?)?.invalidateOptionsMenu()
         }
     }
 

@@ -85,7 +85,14 @@ class MeetingListFragment : Fragment() {
                     binding.list.smoothScrollToPosition(0)
                 }
             }
-            binding.viewEmpty.isVisible = items.isNullOrEmpty()
+            if (items.isNullOrEmpty()) {
+                val searchQueryEmpty = viewModel.isSearchQueryEmpty()
+                binding.viewEmpty.isVisible = searchQueryEmpty
+                binding.viewEmptySearch.root.isVisible = !searchQueryEmpty
+            } else {
+                binding.viewEmpty.isVisible = false
+                binding.viewEmptySearch.root.isVisible = false
+            }
         }
     }
 
