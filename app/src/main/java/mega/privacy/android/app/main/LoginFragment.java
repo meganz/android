@@ -63,7 +63,6 @@ import static mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingS
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
@@ -1925,11 +1924,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                     shareInfos = (ArrayList<ShareInfo>) receivedIntent.getSerializableExtra(FileExplorerActivity.EXTRA_SHARE_INFOS);
 
                     if (shareInfos != null && shareInfos.size() > 0) {
-                        if (hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        String[] PERMISSIONS = new String[] {
+                                PermissionUtils.getImagePermissionByVersion(),
+                                PermissionUtils.getAudioPermissionByVersion(),
+                                PermissionUtils.getVideoPermissionByVersion(),
+                                PermissionUtils.getReadExternalStoragePermission()
+                        };
+                        if (hasPermissions(context, PERMISSIONS)) {
                             toSharePage();
                         } else {
                             PermissionUtils.requestPermission((LoginActivity) context,
-                                    READ_MEDIA_PERMISSION, Manifest.permission.READ_EXTERNAL_STORAGE);
+                                    READ_MEDIA_PERMISSION, PERMISSIONS);
                         }
 
                         return;

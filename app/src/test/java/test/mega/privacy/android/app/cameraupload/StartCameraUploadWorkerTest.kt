@@ -1,7 +1,10 @@
 package test.mega.privacy.android.app.cameraupload
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_MEDIA_IMAGES
+import android.Manifest.permission.READ_MEDIA_VIDEO
 import android.content.Context
+import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ForegroundInfo
@@ -34,6 +37,8 @@ class StartCameraUploadWorkerTest {
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var worker: StartCameraUploadWorker
     private lateinit var workDatabase: WorkDatabase
+
+    private lateinit var permissions: Array<String>
 
     @Before
     fun setUp() {
@@ -68,14 +73,40 @@ class StartCameraUploadWorkerTest {
             TestWrapperModule.jobUtilWrapper,
             TestWrapperModule.cameraUploadsServiceWrapper
         )
+
+        whenever(TestWrapperModule.permissionUtilWrapper.getImagePermissionByVersion()).thenReturn(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                READ_MEDIA_IMAGES
+            } else {
+                READ_EXTERNAL_STORAGE
+            }
+        )
+
+        whenever(TestWrapperModule.permissionUtilWrapper.getVideoPermissionByVersion()).thenReturn(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                READ_MEDIA_VIDEO
+            } else {
+                READ_EXTERNAL_STORAGE
+            }
+        )
+
+        permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(
+                TestWrapperModule.permissionUtilWrapper.getImagePermissionByVersion(),
+                TestWrapperModule.permissionUtilWrapper.getVideoPermissionByVersion()
+            )
+        } else {
+            arrayOf(READ_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE)
+        }
     }
 
     @Test
     fun `test that camera upload worker is started successfully if the read external permission is granted, the user is not over quota and the camera upload service is not yet started`() {
+
         whenever(
             TestWrapperModule.permissionUtilWrapper.hasPermissions(
                 context,
-                READ_EXTERNAL_STORAGE
+                *permissions
             )
         ).thenReturn(true)
         whenever(TestWrapperModule.jobUtilWrapper.isOverQuota(context)).thenReturn(false)
@@ -91,7 +122,7 @@ class StartCameraUploadWorkerTest {
         whenever(
             TestWrapperModule.permissionUtilWrapper.hasPermissions(
                 context,
-                READ_EXTERNAL_STORAGE
+                *permissions
             )
         ).thenReturn(false)
         whenever(TestWrapperModule.jobUtilWrapper.isOverQuota(context)).thenReturn(false)
@@ -107,7 +138,7 @@ class StartCameraUploadWorkerTest {
         whenever(
             TestWrapperModule.permissionUtilWrapper.hasPermissions(
                 context,
-                READ_EXTERNAL_STORAGE
+                *permissions
             )
         ).thenReturn(true)
         whenever(TestWrapperModule.jobUtilWrapper.isOverQuota(context)).thenReturn(true)
@@ -123,7 +154,7 @@ class StartCameraUploadWorkerTest {
         whenever(
             TestWrapperModule.permissionUtilWrapper.hasPermissions(
                 context,
-                READ_EXTERNAL_STORAGE
+                *permissions
             )
         ).thenReturn(true)
         whenever(TestWrapperModule.jobUtilWrapper.isOverQuota(context)).thenReturn(false)

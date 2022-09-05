@@ -65,6 +65,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
@@ -561,6 +562,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     fun saveNode(node: MegaNode) {
+        PermissionUtils.checkNotificationsPermission(this)
         nodeSaver?.saveNode(
             node,
             highPriority = false,
@@ -571,6 +573,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     fun saveOfflineNode(nodeHandle: Long) {
+        PermissionUtils.checkNotificationsPermission(this)
         nodeSaver?.saveOfflineNode(nodeHandle, true)
     }
 

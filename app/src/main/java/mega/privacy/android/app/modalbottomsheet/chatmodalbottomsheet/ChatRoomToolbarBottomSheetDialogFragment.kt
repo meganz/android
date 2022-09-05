@@ -23,6 +23,10 @@ import mega.privacy.android.app.main.megachat.data.FileGalleryItem
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.permission.PermissionUtils.getAudioPermissionByVersion
+import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
+import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternalStoragePermission
+import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 
 /**
@@ -210,9 +214,15 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 if (hasPermission) {
                     viewModel.updatePermissionsGranted(typePermission, hasPermission)
                 } else {
+                    val permissions = arrayOf(
+                        getImagePermissionByVersion(),
+                        getAudioPermissionByVersion(),
+                        getVideoPermissionByVersion(),
+                        getReadExternalStoragePermission()
+                    )
                     ActivityCompat.requestPermissions(
                         chatActivity,
-                        arrayOf(typePermission),
+                        permissions,
                         Constants.REQUEST_READ_STORAGE
                     )
                 }

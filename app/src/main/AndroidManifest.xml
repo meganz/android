@@ -38,7 +38,8 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -65,6 +66,12 @@
     in order to use any APIs for setting exact alarms -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <!-- For apps targeting Android 13 (API level 33) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <queries>
 
@@ -637,6 +644,10 @@
         <activity
             android:name="mega.privacy.android.app.namecollision.NameCollisionActivity"
             android:label="@string/title_duplicated_items"
+            android:launchMode="singleTop"/>
+
+        <activity
+            android:name="mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity"
             android:launchMode="singleTop"/>
 
         <activity

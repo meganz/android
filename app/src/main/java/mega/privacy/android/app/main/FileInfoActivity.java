@@ -170,6 +170,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -1058,6 +1059,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 break;
             }
             case R.id.cab_menu_file_info_download: {
+                PermissionUtils.checkNotificationsPermission(this);
                 nodeSaver.saveNode(node, false, false, false, false);
                 break;
             }

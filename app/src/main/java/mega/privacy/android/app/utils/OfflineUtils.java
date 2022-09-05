@@ -54,6 +54,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -95,6 +96,8 @@ public class OfflineUtils {
             Timber.d("Is File");
             dlFiles.put(node, destination.getAbsolutePath());
         }
+
+        PermissionUtils.checkNotificationsPermission(activity);
 
         for (MegaNode document : dlFiles.keySet()) {
 

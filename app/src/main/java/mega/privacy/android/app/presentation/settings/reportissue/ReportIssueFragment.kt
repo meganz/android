@@ -66,7 +66,7 @@ class ReportIssueFragment : Fragment() {
         val valid = viewModel.state.value.canSubmit
         menu.findItem(R.id.menu_report_issue_submit)?.let {
             it.isEnabled = valid
-            it.icon.alpha = if (valid) 255 else 125
+            it.icon?.alpha = if (valid) 255 else 125
         }
     }
 

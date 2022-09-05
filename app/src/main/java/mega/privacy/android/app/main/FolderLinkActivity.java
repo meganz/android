@@ -119,6 +119,7 @@ import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFrag
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -645,6 +646,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
     }
 
     public void downloadNodes(List<MegaNode> nodes) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodes(nodes, false, true, false, false);
     }
 

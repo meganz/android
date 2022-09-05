@@ -1,6 +1,5 @@
 package mega.privacy.android.app.jobservices
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
@@ -27,7 +26,7 @@ class StartCameraUploadWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val permissionUtilWrapper: PermissionUtilWrapper,
     private val jobUtilWrapper: JobUtilWrapper,
-    private val cameraUploadsServiceWrapper: CameraUploadsServiceWrapper
+    private val cameraUploadsServiceWrapper: CameraUploadsServiceWrapper,
 ) :
     Worker(appContext, workerParams) {
 
@@ -37,11 +36,11 @@ class StartCameraUploadWorker @AssistedInject constructor(
         val ignoreAttributes = inputData.getBoolean(SHOULD_IGNORE_ATTRIBUTES, false)
         return try {
             val isOverQuota = jobUtilWrapper.isOverQuota(appContext)
-            val hasReadPermission =
-                permissionUtilWrapper.hasPermissions(
-                    appContext,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                )
+            val permissions = arrayOf(
+                permissionUtilWrapper.getImagePermissionByVersion(),
+                permissionUtilWrapper.getVideoPermissionByVersion()
+            )
+            val hasReadPermission = permissionUtilWrapper.hasPermissions(appContext, *permissions)
             Timber.d(
                 "isOverQuota: " + isOverQuota +
                         ", hasStoragePermission: " + hasReadPermission +
