@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.settings.startSceen.util.StartScree
 import mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.HOME_BNV
 import mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.SHARED_ITEMS_BNV
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
+import mega.privacy.android.domain.entity.preference.StartScreen
 
 /**
  * Settings fragment to choose the preferred start screen.
@@ -47,11 +48,11 @@ class StartScreenSettingsFragment : Fragment() {
     private fun setupView() {
         hideChecks()
 
-        binding.cloudLayout.setOnClickListener { viewModel.newScreenClicked(CLOUD_DRIVE_BNV) }
-        binding.cuLayout.setOnClickListener { viewModel.newScreenClicked(PHOTOS_BNV) }
-        binding.homeLayout.setOnClickListener { viewModel.newScreenClicked(HOME_BNV) }
-        binding.chatLayout.setOnClickListener { viewModel.newScreenClicked(CHAT_BNV) }
-        binding.sharedLayout.setOnClickListener { viewModel.newScreenClicked(SHARED_ITEMS_BNV) }
+        binding.cloudLayout.setOnClickListener { viewModel.newScreenClicked(StartScreen.CloudDrive) }
+        binding.cuLayout.setOnClickListener { viewModel.newScreenClicked(StartScreen.Photos) }
+        binding.homeLayout.setOnClickListener { viewModel.newScreenClicked(StartScreen.Home) }
+        binding.chatLayout.setOnClickListener { viewModel.newScreenClicked(StartScreen.Chat) }
+        binding.sharedLayout.setOnClickListener { viewModel.newScreenClicked(StartScreen.SharedItems) }
     }
 
     private fun setupObservers() {
@@ -71,15 +72,16 @@ class StartScreenSettingsFragment : Fragment() {
      *
      * @param screenChecked New screen checked.
      */
-    private fun setScreenChecked(screenChecked: Int) {
+    private fun setScreenChecked(screenChecked: StartScreen) {
         hideChecks()
 
         when (screenChecked) {
-            CLOUD_DRIVE_BNV -> binding.cloudCheck.isVisible = true
-            PHOTOS_BNV -> binding.cuCheck.isVisible = true
-            HOME_BNV -> binding.homeCheck.isVisible = true
-            CHAT_BNV -> binding.chatCheck.isVisible = true
-            SHARED_ITEMS_BNV -> binding.sharedCheck.isVisible = true
+            StartScreen.CloudDrive -> binding.cloudCheck.isVisible = true
+            StartScreen.Photos -> binding.cuCheck.isVisible = true
+            StartScreen.Home -> binding.homeCheck.isVisible = true
+            StartScreen.Chat -> binding.chatCheck.isVisible = true
+            StartScreen.SharedItems -> binding.sharedCheck.isVisible = true
+            StartScreen.None -> {}
         }
     }
 }
