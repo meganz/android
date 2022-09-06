@@ -407,7 +407,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         listView.addItemDecoration(new ChatDividerItemDecoration(context));
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
-        listView.setHasFixedSize(true);
         listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
         listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

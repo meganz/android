@@ -166,7 +166,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             addLayout.setVisibility(View.VISIBLE);
             addedLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
             addedList.setLayoutManager(addedLayoutManager);
-            addedList.setHasFixedSize(true);
             addedList.setItemAnimator(new DefaultItemAnimator());
             addedList.setClipToPadding(false);
 
@@ -184,7 +183,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
-        listView.setHasFixedSize(true);
         listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
         listView.setClipToPadding(false);
         listView.setPadding(0, scaleHeightPx(8, outMetrics), 0, 0);
