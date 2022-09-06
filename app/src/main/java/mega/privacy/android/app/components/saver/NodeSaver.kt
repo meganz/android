@@ -37,6 +37,7 @@ import mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE
 import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri
+import mega.privacy.android.app.utils.FileUtil.getDownloadLocationForPreviewingFiles
 import mega.privacy.android.app.utils.FileUtil.getTotalSize
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
@@ -299,7 +300,7 @@ class NodeSaver(
                     return@Callable
                 }
 
-                checkSizeBeforeDownload(parentPath)
+                checkSizeBeforeDownload(getCorrectDownloadPath(parentPath))
             })
             .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { logErr("NodeSaver saveNode") })
@@ -410,7 +411,7 @@ class NodeSaver(
             Completable
                 .fromCallable {
                     storeDownloadLocationIfNeeded(parentPath)
-                    checkSizeBeforeDownload(parentPath)
+                    checkSizeBeforeDownload(getCorrectDownloadPath(parentPath))
                 }
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(onError = { logErr("NodeSaver handleActivityResult") })
@@ -452,7 +453,7 @@ class NodeSaver(
                 return false
             }
 
-            Completable.fromCallable { checkSizeBeforeDownload(parentPath) }
+            Completable.fromCallable { checkSizeBeforeDownload(getCorrectDownloadPath(parentPath)) }
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(onError = { logErr("NodeSaver handleActivityResult") })
                 .addTo(compositeDisposable)
@@ -539,7 +540,7 @@ class NodeSaver(
         if (Util.askMe()) {
             requestLocalFolder(null, activityLauncher)
         } else {
-            checkSizeBeforeDownload(getDownloadLocation())
+            checkSizeBeforeDownload(getCorrectDownloadPath())
         }
     }
 
@@ -613,12 +614,12 @@ class NodeSaver(
 
     private fun checkInstalledAppBeforeDownload(parentPath: String) {
         if (TextUtils.equals(dbHandler.attributes?.askNoAppDownload, false.toString())) {
-            download(parentPath)
+            download(getCorrectDownloadPath(parentPath))
             return
         }
 
         if (!saving.hasUnsupportedFile(app)) {
-            download(parentPath)
+            download(getCorrectDownloadPath(parentPath))
             return
         }
 
@@ -631,8 +632,20 @@ class NodeSaver(
                     .subscribeBy(onError = { logErr("NodeSaver checkInstalledAppBeforeDownload") })
                     .addTo(compositeDisposable)
             }
+            download(getCorrectDownloadPath(parentPath))
+        }
+    }
 
-            download(parentPath)
+    /**
+     * Returns correct download path based on tap
+     *
+     * @return download path string
+     */
+    private fun getCorrectDownloadPath(parentPath: String? = null): String {
+        return if (saving.isDownloadByTap()) {
+            getDownloadLocationForPreviewingFiles().absolutePath
+        } else {
+            parentPath ?: getDownloadLocation()
         }
     }
 

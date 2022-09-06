@@ -434,10 +434,11 @@ public class FileUtil {
         } catch (SecurityException e) {
             // Workaround: devices with system below Android 10 cannot execute the query without storage permission.
             Timber.e(e, "Haven't granted the permission.");
-            return null;
         }
 
-        return null;
+        File file = new File(getDownloadLocationForPreviewingFiles() + "/" + node.getName());
+
+        return isFileAvailable(file) ? file.getAbsolutePath() : null;
     }
 
     /**
@@ -561,6 +562,17 @@ public class FileUtil {
         }
 
         return extension != null;
+    }
+
+    /**
+     * Download location for previewing files
+     *
+     * @return File
+     */
+    public static File getDownloadLocationForPreviewingFiles() {
+        Context context = MegaApplication.getInstance();
+        File downloadsDir = context.getExternalFilesDir(DOWNLOAD_DIR);
+        return downloadsDir != null ? downloadsDir : context.getFilesDir();
     }
 
     public static String getDownloadLocation() {

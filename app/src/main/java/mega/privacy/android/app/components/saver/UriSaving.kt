@@ -67,4 +67,6 @@ class UriSaving(
 
         return AutoPlayInfo.NO_AUTO_PLAY
     }
+
+    override fun isDownloadByTap(): Boolean = false
 }
