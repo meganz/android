@@ -39,7 +39,7 @@ class AppModule {
             // PackageManager.PackageInfoFlags can only be used for devices
             // running Android 13 and above. For devices running below Android 13,
             // the normal getPackageInfo() is used
-            packageInfo = if (Build.VERSION.SDK_INT >= 33) {
+            packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 context.packageManager.getPackageInfo(context.packageName,
                     PackageManager.PackageInfoFlags.of(0))
             } else {
@@ -65,7 +65,7 @@ class AppModule {
             // PackageManager.PackageInfoFlags can only be used for devices
             // running Android 13 and above. For devices running below Android 13,
             // the normal getPackageInfo() is used
-            packageInfo = if (Build.VERSION.SDK_INT >= 33) {
+            packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 context.packageManager.getPackageInfo(context.packageName,
                     PackageManager.PackageInfoFlags.of(0))
             } else {
