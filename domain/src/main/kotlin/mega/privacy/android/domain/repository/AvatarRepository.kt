@@ -11,4 +11,9 @@ interface AvatarRepository {
      * get avatar file
      */
     fun monitorMyAvatarFile(): Flow<File?>
+
+    /**
+     * Get color avatar
+     */
+    suspend fun getMyAvatarColor(): Int
 }

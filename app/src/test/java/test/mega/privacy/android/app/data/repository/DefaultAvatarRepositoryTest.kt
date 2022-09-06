@@ -10,6 +10,7 @@ import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.data.repository.DefaultAvatarRepository
+import mega.privacy.android.app.utils.wrapper.AvatarWrapper
 import nz.mega.sdk.MegaUser
 import org.junit.Before
 import org.junit.Test
@@ -31,6 +32,7 @@ class DefaultAvatarRepositoryTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val cacheFolderGateway = mock<CacheFolderGateway>()
+    private val avatarWrapper = mock<AvatarWrapper>()
     private val currentUser = mock<MegaUser> {
         on { it.isOwnChange }.thenReturn(0)
         on { it.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) }.thenReturn(true)
@@ -50,6 +52,7 @@ class DefaultAvatarRepositoryTest {
         underTest = DefaultAvatarRepository(
             megaApiGateway = megaApiGateway,
             cacheFolderGateway = cacheFolderGateway,
+            avatarWrapper = avatarWrapper,
             sharingScope = TestScope(),
             ioDispatcher = UnconfinedTestDispatcher()
         )
@@ -65,6 +68,7 @@ class DefaultAvatarRepositoryTest {
             underTest = DefaultAvatarRepository(
                 megaApiGateway = megaApiGateway,
                 cacheFolderGateway = cacheFolderGateway,
+                avatarWrapper = avatarWrapper,
                 sharingScope = TestScope(),
                 ioDispatcher = UnconfinedTestDispatcher()
             )
@@ -85,6 +89,7 @@ class DefaultAvatarRepositoryTest {
             underTest = DefaultAvatarRepository(
                 megaApiGateway = megaApiGateway,
                 cacheFolderGateway = cacheFolderGateway,
+                avatarWrapper = avatarWrapper,
                 sharingScope = TestScope(),
                 ioDispatcher = UnconfinedTestDispatcher()
             )
@@ -101,6 +106,7 @@ class DefaultAvatarRepositoryTest {
             underTest = DefaultAvatarRepository(
                 megaApiGateway = megaApiGateway,
                 cacheFolderGateway = cacheFolderGateway,
+                avatarWrapper = avatarWrapper,
                 sharingScope = TestScope(),
                 ioDispatcher = UnconfinedTestDispatcher()
             )
