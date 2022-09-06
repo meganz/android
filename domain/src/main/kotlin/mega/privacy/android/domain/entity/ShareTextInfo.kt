@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.entity
 
 /**
- * Data class containing info about a text to import to MEGA.
+ * Data class containing info about a text to import to MEGA as file or as chat message.
  *
  * @property isUrl          True if the text to share is an Url.
  * @property subject        Subject of the text to share if any, empty otherwise.

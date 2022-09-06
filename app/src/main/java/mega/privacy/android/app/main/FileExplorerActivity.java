@@ -691,7 +691,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 importFileF = true;
                 action = intent.getAction();
 
-                cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
+                cloudDriveFrameLayout = findViewById(R.id.cloudDriveFrameLayout);
 
                 viewModel.ownFilePrepareTask(this, getIntent());
                 chooseFragment(IMPORT_FRAGMENT);
@@ -708,6 +708,11 @@ public class FileExplorerActivity extends TransfersManagementActivity
         }
     }
 
+    /**
+     * Updates the UI for showing tabs and removes the chat one if required.
+     *
+     * @param removeChatTab True if should remove the chat tab, false otherwise.
+     */
     private void updateAdapterExplorer(boolean removeChatTab) {
         tabLayoutExplorer.setVisibility(View.VISIBLE);
         viewPagerExplorer.setVisibility(View.VISIBLE);
@@ -725,9 +730,15 @@ public class FileExplorerActivity extends TransfersManagementActivity
         }
     }
 
+    /**
+     * Updates the UI for showing tabs or only a fragment.
+     * If it has to show tabs, removes the chat one if required.
+     *
+     * @param tab           SHOW_TABS if should show tabs, else the fragment to show.
+     * @param removeChatTab True if should remove the chat tab, false otherwise.
+     */
     private void setView(int tab, boolean removeChatTab) {
         Timber.d("setView %s", tab);
-        tabShown = SHOW_TABS;
 
         switch (tab) {
             case CLOUD_TAB: {
@@ -746,6 +757,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 break;
             }
             case SHOW_TABS: {
+                tabShown = SHOW_TABS;
+
                 if (mTabsAdapterExplorer == null || importFileF) {
                     updateAdapterExplorer(removeChatTab);
                 }

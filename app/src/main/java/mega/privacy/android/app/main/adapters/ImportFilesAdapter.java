@@ -137,6 +137,13 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return new File(childThumbDir, file.getTitle() + JPG_EXTENSION);
     }
 
+    /**
+     * Constructor for importing files.
+     *
+     * @param context Context.
+     * @param files   List of ShareInfo containing all the info to show the files list.
+     * @param names   Map containing the original name of the files and the edited one.
+     */
     public ImportFilesAdapter(Context context, List<ShareInfo> files, HashMap<String, String> names) {
         this.context = context;
         this.filesAll = files;
@@ -155,6 +162,14 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
+    /**
+     * Constructor for importing text as plain text or a link.
+     *
+     * @param context Context.
+     * @param info    ShareTextInfo containing all the info to share the text as file or chat message.
+     * @param names   Map containing the subject of the shared text as name of the file or
+     *                the message to share and edited value.
+     */
     public ImportFilesAdapter(Context context, ShareTextInfo info, HashMap<String, String> names) {
         this.context = context;
         this.textInfo = info;
