@@ -10,8 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +36,7 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.ImportFilesFragment;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.domain.entity.ShareTextInfo;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static android.view.View.GONE;
@@ -60,8 +59,6 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public static final int ITEM_TYPE_BOTTOM = 2;
 
     Context context;
-    Object fragment;
-    DisplayMetrics outMetrics;
 
     MegaApiAndroid megaApi;
 
@@ -69,6 +66,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     List<ShareInfo> filesAll;
     List<ShareInfo> filesPartial = new ArrayList<>();
     HashMap<String, String> names;
+    private ShareTextInfo textInfo;
 
     private boolean areItemsVisible = false;
 
@@ -139,15 +137,10 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return new File(childThumbDir, file.getTitle() + JPG_EXTENSION);
     }
 
-    public ImportFilesAdapter(Context context, Object fragment, List<ShareInfo> files, HashMap<String, String> names) {
+    public ImportFilesAdapter(Context context, List<ShareInfo> files, HashMap<String, String> names) {
         this.context = context;
-        this.fragment = fragment;
         this.filesAll = files;
         this.names = names;
-
-        Display display = ((FileExplorerActivity) context).getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
 
         this.files = files;
         if (files.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING) {
@@ -162,15 +155,26 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
+    public ImportFilesAdapter(Context context, ShareTextInfo info, HashMap<String, String> names) {
+        this.context = context;
+        this.textInfo = info;
+        this.names = names;
+    }
+
     /**
      * Get the size of the content list
      *
      * @return the size of the list
      */
     public int getContentItemCount(){
+        if (textInfo != null) {
+            return 1;
+        }
+
         if (files == null) {
             return 0;
         }
+
         return files.size();
     }
 
@@ -229,8 +233,8 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof BottomViewHolder) {
-            ((BottomViewHolder)holder).showMore.setVisibility(filesAll.size() <= MAX_VISIBLE_ITEMS_AT_BEGINNING
-                    ? GONE : VISIBLE);
+            boolean showMoreVisible = textInfo == null && filesAll.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING;
+            ((BottomViewHolder)holder).showMore.setVisibility(showMoreVisible ? VISIBLE : GONE);
             ((BottomViewHolder)holder).showMore.setOnClickListener(show->{
                 areItemsVisible = !areItemsVisible;
 
@@ -248,18 +252,66 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             ((BottomViewHolder) holder).chatButton.setOnClickListener(l ->
                     onImportFilesAdapterFooterListener.onClickChatButton());
         } else {
-            ShareInfo file = (ShareInfo) getItem(position);
             ((ViewHolderImportFiles) holder).currentPosition = holder.getBindingAdapterPosition();
-            ((ViewHolderImportFiles) holder).name.setText(names.get(file.getTitle()));
+            String fileName;
+
+            if (textInfo != null) {
+                fileName = textInfo.getSubject();
+
+                ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
+                int icon = textInfo.isUrl() ? R.drawable.ic_url_list : typeForName(fileName).getIconResourceId();
+                ((ViewHolderImportFiles) holder).thumbnail.setImageResource(icon);
+            } else {
+                ShareInfo file = (ShareInfo) getItem(position);
+                fileName = file.getTitle();
+
+                Uri uri = null;
+
+                if (typeForName(file.getTitle()).isImage()
+                        || typeForName(file.getTitle()).isVideo()
+                        || typeForName(file.getTitle()).isVideoReproducible()) {
+                    File thumb = getThumbnail(file);
+
+                    if (thumb.exists()) {
+                        uri = Uri.parse(thumb.getAbsolutePath());
+
+                        if (uri != null) {
+                            ((ViewHolderImportFiles) holder).thumbnail.setImageURI(Uri.fromFile(thumb));
+                        }
+                    } else {
+                        new ThumbnailsTask().execute(file, holder);
+                    }
+                }
+
+                if (uri == null) {
+                    ((ViewHolderImportFiles) holder).thumbnail.setImageResource(typeForName(file.getTitle()).getIconResourceId());
+                }
+
+                if (files.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING) {
+                    if (position == getItemCount() - 2 ) {
+                        ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
+                    } else {
+                        ((ViewHolderImportFiles) holder).separator.setVisibility(VISIBLE);
+                    }
+                } else {
+                    if (getItemCount() == 2){
+                        ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
+                    } else if (filesAll.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING && position == LATEST_VISIBLE_ITEM_POSITION_AT_BEGINNING){
+                        ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
+                    } else {
+                        ((ViewHolderImportFiles) holder).separator.setVisibility(VISIBLE);
+                    }
+                }
+            }
+
+            ((ViewHolderImportFiles) holder).name.setText(names.get(fileName));
             ((ViewHolderImportFiles) holder).name.setOnFocusChangeListener((v1, hasFocus) -> {
-                ((ViewHolderImportFiles) holder).editButton.setVisibility(hasFocus ? GONE : VISIBLE);
+                        ((ViewHolderImportFiles) holder).editButton.setVisibility(hasFocus ? GONE : VISIBLE);
 
                         if (!hasFocus) {
-                            String name = file.getTitle();
-                            String newName = ((ViewHolderImportFiles) holder).name.getText() != null
-                                    ? ((ViewHolderImportFiles) holder).name.getText().toString() : null;
-
-                            names.put(name, newName);
+                            Editable text = ((ViewHolderImportFiles) holder).name.getText();
+                            String newName = text != null ? text.toString() : null;
+                            names.put(fileName, newName);
                             ((FileExplorerActivity) context).setNameFiles(names);
                             updateNameLayout(((ViewHolderImportFiles) holder).nameLayout, ((ViewHolderImportFiles) holder).name);
                         } else {
@@ -271,17 +323,15 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             ((ViewHolderImportFiles) holder).name.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
                 }
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 }
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    ((ViewHolderImportFiles) holder).nameLayout.setErrorEnabled(false);
+                    updateNameLayout(((ViewHolderImportFiles) holder).nameLayout, ((ViewHolderImportFiles) holder).name);
                 }
             });
 
@@ -297,46 +347,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             });
 
             updateNameLayout(((ViewHolderImportFiles) holder).nameLayout, ((ViewHolderImportFiles) holder).name);
-
             ((ViewHolderImportFiles) holder).thumbnail.setVisibility(VISIBLE);
-
-            Uri uri = null;
-
-            if (typeForName(file.getTitle()).isImage()
-                    || typeForName(file.getTitle()).isVideo()
-                    || typeForName(file.getTitle()).isVideoReproducible()) {
-                File thumb = getThumbnail(file);
-
-                if (thumb.exists()) {
-                    uri = Uri.parse(thumb.getAbsolutePath());
-
-                    if (uri != null) {
-                        ((ViewHolderImportFiles) holder).thumbnail.setImageURI(Uri.fromFile(thumb));
-                    }
-                } else {
-                    new ThumbnailsTask().execute(file, holder);
-                }
-            }
-
-            if (uri == null) {
-                ((ViewHolderImportFiles) holder).thumbnail.setImageResource(typeForName(file.getTitle()).getIconResourceId());
-            }
-
-            if (files.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING) {
-                if (position == getItemCount() - 2 ) {
-                    ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
-                } else {
-                    ((ViewHolderImportFiles) holder).separator.setVisibility(VISIBLE);
-                }
-            } else {
-                if (getItemCount() == 2){
-                    ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
-                } else if (filesAll.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING && position == LATEST_VISIBLE_ITEM_POSITION_AT_BEGINNING){
-                    ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
-                } else {
-                    ((ViewHolderImportFiles) holder).separator.setVisibility(VISIBLE);
-                }
-            }
         }
     }
 
@@ -384,8 +395,9 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         int mBottomCount = 1;
 
         if (files == null) {
-            return mBottomCount;
+            return textInfo!= null ? mBottomCount + 1 : mBottomCount;
         }
+
         return files.size() + mBottomCount;
     }
 
