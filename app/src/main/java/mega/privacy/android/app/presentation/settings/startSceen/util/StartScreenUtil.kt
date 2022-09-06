@@ -8,18 +8,25 @@ import mega.privacy.android.app.utils.SharedPreferenceConstants.DO_NOT_ALERT_ABO
 import mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN
 import mega.privacy.android.app.utils.SharedPreferenceConstants.START_SCREEN_LOGIN_TIMESTAMP
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
+import mega.privacy.android.domain.entity.preference.StartScreen
 
 /**
  * Class storing util methods for the start screen setting.
  */
 object StartScreenUtil {
 
-    const val CLOUD_DRIVE_BNV = 0
-    const val PHOTOS_BNV = 1
-    const val HOME_BNV = 2
-    const val CHAT_BNV = 3
-    const val SHARED_ITEMS_BNV = 4
-    const val NO_BNV = 5
+    @JvmField
+    val CLOUD_DRIVE_BNV = StartScreen.CloudDrive.id
+    @JvmField
+    val PHOTOS_BNV = StartScreen.Photos.id
+    @JvmField
+    val HOME_BNV = StartScreen.Home.id
+    @JvmField
+    val CHAT_BNV = StartScreen.Chat.id
+    @JvmField
+    val SHARED_ITEMS_BNV = StartScreen.SharedItems.id
+    @JvmField
+    val NO_BNV = StartScreen.None.id
 
     private const val TIME_TO_SHOW_START_SCREEN_DIALOG = 604800000 //1 week in milliseconds
 
