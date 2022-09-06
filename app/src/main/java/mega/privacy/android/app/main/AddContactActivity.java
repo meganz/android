@@ -1691,7 +1691,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerViewList = (RecyclerView) findViewById(R.id.add_contact_list);
         recyclerViewList.setClipToPadding(false);
-        recyclerViewList.setHasFixedSize(true);
         recyclerViewList.addOnItemTouchListener(this);
         recyclerViewList.setItemAnimator(new DefaultItemAnimator());
         fastScroller.setRecyclerView(recyclerViewList);
@@ -1772,7 +1771,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         newGroupHeaderList = (TextView) findViewById(R.id.new_group_text_header_list);
         newGroupRecyclerView = (RecyclerView) findViewById(R.id.new_group_add_contact_list);
         newGroupRecyclerView.setClipToPadding(false);
-        newGroupRecyclerView.setHasFixedSize(true);
         newGroupRecyclerView.addOnItemTouchListener(this);
         newGroupRecyclerView.setItemAnimator(new DefaultItemAnimator());
         newGrouplinearLayoutManager = new LinearLayoutManager(this);

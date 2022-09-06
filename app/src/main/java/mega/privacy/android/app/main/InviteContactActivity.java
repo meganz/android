@@ -249,7 +249,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             return false;
         });
         recyclerViewList.setClipToPadding(false);
-        recyclerViewList.setHasFixedSize(true);
         recyclerViewList.setItemAnimator(new DefaultItemAnimator());
         recyclerViewList.setLayoutManager(linearLayoutManager);
         recyclerViewList.addItemDecoration(new ContactsDividerDecoration(this));
