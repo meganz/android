@@ -7,9 +7,12 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.mapper.TransferEventMapper
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.domain.entity.TransfersSizeInfo
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.repository.TransferRepository as DomainTransferRepository
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import javax.inject.Inject
@@ -25,7 +28,8 @@ class DefaultTransfersRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val dbH: DatabaseHandler,
-) : TransfersRepository {
+    private val transferEventMapper: TransferEventMapper,
+) : TransfersRepository, DomainTransferRepository {
     private val transferMap: MutableMap<Int, MegaTransfer> = hashMapOf()
 
     override suspend fun getUploadTransfers(): List<MegaTransfer> = withContext(ioDispatcher) {
@@ -107,4 +111,7 @@ class DefaultTransfersRepository @Inject constructor(
                 totalSizeTransferred = totalTransferred
             )
         }
+
+    override fun monitorTransferEvents(): Flow<TransferEvent> =
+        megaApiGateway.globalTransfer.map { event -> transferEventMapper(event) }
 }

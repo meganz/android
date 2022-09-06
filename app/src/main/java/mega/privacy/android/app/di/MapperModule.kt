@@ -17,7 +17,9 @@ import mega.privacy.android.app.data.mapper.MimeTypeMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.mapper.ImageMapper
+import mega.privacy.android.app.data.mapper.MegaExceptionMapper
 import mega.privacy.android.app.data.mapper.NodeUpdateMapper
+import mega.privacy.android.app.data.mapper.TransferEventMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.mapper.getFileTypeInfo
 import mega.privacy.android.app.data.mapper.getMimeType
@@ -38,6 +40,8 @@ import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.toRepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.toRepeatToggleModeMapper
 import mega.privacy.android.app.data.mapper.toImage
+import mega.privacy.android.app.data.mapper.toMegaExceptionModel
+import mega.privacy.android.app.data.mapper.toTransferEventModel
 import mega.privacy.android.app.data.mapper.toVideo
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.presentation.mapper.toFavourite
@@ -108,6 +112,23 @@ class MapperModule {
      */
     @Provides
     fun provideMegaTransferMapper(): MegaTransferMapper = ::toTransferModel
+
+    /**
+     * Provide mega exception mapper
+     */
+    @Provides
+    fun provideMegaExceptionMapper(): MegaExceptionMapper = ::toMegaExceptionModel
+
+    /**
+     * Provide transfer event mapper
+     */
+    @Provides
+    fun provideTransferEventMapper(
+        exceptionMapper: MegaExceptionMapper,
+        transferMapper: MegaTransferMapper,
+    ): TransferEventMapper = { event ->
+        toTransferEventModel(event, transferMapper, exceptionMapper)
+    }
 
     @Provides
     fun provideImagesMapper(): ImageMapper = ::toImage

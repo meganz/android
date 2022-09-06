@@ -139,6 +139,12 @@
             android:id="@+id/empty_view"
             android:layout_below="@+id/linear_layout_add"/>
 
+        <include layout="@layout/layout_empty_search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/empty_view_search"
+            android:layout_below="@+id/linear_layout_add"/>
+
         <TextView
             android:id="@+id/empty_text_chat_recent_invite"
             android:layout_width="match_parent"

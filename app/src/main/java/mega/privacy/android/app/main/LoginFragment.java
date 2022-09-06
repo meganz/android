@@ -9,7 +9,7 @@ import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -63,7 +63,6 @@ import static mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingS
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
@@ -1925,11 +1924,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                     shareInfos = (ArrayList<ShareInfo>) receivedIntent.getSerializableExtra(FileExplorerActivity.EXTRA_SHARE_INFOS);
 
                     if (shareInfos != null && shareInfos.size() > 0) {
-                        if (hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        String[] PERMISSIONS = new String[] {
+                                PermissionUtils.getImagePermissionByVersion(),
+                                PermissionUtils.getAudioPermissionByVersion(),
+                                PermissionUtils.getVideoPermissionByVersion(),
+                                PermissionUtils.getReadExternalStoragePermission()
+                        };
+                        if (hasPermissions(context, PERMISSIONS)) {
                             toSharePage();
                         } else {
                             PermissionUtils.requestPermission((LoginActivity) context,
-                                    READ_MEDIA_PERMISSION, Manifest.permission.READ_EXTERNAL_STORAGE);
+                                    READ_MEDIA_PERMISSION, PERMISSIONS);
                         }
 
                         return;

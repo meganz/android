@@ -8,10 +8,9 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.airbnb.android.showkase.models.Showkase
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.theme.getBrowserIntent
+import mega.privacy.android.screenshot.navigateToShowkase
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import java.io.File
 
@@ -32,7 +31,7 @@ class QASettingsFragment : PreferenceFragmentCompat() {
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         return when (preference.key) {
             composeBrowserPreferenceKey -> {
-                startActivity(Showkase.getBrowserIntent(requireContext()))
+                activity?.navigateToShowkase()
                 true
             }
             checkForUpdatesPreferenceKey -> {

@@ -6,7 +6,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +31,7 @@ fun MegaTextField(
             Text(text = label)
         },
         colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = MaterialTheme.colors.primarySurface,
+            backgroundColor = MaterialTheme.colors.surface,
             unfocusedIndicatorColor = grey_alpha_012,
             textColor = MaterialTheme.colors.onSurface,
             cursorColor = MaterialTheme.colors.secondary,

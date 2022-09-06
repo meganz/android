@@ -1,5 +1,6 @@
 package mega.privacy.android.app.data.repository
 
+import android.graphics.Color
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,7 +15,9 @@ import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.wrapper.AvatarWrapper
 import mega.privacy.android.domain.repository.AvatarRepository
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
@@ -32,6 +35,7 @@ import javax.inject.Inject
 class DefaultAvatarRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val cacheFolderGateway: CacheFolderGateway,
+    private val avatarWrapper: AvatarWrapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AvatarRepository {
@@ -62,5 +66,19 @@ class DefaultAvatarRepository @Inject constructor(
             cacheFolderGateway.buildAvatarFile(user.email + FileUtil.JPG_EXTENSION) ?: return null
         megaApiGateway.getUserAvatar(user, avatarFile.absolutePath)
         return avatarFile
+    }
+
+    override suspend fun getMyAvatarColor(): Int {
+        val user = megaApiGateway.getLoggedInUser() ?: return getColor(null)
+        return getColor(megaApiGateway.getUserAvatarColor(user))
+    }
+
+    override suspend fun getMyAvatarFile(): File? =
+        cacheFolderGateway.buildAvatarFile(megaApiGateway.accountEmail + FileUtil.JPG_EXTENSION)
+
+    private fun getColor(color: String?): Int {
+        return if (color == null) {
+            avatarWrapper.getSpecificAvatarColor(Constants.AVATAR_PRIMARY_COLOR)
+        } else Color.parseColor(color)
     }
 }

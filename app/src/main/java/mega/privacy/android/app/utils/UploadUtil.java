@@ -13,6 +13,7 @@ import java.io.File;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import timber.log.Timber;
 
 
@@ -49,6 +50,8 @@ public class UploadUtil {
         activity.startActivityForResult(Intent.createChooser(new Intent(Intent.ACTION_OPEN_DOCUMENT)
                 .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                 .setType("*/*"), null), Constants.REQUEST_CODE_GET_FILES);
+
+        PermissionUtils.checkNotificationsPermission(activity);
     }
 
     /**
@@ -59,6 +62,7 @@ public class UploadUtil {
     public static void chooseFolder(Activity activity) {
         activity.startActivityForResult(Intent.createChooser(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), null), Constants.REQUEST_CODE_GET_FOLDER);
+        PermissionUtils.checkNotificationsPermission(activity);
     }
 
     /**

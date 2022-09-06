@@ -1,6 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.gradleVersion = '7.2.0'
+    ext.gradleVersion = '7.2.2'
     ext.kotlinVersion = '1.7.0'
     ext.navigationVersion = '2.4.2'
     ext.googleServicesVersion = '4.3.10'
@@ -10,6 +10,7 @@ buildscript {
     ext.firebasePerformanceVersion = "1.4.1"
     ext.firebaseAppDistribution = "3.0.1"
     ext.jacocoVersion = '0.8.8'
+    ext.paparazziVersion = "1.0.0"
     repositories {
         jcenter()
         google()
@@ -27,6 +28,7 @@ buildscript {
         classpath "com.google.firebase:firebase-appdistribution-gradle:$firebaseAppDistribution"
         //Jacoco Plugin for code coverage
         classpath "org.jacoco:org.jacoco.core:$jacocoVersion"
+        classpath "app.cash.paparazzi:paparazzi-gradle-plugin:$paparazziVersion"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -57,9 +59,9 @@ ext {
     versionCode = 462
 
     // Sdk and tools
-    compileSdkVersion = 32
+    compileSdkVersion = 33
     minSdkVersion = 23
-    targetSdkVersion = 31
+    targetSdkVersion = 33
     buildToolsVerion = '31.0.0'
 
     // App dependencies

@@ -84,7 +84,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -117,6 +116,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -466,8 +466,15 @@ public class ContactFileListActivity extends PasscodeActivity
 
     public void showUploadPanel() {
         Timber.d("showUploadPanel");
+        String[] PERMISSIONS = new String[] {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                PermissionUtils.getImagePermissionByVersion(),
+                PermissionUtils.getAudioPermissionByVersion(),
+                PermissionUtils.getVideoPermissionByVersion(),
+                PermissionUtils.getReadExternalStoragePermission()
+        };
         if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+            requestPermission(this, REQUEST_READ_WRITE_STORAGE, PERMISSIONS);
         } else {
             onGetReadWritePermission();
         }
@@ -568,6 +575,7 @@ public class ContactFileListActivity extends PasscodeActivity
     }
 
     public void downloadFile(List<MegaNode> nodes) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodes(nodes, true, false, false, false);
     }
 
@@ -818,6 +826,7 @@ public class ContactFileListActivity extends PasscodeActivity
                                         if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
                                             showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error));
                                         } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+                                            PermissionUtils.checkNotificationsPermission(this);
                                             uploadUseCase.upload(this, file, contactFileListFragment.getParentHandle())
                                                     .subscribeOn(Schedulers.io())
                                                     .observeOn(AndroidSchedulers.mainThread())
@@ -891,6 +900,7 @@ public class ContactFileListActivity extends PasscodeActivity
                         }
 
                         if (!withoutCollisions.isEmpty()) {
+                            PermissionUtils.checkNotificationsPermission(this);
                             String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
 
                             uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())

@@ -8,13 +8,13 @@ import nz.mega.sdk.MegaTransfer
  *
  * @property transfer
  */
-sealed class GlobalTransfer(open val transfer: MegaTransfer?) {
+sealed class GlobalTransfer(open val transfer: MegaTransfer) {
     /**
      * On transfer start
      *
      * @property transfer
      */
-    data class OnTransferStart(override val transfer: MegaTransfer?) : GlobalTransfer(transfer)
+    data class OnTransferStart(override val transfer: MegaTransfer) : GlobalTransfer(transfer)
 
     /**
      * On transfer finish
@@ -22,7 +22,7 @@ sealed class GlobalTransfer(open val transfer: MegaTransfer?) {
      * @property transfer
      * @property error
      */
-    data class OnTransferFinish(override val transfer: MegaTransfer?, val error: MegaError) :
+    data class OnTransferFinish(override val transfer: MegaTransfer, val error: MegaError) :
         GlobalTransfer(transfer)
 
     /**
@@ -30,7 +30,7 @@ sealed class GlobalTransfer(open val transfer: MegaTransfer?) {
      *
      * @property transfer
      */
-    data class OnTransferUpdate(override val transfer: MegaTransfer?) : GlobalTransfer(transfer)
+    data class OnTransferUpdate(override val transfer: MegaTransfer) : GlobalTransfer(transfer)
 
     /**
      * On transfer temporary error
@@ -39,7 +39,7 @@ sealed class GlobalTransfer(open val transfer: MegaTransfer?) {
      * @property error
      */
     data class OnTransferTemporaryError(
-        override val transfer: MegaTransfer?,
+        override val transfer: MegaTransfer,
         val error: MegaError,
     ) : GlobalTransfer(transfer)
 
@@ -49,8 +49,6 @@ sealed class GlobalTransfer(open val transfer: MegaTransfer?) {
      * @property transfer
      * @property buffer
      */
-    data class OnTransferData(override val transfer: MegaTransfer?, val buffer: ByteArray?) :
+    data class OnTransferData(override val transfer: MegaTransfer, val buffer: ByteArray?) :
         GlobalTransfer(transfer)
-
-    object None : GlobalTransfer(null)
 }

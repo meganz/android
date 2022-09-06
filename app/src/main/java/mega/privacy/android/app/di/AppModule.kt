@@ -3,7 +3,9 @@ package mega.privacy.android.app.di
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
+import android.os.Build
 import android.os.Process
 import androidx.preference.PreferenceManager
 import dagger.Module
@@ -34,7 +36,16 @@ class AppModule {
         val packageInfo: PackageInfo
         var path: String? = null
         try {
-            packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            // PackageManager.PackageInfoFlags can only be used for devices
+            // running Android 13 and above. For devices running below Android 13,
+            // the normal getPackageInfo() is used
+            packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.getPackageInfo(context.packageName,
+                    PackageManager.PackageInfoFlags.of(0))
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getPackageInfo(context.packageName, 0)
+            }
             path = packageInfo.applicationInfo.dataDir + "/"
         } catch (e: NameNotFoundException) {
             e.printStackTrace()
@@ -46,11 +57,21 @@ class AppModule {
     @MegaApiFolder
     @Singleton
     @Provides
+    @Suppress("DEPRECATION")
     fun provideMegaApiFolder(@ApplicationContext context: Context): MegaApiAndroid {
         val packageInfo: PackageInfo
         var path: String? = null
         try {
-            packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            // PackageManager.PackageInfoFlags can only be used for devices
+            // running Android 13 and above. For devices running below Android 13,
+            // the normal getPackageInfo() is used
+            packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.getPackageInfo(context.packageName,
+                    PackageManager.PackageInfoFlags.of(0))
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getPackageInfo(context.packageName, 0)
+            }
             path = packageInfo.applicationInfo.dataDir + "/"
         } catch (e: NameNotFoundException) {
             e.printStackTrace()

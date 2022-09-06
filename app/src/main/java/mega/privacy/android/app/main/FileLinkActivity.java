@@ -96,6 +96,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -651,6 +652,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 
         switch (v.getId()) {
             case R.id.file_link_button_download: {
+                PermissionUtils.checkNotificationsPermission(this);
                 nodeSaver.saveNode(document, false, false, false, true);
                 break;
             }

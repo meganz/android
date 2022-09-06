@@ -93,6 +93,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -1012,6 +1013,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
                     showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
                     continue;
                 }
+
+                PermissionUtils.checkNotificationsPermission(this);
 
                 Intent service = new Intent(this, DownloadService.class);
                 service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());

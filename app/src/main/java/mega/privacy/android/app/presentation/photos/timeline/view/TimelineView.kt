@@ -46,7 +46,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.DateCard
 import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
-import mega.privacy.android.app.presentation.theme.AndroidTheme
+import mega.privacy.android.presentation.theme.AndroidTheme
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.domain.entity.photos.Photo
 

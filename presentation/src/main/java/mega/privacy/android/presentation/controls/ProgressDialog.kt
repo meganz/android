@@ -15,13 +15,13 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import mega.privacy.android.presentation.theme.AndroidTheme
-import mega.privacy.android.presentation.theme.grey_alpha_054
 import mega.privacy.android.presentation.theme.teal_200
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white_alpha_054
@@ -55,7 +55,9 @@ fun ProgressDialog(
                 Text(
                     title,
                     style = MaterialTheme.typography.subtitle1,
-                    color = if (!MaterialTheme.colors.isLight) white_alpha_054 else grey_alpha_054
+                    color = if (!MaterialTheme.colors.isLight) white_alpha_054 else Color(
+                        0x8A000000
+                    )
                 )
                 LinearProgressIndicator(
                     progress = progress,
@@ -94,7 +96,7 @@ private fun PreviewProgressDialog() {
             title = "Title goes here",
             progress = 0.3f,
             onCancel = {},
-            cancelButtonText = "Cancel"
+            cancelButtonText = "Cancel",
         )
     }
 }

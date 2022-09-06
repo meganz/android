@@ -35,18 +35,17 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOG
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
 import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CHAT_BNV;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.NO_BNV;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.PHOTOS_BNV;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.SHARED_ITEMS_BNV;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.getStartBottomNavigationItem;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.getStartDrawerItem;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldCloseApp;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.CHAT_BNV;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.HOME_BNV;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.NO_BNV;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.PHOTOS_BNV;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.SHARED_ITEMS_BNV;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.getStartBottomNavigationItem;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.getStartDrawerItem;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.shouldCloseApp;
 import static mega.privacy.android.app.main.FileInfoActivity.NODE_HANDLE;
-import static mega.privacy.android.app.main.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
@@ -55,6 +54,7 @@ import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogF
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.incomingSharesState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.linksState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.outgoingSharesState;
+import static mega.privacy.android.app.presentation.permissions.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
@@ -279,7 +279,6 @@ import kotlin.Unit;
 import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
@@ -371,6 +370,7 @@ import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
+import mega.privacy.android.app.presentation.permissions.PermissionsFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.photos.PhotosFragment;
@@ -424,6 +424,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
 import mega.privacy.android.domain.entity.ContactRequest;
 import mega.privacy.android.domain.entity.ContactRequestStatus;
@@ -738,6 +739,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     long lastTimeOnTransferUpdate = Calendar.getInstance().getTimeInMillis();
 
+    boolean requestNotificationsPermissionFirstLogin;
     private boolean askPermissions = false;
 
     boolean megaContacts = true;
@@ -2471,6 +2473,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
                     boolean firstLogin = getIntent().getBooleanExtra(EXTRA_FIRST_LOGIN, false);
                     viewModel.setIsFirstLogin(firstLogin);
+                    setRequestNotificationsPermissionFirstLogin(savedInstanceState);
                     askPermissions = getIntent().getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
 
                     //reset flag to fix incorrect view loaded when orientation changes
@@ -2508,6 +2511,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     getIntent().removeExtra(EXTRA_UPGRADE_ACCOUNT);
                     boolean firstLogin = intentRec.getBooleanExtra(EXTRA_FIRST_LOGIN, false);
                     viewModel.setIsFirstLogin(firstLogin);
+                    setRequestNotificationsPermissionFirstLogin(savedInstanceState);
                     askPermissions = intentRec.getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
                     if (upgradeAccount) {
                         drawerLayout.closeDrawer(Gravity.LEFT);
@@ -2615,12 +2619,14 @@ public class ManagerActivity extends TransfersManagementActivity
 
     /**
      * Checks which screen should be shown when an user is logins.
-     * There are three different screens or warnings:
-     * - Business warning: it takes priority over the other two
-     * - SMS verification screen: it takes priority over the other one
-     * - Onboarding permissions screens: it has to be only shown when account is logged in after the installation,
-     * some of the permissions required have not been granted
-     * and the business warnings and SMS verification have not to be shown.
+     * There are four different screens or warnings:
+     * - Business warning: it takes priority over the other three.
+     * - SMS verification screen: it takes priority over the other two.
+     * - Onboarding permissions screens: it has to be only shown when account is logged in after
+     *   the installation, and some of the permissions required have not been granted and
+     *   the business warning and SMS verification have not to be shown.
+     * - Notifications permission screen: it has to be shown if the onboarding permissions screens
+     *   have not been shown.
      */
     private void checkInitialScreens() {
         if (checkBusinessStatus()) {
@@ -2638,6 +2644,8 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         } else if (getFirstLogin() && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
             askForSMSVerification();
+        } else if(requestNotificationsPermissionFirstLogin) {
+            askForNotificationsPermission();
         }
     }
 
@@ -2896,13 +2904,34 @@ public class ManagerActivity extends TransfersManagementActivity
             Timber.d("Mobile only portrait mode");
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
+
+        boolean notificationsGranted = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+                || hasPermissions(this, Manifest.permission.POST_NOTIFICATIONS);
+
         boolean writeStorageGranted = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        boolean readStorageGranted = hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        String[] PERMISSIONS = new String[] {
+                PermissionUtils.getImagePermissionByVersion(),
+                PermissionUtils.getAudioPermissionByVersion(),
+                PermissionUtils.getVideoPermissionByVersion(),
+                PermissionUtils.getReadExternalStoragePermission()
+        };
+        boolean readStorageGranted = hasPermissions(this, PERMISSIONS);
         boolean cameraGranted = hasPermissions(this, Manifest.permission.CAMERA);
         boolean microphoneGranted = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
+        boolean bluetoothGranted = Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+                || hasPermissions(this, Manifest.permission.BLUETOOTH_CONNECT);
 
-        if (!writeStorageGranted || !readStorageGranted || !cameraGranted || !microphoneGranted/* || !writeCallsGranted*/) {
-            deleteCurrentFragment();
+        boolean contactsGranted = hasPermissions(this, Manifest.permission.READ_CONTACTS);
+
+        if (!notificationsGranted || !writeStorageGranted || !readStorageGranted || !cameraGranted
+                || !microphoneGranted || !bluetoothGranted /*|| !writeCallsGranted*/|| !contactsGranted) {
+
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+            if (currentFragment != null
+                    && !currentFragment.getTag().equals(FragmentTag.PERMISSIONS.getTag())) {
+                deleteCurrentFragment();
+            }
 
             if (permissionsFragment == null) {
                 permissionsFragment = new PermissionsFragment();
@@ -3002,7 +3031,11 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
     }
 
-    void queryIfNotificationsAreOn() {
+        void queryIfNotificationsAreOn() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+
         Timber.d("queryIfNotificationsAreOn");
 
         if (megaApi == null) {
@@ -4266,6 +4299,7 @@ public class ManagerActivity extends TransfersManagementActivity
         replaceFragment(ChatTabsFragment.newInstance(), FragmentTag.RECENT_CHAT.getTag());
 
         drawerLayout.closeDrawer(Gravity.LEFT);
+        PermissionUtils.checkNotificationsPermission(this);
     }
 
     public void setBottomNavigationMenuItemChecked(int item) {
@@ -4987,6 +5021,27 @@ public class ManagerActivity extends TransfersManagementActivity
         }
         drawerItem = DrawerItem.CHAT;
         selectDrawerItem(drawerItem);
+    }
+
+    /**
+     * Launches an intent to open NotificationsPermissionActivity in order to check if should ask
+     * for notifications permission.
+     */
+    private void askForNotificationsPermission() {
+        requestNotificationsPermissionFirstLogin = false;
+        PermissionUtils.checkNotificationsPermission(this);
+    }
+
+    /**
+     * Sets requestNotificationsPermissionFirstLogin as firstLogin only if savedInstanceState
+     * is null.
+     *
+     * @param savedInstanceState Saved state.
+     */
+    private void setRequestNotificationsPermissionFirstLogin(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            requestNotificationsPermissionFirstLogin = getFirstLogin();
+        }
     }
 
     /**
@@ -7214,6 +7269,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void saveNodesToDevice(List<MegaNode> nodes, boolean highPriority, boolean isFolderLink,
                                   boolean fromMediaViewer, boolean fromChat) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodes(nodes, highPriority, isFolderLink, fromMediaViewer, fromChat);
     }
 
@@ -7224,6 +7280,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param node Node to be downloaded.
      */
     public Unit saveNodeByTap(MegaNode node) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, false, true);
         return null;
     }
@@ -7239,6 +7296,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void saveHandlesToDevice(List<Long> handles, boolean highPriority, boolean isFolderLink,
                                     boolean fromMediaViewer, boolean fromChat) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveHandles(handles, highPriority, isFolderLink, fromMediaViewer, fromChat);
     }
 
@@ -7248,6 +7306,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param nodes nodes to save
      */
     public void saveOfflineNodesToDevice(List<MegaOffline> nodes) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveOfflineNodes(nodes, false);
     }
 
@@ -7480,7 +7539,8 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void showUploadPanel(int uploadType) {
         if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+            String[] PERMISSIONS = getReadAndWritePermissions();
+            requestPermission(this, REQUEST_READ_WRITE_STORAGE, PERMISSIONS);
             return;
         }
 
@@ -7500,7 +7560,8 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void showUploadPanelForBackup(int uploadType, int actionType) {
         if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+            String[] PERMISSIONS = getReadAndWritePermissions();
+            requestPermission(this, REQUEST_READ_WRITE_STORAGE, PERMISSIONS);
             return;
         }
 
@@ -7510,6 +7571,16 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         showUploadPanel(uploadType);
+    }
+
+    private String[] getReadAndWritePermissions() {
+        return new String[] {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                PermissionUtils.getImagePermissionByVersion(),
+                PermissionUtils.getAudioPermissionByVersion(),
+                PermissionUtils.getVideoPermissionByVersion(),
+                PermissionUtils.getReadExternalStoragePermission()
+        };
     }
 
     public void updateAccountDetailsVisibleInfo() {
@@ -8014,6 +8085,7 @@ public class ManagerActivity extends TransfersManagementActivity
             //Now, call to the DownloadService
 
             if (handleToDownload != 0 && handleToDownload != -1) {
+                PermissionUtils.checkNotificationsPermission(this);
                 Intent service = new Intent(this, DownloadService.class);
                 service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
                 service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
@@ -8236,6 +8308,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                         if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
                                             showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
                                         } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+                                            PermissionUtils.checkNotificationsPermission(this);
                                             uploadUseCase.upload(this, file, parentHandle)
                                                     .subscribeOn(Schedulers.io())
                                                     .observeOn(AndroidSchedulers.mainThread())
@@ -9051,6 +9124,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 if (info.isContact) {
                                     requestContactsPermissions(info, parentNode);
                                 } else {
+                                    PermissionUtils.checkNotificationsPermission(this);
                                     uploadUseCase.upload(this, info, null, parentNode.getHandle())
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
@@ -9150,6 +9224,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
                                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
                             } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+                                PermissionUtils.checkNotificationsPermission(this);
                                 String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, 1, 1);
 
                                 uploadUseCase.upload(this, file, parentNode.getHandle())
@@ -10885,6 +10960,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 throwable -> Timber.e(throwable, "Retry transfer failed."));
             }
         } else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+            PermissionUtils.checkNotificationsPermission(this);
             File file = new File(transfer.getOriginalPath());
             uploadUseCase.upload(this, file, transfer.getParentHandle())
                     .subscribeOn(Schedulers.io())
