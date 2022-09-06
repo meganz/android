@@ -84,7 +84,7 @@ class PhotosFilterFragment : Fragment() {
         lifecycleScope.launch {
             timelineViewModel.showingFilterPage(false)
             timelineViewModel.applyFilter()
-            mManagerActivity.onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 }
