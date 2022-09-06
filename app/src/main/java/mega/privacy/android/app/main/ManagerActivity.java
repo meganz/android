@@ -9157,16 +9157,37 @@ public class ManagerActivity extends TransfersManagementActivity
             if (cursorID.moveToFirst()) {
                 Timber.d("It is a contact");
 
-                String id = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                int hasPhone = cursorID.getInt(cursorID.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+                String id = null;
+                try {
+                    id = cursorID.getString(cursorID.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+                } catch (IllegalArgumentException exception) {
+                    Timber.w(exception, "Exception getting contact ID.");
+                }
+
+                String name = null;
+                try {
+                    name = cursorID.getString(cursorID.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
+                } catch (IllegalArgumentException exception) {
+                    Timber.w(exception, "Exception getting contact display name.");
+                }
+
+                int hasPhone = -1;
+                try {
+                    hasPhone = cursorID.getInt(cursorID.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+                } catch (IllegalArgumentException exception) {
+                    Timber.w(exception, "Exception getting contact details.");
+                }
 
                 // get the user's email address
                 String email = null;
                 Cursor ce = getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null,
                         ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?", new String[]{id}, null);
                 if (ce != null && ce.moveToFirst()) {
-                    email = ce.getString(ce.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+                    try {
+                        email = ce.getString(ce.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Email.DATA));
+                    } catch (IllegalArgumentException exception) {
+                        Timber.w(exception, "Exception getting contact email.");
+                    }
                     ce.close();
                 }
 
@@ -9176,7 +9197,11 @@ public class ManagerActivity extends TransfersManagementActivity
                     Cursor cp = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
                             ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
                     if (cp != null && cp.moveToFirst()) {
-                        phone = cp.getString(cp.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        try {
+                            phone = cp.getString(cp.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        } catch (IllegalArgumentException exception) {
+                            Timber.w(exception, "Exception getting contact phone number.");
+                        }
                         cp.close();
                     }
                 }
