@@ -256,4 +256,7 @@ class MegaNodeSaving(
 
         return AutoPlayInfo(nodes[0].name, nodes[0].handle, theOnlyLocalFilePath)
     }
+
+    override fun isDownloadByTap(): Boolean = downloadByTap
+
 }

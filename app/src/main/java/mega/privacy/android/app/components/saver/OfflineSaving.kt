@@ -146,4 +146,6 @@ class OfflineSaving(
             }
         }
     }
+
+    override fun isDownloadByTap(): Boolean = false
 }

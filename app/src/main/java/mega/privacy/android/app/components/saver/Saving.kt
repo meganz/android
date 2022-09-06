@@ -48,6 +48,9 @@ abstract class Saving : Parcelable {
         snackbarShower: SnackbarShower?
     ): AutoPlayInfo
 
+
+    abstract fun isDownloadByTap(): Boolean
+
     companion object {
         @Parcelize
         object NOTHING  : Saving() {
@@ -65,6 +68,8 @@ abstract class Saving : Parcelable {
                 sdCardOperator: SDCardOperator?,
                 snackbarShower: SnackbarShower?
             ) = AutoPlayInfo.NO_AUTO_PLAY
+
+            override fun isDownloadByTap(): Boolean = false
         }
     }
 }
