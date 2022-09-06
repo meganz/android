@@ -1,7 +1,5 @@
 package mega.privacy.android.app.main;
 
-import static android.webkit.URLUtil.isHttpUrl;
-import static android.webkit.URLUtil.isHttpsUrl;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
@@ -34,9 +32,7 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFileDialog;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewURLFileDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.existsMyChatFilesFolder;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getCloudRootHandle;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getMyChatFilesFolder;
@@ -139,6 +135,7 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.domain.entity.ShareTextInfo;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -207,8 +204,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
     private static final int INCOMING_TAB = 1;
     private static final int CHAT_TAB = 2;
     private static final int SHOW_TABS = 3;
-    private boolean isChatFirst;
-    private static final int DEFAULT_TAB_TO_REMOVE = -1;
 
     @Inject
     FilePrepareUseCase filePrepareUseCase;
@@ -299,7 +294,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
     private boolean importFileF;
     private int importFragmentSelected = -1;
     private String action;
-    private HashMap<String, String> nameFiles = new HashMap<>();
 
     private MegaNode myChatFilesNode;
     private ArrayList<MegaNode> attachNodes = new ArrayList<>();
@@ -326,7 +320,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
     private BottomSheetDialogFragment bottomSheetDialogFragment;
 
-    private FileExplorerActivityViewModel mViewModel;
+    private FileExplorerActivityViewModel viewModel;
 
     private long parentHandle;
 
@@ -416,12 +410,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 chooseFragment(IMPORT_FRAGMENT);
             }
 
-            if (statusDialog != null) {
-                try {
-                    statusDialog.dismiss();
-                } catch (Exception ex) {
-                }
-            }
+            dismissAlertDialogIfExists(statusDialog);
         } else {
             onIntentProcessed();
         }
@@ -446,8 +435,9 @@ public class FileExplorerActivity extends TransfersManagementActivity
         nameCollisionActivityContract = registerForActivityResult(new NameCollisionActivityContract(),
                 result -> backToCloud(result != null ? parentHandle : INVALID_HANDLE, 0, result));
 
-        mViewModel = new ViewModelProvider(this).get(FileExplorerActivityViewModel.class);
-        mViewModel.info.observe(this, this::onProcessAsyncInfo);
+        viewModel = new ViewModelProvider(this).get(FileExplorerActivityViewModel.class);
+        viewModel.filesInfo.observe(this, this::onProcessAsyncInfo);
+        viewModel.textInfo.observe(this, info -> dismissAlertDialogIfExists(statusDialog));
 
         if (savedInstanceState != null) {
             Timber.d("Bundle is NOT NULL");
@@ -460,7 +450,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
             importFileF = savedInstanceState.getBoolean("importFileF", false);
             importFragmentSelected = savedInstanceState.getInt("importFragmentSelected", -1);
             action = savedInstanceState.getString("action", null);
-            nameFiles = (HashMap<String, String>) savedInstanceState.getSerializable("nameFiles");
             chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().getFragment(savedInstanceState, "chatExplorerFragment");
             querySearch = savedInstanceState.getString("querySearch", "");
             isSearchExpanded = savedInstanceState.getBoolean("isSearchExpanded", isSearchExpanded);
@@ -509,7 +498,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
         if (credentials == null) {
             Timber.w("User credentials NULL");
 
-            if (isChatFirst()) {
+            if (viewModel.isImportingText) {
                 startActivity(new Intent(this, LoginActivity.class)
                         .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
                         .putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(Intent.EXTRA_TEXT))
@@ -523,7 +512,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
             } else {
                 needLogin = true;
 
-                mViewModel.ownFilePrepareTask(this, getIntent());
+                viewModel.ownFilePrepareTask(this, getIntent());
                 createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
             }
 
@@ -636,7 +625,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 mode = SELECT;
 
                 aB.setTitle(getString(R.string.title_share_folder_explorer));
-                setView(CLOUD_TAB, false, -1);
+                setView(CLOUD_TAB, false);
                 tabShown = NO_TABS;
 
             } else if (intent.getAction().equals(ACTION_MULTISELECT_FILE)) {
@@ -647,7 +636,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 multiselect = true;
 
                 aB.setTitle(getResources().getQuantityString(R.plurals.plural_select_file, 10));
-                setView(SHOW_TABS, false, CHAT_TAB);
+                setView(SHOW_TABS, true);
             } else if (intent.getAction().equals(ACTION_PICK_MOVE_FOLDER)) {
                 Timber.d("ACTION_PICK_MOVE_FOLDER");
                 mode = MOVE;
@@ -659,7 +648,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 }
 
                 aB.setTitle(getString(R.string.title_share_folder_explorer));
-                setView(SHOW_TABS, false, CHAT_TAB);
+                setView(SHOW_TABS, true);
             } else if (intent.getAction().equals(ACTION_PICK_COPY_FOLDER)) {
                 Timber.d("ACTION_PICK_COPY_FOLDER");
                 mode = COPY;
@@ -671,20 +660,20 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 }
 
                 aB.setTitle(getString(R.string.title_share_folder_explorer));
-                setView(SHOW_TABS, false, CHAT_TAB);
+                setView(SHOW_TABS, true);
             } else if (intent.getAction().equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC)) {
                 Timber.d("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC");
                 mode = SELECT_CAMERA_FOLDER;
 
                 aB.setTitle(getString(R.string.title_share_folder_explorer));
-                setView(SHOW_TABS, false, CHAT_TAB);
+                setView(SHOW_TABS, true);
             } else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)) {
                 mode = IMPORT;
 
                 importChatHandles = intent.getLongArrayExtra("HANDLES_IMPORT_CHAT");
 
                 aB.setTitle(getString(R.string.title_share_folder_explorer));
-                setView(SHOW_TABS, false, CHAT_TAB);
+                setView(SHOW_TABS, true);
             } else if ((intent.getAction().equals(ACTION_SAVE_TO_CLOUD))) {
                 Timber.d("action = SAVE to Cloud Drive");
                 mode = SAVE;
@@ -693,32 +682,26 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
                 aB.setTitle(StringResourcesUtils.getString(R.string.section_cloud_drive));
                 aB.setSubtitle(StringResourcesUtils.getString(R.string.cloud_drive_select_destination));
-                setView(CLOUD_TAB, false, -1);
+                setView(CLOUD_TAB, false);
                 tabShown = NO_TABS;
             } else {
                 Timber.d("action = UPLOAD");
                 mode = UPLOAD;
-                isChatFirst = isChatFirst();
+                aB.setTitle(getString(R.string.title_upload_explorer));
+                importFileF = true;
+                action = intent.getAction();
 
-                if (isChatFirst) {
-                    aB.setTitle(getString(R.string.title_file_explorer_send_link));
-                    setView(SHOW_TABS, true, INCOMING_TAB);
-                } else {
-                    aB.setTitle(getString(R.string.title_upload_explorer));
-                    importFileF = true;
-                    action = intent.getAction();
+                cloudDriveFrameLayout = findViewById(R.id.cloudDriveFrameLayout);
 
-                    cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
+                viewModel.ownFilePrepareTask(this, getIntent());
+                chooseFragment(IMPORT_FRAGMENT);
+                createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 
-                    mViewModel.ownFilePrepareTask(this, getIntent());
-                    createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
+                cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
-                    cloudDriveFrameLayout.setVisibility(View.VISIBLE);
-
-                    tabLayoutExplorer.setVisibility(View.GONE);
-                    viewPagerExplorer.setVisibility(View.GONE);
-                    tabShown = NO_TABS;
-                }
+                tabLayoutExplorer.setVisibility(View.GONE);
+                viewPagerExplorer.setVisibility(View.GONE);
+                tabShown = NO_TABS;
             }
         } else {
             Timber.e("intent error");
@@ -726,47 +709,36 @@ public class FileExplorerActivity extends TransfersManagementActivity
     }
 
     /**
-     * Checks if should show first the chat tab.
-     * If the action of the intent is ACTION_SEND and the type of the intent is TYPE_TEXT_PLAIN,
-     * the chat tab should be shown first.
+     * Updates the UI for showing tabs and removes the chat one if required.
      *
-     * @return True if should show first the chat tab, false otherwise.
+     * @param removeChatTab True if should remove the chat tab, false otherwise.
      */
-    private boolean isChatFirst() {
-        if (Intent.ACTION_SEND.equals(getIntent().getAction())
-                && TYPE_TEXT_PLAIN.equals(getIntent().getType())) {
-            Bundle extras = getIntent().getExtras();
-            return extras != null && !extras.containsKey(Intent.EXTRA_STREAM);
-        }
-
-        return false;
-    }
-
-    private void updateAdapterExplorer(boolean isChatFirst, int tabToRemove) {
+    private void updateAdapterExplorer(boolean removeChatTab) {
         tabLayoutExplorer.setVisibility(View.VISIBLE);
         viewPagerExplorer.setVisibility(View.VISIBLE);
 
         int position = mTabsAdapterExplorer != null ? viewPagerExplorer.getCurrentItem() : 0;
-        if (isChatFirst) {
-            mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this, true);
-        } else {
-            mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this);
-        }
+        mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager());
         viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
         viewPagerExplorer.setCurrentItem(position);
         tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
-        if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2
-                && ((!isChatFirst && tabToRemove == CHAT_TAB) || (isChatFirst && tabToRemove == INCOMING_TAB))) {
+        if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2 && removeChatTab) {
             mTabsAdapterExplorer.setTabRemoved(true);
             tabLayoutExplorer.removeTabAt(2);
             mTabsAdapterExplorer.notifyDataSetChanged();
         }
     }
 
-    private void setView(int tab, boolean isChatFirst, int tabToRemove) {
+    /**
+     * Updates the UI for showing tabs or only a fragment.
+     * If it has to show tabs, removes the chat one if required.
+     *
+     * @param tab           SHOW_TABS if should show tabs, else the fragment to show.
+     * @param removeChatTab True if should remove the chat tab, false otherwise.
+     */
+    private void setView(int tab, boolean removeChatTab) {
         Timber.d("setView %s", tab);
-        tabShown = SHOW_TABS;
 
         switch (tab) {
             case CLOUD_TAB: {
@@ -785,8 +757,10 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 break;
             }
             case SHOW_TABS: {
+                tabShown = SHOW_TABS;
+
                 if (mTabsAdapterExplorer == null || importFileF) {
-                    updateAdapterExplorer(isChatFirst, tabToRemove);
+                    updateAdapterExplorer(removeChatTab);
                 }
 
                 viewPagerExplorer.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -840,7 +814,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 cloudDriveFrameLayout.setVisibility(View.GONE);
             }
 
-            setView(SHOW_TABS, false, CHAT_TAB);
+            setView(SHOW_TABS, true);
         } else if (fragment == CHAT_FRAGMENT) {
             if (chatExplorer == null) {
                 chatExplorer = new ChatExplorerFragment();
@@ -1070,95 +1044,50 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
         //Check the tab shown
         if (viewPagerExplorer != null && tabShown != NO_TABS) {
-
             int index = viewPagerExplorer.getCurrentItem();
 
-            if (index == 0) {
-                if (isChatFirst) {
-                    searchMenuItem.setVisible(true);
-                    createFolderMenuItem.setVisible(false);
-                    newChatMenuItem.setVisible(false);
-                } else {
-                    //CLOUD TAB
-                    setCreateFolderVisibility();
-                    newChatMenuItem.setVisible(false);
-                    if (multiselect) {
-                        cDriveExplorer = getCloudExplorerFragment();
-                        searchMenuItem.setVisible(cDriveExplorer != null && !cDriveExplorer.isFolderEmpty());
-                    }
+            if (index == CLOUD_TAB) {
+                setCreateFolderVisibility();
+                newChatMenuItem.setVisible(false);
+                if (multiselect) {
+                    cDriveExplorer = getCloudExplorerFragment();
+                    searchMenuItem.setVisible(cDriveExplorer != null && !cDriveExplorer.isFolderEmpty());
                 }
+            } else if (index == INCOMING_TAB) {
+                iSharesExplorer = getIncomingExplorerFragment();
+                if (iSharesExplorer != null) {
+                    Timber.d("Level deepBrowserTree: %s", deepBrowserTree);
+                    if (deepBrowserTree == 0) {
+                        createFolderMenuItem.setVisible(false);
+                    } else {
+                        //Check the folder's permissions
+                        long parentH = iSharesExplorer.getParentHandle();
+                        MegaNode n = megaApi.getNodeByHandle(parentH);
+                        int accessLevel = megaApi.getAccess(n);
+                        Timber.d("Node: %d, Permissions: %d", n.getHandle(), accessLevel);
 
-            } else if (index == 1) {
-                if (isChatFirst) {
-                    //CLOUD TAB
-                    setCreateFolderVisibility();
-                    newChatMenuItem.setVisible(false);
-                } else {
-                    iSharesExplorer = getIncomingExplorerFragment();
-                    if (iSharesExplorer != null) {
-                        Timber.d("Level deepBrowserTree: %s", deepBrowserTree);
-                        if (deepBrowserTree == 0) {
-                            createFolderMenuItem.setVisible(false);
-                        } else {
-                            //Check the folder's permissions
-                            long parentH = iSharesExplorer.getParentHandle();
-                            MegaNode n = megaApi.getNodeByHandle(parentH);
-                            int accessLevel = megaApi.getAccess(n);
-                            Timber.d("Node: %d, Permissions: %d", n.getHandle(), accessLevel);
+                        switch (accessLevel) {
+                            case MegaShare.ACCESS_OWNER:
+                            case MegaShare.ACCESS_READWRITE:
+                            case MegaShare.ACCESS_FULL:
+                                setCreateFolderVisibility();
+                                break;
 
-                            switch (accessLevel) {
-                                case MegaShare.ACCESS_OWNER:
-                                case MegaShare.ACCESS_READWRITE:
-                                case MegaShare.ACCESS_FULL:
-                                    setCreateFolderVisibility();
-                                    break;
-
-                                case MegaShare.ACCESS_READ:
-                                    createFolderMenuItem.setVisible(false);
-                                    break;
-                            }
+                            case MegaShare.ACCESS_READ:
+                                createFolderMenuItem.setVisible(false);
+                                break;
                         }
                     }
-                    newChatMenuItem.setVisible(false);
-                    if (multiselect) {
-                        searchMenuItem.setVisible(iSharesExplorer != null && !iSharesExplorer.isFolderEmpty());
-                    }
                 }
-            } else if (index == 2) {
-                if (isChatFirst) {
-                    //INCOMING TAB
-                    iSharesExplorer = getIncomingExplorerFragment();
-                    if (iSharesExplorer != null) {
-                        Timber.d("Level deepBrowserTree: %s", deepBrowserTree);
-                        if (deepBrowserTree == 0) {
-                            createFolderMenuItem.setVisible(false);
-                        } else {
-                            //Check the folder's permissions
-                            long parentH = iSharesExplorer.getParentHandle();
-                            MegaNode n = megaApi.getNodeByHandle(parentH);
-                            int accessLevel = megaApi.getAccess(n);
-                            Timber.d("Node: %d, Permissions: %d", n.getHandle(), accessLevel);
-
-                            switch (accessLevel) {
-                                case MegaShare.ACCESS_OWNER:
-                                case MegaShare.ACCESS_READWRITE:
-                                case MegaShare.ACCESS_FULL:
-                                    createFolderMenuItem.setVisible(true);
-                                    break;
-                                case MegaShare.ACCESS_READ:
-                                    createFolderMenuItem.setVisible(false);
-                                    break;
-                            }
-                        }
-                    }
-                    newChatMenuItem.setVisible(false);
-                } else {
-                    searchMenuItem.setVisible(true);
-                    createFolderMenuItem.setVisible(false);
-                    newChatMenuItem.setVisible(false);
+                newChatMenuItem.setVisible(false);
+                if (multiselect) {
+                    searchMenuItem.setVisible(iSharesExplorer != null && !iSharesExplorer.isFolderEmpty());
                 }
+            } else if (index == CHAT_TAB) {
+                searchMenuItem.setVisible(true);
+                createFolderMenuItem.setVisible(false);
+                newChatMenuItem.setVisible(false);
             }
-
         } else {
             if (cDriveExplorer != null && !importFileF) {
                 setCreateFolderVisibility();
@@ -1394,7 +1323,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
         bundle.putBoolean("importFileF", importFileF);
         bundle.putInt("importFragmentSelected", importFragmentSelected);
         bundle.putString("action", action);
-        bundle.putSerializable("nameFiles", nameFiles);
 
         if (getChatExplorerFragment() != null) {
             getSupportFragmentManager().putFragment(bundle, "chatExplorerFragment", getChatExplorerFragment());
@@ -1416,7 +1344,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
     protected void onResume() {
         super.onResume();
         if (getIntent() != null && mode == UPLOAD && folderSelected && filePreparedInfos == null) {
-            mViewModel.ownFilePrepareTask(this, getIntent());
+            viewModel.ownFilePrepareTask(this, getIntent());
             createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
         }
     }
@@ -1563,7 +1491,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
             }
         }
 
-        intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, nameFiles);
+        intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, viewModel.fileNames.getValue());
         intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
         intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
         intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
@@ -1582,13 +1510,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
     }
 
     private void finishFileExplorer() {
-        if (statusDialog != null) {
-            try {
-                statusDialog.dismiss();
-            } catch (Exception ex) {
-            }
-        }
-
+        dismissAlertDialogIfExists(statusDialog);
         filePreparedInfos = null;
         Timber.d("finish!!!");
         finishActivity();
@@ -1648,7 +1570,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
         }
 
         if (infos == null) {
-            statusDialog.dismiss();
+            dismissAlertDialogIfExists(statusDialog);
             showSnackbar(getString(R.string.upload_can_not_open));
         } else if (existsMyChatFilesFolder()) {
             setMyChatFilesFolder(getMyChatFilesFolder());
@@ -1716,7 +1638,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                             if (!withoutCollisions.isEmpty()) {
                                 PermissionUtils.checkNotificationsPermission(this);
                                 String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
-                                uploadUseCase.uploadInfos(this, infos, nameFiles, finalParentNode.getHandle())
+                                uploadUseCase.uploadInfos(this, infos, viewModel.fileNames.getValue(), finalParentNode.getHandle())
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(() -> {
@@ -1808,58 +1730,24 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
             Timber.d("mode UPLOAD");
 
-            if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
-                if (TYPE_TEXT_PLAIN.equals(intent.getType())) {
-                    Timber.d("Handle intent of text plain");
-
-                    Bundle extras = intent.getExtras();
-                    if (extras != null) {
-                        if (!extras.containsKey(Intent.EXTRA_STREAM)) {
-                            boolean isURL = false;
-                            StringBuilder body = new StringBuilder();
-                            String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-                            if (sharedText != null) {
-                                if (isHttpsUrl(sharedText) || isHttpUrl(sharedText)) {
-                                    isURL = true;
-                                    String header = "[InternetShortcut]\n";
-                                    body.append(header);
-
-                                    body.append("URL=");
-                                }
-                                body.append(sharedText);
-                            }
-
-                            String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-                            if (sharedText2 != null) {
-                                body.append("\nsubject=");
-                                body.append(sharedText2);
-                            }
-
-                            String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
-                            if (sharedText3 != null) {
-                                body.append("\nemail=");
-                                body.append(sharedText3);
-                            }
-
-                            MegaNode parentNode = megaApi.getNodeByHandle(handle);
-                            if (parentNode == null) {
-                                parentNode = megaApi.getRootNode();
-                            }
-
-                            if (isURL) {
-                                showNewURLFileDialog(this, parentNode, body.toString(), sharedText2);
-                            } else {
-                                showNewFileDialog(this, parentNode, body.toString());
-                            }
-
-                            return;
-                        }
-                    }
+            if (viewModel.isImportingText) {
+                MegaNode parentNode = megaApi.getNodeByHandle(handle);
+                if (parentNode == null) {
+                    parentNode = megaApi.getRootNode();
                 }
+
+                ShareTextInfo info = viewModel.textInfo.getValue();
+                HashMap<String, String> names = viewModel.fileNames.getValue();
+                if (info != null) {
+                    String name = names != null ? names.get(info.getSubject()) : info.getSubject();
+                    createFile(name, info.getFileContent(), parentNode, info.isUrl());
+                }
+
+                return;
             }
 
             if (filePreparedInfos == null) {
-                mViewModel.ownFilePrepareTask(this, getIntent());
+                viewModel.ownFilePrepareTask(this, getIntent());
                 createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
             } else {
                 onIntentProcessed();
@@ -2241,7 +2129,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 Timber.w(e, "IOException deleting childThumbDir.");
             }
         }
-        mViewModel.shutdownExecutorService();
+        viewModel.shutdownExecutorService();
 
         dismissAlertDialogIfExists(newFolderDialog);
         super.onDestroy();
@@ -2484,64 +2372,36 @@ public class FileExplorerActivity extends TransfersManagementActivity
     }
 
     private Unit sendToChats(List<? extends MegaChatRoom> chats) {
-
-        if (statusDialog != null) {
-            try {
-                statusDialog.dismiss();
-            } catch (Exception ex) {
-            }
-        }
+        dismissAlertDialogIfExists(statusDialog);
 
         chatListItems.addAll(chats);
 
-        if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
-            Bundle extras = intent.getExtras();
-            if (TYPE_TEXT_PLAIN.equals(intent.getType()) && extras != null && !extras.containsKey(Intent.EXTRA_STREAM)) {
-                Timber.d("Handle intent of text plain");
-                StringBuilder body = new StringBuilder();
-                String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-                if (sharedText2 != null) {
-                    body.append(getString(R.string.new_file_subject_when_uploading) + ": ");
-                    body.append(sharedText2);
-                }
-                String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-                if (sharedText != null) {
-                    if (body.length() > 0) {
-                        body.append("\n");
-                    }
-                    body.append(sharedText);
-                }
-                String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
-                if (sharedText3 != null) {
-                    if (body.length() > 0) {
-                        body.append("\n");
-                    }
-                    body.append(getString(R.string.new_file_email_when_uploading) + ": ");
-                    body.append(sharedText3);
-                }
+        if (viewModel.isImportingText) {
+            Timber.d("Handle intent of text plain");
 
+            String message = viewModel.getMessageToShare();
+
+            if (message != null) {
                 for (int i = 0; i < chatListItems.size(); i++) {
-                    megaChatApi.sendMessage(chatListItems.get(i).getChatId(), body.toString());
+                    megaChatApi.sendMessage(chatListItems.get(i).getChatId(), message);
                 }
 
                 if (chatListItems.size() == 1) {
                     MegaChatRoom chatItem = chatListItems.get(0);
                     long idChat = chatItem.getChatId();
-                    if (chatItem != null) {
-                        Intent intent = new Intent(this, ManagerActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
-                        intent.putExtra(CHAT_ID, idChat);
-                        startActivity(intent);
-                    }
+                    Intent intent = new Intent(this, ManagerActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
+                    intent.putExtra(CHAT_ID, idChat);
+                    startActivity(intent);
                 } else {
                     Intent chatIntent = new Intent(this, ManagerActivity.class);
                     chatIntent.setAction(ACTION_CHAT_SUMMARY);
                     startActivity(chatIntent);
                 }
-
-                return Unit.INSTANCE;
             }
+
+            return Unit.INSTANCE;
         }
 
         if (filePreparedInfos == null) {
@@ -2575,63 +2435,36 @@ public class FileExplorerActivity extends TransfersManagementActivity
     }
 
     private ChatExplorerFragment getChatExplorerFragment() {
-
-        ChatExplorerFragment c;
-
         if (importFileF) {
             return (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag("chatExplorer");
         }
 
         if (mTabsAdapterExplorer == null) return null;
 
-        if (isChatFirst) {
-            c = (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
-        } else {
-            c = (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
-        }
+        ChatExplorerFragment c = (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
 
-        if (c.isAdded()) {
-            return c;
-        }
-
-        return null;
+        return c.isAdded() ? c : null;
     }
 
     private IncomingSharesExplorerFragment getIncomingExplorerFragment() {
         if (mTabsAdapterExplorer == null) return null;
 
-        if (!isChatFirst) {
-            IncomingSharesExplorerFragment iS =
-                    (IncomingSharesExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
+        IncomingSharesExplorerFragment iS =
+                (IncomingSharesExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
 
-            if (iS.isAdded()) {
-                return iS;
-            }
-        }
-
-        return null;
+        return iS.isAdded() ? iS : null;
     }
 
     private CloudDriveExplorerFragment getCloudExplorerFragment() {
-        CloudDriveExplorerFragment cD;
-
         if (tabShown == NO_TABS) {
             return (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
         }
 
         if (mTabsAdapterExplorer == null) return null;
 
-        if (isChatFirst) {
-            cD = (CloudDriveExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
-        } else {
-            cD = (CloudDriveExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
-        }
+        CloudDriveExplorerFragment cD = (CloudDriveExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
 
-        if (cD.isAdded()) {
-            return cD;
-        }
-
-        return null;
+        return cD.isAdded() ? cD : null;
     }
 
     public void refreshOrderNodes(int order) {
@@ -2723,16 +2556,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
         deepBrowserTree--;
     }
 
-    public List<ShareInfo> getFilePreparedInfos() {
-        return filePreparedInfos;
-    }
-
     public void setNameFiles(HashMap<String, String> nameFiles) {
-        this.nameFiles = nameFiles;
-    }
-
-    public HashMap<String, String> getNameFiles() {
-        return nameFiles;
+        viewModel.fileNames.setValue(nameFiles);
     }
 
     public DrawerItem getCurrentItem() {
@@ -2773,10 +2598,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
     }
 
     public void finishCreateFolder(boolean success, long handle) {
-        try {
-            statusDialog.dismiss();
-        } catch (Exception ex) {
-        }
+        dismissAlertDialogIfExists(statusDialog);
 
         if (success) {
             cDriveExplorer = getCloudExplorerFragment();
