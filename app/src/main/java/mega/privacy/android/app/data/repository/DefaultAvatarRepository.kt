@@ -73,6 +73,9 @@ class DefaultAvatarRepository @Inject constructor(
         return getColor(megaApiGateway.getUserAvatarColor(user))
     }
 
+    override suspend fun getMyAvatarFile(): File? =
+        cacheFolderGateway.buildAvatarFile(megaApiGateway.accountEmail + FileUtil.JPG_EXTENSION)
+
     private fun getColor(color: String?): Int {
         return if (color == null) {
             avatarWrapper.getSpecificAvatarColor(Constants.AVATAR_PRIMARY_COLOR)

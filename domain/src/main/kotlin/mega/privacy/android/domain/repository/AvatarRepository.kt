@@ -16,4 +16,9 @@ interface AvatarRepository {
      * Get color avatar
      */
     suspend fun getMyAvatarColor(): Int
+
+    /**
+     * get avatar file
+     */
+    suspend fun getMyAvatarFile(): File?
 }
