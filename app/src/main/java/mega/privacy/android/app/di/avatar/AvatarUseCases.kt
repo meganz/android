@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.usecase.GetMyAvatarColor
+import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 
 /**
@@ -15,6 +16,13 @@ import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 @InstallIn(ViewModelComponent::class)
 abstract class AvatarUseCases {
     companion object {
+        /**
+         * Provide the GetMyAvatarFile implementation
+         */
+        @Provides
+        fun provideGetMyAvatarFile(repository: AvatarRepository): GetMyAvatarFile =
+            GetMyAvatarFile(repository::getMyAvatarFile)
+
         /**
          * Provide the GetUserAvatarColor implementation
          */
