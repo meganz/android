@@ -947,7 +947,7 @@ open class DatabaseHandler(
         try {
             db.rawQuery(selectQuery, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
-                    var should = cursor.getString(cursor.getColumnIndex(
+                    var should = cursor.getString(cursor.getColumnIndexOrThrow(
                         KEY_SHOULD_CLEAR_CAMSYNC_RECORDS))
                     should = decrypt(should)
                     return if (should.isNullOrEmpty()) {
@@ -1233,20 +1233,47 @@ open class DatabaseHandler(
                     var contact: MegaContact
                     while (cursor.moveToNext()) {
                         contact = MegaContact()
-                        val id = cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_ID))
-                        contact.id = decrypt(id)
-                        val handle =
-                            cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_HANDLE))
-                        contact.handle = decrypt(handle)?.toLong() ?: 0
-                        val localName = cursor.getString(cursor.getColumnIndex(
-                            KEY_MEGA_CONTACTS_LOCAL_NAME))
-                        contact.localName = decrypt(localName)
-                        val email =
-                            cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_EMAIL))
-                        contact.email = decrypt(email)
-                        val phoneNumber = cursor.getString(cursor.getColumnIndex(
-                            KEY_MEGA_CONTACTS_PHONE_NUMBER))
-                        contact.normalizedPhoneNumber = decrypt(phoneNumber)
+                        try {
+                            val id =
+                                cursor.getString(cursor.getColumnIndexOrThrow(KEY_MEGA_CONTACTS_ID))
+                            contact.id = decrypt(id)
+                        } catch (exception: IllegalArgumentException) {
+                            Timber.e(exception,
+                                "Exception getting MEGA contact ID. Contact will not be included")
+                            continue
+                        }
+                        try {
+                            val handle =
+                                cursor.getString(cursor.getColumnIndexOrThrow(
+                                    KEY_MEGA_CONTACTS_HANDLE))
+                            contact.handle = decrypt(handle)?.toLong() ?: 0
+                        } catch (exception: IllegalArgumentException) {
+                            Timber.e(exception,
+                                "Exception getting MEGA contact handle. Contact will not be included")
+                            continue
+                        }
+                        try {
+                            val localName = cursor.getString(cursor.getColumnIndexOrThrow(
+                                KEY_MEGA_CONTACTS_LOCAL_NAME))
+                            contact.localName = decrypt(localName)
+                        } catch (exception: IllegalArgumentException) {
+                            Timber.w(exception, "Exception getting MEGA contact local name")
+                        }
+                        try {
+                            val email =
+                                cursor.getString(cursor.getColumnIndexOrThrow(
+                                    KEY_MEGA_CONTACTS_EMAIL))
+                            contact.email = decrypt(email)
+                        } catch (exception: IllegalArgumentException) {
+                            Timber.w(exception, "Exception getting MEGA contact email")
+                        }
+                        try {
+                            val phoneNumber = cursor.getString(cursor.getColumnIndexOrThrow(
+                                KEY_MEGA_CONTACTS_PHONE_NUMBER))
+                            contact.normalizedPhoneNumber = decrypt(phoneNumber)
+                        } catch (exception: IllegalArgumentException) {
+                            Timber.w(exception, "Exception getting MEGA contact phone number")
+                        }
                         contacts.add(contact)
                     }
                 }
@@ -4287,7 +4314,7 @@ open class DatabaseHandler(
                     val list: MutableList<Backup> = ArrayList()
                     cursor?.let {
                         while (cursor.moveToNext()) {
-                            list.add(getBackupFromCursor(cursor))
+                            getBackupFromCursor(cursor)?.let { it1 -> list.add(it1) }
                         }
                     }
                     return list
@@ -4298,33 +4325,43 @@ open class DatabaseHandler(
             return null
         }
 
-    private fun getBackupFromCursor(cursor: Cursor): Backup {
-        return Backup(backupId = decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_ID)))!!
-            .toLong(),
-            backupType = cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_TYPE)),
-            targetNode = decrypt(cursor.getString(cursor.getColumnIndex(
-                KEY_BACKUP_TARGET_NODE)))!!
+    private fun getBackupFromCursor(cursor: Cursor): Backup? {
+        try {
+            return Backup(backupId = (decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
+                KEY_BACKUP_ID))) ?: return null)
                 .toLong(),
-            localFolder = decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_LOCAL_FOLDER)))!!,
-            backupName = decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_NAME)))!!,
-            state = BackupState.fromValue(cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_STATE))),
-            subState = cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_SUB_STATE)),
-            extraData = decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_EXTRA_DATA)))!!,
-            startTimestamp = decrypt(cursor.getString(cursor.getColumnIndex(
-                KEY_BACKUP_START_TIME)))!!
-                .toLong(),
-            lastFinishTimestamp = decrypt(cursor.getString(cursor.getColumnIndex(
-                KEY_BACKUP_LAST_TIME)))!!
-                .toLong(),
-            targetFolderPath = decrypt(cursor.getString(cursor.getColumnIndex(
-                KEY_BACKUP_TARGET_NODE_PATH)))!!,
-            isExcludeSubFolders = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(
-                KEY_BACKUP_EX)))),
-            isDeleteEmptySubFolders = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(
-                KEY_BACKUP_DEL)))),
-            outdated = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(
-                KEY_BACKUP_OUTDATED))))
-        )
+                backupType = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_BACKUP_TYPE)),
+                targetNode = (decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
+                    KEY_BACKUP_TARGET_NODE))) ?: return null)
+                    .toLong(),
+                localFolder = decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
+                    KEY_BACKUP_LOCAL_FOLDER))) ?: return null,
+                backupName = decrypt(cursor.getString(cursor.getColumnIndexOrThrow(KEY_BACKUP_NAME)))!!,
+                state = BackupState.fromValue(cursor.getInt(cursor.getColumnIndexOrThrow(
+                    KEY_BACKUP_STATE))),
+                subState = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_BACKUP_SUB_STATE)),
+                extraData = decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
+                    KEY_BACKUP_EXTRA_DATA))) ?: return null,
+                startTimestamp = (decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
+                    KEY_BACKUP_START_TIME))) ?: return null)
+                    .toLong(),
+                lastFinishTimestamp = (decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
+                    KEY_BACKUP_LAST_TIME))) ?: return null)
+                    .toLong(),
+                targetFolderPath = decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
+                    KEY_BACKUP_TARGET_NODE_PATH))) ?: return null,
+                isExcludeSubFolders = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
+                    KEY_BACKUP_EX)))),
+                isDeleteEmptySubFolders = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(
+                    cursor.getColumnIndexOrThrow(
+                        KEY_BACKUP_DEL)))),
+                outdated = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
+                    KEY_BACKUP_OUTDATED))))
+            )
+        } catch (exception: IllegalArgumentException) {
+            Timber.w(exception, "Exception getting Backup")
+        }
+        return null
     }
 
     fun deleteBackupById(id: Long) {
