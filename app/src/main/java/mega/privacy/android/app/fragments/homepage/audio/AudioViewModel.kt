@@ -117,6 +117,11 @@ class AudioViewModel @Inject constructor(
     }
 
     init {
+        viewModelScope.launch {
+            sortOrder = getCloudSortOrder()
+            loadAudio(true)
+        }
+
         items.observeForever(loadFinishedObserver)
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
             .observeForever(nodesChangeObserver)
@@ -126,9 +131,6 @@ class AudioViewModel @Inject constructor(
                 Timber.d("Received node update")
                 loadAudio(true)
             }
-
-            sortOrder = getCloudSortOrder()
-            loadAudio(true)
         }
     }
 
