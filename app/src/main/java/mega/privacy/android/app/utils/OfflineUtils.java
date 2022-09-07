@@ -54,6 +54,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway;
+import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -201,7 +202,7 @@ public class OfflineUtils {
 
     public static boolean availableOffline(Context context, MegaNode node) {
 
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+        DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
 
         if (dbH.exists(node.getHandle())) {
             Timber.d("Exists OFFLINE in the DB!!!");
@@ -261,8 +262,7 @@ public class OfflineUtils {
      * @param handle  handle of the offline node
      */
     public static String getOfflineFolderName(Context context, long handle) {
-        DatabaseHandler dbHandler = DatabaseHandler.getDbHandler(context);
-
+        DatabaseHandler dbHandler = DbHandlerModuleKt.getDbHandler();
         MegaOffline node = dbHandler.findByHandle(handle);
         if (node == null) {
             return "";
@@ -628,7 +628,7 @@ public class OfflineUtils {
 
         if (megaApi == null || megaApi.getRootNode() == null) return;
 
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+        DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
         ArrayList<MegaOffline> offlineFiles = dbH.getOfflineFiles();
 
         if (offlineFiles == null || offlineFiles.isEmpty()) return; //No files to move
@@ -743,7 +743,7 @@ public class OfflineUtils {
      * @param nodeHandle Offline node handle to be shared
      */
     public static void shareOfflineNode(Context context, Long nodeHandle) {
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+        DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
         MegaOffline node = dbH.findByHandle(nodeHandle);
         if (node == null) return;
 
@@ -828,7 +828,7 @@ public class OfflineUtils {
      * @param nodeHandle Offline node handle to be open with
      */
     public static void openWithOffline(Context context, Long nodeHandle) {
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+        DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
         MegaOffline node = dbH.findByHandle(nodeHandle);
         if (node == null) return;
 

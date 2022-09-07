@@ -45,8 +45,8 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        if (arguments?.getSerializable(EXTRA_PARTICIPANT) != null) {
-            participantItem = arguments?.getSerializable(EXTRA_PARTICIPANT) as Participant
+        if (arguments?.getSerializable(EXTRA_PARTICIPANT, Participant::class.java) != null) {
+            participantItem = arguments?.getSerializable(EXTRA_PARTICIPANT, Participant::class.java) as Participant
             isMe = participantItem.isMe
             isContact = participantItem.isContact
         }

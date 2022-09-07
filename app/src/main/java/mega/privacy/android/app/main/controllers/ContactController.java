@@ -16,6 +16,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.AddContactActivity;
@@ -58,7 +59,7 @@ public class ContactController {
         }
 
         if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(context);
+            dbH = DbHandlerModuleKt.getDbHandler();
         }
     }
 

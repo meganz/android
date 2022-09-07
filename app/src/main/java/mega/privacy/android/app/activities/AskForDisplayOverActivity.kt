@@ -10,8 +10,8 @@ import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
+import mega.privacy.android.app.di.getDbHandler
 
 /**
  * A dialog style activity can lead to system setting page.
@@ -53,7 +53,7 @@ class AskForDisplayOverActivity : Activity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        DatabaseHandler.getDbHandler(this).dontAskForDisplayOver()
+        getDbHandler().dontAskForDisplayOver()
     }
 
     override fun onClick(v: View) {

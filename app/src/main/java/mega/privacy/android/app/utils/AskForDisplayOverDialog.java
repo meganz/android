@@ -14,6 +14,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.DbHandlerModuleKt;
 
 @TargetApi(Build.VERSION_CODES.Q)
 public class AskForDisplayOverDialog {
@@ -44,13 +45,13 @@ public class AskForDisplayOverDialog {
     }
 
     private void dismiss() {
-        DatabaseHandler.getDbHandler(context).dontAskForDisplayOver();
+        DbHandlerModuleKt.getDbHandler().dontAskForDisplayOver();
         dialog.cancel();
     }
 
 
     public void showDialog() {
-        if (IncomingCallNotification.shouldNotify(context) && DatabaseHandler.getDbHandler(context).shouldAskForDisplayOver()) {
+        if (IncomingCallNotification.shouldNotify(context) && DbHandlerModuleKt.getDbHandler().shouldAskForDisplayOver()) {
             dialog.show();
         }
     }

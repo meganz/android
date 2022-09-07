@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatAdapter;
 import nz.mega.sdk.MegaApiAndroid;
@@ -46,7 +47,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         this.userHandle = userHandle;
         this.isPreview = isPreview;
 
-        dbH = DatabaseHandler.getDbHandler(context);
+        dbH = DbHandlerModuleKt.getDbHandler();
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
@@ -62,7 +63,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         this.isPreview = isPreview;
         this.pos = pos;
 
-        dbH = DatabaseHandler.getDbHandler(context);
+        dbH = DbHandlerModuleKt.getDbHandler();
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
@@ -71,7 +72,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
 
     public ChatNonContactNameListener(Context context) {
         this.context = context;
-        dbH = DatabaseHandler.getDbHandler(context);
+        dbH = DbHandlerModuleKt.getDbHandler();
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();

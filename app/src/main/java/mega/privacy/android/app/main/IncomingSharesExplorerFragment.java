@@ -345,7 +345,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
         modeCloud = ((FileExplorerActivity) context).getMode();
         selectFile = ((FileExplorerActivity) context).isSelectFile();
 
-        MegaPreferences prefs = getPreferences(context);
+        MegaPreferences prefs = getPreferences();
 
         if (prefs != null) {
             if (prefs.getPreferredSortOthers() != null) {

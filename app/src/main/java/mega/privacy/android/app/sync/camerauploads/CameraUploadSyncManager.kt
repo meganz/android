@@ -10,6 +10,7 @@ import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RE
 import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.model.UserCredentials
+import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.sync.Backup
 import mega.privacy.android.app.sync.BackupState
@@ -777,7 +778,7 @@ object CameraUploadSyncManager {
         val isLoggingIn = MegaApplication.isLoggingIn()
         if (megaApi.rootNode == null && !isLoggingIn) {
             Timber.w("RootNode = null, need to login again")
-            val dbH = DatabaseHandler.getDbHandler(megaApplication)
+            val dbH = getDbHandler()
             val gSession = dbH.credentials?.session
             MegaApplication.setLoggingIn(true)
             megaApi.fastLogin(gSession, createHeartbeatListener(onSuccess = {
@@ -816,7 +817,7 @@ object CameraUploadSyncManager {
                 "",
                 "",
                 myUserHandle)
-        val dbH = DatabaseHandler.getDbHandler(megaApplication)
+        val dbH = getDbHandler()
         dbH.saveCredentials(credentials)
     }
 

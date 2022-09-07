@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
+import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -24,7 +25,7 @@ public class FillDBContactsTask extends AsyncTask<String, Void, String> {
 
     public FillDBContactsTask(Context context){
         this.context = context;
-        dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+        dbH = DbHandlerModuleKt.getDbHandler();
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }

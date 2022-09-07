@@ -4,7 +4,6 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
 import static mega.privacy.android.app.utils.ChatUtil.getMegaChatMessage;
 import static mega.privacy.android.app.utils.ChatUtil.getMutedPeriodString;
-import static mega.privacy.android.app.utils.ChatUtil.isGeolocation;
 import static mega.privacy.android.app.utils.Constants.ACTION_FORWARD_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.FROM_OTHERS;
 import static mega.privacy.android.app.utils.Constants.ID_MESSAGES;
@@ -52,6 +51,7 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
+import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CopyListener;
 import mega.privacy.android.app.listeners.ExportListener;
@@ -102,7 +102,7 @@ public class ChatController {
         }
 
         if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(context);
+            dbH = DbHandlerModuleKt.getDbHandler();
         }
     }
 
