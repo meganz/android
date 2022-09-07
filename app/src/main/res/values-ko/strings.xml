@@ -3116,9 +3116,9 @@
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">파일 생성 실패. 다시 시도하세요.</string>
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">%1$s에 파일이 저장되었습니다</string>
+    <string name="file_saved_to">File saved to %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">%1$s에 파일이 저장되지 않았습니다. 다시 시도하세요.</string>
+    <string name="file_saved_to_failed">File not saved to %1$s. Try again.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">파일 업데이트됨</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -3901,4 +3901,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">누군가 통화에 참여하거나 떠날 때 소리를 듣습니다.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">나중에</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">파일이 클라우드 드라이브에 저장되었습니다.</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">파일이 클라우드 드라이브에 저장되지 않았습니다. 다시 시도하세요.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">슬라이드쇼</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">유형 선택</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">모든 미디어</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">다음의 항목 보기</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">모든 위치</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">클라우드 드라이브</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">[B]미디어[/B]를 찾을 수 없습니다</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">[B]이미지[/B]를 찾을 수 없습니다</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">[B]동영상[/B]을 찾을 수 없습니다</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">나중에</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">알림 받기</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA가 통화, 대화, 그리고 파일 전송 알림을 보낼 것입니다.</string>
 </resources>

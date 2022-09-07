@@ -3901,4 +3901,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">ให้ส่งเสียงเมื่อมีคนเข้าร่วมหรือวางสาย</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">ไม่ใช่ตอนนี้</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">บันทึกไฟล์ไปยังคลาวด์ไดรฟ์แล้ว</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">ไฟล์ไม่ได้ถูกบันทึกไปยังคลาวด์ไดรฟ์ ลองอีกครั้ง</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">สไลด์โชว์</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">เลือกประเภท</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">สื่อทั้งหมด</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">แสดงรายการจาก</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">ทุกตำแหน่งที่ตั้ง</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">คลาวด์ไดรฟ์</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">ไม่พบ[B]สื่อ[/B]</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">ไม่พบ[B]รูปภาพ[/B]</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">ไม่พบ[B]วิดีโอ[/B]</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">ไม่ใช่ตอนนี้</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">รับการแจ้งเตือน</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA จะส่งการแจ้งเตือนการโทร แชท และการถ่ายโอนไฟล์ถึงคุณ</string>
 </resources>

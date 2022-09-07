@@ -4111,4 +4111,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">Ouvir um som quando alguém entra ou sai de uma chamada.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Agora não</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">Arquivo salvo na Nuvem de arquivos.</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">Não foi possível salvar o arquivo na Nuvem de arquivos. Tente novamente.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Slideshow</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">Escolher o tipo de arquivo</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">Todos os arquivos de mídia</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">Mostrar itens em</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">Todos os locais</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">Nuvem de arquivos</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">Não há [B]arquivos de mídia[/B]</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">Não há [B]imagens[/B]</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">Não há [B]vídeos[/B]</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">Agora não</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">Receber notificações</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">O MEGA enviará notificações relacionadas a chamadas, chats e transferência de arquivos.</string>
 </resources>

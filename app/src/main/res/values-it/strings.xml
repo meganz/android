@@ -403,7 +403,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Richiesta inviata nuovamente</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Richiesta inviata correttamente a %s. Vedi nella sezione Richieste inviate.</string>
+    <string name="context_contact_request_sent">Richiesta inviata con successo a %s. Vedi nella sezione Richieste inviate.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contatto cancellato</string>
     <!-- error message -->
@@ -419,17 +419,17 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Errore. Cartella non creata</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Rinominato</string>
+    <string name="context_correctly_renamed">Rinominato con successo</string>
     <!-- error message -->
     <string name="context_no_renamed">Errore. Rinominazione fallita</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Copiatto corretamente</string>
+    <string name="context_correctly_copied">Copiato con successo</string>
     <!-- error message -->
     <string name="context_no_copied">Errore. Copia fallita</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Per favore, scegli una cartella di destinazione</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Spostato</string>
+    <string name="context_correctly_moved">Spostato con successo</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="one">%d oggetto spostato</item>
@@ -443,13 +443,13 @@
     <!-- error message -->
     <string name="context_no_moved">Errore. Spostamento fallito</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">Condiviso</string>
+    <string name="context_correctly_shared">Condiviso con successo</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">Errore. %d condivisioni non sono state completate</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Errore. Condivisione non rimossa</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Cancellato</string>
+    <string name="context_correctly_removed">Eliminato con successo</string>
     <!-- error message -->
     <string name="context_no_removed">Errore. Cancellazione fallita</string>
     <!-- success message when moving a node -->
@@ -3391,9 +3391,9 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 oggetto non spostato nel Cestino correttamente</item>
-        <item quantity="many">%d oggetti non spostati nel Cestino correttamente</item>
-        <item quantity="other">%d oggetti non spostati nel Cestino correttamente</item>
+        <item quantity="one">1 oggetto non spostato nel Cestino con successo</item>
+        <item quantity="many">%d oggetti non spostati nel Cestino con successo</item>
+        <item quantity="other">%d oggetti non spostati nel Cestino con successo</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
@@ -3403,9 +3403,9 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 oggetto non ripristinato correttamente</item>
-        <item quantity="many">%d oggetti non ripristinati correttamente</item>
-        <item quantity="other">%d oggetti non ripristinati correttamente</item>
+        <item quantity="one">1 oggetto non ripristinato con successo</item>
+        <item quantity="many">%d oggetti non ripristinati con successo</item>
+        <item quantity="other">%d oggetti non ripristinati con successo</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Cambia lo stesso</string>
@@ -4111,4 +4111,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">Senti un suono quando un utente entra o esce da una chiamata.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Non ora</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">File salvato nel Cloud Drive.</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">File non salvato nel Cloud Drive. Ritenta.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Presentazione</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">Scegli tipo</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">Tutti i media</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">Mostra oggetti da</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">Tutte le posizioni</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">Cloud drive</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">Nessun [B]media[/B] trovato</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">Nessuna [B]immagine[/B] trovata</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">Nessun [B]video[/B] trovato</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">Non ora</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">Ricevi una notifica</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA ti invierà notifiche per chiamate, messaggi, e trasferimenti di file.</string>
 </resources>

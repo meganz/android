@@ -4111,4 +4111,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">Cuando alguien se une o abandona una llamada se emitirá un sonido.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Ahora no</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">File saved to Cloud drive.</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">File not saved to Cloud drive. Try again.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Presentación</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">Elegir tipo</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">Imágenes y vídeos</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">Mostrar elementos desde</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">Todas las ubicaciones</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">Nube</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">No hay [B]ni imágenes ni vídeos[/B]</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">No hay [B]imágenes[/B]</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">No hay [B]videos[/B]</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">Ahora no</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">Activar notificaciones</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA te enviará notificaciones de llamadas, chats y transferencias de archivos.</string>
 </resources>

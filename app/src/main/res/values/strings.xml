@@ -3198,6 +3198,10 @@
     <string name="file_created">File created</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">File creation failed. Please try again.</string>
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
+    <string name="file_saved_to">File saved to %1$s</string>
+    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
+    <string name="file_saved_to_failed">File not saved to %1$s. Try again.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">File updated</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -4019,7 +4023,7 @@
     <!-- Filter page: Radio button text for CD only source -->
     <string name="filter_button_cd_only">Cloud drive</string>
     <!-- Timeline: Empty state for No Media (No Images and Videos) -->
-    <string name="timeline_empty_media">No [B]Media[/B] found</string>
+    <string name="timeline_empty_media">No [B]media[/B] found</string>
     <!-- Timeline: Empty state for No Images -->
     <string name="timeline_empty_images">No [B]images[/B] found</string>
     <!-- Timeline: Empty state for No Videos -->
@@ -4029,5 +4033,5 @@
     <!-- Title of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_title">Get notified</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
-    <string name="permissions_notifications_description">MEGA will send you call, chat and file transfer notifications.</string>
+    <string name="permissions_notifications_description">MEGA will send you call, chat, and file transfer notifications.</string>
 </resources>

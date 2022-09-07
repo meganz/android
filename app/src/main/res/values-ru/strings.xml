@@ -3038,7 +3038,7 @@
     <!-- Label indicating storage over quota -->
     <string name="label_storage_over_quota">Превышен лимит хранения данных</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
-    <string name="label_get_more_transfer_quota">Увеличить квоту на передачу</string>
+    <string name="label_get_more_transfer_quota">Увеличить лимит передачи данных</string>
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">Папка не существует.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
@@ -4216,4 +4216,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">Проигрывать сигнал, когда кто-то присоединяется к вызову или покидает его.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Не сейчас</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">Файл сохранён в облачном диске</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">Файл не сохранён в облачном диске. Попробуйте ещё раз.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Слайдшоу</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">Выберите тип</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">Все медиа</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">Показывать элементы из</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">Все расположения</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">Облачный диск</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">[B]Медиафайлы[/B] не найдены</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">[B]Изображения[/B] не найдены</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">[B]Видео[/B] не найдено</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">Не сейчас</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">Получайте уведомления</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA будет сообщать о звонках, чатах и передачах файлов.</string>
 </resources>

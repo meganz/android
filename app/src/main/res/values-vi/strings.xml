@@ -3901,4 +3901,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">Nghe âm báo khi có người tham gia hoặc rời khỏi cuộc gọi.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Không phải lúc này</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">File saved to Cloud drive.</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">File not saved to Cloud drive. Try again.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Chạy trình chiếu</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">Chọn dạng</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">Tất cả phương tiện số</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">Hiện các mục từ</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">Tất cả các vị trí</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">Ổ mây</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">Không có [B]phương tiện số[/B] nào</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">Không có [B]ảnh[/B] nào</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">Không có [B]video[/B] nào</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">Không phải lúc này</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">Nhận tin thông báo</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA sẽ gửi các thông báo cho bạn khi có cuộc gọi, chát, và truyền tải.</string>
 </resources>
