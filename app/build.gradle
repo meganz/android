@@ -383,7 +383,7 @@ dependencies {
     jacocoAnt 'org.jacoco:org.jacoco.ant:0.8.8:nodeps'
 
     //GMS
-    gmsImplementation 'com.android.billingclient:billing:3.0.2'
+    gmsImplementation 'com.android.billingclient:billing:5.0.0'
     gmsImplementation 'com.google.android.gms:play-services-location:19.0.1'
     gmsImplementation 'com.google.android.gms:play-services-maps:18.0.2'
     gmsImplementation 'com.google.maps.android:android-maps-utils:0.5'

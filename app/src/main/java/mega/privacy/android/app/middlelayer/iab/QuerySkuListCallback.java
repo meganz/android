@@ -8,7 +8,7 @@ import java.util.List;
 public interface QuerySkuListCallback {
 
     /**
-     * Execute when get subscriptions succefully.
+     * Execute when get subscriptions successfully.
      *
      * @param skuList Available subscriptions. Need to covert platform depends subscription object to generic MegaSku object.
      */
