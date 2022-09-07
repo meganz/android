@@ -19,6 +19,7 @@ import mega.privacy.android.app.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.mapper.ImageMapper
 import mega.privacy.android.app.data.mapper.MegaExceptionMapper
 import mega.privacy.android.app.data.mapper.NodeUpdateMapper
+import mega.privacy.android.app.data.mapper.StartScreenMapper
 import mega.privacy.android.app.data.mapper.TransferEventMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.mapper.getFileTypeInfo
@@ -45,6 +46,7 @@ import mega.privacy.android.app.data.mapper.toTransferEventModel
 import mega.privacy.android.app.data.mapper.toVideo
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.presentation.mapper.toFavourite
+import mega.privacy.android.domain.entity.preference.StartScreen
 
 /**
  * Module for providing mapper dependencies
@@ -138,4 +140,7 @@ class MapperModule {
 
     @Provides
     fun provideNodeUpdateMapper(): NodeUpdateMapper = ::mapMegaNodeListToNodeUpdate
+
+    @Provides
+    fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
 }

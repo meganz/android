@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.preference.StartScreen
 
 /**
  * Settings repository - class for handling all calls relating to settings
@@ -308,4 +309,18 @@ interface SettingsRepository {
      * @param time
      */
     suspend fun setLastContactPermissionDismissedTime(time: Long)
+
+    /**
+     * Monitor preferred start screen
+     *
+     * @return flow of start screen preference
+     */
+    fun monitorPreferredStartScreen(): Flow<StartScreen>
+
+    /**
+     * Set preferred start screen
+     *
+     * @param screen
+     */
+    suspend fun setPreferredStartScreen(screen: StartScreen)
 }
