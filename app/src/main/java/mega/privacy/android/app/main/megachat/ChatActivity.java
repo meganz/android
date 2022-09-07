@@ -736,6 +736,7 @@ public class ChatActivity extends PasscodeActivity
 
     private ConstraintLayout unreadMsgsLayout;
     private RelativeLayout unreadBadgeLayout;
+    private ImageView unreadBadgeImage;
     private TextView unreadBadgeText;
     private ArrayList<Long> msgsReceived = new ArrayList<>();
 
@@ -1736,6 +1737,7 @@ public class ChatActivity extends PasscodeActivity
         unreadMsgsLayout.setVisibility(View.GONE);
         unreadBadgeLayout = findViewById(R.id.badge_rl);
         unreadBadgeText = findViewById(R.id.badge_text);
+        unreadBadgeImage = findViewById(R.id.badge_image);
 
         rLKeyboardTwemojiButton = findViewById(R.id.emoji_rl);
 
@@ -9475,6 +9477,11 @@ public class ChatActivity extends PasscodeActivity
         if (isInputTextExpanded) {
             return;
         }
+
+        unreadBadgeImage.setVisibility(View.VISIBLE);
+        unreadBadgeLayout.setVisibility(View.VISIBLE);
+        unreadMsgsLayout.setVisibility(View.VISIBLE);
+
         if (msgsReceived != null && msgsReceived.size() > 0) {
             int numOfNewMessages = msgsReceived.size();
             numOfNewMessages = numOfNewMessages - 99;
@@ -9483,15 +9490,10 @@ public class ChatActivity extends PasscodeActivity
             } else {
                 unreadBadgeText.setText(msgsReceived.size() + "");
             }
-            unreadBadgeLayout.setVisibility(View.VISIBLE);
         } else {
             unreadBadgeLayout.setVisibility(View.GONE);
         }
 
-        if (unreadMsgsLayout.getVisibility() == View.VISIBLE)
-            return;
-
-        unreadMsgsLayout.setVisibility(View.VISIBLE);
     }
 
     public MegaApiAndroid getLocalMegaApiFolder() {
