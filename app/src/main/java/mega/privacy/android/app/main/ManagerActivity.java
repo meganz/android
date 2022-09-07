@@ -428,6 +428,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
 import mega.privacy.android.domain.entity.ContactRequest;
 import mega.privacy.android.domain.entity.ContactRequestStatus;
+import mega.privacy.android.domain.entity.transfer.TransferType;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -1577,7 +1578,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 .observeForever(refreshAddPhoneNumberButtonObserver);
 
         LiveEventBus.get(EVENT_TRANSFER_OVER_QUOTA, Boolean.class).observe(this, update -> {
-            updateTransfersWidget(INVALID_VALUE);
+            updateTransfersWidget(TransferType.NONE);
             showTransfersTransferOverQuotaWarning();
         });
 

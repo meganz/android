@@ -23,6 +23,7 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
+import mega.privacy.android.domain.repository.TransferRepository
 import org.mockito.kotlin.mock
 
 @Module
@@ -85,4 +86,7 @@ object TestRepositoryModule {
 
     @Provides
     fun provideStatisticsRepository(): StatisticsRepository = mock()
+
+    @Provides
+    fun provideTransferRepository(): TransferRepository = mock()
 }

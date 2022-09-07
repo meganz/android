@@ -4,13 +4,13 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.TransfersSizeInfo
 
 /**
- * Get size transfer info
+ * Monitor transfers size
  */
-fun interface GetSizeTransferInfo {
+fun interface MonitorTransfersSize {
     /**
      * Invoke
      *
-     * @return flow size transfer info
+     * @return flow of TransfersSizeInfo
      */
     operator fun invoke(): Flow<TransfersSizeInfo>
 }

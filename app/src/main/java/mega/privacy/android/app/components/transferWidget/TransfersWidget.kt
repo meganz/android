@@ -19,8 +19,8 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.TransfersInfo
+import mega.privacy.android.domain.entity.transfer.TransferType
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaTransfer
 import kotlin.math.roundToInt
 
 /**
@@ -185,7 +185,7 @@ class TransfersWidget(
 
         setProgress(
             transfersInfo = transfersInfo,
-            typeTransfer = NO_TYPE
+            typeTransfer = TransferType.NONE
         )
         progressBar.progressDrawable = getDrawable(R.drawable.thin_circular_warning_progress_bar)
         updateStatus(getDrawable(R.drawable.ic_transfers_error))
@@ -208,11 +208,11 @@ class TransfersWidget(
      *
      * @param transfersInfo Transfers info.
      * @param typeTransfer  type of the transfer:
-     * - NO_TYPE if no type
-     * - MegaTransfer.TYPE_DOWNLOAD if download transfer
-     * - MegaTransfer.TYPE_UPLOAD if upload transfer
+     * - [TransferType.NONE] if no type
+     * - [TransferType.TYPE_DOWNLOAD] if download transfer
+     * - [TransferType.TYPE_UPLOAD] if upload transfer
      */
-    fun setProgress(transfersInfo: TransfersInfo, typeTransfer: Int) {
+    fun setProgress(transfersInfo: TransfersInfo, typeTransfer: TransferType) {
         setProgress(
             getProgress(
                 transfersInfo.totalSizePendingTransfer,
@@ -223,10 +223,10 @@ class TransfersWidget(
         val pendingUploads = transfersInfo.numPendingUploads > 0
 
         val downloadIcon: Boolean =
-            if (typeTransfer == MegaTransfer.TYPE_UPLOAD && pendingUploads) {
+            if (typeTransfer == TransferType.TYPE_UPLOAD && pendingUploads) {
                 false
             } else {
-                (typeTransfer == MegaTransfer.TYPE_DOWNLOAD && pendingDownloads)
+                (typeTransfer == TransferType.TYPE_DOWNLOAD && pendingDownloads)
                         || (pendingDownloads && !pendingUploads)
                         || transfersInfo.numPendingDownloadsNonBackground > transfersInfo.numPendingUploads
             }
