@@ -1,5 +1,6 @@
 package mega.privacy.android.app.data.repository
 
+import mega.privacy.android.domain.repository.TransferRepository as DomainTransferRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -10,11 +11,8 @@ import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.mapper.TransferEventMapper
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.repository.TransfersRepository
-import mega.privacy.android.domain.entity.TransfersSizeInfo
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.repository.TransferRepository as DomainTransferRepository
 import nz.mega.sdk.MegaTransfer
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -30,7 +28,6 @@ class DefaultTransfersRepository @Inject constructor(
     private val dbH: DatabaseHandler,
     private val transferEventMapper: TransferEventMapper,
 ) : TransfersRepository, DomainTransferRepository {
-    private val transferMap: MutableMap<Int, MegaTransfer> = hashMapOf()
 
     override suspend fun getUploadTransfers(): List<MegaTransfer> = withContext(ioDispatcher) {
         megaApiGateway.getTransfers(MegaTransfer.TYPE_UPLOAD)
@@ -78,39 +75,6 @@ class DefaultTransfersRepository @Inject constructor(
     override suspend fun areAllTransfersPaused(): Boolean = withContext(ioDispatcher) {
         areTransfersPaused() || getNumPendingPausedUploads() + getNumPendingNonBackgroundPausedDownloads() == getNumPendingTransfers()
     }
-
-    override fun getSizeTransfer(): Flow<TransfersSizeInfo> = megaApiGateway.globalTransfer
-        .map {
-            val transfer = it.transfer
-            if (transfer != null) {
-                transferMap[transfer.tag] = transfer
-            }
-
-            var totalBytes: Long = 0
-            var totalTransferred: Long = 0
-
-            val megaTransfers = transferMap.values.toList()
-            for (currentTransfer in megaTransfers) {
-                if (currentTransfer.state == MegaTransfer.STATE_COMPLETED) {
-                    totalBytes += currentTransfer.totalBytes
-                    totalTransferred += currentTransfer.totalBytes
-                } else {
-                    totalBytes += currentTransfer.totalBytes
-                    totalTransferred += currentTransfer.transferredBytes
-                }
-            }
-            // we only clear cache when all transfer done
-            // if we remove in OnTransferFinish it can cause the progress show incorrectly
-            if (megaTransfers.all { megaTransfer -> megaTransfer.isFinished }) {
-                transferMap.clear()
-            }
-            Timber.d("Total transfer ${transferMap.size}")
-            TransfersSizeInfo(
-                transferType = transfer?.type ?: -1,
-                totalSizePendingTransfer = totalBytes,
-                totalSizeTransferred = totalTransferred
-            )
-        }
 
     override fun monitorTransferEvents(): Flow<TransferEvent> =
         megaApiGateway.globalTransfer.map { event -> transferEventMapper(event) }
