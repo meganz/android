@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting.list.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemMeetingBinding
@@ -17,6 +18,8 @@ class MeetingsAdapter constructor(
     init {
         setHasStableIds(true)
     }
+
+    var tracker: SelectionTracker<Long>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeetingsViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -36,7 +39,9 @@ class MeetingsAdapter constructor(
     }
 
     override fun onBindViewHolder(holder: MeetingsViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val item = getItem(position)
+        val isItemSelected = tracker?.isSelected(item.chatId) ?: false
+        holder.bind(item, isItemSelected)
     }
 
     override fun getItemId(position: Int): Long =

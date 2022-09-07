@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.selection.SelectionPredicates
+import androidx.recyclerview.selection.SelectionTracker
+import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.components.ChatDividerItemDecoration
@@ -15,10 +18,13 @@ import mega.privacy.android.app.databinding.FragmentMeetingListBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.chats.ChatTabsFragment
+import mega.privacy.android.app.meeting.list.adapter.MeetingItemDetailsLookup
+import mega.privacy.android.app.meeting.list.adapter.MeetingItemKeyProvider
 import mega.privacy.android.app.meeting.list.adapter.MeetingsAdapter
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MeetingListFragment : Fragment() {
@@ -69,7 +75,24 @@ class MeetingListFragment : Fragment() {
                     checkElevation()
                 }
             })
+
+            meetingsAdapter.tracker = SelectionTracker.Builder(
+                MeetingListFragment::class.java.simpleName,
+                this,
+                MeetingItemKeyProvider(meetingsAdapter),
+                MeetingItemDetailsLookup(this),
+                StorageStrategy.createLongStorage()
+            ).withSelectionPredicate(SelectionPredicates.createSelectAnything()).build()
+                .apply {
+                    addObserver(object : SelectionTracker.SelectionObserver<Long>() {
+                        override fun onSelectionChanged() {
+                            super.onSelectionChanged()
+                            Timber.wtf("Selection size: ${selection.size()}")
+                        }
+                    })
+                }
         }
+
         binding.listScroller.setRecyclerView(binding.list)
         binding.btnNewMeeting.setOnClickListener {
             MeetingBottomSheetDialogFragment.newInstance(true)
