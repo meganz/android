@@ -29,7 +29,6 @@ import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_OUTGOI
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_RINGING;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
@@ -37,8 +36,6 @@ import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.EXTRA_CONFIRMATION;
 import static mega.privacy.android.app.utils.Constants.EXTRA_VOLUME_STREAM_TYPE;
 import static mega.privacy.android.app.utils.Constants.EXTRA_VOLUME_STREAM_VALUE;
-import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
-import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
 import static mega.privacy.android.app.utils.Constants.INVALID_VOLUME;
 import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
@@ -126,8 +123,6 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
-import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import dagger.hilt.android.HiltAndroidApp;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
@@ -146,6 +141,7 @@ import mega.privacy.android.app.di.MegaApiFolder;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
@@ -169,6 +165,7 @@ import mega.privacy.android.app.presentation.logging.InitialiseLoggingUseCaseJav
 import mega.privacy.android.app.presentation.theme.ThemeModeState;
 import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
@@ -202,7 +199,7 @@ import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
 @HiltAndroidApp
-public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface, Configuration.Provider {
+public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatListenerInterface, Configuration.Provider {
 
     final String TAG = "MegaApplication";
 
@@ -297,7 +294,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
     private static boolean verifyingCredentials;
 
-    private NetworkStateReceiver networkStateReceiver;
     private BroadcastReceiver logoutReceiver;
     private AppRTCAudioManager rtcAudioManager = null;
 
@@ -309,22 +305,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     private GlobalChatListener globalChatListener = new GlobalChatListener(this);
 
     private final CallSoundsController soundsController = new CallSoundsController();
-
-    @Override
-    public void networkAvailable() {
-        Timber.d("Net available: Broadcast to ManagerActivity");
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-        intent.putExtra(ACTION_TYPE, GO_ONLINE);
-        sendBroadcast(intent);
-    }
-
-    @Override
-    public void networkUnavailable() {
-        Timber.d("Net unavailable: Broadcast to ManagerActivity");
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-        intent.putExtra(ACTION_TYPE, GO_OFFLINE);
-        sendBroadcast(intent);
-    }
 
     public static void smsVerifyShowed(boolean isShowed) {
         isVerifySMSShowed = isShowed;
@@ -807,9 +787,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
             dbH.resetExtendedAccountDetailsTimestamp();
         }
 
-        networkStateReceiver = new NetworkStateReceiver();
-        networkStateReceiver.addListener(this);
-        registerReceiver(networkStateReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        registerReceiver(new NetworkStateReceiver(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
         LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observeForever(callRingingStatusObserver);
