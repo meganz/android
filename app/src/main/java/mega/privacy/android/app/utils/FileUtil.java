@@ -63,6 +63,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -570,7 +571,7 @@ public class FileUtil {
             return file.getAbsolutePath();
         }
 
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(MegaApplication.getInstance());
+        DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
         MegaPreferences prefs = dbH.getPreferences();
 
         if (prefs != null
@@ -1108,7 +1109,7 @@ public class FileUtil {
 
                 // Copy to target location on SD card.
                 SDCardOperator sdCardOperator = new SDCardOperator(context);
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+                DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
                 sdCardOperator.initDocumentFileRoot(dbH.getSdCardUri());
                 sdCardOperator.moveFile(path.substring(0, path.lastIndexOf(File.separator)), temp);
 

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
-import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.DownloadService.EXTRA_DOWNLOAD_BY_TAP
 import mega.privacy.android.app.DownloadService.EXTRA_DOWNLOAD_TO_SDCARD
@@ -19,6 +18,7 @@ import mega.privacy.android.app.DownloadService.EXTRA_TARGET_URI
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.utils.Constants.APP_DATA_VOICE_CLIP
@@ -89,7 +89,7 @@ class MegaNodeSaving(
     ): AutoPlayInfo {
         val app = MegaApplication.getInstance()
         val api = if (isFolderLink) megaApiFolder else megaApi
-        val dbHandler = DatabaseHandler.getDbHandler(app)
+        val dbHandler = getDbHandler()
 
         var numberOfNodesAlreadyDownloaded = 0
         var numberOfNodesPending = 0

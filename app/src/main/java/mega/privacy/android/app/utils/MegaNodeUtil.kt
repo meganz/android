@@ -21,7 +21,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -29,6 +28,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -1236,7 +1236,7 @@ object MegaNodeUtil {
         handle: Long,
     ): LocationInfo? {
         val app = MegaApplication.getInstance()
-        val dbHandler = DatabaseHandler.getDbHandler(app)
+        val dbHandler = getDbHandler()
         val megaApi = app.megaApi
 
         if (adapterType == OFFLINE_ADAPTER) {

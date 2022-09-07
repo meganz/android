@@ -1,7 +1,7 @@
 package mega.privacy.android.app.utils;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
-import static mega.privacy.android.app.utils.Util.isAndroid10;
+import static mega.privacy.android.app.utils.Util.isAndroid10OrUpper;
 
 import android.annotation.TargetApi;
 import android.app.NotificationChannel;
@@ -63,7 +63,7 @@ public class IncomingCallNotification {
     }
 
     public static boolean shouldNotify(Context context) {
-        return isAndroid10() && !Settings.canDrawOverlays(context);
+        return isAndroid10OrUpper() && !Settings.canDrawOverlays(context);
     }
 
     @Retention(RetentionPolicy.SOURCE)

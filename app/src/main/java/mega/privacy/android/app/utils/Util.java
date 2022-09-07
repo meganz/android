@@ -125,6 +125,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity;
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity;
@@ -1093,8 +1094,8 @@ public class Util {
                 : 0;
     }
 
-    public static MegaPreferences getPreferences(Context context) {
-        return DatabaseHandler.getDbHandler(context).getPreferences();
+    public static MegaPreferences getPreferences() {
+        return DbHandlerModuleKt.getDbHandler().getPreferences();
     }
 
     /**
@@ -1103,8 +1104,8 @@ public class Util {
      * @return True if should ask for download location, false otherwise.
      */
     public static boolean askMe() {
-        MegaPreferences prefs = DatabaseHandler.getDbHandler(MegaApplication.getInstance())
-                .getPreferences();
+
+        MegaPreferences prefs = DbHandlerModuleKt.getDbHandler().getPreferences();
 
         if (prefs != null && prefs.getStorageAskAlways() != null
                 && !Boolean.parseBoolean(prefs.getStorageAskAlways())
@@ -1441,7 +1442,7 @@ public class Util {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R;
     }
 
-    public static boolean isAndroid10() {
+    public static boolean isAndroid10OrUpper() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q;
     }
 
@@ -1540,7 +1541,7 @@ public class Util {
      * @param downloadLocation The download location selected by the user.
      */
     public static void storeDownloadLocationIfNeeded(String downloadLocation) {
-        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
 
         MegaPreferences preferences = dbH.getPreferences();
 

@@ -21,7 +21,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.OpenLinkActivity
@@ -31,6 +30,7 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.data.repository.DefaultPushesRepository.Companion.PUSH_TOKEN
+import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileStorageActivity
@@ -319,7 +319,7 @@ class AccountController(private val context: Context) {
                 Timber.w(e, "Cancelling services not allowed by the OS")
             }
 
-            val dbH = DatabaseHandler.getDbHandler(context)
+            val dbH = getDbHandler()
             dbH.clearCredentials()
 
             if (dbH.preferences != null) {

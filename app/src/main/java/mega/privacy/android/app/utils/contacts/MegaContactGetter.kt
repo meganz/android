@@ -5,9 +5,9 @@ import android.content.SharedPreferences
 import android.text.TextUtils
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.CoroutineScopesModule
 import mega.privacy.android.app.di.CoroutinesDispatchersModule
+import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.contacts.ContactsUtil.LocalContact
@@ -24,7 +24,7 @@ class MegaContactGetter(val context: Context) {
         const val LAST_SYNC_TIMESTAMP_KEY = "last_sync_mega_contacts_timestamp"
     }
 
-    private val dbH = DatabaseHandler.getDbHandler(context)
+    private val dbH = getDbHandler()
     val preferences: SharedPreferences by lazy {
         context.getSharedPreferences(LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE)
     }
