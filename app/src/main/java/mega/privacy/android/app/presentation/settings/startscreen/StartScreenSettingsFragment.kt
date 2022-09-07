@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.settings.startSceen
+package mega.privacy.android.app.presentation.settings.startscreen
 
 import android.content.Context
 import android.os.Bundle
@@ -9,11 +9,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.databinding.FragmentStartScreenSettingsBinding
-import mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.PHOTOS_BNV
-import mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.CHAT_BNV
-import mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV
-import mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.HOME_BNV
-import mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.SHARED_ITEMS_BNV
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import mega.privacy.android.domain.entity.preference.StartScreen
 

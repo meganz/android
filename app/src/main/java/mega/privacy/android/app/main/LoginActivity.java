@@ -5,7 +5,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE;
 import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp;
 import static mega.privacy.android.app.utils.Constants.ACTION_CANCEL_CAM_SYNC;
 import static mega.privacy.android.app.utils.Constants.ACTION_CANCEL_DOWNLOAD;
 import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_TRANSFER;
