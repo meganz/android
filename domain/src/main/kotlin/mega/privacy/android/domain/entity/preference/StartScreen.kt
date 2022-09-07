@@ -43,6 +43,6 @@ enum class StartScreen(val id: Int) {
          * @param id
          *
          */
-        operator fun invoke(id: Int) = values().firstOrNull { it.id == id } ?: None
+        operator fun invoke(id: Int?) = values().firstOrNull { it.id == id } ?: None
     }
 }

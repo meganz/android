@@ -6,6 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
@@ -20,6 +21,8 @@ import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.app.data.gateway.preferences.UIPreferencesGateway
+import mega.privacy.android.app.data.mapper.StartScreenMapper
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -27,6 +30,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.SharedPreferenceConstants
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.repository.SettingsRepository
 import nz.mega.sdk.MegaApiJava
@@ -64,6 +68,8 @@ class DefaultSettingsRepository @Inject constructor(
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val appPreferencesGateway: AppPreferencesGateway,
     private val cacheFolderGateway: CacheFolderGateway,
+    private val uiPreferencesGateway: UIPreferencesGateway,
+    private val startScreenMapper: StartScreenMapper,
 ) : SettingsRepository {
     init {
         initialisePreferences()
@@ -324,5 +330,13 @@ class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun setLastContactPermissionDismissedTime(time: Long) {
         chatPreferencesGateway.setLastContactPermissionRequestedTime(time)
+    }
+
+    override fun monitorPreferredStartScreen() =
+        uiPreferencesGateway.monitorPreferredStartScreen()
+            .map{ startScreenMapper(it) }
+
+    override suspend fun setPreferredStartScreen(screen: StartScreen) {
+        uiPreferencesGateway.setPreferredStartScreen(screen.id)
     }
 }
