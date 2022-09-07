@@ -209,30 +209,36 @@ fun CameraUploadProgressBar(
     timelineViewState: TimelineViewState = TimelineViewState(),
     isVisible: () -> Boolean = { true },
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
+    AnimatedVisibility(
+        visible = isVisible(),
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = StringResourcesUtils.getQuantityString(
-                    R.plurals.cu_upload_progress,
-                    timelineViewState.pending,
-                    timelineViewState.pending
-                ),
-                color = colorResource(id = R.color.grey_087_white_087),
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(vertical = 14.dp, horizontal = 16.dp),
-            )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Text(
+                    text = StringResourcesUtils.getQuantityString(
+                        R.plurals.cu_upload_progress,
+                        timelineViewState.pending,
+                        timelineViewState.pending
+                    ),
+                    color = colorResource(id = R.color.grey_087_white_087),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(vertical = 14.dp, horizontal = 16.dp),
+                )
 
-            LinearProgressIndicator(
-                progress = timelineViewState.progress,
-                modifier = Modifier.fillMaxWidth(),
-                color = colorResource(id = R.color.teal_300),
-                backgroundColor = colorResource(id = R.color.grey_alpha_012)
-            )
+                LinearProgressIndicator(
+                    progress = timelineViewState.progress,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = colorResource(id = R.color.teal_300),
+                    backgroundColor = colorResource(id = R.color.grey_alpha_012)
+                )
+            }
         }
     }
 }
