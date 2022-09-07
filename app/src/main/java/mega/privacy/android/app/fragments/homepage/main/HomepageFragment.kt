@@ -32,8 +32,8 @@ import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
-import mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
-import mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.shouldShowStartScreenDialog
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldShowStartScreenDialog
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.ManagerActivity
