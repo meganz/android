@@ -12,6 +12,7 @@ package mega.privacy.android.app.presentation.settings.model
  * @property deleteEnabled
  * @property cameraUploadEnabled
  * @property chatEnabled
+ * @property callsEnabled
  * @property startScreen
  * @property hideRecentActivityChecked
  * @property email
@@ -27,6 +28,7 @@ data class SettingsState(
     val deleteEnabled: Boolean,
     val cameraUploadEnabled: Boolean,
     val chatEnabled: Boolean,
+    val callsEnabled: Boolean,
     val startScreen: Int,
     val hideRecentActivityChecked: Boolean,
     val email: String,

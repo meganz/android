@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.text.Spanned
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -34,7 +35,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
 import timber.log.Timber
-import java.util.Locale
 
 open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
@@ -42,8 +42,8 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         private const val BILLING_WARNING_SHOWN = "BILLING_WARNING_SHOWN"
     }
 
-    protected lateinit var binding: ActivityChooseUpgradeAccountBinding
-    protected val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
+    private lateinit var binding: ActivityChooseUpgradeAccountBinding
+    private val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
 
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -51,7 +51,13 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         }
     }
 
-    protected open fun manageUpdateReceiver(action: Int) {
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            onFreeClick()
+        }
+    }
+
+    private fun manageUpdateReceiver(action: Int) {
         if (isFinishing) {
             return
         }
@@ -66,6 +72,8 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
         binding = ActivityChooseUpgradeAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         viewModel.refreshAccountInfo()
         setupView()
@@ -86,14 +94,10 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         destroyPayments()
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        onFreeClick()
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            onFreeClick()
         }
 
         return super.onOptionsItemSelected(item)
@@ -300,7 +304,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
      *
      * @param upgradeType Selected payment plan.
      */
-    protected open fun onUpgradeClick(upgradeType: Int) {
+    private fun onUpgradeClick(upgradeType: Int) {
         val intent = Intent(this, ManagerActivity::class.java)
             .putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
             .putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)

@@ -467,7 +467,7 @@
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d oggetti non sono stati copiati</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">Cestino pulisto con successo</string>
+    <string name="rubbish_bin_emptied">Cestino pulito con successo</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">C\’è stato un errore. Il Cestino non è stato svuotato</string>
     <!-- dialog cancel subscriptions -->
@@ -1717,7 +1717,7 @@
     <!-- Title of the received requests tab. Capital letters -->
     <string name="tab_received_requests">Richieste ricevute</string>
     <!-- Title dialog overquota error -->
-    <string name="overquota_alert_title">Quota superata</string>
+    <string name="overquota_alert_title">Quota di archiviazione superata</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
     <string name="invalid_link">Link non valido, per favore chiedi un nuovo link valido</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
@@ -2962,7 +2962,7 @@
     <!-- Label indicating transfer over quota -->
     <string name="label_transfer_over_quota">Quota di trasferimento superata</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Quota superata</string>
+    <string name="label_storage_over_quota">Quota di archiviazione superata</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Ottieni più quota di trasferimento</string>
     <!-- Warning show to the user when a folder does not exist -->
@@ -4099,4 +4099,16 @@
     <string name="chat_recent_list_empty_action">Inizia a chattare ora</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chatta in sicurezza e in privato, con chiunque e su qualsiasi dispositivo, sapendo che nessuno può leggere le tue chat, neanche MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Archivia il meeting</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">Avvia un meeting ora</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">Chiamate</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">Suono delle notifiche</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">Senti un suono quando un utente entra o esce da una chiamata.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">Non ora</string>
 </resources>

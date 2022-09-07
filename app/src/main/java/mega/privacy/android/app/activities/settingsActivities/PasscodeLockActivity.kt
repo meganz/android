@@ -175,7 +175,7 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun incrementAttempts() {
         attempts++
-        dbH.setAttrAttemps(attempts)
+        dbH.setAttrAttempts(attempts)
     }
 
     /**
@@ -183,7 +183,7 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun resetAttempts() {
         attempts = 0
-        dbH.setAttrAttemps(attempts)
+        dbH.setAttrAttempts(attempts)
     }
 
     /**
@@ -702,7 +702,7 @@ class PasscodeLockActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
+        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
 
         if (attempts < MAX_ATTEMPTS) {
             when (mode) {

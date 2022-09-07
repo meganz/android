@@ -459,7 +459,7 @@
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">Você saiu de %d pastas compartilhadas.</string>
     <!-- Message shown when a share has been left -->
-    <string name="share_left">esquerda compartilhada</string>
+    <string name="share_left">Saiu do compartilhamento</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d pastas não foram deixadas corretamente</string>
     <!-- success message when sending multiple files -->
@@ -2388,7 +2388,7 @@
     <!-- Subtitle of the historic notification when a contact leaves a shared folder -->
     <string name="notification_left_shared_folder">[A]%s[/A][B] saiu de uma pasta compartilhada.[/B]</string>
     <!-- Subtitle of the historic notification when a contact leaves a shared folder and the name of the folder is known -->
-    <string name="notification_left_shared_folder_with_name">[A]%1$s[/A][B] deixou a pasta compartilhada [/B][A]%2$s.[/A]</string>
+    <string name="notification_left_shared_folder_with_name">[A]%1$s[/A][B] saiu da pasta compartilhada [/B][A]%2$s.[/A]</string>
     <!-- Subtitle of the historic notification for incoming contact request ignored -->
     <string name="subtitle_incoming_contact_request_ignored">[B]A solicitação de contato de [/B][A]%s [/A][B]foi ignorada[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request accepted -->
@@ -4099,4 +4099,16 @@
     <string name="chat_recent_list_empty_action">Comece já a usar o chat</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Converse com segurança e privacidade, com qualquer pessoa e em qualquer dispositivo, sabendo que ninguém pode ler os seus chats, nem mesmo o MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Arquivar reunião</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">Fazer uma reunião agora</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">Chamadas</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">Notificações sonoras</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">Ouvir um som quando alguém entra ou sai de uma chamada.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">Agora não</string>
 </resources>

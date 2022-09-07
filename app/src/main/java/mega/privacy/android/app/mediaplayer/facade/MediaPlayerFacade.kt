@@ -20,24 +20,31 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.EventLogger
+import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
+import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
-import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
+import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
+import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
+import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
-import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * The implementation of MediaPlayerGateway
  */
-class MediaPlayerFacade constructor(
+class MediaPlayerFacade @Inject constructor(
     @ApplicationContext private val context: Context,
-) : MediaPlayerGateway, MediaPlayerServiceGateway {
+    private val repeatModeMapper: RepeatModeMapper,
+    private val repeatToggleModeMapper: RepeatToggleModeMapper,
+) : MediaPlayerGateway {
 
     private lateinit var exoPlayer: ExoPlayer
     private lateinit var player: MediaMegaPlayer
@@ -45,9 +52,9 @@ class MediaPlayerFacade constructor(
     private var notificationDismissed = false
 
     override fun createPlayer(
-        shuffleEnabled: Boolean,
-        shuffleOrder: ShuffleOrder,
-        repeatMode: Int,
+        shuffleEnabled: Boolean?,
+        shuffleOrder: ShuffleOrder?,
+        repeatToggleMode: RepeatToggleMode,
         nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit,
         mediaPlayerCallback: MediaPlayerCallback,
     ) {
@@ -74,11 +81,11 @@ class MediaPlayerFacade constructor(
                     }
 
                     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-                        mediaPlayerCallback.onShuffleModeEnabledChangedCallback(shuffleEnabled)
+                        mediaPlayerCallback.onShuffleModeEnabledChangedCallback(shuffleModeEnabled)
                     }
 
                     override fun onRepeatModeChanged(repeatMode: Int) {
-                        mediaPlayerCallback.onRepeatModeChangedCallback(repeatMode)
+                        mediaPlayerCallback.onRepeatModeChangedCallback(repeatModeMapper(repeatMode))
                     }
 
                     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
@@ -107,10 +114,14 @@ class MediaPlayerFacade constructor(
                         Timber.e(msg)
                     }
                 })
-                shuffleModeEnabled = shuffleEnabled
-                this.repeatMode = repeatMode
-                setShuffleOrder(shuffleOrder)
+                this.repeatMode = convertToRepeatMode(repeatToggleMode)
             }
+        shuffleEnabled?.let {
+            exoPlayer.shuffleModeEnabled = it
+        }
+        shuffleOrder?.let {
+            exoPlayer.setShuffleOrder(it)
+        }
         player = MediaMegaPlayer(exoPlayer)
     }
 
@@ -124,17 +135,14 @@ class MediaPlayerFacade constructor(
                 .setChannelDescriptionResourceId(channelDescriptionResourceId)
                 .setMediaDescriptionAdapter(object :
                     PlayerNotificationManager.MediaDescriptionAdapter {
-                    override fun getCurrentContentTitle(player: Player): String {
-                        return metadata.value?.title ?: metadata.value?.nodeName ?: ""
-                    }
+                    override fun getCurrentContentTitle(player: Player): String =
+                        metadata.value?.title ?: metadata.value?.nodeName ?: ""
 
-                    override fun createCurrentContentIntent(player: Player): PendingIntent? {
-                        return pendingIntent
-                    }
+                    override fun createCurrentContentIntent(player: Player): PendingIntent? =
+                        pendingIntent
 
-                    override fun getCurrentContentText(player: Player): String {
-                        return metadata.value?.artist ?: ""
-                    }
+                    override fun getCurrentContentText(player: Player): String =
+                        metadata.value?.artist ?: ""
 
                     override fun getCurrentLargeIcon(
                         player: Player,
@@ -272,6 +280,13 @@ class MediaPlayerFacade constructor(
         playerNotificationManager?.setPlayer(null)
     }
 
+    override fun setRepeatToggleMode(repeatToggleMode: RepeatToggleMode) {
+        exoPlayer.repeatMode = convertToRepeatMode(repeatToggleMode)
+    }
+
+    private fun convertToRepeatMode(repeatToggleMode: RepeatToggleMode) =
+        repeatToggleModeMapper(repeatToggleMode)
+
     override fun addPlayerListener(listener: Player.Listener) {
         player.wrappedPlayer.addListener(listener)
     }
@@ -283,31 +298,19 @@ class MediaPlayerFacade constructor(
         useController: Boolean,
         controllerShowTimeoutMs: Int,
         controllerHideOnTouch: Boolean,
-        repeatToggleModes: Int?,
+        isAudioPlayer: Boolean,
         showShuffleButton: Boolean?,
-        visibilityCallback: ((visibility: Int) -> Unit)?,
-        clickedCallback: (() -> Unit)?,
     ) {
         with(playerView) {
             player = this@MediaPlayerFacade.player
             this.useController = useController
             this.controllerShowTimeoutMs = controllerShowTimeoutMs
             this.controllerHideOnTouch = controllerHideOnTouch
-            repeatToggleModes?.run {
-                setRepeatToggleModes(this)
+            if (isAudioPlayer) {
+                setRepeatToggleModes(REPEAT_TOGGLE_MODE_ONE or REPEAT_TOGGLE_MODE_ALL)
             }
             showShuffleButton?.run {
                 setShowShuffleButton(this)
-            }
-            visibilityCallback?.run {
-                setControllerVisibilityListener { visibility ->
-                    this(visibility)
-                }
-            }
-            clickedCallback?.run {
-                setOnClickListener {
-                    this()
-                }
             }
             showController()
         }

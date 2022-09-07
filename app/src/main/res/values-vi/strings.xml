@@ -1431,7 +1431,7 @@
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Phần thưởng đã nhận</string>
     <!-- title of the section for unlocked storage quota -->
-    <string name="unlocked_storage_title">Mức lưu trữ</string>
+    <string name="unlocked_storage_title">Hạn mức lưu trữ</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Phần thưởng lời mời</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
@@ -1643,7 +1643,7 @@
     <!-- Title of the received requests tab. Capital letters -->
     <string name="tab_received_requests">Yêu cầu đã nhận</string>
     <!-- Title dialog overquota error -->
-    <string name="overquota_alert_title">Cảnh báo vượt mức</string>
+    <string name="overquota_alert_title">Vượt mức giới hạn lưu trữ</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
     <string name="invalid_link">Đường liên kết không hợp lệ, xin hỏi lại người đã cho</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
@@ -2812,9 +2812,9 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">Các phiên truyên tải đã bị gián đoạn. Xin nâng cấp tài khoản hoặc đợi %s để tiếp tục.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">Quá hạn mức truyền tải</string>
+    <string name="label_transfer_over_quota">Vượt mức băng thông truyền tải</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Cảnh báo vượt mức</string>
+    <string name="label_storage_over_quota">Vượt mức giới hạn lưu trữ</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Tăng hạn mức truyền tải</string>
     <!-- Warning show to the user when a folder does not exist -->
@@ -3889,4 +3889,16 @@
     <string name="chat_recent_list_empty_action">Bắt đầu trò chuyện ngay</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chát an toàn và riêng tư, với bất kỳ ai và bất kỳ thiết bị, và an tâm sẽ không có ai có thể đọc tin nhắn của bạn, ngay cả MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Bảo lưu cuộc họp</string>
+    <!-- Action to indicate immediate meeting creation -->
+    <string name="action_start_meeting_now">Bắt đầu cuộc họp ngay</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_preferences">Gọi Điện</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications">Âm thanh thông báo</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_preferences_sound_notifications_text">Nghe âm báo khi có người tham gia hoặc rời khỏi cuộc gọi.</string>
+    <!-- Not now button for request contact access message box -->
+    <string name="chat_recent_chat_not_now_btn">Không phải lúc này</string>
 </resources>

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,6 +16,7 @@ import mega.privacy.android.app.main.megachat.RecentChatsFragment
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter.Tabs.CHAT
 import mega.privacy.android.app.meeting.list.MeetingListFragment
+import mega.privacy.android.app.utils.AskForDisplayOverDialog
 import mega.privacy.android.app.utils.StringResourcesUtils
 
 /**
@@ -33,7 +35,9 @@ class ChatTabsFragment : Fragment() {
 
     private lateinit var binding: FragmentChatTabsBinding
 
+    private val viewModel by activityViewModels<ChatTabsViewModel>()
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
+    private val askForDisplayOverDialog by lazy { AskForDisplayOverDialog(requireContext()) }
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -55,20 +59,23 @@ class ChatTabsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
+        view.post { askForDisplayOverDialog.showDialog() }
+    }
 
-        if (savedInstanceState?.containsKey(STATE_PAGER_POSITION) == true) {
-            val position = savedInstanceState.getInt(STATE_PAGER_POSITION)
-            binding.pager.post { binding.pager.currentItem = position }
-        }
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        val position = viewModel.getCurrentPosition()
+        binding.pager.setCurrentItem(position, false)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        viewModel.setCurrentPosition(binding.pager.currentItem)
         super.onSaveInstanceState(outState)
-        outState.putInt(STATE_PAGER_POSITION, binding.pager.currentItem)
     }
 
     override fun onDestroyView() {
         binding.pager.unregisterOnPageChangeCallback(pageChangeCallback)
+        askForDisplayOverDialog.recycle()
         super.onDestroyView()
     }
 

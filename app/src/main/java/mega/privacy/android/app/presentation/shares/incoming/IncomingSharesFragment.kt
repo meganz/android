@@ -57,7 +57,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             return null
 
         val view =
-            if (managerActivity.isList) getListView(inflater, container)
+            if (managerActivity?.isList == true) getListView(inflater, container)
             else getGridView(inflater, container)
 
         initAdapter()
@@ -68,7 +68,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     }
 
     override fun activateActionMode() {
-        if (adapter.isMultipleSelect) return
+        if (adapter?.isMultipleSelect == true) return
 
         super.activateActionMode()
         actionMode =
@@ -77,17 +77,15 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             )
     }
 
-    override fun refresh() {}
-
     override fun itemClick(position: Int) {
         val actualPosition = position - 1
 
         when {
             // select mode
-            adapter.isMultipleSelect -> {
-                adapter.toggleSelection(position)
-                val selectedNodes = adapter.selectedNodes
-                if (selectedNodes.size > 0)
+            adapter?.isMultipleSelect == true -> {
+                adapter?.toggleSelection(position)
+                val selectedNodes = adapter?.selectedNodes
+                if ((selectedNodes?.size ?: 0) > 0)
                     updateActionModeTitle()
             }
 
@@ -109,8 +107,8 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         Timber.d("Is folder deep: %s", state().incomingTreeDepth)
 
         val lastFirstVisiblePosition: Int = when {
-            managerActivity.isList ->
-                mLayoutManager.findFirstCompletelyVisibleItemPosition()
+            managerActivity?.isList == true ->
+                mLayoutManager?.findFirstCompletelyVisibleItemPosition() ?: 0
 
             (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition() == -1 ->
                 (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
@@ -119,9 +117,9 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
         }
 
-        viewModel.pushToLastPositionState(lastFirstVisiblePosition)
+        viewModel.pushToLastPositionStack(lastFirstVisiblePosition)
         viewModel.increaseIncomingTreeDepth(node.handle)
-        recyclerView.scrollToPosition(0)
+        recyclerView?.scrollToPosition(0)
         checkScroll()
     }
 
@@ -130,12 +128,12 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         if (adapter == null)
             return 0
 
-        if (managerActivity.comesFromNotifications && managerActivity.comesFromNotificationsLevel == state().incomingTreeDepth) {
-            managerActivity.restoreSharesAfterComingFromNotifications()
+        if (managerActivity?.comesFromNotifications == true && managerActivity?.comesFromNotificationsLevel == state().incomingTreeDepth) {
+            managerActivity?.restoreSharesAfterComingFromNotifications()
             return 4
         }
 
-        managerActivity.invalidateOptionsMenu()
+        managerActivity?.invalidateOptionsMenu()
 
         return when {
             state().incomingTreeDepth == 1 -> {
@@ -145,34 +143,34 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 val lastVisiblePosition = viewModel.popLastPositionStack()
 
                 lastVisiblePosition.takeIf { it > 0 }?.let {
-                    if (managerActivity.isList)
-                        mLayoutManager.scrollToPositionWithOffset(it, 0)
+                    if (managerActivity?.isList == true)
+                        mLayoutManager?.scrollToPositionWithOffset(it, 0)
                     else
-                        gridLayoutManager.scrollToPositionWithOffset(it, 0)
+                        gridLayoutManager?.scrollToPositionWithOffset(it, 0)
                 }
 
-                recyclerView.visibility = View.VISIBLE
-                emptyImageView.visibility = View.GONE
-                emptyLinearLayout.visibility = View.GONE
+                recyclerView?.visibility = View.VISIBLE
+                emptyImageView?.visibility = View.GONE
+                emptyLinearLayout?.visibility = View.GONE
                 3
             }
 
             state().incomingTreeDepth > 1 -> {
                 Timber.d("deepTree>1")
 
-                viewModel.getParentNodeHandle()?.let { parentHandle ->
-                    recyclerView.visibility = View.VISIBLE
-                    emptyImageView.visibility = View.GONE
-                    emptyLinearLayout.visibility = View.GONE
+                state().incomingParentHandle?.let { parentHandle ->
+                    recyclerView?.visibility = View.VISIBLE
+                    emptyImageView?.visibility = View.GONE
+                    emptyLinearLayout?.visibility = View.GONE
                     viewModel.decreaseIncomingTreeDepth(parentHandle)
 
                     val lastVisiblePosition = viewModel.popLastPositionStack()
 
                     lastVisiblePosition.takeIf { it > 0 }?.let {
-                        if (managerActivity.isList)
-                            mLayoutManager.scrollToPositionWithOffset(it, 0)
+                        if (managerActivity?.isList == true)
+                            mLayoutManager?.scrollToPositionWithOffset(it, 0)
                         else
-                            gridLayoutManager.scrollToPositionWithOffset(it, 0)
+                            gridLayoutManager?.scrollToPositionWithOffset(it, 0)
                     }
                 }
 
@@ -187,26 +185,20 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         }
     }
 
-    /**
-     * Method to update an item when a nickname is added, updated or removed from a contact.
-     *
-     * @param contactHandle Contact ID.
-     */
-    override fun updateContact(contactHandle: Long) {
-        adapter.updateItem(contactHandle)
-    }
-
     override fun showSortByPanel() {
         val orderType = when (state().incomingTreeDepth) {
             0 -> ORDER_OTHERS
             else -> ORDER_CLOUD
         }
-        managerActivity.showNewSortByPanel(orderType)
+        managerActivity?.showNewSortByPanel(orderType)
     }
 
-    override fun viewerFrom() = Constants.VIEWER_FROM_INCOMING_SHARES
-
-    override fun getParentHandle(): Long = state().incomingParentHandle
+    override val viewerFrom: Int = Constants.VIEWER_FROM_INCOMING_SHARES
+    override val currentSharesTab: SharesTab = SharesTab.INCOMING_TAB
+    override val sortOrder: Int
+        get() = state().sortOrder
+    override val parentHandle: Long
+        get() = state().incomingHandle
 
     /**
      * Observe viewModel
@@ -219,7 +211,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
                     // If the nodes are loading, don't display the UI
                     if (it.isLoading) {
-                        recyclerView.visibility = View.GONE
+                        recyclerView?.visibility = View.GONE
                         hideTabs(true)
                         return@collect
                     }
@@ -227,13 +219,13 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                     updateNodes(it.nodes)
                     hideTabs(!it.isFirstNavigationLevel())
 
-                    managerActivity.showFabButton()
-                    managerActivity.invalidateOptionsMenu()
-                    managerActivity.setToolbarTitle()
+                    managerActivity?.showFabButton()
+                    managerActivity?.invalidateOptionsMenu()
+                    managerActivity?.setToolbarTitle()
 
                     visibilityFastScroller()
                     hideActionMode()
-                    setEmptyView(it.isInvalidParentHandle)
+                    setEmptyView(it.isInvalidHandle)
 
                 }
             }
@@ -247,7 +239,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
      */
     private fun updateNodes(nodes: List<MegaNode>) {
         val mutableListNodes = ArrayList(nodes)
-        adapter.setNodes(mutableListNodes)
+        adapter?.setNodes(mutableListNodes)
     }
 
     /**
@@ -259,24 +251,24 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 requireActivity(),
                 this,
                 state().nodes,
-                state().incomingParentHandle,
+                state().incomingHandle,
                 recyclerView,
                 Constants.INCOMING_SHARES_ADAPTER,
-                if (managerActivity.isList) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                if (managerActivity?.isList == true) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
                 else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
                 sortByHeaderViewModel
             )
         } else {
-            adapter.parentHandle = state().incomingParentHandle
-            adapter.setListFragment(recyclerView)
+            adapter?.parentHandle = state().incomingHandle
+            adapter?.setListFragment(recyclerView)
         }
 
-        if (!managerActivity.isList)
-            gridLayoutManager.spanSizeLookup =
-                adapter.getSpanSizeLookup(gridLayoutManager.spanCount)
+        if (managerActivity?.isList == false)
+            gridLayoutManager?.spanSizeLookup =
+                gridLayoutManager?.let { adapter?.getSpanSizeLookup(it.spanCount) }
 
-        adapter.isMultipleSelect = false
-        recyclerView.adapter = adapter
+        adapter?.isMultipleSelect = false
+        recyclerView?.adapter = adapter
     }
 
     /**
@@ -285,53 +277,56 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
      * @param hide true if needs to hide shares tabs
      */
     private fun hideTabs(hide: Boolean) {
-        managerActivity.hideTabs(hide, SharesTab.INCOMING_TAB)
+        managerActivity?.hideTabs(hide, SharesTab.INCOMING_TAB)
     }
 
     /**
      * If user navigates from notification about new nodes added to shared folder select all nodes and scroll to the first node in the list
      */
     private fun selectNewlyAddedNodes() {
-        val positions = managerActivity.getPositionsList(state().nodes)
-        if (positions.isNotEmpty()) {
+        val positions = managerActivity?.getPositionsList(state().nodes)
+        if (!positions.isNullOrEmpty()) {
             val firstPosition = Collections.min(positions)
             activateActionMode()
             for (position in positions) {
-                if (adapter.isMultipleSelect) {
-                    adapter.toggleSelection(position)
+                if (adapter?.isMultipleSelect == true) {
+                    adapter?.toggleSelection(position)
                 }
             }
-            val selectedNodes = adapter.selectedNodes
-            if (selectedNodes.size > 0) {
+            val selectedNodes = adapter?.selectedNodes
+            if ((selectedNodes?.size ?: 0) > 0) {
                 updateActionModeTitle()
             }
-            recyclerView.scrollToPosition(firstPosition)
+            recyclerView?.scrollToPosition(firstPosition)
         }
     }
 
     /**
-     * Set the empty view and message depending if the parent handle is valid or not
+     * Set the empty view and message depending if the handle is valid or not
      *
-     * @param isInvalidParentHandle true if the parent handle is invalid
+     * @param isInvalidHandle true if the handle is invalid
      */
-    private fun setEmptyView(isInvalidParentHandle: Boolean) {
+    private fun setEmptyView(isInvalidHandle: Boolean) {
         var textToShow: String? = null
 
-        if (isInvalidParentHandle) {
-            setImageViewAlphaIfDark(requireContext(), emptyImageView, ColorUtils.DARK_IMAGE_ALPHA)
+        if (isInvalidHandle) {
+            emptyImageView?.let {
+                setImageViewAlphaIfDark(requireContext(),
+                    it, ColorUtils.DARK_IMAGE_ALPHA)
+            }
             if (Util.isScreenInPortrait(requireContext())) {
-                emptyImageView.setImageResource(R.drawable.incoming_shares_empty)
+                emptyImageView?.setImageResource(R.drawable.incoming_shares_empty)
             } else {
-                emptyImageView.setImageResource(R.drawable.incoming_empty_landscape)
+                emptyImageView?.setImageResource(R.drawable.incoming_empty_landscape)
             }
             textToShow = requireContext().getString(R.string.context_empty_incoming)
         }
         setFinalEmptyView(textToShow)
     }
 
-    private inner class ActionBarCallBack(currentTab: Tab?) : BaseActionBarCallBack(currentTab) {
-        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            super.onPrepareActionMode(mode, menu)
+    private inner class ActionBarCallBack(currentTab: Tab) : BaseActionBarCallBack(currentTab) {
+        override fun onPrepareActionMode(actionMode: ActionMode, menu: Menu): Boolean {
+            super.onPrepareActionMode(actionMode, menu)
             val control = CloudStorageOptionControlUtil.Control()
 
             if (state().incomingTreeDepth == 0) {
@@ -352,7 +347,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                 }
             }
 
-            if (state().incomingTreeDepth > 0 && selected.size > 0 && allHaveFullAccess(
+            if (state().incomingTreeDepth > 0 && selected.isNotEmpty() && allHaveFullAccess(
                     selected)
             ) {
                 control.move().isVisible = true

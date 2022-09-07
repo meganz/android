@@ -5,18 +5,22 @@ import nz.mega.sdk.MegaNode
 /**
  * Outgoing shares UI state
  *
- * @param outgoingParentHandle current outgoing shares parent handle
+ * @param outgoingHandle current outgoing shares handle
  * @param outgoingTreeDepth current outgoing tree depth
+ * @param outgoingParentHandle parent handle of the current outgoing node
  * @param nodes current list of nodes
- * @param isInvalidParentHandle true if parent handle is invalid
+ * @param isInvalidHandle true if handle is invalid
  * @param isLoading true if the nodes are loading
+ * @param sortOrder current sort order
  */
 data class OutgoingSharesState(
-    val outgoingParentHandle: Long = -1L,
+    val outgoingHandle: Long = -1L,
     val outgoingTreeDepth: Int = 0,
+    val outgoingParentHandle: Long? = null,
     val nodes: List<MegaNode> = emptyList(),
-    val isInvalidParentHandle: Boolean = true,
+    val isInvalidHandle: Boolean = true,
     val isLoading: Boolean = false,
+    val sortOrder: Int = 0,
 ) {
 
     /**

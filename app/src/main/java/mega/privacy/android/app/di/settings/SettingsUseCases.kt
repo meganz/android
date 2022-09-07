@@ -20,6 +20,7 @@ import mega.privacy.android.domain.usecase.DefaultToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.GetStartScreen
@@ -31,6 +32,7 @@ import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
+import mega.privacy.android.domain.usecase.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 
@@ -142,6 +144,14 @@ abstract class SettingsUseCases {
         @Provides
         fun provideSetChatImageQuality(settingsRepository: SettingsRepository): SetChatImageQuality =
             SetChatImageQuality(settingsRepository::setChatImageQuality)
+
+        @Provides
+        fun provideGetCallsSoundNotifications(settingsRepository: SettingsRepository): GetCallsSoundNotifications =
+            GetCallsSoundNotifications(settingsRepository::getCallsSoundNotifications)
+
+        @Provides
+        fun provideSetCallsSoundNotifications(settingsRepository: SettingsRepository): SetCallsSoundNotifications =
+            SetCallsSoundNotifications(settingsRepository::setCallsSoundNotifications)
 
     }
 }

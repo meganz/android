@@ -11,5 +11,5 @@ fun interface GetChargingOnSizeString {
      *
      * @return charging on size string
      */
-    operator fun invoke(): String
+    suspend operator fun invoke(): String
 }

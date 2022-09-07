@@ -15,17 +15,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.google.android.exoplayer2.util.RepeatModeUtil
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlaylistBinding
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.utils.CallUtil
@@ -38,7 +42,8 @@ import mega.privacy.android.app.utils.autoCleared
 class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
     private var binding by autoCleared<FragmentAudioPlaylistBinding>()
 
-    private var playerService: MediaPlayerService? = null
+    private var serviceGateway: MediaPlayerServiceGateway? = null
+    private var playerServiceViewModelGateway: PlayerServiceViewModelGateway? = null
 
     private lateinit var adapter: PlaylistAdapter
     private lateinit var listLayoutManager: LinearLayoutManager
@@ -56,6 +61,8 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
+            serviceGateway = null
+            playerServiceViewModelGateway = null
         }
 
         /**
@@ -63,17 +70,20 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is MediaPlayerServiceBinder) {
-                playerService = service.service
+                serviceGateway = service.serviceGateway
+                playerServiceViewModelGateway = service.playerServiceViewModelGateway
 
-                if (service.service.viewModel.audioPlayer) {
-                    setupPlayerView(service.service.mediaPlayerServiceGateway)
-                } else {
-                    binding.playerView.isVisible = false
+                playerServiceViewModelGateway?.run {
+                    if (isAudioPlayer()) {
+                        setupPlayerView()
+                    } else {
+                        binding.playerView.isVisible = false
+                    }
+                    tryObservePlaylist()
+                    scrollToPlayingPosition()
+                    // Initial item touch helper after the service is connected.
+                    setupItemTouchHelper()
                 }
-                tryObservePlaylist()
-                playerService?.viewModel?.scrollToPlayingPosition()
-                // Initial item touch helper after the service is connected.
-                setupItemTouchHelper()
             }
         }
     }
@@ -113,7 +123,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
         when (item.itemId) {
             R.id.select -> {
                 // Activate the action mode for selecting the tracks
-                playerService?.viewModel?.setActionMode(true)
+                playerServiceViewModelGateway?.setActionMode(true)
             }
         }
         return false
@@ -126,7 +136,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        playerService = null
+        serviceGateway = null
         requireContext().unbindService(connection)
     }
 
@@ -178,7 +188,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
      * Initial the item touch helper and attach to recycle view.
      */
     private fun setupItemTouchHelper() {
-        playerService?.viewModel?.run {
+        playerServiceViewModelGateway?.run {
             val itemTouchCallBack = PlaylistItemTouchCallBack(adapter, this, itemDecoration)
             itemTouchHelper = ItemTouchHelper(itemTouchCallBack)
         }
@@ -189,12 +199,15 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
      * Observe playlist LiveData when view is created and service is connected.
      */
     private fun tryObservePlaylist() {
-        val service = playerService
-        if (!playlistObserved && service != null && view != null) {
-            playlistObserved = true
-            service.viewModel.run {
-                playlist.observe(viewLifecycleOwner) {
-                    adapter.paused = service.viewModel.paused
+        playerServiceViewModelGateway?.run {
+            if (!playlistObserved && view != null) {
+                playlistObserved = true
+
+                playlistUpdate().flowWithLifecycle(
+                    viewLifecycleOwner.lifecycle,
+                    Lifecycle.State.RESUMED
+                ).onEach {
+                    adapter.paused = isPaused()
 
                     adapter.submitList(it.first) {
                         if (it.second != -1) {
@@ -206,32 +219,44 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                             adapter.notifyItemChanged(it.second)
                         }
                     }
-                }
-                playlistTitle.observe(viewLifecycleOwner) {
-                    (requireActivity() as MediaPlayerActivity).setToolbarTitle(it)
-                }
-                itemsSelectedCount.observe(viewLifecycleOwner) {
+                }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+                playlistTitleUpdate().flowWithLifecycle(
+                    viewLifecycleOwner.lifecycle,
+                    Lifecycle.State.RESUMED
+                ).onEach { title ->
+                    (requireActivity() as MediaPlayerActivity).setToolbarTitle(title)
+                }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+                itemsSelectedCountUpdate().flowWithLifecycle(
+                    viewLifecycleOwner.lifecycle,
+                    Lifecycle.State.RESUMED
+                ).onEach { selectedCount ->
                     actionMode?.run {
                         // Set title according to the number of selected tracks
-                        if (it <= 0) {
+                        if (selectedCount <= 0) {
                             title = resources.getString(R.string.title_select_tracks)
                             menu.findItem(R.id.remove).isVisible = false
                         } else {
-                            title = it.toString()
+                            title = selectedCount.toString()
                             menu.findItem(R.id.remove).isVisible = true
                         }
                     }
-                }
-                isActionMode.observe(viewLifecycleOwner) {
-                    if (it) {
+                }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+                actionModeUpdate().flowWithLifecycle(
+                    viewLifecycleOwner.lifecycle,
+                    Lifecycle.State.RESUMED
+                ).onEach { isActionMode ->
+                    if (isActionMode) {
                         activateActionMode()
                         itemTouchHelper?.attachToRecyclerView(null)
                     } else {
                         actionMode?.finish()
                         itemTouchHelper?.attachToRecyclerView(binding.playlist)
                     }
-                    this@PlaylistFragment.isActionMode = it
-                }
+                    this@PlaylistFragment.isActionMode = isActionMode
+                }.launchIn(viewLifecycleOwner.lifecycleScope)
             }
         }
     }
@@ -241,7 +266,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
      */
     private fun activateActionMode() {
         if (playlistActionModeCallback == null) {
-            playerService?.viewModel?.run {
+            playerServiceViewModelGateway?.run {
                 playlistActionModeCallback = PlaylistActionModeCallback(this)
             }
         }
@@ -253,12 +278,11 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
 
     /**
      * Setup PlayerView
-     * @param mediaPlayerServiceGateway mediaPlayerServiceGateway
      */
-    private fun setupPlayerView(mediaPlayerServiceGateway: MediaPlayerServiceGateway) {
-        mediaPlayerServiceGateway.setupPlayerView(
+    private fun setupPlayerView() {
+        serviceGateway?.setupPlayerView(
             playerView = binding.playerView,
-            repeatToggleModes = RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL,
+            isAudioPlayer = isAudioPlayer,
             showShuffleButton = true
         )
     }
@@ -269,27 +293,27 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
         holder: PlaylistViewHolder,
         position: Int,
     ) {
-        playerService?.run {
-            if (viewModel.isActionMode.value == true) {
-                viewModel.itemSelected(item.nodeHandle)
+        playerServiceViewModelGateway?.run {
+            if (isActionMode() == true) {
+                itemSelected(item.nodeHandle)
                 adapter.startAnimation(holder, position)
             } else {
                 if (view.id == R.id.transfers_list_option_reorder) {
                     return
                 }
                 if (!CallUtil.participatingInACall()) {
-                    seekTo(viewModel.getIndexFromPlaylistItems(item))
+                    serviceGateway?.seekTo(getIndexFromPlaylistItems(item))
                 }
                 (requireActivity() as MediaPlayerActivity).closeSearch()
 
                 if (isVideoPlayer()) {
-                    (requireActivity() as MediaPlayerActivity).onBackPressed()
+                    (requireActivity() as MediaPlayerActivity).onBackPressedDispatcher.onBackPressed()
                 }
             }
         }
     }
 
-    private fun isVideoPlayer() = playerService?.viewModel?.audioPlayer == false
+    private fun isVideoPlayer() = playerServiceViewModelGateway?.isAudioPlayer() == false
 
     override fun onDragStarted(holder: PlaylistViewHolder) {
         if (!isActionMode) {

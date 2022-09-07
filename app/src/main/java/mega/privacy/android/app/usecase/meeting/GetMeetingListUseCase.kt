@@ -223,6 +223,7 @@ class GetMeetingListUseCase @Inject constructor(
             chatId = chatId,
             title = title,
             lastMessage = lastMessageFormatted,
+            isPublic = this.isPublic,
             isMuted = isMuted,
             firstUser = firstUser,
             lastUser = lastUser,

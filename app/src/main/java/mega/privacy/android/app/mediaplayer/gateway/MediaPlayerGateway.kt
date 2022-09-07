@@ -3,9 +3,11 @@ package mega.privacy.android.app.mediaplayer.gateway
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.ShuffleOrder
+import com.google.android.exoplayer2.ui.PlayerView
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
+import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 
 /**
@@ -18,14 +20,14 @@ interface MediaPlayerGateway {
      *
      * @param shuffleEnabled true is shuffle enable, otherwise is false
      * @param shuffleOrder ShuffleOrder
-     * @param repeatMode repeat mode
+     * @param repeatToggleMode RepeatToggleMode
      * @param nameChangeCallback the callback when name is changed
      * @param mediaPlayerCallback MediaPlayerCallback
      */
     fun createPlayer(
-        shuffleEnabled: Boolean,
-        shuffleOrder: ShuffleOrder,
-        repeatMode: Int,
+        shuffleEnabled: Boolean? = null,
+        shuffleOrder: ShuffleOrder? = null,
+        repeatToggleMode: RepeatToggleMode,
         nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit,
         mediaPlayerCallback: MediaPlayerCallback,
     )
@@ -156,4 +158,37 @@ interface MediaPlayerGateway {
      * Clear player of player notification
      */
     fun clearPlayerForNotification()
+
+    /**
+     * Set repeat mode
+     *
+     * @param repeatToggleMode RepeatToggleMode
+     */
+    fun setRepeatToggleMode(repeatToggleMode: RepeatToggleMode)
+
+    /**
+     * Add the listener for player
+     *
+     * @param listener Player.Listener
+     */
+    fun addPlayerListener(listener: Player.Listener)
+
+    /**
+     * Setup player view
+     *
+     * @param playerView PlayerView
+     * @param useController useController
+     * @param controllerShowTimeoutMs controllerShowTimeoutMs
+     * @param isAudioPlayer true is audio player, otherwise is false
+     * @param controllerHideOnTouch controllerHideOnTouch
+     * @param showShuffleButton showShuffleButton
+     */
+    fun setupPlayerView(
+        playerView: PlayerView,
+        useController: Boolean = true,
+        controllerShowTimeoutMs: Int = 0,
+        controllerHideOnTouch: Boolean = false,
+        isAudioPlayer: Boolean = true,
+        showShuffleButton: Boolean? = null,
+    )
 }

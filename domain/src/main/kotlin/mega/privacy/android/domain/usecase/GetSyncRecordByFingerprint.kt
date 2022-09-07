@@ -13,7 +13,7 @@ fun interface GetSyncRecordByFingerprint {
      *
      * @return sync record if found
      */
-    operator fun invoke(
+    suspend operator fun invoke(
         fingerprint: String?,
         isSecondary: Boolean,
         isCopyOnly: Boolean,

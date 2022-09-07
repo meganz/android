@@ -2,9 +2,7 @@ package mega.privacy.android.app.main.megachat;
 
 import static android.app.Activity.RESULT_OK;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
-import static mega.privacy.android.app.utils.CallUtil.hintShown;
 import static mega.privacy.android.app.utils.CallUtil.returnActiveCall;
-import static mega.privacy.android.app.utils.CallUtil.shouldShowMeetingHint;
 import static mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsChatAlertDialog;
 import static mega.privacy.android.app.utils.ChatUtil.getPositionFromChatId;
 import static mega.privacy.android.app.utils.ChatUtil.isEnableChatNotifications;
@@ -14,7 +12,6 @@ import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
-import static mega.privacy.android.app.utils.Constants.KEY_HINT_IS_SHOWING;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_CHAT;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA;
@@ -63,6 +60,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -106,10 +104,9 @@ import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatAdapter;
 import mega.privacy.android.app.meeting.chats.ChatTabsFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.chat.recent.RecentChatsViewModel;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.usecase.chat.SearchChatsUseCase;
-import mega.privacy.android.app.utils.AskForDisplayOverDialog;
-import mega.privacy.android.app.utils.HighLightHintHelper;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
@@ -143,6 +140,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     SearchChatsUseCase searchChatsUseCase;
 
     private SearchViewModel searchViewModel;
+    private RecentChatsViewModel recentChatsViewModel;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -185,8 +183,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     private AppBarLayout appBarLayout;
 
-    private static boolean isExpand;
-    private static boolean isFirstTime = true;
+    protected static boolean isExpand;
 
     private boolean grantedContactPermission;
 
@@ -208,13 +205,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     private boolean isExplanationDialogShowing;
     private AlertDialog explanationDialog;
     private static final String KEY_DIALOG_IS_SHOWING = "dialog_is_showing";
-
-    private AskForDisplayOverDialog askForDisplayOverDialog;
-
-    private static final String SP_KEY_IS_HINT_SHOWN_RECENT_CHATS = "is_hint_shown_recent_chats";
-    private boolean isHintShowing;
-
-    private HighLightHintHelper highLightHintHelper;
 
     private final Observer<MegaChatCall> callRingingStatusObserver = call -> {
         if (megaChatApi.getNumCalls() == 0 || adapter == null) {
@@ -276,10 +266,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         grantedContactPermission = hasPermissions(context, Manifest.permission.READ_CONTACTS);
         contactGetter = new MegaContactGetter(context);
         contactGetter.setMegaContactUpdater(this);
-
-        askForDisplayOverDialog = new AskForDisplayOverDialog(context);
-
-        highLightHintHelper = new HighLightHintHelper(requireActivity());
     }
 
     @Override
@@ -316,11 +302,10 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         });
     }
 
-    private void expandContainer() {
-        if (isExpand || isFirstTime) {
+    protected void expandContainer() {
+        if (isExpand) {
             invitationContainer.setVisibility(View.VISIBLE);
             collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
-            isFirstTime = false;
             isExpand = true;
         } else {
             invitationContainer.setVisibility(View.GONE);
@@ -403,6 +388,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         display.getMetrics(outMetrics);
         density = getResources().getDisplayMetrics().density;
 
+        recentChatsViewModel = new ViewModelProvider(this).get(RecentChatsViewModel.class);
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
 
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
@@ -489,30 +475,13 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observe(this, callRingingStatusObserver);
 
-        // Workaround: wait for R.id.action_menu_open_meeting initialized.
-        new Handler().postDelayed(() -> {
-            if (shouldShowMeetingHint(context, SP_KEY_IS_HINT_SHOWN_RECENT_CHATS) || isHintShowing) {
-                highLightHintHelper.showHintForMeetingIcon(R.id.action_menu_open_meeting, () -> {
-                    hintShown(context, SP_KEY_IS_HINT_SHOWN_RECENT_CHATS);
-                    highLightHintHelper.dismissPopupWindow();
-                    isHintShowing = false;
-                    askForDisplayOver();
-                    return null;
-                });
-
-                isHintShowing = true;
-            } else {
-                askForDisplayOver();
-            }
-        }, 300);
-
         return v;
     }
 
-    private void askForDisplayOver() {
-        if (askForDisplayOverDialog != null) {
-            askForDisplayOverDialog.showDialog();
-        }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        RecentChatsFragmentExtensionKt.observer(this, recentChatsViewModel);
     }
 
     private boolean showInviteBanner() {
@@ -728,6 +697,9 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             case R.id.invite_title:
             case R.id.dismiss_button:
             case R.id.collapse_btn:
+                if (v.getId() == R.id.dismiss_button) {
+                    recentChatsViewModel.setLastDismissedRequestContactTime();
+                }
                 if (moreContactsTitle.getVisibility() == View.VISIBLE) {
                     startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 } else {
@@ -1326,7 +1298,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
         }
         outState.putBoolean(KEY_DIALOG_IS_SHOWING, isExplanationDialogShowing);
-        outState.putBoolean(KEY_HINT_IS_SHOWING, isHintShowing);
     }
 
     @Override
@@ -1342,9 +1313,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         super.onDestroy();
         filterDisposable.clear();
 
-        if (askForDisplayOverDialog != null) {
-            askForDisplayOverDialog.recycle();
-        }
         if (explanationDialog != null) {
             explanationDialog.cancel();
         }
@@ -1354,9 +1322,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         if (context instanceof ManagerActivity) {
             ((ManagerActivity) context).setSearchQuery("");
         }
-
-        // Avoid window leak.
-        highLightHintHelper.dismissPopupWindow();
     }
 
     @Override
@@ -1418,8 +1383,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             if (isExplanationDialogShowing) {
                 showExplanationDialog();
             }
-
-            isHintShowing = savedInstanceState.getBoolean(KEY_HINT_IS_SHOWING);
         }
     }
 

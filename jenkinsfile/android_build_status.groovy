@@ -17,6 +17,12 @@ DOMAIN_UNIT_TEST_SUMMARY = ""
 APP_UNIT_TEST_REPORT_ARCHIVE = "app_unit_test_result_${env.GIT_COMMIT}.zip"
 DOMAIN_UNIT_TEST_REPORT_ARCHIVE = "domain_unit_test_result_${env.GIT_COMMIT}.zip"
 
+APP_COVERAGE = ""
+DOMAIN_COVERAGE = ""
+COVERAGE_ARCHIVE = "coverage.zip"
+COVERAGE_FOLDER = "coverage"
+
+HTML_INDENT = "-- "
 /**
  * Decide whether we should skip the current build. If MR title starts with "Draft:"
  * or "WIP:", then CI pipeline skips all stages in a build. After these 2 tags have
@@ -143,58 +149,49 @@ pipeline {
     post {
         failure {
             script {
-                cleanUp()
-
-                if (env.BRANCH_NAME.startsWith('MR-')) {
-                    def mrNumber = env.BRANCH_NAME.replace('MR-', '')
+                if (hasGitLabMergeRequest()) {
 
                     // download Jenkins console log
-                    withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
-                        sh 'curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o console.txt'
+                    downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+
+                    // upload Jenkins console log
+                    String jsonJenkinsLog = uploadFileToGitLab(CONSOLE_LOG_FILE)
+
+                    // upload unit test report if unit test fail
+                    String unitTestResult = ""
+                    if (BUILD_STEP == "Unit Test") {
+                        def appUnitTestSummary = unitTestSummaryWithArchiveLink(
+                                "app/build/test-results/testGmsDebugUnitTest",
+                                "app/build/reports",
+                                APP_UNIT_TEST_REPORT_ARCHIVE
+                        )
+                        unitTestResult += "<br>App Unit Test: ${appUnitTestSummary}"
+
+                        def domainUnitTestSummary = unitTestSummaryWithArchiveLink(
+                                "domain/build/test-results/test",
+                                "domain/build/reports",
+                                DOMAIN_UNIT_TEST_REPORT_ARCHIVE
+                        )
+                        unitTestResult += "<br>Domain Unit Test: ${domainUnitTestSummary}"
                     }
 
-                    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-                        // upload Jenkins console log
-                        final String respJenkinsLog = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
-                        def jsonJenkinsLog = new groovy.json.JsonSlurperClassic().parseText(respJenkinsLog)
-
-                        // upload unit test report if unit test fail
-                        String unitTestResult = ""
-                        if (BUILD_STEP == "Unit Test") {
-                            def appUnitTestSummary = unitTestSummaryWithArchiveLink(
-                                    "app/build/test-results/testGmsDebugUnitTest",
-                                    "app/build/reports",
-                                    APP_UNIT_TEST_REPORT_ARCHIVE
-                            )
-                            unitTestResult += "<br>App Unit Test: ${appUnitTestSummary}"
-
-                            def domainUnitTestSummary = unitTestSummaryWithArchiveLink(
-                                    "domain/build/test-results/test",
-                                    "domain/build/reports",
-                                    DOMAIN_UNIT_TEST_REPORT_ARCHIVE
-                            )
-                            unitTestResult += "<br>Domain Unit Test: ${domainUnitTestSummary}"
-                        }
-
-                        // upload SDK build log if SDK build fails
-                        String sdkBuildMessage = ""
-                        if (BUILD_STEP == "Build SDK") {
-                            final String respSdkLog = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${SDK_LOG_FILE_NAME} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
-                            def jsonSdkLog = new groovy.json.JsonSlurperClassic().parseText(respSdkLog)
-                            sdkBuildMessage = "<br/>SDK Build failed. Log:${jsonSdkLog.markdown}"
-                        }
-
-                        env.MARKDOWN_LINK = ":x: Build Failed" +
-                                "<br/>Failure Stage: ${BUILD_STEP}" +
-                                "<br/>Last Commit Message: <b>${getLastCommitMessage()}</b>" +
-                                "<br/>Last Commit ID: ${env.GIT_COMMIT}" +
-                                "<br/>Build Log: ${jsonJenkinsLog.markdown}" +
-                                sdkBuildMessage +
-                                unitTestResult
-
-                        env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-                        sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
+                    // upload SDK build log if SDK build fails
+                    String sdkBuildMessage = ""
+                    if (BUILD_STEP == "Build SDK") {
+//                            final String respSdkLog = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${SDK_LOG_FILE_NAME} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
+//                            def jsonSdkLog = new groovy.json.JsonSlurperClassic().parseText(respSdkLog)
+                        def jsonSdkLog = uploadFileToGitLab(SDK_LOG_FILE_NAME)
+                        sdkBuildMessage = "<br/>SDK Build failed. Log:${jsonSdkLog}"
                     }
+
+                    def failureMessage = ":x: Build Failed" +
+                            "<br/>Failure Stage: ${BUILD_STEP}" +
+                            "<br/>Last Commit Message: <b>${getLastCommitMessage()}</b>" +
+                            "<br/>Last Commit ID: ${env.GIT_COMMIT}" +
+                            "<br/>Build Log: ${jsonJenkinsLog}" +
+                            sdkBuildMessage +
+                            unitTestResult
+                    sendToMR(failureMessage)
                 } else {
                     withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
                         def comment = ":x: Android Build failed for branch: ${env.GIT_BRANCH}"
@@ -210,39 +207,42 @@ pipeline {
         }
         success {
             script {
-                cleanUp()
-
-                if (env.BRANCH_NAME.startsWith('MR-')) {
-                    def mrNumber = env.BRANCH_NAME.replace('MR-', '')
-
+                if (hasGitLabMergeRequest()) {
                     // If CI build is skipped due to Draft status, send a comment to MR
                     if (shouldSkipBuild()) {
-                        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-                            env.MARKDOWN_LINK = ":raising_hand: Android CI Pipeline Build Skipped! <BR/> Newly triggered builds will resume after you have removed <b>Draft:</b> or <b>WIP:</b> from the beginning of MR title."
-                            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-                            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
-                        }
+                        def skipMessage = ":raising_hand: Android CI Pipeline Build Skipped! <BR/> " +
+                                "Newly triggered builds will resume after you have removed <b>Draft:</b> or " +
+                                "<b>WIP:</b> from the beginning of MR title."
+                        sendToMR(skipMessage)
                     } else {
-                        // always report build success to MR comment
-                        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+                        def jsonLintReportLink = uploadFileToGitLab(LINT_REPORT_ARCHIVE)
 
-                            //Upload Lint check reports
-                            final String respLintReports = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${LINT_REPORT_ARCHIVE} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
-                            def jsonLintReports = new groovy.json.JsonSlurperClassic().parseText(respLintReports)
+                        def successMessage = ":white_check_mark: Build Succeeded!" +
+                                "<br/><b>Last Commit:</b> ${getLastCommitMessage()} (${env.GIT_COMMIT})" +
+                                "<br/><b>Build Warnings:</b> ${readBuildWarnings()}" +
+                                "<br/><b>App Unit Test:</b>" +
+                                "<br/>${HTML_INDENT}${APP_UNIT_TEST_SUMMARY}" +
+                                "<br/>${HTML_INDENT}Line Coverage: ${APP_COVERAGE}" +
+                                "<br/><b>Domain Unit Test:</b>" +
+                                "<br/>${HTML_INDENT}${DOMAIN_UNIT_TEST_SUMMARY}" +
+                                "<br/>${HTML_INDENT}Line Coverage: ${DOMAIN_COVERAGE}" +
+                                "<br/><b>Lint Summary</b>(${jsonLintReportLink}):${LINT_REPORT_SUMMARY}"
+                        sendToMR(successMessage)
 
-                            env.MARKDOWN_LINK = ":white_check_mark: Build Succeeded!" +
-                                    "<br/><b>Last Commit:</b> ${getLastCommitMessage()} (${env.GIT_COMMIT})" +
-                                    "<br/><b>Build Warnings:</b> ${readBuildWarnings()}" +
-                                    "<br/><b>App Unit Test:</b> ${APP_UNIT_TEST_SUMMARY}" +
-                                    "<br/><b>Domain Unit Test:</b> ${DOMAIN_UNIT_TEST_SUMMARY}" +
-                                    "<br/><b>Lint Summary (${jsonLintReports.markdown}):</b><br/>${LINT_REPORT_SUMMARY}"
-
-                            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-                            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
-                        }
+                        def successSlackMessage = "Android Line Code Coverage:" +
+                                "\nCommit:\t${env.GIT_COMMIT}" +
+                                "\nBranch:\t${env.GIT_BRANCH}" +
+                                "\n- $APP_COVERAGE" +
+                                "\n- $DOMAIN_COVERAGE"
+                        slackSend color: "good", message: successSlackMessage
                     }
                 }
             }
+        }
+        cleanup {
+            // delete whole workspace after each successful build, to save Jenkins storage
+            // We do not clean workspace if build fails, for a chance to investigate the crime scene.
+            cleanWs(cleanWhenFailure: false)
         }
     }
     stages {
@@ -277,11 +277,11 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Fetch SDK Submodules"
-                    cleanOldSdkOutput()
                 }
 
                 gitlabCommitStatus(name: 'Fetch SDK Submodules') {
                     withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
+                        sh 'git checkout -- .'
                         sh 'git config --file=.gitmodules submodule."sdk/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
                         sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch ${SDK_BRANCH}"
                         sh 'git config --file=.gitmodules submodule."sdk/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
@@ -411,6 +411,37 @@ pipeline {
                 }
             }
         }
+        stage('Code Coverage') {
+            when {
+                expression { (!shouldSkipBuild()) }
+            }
+            steps {
+                script {
+                    BUILD_STEP = "Code Coverage"
+                }
+                gitlabCommitStatus(name: 'Code Coverage') {
+                    script {
+
+                        // domain coverage
+                        sh "./gradlew domain:jacocoTestReport"
+                        sh "ls -l $WORKSPACE/domain/build/reports/jacoco/test/"
+                        DOMAIN_COVERAGE = "domain coverage: ${coverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
+                        println("DOMAIN_COVERAGE = ${DOMAIN_COVERAGE}")
+
+                        // temporarily disable the failed test cases
+                        sh "rm -frv ${WORKSPACE}/app/src/testDebug"
+
+                        // run coverage for app module
+                        sh "./gradlew clean app:createUnitTestCoverageReport"
+
+                        // restore failed test cases
+                        sh "git checkout -- app/src/testDebug"
+                        APP_COVERAGE = "app coverage: ${coverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
+                        println("APP_COVERAGE = ${APP_COVERAGE}")
+                    }
+                }
+            }
+        }
         stage('Lint Check') {
             when {
                 expression { (!shouldSkipBuild()) }
@@ -423,12 +454,11 @@ pipeline {
 
                 gitlabCommitStatus(name: 'Lint Check') {
                     sh "./gradlew lint"
+
                     script {
                         MODULE_LIST.eachWithIndex { module, index ->
-                            LINT_REPORT_SUMMARY += "<li><b>${module}</b>: ${lintSummary(module)}</li>"
+                            LINT_REPORT_SUMMARY += "<br/>${HTML_INDENT}<b>${module}</b>: ${lintSummary(module)}"
                         }
-                        LINT_REPORT_SUMMARY = "<ul>${LINT_REPORT_SUMMARY}</ul>"
-
                         print("LINT_REPORT_SUMMARY = ${LINT_REPORT_SUMMARY}")
 
                         archiveLintReports()
@@ -536,6 +566,23 @@ def archiveLintReports() {
 }
 
 /**
+ * archive all HTML coverage reports into one zip file
+ */
+def archiveCoverageReport() {
+    sh """
+        cd ${WORKSPACE}
+        rm -frv ${COVERAGE_FOLDER}
+        mkdir -pv ${COVERAGE_FOLDER}/app
+        mkdir -pv ${COVERAGE_FOLDER}/domain
+        mv -v ${WORKSPACE}/domain/build/coverage-report/* $WORKSPACE/$COVERAGE_FOLDER/domain/
+        mv -v ${WORKSPACE}/app/build/reports/jacoco/html/* $WORKSPACE/$COVERAGE_FOLDER/app/
+        
+        zip -r ${COVERAGE_ARCHIVE} $WORKSPACE/$COVERAGE_FOLDER/*
+        ls -l ${COVERAGE_ARCHIVE}
+    """
+}
+
+/**
  *
  * @param reportPath relative path of the test report folder,
  *                  for example: "app/build/reports" or "domain/build/reports"
@@ -565,39 +612,85 @@ def archiveUnitTestReport(String reportPath, String targetFileName) {
  * @param archiveTargetName file name of the test report zip file
  */
 def unitTestSummaryWithArchiveLink(String testResultPath, String reportPath, String archiveTargetName) {
-    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        // upload unit test report if unit test fails
+//    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+    // upload unit test report if unit test fails
 
-        String unitTestResult
+    String unitTestResult
+    if (archiveUnitTestReport(reportPath, archiveTargetName)) {
+        unitTestFileLink = uploadFileToGitLab(archiveTargetName)
+//            final String unitTestUploadResponse = sh(
+//                    script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${archiveTargetName} https://code.developers.mega.co.nz/api/v4/projects/199/uploads",
+//                    returnStdout: true).trim()
+//            def unitTestFileLink = new groovy.json.JsonSlurperClassic().parseText(unitTestUploadResponse).markdown
 
-        if (archiveUnitTestReport(reportPath, archiveTargetName)) {
-            final String unitTestUploadResponse = sh(
-                    script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${archiveTargetName} https://code.developers.mega.co.nz/api/v4/projects/199/uploads",
-                    returnStdout: true).trim()
-            def unitTestFileLink = new groovy.json.JsonSlurperClassic().parseText(unitTestUploadResponse).markdown
+        String unitTestSummary = unitTestSummary("${WORKSPACE}/${testResultPath}")
+        unitTestResult = "<br/>${unitTestSummary} <br/>${unitTestFileLink}"
+    } else {
+        unitTestResult = "<br>Unit Test report not available, perhaps test code has compilation error. Please check full build log."
+    }
+    return unitTestResult
+//    }
+}
 
-            String unitTestSummary = unitTestSummary("${WORKSPACE}/${testResultPath}")
-            unitTestResult = "<br/>${unitTestSummary} <br/>${unitTestFileLink}"
-        } else {
-            unitTestResult = "<br>Unit Test report not available, perhaps test code has compilation error. Please check full build log."
+/**
+ * Read and calculate the coverage by a given csv format report
+ * @param csvReportPath path to the csv coverage file, generated by JaCoCo
+ * @return a summary of coverage report
+ */
+String coverageSummary(String csvReportPath) {
+    summary = sh(
+            script: "python3 ${WORKSPACE}/jenkinsfile/coverage_report.py ${csvReportPath}",
+            returnStdout: true).trim()
+    print("coverage path(${csvReportPath}): ${summary}")
+    return summary
+}
+
+
+/**
+ * Check if this build is triggered by a GitLab Merge Request.
+ * @return true if this build is triggerd by a GitLab MR. False if this build is triggerd
+ * by a plain git push.
+ */
+private boolean hasGitLabMergeRequest() {
+    return env.BRANCH_NAME != null && env.BRANCH_NAME.startsWith('MR-')
+}
+
+/**
+ * send message to GitLab MR comment
+ * @param message message to send
+ */
+private void sendToMR(String message) {
+    if (hasGitLabMergeRequest()) {
+        def mrNumber = env.BRANCH_NAME.replace('MR-', '')
+        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+            env.MARKDOWN_LINK = message
+            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
         }
-        return unitTestResult
     }
 }
 
-// TODO this method is to migrate to new SDK module.
-// TODO: it should deleted after all existing MRs have merged new SDK module
-private void cleanOldSdkOutput() {
-    println("cleanOldSdkOutput")
-    sh """
-    cd $WORKSPACE
-    git checkout -- .gitmodules
-    rm -fr app/src/main/java/nz/mega/sdk/*.java  || true
-    rm -fr app/src/main/jni || true
-    rm -fr app/src/main/obj/*  || true
-    rm -fr app/src/main/libs/arm64-v8a || true
-    rm -fr app/src/main/libs/armeabi-v7a || true
-    rm -fr app/src/main/libs/x86 || true
-    rm -fr app/src/main/libs/x86_64 || true
-    """
+/**
+ * download jenkins build console log and save to file.
+ */
+private void downloadJenkinsConsoleLog(String downloaded) {
+    withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
+        sh "curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o ${downloaded}"
+    }
+}
+
+/**
+ * upload file to GitLab and return the GitLab link
+ * @param fileName the local file to be uploaded
+ * @return file link on GitLab
+ */
+private String uploadFileToGitLab(String fileName) {
+    String link = ""
+    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+        // upload Jenkins console log to GitLab and get download link
+        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
+        link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
+        return link
+    }
+    return link
 }

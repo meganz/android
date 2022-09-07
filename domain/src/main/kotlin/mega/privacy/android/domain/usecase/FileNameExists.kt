@@ -11,5 +11,5 @@ fun interface FileNameExists {
      *
      * @return whether file name exists
      */
-    operator fun invoke(fileName: String, isSecondary: Boolean): Boolean
+    suspend operator fun invoke(fileName: String, isSecondary: Boolean): Boolean
 }

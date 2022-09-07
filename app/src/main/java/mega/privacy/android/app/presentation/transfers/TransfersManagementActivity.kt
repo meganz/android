@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,6 +58,10 @@ open class TransfersManagementActivity : PasscodeActivity() {
     val transfersViewModel: TransfersManagementViewModel by viewModels()
 
     private var scanningDialogTimer: CountDownTimer? = null
+
+    private val showScanTransferDialogObserver = Observer<Boolean> { show ->
+        onShowScanningTransfersDialog(show)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -303,7 +308,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
         super.onPause()
 
         LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
-            .removeObserver(::onShowScanningTransfersDialog)
+            .removeObserver(showScanTransferDialogObserver)
     }
 
     override fun onResume() {
@@ -320,7 +325,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
         super.onPostResume()
 
         LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
-            .observeForever(::onShowScanningTransfersDialog)
+            .observeForever(showScanTransferDialogObserver)
     }
 
     override fun onDestroy() {
@@ -329,7 +334,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
         scanningTransfersDialog?.dismiss()
         cancelTransfersDialog?.dismiss()
         LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
-            .removeObserver(::onShowScanningTransfersDialog)
+            .removeObserver(showScanTransferDialogObserver)
     }
 
     /**

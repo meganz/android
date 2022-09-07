@@ -19,7 +19,6 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Button
 import android.widget.Chronometer
 import android.widget.ImageView
 import android.widget.TextView
@@ -298,7 +297,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     )
                 }
                 MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION,
-                MegaChatCall.CALL_STATUS_DESTROYED
+                MegaChatCall.CALL_STATUS_DESTROYED,
                 -> {
                     disableCamera()
                     removeUI()
@@ -1136,7 +1135,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         lifecycleScope.launchWhenStarted {
             inMeetingViewModel.showOnlyMeBanner.collect { shouldBeShown ->
                 checkMenuItemsVisibility()
-                if (shouldBeShown) {
+                if (shouldBeShown && !MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
                     showCallWillEndBannerAndOnlyMeDialog()
                 } else {
                     hideCallBannerAndOnlyMeDialog()
@@ -2809,9 +2808,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 inMeetingViewModel.checkStayCall()
             }
             .setCancelable(false)
-            .setOnDismissListener {
-                MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
-            }
             .create()
         onlyMeDialog?.show()
 

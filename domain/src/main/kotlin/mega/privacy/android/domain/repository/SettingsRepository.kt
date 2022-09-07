@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
 
 /**
@@ -8,7 +9,6 @@ import mega.privacy.android.domain.entity.ChatImageQuality
  *
  */
 interface SettingsRepository {
-
 
     /**
      * Is passcode lock preference enabled
@@ -78,6 +78,7 @@ interface SettingsRepository {
      * Is use https preference set
      *
      * @return true if set
+     * @return true if set
      */
     suspend fun isUseHttpsPreferenceEnabled(): Boolean
 
@@ -102,6 +103,21 @@ interface SettingsRepository {
      * @return Chat image quality.
      */
     suspend fun setChatImageQuality(quality: ChatImageQuality)
+
+    /**
+     * Gets if call notification sounds are enabled or disabled.
+     *
+     * @return Sound notifications status.
+     */
+    fun getCallsSoundNotifications(): Flow<CallsSoundNotifications>
+
+    /**
+     * Enabling or disabling call notification sounds.
+     *
+     * @param soundNotifications New Sound notifications status.
+     * @return Sound notifications status.
+     */
+    suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundNotifications)
 
     /**
      * Set string preference
@@ -207,4 +223,16 @@ interface SettingsRepository {
      * @return current preference and future updates as a flow
      */
     fun monitorBooleanPreference(key: String?, defaultValue: Boolean): Flow<Boolean>
+
+    /**
+     * Get last contact permission dismissed time
+     */
+    fun getLastContactPermissionDismissedTime(): Flow<Long>
+
+    /**
+     * Set last contact permission dismissed time
+     *
+     * @param time
+     */
+    suspend fun setLastContactPermissionDismissedTime(time: Long)
 }

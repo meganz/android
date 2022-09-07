@@ -16,6 +16,8 @@ class MeetingsViewHolder(
         binding.txtTimestamp.text = item.formattedTimestamp
         binding.txtLastMessage.text = item.lastMessage
         binding.txtLastMessage.isVisible = !item.lastMessage.isNullOrBlank()
+        binding.imgMute.isVisible = item.isMuted
+        binding.imgPrivate.isVisible = !item.isPublic
 
         val firstUserPlaceholder = item.firstUser.getImagePlaceholder(itemView.context)
         if (item.isSingleMeeting() || item.lastUser == null) {

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.getLink
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -42,7 +43,7 @@ class GetSeveralLinksFragment : Fragment() {
 
             MegaAttacher(requireActivity() as ActivityLauncher).handleActivityResult(
                 REQUEST_CODE_SELECT_CHAT,
-                BaseActivity.RESULT_OK,
+                RESULT_OK,
                 data,
                 requireActivity() as SnackbarShower
             )
