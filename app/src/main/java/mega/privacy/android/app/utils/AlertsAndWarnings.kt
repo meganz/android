@@ -4,12 +4,14 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.Settings
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.CheckBox
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -17,6 +19,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
+import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.main.LoginActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -227,4 +230,39 @@ object AlertsAndWarnings {
                 show()
             }
 
+    /**
+     * Shows ask for display over dialog.
+     *
+     * @param activity   Required to create the dialog and finish the activity.
+     */
+    @JvmStatic
+    fun showAskForDisplayOverDialog(activity: Activity) {
+        if (IncomingCallNotification.shouldNotify(activity) && getDbHandler().shouldAskForDisplayOver()) {
+
+            MaterialAlertDialogBuilder(activity)
+                .setView(R.layout.ask_for_display_over_dialog_layout)
+                .setPositiveButton(R.string.general_allow) { dialog, _ ->
+                    val intent =
+                        Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse("package:" + activity.packageName))
+                    activity.startActivity(intent)
+                    dialog.dismiss()
+                }
+                .setNegativeButton(R.string.verify_account_not_now_button) { dialog, _ ->
+                    Toast.makeText(activity,
+                        R.string.ask_for_display_over_explain,
+                        Toast.LENGTH_LONG).show()
+                    dialog.dismiss()
+                }
+                .setOnDismissListener {
+                    getDbHandler().dontAskForDisplayOver()
+                    it.cancel()
+                }
+                .create().apply {
+                    setCancelable(false)
+                    setCanceledOnTouchOutside(false)
+                    show()
+                }
+        }
+    }
 }

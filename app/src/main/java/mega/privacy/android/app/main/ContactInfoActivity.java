@@ -16,6 +16,7 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON
 import static mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showAskForDisplayOverDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
@@ -149,7 +150,6 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
@@ -182,7 +182,6 @@ import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
-import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
@@ -335,7 +334,7 @@ public class ContactInfoActivity extends PasscodeActivity
     private ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment;
     private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
 
-    private AskForDisplayOverDialog askForDisplayOverDialog;
+    //private AskForDisplayOverDialog askForDisplayOverDialog;
 
     private RelativeLayout callInProgressLayout;
     private Chronometer callInProgressChrono;
@@ -478,8 +477,6 @@ public class ContactInfoActivity extends PasscodeActivity
 
         scaleW = getScaleW(outMetrics, density);
         scaleH = getScaleH(outMetrics, density);
-
-        askForDisplayOverDialog = new AskForDisplayOverDialog(this);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -714,9 +711,7 @@ public class ContactInfoActivity extends PasscodeActivity
             Timber.w("Extras is NULL");
         }
 
-        if (askForDisplayOverDialog != null) {
-            askForDisplayOverDialog.showDialog();
-        }
+        showAskForDisplayOverDialog(this);
 
         registerReceiver(manageShareReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
@@ -1570,9 +1565,6 @@ public class ContactInfoActivity extends PasscodeActivity
         }
         if (drawableShare != null) {
             drawableShare.setColorFilter(null);
-        }
-        if (askForDisplayOverDialog != null) {
-            askForDisplayOverDialog.recycle();
         }
 
         unregisterReceiver(chatRoomMuteUpdateReceiver);
