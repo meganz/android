@@ -14,6 +14,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -77,7 +80,7 @@ class MyAccountFragment : Fragment(), Scrollable {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentMyAccountBinding.inflate(layoutInflater)
         usageBinding = binding.usageView
@@ -137,8 +140,13 @@ class MyAccountFragment : Fragment(), Scrollable {
     }
 
     private fun setupObservers() {
-        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
-            .observe(viewLifecycleOwner) { setupAvatar(true) }
+        lifecycleScope.launchWhenStarted {
+            viewModel.onMyAvatarFileChanged.flowWithLifecycle(viewLifecycleOwner.lifecycle,
+                Lifecycle.State.STARTED)
+                .collect {
+                    setupAvatar(true)
+                }
+        }
 
         LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
             .observe(viewLifecycleOwner) { binding.nameText.text = viewModel.getName() }

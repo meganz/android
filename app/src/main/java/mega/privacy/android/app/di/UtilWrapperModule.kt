@@ -1,6 +1,8 @@
 package mega.privacy.android.app.di
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import dagger.Module
@@ -19,6 +21,7 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.wrapper.AvatarWrapper
+import mega.privacy.android.app.utils.wrapper.BitmapFactoryWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
@@ -119,7 +122,18 @@ class UtilWrapperModule {
      */
     @Provides
     fun provideAvatarWrapper() = object : AvatarWrapper {
+        override fun getDominantColor(bimap: Bitmap): Int = AvatarUtil.getDominantColor(bimap)
+
         override fun getSpecificAvatarColor(typeColor: String): Int =
             AvatarUtil.getSpecificAvatarColor(typeColor)
+    }
+
+    /**
+     * provide Bitmap Factory Wrapper
+     */
+    @Provides
+    fun provideBitmapFactoryWrapper() = object : BitmapFactoryWrapper {
+        override fun decodeFile(pathName: String?, opts: BitmapFactory.Options): Bitmap? =
+            BitmapFactory.decodeFile(pathName, opts)
     }
 }

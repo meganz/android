@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
@@ -34,7 +35,6 @@ import nz.mega.sdk.MegaUserAlert
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Mega api facade
@@ -310,14 +310,17 @@ class MegaApiFacade @Inject constructor(
         megaApi.getUserAvatarColor(megaUser)
 
     override suspend fun getUserAvatar(user: MegaUser, dstPath: String): Boolean {
-        return suspendCoroutine { continuation ->
+        return suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, e ->
+                    continuation.resume(e.errorCode == MegaError.API_OK)
+                },
+                onRequestTemporaryError = { _, e -> continuation.resume(e.errorCode == MegaError.API_OK) })
+
+            continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
             megaApi.getUserAvatar(user,
                 dstPath,
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _, e ->
-                        continuation.resume(e.errorCode == MegaError.API_OK)
-                    },
-                    onRequestTemporaryError = { _, e -> continuation.resume(e.errorCode == MegaError.API_OK) })
+                listener
             )
         }
     }
