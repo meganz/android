@@ -1,11 +1,14 @@
 package mega.privacy.android.app.presentation.settings.startscreen.util
 
 import android.content.Context
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
+import mega.privacy.android.app.di.settings.startscreen.getMonitorStartScreenPreference
 import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.main.ManagerActivity.*
+import mega.privacy.android.app.main.ManagerActivity.MODE_PRIVATE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SharedPreferenceConstants.DO_NOT_ALERT_ABOUT_START_SCREEN
-import mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN
 import mega.privacy.android.app.utils.SharedPreferenceConstants.START_SCREEN_LOGIN_TIMESTAMP
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import mega.privacy.android.domain.entity.preference.StartScreen
@@ -17,14 +20,19 @@ object StartScreenUtil {
 
     @JvmField
     val CLOUD_DRIVE_BNV = StartScreen.CloudDrive.id
+
     @JvmField
     val PHOTOS_BNV = StartScreen.Photos.id
+
     @JvmField
     val HOME_BNV = StartScreen.Home.id
+
     @JvmField
     val CHAT_BNV = StartScreen.Chat.id
+
     @JvmField
     val SHARED_ITEMS_BNV = StartScreen.SharedItems.id
+
     @JvmField
     val NO_BNV = StartScreen.None.id
 
@@ -38,13 +46,14 @@ object StartScreenUtil {
      */
     @JvmStatic
     fun getStartDrawerItem(context: Context): DrawerItem =
-        when (context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
-            .getInt(PREFERRED_START_SCREEN, HOME_BNV)) {
-            CLOUD_DRIVE_BNV -> DrawerItem.CLOUD_DRIVE
-            PHOTOS_BNV -> DrawerItem.PHOTOS
-            CHAT_BNV -> DrawerItem.CHAT
-            SHARED_ITEMS_BNV -> DrawerItem.SHARED_ITEMS
-            else -> DrawerItem.HOMEPAGE
+        runBlocking {
+            when (getMonitorStartScreenPreference()().map { it.id }.first()) {
+                CLOUD_DRIVE_BNV -> DrawerItem.CLOUD_DRIVE
+                PHOTOS_BNV -> DrawerItem.PHOTOS
+                CHAT_BNV -> DrawerItem.CHAT
+                SHARED_ITEMS_BNV -> DrawerItem.SHARED_ITEMS
+                else -> DrawerItem.HOMEPAGE
+            }
         }
 
 
@@ -55,9 +64,7 @@ object StartScreenUtil {
      * @return The start bottom navigation item.
      */
     @JvmStatic
-    fun getStartBottomNavigationItem(context: Context): Int =
-        context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
-            .getInt(PREFERRED_START_SCREEN, HOME_BNV)
+    fun getStartBottomNavigationItem(context: Context): Int = getStartScreenOrHomeId()
 
     /**
      * Checks if should close the app because the current DrawerItem is the preferred start screen.
@@ -86,7 +93,7 @@ object StartScreenUtil {
             context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
 
         val doNotAlert = preferences.getBoolean(DO_NOT_ALERT_ABOUT_START_SCREEN, false)
-        val preferredScreen = preferences.getInt(PREFERRED_START_SCREEN, HOME_BNV)
+        val preferredScreen = getStartScreenOrHomeId()
 
         if (doNotAlert || preferredScreen != HOME_BNV) {
             return false
@@ -97,6 +104,14 @@ object StartScreenUtil {
         return timeStamp == INVALID_VALUE.toLong()
                 || System.currentTimeMillis().minus(timeStamp) >= TIME_TO_SHOW_START_SCREEN_DIALOG
     }
+
+    private fun getStartScreenOrHomeId() =
+        runBlocking {
+            getMonitorStartScreenPreference()()
+                .map { if (it == StartScreen.None) StartScreen.Home else it }
+                .map { it.id }.first()
+        }
+
 
     /**
      * Sets is not needed to alert anymore about start screen.

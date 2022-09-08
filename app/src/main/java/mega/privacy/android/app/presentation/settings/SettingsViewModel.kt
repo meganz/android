@@ -26,13 +26,13 @@ import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetPreference
-import mega.privacy.android.domain.usecase.GetStartScreen
 import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsHideRecentActivityEnabled
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
@@ -54,7 +54,7 @@ class SettingsViewModel @Inject constructor(
     private val rootNodeExists: RootNodeExists,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
     private val monitorAutoAcceptQRLinks: MonitorAutoAcceptQRLinks,
-    private val startScreen: GetStartScreen,
+    private val startScreen: MonitorStartScreenPreference,
     private val isHideRecentActivityEnabled: IsHideRecentActivityEnabled,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
     fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
@@ -144,7 +144,7 @@ class SettingsViewModel @Inject constructor(
                     },
                 startScreen()
                     .map { screen ->
-                        { state: SettingsState -> state.copy(startScreen = screen) }
+                        { state: SettingsState -> state.copy(startScreen = screen.id) }
                     },
                 isHideRecentActivityEnabled()
                     .map { hide ->

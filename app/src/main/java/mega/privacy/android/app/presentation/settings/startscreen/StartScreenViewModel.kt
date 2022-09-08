@@ -1,39 +1,50 @@
 package mega.privacy.android.app.presentation.settings.startscreen
 
-import android.content.SharedPreferences
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.jeremyliao.liveeventbus.LiveEventBus
-import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.HOME_BNV
-import mega.privacy.android.app.utils.SharedPreferenceConstants.DO_NOT_ALERT_ABOUT_START_SCREEN
-import mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenOptionMapper
+import mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenSettingsState
 import mega.privacy.android.domain.entity.preference.StartScreen
+import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
+import mega.privacy.android.domain.usecase.SetStartScreenPreference
+import javax.inject.Inject
 
-class StartScreenViewModel : BaseRxViewModel() {
+@HiltViewModel
+class StartScreenViewModel @Inject constructor(
+    private val monitorStartScreenPreference: MonitorStartScreenPreference,
+    private val setStartScreenPreference: SetStartScreenPreference,
+    private val eventBus: StartScreenEventWrapper,
+    startScreenOptionMapper: StartScreenOptionMapper,
+) : ViewModel() {
 
-    private val checkedScreen = MutableLiveData<StartScreen>()
+    private val _state = MutableStateFlow(StartScreenSettingsState(
+        options = StartScreen.values()
+            .filterNot { it == StartScreen.None }
+            .mapNotNull(startScreenOptionMapper),
+        selectedScreen = StartScreen.None,
+    ))
 
-    fun onScreenChecked(): LiveData<StartScreen> = checkedScreen
+    val state: StateFlow<StartScreenSettingsState> = _state
 
-    private lateinit var preferences: SharedPreferences
-
-    fun initPreferences(preferences: SharedPreferences) {
-        this.preferences = preferences
-        checkedScreen.value = StartScreen(preferences.getInt(PREFERRED_START_SCREEN, HOME_BNV))
+    init {
+        viewModelScope.launch {
+            monitorStartScreenPreference()
+                .collect { screen ->
+                    _state.update { it.copy(selectedScreen = screen) }
+                }
+        }
     }
 
     fun newScreenClicked(newScreen: StartScreen) {
-        if (newScreen == checkedScreen.value) {
-            return
+        viewModelScope.launch {
+            setStartScreenPreference(newScreen)
         }
-
-        LiveEventBus.get(EVENT_UPDATE_START_SCREEN, Int::class.java).post(newScreen.id)
-        preferences.edit()
-            .putInt(PREFERRED_START_SCREEN, newScreen.id)
-            .putBoolean(DO_NOT_ALERT_ABOUT_START_SCREEN, true)
-            .apply()
-        checkedScreen.value = newScreen
+//        TODO("Remove this call once all code has been refactored to use monitor instead")
+        eventBus(newScreen.id)
     }
 }
