@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.settings.startscreen
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,8 +7,11 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.databinding.FragmentStartScreenSettingsBinding
-import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import mega.privacy.android.domain.entity.preference.StartScreen
 
 /**
@@ -24,7 +26,7 @@ class StartScreenSettingsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentStartScreenSettingsBinding.inflate(inflater)
         return binding.root
@@ -32,9 +34,6 @@ class StartScreenSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.initPreferences(
-            requireContext().getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
-        )
 
         setupView()
         setupObservers()
@@ -51,7 +50,13 @@ class StartScreenSettingsFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.onScreenChecked().observe(viewLifecycleOwner, ::setScreenChecked)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    setScreenChecked(it.selectedScreen)
+                }
+            }
+        }
     }
 
     private fun hideChecks() {

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.app.di.LoggingModule
 import mega.privacy.android.app.di.settings.SettingsModule
 import mega.privacy.android.app.di.settings.SettingsUseCases
+import mega.privacy.android.app.di.settings.startscreen.TempStartScreenUseCaseStaticModule
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
@@ -21,7 +22,6 @@ import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
-import mega.privacy.android.domain.usecase.GetStartScreen
 import mega.privacy.android.domain.usecase.GetSupportEmail
 import mega.privacy.android.domain.usecase.InitialiseLogging
 import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
@@ -29,6 +29,7 @@ import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsHideRecentActivityEnabled
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
@@ -49,13 +50,14 @@ import test.mega.privacy.android.app.TEST_USER_ACCOUNT
  * Provides test dependencies for Settings tests
  */
 @TestInstallIn(
-    replaces = [SettingsModule::class, SettingsUseCases::class, LoggingModule::class],
+    replaces = [SettingsModule::class, SettingsUseCases::class, LoggingModule::class, TempStartScreenUseCaseStaticModule::class],
     components = [SingletonComponent::class]
 )
 @Module
 object TestSettingsModule {
     val canDeleteAccount = mock<CanDeleteAccount> { on { invoke(any()) }.thenReturn(true) }
-    val getStartScreen = mock<GetStartScreen> { on { invoke() }.thenReturn(emptyFlow()) }
+    val monitorStartScreenPreference =
+        mock<MonitorStartScreenPreference> { on { invoke() }.thenReturn(emptyFlow()) }
     val isMultiFactorAuthAvailable =
         mock<IsMultiFactorAuthAvailable> { on { invoke() }.thenReturn(true) }
     val fetchAutoAcceptQRLinks =
@@ -70,7 +72,8 @@ object TestSettingsModule {
     val setChatImageQuality = mock<SetChatImageQuality>()
     val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
 
-    val getCallsSoundNotifications = mock<GetCallsSoundNotifications> { on { invoke() }.thenReturn(emptyFlow()) }
+    val getCallsSoundNotifications =
+        mock<GetCallsSoundNotifications> { on { invoke() }.thenReturn(emptyFlow()) }
     val setCallsSoundNotifications = mock<SetCallsSoundNotifications>()
 
     @Provides
@@ -110,7 +113,7 @@ object TestSettingsModule {
 
 
     @Provides
-    fun provideGetStartScreen(): GetStartScreen = getStartScreen
+    fun provideGetStartScreen(): MonitorStartScreenPreference = monitorStartScreenPreference
 
 
     @Provides
