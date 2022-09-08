@@ -114,6 +114,15 @@ interface MegaApiGateway {
     suspend fun getParentNode(node: MegaNode): MegaNode?
 
     /**
+     * Get the child node with the provided name
+     *
+     * @param parentNode
+     * @param name
+     * @return mega node or null if doesn't exist
+     */
+    suspend fun getChildNode(parentNode: MegaNode?, name: String?): MegaNode?
+
+    /**
      * Rubbish bin node of the account
      *
      * All accounts have a rubbish bin node, therefore if it is null the account has not been logged in or
@@ -151,6 +160,42 @@ interface MegaApiGateway {
      * @return MegaNode
      */
     suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode?
+
+    /**
+     * Get the fingerprint of a file by path
+     *
+     * @param filePath
+     */
+    suspend fun getFingerprint(filePath: String): String?
+
+    /**
+     * Get MegaNode by original fingerprint
+     * @param originalFingerprint
+     * @param parentNode MegaNode
+     * @return MegaNodeList
+     */
+    suspend fun getNodesByOriginalFingerprint(
+        originalFingerprint: String,
+        parentNode: MegaNode?,
+    ): MegaNodeList?
+
+    /**
+     * Get MegaNode by fingerprint and parent node
+     * @param fingerprint
+     * @param parentNode MegaNode
+     * @return MegaNode
+     */
+    suspend fun getNodeByFingerprintAndParentNode(
+        fingerprint: String,
+        parentNode: MegaNode?,
+    ): MegaNode?
+
+    /**
+     * Get MegaNode by fingerprint only
+     * @param fingerprint
+     * @return MegaNode
+     */
+    suspend fun getNodeByFingerprint(fingerprint: String): MegaNode?
 
     /**
      * Check the node if has version

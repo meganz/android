@@ -23,6 +23,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaShare
 import javax.inject.Inject
@@ -92,6 +93,11 @@ class DefaultFilesRepository @Inject constructor(
         megaApiGateway.getParentNode(node)
     }
 
+    override suspend fun getChildNode(parentNode: MegaNode?, name: String?): MegaNode? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getChildNode(parentNode, name)
+        }
+
     override suspend fun getChildrenNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
         withContext(ioDispatcher) {
             megaApiGateway.getChildrenByNode(parentNode, order)
@@ -100,6 +106,29 @@ class DefaultFilesRepository @Inject constructor(
     override suspend fun getNodeByHandle(handle: Long): MegaNode? = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(handle)
     }
+
+    override suspend fun getFingerprint(filePath: String): String? = withContext(ioDispatcher) {
+        megaApiGateway.getFingerprint(filePath)
+    }
+
+    override suspend fun getNodesByOriginalFingerprint(
+        originalFingerprint: String,
+        parentNode: MegaNode?,
+    ): MegaNodeList? = withContext(ioDispatcher) {
+        megaApiGateway.getNodesByOriginalFingerprint(originalFingerprint, parentNode)
+    }
+
+    override suspend fun getNodeByFingerprintAndParentNode(
+        fingerprint: String,
+        parentNode: MegaNode?,
+    ): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.getNodeByFingerprintAndParentNode(fingerprint, parentNode)
+    }
+
+    override suspend fun getNodeByFingerprint(fingerprint: String): MegaNode? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getNodeByFingerprint(fingerprint)
+        }
 
     override suspend fun getIncomingSharesNode(order: Int?): List<MegaNode> =
         withContext(ioDispatcher) {
