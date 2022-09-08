@@ -1452,6 +1452,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     return null;
                 }));
 
+        ManagerActivityExtensionKt.observer(this, viewModel);
+
         viewModel.onGetNumUnreadUserAlerts().observe(this, this::updateNumUnreadUserAlerts);
 
         viewModel.onInboxSectionUpdate().observe(this, this::updateInboxSectionVisibility);
@@ -2226,7 +2228,6 @@ public class ManagerActivity extends TransfersManagementActivity
             megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
             megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, this);
 
-            this.setDefaultAvatar();
 
             this.setProfileAvatar();
 
@@ -3473,6 +3474,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (circleAvatar.first) {
             nVPictureProfile.setImageBitmap(circleAvatar.second);
         } else {
+            setDefaultAvatar();
             File avatarFile = CacheFolderManager.buildAvatarFile(this, megaApi.getMyEmail() + JPG_EXTENSION);
             if (avatarFile != null && avatarFile.exists()) {
                 megaApi.getUserAvatar(megaApi.getMyUser(), avatarFile.getAbsolutePath(), this);
@@ -3480,7 +3482,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    public void setDefaultAvatar() {
+    private void setDefaultAvatar() {
         Timber.d("setDefaultAvatar");
         nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(megaApi.getMyUser()), megaChatApi.getMyFullname(), AVATAR_SIZE, true));
     }
@@ -9405,18 +9407,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }
         } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
-            if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
-                Timber.d("Request avatar");
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    setProfileAvatar();
-                } else if (e.getErrorCode() == MegaError.API_ENOENT) {
-                    setDefaultAvatar();
-                } else if (e.getErrorCode() == MegaError.API_EARGS) {
-                    Timber.e("Error changing avatar: ");
-                }
-
-                LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
-            } else if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
+            if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
                 updateMyData(true, request.getText(), e);
             } else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
                 updateMyData(false, request.getText(), e);
@@ -9733,22 +9724,6 @@ public class ManagerActivity extends TransfersManagementActivity
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)) {
                             Timber.d("I changed the user: %d nickname", user.getHandle());
                             megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_ALIAS, new GetAttrUserListener(this));
-                        }
-
-                        if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)) {
-                            Timber.d("The user: %dchanged his AVATAR", user.getHandle());
-
-                            File avatar = CacheFolderManager.buildAvatarFile(this, user.getEmail() + ".jpg");
-                            Bitmap bitmap = null;
-                            if (isFileAvailable(avatar)) {
-                                avatar.delete();
-                            }
-
-                            if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
-                                Timber.d("I change my avatar");
-                                String destinationPath = CacheFolderManager.buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath();
-                                megaApi.getUserAvatar(megaApi.getMyUser(), destinationPath, this);
-                            }
                         }
 
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)) {

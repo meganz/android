@@ -10,6 +10,7 @@ import mega.privacy.android.app.domain.repository.GlobalStatesRepository
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
+import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
@@ -89,4 +90,7 @@ object TestRepositoryModule {
 
     @Provides
     fun provideTransferRepository(): TransferRepository = mock()
+
+    @Provides
+    fun provideAvatarRepository(): AvatarRepository = mock()
 }
