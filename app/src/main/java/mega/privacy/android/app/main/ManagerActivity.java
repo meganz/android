@@ -315,6 +315,7 @@ import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
@@ -550,6 +551,8 @@ public class ManagerActivity extends TransfersManagementActivity
     CopyNodeUseCase copyNodeUseCase;
     @Inject
     LegacyLoggingSettings loggingSettings;
+    @Inject
+    ActivityLifecycleHandler activityLifecycleHandler;
 
     public ArrayList<Integer> transfersInProgress;
     public MegaTransferData transferData;
@@ -10757,7 +10760,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (fromAndroidNotification) {
             megaApi.acknowledgeUserAlerts();
         } else {
-            if (drawerItem == DrawerItem.NOTIFICATIONS && app.isActivityVisible()) {
+            if (drawerItem == DrawerItem.NOTIFICATIONS && activityLifecycleHandler.isActivityVisible()) {
                 megaApi.acknowledgeUserAlerts();
             }
         }

@@ -341,6 +341,7 @@ import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.AttachNodeToChatListener;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
@@ -557,6 +558,8 @@ public class ChatActivity extends PasscodeActivity
     GetCallUseCase getCallUseCase;
     @Inject
     GetPushToken getPushToken;
+    @Inject
+    ActivityLifecycleHandler activityLifecycleHandler;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -8952,7 +8955,7 @@ public class ChatActivity extends PasscodeActivity
                             lastMessage = messages.get(index);
                         }
 
-                        if (lastMessage.getMessage() != null && app.isActivityVisible()) {
+                        if (lastMessage.getMessage() != null && activityLifecycleHandler.isActivityVisible()) {
                             boolean resultMarkAsSeen = megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
                             Timber.d("Result setMessageSeen: %s", resultMarkAsSeen);
                         }
@@ -8975,7 +8978,7 @@ public class ChatActivity extends PasscodeActivity
                                 lastMessage = messages.get(index);
                             }
 
-                            if (lastMessage.getMessage() != null && app.isActivityVisible()) {
+                            if (lastMessage.getMessage() != null && activityLifecycleHandler.isActivityVisible()) {
                                 boolean resultMarkAsSeen = megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
                                 Timber.d("Result setMessageSeen: %s", resultMarkAsSeen);
                             }

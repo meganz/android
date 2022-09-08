@@ -60,6 +60,7 @@ import javax.inject.Singleton
 @Singleton
 class TransfersManagement @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
+    private val activityLifecycleHandler: ActivityLifecycleHandler,
     private val dbH: DatabaseHandler,
 ) {
 
@@ -389,7 +390,7 @@ class TransfersManagement @Inject constructor(
                         Intent(app, DownloadService::class.java)
                             .setAction(Constants.ACTION_RESTART_SERVICE)
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !app.isActivityVisible) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !activityLifecycleHandler.isActivityVisible) {
                         app.startForegroundService(downloadServiceIntent)
                     } else {
                         app.startService(downloadServiceIntent)
@@ -404,7 +405,7 @@ class TransfersManagement @Inject constructor(
                     val chatUploadServiceIntent = Intent(app, ChatUploadService::class.java)
                         .setAction(Constants.ACTION_RESTART_SERVICE)
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !app.isActivityVisible) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !activityLifecycleHandler.isActivityVisible) {
                         app.startForegroundService(uploadServiceIntent)
                         app.startForegroundService(chatUploadServiceIntent)
                     } else {

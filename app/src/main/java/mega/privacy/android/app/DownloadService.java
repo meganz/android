@@ -116,6 +116,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.main.LoginActivity;
 import mega.privacy.android.app.main.ManagerActivity;
@@ -169,6 +170,8 @@ public class DownloadService extends Service implements MegaRequestListenerInter
     TransfersManagement transfersManagement;
     @Inject
     DatabaseHandler dbH;
+    @Inject
+    ActivityLifecycleHandler activityLifecycleHandler;
 
     private static int errorEBloqued = 0;
     private int errorCount = 0;
@@ -1523,7 +1526,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
      * @param isCurrentOverQuota true if the overquota is currently received, false otherwise
      */
     private void checkTransferOverQuota(boolean isCurrentOverQuota) {
-        if (app.isActivityVisible()) {
+        if (activityLifecycleHandler.isActivityVisible()) {
             if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
                 transfersManagement.setCurrentTransferOverQuota(isCurrentOverQuota);
                 transfersManagement.setTransferOverQuotaTimestamp();
