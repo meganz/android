@@ -39,7 +39,6 @@ import static mega.privacy.android.app.utils.Constants.INVALID_VOLUME;
 import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_GENERAL_PUSH_CHAT;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
 import static mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS;
 import static mega.privacy.android.app.utils.Constants.UPDATE_CREDIT_CARD_SUBSCRIPTION;
@@ -138,6 +137,7 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
+import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
@@ -177,11 +177,12 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatNotificationListenerInterface;
+import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
-import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
@@ -193,7 +194,7 @@ import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
 @HiltAndroidApp
-public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, Configuration.Provider {
+public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, Configuration.Provider {
 
     final String TAG = "MegaApplication";
 
@@ -239,6 +240,10 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     public TransfersManagement transfersManagement;
     @Inject
     ActivityLifecycleHandler activityLifecycleHandler;
+    @Inject
+    GlobalListener globalListener;
+    @Inject
+    MegaChatNotificationHandler megaChatNotificationHandler;
 
     String localIpAddress = "";
     BackgroundRequestListener requestListener;
@@ -954,7 +959,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         try {
             if (megaChatApi != null) {
                 megaChatApi.removeChatRequestListener(this);
-                megaChatApi.removeChatNotificationListener(this);
+                megaChatApi.removeChatNotificationListener(megaChatNotificationHandler);
                 megaChatApi.removeChatListener(globalChatListener);
                 megaChatApi.removeChatCallListener(meetingListener);
                 registeredChatListeners = false;
@@ -973,7 +978,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         Timber.d("ADD REQUESTLISTENER");
         megaApi.addRequestListener(requestListener);
 
-        megaApi.addGlobalListener(new GlobalListener());
+        megaApi.addGlobalListener(globalListener);
 
         setSDKLanguage();
 
@@ -1041,7 +1046,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
         if (!registeredChatListeners) {
             Timber.d("Add listeners of megaChatApi");
             megaChatApi.addChatRequestListener(this);
-            megaChatApi.addChatNotificationListener(this);
+            megaChatApi.addChatNotificationListener(megaChatNotificationHandler);
             megaChatApi.addChatListener(globalChatListener);
             megaChatApi.addChatCallListener(meetingListener);
             registeredChatListeners = true;
@@ -1263,16 +1268,7 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
             resetDefaults();
 
-            try {
-                if (megaChatApi != null) {
-                    megaChatApi.removeChatRequestListener(this);
-                    megaChatApi.removeChatNotificationListener(this);
-                    megaChatApi.removeChatListener(globalChatListener);
-                    megaChatApi.removeChatCallListener(meetingListener);
-                    registeredChatListeners = false;
-                }
-            } catch (Exception exc) {
-            }
+            disableMegaChatApi();
 
             try {
                 ShortcutBadger.applyCount(getApplicationContext(), 0);
@@ -1383,93 +1379,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
         if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
             getChatManagement().removeActiveChatAndNotificationShown(item.getChatId());
-        }
-    }
-
-    public void updateAppBadge() {
-        Timber.d("updateAppBadge");
-
-        int totalHistoric = 0;
-        int totalIpc = 0;
-        if (megaApi != null && megaApi.getRootNode() != null) {
-            totalHistoric = megaApi.getNumUnreadUserAlerts();
-            ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
-            if (requests != null) {
-                totalIpc = requests.size();
-            }
-        }
-
-        int chatUnread = 0;
-        if (megaChatApi != null) {
-            chatUnread = megaChatApi.getUnreadChats();
-        }
-
-        int totalNotifications = totalHistoric + totalIpc + chatUnread;
-        //Add Android version check if needed
-        if (totalNotifications == 0) {
-            //Remove badge indicator - no unread chats
-            ShortcutBadger.applyCount(getApplicationContext(), 0);
-            //Xiaomi support
-            startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", 0));
-        } else {
-            //Show badge with indicator = unread
-            ShortcutBadger.applyCount(getApplicationContext(), Math.abs(totalNotifications));
-            //Xiaomi support
-            startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", totalNotifications));
-        }
-    }
-
-    @Override
-    public void onChatNotification(MegaChatApiJava api, long chatid, MegaChatMessage msg) {
-        Timber.d("onChatNotification");
-
-        updateAppBadge();
-
-        if (MegaApplication.getOpenChatId() == chatid) {
-            Timber.d("Do not update/show notification - opened chat");
-            return;
-        }
-
-        if (isRecentChatVisible()) {
-            Timber.d("Do not show notification - recent chats shown");
-            return;
-        }
-
-        if (activityLifecycleHandler.isActivityVisible()) {
-
-            try {
-                if (msg != null) {
-
-                    NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                    mNotificationManager.cancel(NOTIFICATION_GENERAL_PUSH_CHAT);
-
-                    if (msg.getStatus() == MegaChatMessage.STATUS_NOT_SEEN) {
-                        if (msg.getType() == MegaChatMessage.TYPE_NORMAL || msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT) {
-                            if (msg.isDeleted()) {
-                                Timber.d("Message deleted");
-
-                                megaChatApi.pushReceived(false);
-                            } else if (msg.isEdited()) {
-                                Timber.d("Message edited");
-                                megaChatApi.pushReceived(false);
-                            } else {
-                                Timber.d("New normal message");
-                                megaChatApi.pushReceived(true);
-                            }
-                        } else if (msg.getType() == MegaChatMessage.TYPE_TRUNCATE) {
-                            Timber.d("New TRUNCATE message");
-                            megaChatApi.pushReceived(false);
-                        }
-                    } else {
-                        Timber.d("Message SEEN");
-                        megaChatApi.pushReceived(false);
-                    }
-                }
-            } catch (Exception e) {
-                Timber.e(e, "EXCEPTION when showing chat notification");
-            }
-        } else {
-            Timber.d("Do not notify chat messages: app in background");
         }
     }
 

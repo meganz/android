@@ -21,9 +21,12 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -37,11 +40,14 @@ import timber.log.Timber;
 public class GlobalListener implements MegaGlobalListenerInterface {
 
     private MegaApplication megaApplication;
-    private DatabaseHandler dbH;
+    private final DatabaseHandler dbH;
+    private final MegaChatNotificationHandler megaChatNotificationHandler;
 
-    public GlobalListener() {
+    @Inject
+    public GlobalListener(DatabaseHandler dbH, MegaChatNotificationHandler megaChatNotificationHandler) {
         megaApplication = MegaApplication.getInstance();
-        dbH = megaApplication.getDbH();
+        this.dbH = dbH;
+        this.megaChatNotificationHandler = megaChatNotificationHandler;
     }
 
     @Override
@@ -107,7 +113,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
     @Override
     public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-        megaApplication.updateAppBadge();
+        megaChatNotificationHandler.updateAppBadge();
 
         notifyNotificationCountChange(api);
     }
@@ -157,7 +163,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
     public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
         if (requests == null) return;
 
-        megaApplication.updateAppBadge();
+        megaChatNotificationHandler.updateAppBadge();
         notifyNotificationCountChange(api);
 
         for (int i = 0; i < requests.size(); i++) {
