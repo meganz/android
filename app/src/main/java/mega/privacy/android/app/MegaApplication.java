@@ -29,7 +29,6 @@ import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_OUTGOI
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_RINGING;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
@@ -37,8 +36,6 @@ import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.EXTRA_CONFIRMATION;
 import static mega.privacy.android.app.utils.Constants.EXTRA_VOLUME_STREAM_TYPE;
 import static mega.privacy.android.app.utils.Constants.EXTRA_VOLUME_STREAM_VALUE;
-import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
-import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
 import static mega.privacy.android.app.utils.Constants.INVALID_VOLUME;
 import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
@@ -125,7 +122,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
-import mega.privacy.android.app.usecase.call.EndCallUseCase;
+
 import dagger.hilt.android.HiltAndroidApp;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
@@ -144,6 +141,7 @@ import mega.privacy.android.app.di.MegaApiFolder;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
@@ -167,6 +165,7 @@ import mega.privacy.android.app.presentation.logging.InitialiseLoggingUseCaseJav
 import mega.privacy.android.app.presentation.theme.ThemeModeState;
 import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
@@ -200,7 +199,7 @@ import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
 @HiltAndroidApp
-public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface, Configuration.Provider {
+public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatListenerInterface, Configuration.Provider {
 
     final String TAG = "MegaApplication";
 
@@ -244,6 +243,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
     CoroutineScope sharingScope;
     @Inject
     public TransfersManagement transfersManagement;
+    @Inject
+    ActivityLifecycleHandler activityLifecycleHandler;
 
     String localIpAddress = "";
     BackgroundRequestListener requestListener;
@@ -253,15 +254,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
     boolean esid = false;
 
     private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
-
-    // The current App Activity
-    private Activity currentActivity = null;
-
-    // Attributes to detect if app changes between background and foreground
-    // Keep the count of number of Activities in the started state
-    private int activityReferences = 0;
-    // Flag to indicate if the current Activity is going through configuration change like orientation switch
-    private boolean isActivityChangingConfigurations = false;
 
     private static boolean isLoggingIn = false;
     private static boolean isLoggingOut = false;
@@ -302,7 +294,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     private static boolean verifyingCredentials;
 
-    private NetworkStateReceiver networkStateReceiver;
     private BroadcastReceiver logoutReceiver;
     private AppRTCAudioManager rtcAudioManager = null;
 
@@ -315,71 +306,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     private final CallSoundsController soundsController = new CallSoundsController();
 
-    @Override
-    public void networkAvailable() {
-        Timber.d("Net available: Broadcast to ManagerActivity");
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-        intent.putExtra(ACTION_TYPE, GO_ONLINE);
-        sendBroadcast(intent);
-    }
-
-    @Override
-    public void networkUnavailable() {
-        Timber.d("Net unavailable: Broadcast to ManagerActivity");
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-        intent.putExtra(ACTION_TYPE, GO_OFFLINE);
-        sendBroadcast(intent);
-    }
-
     public static void smsVerifyShowed(boolean isShowed) {
         isVerifySMSShowed = isShowed;
-    }
-
-    @Override
-    public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-    }
-
-    @Override
-    public void onActivityStarted(@NonNull Activity activity) {
-        currentActivity = activity;
-        if (++activityReferences == 1 && !isActivityChangingConfigurations) {
-            Timber.i("App enters foreground");
-            if (storageState == STORAGE_STATE_PAYWALL) {
-                showOverDiskQuotaPaywallWarning();
-            }
-        }
-    }
-
-    @Override
-    public void onActivityResumed(@NonNull Activity activity) {
-        if (!activity.equals(currentActivity)) {
-            currentActivity = activity;
-        }
-    }
-
-    @Override
-    public void onActivityPaused(@NonNull Activity activity) {
-        if (activity.equals(currentActivity)) {
-            currentActivity = null;
-        }
-    }
-
-    @Override
-    public void onActivityStopped(@NonNull Activity activity) {
-        isActivityChangingConfigurations = activity.isChangingConfigurations();
-        if (--activityReferences == 0 && !isActivityChangingConfigurations) {
-            Timber.i("App enters background");
-        }
-    }
-
-    @Override
-    public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-
-    }
-
-    @Override
-    public void onActivityDestroyed(@NonNull Activity activity) {
-
     }
 
     class BackgroundRequestListener implements MegaRequestListenerInterface {
@@ -595,7 +523,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         @Override
         public void run() {
             try {
-                if (isActivityVisible()) {
+                if (activityLifecycleHandler.isActivityVisible()) {
                     Timber.d("KEEPALIVE: %s", System.currentTimeMillis());
                     if (megaChatApi != null) {
                         backgroundStatus = megaChatApi.getBackgroundStatus();
@@ -805,7 +733,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         Thread.setDefaultUncaughtExceptionHandler((thread, e) -> handleUncaughtException(e));
         RxJavaPlugins.setErrorHandler(this::handleUncaughtException);
 
-        registerActivityLifecycleCallbacks(this);
+        registerActivityLifecycleCallbacks(activityLifecycleHandler);
 
         isVerifySMSShowed = false;
 
@@ -859,9 +787,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             dbH.resetExtendedAccountDetailsTimestamp();
         }
 
-        networkStateReceiver = new NetworkStateReceiver();
-        networkStateReceiver.addListener(this);
-        registerReceiver(networkStateReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        registerReceiver(new NetworkStateReceiver(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
         LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observeForever(callRingingStatusObserver);
@@ -1170,11 +1096,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
         return dbH;
     }
 
-    public boolean isActivityVisible() {
-        Timber.d("Activity visible? => %s", (currentActivity != null));
-        return getCurrentActivity() != null;
-    }
-
     public static boolean isShowInfoChatMessages() {
         return showInfoChatMessages;
     }
@@ -1230,7 +1151,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     }
 
     public boolean isRecentChatVisible() {
-        if (isActivityVisible()) {
+        if (activityLifecycleHandler.isActivityVisible()) {
             return recentChatVisible;
         } else {
             return false;
@@ -1385,14 +1306,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
                     if (getUrlConfirmationLink() != null) {
                         loginIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                         loginIntent.putExtra(EXTRA_CONFIRMATION, getUrlConfirmationLink());
-                        if (isActivityVisible()) {
+                        if (activityLifecycleHandler.isActivityVisible()) {
                             loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         } else {
                             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         }
                         loginIntent.setAction(ACTION_CONFIRM);
                         setUrlConfirmationLink(null);
-                    } else if (isActivityVisible()) {
+                    } else if (activityLifecycleHandler.isActivityVisible()) {
                         loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     } else {
                         loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -1405,7 +1326,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             } else {
                 AccountController.logoutConfirmed(this, sharingScope);
 
-                if (isActivityVisible()) {
+                if (activityLifecycleHandler.isActivityVisible()) {
                     Timber.d("Launch intent to login screen");
                     Intent tourIntent = new Intent(this, LoginActivity.class);
                     tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -1551,7 +1472,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             return;
         }
 
-        if (isActivityVisible()) {
+        if (activityLifecycleHandler.isActivityVisible()) {
 
             try {
                 if (msg != null) {
@@ -1629,7 +1550,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
      * @param callToLaunch The incoming call
      */
     private void checkOneToOneIncomingCall(MegaChatCall callToLaunch) {
-        if (shouldNotify(this) && !isActivityVisible()) {
+        if (shouldNotify(this) && !activityLifecycleHandler.isActivityVisible()) {
             PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
             if (pm != null) {
                 wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":MegaIncomingCallPowerLock");
@@ -2078,7 +1999,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     }
 
     public Activity getCurrentActivity() {
-        return currentActivity;
+        return activityLifecycleHandler.getCurrentActivity();
     }
 
     public static boolean isWaitingForCall() {

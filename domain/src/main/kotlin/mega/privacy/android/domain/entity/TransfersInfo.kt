@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity
 
+import mega.privacy.android.domain.entity.transfer.TransferType
+
 /**
  * Transfers info.
  *
@@ -14,7 +16,7 @@ package mega.privacy.android.domain.entity
  * @property totalSizePendingTransfer           total size pending transfer
  */
 data class TransfersInfo(
-    val transferType: Int,
+    val transferType: TransferType,
     val numPendingDownloadsNonBackground: Int,
     val numPendingUploads: Int,
     val areTransfersPaused: Boolean,

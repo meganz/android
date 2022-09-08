@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.settings.startSceen.util
+package mega.privacy.android.app.presentation.settings.startscreen.util
 
 import android.content.Context
 import mega.privacy.android.app.main.DrawerItem

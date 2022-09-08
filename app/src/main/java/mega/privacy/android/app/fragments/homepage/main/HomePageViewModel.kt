@@ -15,14 +15,20 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.usecase.call.GetCallUseCase
-import mega.privacy.android.app.utils.Constants.*
-import nz.mega.sdk.*
+import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
+import mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_CHANGE
+import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaBanner
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class HomePageViewModel @Inject constructor(
     private val repository: HomepageRepository,
+    private val monitorMyAvatarFile: MonitorMyAvatarFile,
     getCallUseCase: GetCallUseCase
 ) : BaseRxViewModel() {
 
@@ -38,10 +44,6 @@ class HomePageViewModel @Inject constructor(
     private val showCallIcon: MutableLiveData<Boolean> = MutableLiveData()
     val bannerList: LiveData<MutableList<MegaBanner>?> = _bannerList
 
-    private val avatarChangeObserver = androidx.lifecycle.Observer<Boolean> {
-        loadAvatar()
-    }
-
     private val notificationCountObserver = androidx.lifecycle.Observer<Int> {
         _notificationCount.value = it
     }
@@ -51,12 +53,17 @@ class HomePageViewModel @Inject constructor(
     }
 
     init {
-        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
-            .observeForever(avatarChangeObserver)
         LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java)
             .observeForever(notificationCountObserver)
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
             .observeForever(chatOnlineStatusObserver)
+
+        viewModelScope.launch {
+            monitorMyAvatarFile()
+                .collect {
+                    loadAvatar()
+                }
+        }
 
         getCallUseCase.isThereAnOngoingCall()
             .subscribeOn(Schedulers.io())
@@ -78,8 +85,6 @@ class HomePageViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
 
-        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
-            .removeObserver(avatarChangeObserver)
         LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java)
             .removeObserver(notificationCountObserver)
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)

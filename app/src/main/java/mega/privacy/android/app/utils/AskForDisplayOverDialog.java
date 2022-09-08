@@ -12,7 +12,6 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 

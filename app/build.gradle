@@ -427,7 +427,8 @@ dependencies {
     implementation "com.google.accompanist:accompanist-flowlayout:$accompanistLayoutVersion"
 
     // Coil Compose
-    implementation "io.coil-kt:coil-compose:$coilComposeVersion"
+    implementation "io.coil-kt:coil-compose:$coilVersion"
+    implementation "io.coil-kt:coil:$coilVersion"
 
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"
