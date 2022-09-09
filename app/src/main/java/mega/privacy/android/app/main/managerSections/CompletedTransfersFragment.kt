@@ -36,7 +36,7 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
         val v = initView(inflater, container)
@@ -70,7 +70,7 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
         setCompletedTransfers()
 
         adapter = MegaCompletedTransfersAdapter(requireActivity(), tL)
-        listView.adapter = adapter
+        listView?.adapter = adapter
         return v
     }
 

@@ -4964,9 +4964,9 @@ public class ManagerActivity extends TransfersManagementActivity
 
             case TRANSFERS: {
                 if (getTabItemTransfers() == TransfersTab.PENDING_TAB && isTransfersInProgressAdded()) {
-                    transfersFragment.checkScroll();
+                    transfersFragment.updateElevation();
                 } else if (getTabItemTransfers() == TransfersTab.COMPLETED_TAB && isTransfersCompletedAdded()) {
-                    completedTransfersFragment.checkScroll();
+                    completedTransfersFragment.updateElevation();
                 }
             }
         }
