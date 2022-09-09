@@ -334,8 +334,6 @@ public class ContactInfoActivity extends PasscodeActivity
     private ContactFileListBottomSheetDialogFragment bottomSheetDialogFragment;
     private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
 
-    //private AskForDisplayOverDialog askForDisplayOverDialog;
-
     private RelativeLayout callInProgressLayout;
     private Chronometer callInProgressChrono;
     private TextView callInProgressText;

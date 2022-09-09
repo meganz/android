@@ -24,8 +24,8 @@ fun DiscardReportDialog(
     AlertDialog(
         onDismissRequest = onDiscardCancelled,
         properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
         ),
         title = {
             Text(
