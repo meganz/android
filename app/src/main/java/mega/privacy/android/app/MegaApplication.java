@@ -287,7 +287,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     private static boolean isWebOpenDueToEmailVerification = false;
     private static boolean isLoggingRunning = false;
     private static boolean isWaitingForCall = false;
-    public static boolean isSpeakerOn = false;
     private static boolean areAdvertisingCookiesEnabled = false;
     private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
@@ -1612,7 +1611,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
             Timber.d("Creating RTC Audio Manager (%d mode)", type);
             removeRTCAudioManagerRingIn();
-            MegaApplication.isSpeakerOn = isSpeakerOn;
             rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, type);
             if (type != AUDIO_MANAGER_CREATING_JOINING_MEETING) {
                 startProximitySensor();
