@@ -64,10 +64,13 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback
 import mega.privacy.android.app.sync.BackupState
+import mega.privacy.android.app.sync.HeartbeatStatus
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.isActive
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.onUploadSuccess
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.reportUploadFinish
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.reportUploadInterrupted
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.sendPrimaryFolderHeartbeat
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.sendSecondaryFolderHeartbeat
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.startActiveHeartbeat
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.stopActiveHeartbeat
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryFolderBackupState
@@ -172,11 +175,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         const val SECONDARY_UPLOADS_ENGLISH = "Media Uploads"
 
         /**
-         * Cancel Camera Sync
-         */
-        const val ACTION_CANCEL = "CANCEL_SYNC"
-
-        /**
          * Stop Camera Sync
          */
         const val ACTION_STOP = "STOP_SYNC"
@@ -185,16 +183,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
          * Cancel all actions
          */
         const val ACTION_CANCEL_ALL = "CANCEL_ALL"
-
-        /**
-         * Camera Upload Logout
-         */
-        const val ACTION_LOGOUT = "LOGOUT_SYNC"
-
-        /**
-         * New photo or video folder
-         */
-        const val ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER = "PHOTOS_VIDEOS_NEW_FOLDER"
 
         /**
          * Ignore extra attributes
@@ -541,6 +529,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 for (transfer in cuTransfers) {
                     megaApi?.cancelTransfer(transfer)
                 }
+                sendTransfersInterruptedInfoToBackupCenter()
                 finish()
             }
         }
@@ -575,15 +564,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         getAttrUserListener = null
         setAttrUserListener = null
         createFolderListener = null
-
-        // Camera Upload process is running, but interrupted.
-        if (isActive()) {
-            // Update backups' state.
-            updatePrimaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
-            updateSecondaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
-            // Send failed heartbeat.
-            reportUploadInterrupted()
-        }
         stopActiveHeartbeat()
     }
 
@@ -608,6 +588,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     megaApi?.cancelTransfer(transfer, this@CameraUploadsService)
                 }
                 stopped = true
+                sendTransfersInterruptedInfoToBackupCenter()
                 finish()
             }
         }
@@ -631,14 +612,21 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         if (intent != null && intent.action != null) {
             Timber.d("onStartCommand intent action is %s", intent.action)
-            if (intent.action == ACTION_CANCEL || intent.action == ACTION_STOP || intent.action == ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER) {
-                Timber.d("Cancel all CameraUpload transfers.")
-                for (transfer in cuTransfers) {
-                    megaApi?.cancelTransfer(transfer, this)
+
+            when (intent.action) {
+                ACTION_STOP -> {
+                    Timber.d("Stop all Camera Uploads Transfers")
+                    for (transfer in cuTransfers) {
+                        megaApi?.cancelTransfer(transfer, this)
+                    }
+                    sendTransfersInterruptedInfoToBackupCenter()
                 }
-            } else if (ACTION_CANCEL_ALL == intent.action || intent.action == ACTION_LOGOUT) {
-                Timber.d("Cancel all transfers.")
-                megaApi?.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this)
+                ACTION_CANCEL_ALL -> {
+                    Timber.d("Cancel all Camera Uploads Transfers")
+                    megaApi?.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this)
+                    sendTransfersCancelledInfoToBackupCenter()
+                }
+                else -> Unit
             }
             stopped = true
             finish()
@@ -652,6 +640,39 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         Timber.d("Start Service - Create Coroutine")
         startWorkerCoroutine()
         return START_NOT_STICKY
+    }
+
+    /**
+     * Sends the appropriate Backup States and Heartbeat Statuses on both Primary and
+     * Secondary folders when the active Camera Uploads is interrupted by other means (e.g.
+     * no user credentials, Wi-Fi not turned on)
+     */
+    private fun sendTransfersInterruptedInfoToBackupCenter() {
+        if (isActive()) {
+            // Update both Primary and Secondary Folder Backup States to TEMPORARILY_DISABLED
+            updatePrimaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
+            updateSecondaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
+
+            // Send an INACTIVE Heartbeat Status for both Primary and Secondary Folders
+            reportUploadInterrupted()
+        }
+    }
+
+    /**
+     * Sends the appropriate Backup States and Heartbeat Statuses on both Primary and
+     * Secondary folders when the user has cancelled all Transfers.
+     *
+     * In the UI, this is done in the Transfers page where the selects "Cancel all" and
+     * confirms the Dialog
+     */
+    private fun sendTransfersCancelledInfoToBackupCenter() {
+        // Update both Primary and Secondary Backup States to ACTIVE
+        updatePrimaryFolderBackupState(BackupState.ACTIVE)
+        updateSecondaryFolderBackupState(BackupState.ACTIVE)
+
+        // Update both Primary and Secondary Heartbeat Statuses to UP_TO_DATE
+        sendPrimaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
+        sendSecondaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
     }
 
     /**

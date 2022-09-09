@@ -9501,21 +9501,21 @@ public class ManagerActivity extends TransfersManagementActivity
                 updateTransfersWidgetState();
 
                 if (drawerItem == DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
-                    boolean paused = megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
+                    boolean areDownloadsPaused = megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD);
+                    boolean areUploadsPaused = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
+
                     refreshFragment(FragmentTag.TRANSFERS.getTag());
                     mTabsAdapterTransfers.notifyDataSetChanged();
 
-                    pauseTransfersMenuIcon.setVisible(!paused);
-                    playTransfersMenuIcon.setVisible(paused);
+                    pauseTransfersMenuIcon.setVisible(!(areDownloadsPaused || areUploadsPaused));
+                    playTransfersMenuIcon.setVisible(areDownloadsPaused || areUploadsPaused);
+
+                    // For Uploads, when the "Pause All" Button is Clicked, newBackupState = PAUSE_UPLOADS
+                    // Otherwise, when the "Resume All" Button is Clicked, newBackupState = ACTIVE
+                    BackupState newBackupState = areUploadsPaused ? BackupState.PAUSE_UPLOADS : BackupState.ACTIVE;
+                    CameraUploadSyncManager.INSTANCE.updatePrimaryFolderBackupState(newBackupState);
+                    CameraUploadSyncManager.INSTANCE.updateSecondaryFolderBackupState(newBackupState);
                 }
-
-                // Update CU backup state.
-                BackupState newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-                        ? BackupState.PAUSE_UPLOADS
-                        : BackupState.ACTIVE;
-
-                CameraUploadSyncManager.INSTANCE.updatePrimaryFolderBackupState(newBackupState);
-                CameraUploadSyncManager.INSTANCE.updateSecondaryFolderBackupState(newBackupState);
             }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
             Timber.d("One MegaRequest.TYPE_PAUSE_TRANSFER");
