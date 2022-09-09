@@ -310,9 +310,6 @@ public class PdfViewerActivity extends PasscodeActivity
         type = intent.getIntExtra("adapterType", 0);
         path = intent.getStringExtra("path");
 
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-        }
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         if (isFolderLink) {
