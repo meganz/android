@@ -2,86 +2,69 @@ package mega.privacy.android.app.presentation.settings.startscreen
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.launch
-import mega.privacy.android.app.databinding.FragmentStartScreenSettingsBinding
-import mega.privacy.android.domain.entity.preference.StartScreen
+import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenSettingsState
+import mega.privacy.android.app.presentation.settings.startscreen.view.StartScreenOptionView
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.presentation.theme.AndroidTheme
+import javax.inject.Inject
 
 /**
  * Settings fragment to choose the preferred start screen.
  */
+@AndroidEntryPoint
 class StartScreenSettingsFragment : Fragment() {
 
     private val viewModel by activityViewModels<StartScreenViewModel>()
 
-    private lateinit var binding: FragmentStartScreenSettingsBinding
+    /**
+     * Get theme mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        binding = FragmentStartScreenSettingsBinding.inflate(inflater)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupView()
-        setupObservers()
-    }
-
-    private fun setupView() {
-        hideChecks()
-
-        binding.cloudLayout.setOnClickListener { viewModel.newScreenClicked(StartScreen.CloudDrive) }
-        binding.cuLayout.setOnClickListener { viewModel.newScreenClicked(StartScreen.Photos) }
-        binding.homeLayout.setOnClickListener { viewModel.newScreenClicked(StartScreen.Home) }
-        binding.chatLayout.setOnClickListener { viewModel.newScreenClicked(StartScreen.Chat) }
-        binding.sharedLayout.setOnClickListener { viewModel.newScreenClicked(StartScreen.SharedItems) }
-    }
-
-    private fun setupObservers() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect {
-                    setScreenChecked(it.selectedScreen)
-                }
+    ) = ComposeView(requireContext()).apply {
+        setContent {
+            val themeMode by getThemeMode()
+                .collectAsState(initial = ThemeMode.System)
+            val uiState by viewModel.state.collectAsState()
+            AndroidTheme(isDark = themeMode.isDarkMode()) {
+                StartScreenSettingsView(uiState)
             }
         }
     }
 
-    private fun hideChecks() {
-        binding.cloudCheck.isVisible = false
-        binding.cuCheck.isVisible = false
-        binding.homeCheck.isVisible = false
-        binding.chatCheck.isVisible = false
-        binding.sharedCheck.isVisible = false
-    }
-
-    /**
-     * Updates the screen checked.
-     *
-     * @param screenChecked New screen checked.
-     */
-    private fun setScreenChecked(screenChecked: StartScreen) {
-        hideChecks()
-
-        when (screenChecked) {
-            StartScreen.CloudDrive -> binding.cloudCheck.isVisible = true
-            StartScreen.Photos -> binding.cuCheck.isVisible = true
-            StartScreen.Home -> binding.homeCheck.isVisible = true
-            StartScreen.Chat -> binding.chatCheck.isVisible = true
-            StartScreen.SharedItems -> binding.sharedCheck.isVisible = true
-            StartScreen.None -> {}
+    @Composable
+    private fun StartScreenSettingsView(uiState: StartScreenSettingsState) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top
+        ) {
+            uiState.options.forEach {
+                StartScreenOptionView(icon = it.icon,
+                    text = stringResource(id = it.title),
+                    isSelected = it.startScreen == uiState.selectedScreen,
+                    onClick = { viewModel.newScreenClicked(it.startScreen) })
+            }
         }
     }
+
 }
