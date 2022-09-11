@@ -37,8 +37,6 @@ fun AskForDisplayOverDialog(
     onNotNow: () -> Unit,
     onAllow: () -> Unit,
 ) {
-    Timber.d("************************ COMPOSE init show?? $show")
-
     if (show) {
         AlertDialog(
             onDismissRequest = onNotNow,

@@ -57,8 +57,6 @@ class ChatTabsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         this.setupView()
-        Timber.d("******************** ChatTabsFragment -> startActivity AskForDisplayOverActivity");
-
         startActivity(Intent(requireContext(), AskForDisplayOverActivity::class.java))
     }
 
