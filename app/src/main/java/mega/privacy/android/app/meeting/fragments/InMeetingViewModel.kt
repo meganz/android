@@ -1170,6 +1170,7 @@ class InMeetingViewModel @Inject constructor(
      */
     private fun createCurrentParticipants(list: MegaHandleList?) {
         list?.let { listParticipants ->
+            participants.value?.clear()
             if (listParticipants.size() > 0) {
                 for (i in 0 until list.size()) {
                     getSession(list[i])?.let { session ->

@@ -6,8 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
@@ -34,7 +33,6 @@ import nz.mega.sdk.MegaUserAlert
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Mega api facade
@@ -183,9 +181,28 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode? =
         megaApi.getNodeByHandle(nodeHandle)
 
+    override suspend fun getFingerprint(filePath: String): String? =
+        megaApi.getFingerprint(filePath)
+
+    override suspend fun getNodesByOriginalFingerprint(
+        originalFingerprint: String,
+        parentNode: MegaNode?,
+    ): MegaNodeList? = megaApi.getNodesByOriginalFingerprint(originalFingerprint, parentNode)
+
+    override suspend fun getNodeByFingerprintAndParentNode(
+        fingerprint: String,
+        parentNode: MegaNode?,
+    ): MegaNode? = megaApi.getNodeByFingerprint(fingerprint, parentNode)
+
+    override suspend fun getNodeByFingerprint(fingerprint: String): MegaNode? =
+        megaApi.getNodeByFingerprint(fingerprint)
+
     override fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
 
     override suspend fun getParentNode(node: MegaNode): MegaNode? = megaApi.getParentNode(node)
+
+    override suspend fun getChildNode(parentNode: MegaNode?, name: String?): MegaNode? =
+        megaApi.getChildNode(parentNode, name)
 
     override suspend fun getChildrenByNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
         if (order == null)
@@ -310,14 +327,17 @@ class MegaApiFacade @Inject constructor(
         megaApi.getUserAvatarColor(megaUser)
 
     override suspend fun getUserAvatar(user: MegaUser, dstPath: String): Boolean {
-        return suspendCoroutine { continuation ->
+        return suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, e ->
+                    continuation.resume(e.errorCode == MegaError.API_OK)
+                },
+                onRequestTemporaryError = { _, e -> continuation.resume(e.errorCode == MegaError.API_OK) })
+
+            continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
             megaApi.getUserAvatar(user,
                 dstPath,
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _, e ->
-                        continuation.resume(e.errorCode == MegaError.API_OK)
-                    },
-                    onRequestTemporaryError = { _, e -> continuation.resume(e.errorCode == MegaError.API_OK) })
+                listener
             )
         }
     }

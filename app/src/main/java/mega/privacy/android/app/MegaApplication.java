@@ -8,7 +8,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATU
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache;
 import static mega.privacy.android.app.utils.CallUtil.callStatusToString;
 import static mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification;
@@ -28,27 +27,17 @@ import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_IN_PRO
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_OUTGOING;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_RINGING;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.EXTRA_CONFIRMATION;
 import static mega.privacy.android.app.utils.Constants.EXTRA_VOLUME_STREAM_TYPE;
 import static mega.privacy.android.app.utils.Constants.EXTRA_VOLUME_STREAM_VALUE;
-import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
-import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
 import static mega.privacy.android.app.utils.Constants.INVALID_VOLUME;
 import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_GENERAL_PUSH_CHAT;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
 import static mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS;
-import static mega.privacy.android.app.utils.Constants.UPDATE_CREDIT_CARD_SUBSCRIPTION;
-import static mega.privacy.android.app.utils.Constants.UPDATE_GET_PRICING;
-import static mega.privacy.android.app.utils.Constants.UPDATE_PAYMENT_METHODS;
 import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.VOLUME_CHANGED_ACTION;
 import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
@@ -57,22 +46,15 @@ import static mega.privacy.android.app.utils.DBUtil.callToExtendedAccountDetails
 import static mega.privacy.android.app.utils.DBUtil.callToPaymentMethods;
 import static mega.privacy.android.app.utils.IncomingCallNotification.shouldNotify;
 import static mega.privacy.android.app.utils.IncomingCallNotification.toSystemSettingNotification;
-import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
-import static mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT;
-import static mega.privacy.android.app.utils.TimeUtils.formatDateAndTime;
 import static mega.privacy.android.app.utils.Util.checkAppUpgrade;
-import static mega.privacy.android.app.utils.Util.convertToBitSet;
 import static mega.privacy.android.app.utils.Util.isSimplifiedChinese;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.Application;
 import android.app.ApplicationExitInfo;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -89,7 +71,6 @@ import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.StrictMode;
@@ -125,7 +106,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
-import mega.privacy.android.app.usecase.call.EndCallUseCase;
+
 import dagger.hilt.android.HiltAndroidApp;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
@@ -144,11 +125,12 @@ import mega.privacy.android.app.di.MegaApiFolder;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
+import mega.privacy.android.app.globalmanagement.BackgroundRequestListener;
+import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
-import mega.privacy.android.app.listeners.GetAttrUserListener;
-import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.main.LoginActivity;
@@ -168,11 +150,9 @@ import mega.privacy.android.app.presentation.theme.ThemeModeState;
 import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase;
-import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams;
 import mega.privacy.android.domain.usecase.InitialiseLogging;
-import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -180,32 +160,18 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
-import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaChatNotificationListenerInterface;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaPricing;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
 @HiltAndroidApp
-public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface, Configuration.Provider {
-
-    final String TAG = "MegaApplication";
-
-    private static PushNotificationSettingManagement pushNotificationSettingManagement;
-    private static ChatManagement chatManagement;
+public class MegaApplication extends MultiDexApplication implements MegaChatRequestListenerInterface, Configuration.Provider {
 
     @MegaApi
     @Inject
@@ -234,8 +200,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
     @Inject
     GetCallSoundsUseCase getCallSoundsUseCase;
     @Inject
-    EndCallUseCase endCallUseCase;
-    @Inject
     HiltWorkerFactory workerFactory;
     @Inject
     ThemeModeState themeModeState;
@@ -244,24 +208,26 @@ public class MegaApplication extends MultiDexApplication implements Application.
     CoroutineScope sharingScope;
     @Inject
     public TransfersManagement transfersManagement;
+    @Inject
+    ActivityLifecycleHandler activityLifecycleHandler;
+    @Inject
+    GlobalListener globalListener;
+    @Inject
+    MegaChatNotificationHandler megaChatNotificationHandler;
+    @Inject
+    PushNotificationSettingManagement pushNotificationSettingManagement;
+    @Inject
+    ChatManagement chatManagement;
+    @Inject
+    BackgroundRequestListener requestListener;
 
     String localIpAddress = "";
-    BackgroundRequestListener requestListener;
     final static public String APP_KEY = "6tioyn8ka5l6hty";
     final static private String APP_SECRET = "hfzgdtrma231qdm";
 
     boolean esid = false;
 
     private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
-
-    // The current App Activity
-    private Activity currentActivity = null;
-
-    // Attributes to detect if app changes between background and foreground
-    // Keep the count of number of Activities in the started state
-    private int activityReferences = 0;
-    // Flag to indicate if the current Activity is going through configuration change like orientation switch
-    private boolean isActivityChangingConfigurations = false;
 
     private static boolean isLoggingIn = false;
     private static boolean isLoggingOut = false;
@@ -296,13 +262,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private static boolean isWebOpenDueToEmailVerification = false;
     private static boolean isLoggingRunning = false;
     private static boolean isWaitingForCall = false;
-    public static boolean isSpeakerOn = false;
     private static boolean areAdvertisingCookiesEnabled = false;
     private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
     private static boolean verifyingCredentials;
 
-    private NetworkStateReceiver networkStateReceiver;
     private BroadcastReceiver logoutReceiver;
     private AppRTCAudioManager rtcAudioManager = null;
 
@@ -315,271 +279,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     private final CallSoundsController soundsController = new CallSoundsController();
 
-    @Override
-    public void networkAvailable() {
-        Timber.d("Net available: Broadcast to ManagerActivity");
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-        intent.putExtra(ACTION_TYPE, GO_ONLINE);
-        sendBroadcast(intent);
-    }
-
-    @Override
-    public void networkUnavailable() {
-        Timber.d("Net unavailable: Broadcast to ManagerActivity");
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-        intent.putExtra(ACTION_TYPE, GO_OFFLINE);
-        sendBroadcast(intent);
-    }
-
     public static void smsVerifyShowed(boolean isShowed) {
         isVerifySMSShowed = isShowed;
-    }
-
-    @Override
-    public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-    }
-
-    @Override
-    public void onActivityStarted(@NonNull Activity activity) {
-        currentActivity = activity;
-        if (++activityReferences == 1 && !isActivityChangingConfigurations) {
-            Timber.i("App enters foreground");
-            if (storageState == STORAGE_STATE_PAYWALL) {
-                showOverDiskQuotaPaywallWarning();
-            }
-        }
-    }
-
-    @Override
-    public void onActivityResumed(@NonNull Activity activity) {
-        if (!activity.equals(currentActivity)) {
-            currentActivity = activity;
-        }
-    }
-
-    @Override
-    public void onActivityPaused(@NonNull Activity activity) {
-        if (activity.equals(currentActivity)) {
-            currentActivity = null;
-        }
-    }
-
-    @Override
-    public void onActivityStopped(@NonNull Activity activity) {
-        isActivityChangingConfigurations = activity.isChangingConfigurations();
-        if (--activityReferences == 0 && !isActivityChangingConfigurations) {
-            Timber.i("App enters background");
-        }
-    }
-
-    @Override
-    public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-
-    }
-
-    @Override
-    public void onActivityDestroyed(@NonNull Activity activity) {
-
-    }
-
-    class BackgroundRequestListener implements MegaRequestListenerInterface {
-
-        @Override
-        public void onRequestStart(MegaApiJava api, MegaRequest request) {
-            Timber.d("BackgroundRequestListener:onRequestStart: %s", request.getRequestString());
-        }
-
-        @Override
-        public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-            Timber.d("BackgroundRequestListener:onRequestUpdate: %s", request.getRequestString());
-        }
-
-        @Override
-        public void onRequestFinish(MegaApiJava api, MegaRequest request,
-                                    MegaError e) {
-            Timber.d("BackgroundRequestListener:onRequestFinish: %s____%d___%d", request.getRequestString(), e.getErrorCode(), request.getParamType());
-
-            if (e.getErrorCode() == MegaError.API_EPAYWALL) {
-                showOverDiskQuotaPaywallWarning();
-                return;
-            }
-
-            if (e.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
-                sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
-                return;
-            }
-
-            if (request.getType() == MegaRequest.TYPE_LOGOUT) {
-                Timber.d("Logout finished: %s(%d)", e.getErrorString(), e.getErrorCode());
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    Timber.d("END logout sdk request - wait chat logout");
-                    setLoggingOut(false);
-                } else if (e.getErrorCode() == MegaError.API_EINCOMPLETE) {
-                    if (request.getParamType() == MegaError.API_ESSL) {
-                        Timber.w("SSL verification failed");
-                        Intent intent = new Intent(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED);
-                        sendBroadcast(intent);
-                    }
-                } else if (e.getErrorCode() == MegaError.API_ESID) {
-                    Timber.w("TYPE_LOGOUT:API_ESID");
-                    myAccountInfo.resetDefaults();
-
-                    esid = true;
-
-                    AccountController.localLogoutApp(getApplicationContext(), sharingScope);
-                } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
-                    api.localLogout();
-                    megaChatApi.logout();
-                }
-            } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
-                Timber.d("TYPE_FETCH_NODES");
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    askForFullAccountInfo();
-
-                    GetAttrUserListener listener = new GetAttrUserListener(getApplicationContext());
-                    megaApi.shouldShowRichLinkWarning(listener);
-                    megaApi.isRichPreviewsEnabled(listener);
-
-                    listener = new GetAttrUserListener(getApplicationContext(), true);
-                    if (dbH != null && dbH.getMyChatFilesFolderHandle() == INVALID_HANDLE) {
-                        megaApi.getMyChatFilesFolder(listener);
-                    }
-
-                    //Ask for MU and CU folder when App in init state
-                    Timber.d("Get CameraUpload attribute on fetch nodes.");
-                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCameraUploadAttributeListener(getApplicationContext()));
-
-                    // Init CU sync data after login successfully
-                    new CUBackupInitializeChecker(megaApi).initCuSync();
-
-                    //Login check resumed pending transfers
-                    transfersManagement.checkResumedPendingTransfers();
-                    scheduleCameraUploadJob(getApplicationContext());
-                }
-            } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
-                if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
-                    if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-                        pushNotificationSettingManagement.sendPushNotificationSettings(request.getMegaPushNotificationSettings());
-                    }
-                } else if (e.getErrorCode() == MegaError.API_OK) {
-                    if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME || request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
-                        if (megaApi != null && request.getEmail() != null) {
-                            MegaUser user = megaApi.getContact(request.getEmail());
-                            if (user != null) {
-                                Timber.d("User handle: %s", user.getHandle());
-                                Timber.d("Visibility: %s", user.getVisibility()); //If user visibity == MegaUser.VISIBILITY_UNKNOW then, non contact
-                                if (user.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
-                                    Timber.d("Non-contact");
-                                    if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
-                                        dbH.setNonContactEmail(request.getEmail(), user.getHandle() + "");
-                                        dbH.setNonContactFirstName(request.getText(), user.getHandle() + "");
-                                    } else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
-                                        dbH.setNonContactLastName(request.getText(), user.getHandle() + "");
-                                    }
-                                } else {
-                                    Timber.d("The user is or was CONTACT:");
-                                }
-                            } else {
-                                Timber.w("User is NULL");
-                            }
-                        }
-                    }
-                }
-            } else if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
-                if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
-                    if (e.getErrorCode() == MegaError.API_OK) {
-                        pushNotificationSettingManagement.sendPushNotificationSettings(request.getMegaPushNotificationSettings());
-                    } else {
-                        Timber.e("Chat notification settings cannot be updated");
-                    }
-                }
-            } else if (request.getType() == MegaRequest.TYPE_GET_PRICING) {
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    MegaPricing p = request.getPricing();
-
-                    dbH.setPricingTimestamp();
-
-                    myAccountInfo.setProductAccounts(p, request.getCurrency());
-                    myAccountInfo.setPricing(p);
-
-                    Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-                    intent.putExtra(ACTION_TYPE, UPDATE_GET_PRICING);
-                    sendBroadcast(intent);
-                } else {
-                    Timber.e("Error TYPE_GET_PRICING: %s", e.getErrorCode());
-                }
-            } else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS) {
-                Timber.d("Payment methods request");
-                if (myAccountInfo != null) {
-                    myAccountInfo.setGetPaymentMethodsBoolean(true);
-                }
-
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    dbH.setPaymentMethodsTimeStamp();
-                    if (myAccountInfo != null) {
-                        myAccountInfo.setPaymentBitSet(convertToBitSet(request.getNumber()));
-                    }
-
-                    Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-                    intent.putExtra(ACTION_TYPE, UPDATE_PAYMENT_METHODS);
-                    sendBroadcast(intent);
-                }
-            } else if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS) {
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    if (myAccountInfo != null) {
-                        myAccountInfo.setNumberOfSubscriptions(request.getNumber());
-                        Timber.d("NUMBER OF SUBS: %s", myAccountInfo.getNumberOfSubscriptions());
-                    }
-
-                    Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-                    intent.putExtra(ACTION_TYPE, UPDATE_CREDIT_CARD_SUBSCRIPTION);
-                    sendBroadcast(intent);
-                }
-            } else if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS) {
-                Timber.d("Account details request");
-                if (e.getErrorCode() == MegaError.API_OK) {
-
-                    boolean storage = (request.getNumDetails() & MyAccountInfo.HAS_STORAGE_DETAILS) != 0;
-                    if (storage && megaApi.getRootNode() != null) {
-                        dbH.setAccountDetailsTimeStamp();
-                    }
-
-                    if (myAccountInfo != null && request.getMegaAccountDetails() != null) {
-                        myAccountInfo.setAccountInfo(request.getMegaAccountDetails());
-                        myAccountInfo.setAccountDetails(request.getNumDetails());
-
-                        boolean sessions = (request.getNumDetails() & MyAccountInfo.HAS_SESSIONS_DETAILS) != 0;
-                        if (sessions) {
-                            MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
-
-                            if (megaAccountSession != null) {
-                                Timber.d("getMegaAccountSESSION not Null");
-                                dbH.setExtendedAccountDetailsTimestamp();
-                                long mostRecentSession = megaAccountSession.getMostRecentUsage();
-
-                                String date = formatDateAndTime(getApplicationContext(), mostRecentSession, DATE_LONG_FORMAT);
-
-                                myAccountInfo.setLastSessionFormattedDate(date);
-                                myAccountInfo.setCreateSessionTimeStamp(megaAccountSession.getCreationTimestamp());
-                            }
-                        }
-
-                        Timber.d("onRequest TYPE_ACCOUNT_DETAILS: %s", myAccountInfo.getUsedPercentage());
-                    }
-
-                    sendBroadcastUpdateAccountDetails();
-                }
-            } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
-                dbH.setTransferQueueStatus(request.getFlag());
-            }
-        }
-
-        @Override
-        public void onRequestTemporaryError(MegaApiJava api,
-                                            MegaRequest request, MegaError e) {
-            Timber.d("BackgroundRequestListener: onRequestTemporaryError: %s", request.getRequestString());
-        }
-
     }
 
     public void sendBroadcastUpdateAccountDetails() {
@@ -595,7 +296,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         @Override
         public void run() {
             try {
-                if (isActivityVisible()) {
+                if (activityLifecycleHandler.isActivityVisible()) {
                     Timber.d("KEEPALIVE: %s", System.currentTimeMillis());
                     if (megaChatApi != null) {
                         backgroundStatus = megaChatApi.getBackgroundStatus();
@@ -805,7 +506,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         Thread.setDefaultUncaughtExceptionHandler((thread, e) -> handleUncaughtException(e));
         RxJavaPlugins.setErrorHandler(this::handleUncaughtException);
 
-        registerActivityLifecycleCallbacks(this);
+        registerActivityLifecycleCallbacks(activityLifecycleHandler);
 
         isVerifySMSShowed = false;
 
@@ -826,9 +527,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
         LiveEventBus.config().enableLogger(false);
 
         storageState = dbH.getStorageState();
-        pushNotificationSettingManagement = new PushNotificationSettingManagement();
-
-        chatManagement = new ChatManagement(endCallUseCase);
 
         //Logout check resumed pending transfers
         transfersManagement.checkResumedPendingTransfers();
@@ -859,9 +557,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             dbH.resetExtendedAccountDetailsTimestamp();
         }
 
-        networkStateReceiver = new NetworkStateReceiver();
-        networkStateReceiver.addListener(this);
-        registerReceiver(networkStateReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        registerReceiver(new NetworkStateReceiver(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
         LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observeForever(callRingingStatusObserver);
@@ -1034,7 +730,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         try {
             if (megaChatApi != null) {
                 megaChatApi.removeChatRequestListener(this);
-                megaChatApi.removeChatNotificationListener(this);
+                megaChatApi.removeChatNotificationListener(megaChatNotificationHandler);
                 megaChatApi.removeChatListener(globalChatListener);
                 megaChatApi.removeChatCallListener(meetingListener);
                 registeredChatListeners = false;
@@ -1049,11 +745,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
         megaApi.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
         megaApi.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 
-        requestListener = new BackgroundRequestListener();
         Timber.d("ADD REQUESTLISTENER");
         megaApi.addRequestListener(requestListener);
 
-        megaApi.addGlobalListener(new GlobalListener());
+        megaApi.addGlobalListener(globalListener);
 
         setSDKLanguage();
 
@@ -1121,7 +816,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         if (!registeredChatListeners) {
             Timber.d("Add listeners of megaChatApi");
             megaChatApi.addChatRequestListener(this);
-            megaChatApi.addChatNotificationListener(this);
+            megaChatApi.addChatNotificationListener(megaChatNotificationHandler);
             megaChatApi.addChatListener(globalChatListener);
             megaChatApi.addChatCallListener(meetingListener);
             registeredChatListeners = true;
@@ -1168,11 +863,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     public DatabaseHandler getDbH() {
         return dbH;
-    }
-
-    public boolean isActivityVisible() {
-        Timber.d("Activity visible? => %s", (currentActivity != null));
-        return getCurrentActivity() != null;
     }
 
     public static boolean isShowInfoChatMessages() {
@@ -1230,7 +920,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     }
 
     public boolean isRecentChatVisible() {
-        if (isActivityVisible()) {
+        if (activityLifecycleHandler.isActivityVisible()) {
             return recentChatVisible;
         } else {
             return false;
@@ -1348,16 +1038,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
             resetDefaults();
 
-            try {
-                if (megaChatApi != null) {
-                    megaChatApi.removeChatRequestListener(this);
-                    megaChatApi.removeChatNotificationListener(this);
-                    megaChatApi.removeChatListener(globalChatListener);
-                    megaChatApi.removeChatCallListener(meetingListener);
-                    registeredChatListeners = false;
-                }
-            } catch (Exception exc) {
-            }
+            disableMegaChatApi();
 
             try {
                 ShortcutBadger.applyCount(getApplicationContext(), 0);
@@ -1385,14 +1066,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
                     if (getUrlConfirmationLink() != null) {
                         loginIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                         loginIntent.putExtra(EXTRA_CONFIRMATION, getUrlConfirmationLink());
-                        if (isActivityVisible()) {
+                        if (activityLifecycleHandler.isActivityVisible()) {
                             loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         } else {
                             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         }
                         loginIntent.setAction(ACTION_CONFIRM);
                         setUrlConfirmationLink(null);
-                    } else if (isActivityVisible()) {
+                    } else if (activityLifecycleHandler.isActivityVisible()) {
                         loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     } else {
                         loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -1405,7 +1086,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             } else {
                 AccountController.logoutConfirmed(this, sharingScope);
 
-                if (isActivityVisible()) {
+                if (activityLifecycleHandler.isActivityVisible()) {
                     Timber.d("Launch intent to login screen");
                     Intent tourIntent = new Intent(this, LoginActivity.class);
                     tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -1471,124 +1152,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
         }
     }
 
-    @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-    }
-
-    @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandlev, int status, boolean inProgress) {
-
-    }
-
-    @Override
-    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-        if (config.isPending() == false) {
-            Timber.d("Launch local broadcast");
-            Intent intent = new Intent(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE);
-            sendBroadcast(intent);
-        }
-    }
-
-    @Override
-    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-    }
-
-    @Override
-    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-    }
-
-    @Override
-    public void onDbError(MegaChatApiJava api, int error, String msg) {
-    }
-
-    public void updateAppBadge() {
-        Timber.d("updateAppBadge");
-
-        int totalHistoric = 0;
-        int totalIpc = 0;
-        if (megaApi != null && megaApi.getRootNode() != null) {
-            totalHistoric = megaApi.getNumUnreadUserAlerts();
-            ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
-            if (requests != null) {
-                totalIpc = requests.size();
-            }
-        }
-
-        int chatUnread = 0;
-        if (megaChatApi != null) {
-            chatUnread = megaChatApi.getUnreadChats();
-        }
-
-        int totalNotifications = totalHistoric + totalIpc + chatUnread;
-        //Add Android version check if needed
-        if (totalNotifications == 0) {
-            //Remove badge indicator - no unread chats
-            ShortcutBadger.applyCount(getApplicationContext(), 0);
-            //Xiaomi support
-            startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", 0));
-        } else {
-            //Show badge with indicator = unread
-            ShortcutBadger.applyCount(getApplicationContext(), Math.abs(totalNotifications));
-            //Xiaomi support
-            startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", totalNotifications));
-        }
-    }
-
-    @Override
-    public void onChatNotification(MegaChatApiJava api, long chatid, MegaChatMessage msg) {
-        Timber.d("onChatNotification");
-
-        updateAppBadge();
-
-        if (MegaApplication.getOpenChatId() == chatid) {
-            Timber.d("Do not update/show notification - opened chat");
-            return;
-        }
-
-        if (isRecentChatVisible()) {
-            Timber.d("Do not show notification - recent chats shown");
-            return;
-        }
-
-        if (isActivityVisible()) {
-
-            try {
-                if (msg != null) {
-
-                    NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                    mNotificationManager.cancel(NOTIFICATION_GENERAL_PUSH_CHAT);
-
-                    if (msg.getStatus() == MegaChatMessage.STATUS_NOT_SEEN) {
-                        if (msg.getType() == MegaChatMessage.TYPE_NORMAL || msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT) {
-                            if (msg.isDeleted()) {
-                                Timber.d("Message deleted");
-
-                                megaChatApi.pushReceived(false);
-                            } else if (msg.isEdited()) {
-                                Timber.d("Message edited");
-                                megaChatApi.pushReceived(false);
-                            } else {
-                                Timber.d("New normal message");
-                                megaChatApi.pushReceived(true);
-                            }
-                        } else if (msg.getType() == MegaChatMessage.TYPE_TRUNCATE) {
-                            Timber.d("New TRUNCATE message");
-                            megaChatApi.pushReceived(false);
-                        }
-                    } else {
-                        Timber.d("Message SEEN");
-                        megaChatApi.pushReceived(false);
-                    }
-                }
-            } catch (Exception e) {
-                Timber.e(e, "EXCEPTION when showing chat notification");
-            }
-        } else {
-            Timber.d("Do not notify chat messages: app in background");
-        }
-    }
-
     public void checkOneCall(long incomingCallChatId) {
         Timber.d("One call : Chat ID is %d, openCall Chat ID is %d", incomingCallChatId, openCallChatId);
         if (openCallChatId == incomingCallChatId) {
@@ -1629,7 +1192,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
      * @param callToLaunch The incoming call
      */
     private void checkOneToOneIncomingCall(MegaChatCall callToLaunch) {
-        if (shouldNotify(this) && !isActivityVisible()) {
+        if (shouldNotify(this) && !activityLifecycleHandler.isActivityVisible()) {
             PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
             if (pm != null) {
                 wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":MegaIncomingCallPowerLock");
@@ -1819,7 +1382,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
             Timber.d("Creating RTC Audio Manager (%d mode)", type);
             removeRTCAudioManagerRingIn();
-            MegaApplication.isSpeakerOn = isSpeakerOn;
             rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, type);
             if (type != AUDIO_MANAGER_CREATING_JOINING_MEETING) {
                 startProximitySensor();
@@ -2062,11 +1624,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
     }
 
     public static PushNotificationSettingManagement getPushNotificationSettingManagement() {
-        return pushNotificationSettingManagement;
+        return getInstance().pushNotificationSettingManagement;
     }
 
     public static ChatManagement getChatManagement() {
-        return chatManagement;
+        return getInstance().chatManagement;
     }
 
     public static void setVerifyingCredentials(boolean verifyingCredentials) {
@@ -2078,7 +1640,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     }
 
     public Activity getCurrentActivity() {
-        return currentActivity;
+        return activityLifecycleHandler.getCurrentActivity();
     }
 
     public static boolean isWaitingForCall() {

@@ -5,9 +5,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.di.GetNodeModule
+import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
+import mega.privacy.android.app.domain.usecase.DefaultGetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.DefaultGetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
@@ -15,6 +18,13 @@ import mega.privacy.android.app.domain.usecase.DefaultIsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
+import mega.privacy.android.app.domain.usecase.GetChildMegaNode
+import mega.privacy.android.app.domain.usecase.GetFingerprint
+import mega.privacy.android.app.domain.usecase.GetNodeByFingerprint
+import mega.privacy.android.app.domain.usecase.GetNodeByFingerprintAndParentNode
+import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
+import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
+import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
@@ -59,7 +69,7 @@ import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 /**
  * Provides the use case implementation for camera upload
  */
-@Module
+@Module(includes = [GetNodeModule::class])
 @InstallIn(SingletonComponent::class)
 abstract class CameraUploadUseCases {
 
@@ -222,7 +232,55 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideGetVideoQuality(cameraUploadRepository: CameraUploadRepository): GetVideoQuality =
             GetVideoQuality { cameraUploadRepository.getVideoQuality().toInt() }
+
+        /**
+         * Provide the GetFingerprint implementation
+         */
+        @Provides
+        fun provideGetFingerPrint(filesRepository: FilesRepository): GetFingerprint =
+            GetFingerprint(filesRepository::getFingerprint)
+
+        /**
+         * Provide the GetNodesByOriginalFingerprint implementation
+         */
+        @Provides
+        fun provideGetNodesByOriginalFingerprint(filesRepository: FilesRepository): GetNodesByOriginalFingerprint =
+            GetNodesByOriginalFingerprint(filesRepository::getNodesByOriginalFingerprint)
+
+        /**
+         * Provide the GetNodeByFingerprintAndParentNode implementation
+         */
+        @Provides
+        fun provideGetNodeByFingerprintAndParentNode(filesRepository: FilesRepository): GetNodeByFingerprintAndParentNode =
+            GetNodeByFingerprintAndParentNode(filesRepository::getNodeByFingerprintAndParentNode)
+
+        /**
+         * Provide the GetNodeByFingerprint implementation
+         */
+        @Provides
+        fun provideGetNodeByFingerprint(filesRepository: FilesRepository): GetNodeByFingerprint =
+            GetNodeByFingerprint(filesRepository::getNodeByFingerprint)
+
+        /**
+         * Provide the GetParentMegaNode implementation
+         */
+        @Provides
+        fun provideGetParentMegaNode(filesRepository: FilesRepository): GetParentMegaNode =
+            GetParentMegaNode(filesRepository::getParentNode)
+
+        /**
+         * Provide the GetChildMegaNode implementation
+         */
+        @Provides
+        fun provideGetChildMegaNode(filesRepository: FilesRepository): GetChildMegaNode =
+            GetChildMegaNode(filesRepository::getChildNode)
     }
+
+    /**
+     * Provide the GetNodeFromCloud implementation
+     */
+    @Binds
+    abstract fun bindGetNodeFromCloud(getNodeFromCloud: DefaultGetNodeFromCloud): GetNodeFromCloud
 
     /**
      * Provide the UpdateTimeStamp implementation

@@ -34,6 +34,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.ChatRoomListener;
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
@@ -43,6 +46,7 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import timber.log.Timber;
 
+@Singleton
 public class ChatManagement {
 
     private final ChatRoomListener chatRoomListener;
@@ -85,6 +89,7 @@ public class ChatManagement {
     private boolean isScreenBroadcastRegister = false;
     private EndCallUseCase endCallUseCase;
 
+    @Inject
     public ChatManagement(EndCallUseCase endCallUseCase) {
         chatRoomListener = new ChatRoomListener();
         app = MegaApplication.getInstance();
