@@ -16,7 +16,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON
 import static mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showAskForDisplayOverDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
@@ -153,6 +152,7 @@ import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity;
 import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.AppBarStateChangeListener;
@@ -709,8 +709,6 @@ public class ContactInfoActivity extends PasscodeActivity
             Timber.w("Extras is NULL");
         }
 
-        showAskForDisplayOverDialog(this);
-
         registerReceiver(manageShareReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
@@ -732,6 +730,8 @@ public class ContactInfoActivity extends PasscodeActivity
 
         registerReceiver(destroyActionModeReceiver,
                 new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
+
+        startActivity(new Intent(this, AskForDisplayOverActivity.class));
     }
 
     @Override

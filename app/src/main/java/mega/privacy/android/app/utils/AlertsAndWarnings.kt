@@ -229,40 +229,4 @@ object AlertsAndWarnings {
                 setCancelable(false)
                 show()
             }
-
-    /**
-     * Shows ask for display over dialog.
-     *
-     * @param activity   Required to create the dialog and finish the activity.
-     */
-    @JvmStatic
-    fun showAskForDisplayOverDialog(activity: Activity) {
-        if (IncomingCallNotification.shouldNotify(activity) && getDbHandler().shouldAskForDisplayOver()) {
-
-            MaterialAlertDialogBuilder(activity)
-                .setView(R.layout.ask_for_display_over_dialog_layout)
-                .setPositiveButton(R.string.general_allow) { dialog, _ ->
-                    val intent =
-                        Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                            Uri.parse("package:" + activity.packageName))
-                    activity.startActivity(intent)
-                    dialog.dismiss()
-                }
-                .setNegativeButton(R.string.verify_account_not_now_button) { dialog, _ ->
-                    Toast.makeText(activity,
-                        R.string.ask_for_display_over_explain,
-                        Toast.LENGTH_LONG).show()
-                    dialog.dismiss()
-                }
-                .setOnDismissListener {
-                    getDbHandler().dontAskForDisplayOver()
-                    it.cancel()
-                }
-                .create().apply {
-                    setCancelable(false)
-                    setCanceledOnTouchOutside(false)
-                    show()
-                }
-        }
-    }
 }

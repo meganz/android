@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.chats
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,15 +11,16 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity
 import mega.privacy.android.app.databinding.FragmentChatTabsBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.RecentChatsFragment
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter.Tabs.CHAT
 import mega.privacy.android.app.meeting.list.MeetingListFragment
-import mega.privacy.android.app.utils.AlertsAndWarnings.showAskForDisplayOverDialog
 import mega.privacy.android.app.utils.ColorUtils.setElevationWithColor
 import mega.privacy.android.app.utils.StringResourcesUtils
+import timber.log.Timber
 
 /**
  * Chat tabs fragment containing Chat and Meeting fragment
@@ -54,10 +56,10 @@ class ChatTabsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setupView()
-        view.post {
-            showAskForDisplayOverDialog(requireActivity())
-        }
+        this.setupView()
+        Timber.d("******************** ChatTabsFragment -> startActivity AskForDisplayOverActivity");
+
+        startActivity(Intent(requireContext(), AskForDisplayOverActivity::class.java))
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
