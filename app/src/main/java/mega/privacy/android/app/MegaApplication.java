@@ -265,8 +265,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
     private static boolean areAdvertisingCookiesEnabled = false;
     private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
-    private static boolean verifyingCredentials;
-
     private BroadcastReceiver logoutReceiver;
     private AppRTCAudioManager rtcAudioManager = null;
 
@@ -1629,14 +1627,6 @@ public class MegaApplication extends MultiDexApplication implements MegaChatRequ
 
     public static ChatManagement getChatManagement() {
         return getInstance().chatManagement;
-    }
-
-    public static void setVerifyingCredentials(boolean verifyingCredentials) {
-        MegaApplication.verifyingCredentials = verifyingCredentials;
-    }
-
-    public static boolean isVerifyingCredentials() {
-        return MegaApplication.verifyingCredentials;
     }
 
     public Activity getCurrentActivity() {

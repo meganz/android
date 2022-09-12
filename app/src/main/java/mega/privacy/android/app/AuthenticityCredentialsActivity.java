@@ -47,6 +47,8 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
     private static final int MARGIN_LEFT_EXPLANATION_AND_MY_CREDENTIALS = 72;
     private static final int MARGIN_RIGHT_EXPLANATION_AND_MY_CREDENTIALS = 123;
 
+    private VerifyCredentialsListener verifyCredentialsListener;
+
     private MegaUser contact;
     private String contactCredentials;
 
@@ -203,9 +205,9 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
             explanation.setLayoutParams(explanationParams);
         }
 
-        VerifyCredentialsListener verifyCredentialsListener = new VerifyCredentialsListener(this);
+        verifyCredentialsListener = new VerifyCredentialsListener(this);
         credentialsButton.setOnClickListener(v -> {
-            if (MegaApplication.isVerifyingCredentials()) {
+            if (verifyCredentialsListener.isVerifyingCredentials()) {
                 showSnackbar(getString(R.string.already_verifying_credentials));
             } else {
                 credentialsButton.setAlpha(0.5f);
@@ -263,6 +265,14 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (verifyCredentialsListener != null) {
+            megaApi.removeRequestListener(verifyCredentialsListener);
+        }
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString(CONTACT_CREDENTIALS, contactCredentials);
 
@@ -283,7 +293,7 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
      */
     private void updateButtonText() {
         credentialsButton.setText(megaApi.areCredentialsVerified(contact) ? R.string.action_reset : R.string.general_verify);
-        credentialsButton.setAlpha(MegaApplication.isVerifyingCredentials() ? 0.5f : 1f);
+        credentialsButton.setAlpha(verifyCredentialsListener != null && verifyCredentialsListener.isVerifyingCredentials() ? 0.5f : 1f);
     }
 
     /**

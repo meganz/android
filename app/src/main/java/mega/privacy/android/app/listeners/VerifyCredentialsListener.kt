@@ -2,7 +2,6 @@ package mega.privacy.android.app.listeners
 
 import android.content.Intent
 import mega.privacy.android.app.AuthenticityCredentialsActivity
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.BroadcastConstants
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -16,6 +15,7 @@ import nz.mega.sdk.MegaRequestListenerInterface
  */
 class VerifyCredentialsListener(private val activity: AuthenticityCredentialsActivity) :
     MegaRequestListenerInterface {
+    private var verifyingCredentials: Boolean = false
 
     /**
      * Callback function for onRequestStart
@@ -25,7 +25,7 @@ class VerifyCredentialsListener(private val activity: AuthenticityCredentialsAct
      */
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
         if (request.type == MegaRequest.TYPE_VERIFY_CREDENTIALS) {
-            MegaApplication.setVerifyingCredentials(true)
+            verifyingCredentials = true
         }
     }
 
@@ -47,7 +47,7 @@ class VerifyCredentialsListener(private val activity: AuthenticityCredentialsAct
      */
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         if (request.type == MegaRequest.TYPE_VERIFY_CREDENTIALS) {
-            MegaApplication.setVerifyingCredentials(false)
+            verifyingCredentials = false
             activity.sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
                 .setAction(BroadcastConstants.ACTION_UPDATE_CREDENTIALS)
                 .putExtra(BroadcastConstants.EXTRA_USER_HANDLE, request.nodeHandle))
@@ -63,5 +63,12 @@ class VerifyCredentialsListener(private val activity: AuthenticityCredentialsAct
      */
     override fun onRequestTemporaryError(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
         // Do nothing
+    }
+
+    /**
+     * Is verifying credentials
+     */
+    fun isVerifyingCredentials(): Boolean {
+        return verifyingCredentials
     }
 }
