@@ -432,8 +432,9 @@
     <string name="context_correctly_moved">Mutat cu succes</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
-        <item quantity="one">Moved %d item</item>
-        <item quantity="other">Moved %d items</item>
+        <item quantity="one">%d element a fost mutat</item>
+        <item quantity="few">%d elemente au fost mutate</item>
+        <item quantity="other">%d de elemente au fost mutate</item>
     </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d elemente nu au fost mutate cu succes</string>
@@ -962,8 +963,9 @@
     <string name="remove_contact_shared_folder">Contactul %s va fi eliminat din folderul partajat.</string>
     <!-- Message to confirm if the user wants to delete a multiple contacts from a shared folder -->
     <plurals name="remove_multiple_contacts_shared_folder">
-        <item quantity="one">%d contact will be removed from the shared folder.</item>
-        <item quantity="other">%d contacts will be removed from the shared folder.</item>
+        <item quantity="one">%d contact va fi eliminat din folderul partajat.</item>
+        <item quantity="few">%d contacte vor fi eliminate din folderul partajat.</item>
+        <item quantity="other">%d de contacte vor fi eliminate din folderul partajat.</item>
     </plurals>
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">Eșec la actualizarea permisiunilor pentru %d contacte</string>
@@ -973,8 +975,9 @@
     <string name="number_existing_invite_contact_request">%d cereri trimise deja.</string>
     <!-- success message when inviting multiple contacts -->
     <plurals name="number_correctly_invite_contact_request">
-        <item quantity="one">%d invite sent</item>
-        <item quantity="other">%d invites sent</item>
+        <item quantity="one">%d invitație trimisă</item>
+        <item quantity="few">%d invitații trimise</item>
+        <item quantity="other">%d de invitații trimise</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d cereri de invitație trimise cu succes, însă %2$d cereri nu au fost trimise.</string>
@@ -1593,8 +1596,9 @@
     <string name="invalid_characters_defined">Următoarele caractere nu sunt permise: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">File name cannot be empty.</item>
-        <item quantity="other">File names cannot be empty.</item>
+        <item quantity="one">Numele fișierului nu poate fi gol.</item>
+        <item quantity="few">Numele fișierelor nu pot fi goale.</item>
+        <item quantity="other">Numele fișierelor nu pot fi goale.</item>
     </plurals>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">Eroare. Fișierul PDF este corupt sau nu există.</string>
@@ -2452,7 +2456,8 @@
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
         <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="few">%1$d foldere&#160;·&#160;</item>
+        <item quantity="other">%1$d de foldere&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] a adăugat %2$s și %3$s[/B]</string>
@@ -2794,18 +2799,21 @@
     <string name="title_bucket">%1$s și încă %2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
     <plurals name="title_media_bucket_only_images">
-        <item quantity="one">%d image</item>
-        <item quantity="other">%d images</item>
+        <item quantity="one">%d imagine</item>
+        <item quantity="few">%d imagini</item>
+        <item quantity="other">%d de imagini</item>
     </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
     <plurals name="title_media_bucket_only_videos">
-        <item quantity="one">%d video</item>
-        <item quantity="other">%d videos</item>
+        <item quantity="one">%d videoclip</item>
+        <item quantity="few">%d videoclipuri</item>
+        <item quantity="other">%d de videoclipuri</item>
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="one">%1$d imagine&#160;</item>
+        <item quantity="few">%1$d imagini&#160;</item>
+        <item quantity="other">%1$d de imagini&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]creat de [/A]%s</string>
@@ -2927,8 +2935,9 @@
     <string name="general_date_label">în data de %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
     <plurals name="alert_remove_several_shares">
-        <item quantity="one">Unshare this folder?</item>
-        <item quantity="other">Unshare these %1$d folders?</item>
+        <item quantity="one">Oprești partajarea acestui folder?</item>
+        <item quantity="few">Oprești partajarea acestor %1$d foldere?</item>
+        <item quantity="other">Oprești partajarea acestor %1$d de foldere?</item>
     </plurals>
     <!-- Download location label -->
     <string name="download_location">Locație de descărcare</string>
@@ -3830,13 +3839,15 @@
     <string name="meeting_call_screen_two_participants_left_call">%1$s și %2$s au părăsit apelul</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
-        <item quantity="one">%1$s and 1 other joined</item>
-        <item quantity="other">%1$s and %2$d others joined</item>
+        <item quantity="one">%1$s și încă 1 s-au alăturat</item>
+        <item quantity="few">%1$s și ați %2$d s-au alăturat</item>
+        <item quantity="other">%1$s și ați %2$d s-au alăturat</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and 1 other left</item>
-        <item quantity="other">%1$s and %2$d others left</item>
+        <item quantity="one">%1$s și încă 1 au părăsit apelul</item>
+        <item quantity="few">%1$s și ați %2$d au părăsit apelul</item>
+        <item quantity="other">%1$s și ați %2$d au părăsit apelul</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Delete permanently</string>
@@ -4034,8 +4045,9 @@
     <string name="shared_items_outgoing_unshare_confirm_dialog_button_no">Nu</string>
     <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
-        <item quantity="one">and %1$d video</item>
-        <item quantity="other">and %1$d videos</item>
+        <item quantity="one">și %1$d videoclip</item>
+        <item quantity="few">și %1$d videoclipuri</item>
+        <item quantity="other">și %1$d de videoclipuri</item>
     </plurals>
     <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
     <plurals name="num_folders_num_files_2">
