@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.chat.dialog
+package mega.privacy.android.app.presentation.chat.dialog.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
