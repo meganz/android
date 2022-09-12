@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -38,6 +39,7 @@ fun AskForDisplayOverDialog(
     onAllow: () -> Unit,
 ) {
     if (show) {
+
         AlertDialog(
             onDismissRequest = onNotNow,
             properties = DialogProperties(
@@ -59,7 +61,8 @@ fun AskForDisplayOverDialog(
                         textAlign = TextAlign.Center,
                         text = stringResource(id = R.string.ask_for_display_over_title),
                         style = Typography.h6,
-                        color = colorResource(id = R.color.grey_087_white),
+                        color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.grey_alpha_087) else colorResource(
+                            id = R.color.white),
                         fontWeight = FontWeight.Bold
                     )
                     Image(
@@ -77,10 +80,10 @@ fun AskForDisplayOverDialog(
                             .padding(start = 0.dp, top = 20.dp, bottom = 20.dp, end = 0.dp),
                         text = stringResource(id = R.string.ask_for_display_over_msg),
                         style = Typography.subtitle1,
-                        color = colorResource(id = R.color.grey_060_white_060)
+                        color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.grey_alpha_060) else colorResource(
+                            id = R.color.white_alpha_060)
                     )
                 }
-
             },
             confirmButton = {
                 TextButton(
@@ -89,7 +92,8 @@ fun AskForDisplayOverDialog(
                 ) {
                     Text(
                         text = stringResource(id = R.string.general_allow),
-                        color = colorResource(id = R.color.teal_300_teal_200)
+                        color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.teal_300) else colorResource(
+                            id = R.color.teal_200)
                     )
                 }
             },
@@ -100,11 +104,13 @@ fun AskForDisplayOverDialog(
                 ) {
                     Text(
                         text = stringResource(id = R.string.verify_account_not_now_button),
-                        color = colorResource(id = R.color.teal_300_teal_200)
+                        color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.teal_300) else colorResource(
+                            id = R.color.teal_200)
                     )
                 }
             },
-            backgroundColor = colorResource(id = R.color.white_dark_grey)
+            backgroundColor = if (MaterialTheme.colors.isLight) colorResource(id = R.color.white) else colorResource(
+                id = R.color.dark_grey)
         )
     }
 }
