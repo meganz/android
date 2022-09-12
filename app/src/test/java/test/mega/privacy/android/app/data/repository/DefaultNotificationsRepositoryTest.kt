@@ -10,6 +10,7 @@ import mega.privacy.android.app.MegaContactDB
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.mapper.ContactRequestMapper
+import mega.privacy.android.app.data.mapper.EventMapper
 import mega.privacy.android.app.data.mapper.NodeProvider
 import mega.privacy.android.app.data.mapper.UserAlertContactProvider
 import mega.privacy.android.app.data.mapper.UserAlertMapper
@@ -18,9 +19,12 @@ import mega.privacy.android.app.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.app.main.megachat.NonContactInfo
 import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
+import mega.privacy.android.domain.entity.Event
+import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.repository.NotificationsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUserAlert
@@ -38,6 +42,7 @@ class DefaultNotificationsRepositoryTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val contactRequestMapper = mock<ContactRequestMapper>()
+    private val eventMapper = mock<EventMapper>()
     private val userHandle = 12L
     private val email = "email"
 
@@ -60,6 +65,7 @@ class DefaultNotificationsRepositoryTest {
             megaApiGateway = megaApiGateway,
             contactRequestMapper = contactRequestMapper,
             userAlertsMapper = userAlertsMapper,
+            eventMapper = eventMapper,
             localStorageGateway = megaLocalStorageGateway,
             dispatcher = UnconfinedTestDispatcher(),
         )
@@ -172,13 +178,67 @@ class DefaultNotificationsRepositoryTest {
         val contactInfo = mock<NonContactInfo> { on { email }.thenReturn(email) }
         whenever(megaLocalStorageGateway.getNonContactByHandle(any())).thenReturn(contactInfo)
         whenever(megaApiGateway.getContact(any())).thenReturn(mock())
-        val expectedNickname = "An ickname"
+        val expectedNickname = "A nickname"
         val contactDB = mock<MegaContactDB> { on { nickname }.thenReturn(expectedNickname) }
         whenever(megaLocalStorageGateway.getContactByEmail(any())).thenReturn(contactDB)
 
         underTest.monitorUserAlerts().test {
             val alert = awaitItem().first() as ContactAlert
             assertThat(alert.contact.nickname).isEqualTo(expectedNickname)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that event is returned if found`() = runTest {
+        val expectedEvent = Event(
+            handle = 1L,
+            text = "expected text",
+            number = 2L,
+            type = EventType.NodesCurrent,
+            eventString = "expected event string"
+        )
+        val megaEvent = mock<MegaEvent> {
+            on { type }.thenReturn(MegaEvent.EVENT_NODES_CURRENT)
+            on { handle }.thenReturn(expectedEvent.handle)
+            on { text }.thenReturn(expectedEvent.text)
+            on { number }.thenReturn(expectedEvent.number)
+            on { eventString }.thenReturn(expectedEvent.eventString)
+        }
+        val globalUpdate = GlobalUpdate.OnEvent(megaEvent)
+        whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate))
+        whenever(eventMapper(megaEvent)).thenReturn(expectedEvent)
+
+        underTest.monitorEvent().test {
+            assertThat(awaitItem()).isEqualTo(expectedEvent)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that multiple events are returned if found`() = runTest {
+        val expectedEvent = Event(
+            handle = 1L,
+            text = "expected text",
+            number = 2L,
+            type = EventType.NodesCurrent,
+            eventString = "expected event string"
+        )
+        val megaEvent = mock<MegaEvent> {
+            on { type }.thenReturn(MegaEvent.EVENT_NODES_CURRENT)
+            on { handle }.thenReturn(expectedEvent.handle)
+            on { text }.thenReturn(expectedEvent.text)
+            on { number }.thenReturn(expectedEvent.number)
+            on { eventString }.thenReturn(expectedEvent.eventString)
+        }
+        val globalUpdate = GlobalUpdate.OnEvent(megaEvent)
+        whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate, globalUpdate, globalUpdate))
+        whenever(eventMapper(megaEvent)).thenReturn(expectedEvent)
+
+        underTest.monitorEvent().test {
+            assertThat(awaitItem()).isEqualTo(expectedEvent)
+            assertThat(awaitItem()).isEqualTo(expectedEvent)
+            assertThat(awaitItem()).isEqualTo(expectedEvent)
             awaitComplete()
         }
     }

@@ -8,42 +8,44 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.mapper.ChatRequestMapper
 import mega.privacy.android.app.data.mapper.ContactRequestMapper
 import mega.privacy.android.app.data.mapper.DataMapper
+import mega.privacy.android.app.data.mapper.EventMapper
 import mega.privacy.android.app.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.app.data.mapper.FeatureFlagMapper
 import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.app.data.mapper.MegaTransferMapper
-import mega.privacy.android.app.data.mapper.MimeTypeMapper
-import mega.privacy.android.app.data.mapper.PushMessageMapper
-import mega.privacy.android.app.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.mapper.ImageMapper
 import mega.privacy.android.app.data.mapper.MegaExceptionMapper
+import mega.privacy.android.app.data.mapper.MegaTransferMapper
+import mega.privacy.android.app.data.mapper.MimeTypeMapper
 import mega.privacy.android.app.data.mapper.NodeUpdateMapper
+import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.data.mapper.StartScreenMapper
 import mega.privacy.android.app.data.mapper.TransferEventMapper
+import mega.privacy.android.app.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
+import mega.privacy.android.app.data.mapper.VideoMapper
 import mega.privacy.android.app.data.mapper.getFileTypeInfo
 import mega.privacy.android.app.data.mapper.getMimeType
-import mega.privacy.android.app.data.mapper.VideoMapper
 import mega.privacy.android.app.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.app.data.mapper.toChatRequest
 import mega.privacy.android.app.data.mapper.toContactRequest
 import mega.privacy.android.app.data.mapper.toData
+import mega.privacy.android.app.data.mapper.toEvent
 import mega.privacy.android.app.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.app.data.mapper.toFavouriteInfo
 import mega.privacy.android.app.data.mapper.toFeatureFlag
+import mega.privacy.android.app.data.mapper.toImage
+import mega.privacy.android.app.data.mapper.toMegaExceptionModel
 import mega.privacy.android.app.data.mapper.toPushMessage
+import mega.privacy.android.app.data.mapper.toTransferEventModel
 import mega.privacy.android.app.data.mapper.toTransferModel
 import mega.privacy.android.app.data.mapper.toUserAlert
+import mega.privacy.android.app.data.mapper.toVideo
 import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.toRepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.toRepeatToggleModeMapper
-import mega.privacy.android.app.data.mapper.toImage
-import mega.privacy.android.app.data.mapper.toMegaExceptionModel
-import mega.privacy.android.app.data.mapper.toTransferEventModel
-import mega.privacy.android.app.data.mapper.toVideo
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.presentation.mapper.toFavourite
 import mega.privacy.android.domain.entity.preference.StartScreen
@@ -75,6 +77,9 @@ class MapperModule {
 
     @Provides
     fun provideContactRequestMapper(): ContactRequestMapper = ::toContactRequest
+
+    @Provides
+    fun provideEventMapper(): EventMapper = ::toEvent
 
     @Provides
     fun provideMimeTypeMapper(): MimeTypeMapper = { extension ->
