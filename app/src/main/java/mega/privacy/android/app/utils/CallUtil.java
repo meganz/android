@@ -77,6 +77,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.ContactInfoActivity;
@@ -230,11 +231,11 @@ public class CallUtil {
      * @param link               Meeting's link
      * @param passcodeManagement To disable passcode.
      */
-    public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link, PasscodeManagement passcodeManagement) {
+    public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link, PasscodeManagement passcodeManagement, MegaChatRequestHandler chatRequestHandler) {
         Timber.d("Open meeting in guest mode. Chat id is %s", chatId);
         passcodeManagement.setShowPasscodeScreen(true);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
-        MegaApplication.getInstance().setIsLoggingRunning(true);
+        chatRequestHandler.setIsLoggingRunning(true);
 
         Intent intent = new Intent(context, MeetingActivity.class);
         intent.setAction(MEETING_ACTION_GUEST);
