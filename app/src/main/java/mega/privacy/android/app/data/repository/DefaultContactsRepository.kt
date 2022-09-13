@@ -1,5 +1,7 @@
 package mega.privacy.android.app.data.repository
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -13,6 +15,7 @@ import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.mapper.ContactRequestMapper
 import mega.privacy.android.app.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.app.data.mapper.OnlineStatusMapper
+import mega.privacy.android.app.data.mapper.UserLastGreenMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.model.ChatUpdate
 import mega.privacy.android.app.data.model.GlobalUpdate
@@ -33,7 +36,9 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaApiGateway         [MegaApiGateway]
  * @property megaChatApiGateway     [MegaChatApiGateway]
  * @property ioDispatcher           [CoroutineDispatcher]
+ * @property context                [Context]
  * @property contactRequestMapper   [ContactRequestMapper]
+ * @property userLastGreenMapper    [UserLastGreenMapper]
  * @property userUpdateMapper       [UserUpdateMapper]
  * @property megaChatPeerListMapper [MegaChatPeerListMapper]
  * @property onlineStatusMapper     [OnlineStatusMapper]
@@ -42,7 +47,9 @@ class DefaultContactsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @ApplicationContext private val context: Context,
     private val contactRequestMapper: ContactRequestMapper,
+    private val userLastGreenMapper: UserLastGreenMapper,
     private val userUpdateMapper: UserUpdateMapper,
     private val megaChatPeerListMapper: MegaChatPeerListMapper,
     private val onlineStatusMapper: OnlineStatusMapper,
@@ -52,6 +59,10 @@ class DefaultContactsRepository @Inject constructor(
         megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
             .mapNotNull { it.requests?.map(contactRequestMapper) }
+
+    override fun monitorChatPresenceLastGreenUpdates() = megaChatApiGateway.chatUpdates
+        .filterIsInstance<ChatUpdate.OnChatPresenceLastGreen>()
+        .map { userLastGreenMapper(context, it.userHandle, it.lastGreen) }
 
     override suspend fun requestLastGreen(userHandle: Long) {
         megaChatApiGateway.requestLastGreen(userHandle)
