@@ -13,10 +13,8 @@ import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.extension.previewPath
 import mega.privacy.android.app.gallery.repository.fetcher.FavouriteAlbumFetcher
-import mega.privacy.android.app.gallery.repository.fetcher.GalleryBaseFetcher
 import mega.privacy.android.app.utils.CacheFolderManager
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaCancelToken
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -65,13 +63,10 @@ class FavouriteAlbumRepository @Inject constructor(
     /**
      * Gets the image items.
      *
-     * @param cancelToken   MegaCancelToken to cancel the search at any time.
      * @param order         Order to get the items.
      * @param zoom          Zoom value.
-     * @param handle
      */
     suspend fun getFiles(
-        cancelCallback: CancelCallback,
         order: Int,
         zoom: Int,
     ) {
@@ -91,7 +86,7 @@ class FavouriteAlbumRepository @Inject constructor(
         galleryItems = nodesFetcher.result as MutableLiveData<List<GalleryItem>>
 
         withContext(Dispatchers.IO) {
-            nodesFetcher.getGalleryItems((cancelCallback as CancelTokenWrapper).token)
+            nodesFetcher.getGalleryItems()
         }
     }
 
@@ -132,18 +127,4 @@ class FavouriteAlbumRepository @Inject constructor(
             }
         }
     }
-
-    sealed interface CancelCallback {
-        fun cancel()
-    }
-
-    private class CancelTokenWrapper : CancelCallback {
-        val token: MegaCancelToken = MegaCancelToken.createInstance()
-        override fun cancel() {
-            token.cancel()
-        }
-
-    }
-
-    fun createCancelCallback(): CancelCallback = CancelTokenWrapper()
 }

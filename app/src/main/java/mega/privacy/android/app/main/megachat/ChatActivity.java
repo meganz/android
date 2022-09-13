@@ -342,6 +342,7 @@ import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.AttachNodeToChatListener;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
@@ -560,6 +561,8 @@ public class ChatActivity extends PasscodeActivity
     GetPushToken getPushToken;
     @Inject
     ActivityLifecycleHandler activityLifecycleHandler;
+    @Inject
+    MegaChatRequestHandler chatRequestHandler;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -3104,7 +3107,7 @@ public class ChatActivity extends PasscodeActivity
 
             loginIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(loginIntent);
-            app.setIsLoggingRunning(true);
+            chatRequestHandler.setIsLoggingRunning(true);
         }
 
         closeChat(true);

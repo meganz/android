@@ -276,11 +276,6 @@ class AlbumContentFragment : Fragment(), GestureScaleListener.GestureScaleCallba
         return mManagerActivity.isInAlbumContentPage
     }
 
-    override fun onDestroyView() {
-        viewModel.cancelSearch()
-        super.onDestroyView()
-    }
-
     private fun getNodeCount() = viewModel.getRealPhotoCount()
 
     private fun updateUiWhenAnimationEnd() {

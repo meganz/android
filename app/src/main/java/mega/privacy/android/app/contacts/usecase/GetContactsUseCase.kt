@@ -15,6 +15,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.list.data.ContactItem
+import mega.privacy.android.app.data.extensions.getDecodedAliases
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
@@ -26,7 +27,6 @@ import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
 import mega.privacy.android.app.utils.MegaUserUtils.isExternalChange
 import mega.privacy.android.app.utils.MegaUserUtils.wasRecentlyAdded
-import mega.privacy.android.app.utils.StringUtils.getDecodedAliases
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.view.TextDrawable
 import nz.mega.sdk.*

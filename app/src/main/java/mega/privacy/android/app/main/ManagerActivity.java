@@ -427,8 +427,8 @@ import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
-import mega.privacy.android.domain.entity.ContactRequest;
-import mega.privacy.android.domain.entity.ContactRequestStatus;
+import mega.privacy.android.domain.entity.contacts.ContactRequest;
+import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
 import mega.privacy.android.domain.entity.transfer.TransferType;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
@@ -2469,7 +2469,7 @@ public class ManagerActivity extends TransfersManagementActivity
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE);
 
             if (drawerItem == null) {
-                drawerItem = getStartDrawerItem(this);
+                drawerItem = getStartDrawerItem();
 
                 Intent intent = getIntent();
                 if (intent != null) {
@@ -3286,6 +3286,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 fireStopCameraUploadJob(ManagerActivity.this);
                                 dbH.setCamSyncEnabled(false);
                                 sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
+                                transfersFragment.destroyActionMode();
                             });
 
                     builder.setNegativeButton(getString(R.string.general_no), null);
@@ -4105,7 +4106,7 @@ public class ManagerActivity extends TransfersManagementActivity
             Timber.d("DrawerItem on start offline: %s", drawerItem);
             if (drawerItem == null) {
                 Timber.w("drawerItem == null --> On start OFFLINE MODE");
-                drawerItem = getStartDrawerItem(this);
+                drawerItem = getStartDrawerItem();
 
                 if (bNV != null) {
                     disableNavigationViewMenu(bNV.getMenu());
@@ -5282,7 +5283,7 @@ public class ManagerActivity extends TransfersManagementActivity
             Menu bNVMenu = bNV.getMenu();
             if (bNVMenu != null) {
                 if (drawerItem == null) {
-                    drawerItem = getStartDrawerItem(this);
+                    drawerItem = getStartDrawerItem();
                 }
 
                 if (drawerItem == DrawerItem.CLOUD_DRIVE) {
@@ -5559,7 +5560,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             return true;
                         }
                     } else if (drawerItem == DrawerItem.TRANSFERS) {
-                        drawerItem = getStartDrawerItem(this);
+                        drawerItem = getStartDrawerItem();
                         selectDrawerItem(drawerItem);
                         return true;
                     } else if (drawerItem == DrawerItem.HOMEPAGE) {
@@ -6092,13 +6093,10 @@ public class ManagerActivity extends TransfersManagementActivity
      * If not, sets the current DrawerItem as the preferred one.
      */
     private void performOnBack() {
-        int startItem = getStartBottomNavigationItem(this);
+        int startItem = getStartBottomNavigationItem();
 
         if (shouldCloseApp(startItem, drawerItem)) {
-            // The Psa requires the activity to load the new PSA even though the app is on the
-            // background. So don't call super.onBackPressed() since it will destroy this activity
-            // and its embedded web browser fragment.
-            moveTaskToBack(false);
+            handleSuperBackPressed();
         } else {
             backToDrawerItem(startItem);
         }
@@ -7415,7 +7413,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void skipInitialCUSetup() {
         viewModel.setIsFirstLogin(false);
-        drawerItem = getStartDrawerItem(this);
+        drawerItem = getStartDrawerItem();
         selectDrawerItem(drawerItem);
     }
 
