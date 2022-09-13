@@ -19,6 +19,7 @@ import mega.privacy.android.app.data.mapper.MegaExceptionMapper
 import mega.privacy.android.app.data.mapper.MegaTransferMapper
 import mega.privacy.android.app.data.mapper.MimeTypeMapper
 import mega.privacy.android.app.data.mapper.NodeUpdateMapper
+import mega.privacy.android.app.data.mapper.OnlineStatusMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.data.mapper.StartScreenMapper
 import mega.privacy.android.app.data.mapper.TransferEventMapper
@@ -39,6 +40,7 @@ import mega.privacy.android.app.data.mapper.toFeatureFlag
 import mega.privacy.android.app.data.mapper.toImage
 import mega.privacy.android.app.data.mapper.toMegaChatPeerList
 import mega.privacy.android.app.data.mapper.toMegaExceptionModel
+import mega.privacy.android.app.data.mapper.toOnlineStatus
 import mega.privacy.android.app.data.mapper.toPushMessage
 import mega.privacy.android.app.data.mapper.toTransferEventModel
 import mega.privacy.android.app.data.mapper.toTransferModel
@@ -153,4 +155,7 @@ class MapperModule {
 
     @Provides
     fun provideMegaChatPeerListMapper(): MegaChatPeerListMapper = ::toMegaChatPeerList
+
+    @Provides
+    fun provideOnlineStatusMapper(): OnlineStatusMapper = ::toOnlineStatus
 }

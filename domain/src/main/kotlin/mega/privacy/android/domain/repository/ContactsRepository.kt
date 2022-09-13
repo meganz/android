@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.entity.contacts.OnlineStatus
 
 /**
  * Contacts repository.
@@ -23,4 +24,11 @@ interface ContactsRepository {
      * @return The chat conversation handle.
      */
     suspend fun startConversation(isGroup: Boolean, userHandles: List<Long>): Long
+
+    /**
+     * Monitor updates on chat online statuses.
+     *
+     * @return A flow of [OnlineStatus].
+     */
+    fun monitorChatOnlineStatusUpdates(): Flow<OnlineStatus>
 }

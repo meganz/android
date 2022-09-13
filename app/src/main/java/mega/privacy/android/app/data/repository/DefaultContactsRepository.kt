@@ -3,6 +3,7 @@ package mega.privacy.android.app.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
@@ -10,6 +11,8 @@ import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.mapper.ContactRequestMapper
 import mega.privacy.android.app.data.mapper.MegaChatPeerListMapper
+import mega.privacy.android.app.data.mapper.OnlineStatusMapper
+import mega.privacy.android.app.data.model.ChatUpdate
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
@@ -29,6 +32,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property ioDispatcher           [CoroutineDispatcher]
  * @property contactRequestMapper   [ContactRequestMapper]
  * @property megaChatPeerListMapper [MegaChatPeerListMapper]
+ * @property onlineStatusMapper     [OnlineStatusMapper]
  */
 class DefaultContactsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
@@ -36,6 +40,7 @@ class DefaultContactsRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val contactRequestMapper: ContactRequestMapper,
     private val megaChatPeerListMapper: MegaChatPeerListMapper,
+    private val onlineStatusMapper: OnlineStatusMapper,
 ) : ContactsRepository {
 
     override fun monitorContactRequestUpdates(): Flow<List<ContactRequest>> =
@@ -67,4 +72,8 @@ class DefaultContactsRepository @Inject constructor(
                 continuation.failWithError(error)
             }
         }
+
+    override fun monitorChatOnlineStatusUpdates() = megaChatApiGateway.chatUpdates
+        .filterIsInstance<ChatUpdate.OnChatOnlineStatusUpdate>()
+        .map { onlineStatusMapper(it.userHandle, it.status, it.inProgress) }
 }
