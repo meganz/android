@@ -14,8 +14,10 @@ import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatListenerInterface
 import nz.mega.sdk.MegaChatLoggerInterface
+import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatPresenceConfig
 import nz.mega.sdk.MegaChatRequestListenerInterface
+import nz.mega.sdk.MegaChatRoom
 import javax.inject.Inject
 
 /**
@@ -55,7 +57,6 @@ class MegaChatApiFacade @Inject constructor(
 
     override fun retryPendingConnections(disconnect: Boolean) =
         chatApi.retryPendingConnections(disconnect, null)
-
 
     override val chatUpdates: Flow<ChatUpdate>
         get() = callbackFlow {
@@ -111,6 +112,15 @@ class MegaChatApiFacade @Inject constructor(
 
     override suspend fun requestLastGreen(userHandle: Long) =
         chatApi.requestLastGreen(userHandle, null)
+
+    override fun createChat(
+        isGroup: Boolean,
+        peers: MegaChatPeerList,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.createChat(isGroup, peers, listener)
+
+    override fun getChatRoomByUser(userHandle: Long): MegaChatRoom? =
+        chatApi.getChatRoomByUser(userHandle)
 
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
