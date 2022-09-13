@@ -110,6 +110,9 @@ class MegaChatApiFacade @Inject constructor(
             awaitClose { chatApi.removeChatListener(listener) }
         }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
+    override suspend fun requestLastGreen(userHandle: Long) =
+        chatApi.requestLastGreen(userHandle, null)
+
     override fun createChat(
         isGroup: Boolean,
         peers: MegaChatPeerList,

@@ -53,6 +53,10 @@ class DefaultContactsRepository @Inject constructor(
             .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
             .mapNotNull { it.requests?.map(contactRequestMapper) }
 
+    override suspend fun requestLastGreen(userHandle: Long) {
+        megaChatApiGateway.requestLastGreen(userHandle)
+    }
+
     override fun monitorContactUpdates() =
         megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnUsersUpdate>()

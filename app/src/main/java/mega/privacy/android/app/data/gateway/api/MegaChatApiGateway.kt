@@ -81,6 +81,13 @@ interface MegaChatApiGateway {
     val chatUpdates: Flow<ChatUpdate>
 
     /**
+     * Request the number of minutes since the user was seen as green by last time.
+     *
+     * @param userHandle User handle from who the last green has been requested.
+     */
+    suspend fun requestLastGreen(userHandle: Long)
+
+    /**
      * Creates a chat for one or more participants, allowing you to specify their
      * permissions and if the chat should be a group chat or not.
      *

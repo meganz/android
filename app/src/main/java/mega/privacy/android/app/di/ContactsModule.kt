@@ -8,6 +8,7 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorOnlineStatusUpdates
+import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.StartConversation
 
 /**
@@ -22,6 +23,10 @@ class ContactsModule {
     @Provides
     fun provideMonitorContactRequestUpdates(contactsRepository: ContactsRepository): MonitorContactRequestUpdates =
         MonitorContactRequestUpdates(contactsRepository::monitorContactRequestUpdates)
+
+    @Provides
+    fun provideRequestLastGreen(contactsRepository: ContactsRepository): RequestLastGreen =
+        RequestLastGreen(contactsRepository::requestLastGreen)
 
     @Provides
     fun provideMonitorContactUpdates(contactsRepository: ContactsRepository): MonitorContactUpdates =
