@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.entity
+package mega.privacy.android.domain.entity.contacts
 
 /**
  * Contact request status
