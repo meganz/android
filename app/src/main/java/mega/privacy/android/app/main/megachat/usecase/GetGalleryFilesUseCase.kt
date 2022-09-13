@@ -8,7 +8,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
-import mega.privacy.android.app.main.megachat.data.FileGalleryItem
+import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.app.utils.TimeUtils
 import timber.log.Timber
 import javax.inject.Inject
@@ -85,7 +85,7 @@ class GetGalleryFilesUseCase @Inject constructor(
                     isImage = true,
                     isTakePicture = false,
                     title = title,
-                    fileUri = contentUri,
+                    fileUri = contentUri.toString(),
                     dateAdded = date,
                     duration = "",
                     isSelected = false,
@@ -153,7 +153,7 @@ class GetGalleryFilesUseCase @Inject constructor(
                     isImage = false,
                     isTakePicture = false,
                     title = title,
-                    fileUri = contentUri,
+                    fileUri = contentUri.toString(),
                     dateAdded = date,
                     duration = durationText,
                     isSelected = false,

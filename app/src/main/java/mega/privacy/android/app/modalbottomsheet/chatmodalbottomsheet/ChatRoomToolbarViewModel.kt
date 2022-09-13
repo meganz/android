@@ -9,7 +9,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.main.megachat.data.FileGalleryItem
+import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.app.main.megachat.usecase.GetGalleryFilesUseCase
 import mega.privacy.android.app.utils.FileUtil
 import timber.log.Timber
