@@ -17,6 +17,15 @@ interface ContactsRepository {
     fun monitorContactRequestUpdates(): Flow<List<ContactRequest>>
 
     /**
+     * Starts a chat conversation with the provided contacts.
+     *
+     * @param isGroup     True if is should create a group chat, false otherwise.
+     * @param userHandles List of contact handles.
+     * @return The chat conversation handle.
+     */
+    suspend fun startConversation(isGroup: Boolean, userHandles: List<Long>): Long
+
+    /**
      * Monitor updates on chat online statuses.
      *
      * @return A flow of [OnlineStatus].
