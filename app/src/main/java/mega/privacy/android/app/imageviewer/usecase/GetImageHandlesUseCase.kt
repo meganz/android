@@ -80,7 +80,7 @@ class GetImageHandlesUseCase @Inject constructor(
             val items = mutableListOf<ImageItem>()
             when {
                 isTimeline == true ->
-                    items.addTimelineNodes(sortOrder ?: ORDER_PHOTO_ASC)
+                    items.addTimelineNodes()
                 parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
                     val parentNode = getNodeUseCase.get(parentNodeHandle).blockingGetOrNull()
                     if (parentNode != null && megaApi.hasChildren(parentNode)) {
@@ -271,41 +271,36 @@ class GetImageHandlesUseCase @Inject constructor(
 
     /**
      * Add Image timeline nodes
-     *
-     * @param sortOrder     Sort Order for obtaining children
      */
-    private fun MutableList<ImageItem>.addTimelineNodes(sortOrder: Int) {
+    private fun MutableList<ImageItem>.addTimelineNodes() {
         val timelineNodes = mutableListOf<MegaNode>()
+        val cancelToken = MegaCancelToken.createInstance()
 
-        timelineNodes.addAll(megaApi.searchByType(
-            MegaCancelToken.createInstance(),
-            sortOrder,
+        megaApi.searchByType(
+            cancelToken,
+            MegaApiAndroid.ORDER_MODIFICATION_DESC,
             MegaApiJava.FILE_TYPE_PHOTO,
             MegaApiJava.SEARCH_TARGET_ROOTNODE
-        ))
-
-        dbHandler.preferences?.camSyncHandle?.toLongOrNull()?.let { camSyncHandle ->
-            val parentNode = getNodeUseCase.get(camSyncHandle).blockingGetOrNull()
-            if (parentNode != null && megaApi.hasChildren(parentNode)) {
-                timelineNodes.addAll(megaApi.getChildren(parentNode, sortOrder))
-            }
-        }
-
-        dbHandler.preferences?.megaHandleSecondaryFolder?.toLongOrNull()?.let { secondaryFolder ->
-            val parentNode = getNodeUseCase.get(secondaryFolder).blockingGetOrNull()
-            if (parentNode != null && megaApi.hasChildren(parentNode)) {
-                timelineNodes.addAll(megaApi.getChildren(parentNode, sortOrder))
-            }
-        }
-
-        if (sortOrder == ORDER_PHOTO_ASC || sortOrder == ORDER_MODIFICATION_ASC) {
-            timelineNodes.sortBy { it.modificationTime }
-        } else {
-            timelineNodes.sortByDescending { it.modificationTime }
-        }
-
-        timelineNodes.forEach { node ->
+        ).forEach { node ->
             if (node.isValidForImageViewer()) {
+                timelineNodes.add(node)
+            }
+        }
+
+        megaApi.searchByType(
+            cancelToken,
+            MegaApiAndroid.ORDER_MODIFICATION_DESC,
+            MegaApiJava.FILE_TYPE_VIDEO,
+            MegaApiJava.SEARCH_TARGET_ROOTNODE
+        ).forEach { node ->
+            if (node.isValidForImageViewer()) {
+                timelineNodes.add(node)
+            }
+        }
+
+        timelineNodes
+            .sortedByDescending { it.modificationTime }
+            .forEach { node ->
                 this.add(
                     ImageItem.Node(
                         id = node.handle,
@@ -315,6 +310,5 @@ class GetImageHandlesUseCase @Inject constructor(
                     )
                 )
             }
-        }
     }
 }
