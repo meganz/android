@@ -122,7 +122,7 @@ class GetGalleryFilesUseCase @Inject constructor(
 
             emitter.onComplete()
 
-        }, BackpressureStrategy.LATEST)
+        }, BackpressureStrategy.BUFFER)
 
     /**
      * Method to get the videos from the gallery
@@ -189,5 +189,5 @@ class GetGalleryFilesUseCase @Inject constructor(
             }
             emitter.onComplete()
 
-        }, BackpressureStrategy.LATEST)
+        }, BackpressureStrategy.BUFFER)
 }
