@@ -3286,6 +3286,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 fireStopCameraUploadJob(ManagerActivity.this);
                                 dbH.setCamSyncEnabled(false);
                                 sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
+                                transfersFragment.destroyActionMode();
                             });
 
                     builder.setNegativeButton(getString(R.string.general_no), null);
