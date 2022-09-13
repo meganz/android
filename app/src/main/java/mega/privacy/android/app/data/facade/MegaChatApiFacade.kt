@@ -109,6 +109,9 @@ class MegaChatApiFacade @Inject constructor(
             awaitClose { chatApi.removeChatListener(listener) }
         }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
+    override suspend fun requestLastGreen(userHandle: Long) =
+        chatApi.requestLastGreen(userHandle, null)
+
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
     }
