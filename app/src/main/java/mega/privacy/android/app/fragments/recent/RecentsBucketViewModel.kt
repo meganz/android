@@ -70,7 +70,7 @@ class RecentsBucketViewModel @Inject constructor(
         viewModelScope.launch {
             monitorNodeUpdates().collectLatest {
                 Timber.d("Received node update")
-                updateBucket()
+                updateCurrentBucket()
             }
         }
     }
@@ -188,22 +188,19 @@ class RecentsBucketViewModel @Inject constructor(
     /**
      * Update the current bucket
      */
-    private fun updateBucket() {
-        if (bucket.value == null) {
-            return
-        }
-
+    private fun updateCurrentBucket() {
         val recentActions = megaApi.recentActions
 
-        recentActions.forEach { b ->
-            bucket.value?.let { current ->
-                if (isSameBucket(current, b)) {
-                    bucket.value = b
-                    return
-                }
+        // Update the current bucket
+        bucket.value?.let { currentBucket ->
+            recentActions.firstOrNull { isSameBucket(it, currentBucket) }?.let {
+                bucket.value = it
+                return
             }
         }
 
+        // Compare the list of recentActions with the new list of recent actions
+        // and only keep the actions that differs from each other
         cachedActionList?.forEach { b ->
             val iterator = recentActions.iterator()
             while (iterator.hasNext()) {
@@ -213,7 +210,7 @@ class RecentsBucketViewModel @Inject constructor(
             }
         }
 
-        // The last one is the changed one.
+        // The last one is the changed one
         if (recentActions.size == 1) {
             bucket.value = recentActions[0]
             return
