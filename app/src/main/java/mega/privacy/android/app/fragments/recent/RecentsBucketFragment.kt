@@ -110,9 +110,8 @@ class RecentsBucketFragment : Fragment() {
 
         val selectedBucket = selectedBucketModel.selected.value
         bucket = BucketSaved(selectedBucket)
-        viewModel.bucket.value = selectedBucket
-
-        viewModel.cachedActionList.value = selectedBucketModel.currentActionList.value
+        viewModel.setBucket(selectedBucket)
+        viewModel.setCachedActionList(selectedBucketModel.currentActionList.value?.toMutableList())
 
         viewModel.shouldCloseFragment.observe(viewLifecycleOwner) {
             if (it) Navigation.findNavController(view).popBackStack()

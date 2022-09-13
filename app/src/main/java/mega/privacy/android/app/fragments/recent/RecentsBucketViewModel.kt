@@ -6,13 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaRecentActionBucket
 import timber.log.Timber
@@ -28,51 +26,44 @@ class RecentsBucketViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
+
+    /**
+     * True if the actionMode should to be visible
+     */
+    val actionMode: LiveData<Boolean> = _actionMode
+
     private val _nodesToAnimate = MutableLiveData<Set<Int>>()
 
-    val actionMode: LiveData<Boolean> = _actionMode
+    /**
+     * Set of node positions to animate
+     */
     val nodesToAnimate: LiveData<Set<Int>> = _nodesToAnimate
 
     private val selectedNodes: MutableSet<NodeItem> = mutableSetOf()
 
-    var bucket: MutableLiveData<MegaRecentActionBucket> = MutableLiveData()
+    /**
+     * Current bucket
+     */
+    private val bucket: MutableLiveData<MegaRecentActionBucket> = MutableLiveData()
 
-    var cachedActionList = MutableLiveData<List<MegaRecentActionBucket>>()
+    private var cachedActionList: List<MegaRecentActionBucket>? = null
 
-    var shouldCloseFragment: MutableLiveData<Boolean> = MutableLiveData(false)
+    private val _shouldCloseFragment: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    var items: LiveData<List<NodeItem>> = bucket.switchMap {
+    /**
+     * True if the fragment needs to be closed
+     */
+    val shouldCloseFragment: LiveData<Boolean> = _shouldCloseFragment
+
+    /**
+     *  List of node items in the current bucket
+     */
+    val items: LiveData<List<NodeItem>> = bucket.switchMap {
         viewModelScope.launch {
             recentsBucketRepository.getNodes(it)
         }
 
         recentsBucketRepository.nodes
-    }
-
-    var loadNodesJob: Job? = null
-
-    fun getItemPositionByHandle(handle: Long): Int {
-        var index = INVALID_POSITION
-
-        items.value?.forEachIndexed { i, nodeItem ->
-            if (nodeItem.node?.handle == handle) {
-                index = i
-                return@forEachIndexed
-            }
-        }
-
-        return index
-    }
-
-    private fun isSameBucket(
-        selected: MegaRecentActionBucket,
-        other: MegaRecentActionBucket,
-    ): Boolean {
-        return selected.isMedia == other.isMedia &&
-                selected.isUpdate == other.isUpdate &&
-                selected.timestamp == other.timestamp &&
-                selected.parentHandle == other.parentHandle &&
-                selected.userEmail == other.userEmail
     }
 
     init {
@@ -84,12 +75,48 @@ class RecentsBucketViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Set bucket value
+     *
+     * @param selectedBucket
+     */
+    fun setBucket(selectedBucket: MegaRecentActionBucket?) {
+        bucket.value = selectedBucket
+    }
+
+    /**
+     * Set cached action list
+     *
+     * @param cachedActions
+     */
+    fun setCachedActionList(cachedActions: List<MegaRecentActionBucket>?) {
+        cachedActionList = cachedActions
+    }
+
+    /**
+     * Get the selected nodes
+     *
+     * @return the selected nodes
+     */
     fun getSelectedNodes(): List<NodeItem> = selectedNodes.toList()
 
+    /**
+     * Get the count of selected nodes
+     *
+     * @return the count of selected nodes
+     */
     fun getSelectedNodesCount(): Int = selectedNodes.size
 
+    /**
+     * Get the count of nodes
+     *
+     * @return the count of nodes
+     */
     fun getNodesCount(): Int = items.value?.size ?: 0
 
+    /**
+     * Clear selected nodes
+     */
     fun clearSelection() {
         _actionMode.value = false
         selectedNodes.clear()
@@ -108,6 +135,12 @@ class RecentsBucketViewModel @Inject constructor(
         _nodesToAnimate.value = animNodeIndices
     }
 
+    /**
+     * Receive on node long click
+     *
+     * @param position the position of the item in the adapter
+     * @param node the node item
+     */
     fun onNodeLongClicked(position: Int, node: NodeItem) {
         val nodeList = items.value
 
@@ -131,7 +164,9 @@ class RecentsBucketViewModel @Inject constructor(
         _nodesToAnimate.value = hashSetOf(position)
     }
 
-
+    /**
+     * Select all nodes
+     */
     fun selectAll() {
         val nodeList = items.value ?: return
 
@@ -151,7 +186,7 @@ class RecentsBucketViewModel @Inject constructor(
     }
 
     /**
-     * Update the bucket
+     * Update the current bucket
      */
     private fun updateBucket() {
         if (bucket.value == null) {
@@ -169,7 +204,7 @@ class RecentsBucketViewModel @Inject constructor(
             }
         }
 
-        cachedActionList.value?.forEach { b ->
+        cachedActionList?.forEach { b ->
             val iterator = recentActions.iterator()
             while (iterator.hasNext()) {
                 if (isSameBucket(iterator.next(), b)) {
@@ -185,7 +220,25 @@ class RecentsBucketViewModel @Inject constructor(
         }
 
         // No nodes contained in the bucket or the action bucket is no loner exists.
-        shouldCloseFragment.value = true
+        _shouldCloseFragment.value = true
+    }
+
+    /**
+     * Compare two MegaRecentActionBucket
+     *
+     * @param selected the first MegaRecentActionBucket to compare
+     * @param other the second MegaRecentActionBucket to compare
+     * @return true if the two MegaRecentActionBucket are the same
+     */
+    private fun isSameBucket(
+        selected: MegaRecentActionBucket,
+        other: MegaRecentActionBucket,
+    ): Boolean {
+        return selected.isMedia == other.isMedia &&
+                selected.isUpdate == other.isUpdate &&
+                selected.timestamp == other.timestamp &&
+                selected.parentHandle == other.parentHandle &&
+                selected.userEmail == other.userEmail
     }
 
 }
