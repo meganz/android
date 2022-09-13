@@ -9,7 +9,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.MegaContactDB
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.data.mapper.ContactRequestMapper
 import mega.privacy.android.app.data.mapper.EventMapper
 import mega.privacy.android.app.data.mapper.NodeProvider
 import mega.privacy.android.app.data.mapper.UserAlertContactProvider
@@ -41,7 +40,6 @@ class DefaultNotificationsRepositoryTest {
     private lateinit var underTest: NotificationsRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
-    private val contactRequestMapper = mock<ContactRequestMapper>()
     private val eventMapper = mock<EventMapper>()
     private val userHandle = 12L
     private val email = "email"
@@ -63,7 +61,6 @@ class DefaultNotificationsRepositoryTest {
     fun setUp() {
         underTest = DefaultNotificationsRepository(
             megaApiGateway = megaApiGateway,
-            contactRequestMapper = contactRequestMapper,
             userAlertsMapper = userAlertsMapper,
             eventMapper = eventMapper,
             localStorageGateway = megaLocalStorageGateway,
@@ -232,7 +229,9 @@ class DefaultNotificationsRepositoryTest {
             on { eventString }.thenReturn(expectedEvent.eventString)
         }
         val globalUpdate = GlobalUpdate.OnEvent(megaEvent)
-        whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate, globalUpdate, globalUpdate))
+        whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(globalUpdate,
+            globalUpdate,
+            globalUpdate))
         whenever(eventMapper(megaEvent)).thenReturn(expectedEvent)
 
         underTest.monitorEvent().test {
