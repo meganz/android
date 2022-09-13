@@ -41,11 +41,10 @@ object StartScreenUtil {
     /**
      * Gets the start DrawerItem depending on the preferred start screen chosen.
      *
-     * @param context   Current Context.
      * @return The start DrawerItem.
      */
     @JvmStatic
-    fun getStartDrawerItem(context: Context): DrawerItem =
+    fun getStartDrawerItem(): DrawerItem =
         runBlocking {
             when (getMonitorStartScreenPreference()().map { it.id }.first()) {
                 CLOUD_DRIVE_BNV -> DrawerItem.CLOUD_DRIVE
@@ -60,11 +59,10 @@ object StartScreenUtil {
     /**
      * Gets the start bottom navigation item depending on the preferred start screen chosen.
      *
-     * @param context   Current Context.
      * @return The start bottom navigation item.
      */
     @JvmStatic
-    fun getStartBottomNavigationItem(context: Context): Int = getStartScreenOrHomeId()
+    fun getStartBottomNavigationItem(): Int = getStartScreenOrHomeId()
 
     /**
      * Checks if should close the app because the current DrawerItem is the preferred start screen.

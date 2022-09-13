@@ -2469,7 +2469,7 @@ public class ManagerActivity extends TransfersManagementActivity
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE);
 
             if (drawerItem == null) {
-                drawerItem = getStartDrawerItem(this);
+                drawerItem = getStartDrawerItem();
 
                 Intent intent = getIntent();
                 if (intent != null) {
@@ -4106,7 +4106,7 @@ public class ManagerActivity extends TransfersManagementActivity
             Timber.d("DrawerItem on start offline: %s", drawerItem);
             if (drawerItem == null) {
                 Timber.w("drawerItem == null --> On start OFFLINE MODE");
-                drawerItem = getStartDrawerItem(this);
+                drawerItem = getStartDrawerItem();
 
                 if (bNV != null) {
                     disableNavigationViewMenu(bNV.getMenu());
@@ -5283,7 +5283,7 @@ public class ManagerActivity extends TransfersManagementActivity
             Menu bNVMenu = bNV.getMenu();
             if (bNVMenu != null) {
                 if (drawerItem == null) {
-                    drawerItem = getStartDrawerItem(this);
+                    drawerItem = getStartDrawerItem();
                 }
 
                 if (drawerItem == DrawerItem.CLOUD_DRIVE) {
@@ -5560,7 +5560,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             return true;
                         }
                     } else if (drawerItem == DrawerItem.TRANSFERS) {
-                        drawerItem = getStartDrawerItem(this);
+                        drawerItem = getStartDrawerItem();
                         selectDrawerItem(drawerItem);
                         return true;
                     } else if (drawerItem == DrawerItem.HOMEPAGE) {
@@ -6093,7 +6093,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * If not, sets the current DrawerItem as the preferred one.
      */
     private void performOnBack() {
-        int startItem = getStartBottomNavigationItem(this);
+        int startItem = getStartBottomNavigationItem();
 
         if (shouldCloseApp(startItem, drawerItem)) {
             handleSuperBackPressed();
@@ -7413,7 +7413,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void skipInitialCUSetup() {
         viewModel.setIsFirstLogin(false);
-        drawerItem = getStartDrawerItem(this);
+        drawerItem = getStartDrawerItem();
         selectDrawerItem(drawerItem);
     }
 

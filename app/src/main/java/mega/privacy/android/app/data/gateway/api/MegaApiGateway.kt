@@ -66,6 +66,11 @@ interface MegaApiGateway {
     )
 
     /**
+     * Handle for the account
+     */
+    val myUserHandle: Long
+
+    /**
      * Registered email address for the account
      */
     val accountEmail: String?

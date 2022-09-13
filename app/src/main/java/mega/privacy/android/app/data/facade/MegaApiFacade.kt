@@ -72,6 +72,8 @@ class MegaApiFacade @Inject constructor(
         megaApi.startUploadForSupport(path, false, listener)
     }
 
+    override val myUserHandle: Long
+        get() = megaApi.myUserHandleBinary
     override val accountEmail: String?
         get() = megaApi.myEmail
     override val isBusinessAccount: Boolean

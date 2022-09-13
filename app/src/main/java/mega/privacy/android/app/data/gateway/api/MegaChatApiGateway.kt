@@ -3,7 +3,9 @@ package mega.privacy.android.app.data.gateway.api
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.data.model.ChatUpdate
 import nz.mega.sdk.MegaChatLoggerInterface
+import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequestListenerInterface
+import nz.mega.sdk.MegaChatRoom
 
 /**
  * Mega chat api gateway
@@ -77,4 +79,33 @@ interface MegaChatApiGateway {
      * Chat updates.
      */
     val chatUpdates: Flow<ChatUpdate>
+
+    /**
+     * Request the number of minutes since the user was seen as green by last time.
+     *
+     * @param userHandle User handle from who the last green has been requested.
+     */
+    suspend fun requestLastGreen(userHandle: Long)
+
+    /**
+     * Creates a chat for one or more participants, allowing you to specify their
+     * permissions and if the chat should be a group chat or not.
+     *
+     * @param isGroup  True if is should create a group chat, false otherwise.
+     * @param peers    MegaChatPeerList] including contacts and their privilege level.
+     * @param listener Listener.
+     */
+    fun createChat(
+        isGroup: Boolean,
+        peers: MegaChatPeerList,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Gets a 1to1 chat conversation if exists.
+     *
+     * @param userHandle The user handle.
+     * @return The chat conversation.
+     */
+    fun getChatRoomByUser(userHandle: Long): MegaChatRoom?
 }
