@@ -997,7 +997,6 @@ class TimelineFragment : Fragment(), PhotosTabCallback,
                 val nodeHandle = nodeItem.node?.handle ?: MegaApiJava.INVALID_HANDLE
                 val intent = ImageViewerActivity.getIntentForTimeline(
                     requireContext(),
-                    order,
                     nodeHandle
                 )
 

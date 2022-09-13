@@ -442,13 +442,9 @@ class PhotosFragment : Fragment() {
     }
 
     private fun openPhoto(photo: Photo) {
-        val nodeId = photo.id
-        val workaroundArray = LongArray(1)
-        workaroundArray[0] = nodeId
-        val intent = ImageViewerActivity.getIntentForChildren(
+        val intent = ImageViewerActivity.getIntentForTimeline(
             requireContext(),
-            workaroundArray,
-            nodeId
+            currentNodeHandle = photo.id,
         )
 
         startActivity(intent)
