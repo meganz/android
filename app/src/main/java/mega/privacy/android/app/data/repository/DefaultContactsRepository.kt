@@ -2,6 +2,7 @@ package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -12,6 +13,7 @@ import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.mapper.ContactRequestMapper
 import mega.privacy.android.app.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.app.data.mapper.OnlineStatusMapper
+import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.model.ChatUpdate
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
@@ -20,6 +22,7 @@ import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -31,6 +34,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaChatApiGateway     [MegaChatApiGateway]
  * @property ioDispatcher           [CoroutineDispatcher]
  * @property contactRequestMapper   [ContactRequestMapper]
+ * @property userUpdateMapper       [UserUpdateMapper]
  * @property megaChatPeerListMapper [MegaChatPeerListMapper]
  * @property onlineStatusMapper     [OnlineStatusMapper]
  */
@@ -39,6 +43,7 @@ class DefaultContactsRepository @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val contactRequestMapper: ContactRequestMapper,
+    private val userUpdateMapper: UserUpdateMapper,
     private val megaChatPeerListMapper: MegaChatPeerListMapper,
     private val onlineStatusMapper: OnlineStatusMapper,
 ) : ContactsRepository {
@@ -47,6 +52,22 @@ class DefaultContactsRepository @Inject constructor(
         megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
             .mapNotNull { it.requests?.map(contactRequestMapper) }
+
+    override fun monitorContactUpdates() =
+        megaApiGateway.globalUpdates
+            .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
+            .mapNotNull { it.users }
+            .map { usersList ->
+                userUpdateMapper(usersList.filter { user ->
+                    user.handle != megaApiGateway.myUserHandle
+                            && (user.changes == 0
+                            || (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange == 0)
+                            || user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)
+                            || user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)
+                            || user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)
+                            || user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS))
+                })
+            }.filter { it.changes.isNotEmpty() }
 
     override suspend fun startConversation(isGroup: Boolean, userHandles: List<Long>): Long =
         withContext(ioDispatcher) {

@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
+import mega.privacy.android.domain.entity.user.UserUpdate
 
 /**
  * Contacts repository.
@@ -15,6 +16,13 @@ interface ContactsRepository {
      * @return A flow of all global contact request updates.
      */
     fun monitorContactRequestUpdates(): Flow<List<ContactRequest>>
+
+    /**
+     * Monitor contact updates
+     *
+     * @return A flow of all global contact updates.
+     */
+    fun monitorContactUpdates(): Flow<UserUpdate>
 
     /**
      * Starts a chat conversation with the provided contacts.

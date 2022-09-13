@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
+import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorOnlineStatusUpdates
 import mega.privacy.android.domain.usecase.StartConversation
 
@@ -21,6 +22,10 @@ class ContactsModule {
     @Provides
     fun provideMonitorContactRequestUpdates(contactsRepository: ContactsRepository): MonitorContactRequestUpdates =
         MonitorContactRequestUpdates(contactsRepository::monitorContactRequestUpdates)
+
+    @Provides
+    fun provideMonitorContactUpdates(contactsRepository: ContactsRepository): MonitorContactUpdates =
+        MonitorContactUpdates(contactsRepository::monitorContactUpdates)
 
     @Provides
     fun provideStartConversation(contactsRepository: ContactsRepository): StartConversation =
