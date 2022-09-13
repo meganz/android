@@ -1,5 +1,7 @@
 package mega.privacy.android.app.data.gateway.api
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.data.model.ChatUpdate
 import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaChatRequestListenerInterface
 
@@ -70,4 +72,9 @@ interface MegaChatApiGateway {
      * @param disconnect True if should disconnect, false otherwise.
      */
     fun retryPendingConnections(disconnect: Boolean)
+
+    /**
+     * Chat updates.
+     */
+    val chatUpdates: Flow<ChatUpdate>
 }
