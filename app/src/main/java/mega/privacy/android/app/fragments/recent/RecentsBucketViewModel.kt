@@ -3,14 +3,23 @@ package mega.privacy.android.app.fragments.recent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.domain.usecase.GetThumbnail
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaRecentActionBucket
 import timber.log.Timber
@@ -22,7 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RecentsBucketViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val recentsBucketRepository: RecentsBucketRepository,
+    private val getThumbnail: GetThumbnail,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
@@ -44,7 +54,7 @@ class RecentsBucketViewModel @Inject constructor(
     /**
      * Current bucket
      */
-    private val bucket: MutableLiveData<MegaRecentActionBucket> = MutableLiveData()
+    private val bucket: MutableStateFlow<MegaRecentActionBucket?> = MutableStateFlow(null)
 
     private var cachedActionList: List<MegaRecentActionBucket>? = null
 
@@ -55,16 +65,16 @@ class RecentsBucketViewModel @Inject constructor(
      */
     val shouldCloseFragment: LiveData<Boolean> = _shouldCloseFragment
 
+    private val _items =
+        bucket.map {
+            getNodes(it) ?: emptyList()
+        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
     /**
      *  List of node items in the current bucket
      */
-    val items: LiveData<List<NodeItem>> = bucket.switchMap {
-        viewModelScope.launch {
-            recentsBucketRepository.getNodes(it)
-        }
+    val items: StateFlow<List<NodeItem>> = _items
 
-        recentsBucketRepository.nodes
-    }
 
     init {
         viewModelScope.launch {
@@ -81,7 +91,9 @@ class RecentsBucketViewModel @Inject constructor(
      * @param selectedBucket
      */
     fun setBucket(selectedBucket: MegaRecentActionBucket?) {
-        bucket.value = selectedBucket
+        viewModelScope.launch {
+            bucket.emit(selectedBucket)
+        }
     }
 
     /**
@@ -112,7 +124,7 @@ class RecentsBucketViewModel @Inject constructor(
      *
      * @return the count of nodes
      */
-    fun getNodesCount(): Int = items.value?.size ?: 0
+    fun getNodesCount(): Int = items.value.size
 
     /**
      * Clear selected nodes
@@ -122,7 +134,7 @@ class RecentsBucketViewModel @Inject constructor(
         selectedNodes.clear()
 
         val animNodeIndices = mutableSetOf<Int>()
-        val nodeList = items.value ?: return
+        val nodeList = items.value
 
         for ((position, node) in nodeList.withIndex()) {
             if (node in selectedNodes) {
@@ -144,8 +156,7 @@ class RecentsBucketViewModel @Inject constructor(
     fun onNodeLongClicked(position: Int, node: NodeItem) {
         val nodeList = items.value
 
-        if (nodeList == null || position < 0 || position >= nodeList.size
-            || nodeList[position].hashCode() != node.hashCode()
+        if (position < 0 || position >= nodeList.size || nodeList[position].hashCode() != node.hashCode()
         ) {
             return
         }
@@ -168,7 +179,7 @@ class RecentsBucketViewModel @Inject constructor(
      * Select all nodes
      */
     fun selectAll() {
-        val nodeList = items.value ?: return
+        val nodeList = items.value
 
         val animNodeIndices = mutableSetOf<Int>()
 
@@ -188,14 +199,14 @@ class RecentsBucketViewModel @Inject constructor(
     /**
      * Update the current bucket
      */
-    private fun updateCurrentBucket() {
+    private suspend fun updateCurrentBucket() = withContext(ioDispatcher) {
         val recentActions = megaApi.recentActions
 
         // Update the current bucket
         bucket.value?.let { currentBucket ->
             recentActions.firstOrNull { isSameBucket(it, currentBucket) }?.let {
-                bucket.value = it
-                return
+                bucket.emit(it)
+                return@withContext
             }
         }
 
@@ -212,12 +223,12 @@ class RecentsBucketViewModel @Inject constructor(
 
         // The last one is the changed one
         if (recentActions.size == 1) {
-            bucket.value = recentActions[0]
-            return
+            bucket.emit(recentActions[0])
+            return@withContext
         }
 
         // No nodes contained in the bucket or the action bucket is no loner exists.
-        _shouldCloseFragment.value = true
+        _shouldCloseFragment.postValue(true)
     }
 
     /**
@@ -237,6 +248,33 @@ class RecentsBucketViewModel @Inject constructor(
                 selected.parentHandle == other.parentHandle &&
                 selected.userEmail == other.userEmail
     }
+
+    /**
+     * Get the node from the bucket
+     *
+     * @return a list of NodeItem
+     */
+    private suspend fun getNodes(bucket: MegaRecentActionBucket?): List<NodeItem>? =
+        withContext(ioDispatcher) {
+            if (bucket == null) {
+                return@withContext null
+            }
+
+            val size = bucket.nodes.size()
+            val nodesList = ArrayList<NodeItem>(size)
+            for (i in 0 until size) {
+                val node = bucket.nodes[i]
+                nodesList.add(NodeItem(
+                    node = node,
+                    thumbnail = getThumbnail.invoke(node.handle),
+                    index = -1,
+                    isVideo = node.isVideo(),
+                    modifiedDate = node.modificationTime.toString(),
+                ))
+            }
+
+            return@withContext nodesList
+        }
 
 }
 

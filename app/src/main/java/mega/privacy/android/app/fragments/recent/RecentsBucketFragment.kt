@@ -15,6 +15,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +25,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BucketSaved
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -117,20 +122,26 @@ class RecentsBucketFragment : Fragment() {
             if (it) Navigation.findNavController(view).popBackStack()
         }
 
-        viewModel.items.observe(viewLifecycleOwner) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.items.collectLatest {
+                    if (it.isNotEmpty()) {
+                        isInShareBucket =
+                            it[0].node?.let { it1 -> megaApi.getRootParentNode(it1).isInShare } == true
+                    }
 
-            isInShareBucket =
-                it[0].node?.let { it1 -> megaApi.getRootParentNode(it1).isInShare } == true
+                    callManager { activity ->
+                        actionModeCallback =
+                            RecentsBucketActionModeCallback(activity, viewModel, isInShareBucket)
+                    }
 
-            callManager { activity ->
-                actionModeCallback =
-                    RecentsBucketActionModeCallback(activity, viewModel, isInShareBucket)
+                    setupListView(it)
+                    setupHeaderView()
+                    setupFastScroller(it)
+                    setupToolbar()
+                    checkScroll()
+                }
             }
-            setupListView(it)
-            setupHeaderView()
-            setupFastScroller(it)
-            setupToolbar()
-            checkScroll()
         }
 
         viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
