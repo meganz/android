@@ -276,6 +276,7 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
         adapter?.removeItemData(tL, index)
 
         if (tL.isEmpty()) {
+            activateActionMode()
             destroyActionMode()
             setEmptyView(tL.size)
             managerActivity.invalidateOptionsMenu()
