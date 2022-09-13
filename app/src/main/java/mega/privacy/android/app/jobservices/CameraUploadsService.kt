@@ -41,6 +41,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.ApplicationScope
+import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
@@ -462,6 +463,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var tempDbHandler: DatabaseHandler
+
+    /**
+     * AreAllUploadTransfersPaused
+     */
+    @Inject
+    lateinit var areAllUploadTransfersPaused: AreAllUploadTransfersPaused
 
     /**
      * Coroutine scope for service
@@ -1013,6 +1020,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         finalList: List<SyncRecord>,
         isCompressedVideo: Boolean,
     ) {
+        // If the Service detects that all upload transfers are paused when turning on
+        // Camera Uploads, update the Primary and Secondary Folder Backup States to
+        // BackupState.PAUSE_UPLOADS
+        if (areAllUploadTransfersPaused()) {
+            Timber.d("All Pending Uploads Paused. Send Backup State = ${BackupState.PAUSE_UPLOADS}")
+            updatePrimaryFolderBackupState(BackupState.PAUSE_UPLOADS)
+            updateSecondaryFolderBackupState(BackupState.PAUSE_UPLOADS)
+        }
         startActiveHeartbeat(finalList)
         for (file in finalList) {
             if (!running) break

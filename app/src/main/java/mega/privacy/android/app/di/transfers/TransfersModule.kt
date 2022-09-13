@@ -4,8 +4,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
+import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.AreTransfersPaused
 import mega.privacy.android.domain.usecase.DefaultMonitorTransfersSize
@@ -19,7 +21,7 @@ import mega.privacy.android.domain.usecase.MonitorTransfersSize
  * Use cases to check on transfer status
  */
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(ViewModelComponent::class, SingletonComponent::class)
 class TransfersModule {
 
     @Provides
@@ -46,6 +48,10 @@ class TransfersModule {
     @Provides
     fun provideAreAllTransfersPaused(transfersRepository: TransfersRepository): AreAllTransfersPaused =
         AreAllTransfersPaused(transfersRepository::areAllTransfersPaused)
+
+    @Provides
+    fun provideAreAllUploadTransfersPaused(transfersRepository: TransfersRepository): AreAllUploadTransfersPaused =
+        AreAllUploadTransfersPaused(transfersRepository::areAllUploadTransfersPaused)
 
     /**
      * Provide monitor transfers size

@@ -89,6 +89,9 @@ class MegaApiFacade @Inject constructor(
         megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ||
                 megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
 
+    override suspend fun areUploadTransfersPaused(): Boolean =
+        megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+
     override suspend fun getRootNode(): MegaNode? = megaApi.rootNode
 
     override suspend fun getRubbishBinNode(): MegaNode? = megaApi.rubbishNode
