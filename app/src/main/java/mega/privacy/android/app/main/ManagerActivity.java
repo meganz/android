@@ -6095,10 +6095,7 @@ public class ManagerActivity extends TransfersManagementActivity
         int startItem = getStartBottomNavigationItem(this);
 
         if (shouldCloseApp(startItem, drawerItem)) {
-            // The Psa requires the activity to load the new PSA even though the app is on the
-            // background. So don't call super.onBackPressed() since it will destroy this activity
-            // and its embedded web browser fragment.
-            moveTaskToBack(false);
+            handleSuperBackPressed();
         } else {
             backToDrawerItem(startItem);
         }
