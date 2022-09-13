@@ -82,11 +82,11 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val appBarConfiguration by lazy {
         AppBarConfiguration(
-                topLevelDestinationIds = setOf(),
-                fallbackOnNavigateUpListener = {
-                    onBackPressed()
-                    true
-                }
+            topLevelDestinationIds = setOf(),
+            fallbackOnNavigateUpListener = {
+                onBackPressedDispatcher.onBackPressed()
+                true
+            }
         )
     }
 
