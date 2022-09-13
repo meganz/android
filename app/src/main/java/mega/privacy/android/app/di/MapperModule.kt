@@ -14,6 +14,7 @@ import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.app.data.mapper.FeatureFlagMapper
 import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.app.data.mapper.ImageMapper
+import mega.privacy.android.app.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.app.data.mapper.MegaExceptionMapper
 import mega.privacy.android.app.data.mapper.MegaTransferMapper
 import mega.privacy.android.app.data.mapper.MimeTypeMapper
@@ -36,6 +37,7 @@ import mega.privacy.android.app.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.app.data.mapper.toFavouriteInfo
 import mega.privacy.android.app.data.mapper.toFeatureFlag
 import mega.privacy.android.app.data.mapper.toImage
+import mega.privacy.android.app.data.mapper.toMegaChatPeerList
 import mega.privacy.android.app.data.mapper.toMegaExceptionModel
 import mega.privacy.android.app.data.mapper.toPushMessage
 import mega.privacy.android.app.data.mapper.toTransferEventModel
@@ -148,4 +150,7 @@ class MapperModule {
 
     @Provides
     fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
+
+    @Provides
+    fun provideMegaChatPeerListMapper(): MegaChatPeerListMapper = ::toMegaChatPeerList
 }
