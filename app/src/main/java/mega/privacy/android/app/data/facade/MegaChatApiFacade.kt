@@ -1,18 +1,32 @@
 package mega.privacy.android.app.data.facade
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.app.data.model.ChatUpdate
+import mega.privacy.android.app.di.ApplicationScope
 import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatListItem
+import nz.mega.sdk.MegaChatListenerInterface
 import nz.mega.sdk.MegaChatLoggerInterface
+import nz.mega.sdk.MegaChatPresenceConfig
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import javax.inject.Inject
-
 
 /**
  * Mega chat api facade implementation of the [MegaChatApiGateway]
  *
+ * @property chatApi      [MegaChatApiAndroid]
+ * @property sharingScope [CoroutineScope]
  */
 class MegaChatApiFacade @Inject constructor(
     private val chatApi: MegaChatApiAndroid,
+    @ApplicationScope private val sharingScope: CoroutineScope,
 ) : MegaChatApiGateway {
 
     override val initState: Int
@@ -41,6 +55,59 @@ class MegaChatApiFacade @Inject constructor(
 
     override fun retryPendingConnections(disconnect: Boolean) =
         chatApi.retryPendingConnections(disconnect, null)
+
+
+    override val chatUpdates: Flow<ChatUpdate>
+        get() = callbackFlow {
+            val listener = object : MegaChatListenerInterface {
+                override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {
+                    trySend(ChatUpdate.OnChatListItemUpdate(item))
+                }
+
+                override fun onChatInitStateUpdate(api: MegaChatApiJava?, newState: Int) {
+                    trySend(ChatUpdate.OnChatInitStateUpdate(newState))
+                }
+
+                override fun onChatOnlineStatusUpdate(
+                    api: MegaChatApiJava?,
+                    userhandle: Long,
+                    status: Int,
+                    inProgress: Boolean,
+                ) {
+                    trySend(ChatUpdate.OnChatOnlineStatusUpdate(userhandle, status, inProgress))
+                }
+
+                override fun onChatPresenceConfigUpdate(
+                    api: MegaChatApiJava?,
+                    config: MegaChatPresenceConfig?,
+                ) {
+                    trySend(ChatUpdate.OnChatPresenceConfigUpdate(config))
+                }
+
+                override fun onChatConnectionStateUpdate(
+                    api: MegaChatApiJava?,
+                    chatid: Long,
+                    newState: Int,
+                ) {
+                    trySend(ChatUpdate.OnChatConnectionStateUpdate(chatid, newState))
+                }
+
+                override fun onChatPresenceLastGreen(
+                    api: MegaChatApiJava?,
+                    userhandle: Long,
+                    lastGreen: Int,
+                ) {
+                    trySend(ChatUpdate.OnChatPresenceLastGreen(userhandle, lastGreen))
+                }
+
+                override fun onDbError(api: MegaChatApiJava?, error: Int, msg: String?) {
+                    trySend(ChatUpdate.OnDbError(error, msg))
+                }
+            }
+
+            chatApi.addChatListener(listener)
+            awaitClose { chatApi.removeChatListener(listener) }
+        }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
