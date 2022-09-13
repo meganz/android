@@ -22,6 +22,7 @@ import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.data.mapper.StartScreenMapper
 import mega.privacy.android.app.data.mapper.TransferEventMapper
 import mega.privacy.android.app.data.mapper.UserAlertMapper
+import mega.privacy.android.app.data.mapper.UserLastGreenMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.mapper.VideoMapper
 import mega.privacy.android.app.data.mapper.getFileTypeInfo
@@ -41,6 +42,7 @@ import mega.privacy.android.app.data.mapper.toPushMessage
 import mega.privacy.android.app.data.mapper.toTransferEventModel
 import mega.privacy.android.app.data.mapper.toTransferModel
 import mega.privacy.android.app.data.mapper.toUserAlert
+import mega.privacy.android.app.data.mapper.toUserUserLastGreen
 import mega.privacy.android.app.data.mapper.toVideo
 import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
@@ -148,4 +150,7 @@ class MapperModule {
 
     @Provides
     fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
+
+    @Provides
+    fun provideUserLastGreenMapper(): UserLastGreenMapper = ::toUserUserLastGreen
 }
