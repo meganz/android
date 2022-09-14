@@ -137,7 +137,7 @@ class RecentsBucketFragment : Fragment() {
                         RecentsBucketActionModeCallback(
                             activity,
                             viewModel,
-                            viewModel.isInShareBucket
+                            viewModel.isInShare
                         )
                     actionMode = activity.startSupportActionMode(actionModeCallback)
                     activity.setTextSubmitted()
