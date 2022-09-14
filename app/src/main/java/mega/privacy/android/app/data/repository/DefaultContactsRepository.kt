@@ -18,6 +18,7 @@ import mega.privacy.android.app.data.extensions.sortList
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.app.data.mapper.ContactDataMapper
 import mega.privacy.android.app.data.mapper.ContactItemMapper
 import mega.privacy.android.app.data.mapper.ContactRequestMapper
 import mega.privacy.android.app.data.mapper.MegaChatPeerListMapper
@@ -28,14 +29,19 @@ import mega.privacy.android.app.data.model.ChatUpdate
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.repository.ContactsRepository
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import java.util.Locale
 import javax.inject.Inject
@@ -56,6 +62,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaChatPeerListMapper [MegaChatPeerListMapper]
  * @property onlineStatusMapper     [OnlineStatusMapper]
  * @property contactItemMapper      [ContactItemMapper]
+ * @property contactDataMapper      [ContactDataMapper]
  */
 class DefaultContactsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
@@ -69,6 +76,7 @@ class DefaultContactsRepository @Inject constructor(
     private val megaChatPeerListMapper: MegaChatPeerListMapper,
     private val onlineStatusMapper: OnlineStatusMapper,
     private val contactItemMapper: ContactItemMapper,
+    private val contactDataMapper: ContactDataMapper,
 ) : ContactsRepository {
 
     override fun monitorContactRequestUpdates(): Flow<List<ContactRequest>> =
@@ -236,4 +244,121 @@ class DefaultContactsRepository @Inject constructor(
      */
     private fun isRecognizableCharacter(inputChar: Char): Boolean =
         inputChar.code in 48..57 || inputChar.code in 65..90 || inputChar.code in 97..122
+
+
+    override suspend fun getContactData(contactItem: ContactItem): ContactData =
+        withContext(ioDispatcher) {
+            val email = contactItem.email
+            val fullName = getFullName(email)
+            val alias = getAlias(contactItem.handle)
+            val avatarUri = getAvatarUri(email, "${email}.jpg")
+            val defaultAvatarContent = getAvatarFirstLetter(alias ?: fullName ?: email)
+
+            contactDataMapper(fullName, alias, avatarUri, defaultAvatarContent)
+        }
+
+    private suspend fun getFullName(email: String): String? =
+        runCatching { getUserFullName(email) }.fold(
+            onSuccess = { fullName -> fullName },
+            onFailure = { null }
+        )
+
+    private suspend fun getAlias(handle: Long): String? =
+        runCatching { getUserAlias(handle) }.fold(
+            onSuccess = { alias -> alias },
+            onFailure = { null }
+        )
+
+    private suspend fun getUserAlias(handle: Long): String? =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaApiGateway.getUserAlias(handle,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onRequestGetUserAliasCompleted(continuation)
+                    ))
+            }
+        }
+
+    private fun onRequestGetUserAliasCompleted(continuation: Continuation<String?>) =
+        { request: MegaRequest, error: MegaError ->
+            if (error.errorCode == MegaError.API_OK) {
+                continuation.resumeWith(Result.success(request.name))
+            } else {
+                continuation.failWithError(error)
+            }
+        }
+
+    private suspend fun getAvatarUri(email: String, avatarFileName: String): String? =
+        runCatching {
+            val avatarFile =
+                cacheFolderGateway.getCacheFile(CacheFolderManager.AVATAR_FOLDER, avatarFileName)
+
+            getContactAvatar(email, avatarFile?.absolutePath ?: return@runCatching null)
+        }.fold(
+            onSuccess = { avatar -> avatar },
+            onFailure = { null }
+        )
+
+    private suspend fun getContactAvatar(
+        email_or_handle: String,
+        avatarFileName: String,
+    ): String? =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaApiGateway.getContactAvatar(email_or_handle,
+                    avatarFileName,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onRequestGetUserAvatarCompleted(continuation)
+                    ))
+            }
+        }
+
+    private suspend fun getUserFullName(email_or_handle: String): String? =
+        withContext(ioDispatcher) {
+            getUserFirstName(email_or_handle)
+            getUserLastName(email_or_handle)
+            val userHandle = megaApiGateway.getContact(email_or_handle)?.handle ?: -1
+            val fullName = megaChatApiGateway.getUserFullNameFromCache(userHandle)
+            if (fullName.isNullOrEmpty()) null else fullName
+        }
+
+    private suspend fun getUserFirstName(email_or_handle: String): String? =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaApiGateway.getUserAttribute(email_or_handle,
+                    MegaApiJava.USER_ATTR_FIRSTNAME,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onRequestGetUserNameCompleted(continuation)
+                    ))
+            }
+        }
+
+    private fun onRequestGetUserAvatarCompleted(continuation: Continuation<String?>) =
+        { request: MegaRequest, error: MegaError ->
+            if (error.errorCode == MegaError.API_OK) {
+                continuation.resumeWith(Result.success(request.file))
+            } else {
+                continuation.failWithError(error)
+            }
+        }
+
+    private suspend fun getUserLastName(email_or_handle: String): String? =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaApiGateway.getUserAttribute(email_or_handle,
+                    MegaApiJava.USER_ATTR_LASTNAME,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onRequestGetUserNameCompleted(continuation)
+                    ))
+            }
+        }
+
+    private fun onRequestGetUserNameCompleted(continuation: Continuation<String?>) =
+        { request: MegaRequest, error: MegaError ->
+            if (error.errorCode == MegaError.API_OK) {
+                continuation.resumeWith(Result.success(request.text))
+            } else {
+                continuation.failWithError(error)
+            }
+        }
 }
