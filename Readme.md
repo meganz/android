@@ -5,7 +5,7 @@ A fully-featured client to access your Cloud Storage provided by MEGA.
 
 This document will guide you to build the application on a Linux machine with Android Studio.
 
-### Setup development environment
+### 1. Setup development environment
 
 * [Android Studio](https://developer.android.com/studio)
 
@@ -13,7 +13,7 @@ This document will guide you to build the application on a Linux machine with An
 
 * [Android NDK](https://developer.android.com/ndk/downloads)
 
-### Build & Run the application
+### 2. Build & Run the application
 
 1. Get the source code.
 
@@ -21,60 +21,128 @@ This document will guide you to build the application on a Linux machine with An
 git clone --recursive https://github.com/meganz/android.git
 ```
 
-### NDK Configuration
-|  Linux  <div style="width:500px"></div> 	|   MacOS	|
-|---	|---	|
-| Install in the system the **[Android NDK](https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip) [21](https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip)** (latest version tested: NDK r21d, version number: 21.3.6528147). | Install NDK r21d by Android Studio following [these instructions](https://developer.android.com/studio/projects/install-ndk#specific-version) (pay attention to the bottom-right `Show Package Details` checkbox to display the available versions. Latest version tested: NDK r21d, version number: 21.3.6528147) |
-| Export  `NDK_ROOT`  variable or create a symbolic link at `${HOME}/android-ndk`  to point to your Android NDK installation path. <br/><br/> `export NDK_ROOT=/path/to/ndk` <br/><br/> `ln -s /path/to/ndk ${HOME}/android-ndk` | Export `NDK_ROOT` variable or create a symbolic link at `${HOME}/android-ndk` to point to your Android NDK installation path.<br/><br/>Default macOS path: <br/> `export NDK_ROOT="/Users/YOUR_USER_NAME/Library/Android/sdk/ndk/21.3.6528147"`<br/><br/>`ln -s /path/to/ndk ${HOME}/android-ndk`
+### 3. NDK Configuration
 
-1. Export `ANDROID_HOME` variable or create a symbolic link at `${HOME}/android-sdk` to point your Android SDK installation path.
+#### 3.1 Linux
 
-```
-export ANDROID_HOME=/path/to/sdk
-```
-```
-ln -s /path/to/sdk ${HOME}/android-sdk
-```
+Install in the system the **[Android NDK](https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip) [21](https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip)** (latest version tested: NDK r21d, version number: 21.3.6528147).
 
-5. Export `JAVA_HOME` variable or create a symbolic link at `${HOME}/android-java` to point your Java installation path.
+Export  `NDK_ROOT`  variable or create a symbolic link at  `${HOME}/android-ndk`  to point to your Android NDK installation path.
 
-```
-export JAVA_HOME=/path/to/jdk
-```
-```
-ln -s /path/to/jdk ${HOME}/android-java
-```
+`export NDK_ROOT=/path/to/ndk`
 
-6. Download the link https://mega.nz/file/A4pxxQoJ#OoAuL0SKIGuWkw6iSrSPHRMF0-Ri7BSF64IDeIWq-qs, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.
+`ln -s /path/to/ndk ${HOME}/android-ndk`
 
-7. Before running the building script, install the required packages. For example for Ubuntu or other Debian-based distro:
+#### 3.2 MACOS
 
-```
-sudo apt install build-essential swig automake libtool autoconf cmake
-```
+Install NDK r21d by Android Studio following [these instructions](https://developer.android.com/studio/projects/install-ndk#specific-version) (pay attention to the bottom-right `Show Package Details` checkbox to display the available versions. Latest version tested: NDK r21d, version number: 21.3.6528147)
 
-8. Build SDK by running `./build.sh all` at `app/src/main/jni/`. You could also run `./build.sh clean` to clean the previous configuration. **IMPORTANT:** check that the build process finished successfully, it should finish with the **Task finished OK** message. Otherwise, modify `LOG_FILE` variable in `build.sh` from `/dev/null` to a certain text file and run `./build.sh all` again for viewing the build errors.
+Export  `NDK_ROOT`  variable or create a symbolic link at  `${HOME}/android-ndk`  to point to your Android NDK installation path.
 
-9. Download the link https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k, uncompress it and put the folders `debug` and `release` in the path `app/src/`.
+Default macOS path:  `export NDK_ROOT="/Users/YOUR_USER_NAME/Library/Android/sdk/ndk/21.3.6528147"`
 
-10. Open the project with Android Studio, let it build the project and hit _*Run*_.
+`ln -s /path/to/ndk ${HOME}/android-ndk`
 
-#### macOS setup
+### 4. ANDROID_HOME Configuration
 
-To build jni libs on macOS, you need install these dependencies via brew:
+#### 4.1 Linux
 
-    `brew install bash gnu-sed gnu-tar autoconf automake cmake coreutils libtool swig wget xz`
+Export  `ANDROID_HOME`  variable or create a symbolic link at  `${HOME}/android-sdk`  to point to your Android SDK installation path.
 
-Then reboot MacOS to ensure newly installed latest bash(v5.x) overrides default v3.x in PATH
+`export ANDROID_HOME=/path/to/sdk`
+
+`ln -s /path/to/sdk ${HOME}/android-sdk`
+
+#### 4.2 MACOS
+
+Export  `ANDROID_HOME`  variable or create a symbolic link at  `${HOME}/android-sdk`  to point to your Android SDK installation path.
+
+Default macOS path: `export ANDROID_HOME="/Users/YOUR_USER_NAME/Library/Android/sdk/"`)
+
+`ln -s /path/to/sdk ${HOME}/android-sdk`
+
+### 5. JAVA_HOME Configuration
+
+#### 5.1 Linux
+
+Export  `JAVA_HOME`  variable or create a symbolic link at  `${HOME}/android-java`  to point to your Java installation path.
+
+You can use the path in Android Studio, which you can find in  `Preferences > Build, Execution, Deployment > Build Tools > Gradle > Gradle JDK (default)`
+
+`export JAVA_HOME=/path/to/jdk`
+
+`ln -s /path/to/jdk ${HOME}/android-java`
+
+#### 5.2 MACOS
+
+Export  `JAVA_HOME`  variable or create a symbolic link at  `${HOME}/android-java`  to point to your Java installation path.
+
+You can use the path in Android Studio, which you can find in  `Preferences > Build, Execution, Deployment > Build Tools > Gradle > Gradle JDK (default)`
+
+Default macOS path:  `export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/Contents/Home"`)
+
+`ln -s /path/to/jdk ${HOME}/android-java`
+
+### 6. Download WEBRTC files
+
+1. Download the link https://mega.nz/file/A4pxxQoJ#OoAuL0SKIGuWkw6iSrSPHRMF0-Ri7BSF64IDeIWq-qs, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.Be mindful that the download link of webrtc may varies over time, please keep it in line with the one written in build.sh
+
+### 7. Prerequisites of running the build script
+
+#### 7.1 Linux
+
+Before running the SDK building script, install the required packages. For example for Ubuntu or other Debian-based distro:
+
+`sudo apt install build-essential swig automake libtool autoconf cmake ninja-build`
+
+#### 7.2 MACOS
+
+Before running the SDK building script, install the required dependencies via HomeBrew:
+
+Except below tools, please do not use HomeBrew to install other tools, according to SysAdmin's advice.
+
+`brew install bash gnu-sed gnu-tar autoconf automake cmake coreutils libtool swig wget xz python3`
+
+Then reboot MacOS - to ensure newly installed latest bash(v5.x) overrides default v3.x in PATH
 
 Then edit PATH env (Please make sure the gnu paths are setup in front of $PATH):
 
-    `export PATH="/usr/local/opt/gnu-tar/libexec/gnubin:$PATH"`
-    `export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"`
+-   For Intel chip, add below lines in  `~/.zshrc`
 
-Then download and setup NDK follow guides above, then run this command to build:
+`export PATH="/usr/local/opt/gnu-tar/libexec/gnubin:$PATH"`  
+`export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"`
 
-    `bash ./build.sh all`
+-   For Apple chip, add below lines in  `~/.zshrc`
+
+`export PATH="/opt/homebrew/opt/gnu-tar/libexec/gnubin:$PATH"`  
+`export PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"`
+
+`ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python`
+
+Then install CMake version 3.10.2 in `Android Studio > Tools > SDK Manager > SDK Tools > CMake.`
+
+You have to tick checkbox 'Show Package Details' to display this specific version. After installation, add below line in  `~/.zshrc`
+
+`export PATH="/Users/**<USER_NAME>**/Library/Android/sdk/cmake/3.10.2.4988404/bin:$PATH"`
+
+**ATTENTION: After upgrading ExoPlayer to 2.16, build will FAIL with the latest CMake version 3.22.x or version 3.18.1. So we rollback to an older version 3.10 as a workaround.**
+
+### 8. Running the Build Script
+
+Build SDK by running `./build.sh all` at `app/src/main/jni/`. You could also run `./build.sh clean` to clean the previous configuration. **IMPORTANT:** check that the build process finished successfully, it should finish with the **Task finished OK** message. Otherwise, modify `LOG_FILE` variable in `build.sh` from `/dev/null` to a certain text file and run `./build.sh all` again for viewing the build errors.
+
+In case of an error (seen in the log file mentioned) due to licenses not accepted, you can read and accept the licenses with the sdkmanager command-line tool (if you downloaded them)
+
+`/path-to-cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses`
+
+### 9. Download Required Files
+
+Download the link https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k, uncompress it and put the folders `debug` and `release` in the path `app/src/`.
+
+### 10. Run the project
+
+Open the project with Android Studio, let it build the project and hit _*Run*_.
+
 
 
 ##### If the build script fails to detect cmake when building ffmpeg extension on a mac
