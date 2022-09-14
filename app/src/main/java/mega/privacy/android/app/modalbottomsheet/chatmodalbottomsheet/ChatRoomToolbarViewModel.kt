@@ -7,13 +7,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.usecase.GetAllGalleryFiles
-import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -118,7 +116,7 @@ class ChatRoomToolbarViewModel @Inject constructor(
      * Add take picture option in the gallery
      */
     private fun addTakePicture(files: MutableList<FileGalleryItem>) {
-        files.add(0, createTakeAPictureOption())
+      //  files.add(0, createTakeAPictureOption())
         _filesGallery.value = files
     }
 
@@ -133,15 +131,11 @@ class ChatRoomToolbarViewModel @Inject constructor(
             if (_hasReadStoragePermissionsGranted.value) {
                 viewModelScope.launch(Dispatchers.IO) {
                     getAllGalleryFiles().collectLatest { list ->
-                        addFilesToList(list)
+                        addTakePicture(list.toMutableList())
                     }
                 }
             }
         }
-    }
-
-    private fun addFilesToList(files: List<FileGalleryItem>) {
-        addTakePicture(files.toMutableList())
     }
 
     private fun createTakeAPictureOption(): FileGalleryItem {

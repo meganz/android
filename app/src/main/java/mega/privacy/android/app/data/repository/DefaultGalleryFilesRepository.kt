@@ -45,6 +45,8 @@ class DefaultGalleryFilesRepository @Inject constructor(
                     files.add(file)
                     trySend(files.sortedByDescending { it.dateAdded })
                 }
+
+            awaitClose { cancel() }
         }
 
     /**
@@ -150,7 +152,6 @@ class DefaultGalleryFilesRepository @Inject constructor(
                     retriever.setDataSource(context, contentUri)
                     val duration =
                         retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                    //retriever.release()
                     val durationText =
                         TimeUtils.getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)
                     val file = FileGalleryItem(
@@ -166,9 +167,10 @@ class DefaultGalleryFilesRepository @Inject constructor(
                     )
                     trySend(file)
                 }
-
             } ?: kotlin.run {
                 Timber.e("Cursor is null")
             }
+
+            awaitClose { cancel() }
         }
 }
