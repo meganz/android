@@ -8,6 +8,8 @@ import mega.privacy.android.app.di.UtilWrapperModule
 import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
+import mega.privacy.android.app.utils.wrapper.AvatarWrapper
+import mega.privacy.android.app.utils.wrapper.BitmapFactoryWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
@@ -36,6 +38,8 @@ object TestWrapperModule {
     val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
     val fetchNodeWrapper = mock<FetchNodeWrapper>()
     val timeWrapper = mock<TimeWrapper>()
+    val avatarWrapper = mock<AvatarWrapper>()
+    val bitmapFactoryWrapper = mock<BitmapFactoryWrapper>()
 
     @Provides
     fun provideIsOnlineWrapper(): IsOnlineWrapper = isOnlineWrapper
@@ -73,4 +77,10 @@ object TestWrapperModule {
 
     @Provides
     fun provideTimeWrapper(): TimeWrapper = timeWrapper
+
+    @Provides
+    fun provideAvatarWrapper(): AvatarWrapper = avatarWrapper
+
+    @Provides
+    fun provideBitmapFactoryWrapper(): BitmapFactoryWrapper = bitmapFactoryWrapper
 }

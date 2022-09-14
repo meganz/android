@@ -17,14 +17,14 @@ sealed class GlobalUpdate {
      *
      * @property users
      */
-    data class OnUsersUpdate(val users: java.util.ArrayList<MegaUser>?) : GlobalUpdate()
+    data class OnUsersUpdate(val users: ArrayList<MegaUser>?) : GlobalUpdate()
 
     /**
      * On user alerts update
      *
      * @property userAlerts
      */
-    data class OnUserAlertsUpdate(val userAlerts: java.util.ArrayList<MegaUserAlert>?) :
+    data class OnUserAlertsUpdate(val userAlerts: ArrayList<MegaUserAlert>?) :
         GlobalUpdate()
 
     /**
@@ -32,7 +32,7 @@ sealed class GlobalUpdate {
      *
      * @property nodeList
      */
-    data class OnNodesUpdate(val nodeList: java.util.ArrayList<MegaNode>?) : GlobalUpdate()
+    data class OnNodesUpdate(val nodeList: ArrayList<MegaNode>?) : GlobalUpdate()
 
     object OnReloadNeeded : GlobalUpdate()
 
@@ -43,7 +43,7 @@ sealed class GlobalUpdate {
      *
      * @property requests
      */
-    data class OnContactRequestsUpdate(val requests: java.util.ArrayList<MegaContactRequest>?) :
+    data class OnContactRequestsUpdate(val requests: ArrayList<MegaContactRequest>?) :
         GlobalUpdate()
 
     /**

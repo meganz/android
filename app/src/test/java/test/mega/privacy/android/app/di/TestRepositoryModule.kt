@@ -10,8 +10,10 @@ import mega.privacy.android.app.domain.repository.GlobalStatesRepository
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
+import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
@@ -23,6 +25,7 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
+import mega.privacy.android.domain.repository.TransferRepository
 import org.mockito.kotlin.mock
 
 @Module
@@ -69,7 +72,10 @@ object TestRepositoryModule {
     fun bindDeviceRepository(): EnvironmentRepository = mock()
 
     @Provides
-    fun provideContactsRepository(): NotificationsRepository = mock()
+    fun provideContactsRepository(): ContactsRepository = mock()
+
+    @Provides
+    fun provideNotificationsRepository(): NotificationsRepository = mock()
 
     @Provides
     fun providePushesRepository(): PushesRepository = mock()
@@ -85,4 +91,10 @@ object TestRepositoryModule {
 
     @Provides
     fun provideStatisticsRepository(): StatisticsRepository = mock()
+
+    @Provides
+    fun provideTransferRepository(): TransferRepository = mock()
+
+    @Provides
+    fun provideAvatarRepository(): AvatarRepository = mock()
 }

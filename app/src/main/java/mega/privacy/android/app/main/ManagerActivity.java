@@ -35,16 +35,16 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOG
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
 import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.CHAT_BNV;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.HOME_BNV;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.NO_BNV;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.PHOTOS_BNV;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.SHARED_ITEMS_BNV;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.getStartBottomNavigationItem;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.getStartDrawerItem;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.shouldCloseApp;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CHAT_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.HOME_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.NO_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.PHOTOS_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.SHARED_ITEMS_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartBottomNavigationItem;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartDrawerItem;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldCloseApp;
 import static mega.privacy.android.app.main.FileInfoActivity.NODE_HANDLE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
@@ -315,6 +315,7 @@ import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
@@ -426,8 +427,9 @@ import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
-import mega.privacy.android.domain.entity.ContactRequest;
-import mega.privacy.android.domain.entity.ContactRequestStatus;
+import mega.privacy.android.domain.entity.contacts.ContactRequest;
+import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
+import mega.privacy.android.domain.entity.transfer.TransferType;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -549,6 +551,8 @@ public class ManagerActivity extends TransfersManagementActivity
     CopyNodeUseCase copyNodeUseCase;
     @Inject
     LegacyLoggingSettings loggingSettings;
+    @Inject
+    ActivityLifecycleHandler activityLifecycleHandler;
 
     public ArrayList<Integer> transfersInProgress;
     public MegaTransferData transferData;
@@ -1451,6 +1455,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     return null;
                 }));
 
+        ManagerActivityExtensionKt.observer(this, viewModel);
+
         viewModel.onGetNumUnreadUserAlerts().observe(this, this::updateNumUnreadUserAlerts);
 
         viewModel.onInboxSectionUpdate().observe(this, this::updateInboxSectionVisibility);
@@ -1577,7 +1583,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 .observeForever(refreshAddPhoneNumberButtonObserver);
 
         LiveEventBus.get(EVENT_TRANSFER_OVER_QUOTA, Boolean.class).observe(this, update -> {
-            updateTransfersWidget(INVALID_VALUE);
+            updateTransfersWidget(TransferType.NONE);
             showTransfersTransferOverQuotaWarning();
         });
 
@@ -2225,7 +2231,6 @@ public class ManagerActivity extends TransfersManagementActivity
             megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
             megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, this);
 
-            this.setDefaultAvatar();
 
             this.setProfileAvatar();
 
@@ -2464,7 +2469,7 @@ public class ManagerActivity extends TransfersManagementActivity
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE);
 
             if (drawerItem == null) {
-                drawerItem = getStartDrawerItem(this);
+                drawerItem = getStartDrawerItem();
 
                 Intent intent = getIntent();
                 if (intent != null) {
@@ -3281,6 +3286,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 fireStopCameraUploadJob(ManagerActivity.this);
                                 dbH.setCamSyncEnabled(false);
                                 sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
+                                transfersFragment.destroyActionMode();
                             });
 
                     builder.setNegativeButton(getString(R.string.general_no), null);
@@ -3472,6 +3478,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (circleAvatar.first) {
             nVPictureProfile.setImageBitmap(circleAvatar.second);
         } else {
+            setDefaultAvatar();
             File avatarFile = CacheFolderManager.buildAvatarFile(this, megaApi.getMyEmail() + JPG_EXTENSION);
             if (avatarFile != null && avatarFile.exists()) {
                 megaApi.getUserAvatar(megaApi.getMyUser(), avatarFile.getAbsolutePath(), this);
@@ -3479,7 +3486,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    public void setDefaultAvatar() {
+    private void setDefaultAvatar() {
         Timber.d("setDefaultAvatar");
         nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(megaApi.getMyUser()), megaChatApi.getMyFullname(), AVATAR_SIZE, true));
     }
@@ -4099,7 +4106,7 @@ public class ManagerActivity extends TransfersManagementActivity
             Timber.d("DrawerItem on start offline: %s", drawerItem);
             if (drawerItem == null) {
                 Timber.w("drawerItem == null --> On start OFFLINE MODE");
-                drawerItem = getStartDrawerItem(this);
+                drawerItem = getStartDrawerItem();
 
                 if (bNV != null) {
                     disableNavigationViewMenu(bNV.getMenu());
@@ -4958,9 +4965,9 @@ public class ManagerActivity extends TransfersManagementActivity
 
             case TRANSFERS: {
                 if (getTabItemTransfers() == TransfersTab.PENDING_TAB && isTransfersInProgressAdded()) {
-                    transfersFragment.checkScroll();
+                    transfersFragment.updateElevation();
                 } else if (getTabItemTransfers() == TransfersTab.COMPLETED_TAB && isTransfersCompletedAdded()) {
-                    completedTransfersFragment.checkScroll();
+                    completedTransfersFragment.updateElevation();
                 }
             }
         }
@@ -5276,7 +5283,7 @@ public class ManagerActivity extends TransfersManagementActivity
             Menu bNVMenu = bNV.getMenu();
             if (bNVMenu != null) {
                 if (drawerItem == null) {
-                    drawerItem = getStartDrawerItem(this);
+                    drawerItem = getStartDrawerItem();
                 }
 
                 if (drawerItem == DrawerItem.CLOUD_DRIVE) {
@@ -5553,7 +5560,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             return true;
                         }
                     } else if (drawerItem == DrawerItem.TRANSFERS) {
-                        drawerItem = getStartDrawerItem(this);
+                        drawerItem = getStartDrawerItem();
                         selectDrawerItem(drawerItem);
                         return true;
                     } else if (drawerItem == DrawerItem.HOMEPAGE) {
@@ -6086,13 +6093,10 @@ public class ManagerActivity extends TransfersManagementActivity
      * If not, sets the current DrawerItem as the preferred one.
      */
     private void performOnBack() {
-        int startItem = getStartBottomNavigationItem(this);
+        int startItem = getStartBottomNavigationItem();
 
         if (shouldCloseApp(startItem, drawerItem)) {
-            // The Psa requires the activity to load the new PSA even though the app is on the
-            // background. So don't call super.onBackPressed() since it will destroy this activity
-            // and its embedded web browser fragment.
-            moveTaskToBack(false);
+            handleSuperBackPressed();
         } else {
             backToDrawerItem(startItem);
         }
@@ -7409,7 +7413,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void skipInitialCUSetup() {
         viewModel.setIsFirstLogin(false);
-        drawerItem = getStartDrawerItem(this);
+        drawerItem = getStartDrawerItem();
         selectDrawerItem(drawerItem);
     }
 
@@ -9404,18 +9408,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }
         } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
-            if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
-                Timber.d("Request avatar");
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    setProfileAvatar();
-                } else if (e.getErrorCode() == MegaError.API_ENOENT) {
-                    setDefaultAvatar();
-                } else if (e.getErrorCode() == MegaError.API_EARGS) {
-                    Timber.e("Error changing avatar: ");
-                }
-
-                LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
-            } else if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
+            if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
                 updateMyData(true, request.getText(), e);
             } else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
                 updateMyData(false, request.getText(), e);
@@ -9506,21 +9499,21 @@ public class ManagerActivity extends TransfersManagementActivity
                 updateTransfersWidgetState();
 
                 if (drawerItem == DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
-                    boolean paused = megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
+                    boolean areDownloadsPaused = megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD);
+                    boolean areUploadsPaused = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
+
                     refreshFragment(FragmentTag.TRANSFERS.getTag());
                     mTabsAdapterTransfers.notifyDataSetChanged();
 
-                    pauseTransfersMenuIcon.setVisible(!paused);
-                    playTransfersMenuIcon.setVisible(paused);
+                    pauseTransfersMenuIcon.setVisible(!(areDownloadsPaused || areUploadsPaused));
+                    playTransfersMenuIcon.setVisible(areDownloadsPaused || areUploadsPaused);
+
+                    // For Uploads, when the "Pause All" Button is Clicked, newBackupState = PAUSE_UPLOADS
+                    // Otherwise, when the "Resume All" Button is Clicked, newBackupState = ACTIVE
+                    BackupState newBackupState = areUploadsPaused ? BackupState.PAUSE_UPLOADS : BackupState.ACTIVE;
+                    CameraUploadSyncManager.INSTANCE.updatePrimaryFolderBackupState(newBackupState);
+                    CameraUploadSyncManager.INSTANCE.updateSecondaryFolderBackupState(newBackupState);
                 }
-
-                // Update CU backup state.
-                BackupState newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-                        ? BackupState.PAUSE_UPLOADS
-                        : BackupState.ACTIVE;
-
-                CameraUploadSyncManager.INSTANCE.updatePrimaryFolderBackupState(newBackupState);
-                CameraUploadSyncManager.INSTANCE.updateSecondaryFolderBackupState(newBackupState);
             }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
             Timber.d("One MegaRequest.TYPE_PAUSE_TRANSFER");
@@ -9732,22 +9725,6 @@ public class ManagerActivity extends TransfersManagementActivity
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)) {
                             Timber.d("I changed the user: %d nickname", user.getHandle());
                             megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_ALIAS, new GetAttrUserListener(this));
-                        }
-
-                        if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)) {
-                            Timber.d("The user: %dchanged his AVATAR", user.getHandle());
-
-                            File avatar = CacheFolderManager.buildAvatarFile(this, user.getEmail() + ".jpg");
-                            Bitmap bitmap = null;
-                            if (isFileAvailable(avatar)) {
-                                avatar.delete();
-                            }
-
-                            if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
-                                Timber.d("I change my avatar");
-                                String destinationPath = CacheFolderManager.buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath();
-                                megaApi.getUserAvatar(megaApi.getMyUser(), destinationPath, this);
-                            }
                         }
 
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)) {
@@ -10781,7 +10758,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (fromAndroidNotification) {
             megaApi.acknowledgeUserAlerts();
         } else {
-            if (drawerItem == DrawerItem.NOTIFICATIONS && app.isActivityVisible()) {
+            if (drawerItem == DrawerItem.NOTIFICATIONS && activityLifecycleHandler.isActivityVisible()) {
                 megaApi.acknowledgeUserAlerts();
             }
         }

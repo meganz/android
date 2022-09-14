@@ -3,7 +3,7 @@ package mega.privacy.android.app.activities.settingsActivities
 import android.os.Bundle
 import androidx.fragment.app.commit
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.startSceen.StartScreenSettingsFragment
+import mega.privacy.android.app.presentation.settings.startscreen.StartScreenSettingsFragment
 import mega.privacy.android.app.utils.StringResourcesUtils
 
 class StartScreenPreferencesActivity : PreferencesBaseActivity() {

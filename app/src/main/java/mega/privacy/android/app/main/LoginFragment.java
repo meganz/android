@@ -9,7 +9,7 @@ import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -1453,7 +1453,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 if (numberOfClicksKarere == CLICKS_ENABLE_DEBUG) {
                     if (loggingSettings.areKarereLogsEnabled()) {
                         numberOfClicksKarere = 0;
-                        loggingSettings.setStatusLoggerKarere(requireContext(), false);
+                        loggingSettings.setStatusLoggerKarere(requireActivity(), false);
                     } else {
                         ((LoginActivity) context).showConfirmationEnableLogsKarere();
                     }
@@ -1467,7 +1467,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 if (numberOfClicksSDK == CLICKS_ENABLE_DEBUG) {
                     if (loggingSettings.areSDKLogsEnabled()) {
                         numberOfClicksSDK = 0;
-                        loggingSettings.setStatusLoggerSDK(requireContext(), false);
+                        loggingSettings.setStatusLoggerSDK(requireActivity(), false);
                     } else {
                         ((LoginActivity) context).showConfirmationEnableLogsSDK();
                     }

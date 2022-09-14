@@ -309,7 +309,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         AppBarConfiguration(
             topLevelDestinationIds = setOf(),
             fallbackOnNavigateUpListener = {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
                 true
             }
         )

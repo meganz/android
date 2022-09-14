@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.DefaultGetBrowserChildrenNode
@@ -15,9 +16,7 @@ import mega.privacy.android.app.domain.usecase.DefaultGetPublicLinks
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
-import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.GetRootFolder
@@ -31,14 +30,14 @@ import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
-import mega.privacy.android.domain.usecase.MonitorUserAlerts
 
 /**
  * Manager module
  *
  * Provides dependencies used by multiple screens in the manager package
  */
-@Module
+
+@Module(includes = [GetNodeModule::class])
 @InstallIn(ViewModelComponent::class)
 abstract class ManagerUseCases {
 
@@ -75,14 +74,6 @@ abstract class ManagerUseCases {
         @Provides
         fun provideGetRubbishBinFolder(filesRepository: FilesRepository): GetRubbishBinFolder =
             GetRubbishBinFolder(filesRepository::getRubbishBinNode)
-
-        @Provides
-        fun provideGetChildrenNode(filesRepository: FilesRepository): GetChildrenNode =
-            GetChildrenNode(filesRepository::getChildrenNode)
-
-        @Provides
-        fun provideGetNodeByHandle(filesRepository: FilesRepository): GetNodeByHandle =
-            GetNodeByHandle(filesRepository::getNodeByHandle)
 
         @Provides
         fun provideGetNumUnreadUserAlerts(accountRepository: AccountRepository): GetNumUnreadUserAlerts =

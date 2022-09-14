@@ -254,7 +254,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
     private fun stopForeground() {
         isForeground = false
-        stopForeground(true)
+        stopForeground(STOP_FOREGROUND_REMOVE)
         mNotificationManager?.cancel(Constants.NOTIFICATION_CHAT_UPLOAD)
         stopSelf()
     }

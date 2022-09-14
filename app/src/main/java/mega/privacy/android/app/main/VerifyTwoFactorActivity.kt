@@ -194,7 +194,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                     setEt(getEditTextPINByIndex(index - 1))
                 }
 
-                imm.showSoftInput(this, InputMethodManager.SHOW_FORCED)
+                imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
 
                 setOnLongClickListener {
                     pinLongClick = true

@@ -112,19 +112,10 @@ object PaymentUtils {
      * @return Details of the product corresponding to the provided key.
      */
     @JvmStatic
-    fun getSkuDetails(list: List<MegaSku>?, key: String): MegaSku? {
-        if (list == null || list.isEmpty()) {
-            return null
+    fun getSkuDetails(list: List<MegaSku?>?, key: String): MegaSku? =
+        list?.firstOrNull { megaSku ->
+            megaSku?.sku == key
         }
-
-        for (details in list) {
-            if (details.sku == key) {
-                return details
-            }
-        }
-
-        return null
-    }
 
     /**
      * Updates subscription level.

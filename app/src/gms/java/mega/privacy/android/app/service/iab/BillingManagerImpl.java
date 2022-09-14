@@ -30,16 +30,16 @@ import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClient.BillingResponseCode;
 import com.android.billingclient.api.BillingClient.FeatureType;
-import com.android.billingclient.api.BillingClient.SkuType;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ProductDetails;
+import com.android.billingclient.api.ProductDetailsResponseListener;
 import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.Purchase.PurchasesResult;
 import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsParams;
-import com.android.billingclient.api.SkuDetailsResponseListener;
+import com.android.billingclient.api.QueryProductDetailsParams;
+import com.android.billingclient.api.QueryPurchasesParams;
+import com.google.common.collect.ImmutableList;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -124,8 +124,8 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     private final BillingUpdatesListener mBillingUpdatesListener;
     private final Activity mActivity;
     private final List<Purchase> mPurchases = new ArrayList<>();
-    private List<SkuDetails> mSkus;
-    private String obfuscatedAccountId;
+    private List<ProductDetails> mProducts;
+    private final String obfuscatedAccountId;
 
     public static final String SUBSCRIPTION_PLATFORM_PACKAGE_NAME = "com.android.vending";
     public static final String SUBSCRIPTION_LINK_FOR_APP_STORE = "http://play.google.com/store/account/subscriptions";
@@ -166,7 +166,10 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
             mPurchases.clear();
             handlePurchaseList(purchases);
         }
-        mBillingUpdatesListener.onPurchasesUpdated(resultCode != BillingResponseCode.OK, resultCode, Converter.convertPurchases(mPurchases));
+        mBillingUpdatesListener.onPurchasesUpdated(
+                resultCode != BillingResponseCode.OK,
+                resultCode,
+                Converter.convertPurchases(mPurchases));
     }
 
     @Override
@@ -179,47 +182,66 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         Timber.d("oldSku is:%s, new sku is:%s", oldSku, skuDetails);
 
         Timber.d("Obfuscated account id is:%s", obfuscatedAccountId);
-
         //if user is upgrading, it take effect immediately otherwise wait until current plan expired
         final int prorationMode = getProductLevel(skuDetails.getSku()) > getProductLevel(oldSku) ? IMMEDIATE_WITH_TIME_PRORATION : DEFERRED;
-        Timber.d("prorationMode is %d", prorationMode);
-        Runnable purchaseFlowRequest = () -> {
-            BillingFlowParams.Builder builder = BillingFlowParams
-                    .newBuilder()
-                    .setSkuDetails(getSkuDetails(skuDetails))
-                    .setReplaceSkusProrationMode(prorationMode)
-                    .setObfuscatedAccountId(obfuscatedAccountId);
+        ProductDetails productDetails = getProductDetails(skuDetails);
+        if (productDetails != null) {
+            List<ProductDetails.SubscriptionOfferDetails> offerDetailsList =
+                    productDetails.getSubscriptionOfferDetails();
+            if (offerDetailsList != null) {
+                Runnable purchaseFlowRequest = () -> {
+                    String offerToken = productDetails.getSubscriptionOfferDetails()
+                            .get(0)
+                            .getOfferToken();
 
-            // setOldSku requires non-null parameters.
-            if (oldSku != null && purchaseToken != null) {
-                builder.setOldSku(oldSku, purchaseToken);
+                    ImmutableList<BillingFlowParams.ProductDetailsParams> productDetailsParams =
+                            ImmutableList.of(
+                                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                                            .setProductDetails(productDetails)
+                                            .setOfferToken(offerToken)
+                                            .build()
+                            );
+
+
+
+                    BillingFlowParams.Builder purchaseParamsBuilder = BillingFlowParams.newBuilder()
+                            .setProductDetailsParamsList(productDetailsParams)
+                            .setObfuscatedAccountId(obfuscatedAccountId);
+
+                    // setSubscriptionUpdateParams asks that have to include the old sku information,
+                    // otherwise throw an exception
+                    if (oldSku != null && purchaseToken != null) {
+                        BillingFlowParams.SubscriptionUpdateParams.Builder builder =
+                                BillingFlowParams.SubscriptionUpdateParams.newBuilder()
+                                        .setReplaceProrationMode(prorationMode)
+                                        .setOldPurchaseToken(purchaseToken);
+                        purchaseParamsBuilder.setSubscriptionUpdateParams(builder.build());
+                    }
+
+                    /*
+                        If do a full login, ManagerActivity's mIntent will be set as null.
+                        Work around, check the intent's nullity first, if null, set an empty Intent, as we don't use "PROXY_PACKAGE",
+                        otherwise billing library crashes internally.
+                        @see com.android.billingclient.api.BillingClientImpl -> var1.getIntent().getStringExtra("PROXY_PACKAGE")
+                    */
+                    if (mActivity.getIntent() == null) {
+                        mActivity.setIntent(new Intent());
+                    }
+
+                    mBillingClient.launchBillingFlow(mActivity, purchaseParamsBuilder.build());
+                };
+                executeServiceRequest(purchaseFlowRequest);
             }
-
-            BillingFlowParams purchaseParams = builder.build();
-
-            /*
-                If do a full login, ManagerActivity's mIntent will be set as null.
-                Work around, check the intent's nullity first, if null, set an empty Intent, as we don't use "PROXY_PACKAGE",
-                otherwise billing library crashes internally.
-                @see com.android.billingclient.api.BillingClientImpl -> var1.getIntent().getStringExtra("PROXY_PACKAGE")
-             */
-            if (mActivity.getIntent() == null) {
-                mActivity.setIntent(new Intent());
-            }
-
-            mBillingClient.launchBillingFlow(mActivity, purchaseParams);
-        };
-
-        executeServiceRequest(purchaseFlowRequest);
+        }
     }
 
-    private SkuDetails getSkuDetails(MegaSku skuDetails) {
-        if (mSkus == null || mSkus.isEmpty()) {
-            Timber.w("Haven't init skus!");
+    private ProductDetails getProductDetails(MegaSku skuDetails) {
+        if (mProducts == null || mProducts.isEmpty()) {
+            Timber.w("Haven't init products!");
             return null;
         }
-        for (SkuDetails details : mSkus) {
-            if (details.getSku().equals(skuDetails.getSku())) {
+        for (ProductDetails details : mProducts) {
+            if (details.getProductId().equals(skuDetails.getSku())) {
                 return details;
             }
         }
@@ -253,19 +275,31 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     /**
      * Query all the available skus of MEGA in Play Store.
      *
-     * @param itemType The type of sku, for MEGA it should always be {@link BillingClient.SkuType#SUBS}
-     * @param skuList  Supported skus' id.
-     * @param listener Callback when query available skus finished.
+     * @param listener Callback when query available product finished.
      * @see PaymentUtils
      */
-    private void querySkuDetailsAsync(@SkuType String itemType, List<String> skuList, SkuDetailsResponseListener listener) {
-        Timber.d("querySkuDetailsAsync type is %s", itemType);
+    private void queryProductDetailsAsync(ProductDetailsResponseListener listener) {
+        Timber.d("querySkuDetailsAsync type is %s", BillingClient.ProductType.SUBS);
         // Creating a runnable from the request to use it inside our connection retry policy below
         Runnable queryRequest = () -> {
             // Query the purchase async
-            SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
-            params.setSkusList(skuList).setType(itemType);
-            mBillingClient.querySkuDetailsAsync(params.build(), listener);
+            List<QueryProductDetailsParams.Product> productList = new ArrayList<>();
+            for(String sku: BillingManager.IN_APP_SKUS) {
+                productList.add(
+                        QueryProductDetailsParams.Product.newBuilder()
+                                .setProductId(sku)
+                                .setProductType(BillingClient.ProductType.SUBS)
+                                .build()
+                );
+            }
+            QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
+                    .setProductList(productList)
+                    .build();
+
+            mBillingClient.queryProductDetailsAsync(
+                    params,
+                    listener
+            );
         };
 
         executeServiceRequest(queryRequest);
@@ -273,17 +307,17 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
 
     @Override
     public void getInventory(QuerySkuListCallback callback) {
-        SkuDetailsResponseListener listener = (result, skuList) -> {
+        ProductDetailsResponseListener listener = (result, productDetailsList) -> {
             if (result.getResponseCode() != BillingClient.BillingResponseCode.OK) {
                 Timber.w("Failed to get SkuDetails, error code is %s", result.getResponseCode());
             }
-            if (skuList != null && skuList.size() > 0) {
-                mSkus = skuList;
-                callback.onSuccess(Converter.convertSkus(skuList));
+            if (productDetailsList.size() > 0) {
+                mProducts = productDetailsList;
+                callback.onSuccess(Converter.convertSkus(productDetailsList));
             }
         };
         //we only support subscription for google pay
-        querySkuDetailsAsync(BillingClient.SkuType.SUBS, IN_APP_SKUS, listener);
+        queryProductDetailsAsync(listener);
     }
 
     private void handlePurchaseList(List<Purchase> purchases) {
@@ -336,24 +370,25 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     /**
      * Handle a result from querying of purchases and report an updated list to the listener
      *
-     * @param result PurchasesResult contains purchase result {@link BillingResult} and a list which includes all the purchased items.
+     * @param responseCode Purchase result response code
+     * @param purchaseList Purchase list
      */
-    private void onQueryPurchasesFinished(PurchasesResult result) {
-        Timber.d("onQueryPurchasesFinished, succeed? %s", (result.getResponseCode() == BillingResponseCode.OK));
+    private void onQueryPurchasesFinished(int responseCode, List<Purchase> purchaseList) {
+        Timber.d("onQueryPurchasesFinished, succeed? %s", (responseCode == BillingResponseCode.OK));
         // Have we been disposed of in the meantime? If so, or bad result code, then quit
-        if (mBillingClient == null || result.getResponseCode() != BillingResponseCode.OK) {
+        if (mBillingClient == null || responseCode != BillingResponseCode.OK) {
             return;
         }
 
         // Update the UI and purchases inventory with new list of purchases
         mPurchases.clear();
 
-        int resultCode = result.getResponseCode();
-        Timber.d("Purchases updated, response code is %s", resultCode);
-        if (resultCode == BillingResponseCode.OK) {
-            handlePurchaseList(result.getPurchasesList());
-        }
-        mBillingUpdatesListener.onQueryPurchasesFinished(resultCode != BillingResponseCode.OK, resultCode, Converter.convertPurchases(mPurchases));
+        Timber.d("Purchases updated, response code is %s", responseCode);
+        handlePurchaseList(purchaseList);
+        mBillingUpdatesListener.onQueryPurchasesFinished(
+                false,
+                responseCode,
+                Converter.convertPurchases(mPurchases));
     }
 
     /**
@@ -375,40 +410,43 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      */
     @Override
     public void queryPurchases() {
-        Runnable queryToExecute = () -> {
-            PurchasesResult purchasesResult = mBillingClient.queryPurchases(SkuType.INAPP);
-            List<Purchase> purchasesList = purchasesResult.getPurchasesList();
-            if (purchasesList == null) {
-                Timber.w("getPurchasesList() for in-app products returned NULL, using an empty list.");
-                purchasesList = new ArrayList<>();
-            }
-
-            // If there are subscriptions supported, we add subscription rows as well
-            if (areSubscriptionsSupported()) {
-                PurchasesResult subscriptionResult = mBillingClient.queryPurchases(SkuType.SUBS);
-                if (subscriptionResult.getResponseCode() == BillingResponseCode.OK) {
-                    purchasesList.addAll(subscriptionResult.getPurchasesList());
+        Runnable queryToExecute = () -> mBillingClient.queryPurchasesAsync(
+                QueryPurchasesParams.newBuilder().
+                        setProductType(BillingClient.ProductType.INAPP).build(),
+                (resultINAPP, listINAPP) -> {
+                    if (areSubscriptionsSupported()) {
+                        mBillingClient.queryPurchasesAsync(
+                                QueryPurchasesParams.newBuilder()
+                                        .setProductType(BillingClient.ProductType.SUBS).build(),
+                                (resultSUBS, listSUBS) -> {
+                                    listINAPP.addAll(listSUBS);
+                                    queryPurchasesFinished(resultINAPP, listINAPP);
+                                }
+                        );
+                    } else {
+                        queryPurchasesFinished(resultINAPP, listINAPP);
+                    }
                 }
-            }
-
-            // Verify all available purchases
-            List<Purchase> list = new ArrayList<>();
-            for (Purchase purchase : purchasesList) {
-                if (purchase != null && verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())
-                        && purchase.getAccountIdentifiers() != null
-                        && purchase.getAccountIdentifiers().getObfuscatedAccountId() != null
-                        && purchase.getAccountIdentifiers().getObfuscatedAccountId().equals(obfuscatedAccountId)) {
-                    list.add(purchase);
-                    Timber.d("Purchase added, %s", purchase.getOriginalJson());
-                }
-            }
-
-            PurchasesResult finalResult = new PurchasesResult(purchasesResult.getBillingResult(), list);
-            Timber.d("Final purchase result is %s", finalResult.getBillingResult());
-            onQueryPurchasesFinished(finalResult);
-        };
+        );
 
         executeServiceRequest(queryToExecute);
+    }
+
+    private void queryPurchasesFinished(BillingResult billingResult, List<Purchase> purchaseList) {
+        // Verify all available purchases
+        List<Purchase> list = new ArrayList<>();
+        for (Purchase purchase : purchaseList) {
+            if (purchase != null && verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())
+                    && purchase.getAccountIdentifiers() != null
+                    && purchase.getAccountIdentifiers().getObfuscatedAccountId() != null
+                    && purchase.getAccountIdentifiers().getObfuscatedAccountId().equals(obfuscatedAccountId)) {
+                list.add(purchase);
+                Timber.d("Purchase added, %s", purchase.getOriginalJson());
+            }
+        }
+
+        Timber.d("Final purchase result is %s", billingResult);
+        onQueryPurchasesFinished(billingResult.getResponseCode(), list);
     }
 
     /**
@@ -420,7 +458,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         mBillingClient.startConnection(new BillingClientStateListener() {
 
             @Override
-            public void onBillingSetupFinished(BillingResult billingResult) {
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
                 Timber.d("Response code is: %s", billingResult.getResponseCode());
                 mIsServiceConnected = billingResult.getResponseCode() == BillingResponseCode.OK;
 
@@ -483,7 +521,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
          */
         public static MegaPurchase convert(Purchase purchase) {
             MegaPurchase p = new MegaPurchase();
-            p.setSku(purchase.getSku());
+            p.setSku(purchase.getProducts().get(0));
             p.setReceipt(purchase.getOriginalJson());
             p.setState(purchase.getPurchaseState());
             p.setToken(purchase.getPurchaseToken());
@@ -510,26 +548,40 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         /**
          * Convert SkuDetails object in GMS into generic MegaSku object.
          *
-         * @param sku SkuDetails object.
+         * @param product ProductDetails object.
          * @return Generic MegaSku object.
          */
-        public static MegaSku convert(SkuDetails sku) {
-            return new MegaSku(sku.getSku(), sku.getPriceAmountMicros(), sku.getPriceCurrencyCode());
+        public static MegaSku convert(ProductDetails product) {
+            List<ProductDetails.SubscriptionOfferDetails> offerDetailsList =
+                    product.getSubscriptionOfferDetails();
+            if (offerDetailsList != null && !offerDetailsList.isEmpty()) {
+                ProductDetails.SubscriptionOfferDetails offerDetails =
+                        product.getSubscriptionOfferDetails().get(0);
+                if (offerDetails != null) {
+                    ProductDetails.PricingPhase pricingPhase =
+                            offerDetails.getPricingPhases().getPricingPhaseList().get(0);
+                    return new MegaSku(product.getProductId(),
+                            pricingPhase.getPriceAmountMicros(),
+                            pricingPhase.getPriceCurrencyCode());
+                }
+            }
+
+            return null;
         }
 
         /**
          * Convert SkuDetails objects in a list into generic MegaSku objects list.
          *
-         * @param skus SkuDetails objects list.
+         * @param products ProductDetails objects list.
          * @return Generic MegaSku objects list.
          */
-        public static List<MegaSku> convertSkus(@Nullable List<SkuDetails> skus) {
-            if (skus == null) {
+        public static List<MegaSku> convertSkus(@Nullable List<ProductDetails> products) {
+            if (products == null) {
                 return null;
             }
-            List<MegaSku> result = new ArrayList<>(skus.size());
-            for (SkuDetails sku : skus) {
-                result.add(convert(sku));
+            List<MegaSku> result = new ArrayList<>(products.size());
+            for (ProductDetails product : products) {
+                result.add(convert(product));
             }
             return result;
         }

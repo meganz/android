@@ -78,6 +78,7 @@ import java.util.Set;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
@@ -153,7 +154,7 @@ public final class ChatAdvancedNotificationBuilder {
         this.context = context.getApplicationContext();
         this.notificationManager = notificationManager;
 
-        dbH = DatabaseHandler.getDbHandler(context);
+        dbH = DbHandlerModuleKt.getDbHandler();
         megaApi = MegaApplication.getInstance().getMegaApi();
         megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

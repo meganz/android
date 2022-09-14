@@ -59,7 +59,7 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
         val v = initView(inflater, container)
@@ -96,8 +96,8 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
             requireActivity(), tL, listView, this, transfersManagement)
 
         adapter?.isMultipleSelect = false
-        listView.adapter = adapter
-        listView.itemAnimator = noChangeRecyclerViewItemAnimator()
+        listView?.adapter = adapter
+        listView?.itemAnimator = noChangeRecyclerViewItemAnimator()
 
         itemTouchHelper = ItemTouchHelper(
             object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
@@ -137,7 +137,7 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
                 ) {
                     if (addElevation) {
                         recyclerView.post {
-                            listView.removeItemDecoration(itemDecoration)
+                            listView?.removeItemDecoration(itemDecoration)
                         }
                         val animator = viewHolder.itemView.animate()
                         viewHolder.itemView.translationZ =
@@ -150,7 +150,7 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
 
                     if (resetElevation) {
                         recyclerView.post {
-                            listView.addItemDecoration(itemDecoration)
+                            listView?.addItemDecoration(itemDecoration)
                         }
                         val animator = viewHolder.itemView.animate()
                         viewHolder.itemView.translationZ = 0f
@@ -276,6 +276,7 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
         adapter?.removeItemData(tL, index)
 
         if (tL.isEmpty()) {
+            activateActionMode()
             destroyActionMode()
             setEmptyView(tL.size)
             managerActivity.invalidateOptionsMenu()
@@ -321,12 +322,12 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
         }
     }
 
-    override fun onCreateActionMode() = checkScroll()
+    override fun onCreateActionMode() = updateElevation()
 
     override fun onDestroyActionMode() {
         clearSelections()
         adapter?.hideMultipleSelect()
-        checkScroll()
+        updateElevation()
     }
 
     override fun cancelTransfers() {
@@ -401,12 +402,10 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
         }
     }
 
-    override fun checkScroll() =
+    override fun updateElevation() =
         managerActivity.changeAppBarElevation(
-            (listView != null && listView.canScrollVertically(-1)) ||
-                    (adapter != null && adapter?.isMultipleSelect ?: false)
-        )
-
+            listView?.canScrollVertically(DEFAULT_SCROLL_DIRECTION) == true ||
+                    adapter?.isMultipleSelect == true)
 
     private fun setTransfers() {
         tL.clear()

@@ -29,20 +29,15 @@ enum class StartScreen(val id: Int) {
     /**
      * Shared items
      */
-    SharedItems(4),
+    SharedItems(4);
 
-    /**
-     * None
-     */
-    None(5);
-
-    companion object{
+    companion object {
         /**
-         * Return the correct start screen associated with the given id, or None if none matches
+         * Return the correct start screen associated with the given id, or null if none matches
          *
          * @param id
          *
          */
-        operator fun invoke(id: Int) = values().firstOrNull { it.id == id } ?: None
+        operator fun invoke(id: Int?) = values().firstOrNull { it.id == id }
     }
 }

@@ -1,25 +1,42 @@
 package mega.privacy.android.app.fragments.homepage.video
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
-import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
+import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * ViewModel associated to [VideoFragment]
+ *
+ * @param repository
+ * @param getCloudSortOrder
+ * @param monitorNodeUpdates
+ */
 @HiltViewModel
 class VideoViewModel @Inject constructor(
     private val repository: TypedFilesRepository,
-    private val sortOrderManagement: SortOrderManagement
+    private val getCloudSortOrder: GetCloudSortOrder,
+    monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel(), SearchCallback.Data {
 
     private var _query = MutableLiveData<String>()
@@ -40,6 +57,11 @@ class VideoViewModel @Inject constructor(
 
     private var cancelToken: MegaCancelToken? = null
 
+    /**
+     * Sort order used in the search function
+     */
+    private var sortOrder: Int = 1
+
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate || repository.fileNodeItems.value == null) {
             viewModelScope.launch {
@@ -47,7 +69,7 @@ class VideoViewModel @Inject constructor(
                 repository.getFiles(
                     cancelToken!!,
                     FILE_TYPE_VIDEO,
-                    sortOrderManagement.getOrderCloud()
+                    sortOrder,
                 )
             }
         } else {
@@ -78,12 +100,9 @@ class VideoViewModel @Inject constructor(
         filteredNodes
     }
 
-    private val nodesChangeObserver = Observer<Boolean> {
-        if (it) {
-            loadVideo(true)
-        } else {
+    private val nodesChangeObserver = Observer<Boolean> { forceUpdate ->
+        if (!forceUpdate)
             refreshUi()
-        }
     }
 
     private val loadFinishedObserver = Observer<List<NodeItem>> {
@@ -95,10 +114,21 @@ class VideoViewModel @Inject constructor(
     }
 
     init {
+        viewModelScope.launch {
+            sortOrder = getCloudSortOrder()
+            loadVideo(true)
+        }
+
         items.observeForever(loadFinishedObserver)
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
             .observeForever(nodesChangeObserver)
-        loadVideo(true)
+
+        viewModelScope.launch {
+            monitorNodeUpdates().collectLatest {
+                Timber.d("Received node update")
+                loadVideo(true)
+            }
+        }
     }
 
     /**

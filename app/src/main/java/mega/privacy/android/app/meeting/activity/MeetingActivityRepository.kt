@@ -11,6 +11,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.MeetingAvatarListener
 import mega.privacy.android.app.utils.AvatarUtil
@@ -33,6 +34,7 @@ class MeetingActivityRepository @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context,
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway,
 ) {
 
     /**
@@ -176,13 +178,11 @@ class MeetingActivityRepository @Inject constructor(
      * @param device AudioDevice
      */
     fun switchSpeaker(device: AppRTCAudioManager.AudioDevice) {
-        if (MegaApplication.getInstance().audioManager != null) {
-            Timber.d("Switch the speaker")
-            MegaApplication.getInstance().audioManager.selectAudioDevice(
-                device,
-                false
-            )
-        }
+        Timber.d("Switch the speaker")
+        rtcAudioManagerGateway.audioManager?.selectAudioDevice(
+            device,
+            false
+        )
     }
 
     /**

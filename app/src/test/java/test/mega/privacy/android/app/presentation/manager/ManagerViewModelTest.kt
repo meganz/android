@@ -25,11 +25,12 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.domain.entity.ContactRequest
-import mega.privacy.android.domain.entity.ContactRequestStatus
+import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
+import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
@@ -54,6 +55,7 @@ class ManagerViewModelTest {
     private val monitorContactRequestUpdates = mock<MonitorContactRequestUpdates>()
     private val sendStatisticsMediaDiscovery = mock<SendStatisticsMediaDiscovery>()
     private val savedStateHandle = SavedStateHandle(mapOf())
+    private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -79,6 +81,7 @@ class ManagerViewModelTest {
             hasInboxChildren = hasInboxChildren,
             sendStatisticsMediaDiscovery = sendStatisticsMediaDiscovery,
             savedStateHandle = savedStateHandle,
+            monitorMyAvatarFile = monitorMyAvatarFile,
             ioDispatcher = StandardTestDispatcher()
         )
     }

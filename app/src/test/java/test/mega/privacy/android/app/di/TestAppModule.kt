@@ -6,7 +6,6 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.flow.emptyFlow
-import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.AppModule
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
@@ -32,9 +31,6 @@ object TestAppModule {
 
     @Provides
     fun provideMegaChatApi(): MegaChatApiAndroid = mock()
-
-    @Provides
-    fun provideDbHandler(): DatabaseHandler = mock()
 
     @Provides
     fun providePreferences(): SharedPreferences = mock()

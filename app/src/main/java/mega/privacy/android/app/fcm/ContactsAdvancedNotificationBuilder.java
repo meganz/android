@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.main.ManagerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -79,7 +80,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     public ContactsAdvancedNotificationBuilder(Context context, NotificationManager notificationManager, MegaApiAndroid megaApi) {
         this.context = context.getApplicationContext();
         this.notificationManager = notificationManager;
-        dbH = DatabaseHandler.getDbHandler(context);
+        dbH = DbHandlerModuleKt.getDbHandler();
         this.megaApi = megaApi;
     }
 

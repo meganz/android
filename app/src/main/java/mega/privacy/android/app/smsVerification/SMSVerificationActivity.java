@@ -36,9 +36,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
 import mega.privacy.android.app.main.CountryCodePickerActivity;
 import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -53,6 +57,7 @@ import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaStringListMap;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class SMSVerificationActivity extends PasscodeActivity implements View.OnClickListener, MegaRequestListenerInterface {
 
     public static final String SELECTED_COUNTRY_CODE = "COUNTRY_CODE";
@@ -70,6 +75,9 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
     private boolean pendingSelectingCountryCode = false;
     private String inferredCountryCode;
     private String bonusStorageSMS = "GB";
+
+    @Inject
+    MegaChatRequestHandler chatRequestHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -281,7 +289,7 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
                        If the account is trying to login,
                        at this stage should set isLoggingRunning as `false` to indicate the login process is ended.
                      */
-                    MegaApplication.getInstance().setIsLoggingRunning(false);
+                    chatRequestHandler.setIsLoggingRunning(false);
                     megaApi.logout();
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:

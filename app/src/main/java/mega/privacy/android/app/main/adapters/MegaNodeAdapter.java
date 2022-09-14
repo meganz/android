@@ -83,6 +83,7 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.databinding.SortByHeaderBinding;
+import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.main.ContactFileListActivity;
 import mega.privacy.android.app.main.ContactFileListFragment;
@@ -597,7 +598,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         this.adapterType = adapterType;
         this.fragment = fragment;
 
-        dbH = DatabaseHandler.getDbHandler(context);
+        dbH = DbHandlerModuleKt.getDbHandler();
 
         switch (type) {
             case CONTACT_FILE_ADAPTER: {

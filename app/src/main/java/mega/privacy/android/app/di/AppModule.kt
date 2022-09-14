@@ -14,7 +14,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.BuildConfig
-import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.utils.threadpool.MegaThreadFactory
 import mega.privacy.android.domain.usecase.DefaultGetThemeMode
@@ -84,12 +83,6 @@ class AppModule {
     @Provides
     fun provideMegaChatApi(@MegaApi megaApi: MegaApiAndroid): MegaChatApiAndroid {
         return MegaChatApiAndroid(megaApi)
-    }
-
-    @Singleton
-    @Provides
-    fun provideDbHandler(@ApplicationContext context: Context): DatabaseHandler {
-        return DatabaseHandler.getDbHandler(context)
     }
 
     @Singleton

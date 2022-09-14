@@ -102,8 +102,10 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
         super.onStart()
 
         val dialog = dialog ?: return
-        BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
-            BottomSheetBehavior.STATE_HALF_EXPANDED
+        BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).run {
+            state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            maxWidth = ViewGroup.LayoutParams.MATCH_PARENT
+        }
     }
 
     override fun onResume() {
