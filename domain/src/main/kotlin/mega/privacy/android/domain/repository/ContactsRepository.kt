@@ -71,4 +71,16 @@ interface ContactsRepository {
      * @return [ContactData] containing the updated data.
      */
     suspend fun getContactData(contactItem: ContactItem): ContactData
+
+    /**
+     * Updates the contact list with the received contact updates.
+     *
+     * @param outdatedContactList Outdated contact list.
+     * @param contactUpdates      Map with all contact updates.
+     * @return The updated contact list.
+     */
+    suspend fun applyContactUpdates(
+        outdatedContactList: List<ContactItem>,
+        contactUpdates: UserUpdate,
+    ): List<ContactItem>
 }

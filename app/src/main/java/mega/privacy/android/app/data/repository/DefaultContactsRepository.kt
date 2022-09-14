@@ -14,6 +14,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiUtils
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes
 import mega.privacy.android.app.data.extensions.failWithError
+import mega.privacy.android.app.data.extensions.findItemByHandle
+import mega.privacy.android.app.data.extensions.getDecodedAliases
+import mega.privacy.android.app.data.extensions.replaceIfExists
 import mega.privacy.android.app.data.extensions.sortList
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
@@ -35,6 +38,8 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -357,6 +362,116 @@ class DefaultContactsRepository @Inject constructor(
         { request: MegaRequest, error: MegaError ->
             if (error.errorCode == MegaError.API_OK) {
                 continuation.resumeWith(Result.success(request.text))
+            } else {
+                continuation.failWithError(error)
+            }
+        }
+
+    override suspend fun applyContactUpdates(
+        outdatedContactList: List<ContactItem>,
+        contactUpdates: UserUpdate,
+    ): List<ContactItem> {
+        val updatedList = outdatedContactList.toMutableList()
+
+        contactUpdates.changes.forEach { (userId, changes) ->
+            var updatedContact = outdatedContactList.findItemByHandle(userId.id)
+            val megaUser = megaApiGateway.getContact(megaApiGateway.userHandleToBase64(userId.id))
+
+            if (changes.isEmpty()
+                && (megaUser == null || megaUser.visibility != MegaUser.VISIBILITY_VISIBLE)
+            ) {
+                updatedList.removeIf { (handle) -> handle == userId.id }
+            } else if (megaUser != null) {
+                if (updatedContact == null && megaUser.visibility == MegaUser.VISIBILITY_VISIBLE) {
+                    updatedContact = getVisibleContact(megaUser)
+                    updatedList.add(updatedContact)
+                }
+
+                if (changes.contains(UserChanges.Alias)) {
+                    runCatching { getAliases() }.fold(
+                        onSuccess = { aliases -> aliases },
+                        onFailure = { null }
+                    )?.let { aliases ->
+                        outdatedContactList.forEach { (userHandle) ->
+                            val updatedAlias = updatedList.findItemByHandle(userHandle)
+                                ?.copy(alias = if (aliases.containsKey(userHandle)) aliases[userHandle] else null)
+
+                            if (updatedAlias != null) {
+                                updatedList.replaceIfExists(updatedAlias.copy(
+                                    defaultAvatarContent = getAvatarFirstLetter(
+                                        updatedAlias.alias ?: updatedAlias.fullName
+                                        ?: updatedAlias.email)))
+                            }
+                        }
+                    }
+                }
+
+                if (changes.contains(UserChanges.Firstname) || changes.contains(UserChanges.Lastname)) {
+                    val fullName = getFullName(megaUser.email)
+                    updatedContact = updatedContact?.copy(fullName = fullName)
+                }
+
+                if (changes.contains(UserChanges.Email)) {
+                    updatedContact = updatedContact?.copy(email = megaUser.email)
+                }
+
+                if (changes.contains(UserChanges.Avatar)) {
+                    val avatarUri = getAvatarUri(megaUser.email, "${megaUser.email}.jpg")
+                    updatedContact = updatedContact?.copy(avatarUri = avatarUri)
+                }
+
+                if (updatedContact != null) {
+                    updatedList.replaceIfExists(updatedContact.copy(
+                        defaultAvatarContent = getAvatarFirstLetter(
+                            updatedContact.alias ?: updatedContact.fullName
+                            ?: updatedContact.email)))
+                }
+            }
+        }
+
+        return updatedList.sortList().toMutableList()
+    }
+
+    private suspend fun getVisibleContact(megaUser: MegaUser): ContactItem {
+        val fullName = getFullName(megaUser.email)
+        val alias = getAlias(megaUser.handle)
+        val status = megaChatApiGateway.getUserOnlineStatus(megaUser.handle)
+        val lastSeen = if (status == MegaChatApi.STATUS_ONLINE) {
+            context.getFormattedStringOrDefault(R.string.online_status)
+        } else {
+            megaChatApiGateway.requestLastGreen(megaUser.handle)
+            null
+        }
+
+        return contactItemMapper(
+            megaUser,
+            fullName,
+            alias,
+            getAvatarFirstLetter(alias ?: fullName ?: megaUser.email),
+            megaApiGateway.getUserAvatarColor(megaUser),
+            megaApiGateway.areCredentialsVerified(megaUser),
+            status,
+            getAvatarUri(megaUser.email, "${megaUser.email}.jpg"),
+            lastSeen
+        )
+    }
+
+    private suspend fun getAliases(): Map<Long, String> = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.myUser?.let {
+                megaApiGateway.getUserAttribute(it, MegaApiJava.USER_ATTR_ALIAS,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onRequestGetAliasesCompleted(continuation)
+                    )
+                )
+            }
+        }
+    }
+
+    private fun onRequestGetAliasesCompleted(continuation: Continuation<Map<Long, String>>) =
+        { request: MegaRequest, error: MegaError ->
+            if (error.errorCode == MegaError.API_OK) {
+                continuation.resumeWith(Result.success(request.megaStringMap.getDecodedAliases()))
             } else {
                 continuation.failWithError(error)
             }
