@@ -572,4 +572,19 @@ interface MegaApiGateway {
      * @return True in, else not in
      */
     suspend fun isInRubbish(node: MegaNode): Boolean
+
+    /**
+     * Gets all contacts of this MEGA account.
+     *
+     * @return List of [MegaUser] with all the contacts.
+     */
+    suspend fun getContacts(): List<MegaUser>
+
+    /**
+     * Checks if credentials are verified for the given user.
+     *
+     * @param megaUser [MegaUser] of the contact whose credentials want to be checked.
+     * @return True if verified, false otherwise.
+     */
+    suspend fun areCredentialsVerified(megaUser: MegaUser): Boolean
 }
