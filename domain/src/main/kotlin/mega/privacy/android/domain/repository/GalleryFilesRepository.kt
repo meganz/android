@@ -12,5 +12,5 @@ interface GalleryFilesRepository {
      * Gets a fow of list of all files of gallery
      * @return: Flow of List of @FileGalleryItem
      */
-    suspend fun getAllGalleryFiles(): Flow<List<FileGalleryItem>>
+    fun getAllGalleryFiles(): Flow<List<FileGalleryItem>>
 }

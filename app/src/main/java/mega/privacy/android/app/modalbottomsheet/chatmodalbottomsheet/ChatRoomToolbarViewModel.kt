@@ -2,23 +2,19 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet
 
 import android.Manifest
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.domain.entity.chat.FileGalleryItem
-import mega.privacy.android.app.main.megachat.usecase.GetGalleryFilesUseCase
 import mega.privacy.android.app.utils.FileUtil
-import timber.log.Timber
+import mega.privacy.android.domain.usecase.GetAllGalleryFiles
 import javax.inject.Inject
 
 
 @HiltViewModel
 class ChatRoomToolbarViewModel @Inject constructor(
-    private val getGalleryFilesUseCase: GetGalleryFilesUseCase,
+    private val getAllGalleryFiles: GetAllGalleryFiles,
 ) : BaseRxViewModel() {
 
     private val _filesGallery =
@@ -130,14 +126,9 @@ class ChatRoomToolbarViewModel @Inject constructor(
             addTakePicture(emptyFiles)
 
             if (_hasReadStoragePermissionsGranted.value) {
-                getGalleryFilesUseCase.getFiles()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onNext = ::addFilesToList,
-                        onError = Timber::e
-                    )
-                    .addTo(composite)
+                getAllGalleryFiles().map { list ->
+                    addFilesToList(list)
+                }
             }
         }
     }
