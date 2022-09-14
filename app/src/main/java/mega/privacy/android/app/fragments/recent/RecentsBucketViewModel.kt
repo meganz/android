@@ -6,9 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -65,15 +67,12 @@ class RecentsBucketViewModel @Inject constructor(
      */
     val shouldCloseFragment: LiveData<Boolean> = _shouldCloseFragment
 
-    private val _items =
-        bucket.map {
-            getNodes(it) ?: emptyList()
-        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
     /**
      *  List of node items in the current bucket
      */
-    val items: StateFlow<List<NodeItem>> = _items
+    val items = bucket
+        .map { it?.let { getNodes(it) } ?: emptyList() }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 
     init {
@@ -254,23 +253,28 @@ class RecentsBucketViewModel @Inject constructor(
      *
      * @return a list of NodeItem
      */
-    private suspend fun getNodes(bucket: MegaRecentActionBucket?): List<NodeItem>? =
+    private suspend fun getNodes(bucket: MegaRecentActionBucket): List<NodeItem> =
         withContext(ioDispatcher) {
-            if (bucket == null) {
-                return@withContext null
+            val size = bucket.nodes.size()
+            val deferredNodeItems = mutableListOf<Deferred<NodeItem>>().apply {
+                for (i in 0 until size) {
+                    val node = bucket.nodes[i]
+                    add(
+                        async {
+                            NodeItem(
+                                node = node,
+                                thumbnail = getThumbnail(node.handle),
+                                index = -1,
+                                isVideo = node.isVideo(),
+                                modifiedDate = node.modificationTime.toString(),
+                            )
+                        }
+                    )
+                }
             }
 
-            val size = bucket.nodes.size()
-            val nodesList = ArrayList<NodeItem>(size)
-            for (i in 0 until size) {
-                val node = bucket.nodes[i]
-                nodesList.add(NodeItem(
-                    node = node,
-                    thumbnail = getThumbnail.invoke(node.handle),
-                    index = -1,
-                    isVideo = node.isVideo(),
-                    modifiedDate = node.modificationTime.toString(),
-                ))
+            val nodesList = ArrayList<NodeItem>(size).apply {
+                addAll(deferredNodeItems.awaitAll())
             }
 
             return@withContext nodesList
