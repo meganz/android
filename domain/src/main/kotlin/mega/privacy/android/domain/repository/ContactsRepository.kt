@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.user.UserLastGreen
@@ -54,4 +55,11 @@ interface ContactsRepository {
      * @return A flow of [OnlineStatus].
      */
     fun monitorChatOnlineStatusUpdates(): Flow<OnlineStatus>
+
+    /**
+     * Gets visible contacts.
+     *
+     * @return A list with all visible contacts.
+     */
+    suspend fun getVisibleContacts(): List<ContactItem>
 }

@@ -378,4 +378,8 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getChildren(parentNodes: MegaNodeList, order: Int): List<MegaNode> =
         megaApi.getChildren(parentNodes, order)
 
+    override suspend fun getContacts(): List<MegaUser> = megaApi.contacts
+
+    override suspend fun areCredentialsVerified(megaUser: MegaUser): Boolean =
+        megaApi.areCredentialsVerified(megaUser)
 }
