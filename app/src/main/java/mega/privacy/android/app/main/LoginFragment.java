@@ -1453,7 +1453,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 if (numberOfClicksKarere == CLICKS_ENABLE_DEBUG) {
                     if (loggingSettings.areKarereLogsEnabled()) {
                         numberOfClicksKarere = 0;
-                        loggingSettings.setStatusLoggerKarere(requireContext(), false);
+                        loggingSettings.setStatusLoggerKarere(requireActivity(), false);
                     } else {
                         ((LoginActivity) context).showConfirmationEnableLogsKarere();
                     }
@@ -1467,7 +1467,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 if (numberOfClicksSDK == CLICKS_ENABLE_DEBUG) {
                     if (loggingSettings.areSDKLogsEnabled()) {
                         numberOfClicksSDK = 0;
-                        loggingSettings.setStatusLoggerSDK(requireContext(), false);
+                        loggingSettings.setStatusLoggerSDK(requireActivity(), false);
                     } else {
                         ((LoginActivity) context).showConfirmationEnableLogsSDK();
                     }
