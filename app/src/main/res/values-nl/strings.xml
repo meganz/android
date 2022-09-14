@@ -2164,8 +2164,6 @@
     <string name="title_file_explorer_send_link">Link verzenden naar &#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Versturen naar&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">Uploaden  naar&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">Meer</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2467,8 +2465,6 @@
     <string name="allow_access_contact_explanation">MEGA zal deze gegevens niet voor andere doeleinden gebruiken en zal nooit zonder uw toestemming met uw contacten communiceren.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Bied toegang tot uw microfoon om gecodeerde oproepen te maken.</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">Toegang verlenen</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Gedeelde bestanden</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3198,10 +3194,6 @@
     <string name="file_created">Bestand aangemaakt</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Het maken van het bestand is mislukt. Probeer het opnieuw.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">Bestand opgeslagen in %1$s</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">Bestand niet opgeslagen in %1$s. Probeer het nogmaals.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Bestand bijgewerkt</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -4006,4 +3998,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">Hoor een geluid wanneer iemand aansluit of de oproep verlaat.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Niet nu</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">Bestand opgeslagen naar Cloud schijf.</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">Bestand niet opgeslagen naar Cloud schijf. Probeer nogmaals.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Diavoorstelling</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">Kies type</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">Alle media</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">Items weergeven van</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">Alle locaties</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">Cloud schijf</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">Geen [B]media[/B] gevonden</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">Geen [B]afbeeldingen[/B] gevonden</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">Geen [B]video\’s[/B] gevonden</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">Niet nu</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">Ontvang een melding</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA stuurt u bel-, gesprek- en bestandsoverdrachtmeldingen.</string>
 </resources>

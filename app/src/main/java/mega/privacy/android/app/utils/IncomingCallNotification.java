@@ -21,13 +21,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.AskForDisplayOverActivity;
+import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity;
 
 public class IncomingCallNotification {
 
     private static final int TO_SYSTEM_SETTING_ID = 13992;
-
-    public static final int INCOMING_CALL_NOTI_ID = 13993;
 
     public static final String INCOMING_CALL_CHANNEL_ID = "incoming_call_channel_id";
     public static final String INCOMING_CALL_CHANNEL_NAME = "Incoming call";

@@ -63,7 +63,7 @@
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
     <string name="secondary_media_service_error_local_folder">Folderul media secundar nu există, te rugăm să alegi un folder nou</string>
     <!-- when no external card exists -->
-    <string name="no_external_SD_card_detected">Nicio stocare externă detectată</string>
+    <string name="no_external_SD_card_detected">Niciun spațiu stocare externă detectat</string>
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">Deconectează-te</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -141,7 +141,7 @@
     <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
     <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
-    <string name="new_to_mega">Ești nou pe MEGA?</string>
+    <string name="new_to_mega">Ești utilizator nou pe MEGA?</string>
     <!-- button that allows the user to create an account -->
     <string name="create_account">Creează un cont</string>
     <!-- when the user tries to log in MEGA without typing the email -->
@@ -183,7 +183,7 @@
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Înțeleg că [B]dacă îmi pierd parola, se poate să îmi pierd datele[/B]. Citește mai multe despre [A]criptarea capăt-la-capăt MEGA[/A].</string>
     <!-- warning dialog -->
-    <string name="create_account_no_terms">Trebuie să accepți Termenii de utilizare a serviciului nostru</string>
+    <string name="create_account_no_terms">Trebuie să accepți Termenii noștri de utilizare a serviciului</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Trebuie să fii de acord cu faptul că înțelegi pericolul pierderii parolei</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
@@ -239,7 +239,7 @@
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
     <string name="tab_incoming_shares">Primite</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
-    <string name="tab_outgoing_shares">Efectuate</string>
+    <string name="tab_outgoing_shares">Trimise</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Linkuri</string>
     <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
@@ -2213,8 +2213,6 @@
     <string name="title_file_explorer_send_link">Trimite linkul către&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Trimite către&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">Încarcă către&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">Mai multe</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2486,7 +2484,7 @@
         <item quantity="other">%d de participanți</item>
     </plurals>
     <!--  -->
-    <string name="custom_subtitle_of_group_chat">%1$s și încă %2$d</string>
+    <string name="custom_subtitle_of_group_chat">%1$s și alți %2$d</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Înainte de a putea genera un link pentru acest chat, trebuie să setezi o descriere:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
@@ -2525,8 +2523,6 @@
     <string name="allow_access_contact_explanation">MEGA nu va folosi aceste date în alt scop și nu va interacționa niciodată cu contactele tale fără consimțământul tău.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Permite accesul la microfon pentru a efectua apeluri criptate.</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">Acordă acces</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Fișiere partajate</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3281,10 +3277,6 @@
     <string name="file_created">Fișier creat</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Crearea fișierului a eșuat. Te rugăm să încerci din nou.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">Fișier salvat în %1$s</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">Fișier nesalvat în %1$s. Încearcă din nou.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Fișier actualizat</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -4111,4 +4103,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">Hear a sound when someone joins or leaves a call.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Nu acum</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">File saved to Cloud drive.</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">File not saved to Cloud drive. Try again.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Expunere de diapozitive</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">Alege tipul</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">Toate media</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">Show items from</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">Toate locațiile</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">Unitate cloud</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">No [B]media[/B] found</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">No [B]images[/B] found</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">No [B]videos[/B] found</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">Nu acum</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">Get notified</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA will send you call, chat, and file transfer notifications.</string>
 </resources>
