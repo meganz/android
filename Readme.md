@@ -33,7 +33,7 @@ Export  `NDK_ROOT`  variable or create a symbolic link at  `${HOME}/android-ndk`
 
 `ln -s /path/to/ndk ${HOME}/android-ndk`
 
-#### 3.2 MACOS
+#### 3.2 MacOS
 
 Install NDK r21d by Android Studio following [these instructions](https://developer.android.com/studio/projects/install-ndk#specific-version) (pay attention to the bottom-right `Show Package Details` checkbox to display the available versions. Latest version tested: NDK r21d, version number: 21.3.6528147)
 
@@ -53,7 +53,7 @@ Export  `ANDROID_HOME`  variable or create a symbolic link at  `${HOME}/android-
 
 `ln -s /path/to/sdk ${HOME}/android-sdk`
 
-#### 4.2 MACOS
+#### 4.2 MacOS
 
 Export  `ANDROID_HOME`  variable or create a symbolic link at  `${HOME}/android-sdk`  to point to your Android SDK installation path.
 
@@ -73,7 +73,7 @@ You can use the path in Android Studio, which you can find in  `Preferences > Bu
 
 `ln -s /path/to/jdk ${HOME}/android-java`
 
-#### 5.2 MACOS
+#### 5.2 MacOS
 
 Export  `JAVA_HOME`  variable or create a symbolic link at  `${HOME}/android-java`  to point to your Java installation path.
 
@@ -95,7 +95,7 @@ Before running the SDK building script, install the required packages. For examp
 
 `sudo apt install build-essential swig automake libtool autoconf cmake ninja-build`
 
-#### 7.2 MACOS
+#### 7.2 MacOS
 
 Before running the SDK building script, install the required dependencies via HomeBrew:
 
