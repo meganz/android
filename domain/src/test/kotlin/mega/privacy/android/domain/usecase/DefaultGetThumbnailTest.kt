@@ -26,7 +26,7 @@ class DefaultGetThumbnailTest {
     }
 
     @Test
-    fun `test that if thumbnail is in local then return local thumbnail`() = runTest {
+    fun `test that if local thumbnail exist then return local thumbnail`() = runTest {
         val expected = mock<File>()
         whenever(imageRepository.getThumbnailFromLocal(any())).thenReturn(expected)
 
@@ -34,16 +34,17 @@ class DefaultGetThumbnailTest {
     }
 
     @Test
-    fun `test that if thumbnail is not in local then return thumbnail from server`() = runTest {
-        val expected = mock<File>()
-        whenever(imageRepository.getThumbnailFromLocal(any())).thenReturn(null)
-        whenever(imageRepository.getThumbnailFromServer(any())).thenReturn(expected)
+    fun `test that if local thumbnail does not exist then return thumbnail from server`() =
+        runTest {
+            val expected = mock<File>()
+            whenever(imageRepository.getThumbnailFromLocal(any())).thenReturn(null)
+            whenever(imageRepository.getThumbnailFromServer(any())).thenReturn(expected)
 
-        assertThat(underTest.invoke(any())).isEqualTo(expected)
-    }
+            assertThat(underTest.invoke(any())).isEqualTo(expected)
+        }
 
     @Test
-    fun `test that if thumbnail if an error is thwrown when retrieving from local or server then return null`() =
+    fun `test that if local thumbnail does not exist and an error is thrown when retrieving from server then return null`() =
         runTest {
             whenever(imageRepository.getThumbnailFromLocal(any())).thenReturn(null)
             whenever(imageRepository.getThumbnailFromServer(any())).thenThrow(MegaException(null,
