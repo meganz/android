@@ -6,14 +6,11 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
-import mega.privacy.android.app.di.IoDispatcher
+import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.domain.repository.GalleryFilesRepository
@@ -22,10 +19,8 @@ import javax.inject.Inject
 
 /**
  * The repository implementation class regarding gallery files
- * @param ioDispatcher IODispatcher
  */
 class DefaultGalleryFilesRepository @Inject constructor(
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
 ) : GalleryFilesRepository {
 
@@ -36,37 +31,29 @@ class DefaultGalleryFilesRepository @Inject constructor(
         const val DATA = "_data"
     }
 
-    override fun getAllGalleryFiles(): Flow<List<FileGalleryItem>> {
-        return callbackFlow {
+    override fun getAllGalleryFiles(): Flow<List<FileGalleryItem>> =
+        callbackFlow {
             val files = mutableListOf<FileGalleryItem>()
-
             fetchVideos()
-                .filter { file ->
-                    !files.contains(file)
-                }.map { file ->
-                    Timber.d("************ Recuperado 1 video")
+                .collectLatest { file ->
                     files.add(file)
                     trySend(files.sortedByDescending { it.dateAdded })
                 }
 
             fetchImages()
-                .filter { file ->
-                    !files.contains(file)
-                }.map { file ->
-                    Timber.d("************ Recuperado 1 imagen")
+                .collectLatest { file ->
                     files.add(file)
                     trySend(files.sortedByDescending { it.dateAdded })
                 }
         }
-    }
 
     /**
      * Method to get the images from the gallery
      *
      * @return ArrayList<FileGalleryItem> List of images
      */
-    fun fetchImages(): Flow<FileGalleryItem> {
-        return callbackFlow {
+    private fun fetchImages(): Flow<FileGalleryItem> =
+        callbackFlow {
             val queryUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
             val projection = arrayOf(
@@ -119,17 +106,15 @@ class DefaultGalleryFilesRepository @Inject constructor(
 
             awaitClose { cancel() }
         }
-    }
 
     /**
      * Method to get the videos from the gallery
      *
      * @return ArrayList<FileGalleryItem> List of videos
      */
-    fun fetchVideos(): Flow<FileGalleryItem> {
-        return callbackFlow {
+    private fun fetchVideos(): Flow<FileGalleryItem> =
+        callbackFlow {
             val queryUri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-
             val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
             val projection = arrayOf(
                 MediaStore.Video.Media._ID,
@@ -185,7 +170,5 @@ class DefaultGalleryFilesRepository @Inject constructor(
             } ?: kotlin.run {
                 Timber.e("Cursor is null")
             }
-
         }
-    }
 }
