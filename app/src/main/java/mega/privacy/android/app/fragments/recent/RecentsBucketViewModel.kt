@@ -20,6 +20,7 @@ import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.domain.usecase.GetThumbnail
 import nz.mega.sdk.MegaApiAndroid
@@ -68,12 +69,16 @@ class RecentsBucketViewModel @Inject constructor(
     val shouldCloseFragment: LiveData<Boolean> = _shouldCloseFragment
 
     /**
+     * True if the parent of the bucket is an incoming shares
+     */
+    var isInShare = false
+
+    /**
      *  List of node items in the current bucket
      */
     val items = bucket
         .map { it?.let { getNodes(it) } ?: emptyList() }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
 
     init {
         viewModelScope.launch {
@@ -81,6 +86,12 @@ class RecentsBucketViewModel @Inject constructor(
                 Timber.d("Received node update")
                 updateCurrentBucket()
                 clearSelection()
+            }
+
+            items.collectLatest {
+                isInShare = it.firstOrNull()?.node?.let { node ->
+                    megaApi.getRootParentNode(node).isInShare
+                } ?: false
             }
         }
     }

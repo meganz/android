@@ -81,8 +81,6 @@ class RecentsBucketFragment : Fragment() {
 
     private val viewModel by viewModels<RecentsBucketViewModel>()
 
-    private var isInShareBucket: Boolean = false
-
     private val selectedBucketModel: SelectedBucketViewModel by activityViewModels()
 
     private lateinit var binding: FragmentRecentBucketBinding
@@ -123,11 +121,6 @@ class RecentsBucketFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.items.collectLatest {
-                    isInShareBucket =
-                        it.firstOrNull()?.node?.let { node ->
-                            megaApi.getRootParentNode(node).isInShare
-                        } ?: false
-
                     setupListView(it)
                     setupHeaderView()
                     setupFastScroller(it)
@@ -141,7 +134,11 @@ class RecentsBucketFragment : Fragment() {
             if (visible && actionMode == null) {
                 callManager { activity ->
                     val actionModeCallback =
-                        RecentsBucketActionModeCallback(activity, viewModel, isInShareBucket)
+                        RecentsBucketActionModeCallback(
+                            activity,
+                            viewModel,
+                            viewModel.isInShareBucket
+                        )
                     actionMode = activity.startSupportActionMode(actionModeCallback)
                     activity.setTextSubmitted()
                 }
