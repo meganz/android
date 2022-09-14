@@ -10,6 +10,7 @@ import mega.privacy.android.app.presentation.notification.model.mapper.getNotifi
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.AcknowledgeUserAlerts
 import mega.privacy.android.domain.usecase.DefaultMonitorUserAlerts
+import mega.privacy.android.domain.usecase.MonitorEvent
 import mega.privacy.android.domain.usecase.MonitorUserAlerts
 
 @Module
@@ -26,6 +27,10 @@ abstract class NotificationUseCases {
 
         @Provides
         fun provideNotificationMapper(): NotificationMapper = ::getNotification
+
+        @Provides
+        fun provideMonitorEventUpdate(repository: NotificationsRepository): MonitorEvent =
+            MonitorEvent(repository::monitorEvent)
     }
 
 }

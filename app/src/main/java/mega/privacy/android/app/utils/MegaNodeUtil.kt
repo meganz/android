@@ -221,7 +221,7 @@ object MegaNodeUtil {
     fun shareNode(
         context: Context,
         node: MegaNode?,
-        onExportFinishedListener: ExportListener.OnExportFinishedListener?,
+        onExportFinishedListener: (() -> Unit)?,
     ) {
         if (shouldContinueWithoutError(context, node)) {
             val path = getLocalFile(node)

@@ -753,7 +753,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
             canceled = true
             running = false
-            stopForeground(true)
+            stopForeground(STOP_FOREGROUND_REMOVE)
             cancelNotification()
             finish()
         }
@@ -1559,7 +1559,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         cuTransfers.clear()
         canceled = true
         running = false
-        stopForeground(true)
+        stopForeground(STOP_FOREGROUND_REMOVE)
         cancelNotification()
         stopSelf()
     }

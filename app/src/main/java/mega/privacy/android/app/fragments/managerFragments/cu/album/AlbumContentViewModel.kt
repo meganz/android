@@ -68,8 +68,6 @@ class AlbumContentViewModel @Inject constructor(
     private val _refreshCards = MutableLiveData(false)
     val refreshCards: LiveData<Boolean> = _refreshCards
 
-    private var cancelToken: FavouriteAlbumRepository.CancelCallback? = null
-
     /**
      * Custom condition in sub class for filter the real photos count
      */
@@ -104,9 +102,7 @@ class AlbumContentViewModel @Inject constructor(
     var items: LiveData<List<GalleryItem>> = liveDataRoot.switchMap {
         liveData(viewModelScope.coroutineContext) {
             if (forceUpdate) {
-                cancelToken = initNewSearch()
                 repository.getFiles(
-                    cancelToken ?: return@liveData,
                     getCameraSortOrder(),
                     mZoom
                 )
@@ -321,14 +317,5 @@ class AlbumContentViewModel @Inject constructor(
                 return it.size
             }
         return 0
-    }
-
-    fun initNewSearch(): FavouriteAlbumRepository.CancelCallback {
-        cancelSearch()
-        return repository.createCancelCallback()
-    }
-
-    fun cancelSearch() {
-        cancelToken?.cancel()
     }
 }

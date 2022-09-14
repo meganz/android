@@ -342,6 +342,7 @@ import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.AttachNodeToChatListener;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
@@ -374,6 +375,7 @@ import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatRoomToolbarBottomSheetDialogFragment;
@@ -560,6 +562,10 @@ public class ChatActivity extends PasscodeActivity
     GetPushToken getPushToken;
     @Inject
     ActivityLifecycleHandler activityLifecycleHandler;
+    @Inject
+    MegaChatRequestHandler chatRequestHandler;
+    @Inject
+    RTCAudioManagerGateway rtcAudioManagerGateway;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -3104,7 +3110,7 @@ public class ChatActivity extends PasscodeActivity
 
             loginIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(loginIntent);
-            app.setIsLoggingRunning(true);
+            chatRequestHandler.setIsLoggingRunning(true);
         }
 
         closeChat(true);
@@ -9759,7 +9765,7 @@ public class ChatActivity extends PasscodeActivity
     }
 
     private void createSpeakerAudioManger() {
-        rtcAudioManager = app.getAudioManager();
+        rtcAudioManager = rtcAudioManagerGateway.getAudioManager();
 
         if (rtcAudioManager == null) {
             speakerWasActivated = true;
@@ -9797,7 +9803,7 @@ public class ChatActivity extends PasscodeActivity
             if (call != null) {
                 if (!MegaApplication.getChatManagement().getSpeakerStatus(call.getChatid())) {
                     MegaApplication.getChatManagement().setSpeakerStatus(call.getChatid(), true);
-                    app.updateSpeakerStatus(true, AUDIO_MANAGER_CALL_IN_PROGRESS);
+                    rtcAudioManagerGateway.updateSpeakerStatus(true, AUDIO_MANAGER_CALL_IN_PROGRESS);
                 }
             } else {
                 rtcAudioManager.updateSpeakerStatus(true, AUDIO_MANAGER_PLAY_VOICE_CLIP);

@@ -24,9 +24,8 @@ class StartScreenViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(StartScreenSettingsState(
         options = StartScreen.values()
-            .filterNot { it == StartScreen.None }
             .mapNotNull(startScreenOptionMapper),
-        selectedScreen = StartScreen.None,
+        selectedScreen = null,
     ))
 
     val state: StateFlow<StartScreenSettingsState> = _state

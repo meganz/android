@@ -25,8 +25,8 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.domain.entity.ContactRequest
-import mega.privacy.android.domain.entity.ContactRequestStatus
+import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates

@@ -18,7 +18,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
@@ -33,6 +32,7 @@ import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
@@ -67,6 +67,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val answerCallUseCase: AnswerCallUseCase,
     getLocalAudioChangesUseCase: GetLocalAudioChangesUseCase,
     private val getCallUseCase: GetCallUseCase,
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
@@ -82,11 +83,8 @@ class MeetingActivityViewModel @Inject constructor(
     private val _cameraLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
     private val _speakerLiveData: MutableLiveData<AppRTCAudioManager.AudioDevice> =
         MutableLiveData<AppRTCAudioManager.AudioDevice>().apply {
-            value = if (MegaApplication.getInstance().audioManager == null) {
-                AppRTCAudioManager.AudioDevice.NONE
-            } else {
-                MegaApplication.getInstance().audioManager!!.selectedAudioDevice
-            }
+            val audioManager = rtcAudioManagerGateway.audioManager
+            value = audioManager?.selectedAudioDevice ?: AppRTCAudioManager.AudioDevice.NONE
         }
 
     val micLiveData: LiveData<Boolean> = _micLiveData

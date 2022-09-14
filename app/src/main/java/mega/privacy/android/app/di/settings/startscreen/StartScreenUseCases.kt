@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.settings.startscreen.StartScreenEve
 import mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenOptionMapper
 import mega.privacy.android.app.presentation.settings.startscreen.model.mapStartScreenOption
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.usecase.DefaultMonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.SetStartScreenPreference
 
@@ -63,11 +64,11 @@ class TempStartScreenUseCaseStaticModule {
     /**
      * Provide monitor start screen preference
      *
-     * @param repository
+     * @param useCase
      */
     @Provides
-    fun provideMonitorStartScreenPreference(repository: SettingsRepository): MonitorStartScreenPreference =
-        MonitorStartScreenPreference(repository::monitorPreferredStartScreen)
+    fun provideMonitorStartScreenPreference(useCase: DefaultMonitorStartScreenPreference): MonitorStartScreenPreference =
+        useCase
 }
 
 /**

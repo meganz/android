@@ -13,6 +13,7 @@ import mega.privacy.android.domain.repository.AlbumsRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
@@ -71,7 +72,10 @@ object TestRepositoryModule {
     fun bindDeviceRepository(): EnvironmentRepository = mock()
 
     @Provides
-    fun provideContactsRepository(): NotificationsRepository = mock()
+    fun provideContactsRepository(): ContactsRepository = mock()
+
+    @Provides
+    fun provideNotificationsRepository(): NotificationsRepository = mock()
 
     @Provides
     fun providePushesRepository(): PushesRepository = mock()

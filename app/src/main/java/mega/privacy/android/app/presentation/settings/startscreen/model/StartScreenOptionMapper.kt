@@ -49,5 +49,4 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
             icon = R.drawable.ic_shared,
         )
     }
-    StartScreen.None -> null
 }

@@ -1,7 +1,7 @@
 package mega.privacy.android.app.data.mapper
 
-import mega.privacy.android.domain.entity.ContactRequest
-import mega.privacy.android.domain.entity.ContactRequestStatus
+import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import nz.mega.sdk.MegaContactRequest
 
 /**

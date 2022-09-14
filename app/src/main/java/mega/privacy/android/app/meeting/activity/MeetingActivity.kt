@@ -28,6 +28,7 @@ import mega.privacy.android.app.meeting.fragments.JoinMeetingAsGuestFragment
 import mega.privacy.android.app.meeting.fragments.JoinMeetingFragment
 import mega.privacy.android.app.meeting.fragments.MakeModeratorFragment
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
@@ -76,6 +77,12 @@ class MeetingActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
+
+    /**
+     * Rtc audio manager gateway
+     */
+    @Inject
+    lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
 
     lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
@@ -404,21 +411,21 @@ class MeetingActivity : BaseActivity() {
      */
     private fun removeRTCAudioManager() {
         if (!meetingViewModel.isChatCreatedAndIParticipating()) {
-            MegaApplication.getInstance().removeRTCAudioManager()
+            rtcAudioManagerGateway.removeRTCAudioManager()
         }
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         return when (event.keyCode) {
             KeyEvent.KEYCODE_VOLUME_UP -> {
-                if (app?.isAnIncomingCallRinging == true) {
-                    app?.muteOrUnmute(false)
+                if (rtcAudioManagerGateway.isAnIncomingCallRinging) {
+                    rtcAudioManagerGateway.muteOrUnMute(false)
                 }
                 false
             }
             KeyEvent.KEYCODE_VOLUME_DOWN -> {
-                if (app?.isAnIncomingCallRinging == true) {
-                    app?.muteOrUnmute(true)
+                if (rtcAudioManagerGateway.isAnIncomingCallRinging) {
+                    rtcAudioManagerGateway.muteOrUnMute(true)
                 }
                 false
             }
