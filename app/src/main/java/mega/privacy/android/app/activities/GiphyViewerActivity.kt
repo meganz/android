@@ -78,7 +78,15 @@ class GiphyViewerActivity : PasscodeActivity() {
             binding.sendFab.setOnClickListener { sendGifToChat() }
         }
 
-        gifData = intent.getParcelableExtra(GIF_DATA)
+        gifData = with(intent) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getParcelableExtra(GIF_DATA, GifData::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                getParcelableExtra(GIF_DATA)
+            }
+        }
+
         updateGifDimensionsView()
 
         loadGif(binding.gifImage, binding.gifProgressBar, false, null, getOriginalGiphySrc(gifData?.webpUrl))
