@@ -101,6 +101,11 @@ interface MegaApiGateway {
     suspend fun areTransfersPaused(): Boolean
 
     /**
+     * Are upload transfers paused
+     */
+    suspend fun areUploadTransfersPaused(): Boolean
+
+    /**
      * Root node of the account
      *
      * All accounts have a root node, therefore if it is null the account has not been logged in or
