@@ -2,6 +2,7 @@ package mega.privacy.android.app.middlelayer.iar
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.preference.PreferenceManager
 import mega.privacy.android.app.MegaApplication
 import nz.mega.sdk.MegaApiJava
@@ -159,7 +160,12 @@ abstract class RatingHandler(val context: Context) {
     private fun getPreferenceKeyForRating(): String? {
         val pm = context.packageManager
         try {
-            val packageInfo = pm.getPackageInfo(context.packageName, 0)
+            val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                pm.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
+            } else {
+                @Suppress("DEPRECATION")
+                pm.getPackageInfo(context.packageName, 0)
+            }
             return PREFERENCE_SHOW_RATING + packageInfo.versionName
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()

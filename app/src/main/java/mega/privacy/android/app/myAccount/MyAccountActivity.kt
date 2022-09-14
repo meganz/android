@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -770,10 +771,14 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
      */
     private fun isAppStoreAvailable(): Boolean {
         return try {
-            packageManager.getPackageInfo(
-                BillingManagerImpl.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
-                PackageManager.GET_ACTIVITIES
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.getPackageInfo(BillingManagerImpl.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
+                    PackageManager.PackageInfoFlags.of(PackageManager.GET_ACTIVITIES.toLong()))
+            } else {
+                @Suppress("DEPRECATION")
+                packageManager.getPackageInfo(BillingManagerImpl.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
+                    PackageManager.GET_ACTIVITIES)
+            }
             true
         } catch (exception: PackageManager.NameNotFoundException) {
             false

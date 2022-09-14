@@ -44,6 +44,6 @@
             app:argType="long" />
         <argument
             android:name="uri"
-            app:argType="android.net.Uri" />
+            app:argType="string" />
     </fragment>
 </navigation>

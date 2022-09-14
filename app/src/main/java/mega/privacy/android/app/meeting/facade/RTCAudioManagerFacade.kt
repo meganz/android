@@ -34,9 +34,9 @@ class RTCAudioManagerFacade @Inject constructor(
             val action = intent.action ?: return
             val audioManager = rtcAudioManagerRingInCall ?: return
             if (action == Constants.VOLUME_CHANGED_ACTION) {
-                val type = intent.extras?.get(Constants.EXTRA_VOLUME_STREAM_TYPE) as? Int
+                val type = intent.extras?.getInt(Constants.EXTRA_VOLUME_STREAM_TYPE)
                 if (type != AudioManager.STREAM_RING) return
-                val newVolume = intent.extras?.get(Constants.EXTRA_VOLUME_STREAM_VALUE) as? Int
+                val newVolume = intent.extras?.getInt(Constants.EXTRA_VOLUME_STREAM_VALUE)
                 if (newVolume != null && newVolume != Constants.INVALID_VOLUME) {
                     audioManager.checkVolume(newVolume)
                 }

@@ -89,6 +89,9 @@ class MegaApiFacade @Inject constructor(
         megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ||
                 megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
 
+    override suspend fun areUploadTransfersPaused(): Boolean =
+        megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+
     override suspend fun getRootNode(): MegaNode? = megaApi.rootNode
 
     override suspend fun getRubbishBinNode(): MegaNode? = megaApi.rubbishNode
@@ -375,4 +378,8 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getChildren(parentNodes: MegaNodeList, order: Int): List<MegaNode> =
         megaApi.getChildren(parentNodes, order)
 
+    override suspend fun getContacts(): List<MegaUser> = megaApi.contacts
+
+    override suspend fun areCredentialsVerified(megaUser: MegaUser): Boolean =
+        megaApi.areCredentialsVerified(megaUser)
 }
