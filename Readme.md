@@ -21,18 +21,13 @@ This document will guide you to build the application on a Linux machine with An
 git clone --recursive https://github.com/meganz/android.git
 ```
 
-2. Install in your system the [Android NDK 21](https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip) (latest version tested: NDK r21d).
+### NDK Configuration
+|  Linux  <div style="width:500px"></div> 	|   MacOS	|
+|---	|---	|
+| Install in the system the **[Android NDK](https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip) [21](https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip)** (latest version tested: NDK r21d, version number: 21.3.6528147). | Install NDK r21d by Android Studio following [these instructions](https://developer.android.com/studio/projects/install-ndk#specific-version) (pay attention to the bottom-right `Show Package Details` checkbox to display the available versions. Latest version tested: NDK r21d, version number: 21.3.6528147) |
+| Export  `NDK_ROOT`  variable or create a symbolic link at `${HOME}/android-ndk`  to point to your Android NDK installation path. <br/><br/> `export NDK_ROOT=/path/to/ndk` <br/><br/> `ln -s /path/to/ndk ${HOME}/android-ndk` | Export `NDK_ROOT` variable or create a symbolic link at `${HOME}/android-ndk` to point to your Android NDK installation path.<br/><br/>Default macOS path: <br/> `export NDK_ROOT="/Users/YOUR_USER_NAME/Library/Android/sdk/ndk/21.3.6528147"`<br/><br/>`ln -s /path/to/ndk ${HOME}/android-ndk`
 
-3. Export `NDK_ROOT` variable or create a symbolic link at `${HOME}/android-ndk` to point to your Android NDK installation path.
-
-```
-export NDK_ROOT=/path/to/ndk
-```
-```
-ln -s /path/to/ndk ${HOME}/android-ndk
-```
-
-4. Export `ANDROID_HOME` variable or create a symbolic link at `${HOME}/android-sdk` to point your Android SDK installation path.
+1. Export `ANDROID_HOME` variable or create a symbolic link at `${HOME}/android-sdk` to point your Android SDK installation path.
 
 ```
 export ANDROID_HOME=/path/to/sdk
