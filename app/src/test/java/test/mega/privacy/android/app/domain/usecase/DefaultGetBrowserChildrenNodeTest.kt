@@ -7,8 +7,8 @@ import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRootFolder
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -52,7 +52,7 @@ class DefaultGetBrowserChildrenNodeTest {
     fun `test that -1L invoke getChildrenNode with result of getRootNode`() = runTest {
         val result = mock<MegaNode> {}
         whenever(getRootFolder()).thenReturn(result)
-        whenever(getCloudSortOrder()).thenReturn(MegaApiJava.ORDER_DEFAULT_ASC)
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC.value)
         underTest(-1L)
 
         verify(getChildrenNode).invoke(eq(result), any())
@@ -63,7 +63,7 @@ class DefaultGetBrowserChildrenNodeTest {
         val result = mock<MegaNode> {}
         val parentHandle = 0L
         whenever(getNodeByHandle(parentHandle)).thenReturn(result)
-        whenever(getCloudSortOrder()).thenReturn(MegaApiJava.ORDER_DEFAULT_ASC)
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC.value)
         underTest(parentHandle)
 
         verify(getChildrenNode).invoke(eq(result), any())
@@ -71,7 +71,7 @@ class DefaultGetBrowserChildrenNodeTest {
 
     @Test
     fun `test that underTest is invoked with value of get order sort management`() = runTest {
-        val sortOrder = MegaApiJava.ORDER_DEFAULT_ASC
+        val sortOrder = SortOrder.ORDER_DEFAULT_ASC.value
         whenever(getCloudSortOrder()).thenReturn(sortOrder)
         whenever(getRootFolder()).thenReturn(mock())
         underTest(-1L)

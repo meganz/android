@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolder
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import nz.mega.sdk.MegaNode
@@ -63,7 +64,7 @@ class FavouritesViewModelTest {
 
     @Test
     fun `test that start with loading state and there is no favourite item`() = runTest {
-        whenever(getCloudSortOrder()).thenReturn(1)
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC.value)
         whenever(getAllFavorites()).thenReturn(
             flowOf(emptyList())
         )
@@ -99,7 +100,7 @@ class FavouritesViewModelTest {
             isTakenDown = false,
         )
         val list = listOf(favourite)
-        whenever(getCloudSortOrder()).thenReturn(1)
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC.value)
         whenever(getAllFavorites()).thenReturn(
             flowOf(list)
         )
