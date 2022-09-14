@@ -3,8 +3,8 @@ package mega.privacy.android.app.di.transfers
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
 import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
@@ -21,7 +21,7 @@ import mega.privacy.android.domain.usecase.MonitorTransfersSize
  * Use cases to check on transfer status
  */
 @Module
-@InstallIn(ViewModelComponent::class, SingletonComponent::class)
+@InstallIn(ViewModelComponent::class, ServiceComponent::class)
 class TransfersModule {
 
     @Provides
