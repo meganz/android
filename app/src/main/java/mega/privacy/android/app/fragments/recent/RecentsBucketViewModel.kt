@@ -80,6 +80,7 @@ class RecentsBucketViewModel @Inject constructor(
             monitorNodeUpdates().collectLatest {
                 Timber.d("Received node update")
                 updateCurrentBucket()
+                clearSelection()
             }
         }
     }

@@ -81,7 +81,7 @@ class RecentsBucketFragment : Fragment() {
 
     private val viewModel by viewModels<RecentsBucketViewModel>()
 
-    var isInShareBucket: Boolean = false
+    private var isInShareBucket: Boolean = false
 
     private val selectedBucketModel: SelectedBucketViewModel by activityViewModels()
 
@@ -92,8 +92,6 @@ class RecentsBucketFragment : Fragment() {
     private var adapter: MultipleBucketAdapter? = null
 
     private var actionMode: ActionMode? = null
-
-    private lateinit var actionModeCallback: RecentsBucketActionModeCallback
 
     private lateinit var bucket: BucketSaved
 
@@ -123,17 +121,12 @@ class RecentsBucketFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.items.collectLatest {
-                    if (it.isNotEmpty()) {
-                        isInShareBucket =
-                            it[0].node?.let { it1 -> megaApi.getRootParentNode(it1).isInShare } == true
-                    }
-
-                    callManager { activity ->
-                        actionModeCallback =
-                            RecentsBucketActionModeCallback(activity, viewModel, isInShareBucket)
-                    }
+                    isInShareBucket =
+                        it.firstOrNull()?.node?.let { node ->
+                            megaApi.getRootParentNode(node).isInShare
+                        } ?: false
 
                     setupListView(it)
                     setupHeaderView()
@@ -147,6 +140,8 @@ class RecentsBucketFragment : Fragment() {
         viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
             if (visible && actionMode == null) {
                 callManager { activity ->
+                    val actionModeCallback =
+                        RecentsBucketActionModeCallback(activity, viewModel, isInShareBucket)
                     actionMode = activity.startSupportActionMode(actionModeCallback)
                     activity.setTextSubmitted()
                 }
