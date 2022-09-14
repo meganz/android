@@ -46,3 +46,7 @@ captures
 
 ## Transifex script project
 /transifex/
+
+## Generated Files
+*.DS_Store
+wget-log

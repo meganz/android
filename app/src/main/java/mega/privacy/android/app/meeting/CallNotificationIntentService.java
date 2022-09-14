@@ -16,6 +16,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
@@ -44,6 +45,9 @@ public class CallNotificationIntentService extends IntentService implements Hang
 
     @Inject
     AnswerCallUseCase answerCallUseCase;
+
+    @Inject
+    RTCAudioManagerGateway rtcAudioManagerGateway;
 
     MegaChatApiAndroid megaChatApi;
     MegaApiAndroid megaApi;
@@ -129,7 +133,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
             case IGNORE:
                 Timber.d("Ignore incoming call... ");
                 megaChatApi.setIgnoredCall(chatIdIncomingCall);
-                MegaApplication.getInstance().stopSounds();
+                rtcAudioManagerGateway.stopSounds();
                 clearIncomingCallNotification(callIdIncomingCall);
                 stopSelf();
                 break;

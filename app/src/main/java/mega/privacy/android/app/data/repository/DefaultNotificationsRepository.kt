@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.data.mapper.ContactRequestMapper
 import mega.privacy.android.app.data.mapper.EventMapper
 import mega.privacy.android.app.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
@@ -29,16 +28,11 @@ import kotlin.coroutines.suspendCoroutine
  */
 class DefaultNotificationsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
-    private val contactRequestMapper: ContactRequestMapper,
     private val userAlertsMapper: UserAlertMapper,
     private val eventMapper: EventMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : NotificationsRepository {
-
-    override fun monitorContactRequestUpdates() = megaApiGateway.globalUpdates
-        .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
-        .mapNotNull { it.requests?.map(contactRequestMapper) }
 
     override fun monitorUserAlerts() = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()

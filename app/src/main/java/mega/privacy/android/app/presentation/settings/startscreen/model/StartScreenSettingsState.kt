@@ -10,5 +10,5 @@ import mega.privacy.android.domain.entity.preference.StartScreen
  */
 data class StartScreenSettingsState(
     val options: List<StartScreenOption>,
-    val selectedScreen: StartScreen,
+    val selectedScreen: StartScreen?,
 )

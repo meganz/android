@@ -87,6 +87,7 @@ import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1361,8 +1362,8 @@ public class CallUtil {
      * @param callId           Call ID
      * @param typeAudioManager audio Manager type
      */
-    public static void ongoingCall(long chatId, long callId, int typeAudioManager) {
-        AppRTCAudioManager rtcAudioManager = MegaApplication.getInstance().getAudioManager();
+    public static void ongoingCall(RTCAudioManagerGateway rtcAudioManagerGateway, long chatId, long callId, int typeAudioManager) {
+        AppRTCAudioManager rtcAudioManager = rtcAudioManagerGateway.getAudioManager();
         if (rtcAudioManager != null && rtcAudioManager.getTypeAudioManager() == typeAudioManager)
             return;
 

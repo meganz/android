@@ -226,5 +226,4 @@ object AlertsAndWarnings {
                 setCancelable(false)
                 show()
             }
-
 }

@@ -125,16 +125,25 @@ class ChatRoomToolbarViewModel @Inject constructor(
      * Get images and videos from the gallery
      */
     private fun loadGallery() {
-        if (_hasReadStoragePermissionsGranted.value && filesGallery.value.isEmpty()) {
-            getGalleryFilesUseCase.get()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = ::addTakePicture,
-                    onError = Timber::e
-                )
-                .addTo(composite)
+        if (filesGallery.value.isEmpty()) {
+            val emptyFiles = mutableListOf<FileGalleryItem>()
+            addTakePicture(emptyFiles)
+
+            if (_hasReadStoragePermissionsGranted.value) {
+                getGalleryFilesUseCase.getFiles()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onNext = ::addFilesToList,
+                        onError = Timber::e
+                    )
+                    .addTo(composite)
+            }
         }
+    }
+
+    private fun addFilesToList(files: List<FileGalleryItem>) {
+        addTakePicture(files.toMutableList())
     }
 
     private fun createTakeAPictureOption(): FileGalleryItem {
