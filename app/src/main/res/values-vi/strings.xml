@@ -2115,8 +2115,6 @@
     <string name="title_file_explorer_send_link">Gửi liên kết đến&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Gửi đến&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">Tải lên tới&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">Thêm nữa</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2409,8 +2407,6 @@
     <string name="allow_access_contact_explanation">MEGA sẽ không bao giờ sử dụng dữ liệu này cho bất kỳ mục đích nào khác và không giao tiếp với người nào trong danh bạ của bạn mà không có sự cho phép.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Cho phép ứng dụng MEGA sử dụng micrôphone của điện thoại để thực hiện cuộc gọi khi bạn yêu cầu.</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">Cấp quyền</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Chia sẻ tệp tin</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -2824,7 +2820,7 @@
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Hết Không Gian Lưu Trữ</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
-    <string name="over_disk_quota_paywall_title">Dữ liệu sắp bị mất!</string>
+    <string name="over_disk_quota_paywall_title">Dữ liệu đang gặp rủi ro!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
         <item quantity="other">Chúng tôi đã gửi thông báo vào địa chỉ email %1$s của quý khách vào ngày %2$s và ngày %3$s, nhưng quý khách vẫn còn %4$s tệp tin chiếm tới %5$s trong tài khoản MEGA, quý khách cần phải nâng câp lên %6$s để đáp ứng dung lượng.</item>
@@ -3115,10 +3111,6 @@
     <string name="file_created">Tệp tin đã được tạo</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Tạo tệp tin thất bại. Xin thử lại.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">Tệp đã được lưu vào %1$s</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">Tệp tin chưa lưu vào %1$s được. Xin thử lại.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Tệp tin đã được cập nhật</string>
     <!-- Warning indicating a file was not updated successfully -->

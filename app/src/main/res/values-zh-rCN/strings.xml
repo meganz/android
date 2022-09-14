@@ -2115,8 +2115,6 @@
     <string name="title_file_explorer_send_link">发送链接给&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">发送到&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">上传到&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">更多</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2409,8 +2407,6 @@
     <string name="allow_access_contact_explanation">MEGA不会将这些数据用于任何其他目的，并且未经您的允许绝不会与您的联系人互动。</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">允许访问您的麦克风以进行加密通话。</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">授予权限</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">已分享文件</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3115,10 +3111,6 @@
     <string name="file_created">文件已创建</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">创建文件失败。请重试。</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">文件已保存到%1$s</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">文件未保存到%1$s。请重试。</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">文件已更新</string>
     <!-- Warning indicating a file was not updated successfully -->

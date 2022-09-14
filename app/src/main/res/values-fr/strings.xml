@@ -2213,8 +2213,6 @@
     <string name="title_file_explorer_send_link">Envoyer le lien à&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Envoyer à&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">Téléverser vers&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">Plus</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2525,8 +2523,6 @@
     <string name="allow_access_contact_explanation">MEGA n’utilisera pas ces données et n’interagira jamais avec vos contacts sans votre consentement.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Autorisez l’accès à votre microphone pour faire des appels chiffrés.</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">Accorder l’accès</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Fichiers partagés</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3281,10 +3277,6 @@
     <string name="file_created">Le fichier a été créé</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Erreur de création du fichier. Veuillez réessayer.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">Le fichier a été enregistré dans le %1$s</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">Le fichier n’a pas été enregistré dans le %1$s. Veuillez réessayer.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Le fichier a été mis à jour</string>
     <!-- Warning indicating a file was not updated successfully -->

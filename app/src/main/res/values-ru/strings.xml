@@ -1107,7 +1107,7 @@
     <!-- Label for the option of the sliding panel to edit the profile -->
     <string name="group_chat_edit_profile_label">Изменить профиль</string>
     <!-- Title of the section to leave a group content in the Contact Properties screen -->
-    <string name="title_properties_chat_leave_chat">Покинуть Группу</string>
+    <string name="title_properties_chat_leave_chat">Покинуть группу</string>
     <!-- Label for participants of a group chat -->
     <string name="participants_chat_label">Участники</string>
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
@@ -1613,7 +1613,7 @@
     <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="dialog_title_new_link">Название ссылки</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="context_new_link_name">URL ссылки</string>
+    <string name="context_new_link_name">Адрес ссылки</string>
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">ОБЪЕКТ</string>
     <!-- Title of the field email when a new contact is created to upload -->
@@ -2221,7 +2221,7 @@
     <!-- Title of the alert when the account have been logged out from another client -->
     <string name="title_alert_logged_out">Выйти из системы</string>
     <!-- Text shown to indicate user that his account has already been confirmed -->
-    <string name="account_confirmed">Ваша учётная запись активирована. Пожалуйста, авторизируйтесь.</string>
+    <string name="account_confirmed">Ваш аккаунт активирован. Пожалуйста, авторизируйтесь.</string>
     <!-- Text shown to indicate user that his account should be confirmed typing his password -->
     <string name="confirm_account">Пожалуйста, введите пароль, чтобы подтвердить свою учётную запись</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
@@ -2262,8 +2262,6 @@
     <string name="title_file_explorer_send_link">Отправить ссылку&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Отправить в&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">Загрузить в&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">Больше</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2583,8 +2581,6 @@
     <string name="allow_access_contact_explanation">MEGA не будет использовать эти данные для каких-либо других целей и никогда не будет взаимодействовать с вашими контактами без вашего согласия.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Разрешите доступ к микрофону для зашифрованных звонков.</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">Открыть доступ</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Общие файлы</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3361,13 +3357,9 @@
     <!-- Action discard -->
     <string name="discard_close_action">Отменить и закрыть</string>
     <!-- Label indicating a file was created successfully -->
-    <string name="file_created">Фйал создан</string>
+    <string name="file_created">Файл создан</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Не удалось создать файл. Пожалуйста, попробуйте ещё раз.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">Файл сохранён в %1$s</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">Файл не сохранён в %1$s. Попробуйте ещё раз.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Файл обновлён</string>
     <!-- Warning indicating a file was not updated successfully -->

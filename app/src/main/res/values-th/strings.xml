@@ -461,7 +461,7 @@
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">การสมัครสมาชิกของคุณยังไม่ถูกยกเลิก กรุณาระบุเหตุผลในการยกเลิกของคุณ</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
-    <string name="message_user_purchased_subscription_down_grade">การสมัครสมาชิกใหม่ของคุณจะมีผลเมื่อการสมัครสมาชิกปัจจุบันหมดอายุ ราคาใหม่จะถูกเรียกเก็บเงินในเวลานั้น</string>
+    <string name="message_user_purchased_subscription_down_grade">การสมัครใช้งานใหม่ของคุณจะมีผลก็ต่อเมื่อการสมัครใช้งานปัจจุบันหมดอายุลง ราคาใหม่ถึงจะถูกเรียกเก็บตามรอบเวลาเดิม</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
     <string name="message_user_payment_pending">การสมัครของคุณจะมีผลเมื่อ Google ดำเนินการชำระเงินแล้ว</string>
     <!--  -->
@@ -1435,7 +1435,7 @@
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">โบนัสคำเชิญ</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">ติดตั้งแอปของเราบนมือถือ</string>
+    <string name="title_install_app">ติดตั้งแอป MEGA บนมือถือ</string>
     <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
     <string name="title_add_phone">เพิ่มหมายเลขโทรศัพท์</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
@@ -2115,8 +2115,6 @@
     <string name="title_file_explorer_send_link">ส่งลิงก์ไปยัง&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">ส่งไปยัง&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">อัปโหลดไปที่&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">เพิ่มเติม</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2409,8 +2407,6 @@
     <string name="allow_access_contact_explanation">MEGA จะไม่ใช้ข้อมูลนี้เพื่อวัตถุประสงค์อื่นใดและจะไม่โต้ตอบกับผู้ติดต่อของคุณโดยไม่ได้รับความยินยอมจากคุณ</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">อนุญาตให้เข้าถึงไมโครโฟนของคุณ เพื่อให้โทรแบบเข้ารหัสได้</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">ให้สิทธิ์เข้าถึง</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">ไฟล์ที่ใช้ร่วมกัน</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -2789,7 +2785,7 @@
     <string name="general_date_label">เมื่อ %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
     <plurals name="alert_remove_several_shares">
-        <item quantity="other">ยกเลิกแชร์ %1$d โฟลเดอร์นี้หรือไม่</item>
+        <item quantity="other">ยกเลิกแชร์โฟลเดอร์ %1$d นี้หรือไม่</item>
     </plurals>
     <!-- Download location label -->
     <string name="download_location">ที่ตั้งดาวน์โหลด</string>
@@ -2870,7 +2866,7 @@
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">หมายเลขโทรศัพท์ของคุณถูกลบเรียบร้อยแล้ว</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
-    <string name="remove_phone_number_fail">ไม่สามารถลบหมายเลขโทรศัพท์ของคุณ</string>
+    <string name="remove_phone_number_fail">ไม่สามารถลบหมายเลขโทรศัพท์ของคุณได้</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
     <string name="search_hint">ค้นหาใน MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
@@ -3090,7 +3086,7 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">คุกกี้สำหรับประสิทธิภาพและการวิเคราะห์</string>
     <!-- Preference screen item summary -->
-    <string name="preference_cookies_performance_summary">ช่วยให้เราเข้าใจว่าคุณใช้บริการของเราอย่างไร และให้ข้อมูลที่เราสามารถใช้เพื่อปรับปรุง การไม่ยอมรับคุกกี้เหล่านี้จะทำให้เรามีข้อมูลเพื่อช่วยในการออกแบบการปรับปรุงผลิตภัณฑ์ของเราน้อยลง</string>
+    <string name="preference_cookies_performance_summary">ช่วยให้เราเข้าใจว่าคุณใช้บริการของเราอย่างไรและให้ข้อมูลที่เราสามารถใช้เพื่อปรับปรุงได้ การไม่ยอมรับคุกกี้เหล่านี้จะทำให้เรามีข้อมูลน้อยลงเพื่อช่วยปรับปรุงการออกแบบ</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">เปิดไว้เสมอ</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3115,10 +3111,6 @@
     <string name="file_created">สร้างไฟล์แล้ว</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">สร้างไฟล์ล้มเหลว กรุณาลองอีกครั้ง</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">บันทึกไฟล์ลงใน %1$s แล้ว</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">ไม่ได้บันทึกไฟล์ลงใน %1$s ลองอีกครั้ง</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">ไฟล์อัปเดตแล้ว</string>
     <!-- Warning indicating a file was not updated successfully -->

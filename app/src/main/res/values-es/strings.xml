@@ -2213,8 +2213,6 @@
     <string name="title_file_explorer_send_link">Enviar enlace a&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Enviar a&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">Subir a&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">Más</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2525,8 +2523,6 @@
     <string name="allow_access_contact_explanation">MEGA no utilizará estos datos para ningún otro propósito y nunca interactuará con tus contactos sin tu consentimiento.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Permite al acceso al micrófono para realizar llamadas cifradas.</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">Otorga acceso</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Archivos compartidos</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3281,10 +3277,6 @@
     <string name="file_created">Archivo creado</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">No se ha podido crear el archivo. Inténtalo de nuevo.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">Archivo guardado en %1$s</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">No se ha podido guardar el archivo en %1$s. Inténtalo de nuevo.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Archivo actualizado</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -3564,7 +3556,7 @@
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Toca para unirte a la reunión.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">Reunión MEGA</string>
+    <string name="title_tour_five">Reuniones en MEGA</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_five">Reunión cifrada punto a punto</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -4112,9 +4104,9 @@
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Ahora no</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
-    <string name="text_editor_creation_success">File saved to Cloud drive.</string>
+    <string name="text_editor_creation_success">Archivo guardado en la Nube.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
-    <string name="text_editor_creation_error">File not saved to Cloud drive. Try again.</string>
+    <string name="text_editor_creation_error">No se ha podido guardar el archivo en la Nube. Inténtalo de nuevo.</string>
     <!-- Action label to start images slideshow -->
     <string name="action_slideshow">Presentación</string>
     <!-- Filter page: Prompt to choose media type -->
