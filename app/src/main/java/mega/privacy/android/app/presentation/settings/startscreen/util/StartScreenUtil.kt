@@ -34,7 +34,7 @@ object StartScreenUtil {
     val SHARED_ITEMS_BNV = StartScreen.SharedItems.id
 
     @JvmField
-    val NO_BNV = StartScreen.None.id
+    val NO_BNV = 5
 
     private const val TIME_TO_SHOW_START_SCREEN_DIALOG = 604800000 //1 week in milliseconds
 
@@ -62,7 +62,7 @@ object StartScreenUtil {
      * @return The start bottom navigation item.
      */
     @JvmStatic
-    fun getStartBottomNavigationItem(): Int = getStartScreenOrHomeId()
+    fun getStartBottomNavigationItem(): Int = getStartScreenId()
 
     /**
      * Checks if should close the app because the current DrawerItem is the preferred start screen.
@@ -91,7 +91,7 @@ object StartScreenUtil {
             context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
 
         val doNotAlert = preferences.getBoolean(DO_NOT_ALERT_ABOUT_START_SCREEN, false)
-        val preferredScreen = getStartScreenOrHomeId()
+        val preferredScreen = getStartScreenId()
 
         if (doNotAlert || preferredScreen != HOME_BNV) {
             return false
@@ -103,10 +103,9 @@ object StartScreenUtil {
                 || System.currentTimeMillis().minus(timeStamp) >= TIME_TO_SHOW_START_SCREEN_DIALOG
     }
 
-    private fun getStartScreenOrHomeId() =
+    private fun getStartScreenId() =
         runBlocking {
             getMonitorStartScreenPreference()()
-                .map { if (it == StartScreen.None) StartScreen.Home else it }
                 .map { it.id }.first()
         }
 

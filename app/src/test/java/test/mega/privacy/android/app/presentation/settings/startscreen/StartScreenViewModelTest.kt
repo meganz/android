@@ -66,16 +66,15 @@ class StartScreenViewModelTest {
     fun `test that initial value has no screen selected`() = runTest {
         underTest.state.test {
             val (_, selectedScreen) = awaitItem()
-            assertThat(selectedScreen).isEqualTo(StartScreen.None)
+            assertThat(selectedScreen).isNull()
         }
     }
 
     @Test
-    fun `test that all values except None is included as an option`() = runTest {
+    fun `test that all values are included as an option`() = runTest {
         underTest.state.test {
             val (options, _) = awaitItem()
-            assertThat(options.map { it.startScreen }).containsExactlyElementsIn(StartScreen.values()
-                .filterNot { it == StartScreen.None })
+            assertThat(options.map { it.startScreen }).containsExactlyElementsIn(StartScreen.values())
         }
     }
 
