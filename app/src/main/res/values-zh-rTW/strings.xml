@@ -211,7 +211,7 @@
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">離線</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
-    <string name="location_label">%1$s (%2$s)</string>
+    <string name="location_label">%1$s（%2$s）</string>
     <!-- title of the screen that shows all the shared items -->
     <string name="title_shared_items">共享檔案</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
@@ -219,7 +219,7 @@
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
     <string name="section_contacts">聯絡人</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
-    <string name="section_contacts_with_notification">聯絡人 [A](%1$d)[/A]</string>
+    <string name="section_contacts_with_notification">聯絡人 [A]（%1$d）[/A]</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
     <string name="sent_requests_empty">[B]沒有[/B][A]發送的邀請[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
@@ -1998,7 +1998,7 @@
     <!-- Title of the section Archived chats -->
     <string name="archived_chats_title_section">已封存的對話</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">封存對話 (%d)</string>
+    <string name="archived_chats_show_option">封存對話（%d）</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">封存對話</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
@@ -2115,8 +2115,6 @@
     <string name="title_file_explorer_send_link">發送連結到⋯</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">寄到⋯</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">上傳到⋯</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">更多</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2246,9 +2244,9 @@
     <!-- Subtitle of the historic notification when an user blocks you as contact -->
     <string name="subtitle_contact_notification_blocked">[A]%s[/A][B]已封鎖您。[/B]</string>
     <!-- Item of the navigation title for the notification section when there is any unread -->
-    <string name="section_notification_with_unread">[A](%1$d)[/A]則通知</string>
+    <string name="section_notification_with_unread">[A]（%1$d）[/A]則通知</string>
     <!-- Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown -->
-    <string name="section_notification_user_with_nickname">[A]%1$s (%2$s)[/A]</string>
+    <string name="section_notification_user_with_nickname">[A]%1$s（%2$s）[/A]</string>
     <!-- Title of the historic notification for an account deleted -->
     <string name="title_account_notification_deleted">帳戶已刪除</string>
     <!-- Subtitle of the historic notification for an account deleted -->
@@ -2409,8 +2407,6 @@
     <string name="allow_access_contact_explanation">MEGA不會將這些資料用於任何其他目的，並且未經您的同意絕不會與您的聯絡人互動。</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">允許存取麥克風以進行加密通話。</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">同意存取</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">共享的檔案</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3115,10 +3111,6 @@
     <string name="file_created">檔案已建立</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">檔案建立牧敗。請再試一次。</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">檔案已儲存到%1$s</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">檔案未儲存到%1$s。再試一次。</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">檔案已更新</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -3126,7 +3118,7 @@
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">檔案太大而無法開啟或預覽。</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
-    <string name="file_without_extension">檔案沒有副檔名 (.%1$s)</string>
+    <string name="file_without_extension">檔案沒有副檔名（.%1$s）</string>
     <!-- Error shown when the user writes a file name without extension -->
     <string name="file_without_extension_warning">您需要輸入副檔名才能繼續</string>
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
@@ -3901,4 +3893,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">當有人加入或離開通話時播放提示音</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">稍後再說</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">檔案已儲存到雲端硬碟。</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">檔案未儲存到雲端硬碟。請重試。</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">投影播放</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">選擇類型</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">所有媒體</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">顯示來自以下的項目</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">所有位置</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">雲端硬碟</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">未找到[B]媒體[/B]</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">找不到[B]圖片[/B]</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">找不到[B]影片[/B]</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">稍後再說</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">開啟通知</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA將會向您發送通話、聊天和檔案傳輸的通知。</string>
 </resources>

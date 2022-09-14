@@ -2115,8 +2115,6 @@
     <string name="title_file_explorer_send_link">リンクの送信先&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">送信先&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">アップロード先&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">詳細</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2409,8 +2407,6 @@
     <string name="allow_access_contact_explanation">MEGAはこのデータを他の目的に使用せず、あなたの同意なしにあなたの連絡先とやり取りすることは絶対にございません。</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">あなたのマイクへのアクセスを許可して、暗号化通話を行います。</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">アクセスを許可</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">共有ファイル</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3115,10 +3111,6 @@
     <string name="file_created">ファイルが作成されました</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">ファイルの作成に失敗しました。もう一度やり直してください。</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">ファイルが%1$sに保存されました</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">ファイルが%1$sに保存されませんでした。もう一度お試しください。</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">ファイルが更新されました</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -3901,4 +3893,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">誰かが通話に参加または退出したときに音を聞きます。</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">今はやめます</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">ファイルがクラウドドライブに保存されました。</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">ファイルがクラウドドライブに保存されませんでした。もう一度試してみてください。</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">スライドショー</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">種類を選択</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">すべてのメディア</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">以下の項目を表示する</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">すべての場所</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">クラウドドライブ</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">[B]メディア[/B]が見つかりません</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">[B]画像[/B]が見つかりません</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">[B]動画[/B]が見つかりません</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">今はやめます</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">通知を受け取る</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGAは通話、チャット、ファイル転送の通知を送信します。</string>
 </resources>
