@@ -184,7 +184,7 @@ class ImageSlideshowFragment : Fragment() {
             STARTED -> {
                 binding.btnPlay.isVisible = false
                 binding.btnPause.isVisible = true
-                viewModel.switchToolbar(false)
+                viewModel.showToolbar(false)
             }
             NEXT -> {
                 binding.btnPlay.isVisible = false
@@ -199,7 +199,7 @@ class ImageSlideshowFragment : Fragment() {
             STOPPED -> {
                 binding.btnPause.isVisible = false
                 binding.btnPlay.isVisible = true
-                viewModel.switchToolbar(true)
+                viewModel.showToolbar(true)
             }
         }
     }

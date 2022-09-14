@@ -1,6 +1,5 @@
 package mega.privacy.android.app.imageviewer
 
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -9,6 +8,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -339,8 +339,15 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         if (savedInstanceState == null) {
             if (!Fresco.hasBeenInitialized()) Fresco.initialize(this)
             binding.root.post {
-                dragToExit?.runEnterAnimation(intent, binding.root) { startAnimation ->
-                    changeToolbarVisibility(!startAnimation)
+                dragToExit?.runEnterAnimation(intent, binding.root) { activate ->
+                    viewModel.showToolbar(!activate)
+                    binding.imagesNavHostFragment.setBackgroundColor(ContextCompat.getColor(this@ImageViewerActivity,
+                        if (activate) {
+                            android.R.color.transparent
+                        } else {
+                            R.color.white_black
+                        })
+                    )
                 }
             }
         }
@@ -447,7 +454,18 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     private fun setupAttachers(savedInstanceState: Bundle?) {
-        dragToExit = DragToExitSupport(this, { changeToolbarVisibility(!it) }) {
+        dragToExit = DragToExitSupport(this, { activate ->
+            binding.root.post {
+                viewModel.showToolbar(!activate)
+                binding.imagesNavHostFragment.setBackgroundColor(ContextCompat.getColor(this@ImageViewerActivity,
+                    if (activate) {
+                        android.R.color.transparent
+                    } else {
+                        R.color.white_black
+                    })
+                )
+            }
+        }) {
             finish()
             overridePendingTransition(0, android.R.anim.fade_out)
         }
@@ -467,14 +485,25 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     /**
      * Change toolbar visibility with animation.
      *
-     * @param show                  Show or hide toolbar/bottombar
+     * @param show  Show or hide toolbar/bottombar
      */
     private fun changeToolbarVisibility(show: Boolean) {
-        binding.toolbar.post {
-            val value = if (!show) -binding.toolbar.height.toFloat() else 0f
-            ObjectAnimator.ofFloat(binding.toolbar, "translationY", value).apply {
-                duration = 250
-                start()
+        binding.toolbar.apply {
+            post {
+                val newAlpha: Float
+                val newTranslationY: Float
+                if (show) {
+                    newAlpha = 1f
+                    newTranslationY = 0f
+                } else {
+                    newAlpha = 0f
+                    newTranslationY = -height.toFloat()
+                }
+                animate()
+                    .alpha(newAlpha)
+                    .translationY(newTranslationY)
+                    .setDuration(250)
+                    .start()
             }
         }
     }
@@ -498,11 +527,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         return super.onPrepareOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val imageItem = viewModel.getCurrentImageItem() ?: return true
-        val nodeItem = imageItem.nodeItem ?: return true
-
-        return when (item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
+        when (item.itemId) {
             android.R.id.home -> {
                 onBackPressedDispatcher.onBackPressed()
                 true
@@ -511,23 +537,24 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 getNavController().navigate(ImageViewerFragmentDirections.actionViewerToSlideshow())
                 true
             }
-            R.id.action_forward -> {
-                nodeItem.node?.let(::attachNode)
+            R.id.action_forward, R.id.action_send_to_chat -> {
+                viewModel.getCurrentImageItem()?.nodeItem?.node?.let(::attachNode)
                 true
             }
             R.id.action_share -> {
+                val imageItem = viewModel.getCurrentImageItem()
                 when {
+                    imageItem == null ->
+                        Timber.w("Image Item is null")
                     imageItem is ImageItem.OfflineNode ->
-                        OfflineUtils.shareOfflineNode(this, nodeItem.handle)
+                        OfflineUtils.shareOfflineNode(this, imageItem.nodeItem!!.handle)
                     imageItem.imageResult?.fullSizeUri?.toFile()?.exists() == true ->
                         FileUtil.shareFile(this, imageItem.imageResult!!.fullSizeUri!!.toFile())
                     imageItem is ImageItem.PublicNode ->
                         MegaNodeUtil.shareLink(this, imageItem.nodePublicLink)
                     imageItem.nodeItem?.node != null ->
                         viewModel.exportNode(imageItem.nodeItem!!.node!!).observe(this) { link ->
-                            if (!link.isNullOrBlank()) {
-                                MegaNodeUtil.shareLink(this, link)
-                            }
+                            if (!link.isNullOrBlank()) MegaNodeUtil.shareLink(this, link)
                         }
                     else ->
                         Timber.w("Node cannot be shared")
@@ -535,31 +562,32 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_download -> {
-                viewModel.executeTransfer {
-                    if (nodeItem.isAvailableOffline) {
-                        saveOfflineNode(nodeItem.handle)
-                    } else if (nodeItem.node != null) {
-                        saveNode(nodeItem.node)
+                viewModel.getCurrentImageItem()?.nodeItem?.let { nodeItem ->
+                    viewModel.executeTransfer {
+                        if (nodeItem.isAvailableOffline) {
+                            saveOfflineNode(nodeItem.handle)
+                        } else if (nodeItem.node != null) {
+                            saveNode(nodeItem.node)
+                        }
                     }
                 }
                 true
             }
             R.id.action_get_link -> {
-                LinksUtil.showGetLinkActivity(this, nodeItem.handle)
-                true
-            }
-            R.id.action_send_to_chat -> {
-                nodeItem.node?.let(::attachNode)
+                viewModel.getCurrentImageItem()?.nodeItem?.handle?.let { nodeHandle ->
+                    LinksUtil.showGetLinkActivity(this, nodeHandle)
+                }
                 true
             }
             R.id.action_more -> {
-                bottomSheet = ImageBottomSheetDialogFragment.newInstance(imageItem.id)
-                    .apply { show(supportFragmentManager) }
+                bottomSheet = viewModel.getCurrentImageItem()?.id?.let { itemId ->
+                    ImageBottomSheetDialogFragment.newInstance(itemId)
+                        .apply { show(supportFragmentManager) }
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
 
     fun saveNode(node: MegaNode) {
         PermissionUtils.checkNotificationsPermission(this)

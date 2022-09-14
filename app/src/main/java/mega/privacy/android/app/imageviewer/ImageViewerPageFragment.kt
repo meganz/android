@@ -119,7 +119,9 @@ class ImageViewerPageFragment : Fragment() {
                 setTapListener(
                     MultiTapGestureListener(
                         this,
-                        onSingleTapCallback = viewModel::switchToolbar,
+                        onSingleTapCallback = {
+                            viewModel.showToolbar(!viewModel.isToolbarShown())
+                        },
                         onZoomCallback = {
                             if (!hasZoomBeenTriggered) {
                                 hasZoomBeenTriggered = true
@@ -131,7 +133,7 @@ class ImageViewerPageFragment : Fragment() {
             } else {
                 setTapListener(object : GestureDetector.SimpleOnGestureListener() {
                     override fun onSingleTapUp(e: MotionEvent): Boolean {
-                        viewModel.switchToolbar()
+                        viewModel.showToolbar(!viewModel.isToolbarShown())
                         return true
                     }
 
@@ -146,7 +148,7 @@ class ImageViewerPageFragment : Fragment() {
                     }
                 })
                 setOnClickListener {
-                    viewModel.switchToolbar()
+                    viewModel.showToolbar(!viewModel.isToolbarShown())
                 }
             }
         }
@@ -276,7 +278,7 @@ class ImageViewerPageFragment : Fragment() {
     private fun showVideoButton() {
         if (binding.btnVideo.isVisible && viewModel.isToolbarShown()) return
 
-        viewModel.switchToolbar(true)
+        viewModel.showToolbar(true)
         binding.btnVideo.setOnClickListener { launchVideoScreen() }
         binding.btnVideo.isVisible = true
         binding.image.apply {

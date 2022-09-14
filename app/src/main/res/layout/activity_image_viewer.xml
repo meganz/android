@@ -11,6 +11,7 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white_black"
         app:defaultNavHost="true"
         tools:navGraph="@navigation/nav_image_viewer" />
 

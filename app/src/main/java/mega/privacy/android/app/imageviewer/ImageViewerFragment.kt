@@ -6,7 +6,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -102,8 +101,6 @@ class ImageViewerFragment : Fragment() {
             setPageTransformer(MarginPageTransformer(resources.getDimensionPixelSize(R.dimen.image_viewer_pager_margin)))
             adapter = pagerAdapter
         }
-
-        binding.motion.post { binding.motion.transitionToEnd() }
     }
 
     private fun setupObservers() {
@@ -165,25 +162,47 @@ class ImageViewerFragment : Fragment() {
     /**
      * Change bottomBar visibility with animation.
      *
-     * @param show                  Show or hide toolbar/bottombar
-     * @param enableTransparency    Enable transparency change
+     * @param show  Show or hide toolbar/bottombar
      */
-    private fun changeBottomBarVisibility(show: Boolean, enableTransparency: Boolean = false) {
-        binding.motion.post {
-            val color: Int
-            if (show) {
-                color = R.color.white_black
-                binding.motion.transitionToEnd()
-            } else {
-                color = android.R.color.black
-                binding.motion.transitionToStart()
-            }
-            binding.motion.setBackgroundColor(ContextCompat.getColor(requireContext(),
-                if (enableTransparency && !show) {
-                    android.R.color.transparent
+    private fun changeBottomBarVisibility(show: Boolean) {
+        binding.root.post {
+            val newAlpha = if (show) 1f else 0f
+            binding.bgBottom.apply {
+                val newTranslationY = if (show) {
+                    0f
                 } else {
-                    color
-                }))
+                    height.toFloat()
+                }
+                animate()
+                    .alpha(newAlpha)
+                    .translationY(newTranslationY)
+                    .setDuration(250)
+                    .start()
+            }
+            binding.txtTitle.apply {
+                val newTranslationY = if (show) {
+                    0f
+                } else {
+                    height.toFloat()
+                }
+                animate()
+                    .alpha(newAlpha)
+                    .translationY(newTranslationY)
+                    .setDuration(250)
+                    .start()
+            }
+            binding.txtPageCount.apply {
+                val newTranslationY = if (show) {
+                    0f
+                } else {
+                    height.toFloat()
+                }
+                animate()
+                    .alpha(newAlpha)
+                    .translationY(newTranslationY)
+                    .setDuration(250)
+                    .start()
+            }
         }
     }
 }
