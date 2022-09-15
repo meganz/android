@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactData
 import mega.privacy.android.domain.usecase.GetVisibleContacts
@@ -59,4 +60,8 @@ class ContactsModule {
     @Provides
     fun provideApplyContactUpdates(contactsRepository: ContactsRepository): ApplyContactUpdates =
         ApplyContactUpdates(contactsRepository::applyContactUpdates)
+
+    @Provides
+    fun provideAddNewContacts(contactsRepository: ContactsRepository): AddNewContacts =
+        AddNewContacts(contactsRepository::addNewContacts)
 }

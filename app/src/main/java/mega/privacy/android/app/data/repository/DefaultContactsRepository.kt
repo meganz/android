@@ -476,4 +476,22 @@ class DefaultContactsRepository @Inject constructor(
                 continuation.failWithError(error)
             }
         }
+
+    override suspend fun addNewContacts(
+        outdatedContactList: List<ContactItem>,
+        newContacts: List<ContactRequest>,
+    ): List<ContactItem> {
+        val updatedList = outdatedContactList.toMutableList()
+
+        newContacts.forEach { contactRequest ->
+            if (updatedList.find { contact -> contact.email == contactRequest.sourceEmail } == null) {
+                val megaUser = megaApiGateway.getContact(contactRequest.sourceEmail)
+                if (megaUser != null) {
+                    updatedList.add(getVisibleContact(megaUser))
+                }
+            }
+        }
+
+        return updatedList.sortList()
+    }
 }
