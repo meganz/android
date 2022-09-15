@@ -254,7 +254,12 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
     private fun stopForeground() {
         isForeground = false
-        stopForeground(STOP_FOREGROUND_REMOVE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
         mNotificationManager?.cancel(Constants.NOTIFICATION_CHAT_UPLOAD)
         stopSelf()
     }
