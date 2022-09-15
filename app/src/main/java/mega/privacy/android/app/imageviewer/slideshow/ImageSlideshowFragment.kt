@@ -190,14 +190,15 @@ class ImageSlideshowFragment : Fragment() {
 
     private fun enterFullScreenMode(enable: Boolean) {
         if (enable) {
+            binding.root.setBackgroundResource(R.color.black)
             activity?.window?.decorView?.let { ViewCompat.getWindowInsetsController(it) }?.apply {
                 systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                 hide(WindowInsetsCompat.Type.systemBars())
             }
         } else {
-            activity?.window?.decorView?.let { ViewCompat.getWindowInsetsController(it) }?.apply {
-                show(WindowInsetsCompat.Type.systemBars())
-            }
+            binding.root.background = null
+            activity?.window?.decorView?.let { ViewCompat.getWindowInsetsController(it) }
+                ?.show(WindowInsetsCompat.Type.systemBars())
         }
     }
 

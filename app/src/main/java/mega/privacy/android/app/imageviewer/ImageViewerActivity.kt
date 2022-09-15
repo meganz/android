@@ -338,13 +338,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             binding.root.post {
                 dragToExit?.runEnterAnimation(intent, binding.root) { activate ->
                     viewModel.showToolbar(!activate)
-                    binding.imagesNavHostFragment.setBackgroundColor(ContextCompat.getColor(this@ImageViewerActivity,
-                        if (activate) {
-                            android.R.color.transparent
-                        } else {
-                            R.color.white_black
-                        })
-                    )
+                    val color = if (activate) android.R.color.transparent else R.color.white_black
+                    binding.imagesNavHostFragment.setBackgroundResource(color)
                 }
             }
         }
@@ -456,16 +451,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         dragToExit = DragToExitSupport(this, { activate ->
             if (activate) {
                 dragStarted = true
+                binding.imagesNavHostFragment.setBackgroundResource(android.R.color.transparent)
                 viewModel.showToolbar(false)
-                binding.imagesNavHostFragment.setBackgroundColor(
-                    ContextCompat.getColor(this@ImageViewerActivity, android.R.color.transparent)
-                )
             } else if (dragStarted) {
                 dragStarted = false
+                binding.imagesNavHostFragment.setBackgroundResource(R.color.white_black)
                 viewModel.showToolbar(true)
-                binding.imagesNavHostFragment.setBackgroundColor(
-                    ContextCompat.getColor(this@ImageViewerActivity, R.color.white_black)
-                )
             }
         }) {
             finish()
