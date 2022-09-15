@@ -16,7 +16,6 @@ import mega.privacy.android.app.contacts.requests.ContactRequestsFragment.Compan
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestListAdapter
 import mega.privacy.android.app.contacts.requests.dialog.ContactRequestBottomSheetDialogFragment
 import mega.privacy.android.app.databinding.PageContactRequestsBinding
-import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
@@ -37,7 +36,7 @@ class ContactRequestsPageFragment : Fragment() {
 
     private lateinit var binding: PageContactRequestsBinding
 
-    private val isOutgoing by extraNotNull(EXTRA_IS_OUTGOING, false)
+    private val isOutgoing by lazy { arguments?.getBoolean(EXTRA_IS_OUTGOING, false) ?: false }
     private val viewModel by viewModels<ContactRequestsViewModel>({ requireParentFragment() })
     private val adapter by lazy { ContactRequestListAdapter(::onRequestClick) }
 
