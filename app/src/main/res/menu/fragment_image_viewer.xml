@@ -11,7 +11,8 @@
         android:title="@string/action_slideshow"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        tools:visible="true" />
 
     <item
         android:id="@+id/action_forward"
@@ -20,7 +21,8 @@
         android:title="@string/forward_menu_item"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        tools:visible="true" />
 
     <item
         android:id="@+id/action_share"
@@ -29,7 +31,8 @@
         android:title="@string/general_share"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        tools:visible="true" />
 
     <item
         android:id="@+id/action_download"
@@ -38,7 +41,8 @@
         android:title="@string/general_save_to_device"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        tools:visible="true" />
 
     <item
         android:id="@+id/action_get_link"
@@ -47,7 +51,8 @@
         android:title="@{@plurals/get_links(one)}"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        tools:visible="true" />
 
     <item
         android:id="@+id/action_send_to_chat"
@@ -56,7 +61,8 @@
         android:title="@string/context_send_file_to_chat"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        tools:visible="true" />
 
     <item
         android:id="@+id/action_more"
@@ -65,5 +71,6 @@
         android:title="@string/label_more"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        tools:visible="true" />
 </menu>

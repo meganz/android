@@ -24,5 +24,5 @@ class ImageViewerAdapter(
         getItem(position).id
 
     override fun containsItem(itemId: Long): Boolean =
-        getCurrentList().any { itemId == it.id }
+        getCurrentList().any { it.id == itemId }
 }
