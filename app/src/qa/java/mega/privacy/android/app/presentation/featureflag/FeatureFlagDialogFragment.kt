@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.featureflag
 import android.app.Dialog
 import android.os.Bundle
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
