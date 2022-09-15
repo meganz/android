@@ -7,34 +7,33 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.core.text.HtmlCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
-import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment
 import mega.privacy.android.app.fragments.managerFragments.actionMode.TransfersActionBarCallBack
 import mega.privacy.android.app.interfaces.MoveTransferInterface
 import mega.privacy.android.app.listeners.MoveTransferListener
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransfer.STATE_COMPLETING
 import timber.log.Timber
-import java.util.Collections
-import javax.inject.Inject
 
 /**
  * The Fragment is used for displaying the transfer list.
@@ -43,13 +42,7 @@ import javax.inject.Inject
 class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectModeInterface,
     TransfersActionBarCallBack.TransfersActionCallback, MoveTransferInterface {
 
-    @MegaApi
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
-
     private var adapter: MegaTransfersAdapter? = null
-
-    private val tL = mutableListOf<MegaTransfer>()
 
     private var actionMode: ActionMode? = null
 
@@ -61,142 +54,38 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
         savedInstanceState: Bundle?,
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
+        return initView(inflater, container)
+    }
 
-        val v = initView(inflater, container)
-
-        emptyImage.setImageResource(
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.transfersEmptyImage.setImageResource(
             if (Util.isScreenInPortrait(requireContext())) {
                 R.drawable.empty_transfer_portrait
             } else R.drawable.empty_transfer_landscape)
 
-        var textToShow = StringResourcesUtils.getString(R.string.transfers_empty_new)
+        binding.transfersEmptyText.text = TextUtil.formatEmptyScreenText(requireContext(),
+            getString(R.string.transfers_empty_new))
 
-        try {
-            textToShow = textToShow.replace("[A]",
-                "<font color=\'${
-                    getColorHexString(requireContext(),
-                        R.color.grey_900_grey_100)
-                }\'>")
-            textToShow = textToShow.replace("[/A]", "</font>")
-            textToShow = textToShow.replace("[B]",
-                "<font color=\'${
-                    getColorHexString(requireContext(),
-                        R.color.grey_300_grey_600)
-                }\'>")
-            textToShow = textToShow.replace("[/B]", "</font>")
-        } catch (e: Exception) {
-            Timber.w(e, "Exception formatting string")
+        setupFlow()
+        viewModel.setActiveTransfers((requireActivity() as ManagerActivity).transfersInProgress)
+
+        binding.transfersListView.let { recyclerView ->
+            adapter = MegaTransfersAdapter(requireActivity(),
+                viewModel.getActiveTransfers(),
+                recyclerView,
+                this,
+                viewModel)
+
+            adapter?.isMultipleSelect = false
+            recyclerView.adapter = adapter
+            recyclerView.itemAnimator = noChangeRecyclerViewItemAnimator()
         }
 
-        emptyText.text = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY)
-
-        setTransfers()
-
-        adapter = MegaTransfersAdapter(
-            requireActivity(), tL, listView, this, transfersManagement)
-
-        adapter?.isMultipleSelect = false
-        listView?.adapter = adapter
-        listView?.itemAnimator = noChangeRecyclerViewItemAnimator()
-
-        itemTouchHelper = ItemTouchHelper(
-            object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
-                private var addElevation = true
-                private var resetElevation = false
-                private var draggedTransfer: MegaTransfer? = null
-                private var newPosition = 0
-
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder,
-                ): Boolean {
-                    val posDragged = viewHolder.absoluteAdapterPosition
-                    newPosition = target.absoluteAdapterPosition
-
-                    if (draggedTransfer == null) {
-                        draggedTransfer = tL[posDragged]
-                    }
-
-                    Collections.swap(tL, posDragged, newPosition)
-                    adapter?.moveItemData(tL, posDragged, newPosition)
-
-                    return false
-                }
-
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-
-                override fun onChildDraw(
-                    c: Canvas,
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    dX: Float,
-                    dY: Float,
-                    actionState: Int,
-                    isCurrentlyActive: Boolean,
-                ) {
-                    if (addElevation) {
-                        recyclerView.post {
-                            listView?.removeItemDecoration(itemDecoration)
-                        }
-                        val animator = viewHolder.itemView.animate()
-                        viewHolder.itemView.translationZ =
-                            dp2px(2f, resources.displayMetrics).toFloat()
-                        viewHolder.itemView.alpha = 0.95f
-                        animator.start()
-
-                        addElevation = false
-                    }
-
-                    if (resetElevation) {
-                        recyclerView.post {
-                            listView?.addItemDecoration(itemDecoration)
-                        }
-                        val animator = viewHolder.itemView.animate()
-                        viewHolder.itemView.translationZ = 0f
-                        viewHolder.itemView.alpha = 1f
-                        animator.start()
-
-                        addElevation = true
-                        resetElevation = false
-                    }
-
-                    super.onChildDraw(c,
-                        recyclerView,
-                        viewHolder,
-                        dX,
-                        dY,
-                        actionState,
-                        isCurrentlyActive)
-                }
-
-                override fun clearView(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                ) {
-                    super.clearView(recyclerView, viewHolder)
-                    // Drag finished, elevation should be removed.
-                    resetElevation = true
-                }
-
-                override fun onSelectedChanged(
-                    viewHolder: RecyclerView.ViewHolder?,
-                    actionState: Int,
-                ) {
-                    super.onSelectedChanged(viewHolder, actionState)
-
-                    draggedTransfer?.let {
-                        if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
-                            startMovementRequest(it, newPosition)
-                            draggedTransfer = null
-                        }
-                    }
-                }
-            }
-        )
+        itemTouchHelper = ItemTouchHelper(initItemTouchHelperCallback(
+            dragDirs = ItemTouchHelper.UP or ItemTouchHelper.DOWN))
 
         enableDragAndDrop()
-        return v
     }
 
     /**
@@ -204,84 +93,29 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
      *
      * @param transfer transfer to update
      */
-    fun transferUpdate(transfer: MegaTransfer?) {
-        tryToUpdateTransfer(transfer).let { transferPosition ->
-            if (transferPosition != INVALID_POSITION) {
-                adapter?.updateProgress(transferPosition, transfer)
-            }
-        }
-    }
-
-    /**
-     * Tries to update a MegaTransfer in the transfers list.
-     *
-     * @param transfer The MegaTransfer to update.
-     * @return The position of the updated transfer if success, INVALID_POSITION otherwise.
-     */
-    fun tryToUpdateTransfer(transfer: MegaTransfer?): Int {
+    fun transferUpdate(transfer: MegaTransfer?) =
         transfer?.let {
-            try {
-                val li = tL.listIterator()
-                while (li.hasNext()) {
-                    val next = li.next()
-                    if (next.tag == transfer.tag) {
-                        val index = li.previousIndex()
-                        tL[index] = transfer
-                        return index
-                    }
+            viewModel.getUpdatedTransferPosition(it).let { transferPosition ->
+                if (transferPosition != INVALID_POSITION) {
+                    viewModel.updateActiveTransfer(transferPosition, it)
+                    adapter?.updateProgress(transferPosition, it)
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "IndexOutOfBoundsException trying to update a transfer.")
             }
         }
-        return INVALID_POSITION
-    }
 
     /**
      * Changes the status (play/pause) of the button of a transfer.
      *
      * @param tag identifier of the transfer to change the status of the button
      */
-    fun changeStatusButton(tag: Int) {
-        Timber.d("tag: $tag")
-
-        val li = tL.listIterator()
-        var index = 0
-        while (li.hasNext()) {
-            val next = li.next()
-            if (next.tag == tag) {
-                index = li.previousIndex()
-                break
-            }
-        }
-        megaApi.getTransferByTag(tag)?.let { transfer ->
-            tL[index] = transfer
-            Timber.d("The transfer with index : $index has been paused/resumed, left: ${tL.size}")
-            adapter?.notifyItemChanged(index)
-        }
-    }
+    fun changeStatusButton(tag: Int) = viewModel.activeTransferChangeStatus(tag)
 
     /**
      * Removes a transfer when finishes.
      *
      * @param transferTag identifier of the transfer to remove
      */
-    fun transferFinish(transferTag: Int) {
-        val index = tL.indexOfFirst { transfer ->
-            transfer.tag == transferTag
-        }
-        tL.removeIf { transfer ->
-            transfer.tag == transferTag
-        }
-        adapter?.removeItemData(tL, index)
-
-        if (tL.isEmpty()) {
-            activateActionMode()
-            destroyActionMode()
-            setEmptyView(tL.size)
-            managerActivity.invalidateOptionsMenu()
-        }
-    }
+    fun transferFinish(transferTag: Int) = viewModel.activeTransferFinished(transferTag)
 
     /**
      * Adds a transfer when starts.
@@ -290,26 +124,12 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
      */
     fun transferStart(transfer: MegaTransfer) {
         if (!transfer.isStreamingTransfer && !transfer.isBackgroundTransfer()) {
-            if (tL.isEmpty()) {
-                managerActivity.invalidateOptionsMenu()
+            if (viewModel.getActiveTransfers().isEmpty()) {
+                requireActivity().invalidateOptionsMenu()
             }
-
-            tL.add(transfer)
-            orderTransfersByDescendingPriority()
-            adapter?.addItemData(tL, tL.indexOf(transfer))
-
-            if (tL.size == 1) {
-                setEmptyView(tL.size)
-            }
+            viewModel.activeTransferStart(transfer)
         }
     }
-
-    /**
-     * Checks if there is any transfer in progress.
-     *
-     * @return True if there is not any transfer, false otherwise.
-     */
-    fun isEmpty(): Boolean = tL.isEmpty()
 
     /**
      * Check whether is in select mode after changing tab or drawer item.
@@ -332,7 +152,8 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
 
     override fun cancelTransfers() {
         adapter?.run {
-            managerActivity.showConfirmationCancelSelectedTransfers(selectedTransfers)
+            (requireActivity() as ManagerActivity).showConfirmationCancelSelectedTransfers(
+                selectedTransfers)
         }
     }
 
@@ -348,13 +169,13 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
 
     override fun areAllTransfersSelected() = adapter?.run {
         selectedItemsCount == itemCount
-    } ?: false
+    } == true
 
-    override fun hideTabs(hide: Boolean) = managerActivity.hideTabs(hide, TransfersTab.PENDING_TAB)
+    override fun hideTabs(hide: Boolean) =
+        (requireActivity() as ManagerActivity).hideTabs(hide, TransfersTab.PENDING_TAB)
 
     override fun movementFailed(transferTag: Int) =
         finishMovement(success = false, transferTag = transferTag)
-
 
     override fun movementSuccess(transferTag: Int) =
         finishMovement(success = true, transferTag = transferTag)
@@ -388,7 +209,6 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
 
     override fun updateActionModeTitle() {
         if (actionMode != null && activity != null && adapter != null) {
-
             val count = adapter?.selectedItemsCount
             val title: String = if (count == 0) {
                 getString(R.string.title_select_transfers)
@@ -403,28 +223,155 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
     }
 
     override fun updateElevation() =
-        managerActivity.changeAppBarElevation(
-            listView?.canScrollVertically(DEFAULT_SCROLL_DIRECTION) == true ||
+        (requireActivity() as ManagerActivity).changeAppBarElevation(
+            binding.transfersListView.canScrollVertically(DEFAULT_SCROLL_DIRECTION) ||
                     adapter?.isMultipleSelect == true)
 
-    private fun setTransfers() {
-        tL.clear()
+    private fun setupFlow() {
+        viewModel.activeState.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).onEach { transfersState ->
+            when (transfersState) {
+                is ActiveTransfersState.TransfersUpdated -> {
+                    setEmptyView(transfersState.newTransfers.size)
+                }
+                is ActiveTransfersState.TransferUpdated -> {
+                    adapter?.updateProgress(transfersState.index, transfersState.updatedTransfer)
+                }
+                is ActiveTransfersState.TransferMovementFinishedUpdated -> {
+                    if (transfersState.success) {
+                        adapter?.notifyItemChanged(transfersState.pos)
+                    } else {
+                        (requireActivity() as ManagerActivity).showSnackbar(
+                            SNACKBAR_TYPE,
+                            getString(R.string.change_of_transfer_priority_failed,
+                                transfersState.newTransfers[transfersState.pos].fileName),
+                            MEGACHAT_INVALID_HANDLE
+                        )
+                        adapter?.setTransfers(transfersState.newTransfers)
+                    }
+                }
+                is ActiveTransfersState.TransferStartUpdated -> {
+                    val transfers = transfersState.newTransfers
+                    adapter?.addItemData(transfers,
+                        transfers.indexOf(transfersState.updatedTransfer))
 
-        managerActivity.transfersInProgress.map { tag ->
-            megaApi.getTransferByTag(tag)
-        }.filter { transfer ->
-            transfer != null && !transfer.isStreamingTransfer && !transfer.isBackgroundTransfer()
-        }.map {
-            tL.add(it)
-        }
-
-        orderTransfersByDescendingPriority()
-        setEmptyView(tL.size)
+                    if (transfers.size == 1) {
+                        setEmptyView(transfers.size)
+                    }
+                }
+                is ActiveTransfersState.TransferFinishedUpdated -> {
+                    val transfers = transfersState.newTransfers
+                    Timber.d("new transfer is ${transfers.joinToString { it.fileName }}")
+                    adapter?.removeItemData(transfers, transfersState.index)
+                    if (transfers.isEmpty()) {
+                        activateActionMode()
+                        destroyActionMode()
+                        setEmptyView(transfers.size)
+                        requireActivity().invalidateOptionsMenu()
+                    }
+                }
+                is ActiveTransfersState.TransferChangeStatusUpdated -> {
+                    val index = transfersState.index
+                    viewModel.updateActiveTransfer(index, transfersState.transfer)
+                    adapter?.notifyItemChanged(index)
+                }
+                else -> {}
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun orderTransfersByDescendingPriority() =
-        tL.sortWith { t1: MegaTransfer, t2: MegaTransfer ->
-            t1.priority.compareTo(t2.priority)
+    private fun initItemTouchHelperCallback(
+        dragDirs: Int,
+        swipeDirs: Int = 0,
+    ): ItemTouchHelper.SimpleCallback =
+        object : ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
+            private var addElevation = true
+            private var resetElevation = false
+            private var draggedTransfer: MegaTransfer? = null
+            private var newPosition = 0
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder,
+            ): Boolean {
+                val posDragged = viewHolder.absoluteAdapterPosition
+                newPosition = target.absoluteAdapterPosition
+
+                if (draggedTransfer == null) {
+                    draggedTransfer = viewModel.getActiveTransfer(posDragged)
+                }
+                adapter?.moveItemData(
+                    viewModel.activeTransfersSwap(posDragged, newPosition), posDragged, newPosition)
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean,
+            ) {
+                if (addElevation) {
+                    recyclerView.post {
+                        binding.transfersListView.removeItemDecoration(itemDecoration)
+                    }
+                    val animator = viewHolder.itemView.animate()
+                    viewHolder.itemView.translationZ = dp2px(2f, resources.displayMetrics).toFloat()
+                    viewHolder.itemView.alpha = 0.95f
+                    animator.start()
+
+                    addElevation = false
+                }
+
+                if (resetElevation) {
+                    recyclerView.post {
+                        binding.transfersListView.addItemDecoration(itemDecoration)
+                    }
+                    val animator = viewHolder.itemView.animate()
+                    viewHolder.itemView.translationZ = 0f
+                    viewHolder.itemView.alpha = 1f
+                    animator.start()
+
+                    addElevation = true
+                    resetElevation = false
+                }
+                super.onChildDraw(c,
+                    recyclerView,
+                    viewHolder,
+                    dX,
+                    dY,
+                    actionState,
+                    isCurrentlyActive)
+            }
+
+            override fun clearView(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+            ) {
+                super.clearView(recyclerView, viewHolder)
+                // Drag finished, elevation should be removed.
+                resetElevation = true
+            }
+
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                super.onSelectedChanged(viewHolder, actionState)
+
+                draggedTransfer?.let {
+                    if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+                        startMovementRequest(it, newPosition)
+                        draggedTransfer = null
+                    }
+                }
+            }
         }
 
     /**
@@ -435,35 +382,17 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
      */
     private fun startMovementRequest(transfer: MegaTransfer, newPosition: Int) {
         MoveTransferListener(requireContext(), this).let { moveTransferListener ->
-            when (newPosition) {
-                0 -> {
-                    megaApi.moveTransferToFirst(transfer, moveTransferListener)
-                }
-                tL.size - 1 -> {
-                    megaApi.moveTransferToLast(transfer, moveTransferListener)
-                }
-                else -> {
-                    megaApi.moveTransferBefore(transfer, tL[newPosition + 1], moveTransferListener)
-                }
-            }
+            viewModel.moveTransfer(transfer, newPosition, moveTransferListener)
         }
     }
 
     private fun enableDragAndDrop() {
-        listView?.let {
-            itemTouchHelper?.attachToRecyclerView(it)
-        }
+        itemTouchHelper?.attachToRecyclerView(binding.transfersListView)
     }
 
     private fun disableDragAndDrop() =
         itemTouchHelper?.attachToRecyclerView(null)
 
-
-    private fun reorderTransfersAfterFailedMovement() {
-        orderTransfersByDescendingPriority()
-
-        adapter?.setTransfers(tL)
-    }
 
     /**
      * Updates the UI in consequence after a transfer movement.
@@ -475,29 +404,7 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
      * @param transferTag Identifier of the transfer.
      */
     private fun finishMovement(success: Boolean, transferTag: Int) {
-        megaApi.getTransferByTag(transferTag).let { transfer ->
-            if (transfer != null && transfer.state >= STATE_COMPLETING) {
-                val transferPosition = tryToUpdateTransfer(transfer)
-                if (transferPosition != INVALID_POSITION) {
-                    if (!success) {
-                        reorderTransfersAfterFailedMovement()
-                        managerActivity.showSnackbar(
-                            SNACKBAR_TYPE,
-                            getString(R.string.change_of_transfer_priority_failed,
-                                transfer.fileName),
-                            MEGACHAT_INVALID_HANDLE
-                        )
-                        adapter?.setTransfers(tL)
-                    } else {
-                        adapter?.notifyItemChanged(transferPosition)
-                    }
-                } else {
-                    Timber.w("The transfer doesn't exist.")
-                }
-            } else {
-                Timber.w("The transfer doesn't exist, finished or is finishing.")
-            }
-        }
+        viewModel.activeTransferFinishMovement(success, transferTag)
     }
 
     companion object {
