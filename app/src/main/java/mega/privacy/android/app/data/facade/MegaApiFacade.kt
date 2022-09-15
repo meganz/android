@@ -389,16 +389,16 @@ class MegaApiFacade @Inject constructor(
         megaApi.getUserAlias(userHandle, listener)
 
     override fun getContactAvatar(
-        email_or_handle: String,
+        emailOrHandle: String,
         path: String,
         listener: MegaRequestListenerInterface,
-    ) = megaApi.getUserAvatar(email_or_handle, path, listener)
+    ) = megaApi.getUserAvatar(emailOrHandle, path, listener)
 
     override fun getUserAttribute(
-        email_or_handle: String,
+        emailOrHandle: String,
         type: Int,
         listener: MegaRequestListenerInterface,
-    ) = megaApi.getUserAttribute(email_or_handle, type, listener)
+    ) = megaApi.getUserAttribute(emailOrHandle, type, listener)
 
     override fun userHandleToBase64(userHandle: Long): String =
         MegaApiJava.userHandleToBase64(userHandle)
