@@ -3,21 +3,25 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet
 import android.Manifest
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.domain.usecase.GetAllGalleryFiles
+import mega.privacy.android.domain.usecase.GetAllGalleryImages
+import mega.privacy.android.domain.usecase.GetAllGalleryVideos
 import javax.inject.Inject
 
 
 @HiltViewModel
 class ChatRoomToolbarViewModel @Inject constructor(
-    private val getAllGalleryFiles: GetAllGalleryFiles,
+    private val getAllGalleryVideos: GetAllGalleryVideos,
+    private val getAllGalleryImages: GetAllGalleryImages,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
     private val _filesGallery =
@@ -121,6 +125,21 @@ class ChatRoomToolbarViewModel @Inject constructor(
     }
 
     /**
+     * Add new file in gallery
+     *
+     * @param newFile FileGalleryItem
+     */
+    private fun addFile(newFile: FileGalleryItem) {
+        val listToAdd: MutableList<FileGalleryItem> = arrayListOf()
+        listToAdd.addAll(_filesGallery.value)
+        listToAdd.removeAt(0)
+        listToAdd.add(listToAdd.size, newFile)
+        listToAdd.sortByDescending { it.dateAdded }
+
+        addTakePicture(listToAdd)
+    }
+
+    /**
      * Get images and videos from the gallery
      */
     private fun loadGallery() {
@@ -129,10 +148,18 @@ class ChatRoomToolbarViewModel @Inject constructor(
             addTakePicture(emptyFiles)
 
             if (_hasReadStoragePermissionsGranted.value) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    getAllGalleryFiles().collectLatest { list ->
-                        addTakePicture(list.toMutableList())
-                    }
+                viewModelScope.launch(ioDispatcher) {
+                    getAllGalleryVideos()
+                        .collectLatest { video ->
+                            addFile(video)
+                        }
+                }
+
+                viewModelScope.launch(ioDispatcher) {
+                    getAllGalleryImages()
+                        .collectLatest { image ->
+                            addFile(image)
+                        }
                 }
             }
         }

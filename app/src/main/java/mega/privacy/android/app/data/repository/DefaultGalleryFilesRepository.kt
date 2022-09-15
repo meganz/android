@@ -9,7 +9,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.domain.repository.GalleryFilesRepository
@@ -30,30 +29,12 @@ class DefaultGalleryFilesRepository @Inject constructor(
         const val DATA = "_data"
     }
 
-    override fun getAllGalleryFiles(): Flow<List<FileGalleryItem>> =
-        callbackFlow {
-            val files = mutableListOf<FileGalleryItem>()
-            fetchVideos()
-                .collectLatest { file ->
-                    files.add(file)
-                    trySend(files.sortedByDescending { it.dateAdded })
-                }
-
-            fetchImages()
-                .collectLatest { file ->
-                    files.add(file)
-                    trySend(files.sortedByDescending { it.dateAdded })
-                }
-
-            awaitClose { }
-        }
-
     /**
      * Method to get the images from the gallery
      *
-     * @return ArrayList<FileGalleryItem> List of images
+     * @return  Flow of List of [FileGalleryItem].
      */
-    private fun fetchImages(): Flow<FileGalleryItem> =
+    override fun getAllGalleryImages(): Flow<FileGalleryItem> =
         callbackFlow {
             val queryUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
@@ -92,7 +73,7 @@ class DefaultGalleryFilesRepository @Inject constructor(
                         isTakePicture = false,
                         title = title,
                         fileUri = contentUri.toString(),
-                        dateAdded = date,
+                        dateAdded = date.toLong(),
                         duration = "",
                         isSelected = false,
                         filePath = path
@@ -105,15 +86,15 @@ class DefaultGalleryFilesRepository @Inject constructor(
                 Timber.e("Cursor is null")
             }
 
-            awaitClose { }
+            awaitClose {}
         }
 
     /**
-     * Method to get the videos from the gallery
+     * Method to get the images from the gallery
      *
-     * @return ArrayList<FileGalleryItem> List of videos
+     * @return  Flow of List of [FileGalleryItem].
      */
-    private fun fetchVideos(): Flow<FileGalleryItem> =
+    override fun getAllGalleryVideos(): Flow<FileGalleryItem> =
         callbackFlow {
             val queryUri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
             val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
@@ -159,17 +140,18 @@ class DefaultGalleryFilesRepository @Inject constructor(
                         isTakePicture = false,
                         title = title,
                         fileUri = contentUri.toString(),
-                        dateAdded = date,
+                        dateAdded = date.toLong(),
                         duration = durationText,
                         isSelected = false,
                         filePath = path
                     )
+
                     trySend(file)
                 }
             } ?: kotlin.run {
                 Timber.e("Cursor is null")
             }
 
-            awaitClose { }
+            awaitClose {}
         }
 }
