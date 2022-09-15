@@ -24,7 +24,7 @@ class MegaLocalStorageFacadeTest {
     }
 
     @Test
-    fun test_getCloudSortOrder_ReturnsDefaultValue_WhenPreferencesIsNotSet() =
+    fun `test that get cloud sort order returns default value when preferences is not set`() =
         runTest {
             val expected = SortOrder.ORDER_DEFAULT_ASC.value
             whenever(dbHandler.preferences?.preferredSortCloud).thenReturn(null)
@@ -32,7 +32,7 @@ class MegaLocalStorageFacadeTest {
         }
 
     @Test
-    fun test_getCloudSortOrder_ReturnsValueInPreferences_WhenPreferencesIsSet() =
+    fun `test that get cloud sort order returns value in preferences when preferences is set`() =
         runTest {
             val expected = SortOrder.ORDER_SIZE_DESC.value
             whenever(dbHandler.preferences?.preferredSortCloud).thenReturn(expected.toString())
@@ -40,7 +40,7 @@ class MegaLocalStorageFacadeTest {
         }
 
     @Test
-    fun test_getCameraSortOrder_ReturnsDefaultValue_WhenPreferencesIsNotSet() =
+    fun `test that get camera sort order returns default value when preferences is not set`() =
         runTest {
             val expected = SortOrder.ORDER_MODIFICATION_DESC.value
             whenever(dbHandler.preferences?.preferredSortCameraUpload).thenReturn(null)
@@ -48,7 +48,7 @@ class MegaLocalStorageFacadeTest {
         }
 
     @Test
-    fun test_getCameraSortOrder_ReturnsValueInPreferences_WhenPreferencesIsSet() =
+    fun `test that get camera sort order returns value in preferences when preferences is set`() =
         runTest {
             val expected = SortOrder.ORDER_ALPHABETICAL_ASC.value
             whenever(dbHandler.preferences?.preferredSortCameraUpload).thenReturn(expected.toString())
@@ -57,7 +57,7 @@ class MegaLocalStorageFacadeTest {
 
 
     @Test
-    fun test_getOthersSortOrder_ReturnsDefaultValue_WhenPreferencesIsNotSet() =
+    fun `test that get others sort order returns default value when preferences is not set`() =
         runTest {
             val expected = SortOrder.ORDER_DEFAULT_ASC.value
             whenever(dbHandler.preferences?.preferredSortOthers).thenReturn(null)
@@ -65,7 +65,7 @@ class MegaLocalStorageFacadeTest {
         }
 
     @Test
-    fun test_getOthersSortOrder_ReturnsValueInPreferences_WhenPreferencesIsSet() =
+    fun `test that get others sort order returns value in preferences when preferences is set`() =
         runTest {
             val expected = SortOrder.ORDER_ALPHABETICAL_DESC.value
             whenever(dbHandler.preferences?.preferredSortOthers).thenReturn(expected.toString())
@@ -74,7 +74,7 @@ class MegaLocalStorageFacadeTest {
 
 
     @Test
-    fun test_getLinksSortOrder_ReturnsDefaultASCValue_WhenCloudSortOrderIsOrderModificationASC() =
+    fun `test that get links sort order returns default ASC value when cloud sort order is modification ASC`() =
         runTest {
             whenever(dbHandler.preferences?.preferredSortCloud).thenReturn(SortOrder.ORDER_MODIFICATION_ASC.value.toString())
             val expected = SortOrder.ORDER_LINK_CREATION_ASC.value
@@ -82,7 +82,7 @@ class MegaLocalStorageFacadeTest {
         }
 
     @Test
-    fun test_getLinksSortOrder_ReturnsDefaultDESCValue_WhenCloudSortOrderIsOrderModificationDESC() =
+    fun `test that get links sort order returns default DESC value when cloud sort order is modification DESC`() =
         runTest {
             whenever(dbHandler.preferences?.preferredSortCloud).thenReturn(SortOrder.ORDER_MODIFICATION_DESC.value.toString())
             val expected = SortOrder.ORDER_LINK_CREATION_DESC.value
@@ -90,7 +90,7 @@ class MegaLocalStorageFacadeTest {
         }
 
     @Test
-    fun test_getLinksSortOrder_ReturnsCloudSortOrder_WhenCloudSortOrderIsNotOrderModification() =
+    fun `test that get links sort order returns cloud sort order when cloud sort order is other than modification`() =
         runTest {
             val expected = SortOrder.ORDER_DEFAULT_ASC.value
             whenever(dbHandler.preferences?.preferredSortCloud).thenReturn(expected.toString())
