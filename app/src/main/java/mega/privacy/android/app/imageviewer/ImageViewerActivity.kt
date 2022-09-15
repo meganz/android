@@ -57,7 +57,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_NEARBY_FILES
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_URI
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
-import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
@@ -66,7 +65,6 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
@@ -289,19 +287,19 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
 
-    private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
-    private val nodeOfflineHandle: Long? by extra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, INVALID_HANDLE)
-    private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
-    private val nodeFileLink: String? by extra(EXTRA_LINK)
-    private val childrenHandles: LongArray? by extra(NODE_HANDLES)
-    private val childrenOfflineHandles: LongArray? by extra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
-    private val childOrder: Int? by extra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN)
-    private val chatRoomId: Long? by extra(INTENT_EXTRA_KEY_CHAT_ID)
-    private val chatMessagesId: LongArray? by extra(INTENT_EXTRA_KEY_MSG_ID)
-    private val imageFileUri: Uri? by extra(INTENT_EXTRA_KEY_URI)
-    private val showNearbyFiles: Boolean? by extra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES)
-    private val showSlideshow: Boolean by extraNotNull(EXTRA_SHOW_SLIDESHOW, false)
-    private val isTimeline: Boolean by extraNotNull(EXTRA_IS_TIMELINE, false)
+    private val nodeHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE) }
+    private val nodeOfflineHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, INVALID_HANDLE) }
+    private val parentNodeHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE) }
+    private val nodeFileLink by lazy { intent.getStringExtra(EXTRA_LINK) }
+    private val childrenHandles by lazy { intent.getLongArrayExtra(NODE_HANDLES) }
+    private val childrenOfflineHandles by lazy { intent.getLongArrayExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE) }
+    private val childOrder by lazy { intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_PHOTO_ASC) }
+    private val chatRoomId by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_CHAT_ID, INVALID_HANDLE) }
+    private val chatMessagesId by lazy { intent.getLongArrayExtra(INTENT_EXTRA_KEY_MSG_ID) }
+    private val imageFileUri by lazy { intent.getParcelableExtra(INTENT_EXTRA_KEY_URI, Uri::class.java) }
+    private val showNearbyFiles by lazy { intent.getBooleanExtra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES, false) }
+    private val showSlideshow by lazy { intent.getBooleanExtra(EXTRA_SHOW_SLIDESHOW, false) }
+    private val isTimeline by lazy { intent.getBooleanExtra(EXTRA_IS_TIMELINE, false) }
     private val isFileVersion by lazy { intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_FILE_VERSION, false) }
 
     private val viewModel by viewModels<ImageViewerViewModel>()
@@ -394,24 +392,26 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             when {
                 isTimeline ->
                     viewModel.retrieveImagesFromTimeline(nodeHandle)
-                parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE ->
-                    viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder, nodeHandle)
+                parentNodeHandle != INVALID_HANDLE ->
+                    viewModel.retrieveImagesFromParent(parentNodeHandle, childOrder, nodeHandle)
                 childrenHandles?.isNotEmpty() == true ->
                     viewModel.retrieveImages(childrenHandles!!, nodeHandle)
                 childrenOfflineHandles?.isNotEmpty() == true ->
                     viewModel.retrieveImages(childrenOfflineHandles!!, nodeHandle, isOffline = true)
-                nodeOfflineHandle != null && nodeOfflineHandle != INVALID_HANDLE ->
-                    viewModel.retrieveSingleImage(nodeOfflineHandle!!, isOffline = true)
-                chatRoomId != null && chatMessagesId?.isNotEmpty() == true ->
-                    viewModel.retrieveChatImages(chatRoomId!!, chatMessagesId!!, nodeHandle)
+                nodeOfflineHandle != INVALID_HANDLE && nodeOfflineHandle != INVALID_HANDLE ->
+                    viewModel.retrieveSingleImage(nodeOfflineHandle, isOffline = true)
+                chatRoomId != INVALID_HANDLE && chatMessagesId?.isNotEmpty() == true ->
+                    viewModel.retrieveChatImages(chatRoomId, chatMessagesId!!, nodeHandle)
                 !nodeFileLink.isNullOrBlank() ->
                     viewModel.retrieveSingleImage(nodeFileLink!!)
-                nodeHandle != null && nodeHandle != INVALID_HANDLE ->
-                    viewModel.retrieveSingleImage(nodeHandle!!)
+                nodeHandle != INVALID_HANDLE ->
+                    viewModel.retrieveSingleImage(nodeHandle)
                 imageFileUri != null ->
-                    viewModel.retrieveFileImage(imageFileUri!!,
+                    viewModel.retrieveFileImage(
+                        imageFileUri!!,
                         showNearbyFiles,
-                        imageFileUri.hashCode().toLong())
+                        imageFileUri.hashCode().toLong()
+                    )
                 else ->
                     error("Invalid params")
             }
