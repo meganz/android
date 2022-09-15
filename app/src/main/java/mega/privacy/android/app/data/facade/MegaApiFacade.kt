@@ -73,6 +73,8 @@ class MegaApiFacade @Inject constructor(
         megaApi.startUploadForSupport(path, false, listener)
     }
 
+    override val myUser: MegaUser?
+        get() = megaApi.myUser
     override val myUserHandle: Long
         get() = megaApi.myUserHandleBinary
     override val accountEmail: String?
@@ -416,4 +418,13 @@ class MegaApiFacade @Inject constructor(
         type: Int,
         listener: MegaRequestListenerInterface,
     ) = megaApi.getUserAttribute(emailOrHandle, type, listener)
+
+    override fun userHandleToBase64(userHandle: Long): String =
+        MegaApiJava.userHandleToBase64(userHandle)
+
+    override fun getUserAttribute(
+        user: MegaUser,
+        type: Int,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getUserAttribute(user, type, listener)
 }

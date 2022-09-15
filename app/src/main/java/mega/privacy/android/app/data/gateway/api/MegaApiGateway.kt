@@ -71,6 +71,11 @@ interface MegaApiGateway {
     val myUserHandle: Long
 
     /**
+     * [MegaUser] for the account
+     */
+    val myUser: MegaUser?
+
+    /**
      * Registered email address for the account
      */
     val accountEmail: String?
@@ -657,4 +662,20 @@ interface MegaApiGateway {
      * @param type          Attribute type.
      */
     fun getUserAttribute(emailOrHandle: String, type: Int, listener: MegaRequestListenerInterface)
+
+    /**
+     * Converts a user handle to a Base64-encoded string.
+     *
+     * @param userHandle User handle.
+     * @return Base64-encoded user handle.
+     */
+    fun userHandleToBase64(userHandle: Long): String
+
+    /**
+     * Gets an attribute of any user in MEGA.
+     *
+     * @param user Email or user handle (Base64 encoded) to get the attribute.
+     * @param type Attribute type.
+     */
+    fun getUserAttribute(user: MegaUser, type: Int, listener: MegaRequestListenerInterface)
 }
