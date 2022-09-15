@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
@@ -62,4 +63,12 @@ interface ContactsRepository {
      * @return A list with all visible contacts.
      */
     suspend fun getVisibleContacts(): List<ContactItem>
+
+    /**
+     * Gets the updated main data of a contact.
+     *
+     * @param contactItem [ContactItem] whose data is going to be requested.
+     * @return [ContactData] containing the updated data.
+     */
+    suspend fun getContactData(contactItem: ContactItem): ContactData
 }

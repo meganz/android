@@ -401,4 +401,19 @@ class MegaApiFacade @Inject constructor(
 
     override suspend fun areCredentialsVerified(megaUser: MegaUser): Boolean =
         megaApi.areCredentialsVerified(megaUser)
+
+    override fun getUserAlias(userHandle: Long, listener: MegaRequestListenerInterface) =
+        megaApi.getUserAlias(userHandle, listener)
+
+    override fun getContactAvatar(
+        emailOrHandle: String,
+        path: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getUserAvatar(emailOrHandle, path, listener)
+
+    override fun getUserAttribute(
+        emailOrHandle: String,
+        type: Int,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getUserAttribute(emailOrHandle, type, listener)
 }

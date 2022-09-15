@@ -627,4 +627,34 @@ interface MegaApiGateway {
      * @return True if verified, false otherwise.
      */
     suspend fun areCredentialsVerified(megaUser: MegaUser): Boolean
+
+    /**
+     * Gets a user alias if exists.
+     *
+     * @param userHandle User handle.
+     * @param listener   Listener.
+     */
+    fun getUserAlias(userHandle: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Gets the avatar of a contact if exists.
+     *
+     * @param emailOrHandle Email or user handle (Base64 encoded) to get the attribute.
+     * @param path          Path in which the avatar will be stored if exists.
+     * @param listener      Listener.
+     * @return The path of the avatar if exists.
+     */
+    fun getContactAvatar(
+        emailOrHandle: String,
+        path: String,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Gets an attribute of any user in MEGA.
+     *
+     * @param emailOrHandle Email or user handle (Base64 encoded) to get the attribute.
+     * @param type          Attribute type.
+     */
+    fun getUserAttribute(emailOrHandle: String, type: Int, listener: MegaRequestListenerInterface)
 }

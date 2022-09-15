@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.usecase.GetContactData
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -49,4 +50,8 @@ class ContactsModule {
     @Provides
     fun provideGetVisibleContacts(contactsRepository: ContactsRepository): GetVisibleContacts =
         GetVisibleContacts(contactsRepository::getVisibleContacts)
+
+    @Provides
+    fun provideGetContactData(contactsRepository: ContactsRepository): GetContactData =
+        GetContactData(contactsRepository::getContactData)
 }
