@@ -13,7 +13,6 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -36,10 +35,10 @@ class LinksViewModelTest {
     private val getParentNodeHandle = mock<GetParentNodeHandle>()
     private val getPublicLinks = mock<GetPublicLinks>()
     private val getCloudSortOrder = mock<GetCloudSortOrder> {
-        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC.value)
+        onBlocking { invoke() }.thenReturn(1)
     }
     private val getLinksSortOrder = mock<GetLinksSortOrder> {
-        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_DESC.value)
+        onBlocking { invoke() }.thenReturn(2)
     }
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
@@ -370,7 +369,7 @@ class LinksViewModelTest {
     @Test
     fun `test that sort order is set with result of getLinksSortOrder if depth is equals to 0 when call setIncomingTreeDepth`() =
         runTest {
-            val expected = SortOrder.ORDER_CREATION_ASC.value
+            val expected = 5
             whenever(getPublicLinks(any())).thenReturn(mock())
             whenever(getLinksSortOrder()).thenReturn(expected)
 
@@ -385,7 +384,7 @@ class LinksViewModelTest {
     @Test
     fun `test that sort order is set with result of getCloudSortOrder if depth is different than 0 when call setIncomingTreeDepth`() =
         runTest {
-            val expected = SortOrder.ORDER_CREATION_ASC.value
+            val expected = 5
             whenever(getPublicLinks(any())).thenReturn(mock())
             whenever(getCloudSortOrder()).thenReturn(expected)
 

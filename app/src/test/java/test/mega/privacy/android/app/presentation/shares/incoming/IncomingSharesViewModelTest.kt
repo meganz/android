@@ -14,7 +14,6 @@ import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -38,10 +37,10 @@ class IncomingSharesViewModelTest {
     private val authorizeNode = mock<AuthorizeNode>()
     private val getIncomingSharesChildrenNode = mock<GetIncomingSharesChildrenNode>()
     private val getCloudSortOrder = mock<GetCloudSortOrder> {
-        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC.value)
+        onBlocking { invoke() }.thenReturn(1)
     }
     private val getOtherSortOrder = mock<GetOthersSortOrder> {
-        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_DESC.value)
+        onBlocking { invoke() }.thenReturn(2)
     }
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
@@ -395,7 +394,7 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that sort order is set with result of getOthersSortOrder if depth is equals to 0 when call setIncomingTreeDepth`() =
         runTest {
-            val expected = SortOrder.ORDER_CREATION_ASC.value
+            val expected = 5
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
             whenever(getOtherSortOrder()).thenReturn(expected)
 
@@ -410,7 +409,7 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that sort order is set with result of getCloudSortOrder if depth is different than 0 when call setIncomingTreeDepth`() =
         runTest {
-            val expected = SortOrder.ORDER_CREATION_ASC.value
+            val expected = 5
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
             whenever(getCloudSortOrder()).thenReturn(expected)
 
@@ -425,7 +424,7 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that sort order is set with result of getOtherSortOrder when refreshNodes fails`() =
         runTest {
-            val expected = SortOrder.ORDER_CREATION_ASC.value
+            val expected = 5
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(null)
             whenever(getOtherSortOrder()).thenReturn(expected)
 
