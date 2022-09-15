@@ -34,6 +34,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @param context [CoroutineContext] to use for collecting.
  */
 @Composable
+@Suppress("StateFlowValueCalledInComposition")
 fun <T> StateFlow<T>.collectAsStateWithLifecycle(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
@@ -66,6 +67,7 @@ fun <T> StateFlow<T>.collectAsStateWithLifecycle(
  * @param context [CoroutineContext] to use for collecting.
  */
 @Composable
+@Suppress("StateFlowValueCalledInComposition")
 fun <T> StateFlow<T>.collectAsStateWithLifecycle(
     lifecycle: Lifecycle,
     minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
@@ -101,6 +103,7 @@ fun <T> StateFlow<T>.collectAsStateWithLifecycle(
  * @param context [CoroutineContext] to use for collecting.
  */
 @Composable
+@Suppress("StateFlowValueCalledInComposition")
 fun <T> Flow<T>.collectAsStateWithLifecycle(
     initialValue: T,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
@@ -135,6 +138,7 @@ fun <T> Flow<T>.collectAsStateWithLifecycle(
  * @param context [CoroutineContext] to use for collecting.
  */
 @Composable
+@Suppress("StateFlowValueCalledInComposition")
 fun <T> Flow<T>.collectAsStateWithLifecycle(
     initialValue: T,
     lifecycle: Lifecycle,

@@ -1,6 +1,14 @@
 package mega.privacy.android.app.data.repository
 
+import android.app.ActivityManager
+import android.app.Application
+import android.app.ApplicationExitInfo
+import android.app.usage.UsageStatsManager
 import android.content.Context
+import android.os.Build
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
+import android.os.StrictMode.VmPolicy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -22,6 +30,8 @@ import mega.privacy.android.app.logging.ChatLogger
 import mega.privacy.android.app.logging.SdkLogger
 import mega.privacy.android.app.presentation.logging.tree.LineNumberDebugTree
 import mega.privacy.android.app.presentation.logging.tree.LogFlowTree
+import mega.privacy.android.app.protobuf.TombstoneProtos.Tombstone
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.logging.LogEntry
 import mega.privacy.android.domain.repository.LoggingRepository
 import nz.mega.sdk.MegaApiAndroid
@@ -30,6 +40,7 @@ import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaLoggerInterface
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -67,6 +78,7 @@ class TimberLoggingRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val loggingPreferencesGateway: LoggingPreferencesGateway,
     @ApplicationScope private val appScope: CoroutineScope,
+    private val application: Application,
 ) : LoggingRepository {
 
     init {
@@ -84,6 +96,29 @@ class TimberLoggingRepository @Inject constructor(
         MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX)
         MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX)
         Timber.plant(LineNumberDebugTree())
+    }
+
+    override fun enableStrictMode() {
+        StrictMode.setThreadPolicy(
+            ThreadPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build()
+        )
+
+        StrictMode.setVmPolicy(
+            VmPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build()
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            StrictMode.setVmPolicy(VmPolicy.Builder() // Other StrictMode checks that you've previously added.
+                .detectUnsafeIntentLaunch()
+                .penaltyLog()
+                .build())
+        }
     }
 
     override fun resetSdkLogging() {
@@ -149,5 +184,66 @@ class TimberLoggingRepository @Inject constructor(
 
     override suspend fun setChatLoggingEnabled(enabled: Boolean) {
         loggingPreferencesGateway.setChatLoggingEnabledPreference(enabled)
+    }
+
+    override suspend fun startUpLogging() {
+        withContext(ioDispatcher) {
+            Util.checkAppUpgrade()
+            checkMegaStandbyBucket()
+            getTombstoneInfo()
+        }
+    }
+
+    /**
+     * Get the current standby bucket of the app.
+     * The system determines the standby state of the app based on app usage patterns.
+     *
+     * @return the current standby bucket of the app：
+     * STANDBY_BUCKET_ACTIVE,
+     * STANDBY_BUCKET_WORKING_SET,
+     * STANDBY_BUCKET_FREQUENT,
+     * STANDBY_BUCKET_RARE,
+     * STANDBY_BUCKET_RESTRICTED,
+     * STANDBY_BUCKET_NEVER
+     */
+    private fun checkMegaStandbyBucket() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val usageStatsManager =
+                application.getSystemService(Context.USAGE_STATS_SERVICE) as? UsageStatsManager
+                    ?: return
+            val standbyBucket = usageStatsManager.appStandbyBucket
+            Timber.d("getAppStandbyBucket(): %s", standbyBucket)
+        }
+    }
+
+    /**
+     * Get the tombstone information.
+     */
+    private fun getTombstoneInfo() {
+        Timber.d("getTombstoneInfo")
+        val activityManager =
+            application.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager ?: return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val exitReasons = activityManager.getHistoricalProcessExitReasons(
+                /* packageName = */null,
+                /* pid = */0,
+                /* maxNum = */3
+            )
+            exitReasons.forEach { exitReason ->
+                if (exitReason.reason == ApplicationExitInfo.REASON_CRASH_NATIVE) {
+                    // Get the tombstone input stream.
+                    try {
+                        exitReason.traceInputStream?.use {
+                            // The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
+                            val tombstone =
+                                Tombstone.parseFrom(it)
+                            Timber.e("Tombstone Info%s", tombstone.toString())
+                        }
+                    } catch (e: IOException) {
+                        Timber.e(e)
+                    }
+                }
+            }
+        }
     }
 }

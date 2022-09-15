@@ -17,6 +17,12 @@ interface LoggingRepository {
     fun enableLogAllToConsole()
 
     /**
+     * Enable strict mode
+     *
+     */
+    fun enableStrictMode()
+
+    /**
      * Reset sdk logging
      *
      */
@@ -82,4 +88,10 @@ interface LoggingRepository {
      * @param enabled
      */
     suspend fun setChatLoggingEnabled(enabled: Boolean)
+
+    /**
+     * Start up logging
+     *
+     */
+    suspend fun startUpLogging()
 }

@@ -13,7 +13,7 @@ object ExtraUtils {
      * Get Activity Intent extra at runtime when accessing the data.
      */
     inline fun <reified T : Any> Activity.extra(key: String, default: T? = null) = lazy {
-        val value = intent?.extras?.get(key)
+        val value = intent?.extras?.getString(key)
         if (value is T) value else default
     }
 
@@ -21,7 +21,7 @@ object ExtraUtils {
      * Get Activity Intent not nullable extra at runtime when accessing the data.
      */
     inline fun <reified T : Any> Activity.extraNotNull(key: String, default: T? = null) = lazy {
-        val value = intent?.extras?.get(key)
+        val value = intent?.extras?.getString(key)
         requireNotNull(if (value is T) value else default) { key }
     }
 
@@ -29,7 +29,7 @@ object ExtraUtils {
      * Get Fragment Argument at runtime when accessing the data.
      */
     inline fun <reified T : Any> Fragment.extra(key: String, default: T? = null) = lazy {
-        val value = arguments?.get(key)
+        val value = arguments?.getString(key)
         if (value is T) value else default
     }
 
@@ -37,7 +37,7 @@ object ExtraUtils {
      * Get Fragment not nullable Argument at runtime when accessing the data.
      */
     inline fun <reified T : Any> Fragment.extraNotNull(key: String, default: T? = null) = lazy {
-        val value = arguments?.get(key)
+        val value = arguments?.getString(key)
         requireNotNull(if (value is T) value else default) { key }
     }
 }

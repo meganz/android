@@ -6,6 +6,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.mapper.ChatRequestMapper
+import mega.privacy.android.app.data.mapper.ContactDataMapper
+import mega.privacy.android.app.data.mapper.ContactItemMapper
 import mega.privacy.android.app.data.mapper.ContactRequestMapper
 import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.data.mapper.EventMapper
@@ -32,6 +34,8 @@ import mega.privacy.android.app.data.mapper.getMimeType
 import mega.privacy.android.app.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.app.data.mapper.toChatRequest
+import mega.privacy.android.app.data.mapper.toContactData
+import mega.privacy.android.app.data.mapper.toContactItem
 import mega.privacy.android.app.data.mapper.toContactRequest
 import mega.privacy.android.app.data.mapper.toData
 import mega.privacy.android.app.data.mapper.toEvent
@@ -163,4 +167,10 @@ class MapperModule {
 
     @Provides
     fun provideOnlineStatusMapper(): OnlineStatusMapper = ::toOnlineStatus
+
+    @Provides
+    fun provideContactItemMapper(): ContactItemMapper = ::toContactItem
+
+    @Provides
+    fun provideContactDataMapper(): ContactDataMapper = ::toContactData
 }

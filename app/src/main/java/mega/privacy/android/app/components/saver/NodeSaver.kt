@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.StatFs
 import android.text.TextUtils
@@ -507,7 +508,15 @@ class NodeSaver(
      * @param savedInstanceState savedInstanceState param of onCreate
      */
     fun restoreState(savedInstanceState: Bundle) {
-        val oldSaving = savedInstanceState.getParcelable<Saving>(STATE_KEY_SAVING) ?: return
+        val oldSaving = with(savedInstanceState) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getParcelable(STATE_KEY_SAVING, Saving::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                getParcelable(STATE_KEY_SAVING)
+            }
+        } ?: return
+
         saving = oldSaving
     }
 

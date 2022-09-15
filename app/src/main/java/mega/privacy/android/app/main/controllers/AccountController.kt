@@ -13,6 +13,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.os.Build
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
@@ -447,7 +448,13 @@ class AccountController(private val context: Context) {
             var s = context.packageName
 
             try {
-                val p = m.getPackageInfo(s!!, 0)
+                val p = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    m.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
+                } else {
+                    @Suppress("DEPRECATION")
+                    m.getPackageInfo(context.packageName, 0)
+                }
+
                 s = p.applicationInfo.dataDir
             } catch (e: PackageManager.NameNotFoundException) {
                 Timber.d("Error Package name not found $e")

@@ -122,6 +122,15 @@ class MegaChatApiFacade @Inject constructor(
     override fun getChatRoomByUser(userHandle: Long): MegaChatRoom? =
         chatApi.getChatRoomByUser(userHandle)
 
+    override fun getUserAliasFromCache(userHandle: Long): String? =
+        chatApi.getUserAliasFromCache(userHandle)
+
+    override fun getUserFullNameFromCache(userHandle: Long): String? =
+        chatApi.getUserFullnameFromCache(userHandle)
+
+    override fun getUserOnlineStatus(userHandle: Long): Int =
+        chatApi.getUserOnlineStatus(userHandle)
+
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
     }

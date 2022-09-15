@@ -1,6 +1,5 @@
 package mega.privacy.android.app;
 
-import static android.app.ApplicationExitInfo.REASON_CRASH_NATIVE;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
@@ -36,24 +35,19 @@ import static mega.privacy.android.app.utils.DBUtil.callToExtendedAccountDetails
 import static mega.privacy.android.app.utils.DBUtil.callToPaymentMethods;
 import static mega.privacy.android.app.utils.IncomingCallNotification.shouldNotify;
 import static mega.privacy.android.app.utils.IncomingCallNotification.toSystemSettingNotification;
-import static mega.privacy.android.app.utils.Util.checkAppUpgrade;
 import static mega.privacy.android.app.utils.Util.isSimplifiedChinese;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ApplicationExitInfo;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
@@ -61,13 +55,11 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.os.StrictMode;
 import android.text.Spanned;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
@@ -87,10 +79,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.webrtc.ContextUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -121,7 +110,6 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.CallSoundsController;
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
@@ -131,7 +119,6 @@ import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.logging.InitialiseLoggingUseCaseJavaWrapper;
 import mega.privacy.android.app.presentation.theme.ThemeModeState;
-import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase;
 import mega.privacy.android.app.utils.CallUtil;
@@ -246,7 +233,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
     private static boolean isBlockedDueToWeakAccount = false;
     private static boolean isWebOpenDueToEmailVerification = false;
     private static boolean isWaitingForCall = false;
-    private static boolean areAdvertisingCookiesEnabled = false;
     private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
     private BroadcastReceiver logoutReceiver;
@@ -431,8 +417,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
         super.onCreate();
 
-        setStrictModePolicies();
-
         initialiseLogging();
 
         themeModeState.initialise();
@@ -447,13 +431,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
         keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis() + interval);
         keepAliveHandler.postDelayed(keepAliveRunnable, interval);
-
-        checkAppUpgrade();
-        checkMegaStandbyBucket();
-        getTombstoneInfo();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            checkForUnsafeIntentLaunch();
-        }
 
         setupMegaApi();
         setupMegaApiFolder();
@@ -545,24 +522,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
         initFresco();
 
-    }
-
-    private void setStrictModePolicies() {
-        if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(
-                    new StrictMode.ThreadPolicy.Builder()
-                            .detectAll()
-                            .penaltyLog()
-                            .build()
-            );
-
-            StrictMode.setVmPolicy(
-                    new StrictMode.VmPolicy.Builder()
-                            .detectAll()
-                            .penaltyLog()
-                            .build()
-            );
-        }
     }
 
     private void initialiseLogging() {
@@ -778,8 +737,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((cookies, throwable) -> {
                     if (throwable == null) {
-                        setAdvertisingCookiesEnabled(cookies.contains(CookieType.ADVERTISEMENT));
-
                         boolean analyticsCookiesEnabled = cookies.contains(CookieType.ANALYTICS);
                         crashReporter.setEnabled(analyticsCookiesEnabled);
                         performanceReporter.setEnabled(analyticsCookiesEnabled);
@@ -1122,73 +1079,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
         }
     }
 
-    /**
-     * Get the current standby bucket of the app.
-     * The system determines the standby state of the app based on app usage patterns.
-     *
-     * @return the current standby bucket of the app：
-     * STANDBY_BUCKET_ACTIVE,
-     * STANDBY_BUCKET_WORKING_SET,
-     * STANDBY_BUCKET_FREQUENT,
-     * STANDBY_BUCKET_RARE,
-     * STANDBY_BUCKET_RESTRICTED,
-     * STANDBY_BUCKET_NEVER
-     */
-    public int checkMegaStandbyBucket() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(USAGE_STATS_SERVICE);
-            if (usageStatsManager != null) {
-                int standbyBucket = usageStatsManager.getAppStandbyBucket();
-                Timber.d("getAppStandbyBucket(): %s", standbyBucket);
-                return standbyBucket;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Get the tombstone information.
-     */
-    public void getTombstoneInfo() {
-        new Thread(() -> {
-            Timber.d("getTombstoneInfo");
-            ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-            List<ApplicationExitInfo> exitReasons;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                exitReasons = activityManager.getHistoricalProcessExitReasons(/* packageName = */ null, /* pid = */ 0, /* maxNum = */ 3);
-                for (ApplicationExitInfo aei : exitReasons) {
-                    if (aei.getReason() == REASON_CRASH_NATIVE) {
-                        // Get the tombstone input stream.
-                        try {
-                            InputStream tombstoneInputStream = aei.getTraceInputStream();
-                            if (tombstoneInputStream != null) {
-                                // The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
-                                TombstoneProtos.Tombstone tombstone = TombstoneProtos.Tombstone.parseFrom(tombstoneInputStream);
-                                Timber.e("Tombstone Info%s", tombstone.toString());
-                                tombstoneInputStream.close();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }).start();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.S)
-    private void checkForUnsafeIntentLaunch() {
-        boolean isDebug = ((this.getApplicationInfo().flags &
-                ApplicationInfo.FLAG_DEBUGGABLE) != 0);
-        if (isDebug) {
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    // Other StrictMode checks that you've previously added.
-                    .detectUnsafeIntentLaunch()
-                    .penaltyLog()
-                    .build());
-        }
-    }
-
     public void createOrUpdateAudioManager(boolean isSpeakerOn, int type) {
         Timber.d("Create or update audio manager, type is %s", type);
         chatManagement.registerScreenReceiver();
@@ -1360,13 +1250,5 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
     public static void setUserWaitingForCall(long userWaitingForCall) {
         MegaApplication.userWaitingForCall = userWaitingForCall;
-    }
-
-    public static boolean areAdvertisingCookiesEnabled() {
-        return areAdvertisingCookiesEnabled;
-    }
-
-    public static void setAdvertisingCookiesEnabled(boolean enabled) {
-        areAdvertisingCookiesEnabled = enabled;
     }
 }

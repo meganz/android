@@ -209,13 +209,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         @JvmOverloads
         fun getIntentForTimeline(
             context: Context,
-            childOrder: Int = ORDER_PHOTO_ASC,
             currentNodeHandle: Long? = null,
             showSlideshow: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(EXTRA_IS_TIMELINE, true)
-                putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, childOrder)
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
                 putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
             }
@@ -395,7 +393,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         if (requestImagesData) {
             when {
                 isTimeline ->
-                    viewModel.retrieveImagesFromTimeline(childOrder, nodeHandle)
+                    viewModel.retrieveImagesFromTimeline(nodeHandle)
                 parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE ->
                     viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder, nodeHandle)
                 childrenHandles?.isNotEmpty() == true ->
