@@ -189,8 +189,7 @@ class StartConversationViewModel @Inject constructor(
                         replaceIfExists(copy(
                             fullName = contactData.fullName,
                             alias = contactData.alias,
-                            avatarUri = contactData.avatarUri,
-                            defaultAvatarContent = contactData.defaultAvatarContent
+                            avatarUri = contactData.avatarUri
                         ))
                         contactList.update { this.sortList() }
                     }

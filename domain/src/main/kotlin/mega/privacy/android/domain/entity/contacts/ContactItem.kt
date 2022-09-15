@@ -10,7 +10,6 @@ import java.io.Serializable
  * @property email                  User email.
  * @property fullName               User full name.
  * @property alias                  User alias.
- * @property defaultAvatarContent   User default avatar letter.
  * @property defaultAvatarColor     User default avatar color.
  * @property visibility             [UserVisibility].
  * @property timestamp              Time when the user was included in the contact list.
@@ -24,7 +23,6 @@ data class ContactItem(
     val email: String,
     val fullName: String? = null,
     val alias: String? = null,
-    val defaultAvatarContent: String,
     val defaultAvatarColor: String,
     val visibility: UserVisibility,
     val timestamp: Long,
