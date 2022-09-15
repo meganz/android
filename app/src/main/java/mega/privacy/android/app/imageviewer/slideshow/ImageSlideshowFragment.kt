@@ -7,7 +7,9 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -103,6 +105,7 @@ class ImageSlideshowFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        enterFullScreenMode(false)
         binding.viewPager.adapter = null
         super.onDestroyView()
     }
@@ -146,31 +149,55 @@ class ImageSlideshowFragment : Fragment() {
         }
 
         viewModel.onSlideshowState().observe(viewLifecycleOwner, ::updateSlideshowState)
-        viewModel.onShowToolbar().observe(viewLifecycleOwner, ::changeBottomBarVisibility)
+        viewModel.onShowToolbar().observe(viewLifecycleOwner, ::animateBottomBar)
     }
 
     /**
      * Change bottomBar visibility with animation.
      *
-     * @param show                  Show or hide toolbar/bottombar
-     * @param enableTransparency    Enable transparency change
+     * @param show  Show or hide bottombar
      */
-    private fun changeBottomBarVisibility(show: Boolean, enableTransparency: Boolean = false) {
-        binding.motion.post {
-            val color: Int
-            if (show) {
-                color = R.color.white_black
-                binding.motion.transitionToEnd()
-            } else {
-                color = android.R.color.black
-                binding.motion.transitionToStart()
+    private fun animateBottomBar(show: Boolean) {
+        binding.root.post {
+            val newAlpha = if (show) 1f else 0f
+            binding.bgBottom.apply {
+                val newTranslationY = if (show) 0f else height.toFloat()
+                animate()
+                    .alpha(newAlpha)
+                    .translationY(newTranslationY)
+                    .setDuration(250)
+                    .start()
             }
-            binding.motion.setBackgroundColor(ContextCompat.getColor(requireContext(),
-                if (enableTransparency && !show) {
-                    android.R.color.transparent
-                } else {
-                    color
-                }))
+            binding.btnPause.apply {
+                val newTranslationY = if (show) 0f else height.toFloat()
+                animate()
+                    .alpha(newAlpha)
+                    .translationY(newTranslationY)
+                    .setDuration(250)
+                    .start()
+            }
+            binding.btnPlay.apply {
+                val newTranslationY = if (show) 0f else height.toFloat()
+                animate()
+                    .alpha(newAlpha)
+                    .translationY(newTranslationY)
+                    .setDuration(250)
+                    .start()
+            }
+            enterFullScreenMode(!show)
+        }
+    }
+
+    private fun enterFullScreenMode(enable: Boolean) {
+        if (enable) {
+            activity?.window?.decorView?.let { ViewCompat.getWindowInsetsController(it) }?.apply {
+                systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                hide(WindowInsetsCompat.Type.systemBars())
+            }
+        } else {
+            activity?.window?.decorView?.let { ViewCompat.getWindowInsetsController(it) }?.apply {
+                show(WindowInsetsCompat.Type.systemBars())
+            }
         }
     }
 

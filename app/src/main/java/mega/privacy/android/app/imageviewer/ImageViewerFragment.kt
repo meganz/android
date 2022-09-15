@@ -135,7 +135,7 @@ class ImageViewerFragment : Fragment() {
         }
 
         viewModel.onCurrentImageItem().observe(viewLifecycleOwner, ::showCurrentImageInfo)
-        viewModel.onShowToolbar().observe(viewLifecycleOwner, ::changeBottomBarVisibility)
+        viewModel.onShowToolbar().observe(viewLifecycleOwner, ::animateBottomBar)
     }
 
     /**
@@ -162,17 +162,13 @@ class ImageViewerFragment : Fragment() {
     /**
      * Change bottomBar visibility with animation.
      *
-     * @param show  Show or hide toolbar/bottombar
+     * @param show  Show or hide bottombar
      */
-    private fun changeBottomBarVisibility(show: Boolean) {
+    private fun animateBottomBar(show: Boolean) {
         binding.root.post {
             val newAlpha = if (show) 1f else 0f
             binding.bgBottom.apply {
-                val newTranslationY = if (show) {
-                    0f
-                } else {
-                    height.toFloat()
-                }
+                val newTranslationY = if (show) 0f else height.toFloat()
                 animate()
                     .alpha(newAlpha)
                     .translationY(newTranslationY)
@@ -180,11 +176,7 @@ class ImageViewerFragment : Fragment() {
                     .start()
             }
             binding.txtTitle.apply {
-                val newTranslationY = if (show) {
-                    0f
-                } else {
-                    height.toFloat()
-                }
+                val newTranslationY = if (show) 0f else height.toFloat()
                 animate()
                     .alpha(newAlpha)
                     .translationY(newTranslationY)
@@ -192,11 +184,7 @@ class ImageViewerFragment : Fragment() {
                     .start()
             }
             binding.txtPageCount.apply {
-                val newTranslationY = if (show) {
-                    0f
-                } else {
-                    height.toFloat()
-                }
+                val newTranslationY = if (show) 0f else height.toFloat()
                 animate()
                     .alpha(newAlpha)
                     .translationY(newTranslationY)

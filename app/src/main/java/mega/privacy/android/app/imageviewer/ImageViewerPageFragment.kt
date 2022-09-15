@@ -102,11 +102,11 @@ class ImageViewerPageFragment : Fragment() {
         super.onPause()
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         if (activity?.isFinishing == true) {
             viewModel.stopImageLoading(itemId)
         }
-        super.onDestroy()
+        super.onDestroyView()
     }
 
     private fun setupView() {

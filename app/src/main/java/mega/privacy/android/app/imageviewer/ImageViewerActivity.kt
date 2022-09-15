@@ -321,6 +321,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private var nodeSaver: NodeSaver? = null
     private var nodeAttacher: MegaAttacher? = null
     private var dragToExit: DragToExitSupport? = null
+    private var dragStarted: Boolean = false
 
     private lateinit var binding: ActivityImageViewerBinding
 
@@ -418,7 +419,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
         }
 
-        viewModel.onShowToolbar().observe(this, ::changeToolbarVisibility)
+        viewModel.onShowToolbar().observe(this, ::animateToolbar)
         viewModel.onSnackBarMessage().observe(this) { message ->
             bottomSheet?.dismissAllowingStateLoss()
             showSnackbar(message)
@@ -455,14 +456,17 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     private fun setupAttachers(savedInstanceState: Bundle?) {
         dragToExit = DragToExitSupport(this, { activate ->
-            binding.root.post {
-                viewModel.showToolbar(!activate)
-                binding.imagesNavHostFragment.setBackgroundColor(ContextCompat.getColor(this@ImageViewerActivity,
-                    if (activate) {
-                        android.R.color.transparent
-                    } else {
-                        R.color.white_black
-                    })
+            if (activate) {
+                dragStarted = true
+                viewModel.showToolbar(false)
+                binding.imagesNavHostFragment.setBackgroundColor(
+                    ContextCompat.getColor(this@ImageViewerActivity, android.R.color.transparent)
+                )
+            } else if (dragStarted) {
+                dragStarted = false
+                viewModel.showToolbar(true)
+                binding.imagesNavHostFragment.setBackgroundColor(
+                    ContextCompat.getColor(this@ImageViewerActivity, R.color.white_black)
                 )
             }
         }) {
@@ -485,9 +489,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     /**
      * Change toolbar visibility with animation.
      *
-     * @param show  Show or hide toolbar/bottombar
+     * @param show  Show or hide toolbar
      */
-    private fun changeToolbarVisibility(show: Boolean) {
+    private fun animateToolbar(show: Boolean) {
         binding.toolbar.apply {
             post {
                 val newAlpha: Float
