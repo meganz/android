@@ -6,7 +6,6 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -46,7 +45,7 @@ class DefaultGalleryFilesRepository @Inject constructor(
                     trySend(files.sortedByDescending { it.dateAdded })
                 }
 
-            awaitClose { cancel() }
+            awaitClose { }
         }
 
     /**
@@ -106,7 +105,7 @@ class DefaultGalleryFilesRepository @Inject constructor(
                 Timber.e("Cursor is null")
             }
 
-            awaitClose { cancel() }
+            awaitClose { }
         }
 
     /**
@@ -171,6 +170,6 @@ class DefaultGalleryFilesRepository @Inject constructor(
                 Timber.e("Cursor is null")
             }
 
-            awaitClose { cancel() }
+            awaitClose { }
         }
 }

@@ -116,7 +116,7 @@ class ChatRoomToolbarViewModel @Inject constructor(
      * Add take picture option in the gallery
      */
     private fun addTakePicture(files: MutableList<FileGalleryItem>) {
-      //  files.add(0, createTakeAPictureOption())
+        files.add(0, createTakeAPictureOption())
         _filesGallery.value = files
     }
 
