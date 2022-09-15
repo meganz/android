@@ -6,9 +6,13 @@ import mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_Q
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.main.megachat.NonContactInfo
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_DESC
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
 import javax.inject.Inject
 
 /**
@@ -29,19 +33,18 @@ class MegaLocalStorageFacade @Inject constructor(
         dbHandler.preferences?.megaHandleSecondaryFolder?.toLongOrNull()
 
     override suspend fun getCloudSortOrder(): Int =
-        dbHandler.preferences?.preferredSortCloud?.toInt() ?: SortOrder.ORDER_DEFAULT_ASC.value
+        dbHandler.preferences?.preferredSortCloud?.toInt() ?: ORDER_DEFAULT_ASC
 
     override suspend fun getCameraSortOrder(): Int =
-        dbHandler.preferences?.preferredSortCameraUpload?.toInt()
-            ?: SortOrder.ORDER_MODIFICATION_DESC.value
+        dbHandler.preferences?.preferredSortCameraUpload?.toInt() ?: ORDER_MODIFICATION_DESC
 
     override suspend fun getOthersSortOrder(): Int =
-        dbHandler.preferences?.preferredSortOthers?.toInt() ?: SortOrder.ORDER_DEFAULT_ASC.value
+        dbHandler.preferences?.preferredSortOthers?.toInt() ?: ORDER_DEFAULT_ASC
 
     override suspend fun getLinksSortOrder(): Int =
         when (val order = getCloudSortOrder()) {
-            SortOrder.ORDER_MODIFICATION_ASC.value -> SortOrder.ORDER_LINK_CREATION_ASC.value
-            SortOrder.ORDER_MODIFICATION_DESC.value -> SortOrder.ORDER_LINK_CREATION_DESC.value
+            ORDER_MODIFICATION_ASC -> ORDER_LINK_CREATION_ASC
+            ORDER_MODIFICATION_DESC -> ORDER_LINK_CREATION_DESC
             else -> order
         }
 
