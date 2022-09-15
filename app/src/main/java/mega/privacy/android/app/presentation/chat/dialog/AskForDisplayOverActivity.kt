@@ -12,9 +12,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
+import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -31,7 +31,6 @@ import javax.inject.Inject
  *
  * @see mega.privacy.android.app.utils.IncomingCallNotification.toSystemSettingNotification
  */
-@RequiresApi(Build.VERSION_CODES.M)
 @AndroidEntryPoint
 class AskForDisplayOverActivity : ComponentActivity() {
 
@@ -81,9 +80,9 @@ class AskForDisplayOverActivity : ComponentActivity() {
         }
 
         setContent {
-            val showDialogState: Boolean by viewModel.showDialog.collectAsState()
+            val showDialogState: Boolean by viewModel.showDialog.collectAsStateWithLifecycle()
             val themeMode by getThemeMode()
-                .collectAsState(initial = ThemeMode.System)
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             AndroidTheme(isDark = themeMode.isDarkMode()) {
                 AskForDisplayOverDialogView(showDialogState)
             }

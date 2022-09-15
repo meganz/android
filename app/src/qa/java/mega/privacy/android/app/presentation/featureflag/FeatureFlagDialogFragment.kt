@@ -36,7 +36,7 @@ class FeatureFlagDialogFragment : DialogFragment() {
             ComposeView(requireContext()).apply {
                 setContent {
                     val mode by getThemeMode()
-                        .collectAsState(initial = ThemeMode.System)
+                        .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                     AndroidTheme(isDark = mode.isDarkMode()) {
                         FeatureFlagBody()
                     }
@@ -50,7 +50,7 @@ class FeatureFlagDialogFragment : DialogFragment() {
      */
     @Composable
     fun FeatureFlagBody() {
-        val uiState by featureFlagMenuViewModel.state.collectAsState()
+        val uiState by featureFlagMenuViewModel.state.collectAsStateWithLifecycle()
         FeatureFlagListContainer(
             uiState = uiState,
             onCheckedChange = featureFlagMenuViewModel::setFeatureEnabled
