@@ -599,13 +599,13 @@ interface MegaApiGateway {
     /**
      * Gets the avatar of a contact if exists.
      *
-     * @param email_or_handle Email or user handle (Base64 encoded) to get the attribute.
-     * @param path            Path in which the avatar will be stored if exists.
-     * @param listener        Listener.
+     * @param emailOrHandle Email or user handle (Base64 encoded) to get the attribute.
+     * @param path          Path in which the avatar will be stored if exists.
+     * @param listener      Listener.
      * @return The path of the avatar if exists.
      */
     fun getContactAvatar(
-        email_or_handle: String,
+        emailOrHandle: String,
         path: String,
         listener: MegaRequestListenerInterface,
     )
@@ -613,8 +613,8 @@ interface MegaApiGateway {
     /**
      * Gets an attribute of any user in MEGA.
      *
-     * @param email_or_handle Email or user handle (Base64 encoded) to get the attribute.
-     * @param type            Attribute type.
+     * @param emailOrHandle Email or user handle (Base64 encoded) to get the attribute.
+     * @param type          Attribute type.
      */
-    fun getUserAttribute(email_or_handle: String, type: Int, listener: MegaRequestListenerInterface)
+    fun getUserAttribute(emailOrHandle: String, type: Int, listener: MegaRequestListenerInterface)
 }

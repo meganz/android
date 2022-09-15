@@ -300,12 +300,12 @@ class DefaultContactsRepository @Inject constructor(
         )
 
     private suspend fun getContactAvatar(
-        email_or_handle: String,
+        emailOrHandle: String,
         avatarFileName: String,
     ): String? =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaApiGateway.getContactAvatar(email_or_handle,
+                megaApiGateway.getContactAvatar(emailOrHandle,
                     avatarFileName,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = onRequestGetUserAvatarCompleted(continuation)
@@ -313,19 +313,19 @@ class DefaultContactsRepository @Inject constructor(
             }
         }
 
-    private suspend fun getUserFullName(email_or_handle: String): String? =
+    private suspend fun getUserFullName(emailOrHandle: String): String? =
         withContext(ioDispatcher) {
-            getUserFirstName(email_or_handle)
-            getUserLastName(email_or_handle)
-            val userHandle = megaApiGateway.getContact(email_or_handle)?.handle ?: -1
+            getUserFirstName(emailOrHandle)
+            getUserLastName(emailOrHandle)
+            val userHandle = megaApiGateway.getContact(emailOrHandle)?.handle ?: -1
             val fullName = megaChatApiGateway.getUserFullNameFromCache(userHandle)
             if (fullName.isNullOrEmpty()) null else fullName
         }
 
-    private suspend fun getUserFirstName(email_or_handle: String): String? =
+    private suspend fun getUserFirstName(emailOrHandle: String): String? =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaApiGateway.getUserAttribute(email_or_handle,
+                megaApiGateway.getUserAttribute(emailOrHandle,
                     MegaApiJava.USER_ATTR_FIRSTNAME,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = onRequestGetUserNameCompleted(continuation)
@@ -342,10 +342,10 @@ class DefaultContactsRepository @Inject constructor(
             }
         }
 
-    private suspend fun getUserLastName(email_or_handle: String): String? =
+    private suspend fun getUserLastName(emailOrHandle: String): String? =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaApiGateway.getUserAttribute(email_or_handle,
+                megaApiGateway.getUserAttribute(emailOrHandle,
                     MegaApiJava.USER_ATTR_LASTNAME,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = onRequestGetUserNameCompleted(continuation)
