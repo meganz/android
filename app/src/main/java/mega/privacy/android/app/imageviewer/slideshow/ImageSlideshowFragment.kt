@@ -107,6 +107,7 @@ class ImageSlideshowFragment : Fragment() {
     override fun onDestroyView() {
         enterFullScreenMode(false)
         binding.viewPager.adapter = null
+        if (activity?.isFinishing != true) viewModel.showToolbar(true)
         super.onDestroyView()
     }
 
