@@ -35,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,8 +45,8 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.main.managerSections.TransfersViewModel;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -67,16 +68,16 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
     private boolean multipleSelect;
     private SparseBooleanArray selectedItems;
 
-    private TransfersManagement transfersManagement;
+    private final TransfersViewModel viewModel;
 
     public MegaTransfersAdapter(Context _context, List<MegaTransfer> _transfers,
                                 RecyclerView _listView, SelectModeInterface selectModeInterface,
-                                TransfersManagement transfersManagement) {
+                                TransfersViewModel viewModel) {
         this.context = _context;
         this.tL = _transfers;
         this.listFragment = _listView;
         this.selectModeInterface = selectModeInterface;
-        this.transfersManagement = transfersManagement;
+        this.viewModel = viewModel;
 
         if (megaApi == null) {
             megaApi = MegaApplication.getInstance().getMegaApi();
@@ -136,7 +137,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
     }
 
     @Override
-    public void onBindViewHolder(ViewHolderTransfer holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolderTransfer holder, int position) {
         MegaTransfer transfer = (MegaTransfer) getItem(position);
 
         if (transfer == null) {
@@ -271,7 +272,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
                 case STATE_COMPLETING:
                 case STATE_RETRYING:
                 case STATE_QUEUED:
-                    if ((transferType == TYPE_DOWNLOAD && transfersManagement.isOnTransferOverQuota())
+                    if ((transferType == TYPE_DOWNLOAD && viewModel.isOnTransferOverQuota())
                             || (transferType == TYPE_UPLOAD && MegaApplication.getInstance().getStorageState() == MegaApiJava.STORAGE_STATE_RED)) {
                         holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.orange_400_orange_300));
 
@@ -357,7 +358,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
             return;
         }
 
-        int currentPosition = holder.getAdapterPosition();
+        int currentPosition = holder.getAbsoluteAdapterPosition();
         MegaTransfer t = (MegaTransfer) getItem(currentPosition);
         if (t == null) {
             Timber.w("MegaTransfer is NULL- not action performed");

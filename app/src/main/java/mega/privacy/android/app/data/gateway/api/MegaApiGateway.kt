@@ -438,6 +438,17 @@ interface MegaApiGateway {
     suspend fun getTransfers(type: Int): List<MegaTransfer>
 
     /**
+     * Get the transfer with a transfer tag
+     * That tag can be got using MegaTransfer::getTag
+     * You take the ownership of the returned value
+     *
+     * @param tag tag to check
+     * @return MegaTransfer object with that tag, or NULL if there isn't any
+     * active transfer with it
+     */
+    suspend fun getTransfersByTag(tag: Int): MegaTransfer?
+
+    /**
      * Starts a download.
      *
      * @param node        MegaNode that identifies the file or folder.
@@ -572,6 +583,35 @@ interface MegaApiGateway {
      * @return True in, else not in
      */
     suspend fun isInRubbish(node: MegaNode): Boolean
+
+    /**
+     * Move a transfer to the top of the transfer queue
+     *
+     * @param transfer Transfer to move
+     * @param listener MegaRequestListener to track this request
+     */
+    suspend fun moveTransferToFirst(transfer: MegaTransfer, listener: MegaRequestListenerInterface)
+
+    /**
+     * Move a transfer to the bottom of the transfer queue
+     *
+     * @param transfer Transfer to move
+     * @param listener MegaRequestListener to track this request
+     */
+    suspend fun moveTransferToLast(transfer: MegaTransfer, listener: MegaRequestListenerInterface)
+
+    /**
+     * Move a transfer before another one in the transfer queue
+     *
+     * @param transfer     Transfer to move
+     * @param prevTransfer Transfer with the target position
+     * @param listener     MegaRequestListener to track this request
+     */
+    suspend fun moveTransferBefore(
+        transfer: MegaTransfer,
+        prevTransfer: MegaTransfer,
+        listener: MegaRequestListenerInterface,
+    )
 
     /**
      * Gets all contacts of this MEGA account.
