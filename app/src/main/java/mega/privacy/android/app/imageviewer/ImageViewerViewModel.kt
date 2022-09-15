@@ -227,10 +227,9 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun retrieveImagesFromTimeline(
-        childOrder: Int? = null,
         currentNodeHandle: Long? = null,
     ) {
-        getImageHandlesUseCase.get(isTimeline = true, sortOrder = childOrder)
+        getImageHandlesUseCase.get(isTimeline = true)
             .subscribeAndUpdateImages(currentNodeHandle)
     }
 

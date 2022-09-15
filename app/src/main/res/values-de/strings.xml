@@ -3999,9 +3999,9 @@
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Jetzt nicht</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
-    <string name="text_editor_creation_success">File saved to Cloud drive.</string>
+    <string name="text_editor_creation_success">Datei im Cloud Drive gespeichert.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
-    <string name="text_editor_creation_error">File not saved to Cloud drive. Try again.</string>
+    <string name="text_editor_creation_error">Datei konnte nicht im Cloud Drive gespeichert werden. Bitte versuchen Sie es erneut.</string>
     <!-- Action label to start images slideshow -->
     <string name="action_slideshow">Diaschau</string>
     <!-- Filter page: Prompt to choose media type -->
@@ -4023,7 +4023,7 @@
     <!-- Button to skip asking permissions. -->
     <string name="permissions_not_now_button">Jetzt nicht</string>
     <!-- Title of the screen asking for enabling notifications permission. -->
-    <string name="permissions_notifications_title">Get notified</string>
+    <string name="permissions_notifications_title">Benachrichtigungen erhalten</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
-    <string name="permissions_notifications_description">MEGA will send you call, chat, and file transfer notifications.</string>
+    <string name="permissions_notifications_description">MEGA sendet Ihnen Benachrichtigungen für Anrufe, Chats und Dateitransfers.</string>
 </resources>

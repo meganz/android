@@ -67,6 +67,10 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class ZipBrowserActivity : PasscodeActivity() {
+
+    /**
+     * [CrashReporter] injection
+     */
     @Inject
     lateinit var crashReporter: CrashReporter
 
@@ -105,7 +109,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             //Get the zip file path
             zipFullPath = getString(EXTRA_PATH_ZIP) ?: ""
             //Get the unzip root path for unpack zip file
-            unzipRootPath = zipFullPath.split(".").first()
+            unzipRootPath = zipFullPath.substring(0, zipFullPath.lastIndexOf("."))
         }
     }
 
@@ -155,8 +159,8 @@ class ZipBrowserActivity : PasscodeActivity() {
                     showAlert()
                 }
             }
-            openFile.observe(this@ZipBrowserActivity) { openFile ->
-                openFile(openFile.second, openFile.first)
+            openFile.observe(this@ZipBrowserActivity) { (first, second) ->
+                openFile(second, first)
             }
             lifecycleScope.launchWhenStarted {
                 enableBackPressedHandler.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
@@ -196,7 +200,7 @@ class ZipBrowserActivity : PasscodeActivity() {
      * @return bottom padding
      */
     private fun recycleViewBottomPadding(): Int {
-        return (RATIO_RECYCLE_VIEW * getScreenHeight()).toInt() //Based on Eduardo's measurements
+        return (RATIO_RECYCLER_VIEW * getScreenHeight()).toInt() //Based on Eduardo's measurements
     }
 
     /**
@@ -466,17 +470,38 @@ class ZipBrowserActivity : PasscodeActivity() {
         @EntryPoint
         @InstallIn(SingletonComponent::class)
         interface CrashReporterEntryPoint {
+            /**
+             * Get [CrashReporter]
+             *
+             * @return [CrashReporter] instance
+             */
             fun crashReporter(): CrashReporter
         }
 
+        /**
+         * Intent key for zip path
+         */
         const val EXTRA_PATH_ZIP = "PATH_ZIP"
-        const val EXTRA_HANDLE_ZIP = "HANDLE_ZIP"
-        const val MEGA_DOWNLOADS = "MEGA Downloads/"
 
+        /**
+         * Intent key for nodeHandle of zip file
+         */
+        const val EXTRA_HANDLE_ZIP = "HANDLE_ZIP"
+
+        /**
+         * File provider uri
+         */
         const val URI_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider"
+
+        /**
+         * Type audio
+         */
         const val TYPE_AUDIO = "audio/*"
 
-        const val RATIO_RECYCLE_VIEW = 85.0f / 548
+        /**
+         * Ratio of recycler view
+         */
+        const val RATIO_RECYCLER_VIEW = 85.0f / 548
 
         /**
          * Start ZipBrowserActivity and check the zip file if is error format

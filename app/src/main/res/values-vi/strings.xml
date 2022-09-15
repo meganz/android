@@ -2820,7 +2820,7 @@
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Hết Không Gian Lưu Trữ</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
-    <string name="over_disk_quota_paywall_title">Dữ liệu sắp bị mất!</string>
+    <string name="over_disk_quota_paywall_title">Dữ liệu đang gặp rủi ro!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
         <item quantity="other">Chúng tôi đã gửi thông báo vào địa chỉ email %1$s của quý khách vào ngày %2$s và ngày %3$s, nhưng quý khách vẫn còn %4$s tệp tin chiếm tới %5$s trong tài khoản MEGA, quý khách cần phải nâng câp lên %6$s để đáp ứng dung lượng.</item>
