@@ -898,7 +898,6 @@ public class Constants {
 
     public static final String EVENT_FAB_CHANGE = "fab_change";
 
-    public static final String KEY_HINT_IS_SHOWING = "hint_is_showing";
     public static final String KEY_IS_SHOWED_WARNING_MESSAGE = "is_showed_meeting_warning_message_";
 
     /** In database, invalid value is defined as '-1' */
