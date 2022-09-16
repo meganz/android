@@ -499,7 +499,8 @@ pipeline {
                             trackName: 'alpha',
                             rolloutPercentage: '0',
                             additionalVersionCodes: '429',
-                            nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}"
+                            nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}",
+                            recentChangeList: getRecentChangeList()
                 }
             }
         }
@@ -912,4 +913,45 @@ private void printWorkspaceSize(String prompt) {
         cd ${WORKSPACE}
         du -sh
     """
+}
+
+/**
+ * Get the list of recent changes (release note) sorted by language to upload to the Google Play
+ *
+ * @return the list of recent changes sorted by language
+ */
+def getRecentChangeList() {
+    def map = []
+
+    // The input file to load the data
+    //def input = new File('release_notes.xml').text
+    def input =
+            '''
+                <en-US>
+                - Bug fixes and performance improvements
+                </en-US>
+                <ar>
+                - إصلاح أخطاء وتحسينات على الأداء
+                </ar>
+                <de-DE>
+                - Fehlerkorrekturen und Leistungsverbesserungen
+                </de-DE>
+            '''
+
+    def list = new XmlSlurper().parseText(input)
+    list.each { language ->
+        def languageMap = [:]
+        languageMap["language"] = "${language.name}"
+        languageMap["text"] = "${language.text}"
+        map.add(languageMap)
+    }
+
+    // output
+//    def output = [
+//            [language: 'en-US', text: "Bug fixes and performance improvements"],
+//            [language: 'fr-FR', text: "Correctifs de bogues et améliorations des performances"],
+//            [language: 'zh-Tw', text: "錯誤修復和性能改進"],
+//    ]
+
+    return map
 }
