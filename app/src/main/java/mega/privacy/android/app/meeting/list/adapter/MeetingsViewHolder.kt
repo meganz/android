@@ -17,6 +17,10 @@ class MeetingsViewHolder(
     private val binding: ItemMeetingBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
+    private val selectAnimation by lazy {
+        AnimationUtils.loadAnimation(itemView.context, R.anim.multiselect_flip)
+    }
+
     fun bind(item: MeetingItem, isSelected: Boolean) {
         binding.txtTitle.text = item.title
         binding.txtTimestamp.text = item.formattedTimestamp
@@ -58,27 +62,25 @@ class MeetingsViewHolder(
             binding.imgThumbnail.isVisible = false
         }
 
-        if ((binding.imgSelectState.isVisible && !isSelected)
-            || (!binding.imgSelectState.isVisible && isSelected)
-        ) {
-            val animation = AnimationUtils.loadAnimation(itemView.context, R.anim.multiselect_flip)
-                .apply {
+        binding.imgSelectState.apply {
+            if ((isSelected && !isVisible) || (!isSelected && isVisible)) {
+                isVisible = true
+                startAnimation(selectAnimation.apply {
                     setAnimationListener(object : Animation.AnimationListener {
-                        override fun onAnimationStart(p0: Animation?) {
-                            binding.imgSelectState.isVisible = true
+                        override fun onAnimationEnd(animation: Animation?) {
+                            isVisible = isSelected
                         }
 
-                        override fun onAnimationEnd(p0: Animation?) {
-                            binding.imgSelectState.isVisible = isSelected
+                        override fun onAnimationStart(animation: Animation?) {
                         }
 
-                        override fun onAnimationRepeat(p0: Animation?) {
+                        override fun onAnimationRepeat(animation: Animation?) {
                         }
                     })
-                }
-            binding.imgSelectState.startAnimation(animation)
-        } else {
-            binding.imgSelectState.isVisible = isSelected
+                })
+            } else {
+                isVisible = isSelected
+            }
         }
     }
 
