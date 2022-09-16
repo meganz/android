@@ -83,4 +83,16 @@ interface ContactsRepository {
         outdatedContactList: List<ContactItem>,
         contactUpdates: UserUpdate,
     ): List<ContactItem>
+
+    /**
+     * Updates the contact list with the new contact.
+     *
+     * @param outdatedContactList Outdated contact list.
+     * @param newContacts         List with new contacts.
+     * @return The updated contact list.
+     */
+    suspend fun addNewContacts(
+        outdatedContactList: List<ContactItem>,
+        newContacts: List<ContactRequest>,
+    ): List<ContactItem>
 }
