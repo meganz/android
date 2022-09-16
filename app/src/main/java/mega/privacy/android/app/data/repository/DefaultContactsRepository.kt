@@ -154,14 +154,18 @@ class DefaultContactsRepository @Inject constructor(
                     null
                 }
 
-                contactItemMapper(
-                    megaUser,
+                val contactData = contactDataMapper(
                     fullName?.ifEmpty { null },
                     alias?.ifEmpty { null },
+                    avatarUri
+                )
+
+                contactItemMapper(
+                    megaUser,
+                    contactData,
                     megaApiGateway.getUserAvatarColor(megaUser),
                     megaApiGateway.areCredentialsVerified(megaUser),
                     status,
-                    avatarUri,
                     lastSeen
                 )
             }
@@ -308,16 +312,21 @@ class DefaultContactsRepository @Inject constructor(
                         onSuccess = { aliases -> aliases },
                         onFailure = { null }
                     )?.let { aliases ->
-                        outdatedContactList.forEach { (userHandle) ->
-                            updatedContact = updatedList.findItemByHandle(userHandle)
-                                ?.copy(alias = if (aliases.containsKey(userHandle)) aliases[userHandle] else null)
+                        outdatedContactList.forEach { (handle, _, contactData) ->
+                            val newContactData = contactData.copy(
+                                alias = if (aliases.containsKey(handle)) aliases[handle] else null)
+
+                            updatedContact = updatedList.findItemByHandle(handle)
+                                ?.copy(contactData = newContactData)
                         }
                     }
                 }
 
                 if (changes.contains(UserChanges.Firstname) || changes.contains(UserChanges.Lastname)) {
                     val fullName = getFullName(megaUser.email)
-                    updatedContact = updatedContact?.copy(fullName = fullName)
+                    updatedContact?.contactData?.copy(fullName = fullName)?.let { contactData ->
+                        updatedContact = updatedContact?.copy(contactData = contactData)
+                    }
                 }
 
                 if (changes.contains(UserChanges.Email)) {
@@ -326,7 +335,9 @@ class DefaultContactsRepository @Inject constructor(
 
                 if (changes.contains(UserChanges.Avatar)) {
                     val avatarUri = getAvatarUri(megaUser.email, "${megaUser.email}.jpg")
-                    updatedContact = updatedContact?.copy(avatarUri = avatarUri)
+                    updatedContact?.contactData?.copy(avatarUri = avatarUri)?.let { contactData ->
+                        updatedContact = updatedContact?.copy(contactData = contactData)
+                    }
                 }
 
                 updatedContact?.let { updatedList.replaceIfExists(it) }
@@ -347,14 +358,18 @@ class DefaultContactsRepository @Inject constructor(
             null
         }
 
-        return contactItemMapper(
-            megaUser,
+        val contactData = contactDataMapper(
             fullName,
             alias,
+            getAvatarUri(megaUser.email, "${megaUser.email}.jpg")
+        )
+
+        return contactItemMapper(
+            megaUser,
+            contactData,
             megaApiGateway.getUserAvatarColor(megaUser),
             megaApiGateway.areCredentialsVerified(megaUser),
             status,
-            getAvatarUri(megaUser.email, "${megaUser.email}.jpg"),
             lastSeen
         )
     }

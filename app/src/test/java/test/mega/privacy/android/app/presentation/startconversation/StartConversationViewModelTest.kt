@@ -20,6 +20,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.app.presentation.startconversation.StartConversationViewModel
+import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.presentation.controls.SearchWidgetState
 import mega.privacy.android.domain.entity.contacts.UserStatus
@@ -52,9 +53,11 @@ class StartConversationViewModelTest {
     var rule: TestRule = InstantTaskExecutorRule()
 
     private val savedStateHandle = SavedStateHandle(mapOf())
+    private val emptyContactData = ContactData(null, null, null)
     private val testContact = ContactItem(
         handle = Random.nextLong(),
         email = "email@mega.nz",
+        contactData = emptyContactData,
         defaultAvatarColor = "0asf80",
         visibility = UserVisibility.Visible,
         timestamp = Random.nextLong(),
@@ -66,6 +69,7 @@ class StartConversationViewModelTest {
             add(ContactItem(
                 handle = Random.nextLong(),
                 email = "email$i@mega.nz",
+                contactData = emptyContactData,
                 defaultAvatarColor = "0asf80",
                 visibility = UserVisibility.Visible,
                 timestamp = Random.nextLong(),

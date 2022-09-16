@@ -8,26 +8,22 @@ import java.io.Serializable
  *
  * @property handle                 User identifier.
  * @property email                  User email.
- * @property fullName               User full name.
- * @property alias                  User alias.
+ * @property contactData            [ContactData].
  * @property defaultAvatarColor     User default avatar color.
  * @property visibility             [UserVisibility].
  * @property timestamp              Time when the user was included in the contact list.
  * @property areCredentialsVerified True if user credentials are verified, false otherwise.
  * @property status                 [UserStatus].
- * @property avatarUri              User avatar uri.
  * @property lastSeen               User last seen.
  */
 data class ContactItem(
     val handle: Long,
     val email: String,
-    val fullName: String? = null,
-    val alias: String? = null,
+    val contactData: ContactData,
     val defaultAvatarColor: String,
     val visibility: UserVisibility,
     val timestamp: Long,
     val areCredentialsVerified: Boolean,
     val status: UserStatus,
-    val avatarUri: String? = null,
     val lastSeen: String? = null,
 ) : Serializable

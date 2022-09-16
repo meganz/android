@@ -12,7 +12,7 @@ import java.util.Locale
  * @return The first letter of the string to be painted in the default avatar.
  */
 fun ContactItem.getAvatarFirstLetter(): String =
-    getAvatarFirstLetter(alias ?: fullName ?: email)
+    getAvatarFirstLetter(contactData.alias ?: contactData.fullName ?: email)
 
 /**
  * Retrieve the first letter of a String.

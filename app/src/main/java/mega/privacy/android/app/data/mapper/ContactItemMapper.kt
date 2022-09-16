@@ -1,5 +1,6 @@
 package mega.privacy.android.app.data.mapper
 
+import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
@@ -10,35 +11,29 @@ import nz.mega.sdk.MegaUser
  */
 typealias ContactItemMapper = (
     @JvmSuppressWildcards MegaUser,
-    @JvmSuppressWildcards String?,
-    @JvmSuppressWildcards String?,
+    @JvmSuppressWildcards ContactData,
     @JvmSuppressWildcards String,
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards Int,
-    @JvmSuppressWildcards String?,
     @JvmSuppressWildcards String?,
 ) -> @JvmSuppressWildcards ContactItem
 
 internal fun toContactItem(
     user: MegaUser,
-    fullName: String?,
-    alias: String?,
+    contactData: ContactData,
     defaultAvatarColor: String,
     areCredentialsVerified: Boolean,
     status: Int,
-    avatarUri: String?,
     lastSeen: String?,
 ) = ContactItem(
     handle = user.handle,
     email = user.email,
-    fullName = fullName,
-    alias = alias,
+    contactData = contactData,
     defaultAvatarColor = defaultAvatarColor,
     visibility = userVisibility[user.visibility] ?: UserVisibility.Unknown,
     timestamp = user.timestamp,
     areCredentialsVerified = areCredentialsVerified,
     status = userStatus[status] ?: UserStatus.Invalid,
-    avatarUri = avatarUri,
     lastSeen = lastSeen
 )
 
