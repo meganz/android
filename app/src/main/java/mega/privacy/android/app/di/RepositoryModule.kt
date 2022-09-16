@@ -10,6 +10,7 @@ import mega.privacy.android.app.data.repository.DefaultAlbumsRepository
 import mega.privacy.android.app.data.repository.DefaultAvatarRepository
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.app.data.repository.DefaultChatRepository
+import mega.privacy.android.app.data.repository.DefaultContactsRepository
 import mega.privacy.android.app.data.repository.DefaultEnvironmentRepository
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.app.data.repository.DefaultFeatureFlagRepository
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.repository.AlbumsRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
@@ -105,6 +107,9 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindNotificationsRepository(repository: DefaultNotificationsRepository): NotificationsRepository
+
+    @Binds
+    abstract fun bindContactsRepository(repository: DefaultContactsRepository): ContactsRepository
 
     @Binds
     abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository

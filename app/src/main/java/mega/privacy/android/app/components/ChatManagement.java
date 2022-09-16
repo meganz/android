@@ -15,9 +15,7 @@ import static mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_ALONE_ON_
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import mega.privacy.android.app.usecase.call.EndCallUseCase;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -34,15 +32,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.ChatRoomListener;
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
+import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.VideoCaptureUtils;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import timber.log.Timber;
 
+@Singleton
 public class ChatManagement {
 
     private final ChatRoomListener chatRoomListener;
@@ -83,12 +89,15 @@ public class ChatManagement {
     private boolean isDisablingLocalVideo = false;
     private boolean isScreenOn = true;
     private boolean isScreenBroadcastRegister = false;
-    private EndCallUseCase endCallUseCase;
+    private final EndCallUseCase endCallUseCase;
+    private final RTCAudioManagerGateway rtcAudioManagerGateway;
 
-    public ChatManagement(EndCallUseCase endCallUseCase) {
+    @Inject
+    public ChatManagement(EndCallUseCase endCallUseCase, RTCAudioManagerGateway rtcAudioManagerGateway) {
         chatRoomListener = new ChatRoomListener();
         app = MegaApplication.getInstance();
         this.endCallUseCase = endCallUseCase;
+        this.rtcAudioManagerGateway = rtcAudioManagerGateway;
     }
 
     /**
@@ -327,7 +336,7 @@ public class ChatManagement {
     public void controlCallFinished(long callId, long chatId) {
         ArrayList<Long> listCalls = CallUtil.getCallsParticipating();
         if (listCalls == null || listCalls.isEmpty()) {
-            MegaApplication.getInstance().unregisterProximitySensor();
+            rtcAudioManagerGateway.unregisterProximitySensor();
         }
 
         clearIncomingCallNotification(callId);
@@ -340,7 +349,7 @@ public class ChatManagement {
     /**
      * Method to start a timer to end the call
      *
-     * @param chatId        Chat ID of the call
+     * @param chatId Chat ID of the call
      */
     public void startCounterToFinishCall(long chatId) {
         stopCounterToFinishCall();
@@ -391,10 +400,10 @@ public class ChatManagement {
         PreferenceManager.getDefaultSharedPreferences(MegaApplication.getInstance().getApplicationContext()).edit().remove(KEY_IS_SHOWED_WARNING_MESSAGE + chatId).apply();
 
         if (!existsAnOngoingOrIncomingCall()) {
-            MegaApplication.getInstance().removeRTCAudioManager();
-            MegaApplication.getInstance().removeRTCAudioManagerRingIn();
+            rtcAudioManagerGateway.removeRTCAudioManager();
+            rtcAudioManagerGateway.removeRTCAudioManagerRingIn();
         } else if (participatingInACall()) {
-            MegaApplication.getInstance().removeRTCAudioManagerRingIn();
+            rtcAudioManagerGateway.removeRTCAudioManagerRingIn();
         }
     }
 
@@ -491,7 +500,7 @@ public class ChatManagement {
 
             switch (intent.getAction()) {
                 case ACTION_SCREEN_OFF:
-                    MegaApplication.getInstance().muteOrUnmute(true);
+                    rtcAudioManagerGateway.muteOrUnMute(true);
                     setDisablingLocalVideo(false);
                     setInTemporaryState(true);
                     if (callInProgress.hasLocalVideo() && !isDisablingLocalVideo) {

@@ -77,4 +77,12 @@ interface TransfersRepository {
      * individually paused, false otherwise.
      */
     suspend fun areAllTransfersPaused(): Boolean
+
+    /**
+     * Checks if the queue of upload transfers is paused or if all in progress upload transfers are individually paused.
+     *
+     * @return True if the queue of upload transfers is paused or if all in progress upload transfers
+     * are individually paused, and False if otherwise.
+     */
+    suspend fun areAllUploadTransfersPaused(): Boolean
 }

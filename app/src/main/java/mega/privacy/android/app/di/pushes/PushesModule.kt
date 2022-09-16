@@ -4,10 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.usecase.GetPushToken
-import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RegisterPushNotifications
 import mega.privacy.android.domain.usecase.SetPushToken
@@ -35,9 +33,5 @@ internal abstract class PushesModule {
         @Provides
         fun providePushReceived(pushesRepository: PushesRepository): PushReceived =
             PushReceived(pushesRepository::pushReceived)
-
-        @Provides
-        fun provideMonitorContactRequestUpdates(notificationsRepository: NotificationsRepository): MonitorContactRequestUpdates =
-            MonitorContactRequestUpdates(notificationsRepository::monitorContactRequestUpdates)
     }
 }

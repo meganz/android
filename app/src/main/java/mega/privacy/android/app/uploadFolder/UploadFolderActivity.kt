@@ -5,6 +5,7 @@ import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -106,8 +107,16 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
                     Activity.RESULT_OK -> {
                         @Suppress("UNCHECKED_CAST")
                         val collisionsResult =
-                            result.data?.getParcelableArrayListExtra<NameCollisionResult>(
-                                INTENT_EXTRA_COLLISION_RESULTS)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                result.data?.getParcelableArrayListExtra(
+                                    INTENT_EXTRA_COLLISION_RESULTS,
+                                    NameCollisionResult::class.java)
+                            } else {
+                                @Suppress("DEPRECATION")
+                                result.data?.getParcelableArrayListExtra(
+                                    INTENT_EXTRA_COLLISION_RESULTS)
+                            }
+
                         viewModel.proceedWithUpload(this, collisionsResult)
                     }
                     Activity.RESULT_CANCELED -> {

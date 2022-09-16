@@ -8,10 +8,11 @@
         android:id="@+id/transfers_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-		android:layout_above="@+id/get_more_quota_view"
+		android:layout_above="@+id/layout_get_more_quota_view"
         android:choiceMode="multipleChoice"/>
 
 	<include
+		android:id="@+id/layout_get_more_quota_view"
 		layout="@layout/get_more_quota_view"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"

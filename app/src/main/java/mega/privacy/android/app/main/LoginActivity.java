@@ -5,7 +5,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE;
 import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
-import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp;
 import static mega.privacy.android.app.utils.Constants.ACTION_CANCEL_CAM_SYNC;
 import static mega.privacy.android.app.utils.Constants.ACTION_CANCEL_DOWNLOAD;
 import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_TRANSFER;
@@ -62,6 +62,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -97,6 +98,8 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
     @Inject
     DatabaseHandler dbH;
+    @Inject
+    MegaChatRequestHandler chatRequestHandler;
 
     Handler handler = new Handler();
     private MegaApiAndroid megaApi;
@@ -157,7 +160,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     protected void onDestroy() {
         Timber.d("onDestroy");
 
-        app.setIsLoggingRunning(false);
+        chatRequestHandler.setIsLoggingRunning(false);
 
         unregisterReceiver(updateMyAccountReceiver);
         unregisterReceiver(onAccountUpdateReceiver);
@@ -171,7 +174,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
         Timber.d("onCreate");
         super.onCreate(savedInstanceState);
 
-        app.setIsLoggingRunning(true);
+        chatRequestHandler.setIsLoggingRunning(true);
 
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();

@@ -10,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.SqliteDatabaseHandler
 import javax.inject.Singleton
 
 
@@ -19,7 +20,7 @@ class DatabaseHandlerModule {
     @Singleton
     @Provides
     fun provideDbHandler(@ApplicationContext context: Context): DatabaseHandler {
-        return DatabaseHandler.getDbHandler(context)
+        return SqliteDatabaseHandler.getDbHandler(context)
     }
 }
 

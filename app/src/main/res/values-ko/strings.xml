@@ -2115,8 +2115,6 @@
     <string name="title_file_explorer_send_link">다음으로 링크 보내기&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">보내기&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">Upload to&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">더 보기</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2409,8 +2407,6 @@
     <string name="allow_access_contact_explanation">MEGA는 당신의 동의 없이 이 데이터를 다른 목적으로 사용하고 당신의 지인들과 상호 작용하지 않을 것입니다.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">암호화된 통화를 하려면 당신의 마이크에 접근을 허용하세요.</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">접근 허가</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">공유된 파일</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3115,10 +3111,6 @@
     <string name="file_created">파일 생성됨</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">파일 생성 실패. 다시 시도하세요.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">%1$s에 파일이 저장되었습니다</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">%1$s에 파일이 저장되지 않았습니다. 다시 시도하세요.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">파일 업데이트됨</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -3901,4 +3893,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">누군가 통화에 참여하거나 떠날 때 소리를 듣습니다.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">나중에</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">파일이 클라우드 드라이브에 저장되었습니다.</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">파일이 클라우드 드라이브에 저장되지 않았습니다. 다시 시도하세요.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">슬라이드쇼</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">유형 선택</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">모든 미디어</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">다음의 항목 보기</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">모든 위치</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">클라우드 드라이브</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">[B]미디어[/B]를 찾을 수 없습니다</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">[B]이미지[/B]를 찾을 수 없습니다</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">[B]동영상[/B]을 찾을 수 없습니다</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">나중에</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">알림 받기</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA가 통화, 대화, 그리고 파일 전송 알림을 보낼 것입니다.</string>
 </resources>

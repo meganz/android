@@ -81,6 +81,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_IS_GUEST
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
@@ -133,6 +134,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
+
+    @Inject
+    lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
 
     val args: InMeetingFragmentArgs by navArgs()
 
@@ -2635,7 +2639,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onPause() {
         super.onPause()
-        MegaApplication.getInstance().unregisterProximitySensor()
+        rtcAudioManagerGateway.unregisterProximitySensor()
     }
 
     override fun onStop() {
@@ -2740,7 +2744,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         ).setMessage(StringResourcesUtils.getString(R.string.meeting_is_failed_content))
             .setCancelable(false)
             .setPositiveButton(R.string.general_ok) { _, _ ->
-                MegaApplication.getInstance().removeRTCAudioManager()
+                rtcAudioManagerGateway.removeRTCAudioManager()
                 finishActivity()
             }.show()
     }

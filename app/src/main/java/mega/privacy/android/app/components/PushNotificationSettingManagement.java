@@ -18,10 +18,15 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class PushNotificationSettingManagement {
 
     private MegaPushNotificationSettings push;
 
+    @Inject
     public PushNotificationSettingManagement() {
         push = getPushNotificationSetting();
     }

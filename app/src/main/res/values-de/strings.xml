@@ -2164,8 +2164,6 @@
     <string name="title_file_explorer_send_link">Link senden an&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Senden an&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">Upload an&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">Weitere</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2467,8 +2465,6 @@
     <string name="allow_access_contact_explanation">MEGA wird diese Daten niemals für andere Zwecke nutzen und Ihre Kontakte niemals ohne Ihre Zustimmung kontaktieren.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Zugriff auf das Mikrofon für verschlüsselte Anrufe freigeben.</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">Zugriff gewähren</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Freigegebene Dateien</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3198,10 +3194,6 @@
     <string name="file_created">Datei erstellt</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Dateierstellung fehlgeschlagen. Bitte versuchen Sie es erneut.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">Datei im Ordner %1$s gespeichert</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">Datei konnte nicht im Ordner %1$s gespeichert werden. Bitte versuchen Sie es erneut.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Datei aktualisiert</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -4006,4 +3998,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">Lassen Sie sich durch einen Ton benachrichtigen, wenn jemand einer Konferenz beitritt oder sie verlässt.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Jetzt nicht</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">Datei im Cloud Drive gespeichert.</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">Datei konnte nicht im Cloud Drive gespeichert werden. Bitte versuchen Sie es erneut.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Diaschau</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">Typ wählen</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">Alle Medien</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">Inhalte anzeigen von</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">Alle Speicherorte</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">Cloud Drive</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">Keine [B]Medien[/B] vorhanden</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">Keine [B]Bilder[/B] vorhanden</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">Keine [B]Videos[/B] vorhanden</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">Jetzt nicht</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">Benachrichtigungen erhalten</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA sendet Ihnen Benachrichtigungen für Anrufe, Chats und Dateitransfers.</string>
 </resources>

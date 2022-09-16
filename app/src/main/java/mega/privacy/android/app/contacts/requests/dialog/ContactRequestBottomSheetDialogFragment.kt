@@ -11,8 +11,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.contacts.requests.ContactRequestsViewModel
 import mega.privacy.android.app.databinding.BottomSheetContactRequestBinding
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
-import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.setImageRequestFromUri
+import nz.mega.sdk.MegaApiJava
 
 /**
  * Bottom Sheet Dialog that represents the UI for a dialog containing contact request information.
@@ -33,7 +33,10 @@ class ContactRequestBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
     }
 
     private val viewModel by viewModels<ContactRequestsViewModel>({ requireParentFragment() })
-    private val requestHandle by extraNotNull<Long>(REQUEST_HANDLE)
+    private val requestHandle by lazy {
+        arguments?.getLong(REQUEST_HANDLE,
+            MegaApiJava.INVALID_HANDLE) ?: MegaApiJava.INVALID_HANDLE
+    }
 
     private lateinit var binding: BottomSheetContactRequestBinding
 

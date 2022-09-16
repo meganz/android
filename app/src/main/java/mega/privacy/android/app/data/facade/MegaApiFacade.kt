@@ -6,8 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
@@ -31,10 +30,10 @@ import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
+import java.util.ArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Mega api facade
@@ -74,6 +73,10 @@ class MegaApiFacade @Inject constructor(
         megaApi.startUploadForSupport(path, false, listener)
     }
 
+    override val myUser: MegaUser?
+        get() = megaApi.myUser
+    override val myUserHandle: Long
+        get() = megaApi.myUserHandleBinary
     override val accountEmail: String?
         get() = megaApi.myEmail
     override val isBusinessAccount: Boolean
@@ -89,6 +92,9 @@ class MegaApiFacade @Inject constructor(
         megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ||
                 megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
 
+    override suspend fun areUploadTransfersPaused(): Boolean =
+        megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+
     override suspend fun getRootNode(): MegaNode? = megaApi.rootNode
 
     override suspend fun getRubbishBinNode(): MegaNode? = megaApi.rubbishNode
@@ -99,21 +105,21 @@ class MegaApiFacade @Inject constructor(
         val listener = object : MegaGlobalListenerInterface {
             override fun onUsersUpdate(
                 api: MegaApiJava?,
-                users: java.util.ArrayList<MegaUser>?,
+                users: ArrayList<MegaUser>?,
             ) {
                 trySend(GlobalUpdate.OnUsersUpdate(users))
             }
 
             override fun onUserAlertsUpdate(
                 api: MegaApiJava?,
-                userAlerts: java.util.ArrayList<MegaUserAlert>?,
+                userAlerts: ArrayList<MegaUserAlert>?,
             ) {
                 trySend(GlobalUpdate.OnUserAlertsUpdate(userAlerts))
             }
 
             override fun onNodesUpdate(
                 api: MegaApiJava?,
-                nodeList: java.util.ArrayList<MegaNode>?,
+                nodeList: ArrayList<MegaNode>?,
             ) {
                 trySend(GlobalUpdate.OnNodesUpdate(nodeList))
             }
@@ -128,7 +134,7 @@ class MegaApiFacade @Inject constructor(
 
             override fun onContactRequestsUpdate(
                 api: MegaApiJava?,
-                requests: java.util.ArrayList<MegaContactRequest>?,
+                requests: ArrayList<MegaContactRequest>?,
             ) {
                 trySend(GlobalUpdate.OnContactRequestsUpdate(requests))
             }
@@ -183,9 +189,28 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode? =
         megaApi.getNodeByHandle(nodeHandle)
 
+    override suspend fun getFingerprint(filePath: String): String? =
+        megaApi.getFingerprint(filePath)
+
+    override suspend fun getNodesByOriginalFingerprint(
+        originalFingerprint: String,
+        parentNode: MegaNode?,
+    ): MegaNodeList? = megaApi.getNodesByOriginalFingerprint(originalFingerprint, parentNode)
+
+    override suspend fun getNodeByFingerprintAndParentNode(
+        fingerprint: String,
+        parentNode: MegaNode?,
+    ): MegaNode? = megaApi.getNodeByFingerprint(fingerprint, parentNode)
+
+    override suspend fun getNodeByFingerprint(fingerprint: String): MegaNode? =
+        megaApi.getNodeByFingerprint(fingerprint)
+
     override fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
 
     override suspend fun getParentNode(node: MegaNode): MegaNode? = megaApi.getParentNode(node)
+
+    override suspend fun getChildNode(parentNode: MegaNode?, name: String?): MegaNode? =
+        megaApi.getChildNode(parentNode, name)
 
     override suspend fun getChildrenByNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
         if (order == null)
@@ -285,6 +310,8 @@ class MegaApiFacade @Inject constructor(
 
     override suspend fun getTransfers(type: Int): List<MegaTransfer> = megaApi.getTransfers(type)
 
+    override suspend fun getTransfersByTag(tag: Int): MegaTransfer? = megaApi.getTransferByTag(tag)
+
     override fun startDownload(
         node: MegaNode,
         localPath: String,
@@ -310,14 +337,17 @@ class MegaApiFacade @Inject constructor(
         megaApi.getUserAvatarColor(megaUser)
 
     override suspend fun getUserAvatar(user: MegaUser, dstPath: String): Boolean {
-        return suspendCoroutine { continuation ->
+        return suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, e ->
+                    continuation.resume(e.errorCode == MegaError.API_OK)
+                },
+                onRequestTemporaryError = { _, e -> continuation.resume(e.errorCode == MegaError.API_OK) })
+
+            continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
             megaApi.getUserAvatar(user,
                 dstPath,
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _, e ->
-                        continuation.resume(e.errorCode == MegaError.API_OK)
-                    },
-                    onRequestTemporaryError = { _, e -> continuation.resume(e.errorCode == MegaError.API_OK) })
+                listener
             )
         }
     }
@@ -326,12 +356,8 @@ class MegaApiFacade @Inject constructor(
         megaApi.acknowledgeUserAlerts()
     }
 
-    override suspend fun getIncomingContactRequests() =
+    override suspend fun getIncomingContactRequests(): ArrayList<MegaContactRequest> =
         megaApi.incomingContactRequests
-
-    companion object {
-        private const val ANDROID_SUPPORT_ISSUE = 10
-    }
 
     override suspend fun searchByType(
         cancelToken: MegaCancelToken,
@@ -353,4 +379,52 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getChildren(parentNodes: MegaNodeList, order: Int): List<MegaNode> =
         megaApi.getChildren(parentNodes, order)
 
+    override suspend fun moveTransferToLast(
+        transfer: MegaTransfer,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.moveTransferToLast(transfer, listener)
+
+    override suspend fun moveTransferBefore(
+        transfer: MegaTransfer,
+        prevTransfer: MegaTransfer,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.moveTransferBefore(transfer, prevTransfer, listener)
+
+    override suspend fun moveTransferToFirst(
+        transfer: MegaTransfer,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.moveTransferToFirst(transfer, listener)
+
+    companion object {
+        private const val ANDROID_SUPPORT_ISSUE = 10
+    }
+
+    override suspend fun getContacts(): List<MegaUser> = megaApi.contacts
+
+    override suspend fun areCredentialsVerified(megaUser: MegaUser): Boolean =
+        megaApi.areCredentialsVerified(megaUser)
+
+    override fun getUserAlias(userHandle: Long, listener: MegaRequestListenerInterface) =
+        megaApi.getUserAlias(userHandle, listener)
+
+    override fun getContactAvatar(
+        emailOrHandle: String,
+        path: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getUserAvatar(emailOrHandle, path, listener)
+
+    override fun getUserAttribute(
+        emailOrHandle: String,
+        type: Int,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getUserAttribute(emailOrHandle, type, listener)
+
+    override fun userHandleToBase64(userHandle: Long): String =
+        MegaApiJava.userHandleToBase64(userHandle)
+
+    override fun getUserAttribute(
+        user: MegaUser,
+        type: Int,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getUserAttribute(user, type, listener)
 }

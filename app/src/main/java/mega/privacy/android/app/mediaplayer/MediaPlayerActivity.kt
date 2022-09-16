@@ -742,7 +742,10 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                             ?: return true
                     navController.navigate(
                         MediaPlayerFragmentDirections.actionPlayerToTrackInfo(
-                            adapterType, adapterType == INCOMING_SHARES_ADAPTER, playingHandle, uri
+                            adapterType,
+                            adapterType == INCOMING_SHARES_ADAPTER,
+                            playingHandle,
+                            uri.toString()
                         )
                     )
                 } else {

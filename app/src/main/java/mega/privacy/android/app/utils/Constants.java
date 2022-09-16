@@ -885,7 +885,6 @@ public class Constants {
     public static final String EVENT_NODES_CHANGE = "nodes_change";
     public static final String EVENT_ORDER_CHANGE = "order_change";
     public static final String EVENT_LIST_GRID_CHANGE = "list_grid_change";
-    public static final String EVENT_AVATAR_CHANGE = "avatar_change";
     public static final String EVENT_NOTIFICATION_COUNT_CHANGE = "notification_count_change";
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";

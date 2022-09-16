@@ -128,7 +128,9 @@ class SettingsFragment :
     ): View {
         val v = super.onCreateView(inflater, container, savedInstanceState)
         val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
-        requireContext().bindService(playerServiceIntent, mediaServiceConnection, 0)
+        requireContext().bindService(playerServiceIntent,
+            mediaServiceConnection,
+            Context.BIND_AUTO_CREATE)
         return v
     }
 
@@ -350,7 +352,11 @@ class SettingsFragment :
                     CookiePreferencesActivity::class.java
                 )
             )
-            KEY_AUDIO_BACKGROUND_PLAY_ENABLED -> playerServiceViewModelGateway?.toggleBackgroundPlay()
+            KEY_AUDIO_BACKGROUND_PLAY_ENABLED -> {
+                val checked = findPreference<SwitchPreferenceCompat>(
+                    KEY_AUDIO_BACKGROUND_PLAY_ENABLED)?.isChecked == true
+                playerServiceViewModelGateway?.toggleBackgroundPlay(checked)
+            }
             KEY_START_SCREEN -> startActivity(
                 Intent(
                     context,

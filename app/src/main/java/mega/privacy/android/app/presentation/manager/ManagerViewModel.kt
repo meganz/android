@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.manager
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -9,6 +8,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -33,16 +33,18 @@ import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
-import mega.privacy.android.domain.entity.ContactRequest
+import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
+import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -69,6 +71,7 @@ class ManagerViewModel @Inject constructor(
     private val sendStatisticsMediaDiscovery: SendStatisticsMediaDiscovery,
     savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val monitorMyAvatarFile: MonitorMyAvatarFile,
 ) : ViewModel() {
 
     /**
@@ -128,7 +131,7 @@ class ManagerViewModel @Inject constructor(
             .also { Timber.d("onUsersUpdate") }
             .mapNotNull { it.users?.toList() }
             .map { Event(it) }
-            .asLiveData()
+            .asLiveData(timeoutInMs = Long.MAX_VALUE)
 
     /**
      * Monitor user alerts updates and dispatch to observers
@@ -179,6 +182,12 @@ class ManagerViewModel @Inject constructor(
             .mapNotNull { getBrowserChildrenNode(_state.value.browserParentHandle) }
             .map { Event(it) }
             .asLiveData()
+
+    /**
+     * On my avatar file changed
+     */
+    val onMyAvatarFileChanged: Flow<File?>
+        get() = monitorMyAvatarFile()
 
     /**
      * Get the browser parent handle

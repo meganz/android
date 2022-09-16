@@ -541,14 +541,6 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".receivers.NetworkStateReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
-        <receiver
             android:name=".receivers.ChargeEventReceiver"
             android:enabled="true"
             android:exported="false">
@@ -575,12 +567,17 @@
                 android:resource="@xml/filepaths" />
         </provider>
 
-<!--    remove default WorkManager initializer-->
         <provider
             tools:replace="android:authorities"
             android:name="androidx.startup.InitializationProvider"
-            android:authorities="mega.privacy.android.app.androidx-startup"
-            tools:node="remove">
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <!--    remove default WorkManager initializer-->
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
         </provider>
 
         <activity
@@ -633,7 +630,7 @@
         </receiver>
 
         <activity
-            android:name=".activities.AskForDisplayOverActivity"
+            android:name=".presentation.chat.dialog.AskForDisplayOverActivity"
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
         <activity

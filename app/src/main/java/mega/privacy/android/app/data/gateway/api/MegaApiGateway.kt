@@ -66,6 +66,16 @@ interface MegaApiGateway {
     )
 
     /**
+     * Handle for the account
+     */
+    val myUserHandle: Long
+
+    /**
+     * [MegaUser] for the account
+     */
+    val myUser: MegaUser?
+
+    /**
      * Registered email address for the account
      */
     val accountEmail: String?
@@ -96,6 +106,11 @@ interface MegaApiGateway {
     suspend fun areTransfersPaused(): Boolean
 
     /**
+     * Are upload transfers paused
+     */
+    suspend fun areUploadTransfersPaused(): Boolean
+
+    /**
      * Root node of the account
      *
      * All accounts have a root node, therefore if it is null the account has not been logged in or
@@ -112,6 +127,15 @@ interface MegaApiGateway {
      *         is the root node
      */
     suspend fun getParentNode(node: MegaNode): MegaNode?
+
+    /**
+     * Get the child node with the provided name
+     *
+     * @param parentNode
+     * @param name
+     * @return mega node or null if doesn't exist
+     */
+    suspend fun getChildNode(parentNode: MegaNode?, name: String?): MegaNode?
 
     /**
      * Rubbish bin node of the account
@@ -151,6 +175,42 @@ interface MegaApiGateway {
      * @return MegaNode
      */
     suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode?
+
+    /**
+     * Get the fingerprint of a file by path
+     *
+     * @param filePath
+     */
+    suspend fun getFingerprint(filePath: String): String?
+
+    /**
+     * Get MegaNode by original fingerprint
+     * @param originalFingerprint
+     * @param parentNode MegaNode
+     * @return MegaNodeList
+     */
+    suspend fun getNodesByOriginalFingerprint(
+        originalFingerprint: String,
+        parentNode: MegaNode?,
+    ): MegaNodeList?
+
+    /**
+     * Get MegaNode by fingerprint and parent node
+     * @param fingerprint
+     * @param parentNode MegaNode
+     * @return MegaNode
+     */
+    suspend fun getNodeByFingerprintAndParentNode(
+        fingerprint: String,
+        parentNode: MegaNode?,
+    ): MegaNode?
+
+    /**
+     * Get MegaNode by fingerprint only
+     * @param fingerprint
+     * @return MegaNode
+     */
+    suspend fun getNodeByFingerprint(fingerprint: String): MegaNode?
 
     /**
      * Check the node if has version
@@ -383,6 +443,17 @@ interface MegaApiGateway {
     suspend fun getTransfers(type: Int): List<MegaTransfer>
 
     /**
+     * Get the transfer with a transfer tag
+     * That tag can be got using MegaTransfer::getTag
+     * You take the ownership of the returned value
+     *
+     * @param tag tag to check
+     * @return MegaTransfer object with that tag, or NULL if there isn't any
+     * active transfer with it
+     */
+    suspend fun getTransfersByTag(tag: Int): MegaTransfer?
+
+    /**
      * Starts a download.
      *
      * @param node        MegaNode that identifies the file or folder.
@@ -517,4 +588,94 @@ interface MegaApiGateway {
      * @return True in, else not in
      */
     suspend fun isInRubbish(node: MegaNode): Boolean
+
+    /**
+     * Move a transfer to the top of the transfer queue
+     *
+     * @param transfer Transfer to move
+     * @param listener MegaRequestListener to track this request
+     */
+    suspend fun moveTransferToFirst(transfer: MegaTransfer, listener: MegaRequestListenerInterface)
+
+    /**
+     * Move a transfer to the bottom of the transfer queue
+     *
+     * @param transfer Transfer to move
+     * @param listener MegaRequestListener to track this request
+     */
+    suspend fun moveTransferToLast(transfer: MegaTransfer, listener: MegaRequestListenerInterface)
+
+    /**
+     * Move a transfer before another one in the transfer queue
+     *
+     * @param transfer     Transfer to move
+     * @param prevTransfer Transfer with the target position
+     * @param listener     MegaRequestListener to track this request
+     */
+    suspend fun moveTransferBefore(
+        transfer: MegaTransfer,
+        prevTransfer: MegaTransfer,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Gets all contacts of this MEGA account.
+     *
+     * @return List of [MegaUser] with all the contacts.
+     */
+    suspend fun getContacts(): List<MegaUser>
+
+    /**
+     * Checks if credentials are verified for the given user.
+     *
+     * @param megaUser [MegaUser] of the contact whose credentials want to be checked.
+     * @return True if verified, false otherwise.
+     */
+    suspend fun areCredentialsVerified(megaUser: MegaUser): Boolean
+
+    /**
+     * Gets a user alias if exists.
+     *
+     * @param userHandle User handle.
+     * @param listener   Listener.
+     */
+    fun getUserAlias(userHandle: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Gets the avatar of a contact if exists.
+     *
+     * @param emailOrHandle Email or user handle (Base64 encoded) to get the attribute.
+     * @param path          Path in which the avatar will be stored if exists.
+     * @param listener      Listener.
+     * @return The path of the avatar if exists.
+     */
+    fun getContactAvatar(
+        emailOrHandle: String,
+        path: String,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Gets an attribute of any user in MEGA.
+     *
+     * @param emailOrHandle Email or user handle (Base64 encoded) to get the attribute.
+     * @param type          Attribute type.
+     */
+    fun getUserAttribute(emailOrHandle: String, type: Int, listener: MegaRequestListenerInterface)
+
+    /**
+     * Converts a user handle to a Base64-encoded string.
+     *
+     * @param userHandle User handle.
+     * @return Base64-encoded user handle.
+     */
+    fun userHandleToBase64(userHandle: Long): String
+
+    /**
+     * Gets an attribute of any user in MEGA.
+     *
+     * @param user Email or user handle (Base64 encoded) to get the attribute.
+     * @param type Attribute type.
+     */
+    fun getUserAttribute(user: MegaUser, type: Int, listener: MegaRequestListenerInterface)
 }

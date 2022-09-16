@@ -7,10 +7,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.sample
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
@@ -49,15 +48,17 @@ class TransfersManagementViewModel @Inject constructor(
     private val transfersInfo: MutableLiveData<TransfersInfo> = MutableLiveData()
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
     private val areTransfersPaused = SingleLiveEvent<Boolean>()
-    private val transfersSizeInfoState = monitorTransfersSize()
-        .flowOn(ioDispatcher)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), TransfersSizeInfo())
+    private val transfersSizeInfoState = MutableStateFlow(TransfersSizeInfo())
 
     init {
         viewModelScope.launch {
-            transfersSizeInfoState
+            monitorTransfersSize()
+                .flowOn(ioDispatcher)
                 .sample(500L)
-                .collect(::getPendingDownloadAndUpload)
+                .collect { transfersInfo ->
+                    transfersSizeInfoState.value = transfersInfo
+                    getPendingDownloadAndUpload(transfersInfo)
+                }
         }
     }
 

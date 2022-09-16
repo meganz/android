@@ -37,7 +37,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.presentation.theme.AndroidTheme
 
@@ -207,7 +206,9 @@ fun EnableCU(
 @Composable
 fun PreviewEnableCU() {
     AndroidTheme(isSystemInDarkTheme()) {
-        Scaffold {
+        Scaffold { paddingValues ->
+            Column(modifier = Modifier
+                .padding(paddingValues)) { }
             EnableCU()
         }
     }

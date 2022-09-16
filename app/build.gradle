@@ -428,7 +428,8 @@ dependencies {
     implementation "com.google.accompanist:accompanist-flowlayout:$accompanistLayoutVersion"
 
     // Coil Compose
-    implementation "io.coil-kt:coil-compose:$coilComposeVersion"
+    implementation "io.coil-kt:coil-compose:$coilVersion"
+    implementation "io.coil-kt:coil:$coilVersion"
 
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"
@@ -441,6 +442,7 @@ dependencies {
     testImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
+    testImplementation "org.mockito:mockito-inline:3.11.2"
     testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
     testImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion") {

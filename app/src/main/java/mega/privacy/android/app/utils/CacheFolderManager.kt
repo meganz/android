@@ -15,7 +15,7 @@ object CacheFolderManager {
     private const val OLD_CHAT_TEMPORARY_DIR = "MEGA/MEGA Temp/Chat"
     const val THUMBNAIL_FOLDER = "thumbnailsMEGA"
     const val PREVIEW_FOLDER = "previewsMEGA"
-    private const val AVATAR_FOLDER = "avatarsMEGA"
+    const val AVATAR_FOLDER = "avatarsMEGA"
     private const val QR_FOLDER = "qrMEGA"
     const val VOICE_CLIP_FOLDER = "voiceClipsMEGA"
     const val TEMPORARY_FOLDER = "tempMEGA"

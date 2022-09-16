@@ -59,7 +59,6 @@ import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.NAME
-import mega.privacy.android.app.utils.ExtraUtils.extra
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -100,7 +99,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private val viewModel by viewModels<ImageViewerViewModel>({ requireActivity() })
-    private val itemId: Long? by extra(INTENT_EXTRA_KEY_HANDLE)
+    private val itemId by lazy { arguments?.getLong(INTENT_EXTRA_KEY_HANDLE) ?: error("Null Item Id") }
     private var alertDialog: Dialog? = null
     private var alertDialogType: AlertDialogType? = null
 
@@ -108,11 +107,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private lateinit var selectMoveFolderLauncher: ActivityResultLauncher<LongArray>
     private lateinit var selectCopyFolderLauncher: ActivityResultLauncher<LongArray>
     private lateinit var selectImportFolderLauncher: ActivityResultLauncher<LongArray>
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        requireNotNull(itemId)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
