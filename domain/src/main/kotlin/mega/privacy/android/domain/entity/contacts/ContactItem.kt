@@ -31,5 +31,5 @@ data class ContactItem(
     val areCredentialsVerified: Boolean,
     val status: UserStatus,
     val avatarUri: String? = null,
-    val lastSeen: String? = null,
+    val lastSeen: Int? = null,
 ) : Serializable
