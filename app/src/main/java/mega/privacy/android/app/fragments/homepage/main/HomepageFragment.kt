@@ -1,12 +1,21 @@
 package mega.privacy.android.app.fragments.homepage.main
 
-import android.animation.*
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
 import android.view.View.OnClickListener
+import android.view.ViewGroup
+import android.view.Window
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -32,18 +41,26 @@ import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldShowStartScreenDialog
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.main.AddContactActivity
-import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE
+import mega.privacy.android.app.utils.Constants.EVENT_HOMEPAGE_VISIBILITY
+import mega.privacy.android.app.utils.Constants.GO_OFFLINE
+import mega.privacy.android.app.utils.Constants.GO_ONLINE
+import mega.privacy.android.app.utils.Constants.REQUEST_CREATE_CHAT
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
+import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -630,11 +647,8 @@ class HomepageFragment : Fragment() {
 
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     private fun openNewChatActivity() = doIfOnline(true) {
-        val intent = Intent(activity, AddContactActivity::class.java).apply {
-            putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-        }
-
-        activity?.startActivityForResult(intent, REQUEST_CREATE_CHAT)
+        activity?.startActivityForResult(Intent(activity, StartConversationActivity::class.java),
+            REQUEST_CREATE_CHAT)
     }
 
     private fun showUploadPanel() = doIfOnline(true) {

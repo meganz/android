@@ -652,6 +652,11 @@
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing"/>
 
+        <activity
+            android:name="mega.privacy.android.app.presentation.startconversation.StartConversationActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustNothing"/>
+
     </application>
 
 </manifest>
