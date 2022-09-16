@@ -59,6 +59,10 @@ class DefaultTransfersRepository @Inject constructor(
         megaApiGateway.areTransfersPaused()
     }
 
+    override suspend fun areAllUploadTransfersPaused(): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.areUploadTransfersPaused()
+    }
+
     override suspend fun getNumPendingPausedUploads(): Int = withContext(ioDispatcher) {
         getUploadTransfers().count { transfer ->
             !transfer.isFinished && transfer.state == MegaTransfer.STATE_PAUSED

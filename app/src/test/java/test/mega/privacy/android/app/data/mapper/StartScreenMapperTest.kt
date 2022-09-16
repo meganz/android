@@ -9,8 +9,8 @@ class StartScreenMapperTest {
     private val underTest: StartScreenMapper = { StartScreen(it) }
 
     @Test
-    fun `test that null id returns none`() {
-        assertThat(underTest(null)).isEqualTo(StartScreen.None)
+    fun `test that null id returns null`() {
+        assertThat(underTest(null)).isNull()
     }
 
     @Test
@@ -23,6 +23,6 @@ class StartScreenMapperTest {
     @Test
     fun `test that value not found in ids maps to null`() {
         val notValid = StartScreen.values().maxOf { it.id } + 1
-        assertThat(underTest(notValid)).isEqualTo(StartScreen.None)
+        assertThat(underTest(notValid)).isNull()
     }
 }

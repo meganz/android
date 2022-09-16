@@ -1,8 +1,12 @@
 package mega.privacy.android.app.usecase.call
 
+import android.Manifest
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.app.meeting.answerChatCall
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.START_CALL_AUDIO_ENABLE
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
@@ -12,9 +16,6 @@ import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import timber.log.Timber
-import android.Manifest
-import mega.privacy.android.app.meeting.answerChatCall
-import mega.privacy.android.app.usecase.exception.toMegaException
 import javax.inject.Inject
 
 /**
@@ -24,6 +25,7 @@ import javax.inject.Inject
  */
 class AnswerCallUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway
 ) {
     /**
      * Call Result.
@@ -107,7 +109,7 @@ class AnswerCallUseCase @Inject constructor(
                                 )
                             )
                         } else {
-                            MegaApplication.getInstance().removeRTCAudioManagerRingIn()
+                            rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
                             megaChatApi.getChatCall(request.chatHandle)?.let { call ->
                                 CallUtil.clearIncomingCallNotification(call.callId)
                             }

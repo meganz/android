@@ -219,7 +219,7 @@
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
     <string name="section_contacts">联系人</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
-    <string name="section_contacts_with_notification">联系人[A](%1$d)[/A]</string>
+    <string name="section_contacts_with_notification">联系人[A]（%1$d）[/A]</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
     <string name="sent_requests_empty">[B]无 [/B][A]发送请求[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
@@ -950,7 +950,7 @@
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d个联系人邀请发送成功，%2$d个邀请发送失败。</string>
     <!-- Word next to own user’s message in chat screen -->
-    <string name="chat_me_text_bracket">%1s (我)</string>
+    <string name="chat_me_text_bracket">%1s（我）</string>
     <!-- button -->
     <string name="general_mute">静音</string>
     <!-- button -->
@@ -1062,7 +1062,7 @@
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="administrator_permission_label_participants_panel">主持人</string>
     <!-- Text appended to a edited message. -->
-    <string name="edited_message_text">(已编辑)</string>
+    <string name="edited_message_text">（已编辑）</string>
     <!-- Option in menu to change title of a chat group. -->
     <string name="change_title_option">更改名称</string>
     <!-- confirmation message before leaving a group chat -->
@@ -1381,7 +1381,7 @@
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">是否要移除附件？</string>
     <!-- Menu option -->
-    <string name="general_view_with_revoke">查看文件 (已删除%1$d个)</string>
+    <string name="general_view_with_revoke">查看文件（已删除%1$d个）</string>
     <!-- Error message when the attachment cannot be sent -->
     <string name="error_attaching_node_from_cloud">发生错误。该文件尚未发送</string>
     <!-- Error message when the attachment cannot be revoked -->
@@ -1998,7 +1998,7 @@
     <!-- Title of the section Archived chats -->
     <string name="archived_chats_title_section">已归档的聊天</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">已归档的聊天(%d)</string>
+    <string name="archived_chats_show_option">已归档的聊天（%d）</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">归档聊天</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
@@ -2115,8 +2115,6 @@
     <string name="title_file_explorer_send_link">发送链接给&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">发送到&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">上传到&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">更多</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2246,9 +2244,9 @@
     <!-- Subtitle of the historic notification when an user blocks you as contact -->
     <string name="subtitle_contact_notification_blocked">[A]%s [/A][B]从联系人中屏蔽了您。[/B]</string>
     <!-- Item of the navigation title for the notification section when there is any unread -->
-    <string name="section_notification_with_unread">通知[A](%1$d)[/A]</string>
+    <string name="section_notification_with_unread">通知[A]（%1$d）[/A]</string>
     <!-- Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown -->
-    <string name="section_notification_user_with_nickname">[A]%1$s (%2$s)[/A]</string>
+    <string name="section_notification_user_with_nickname">[A]%1$s（%2$s）[/A]</string>
     <!-- Title of the historic notification for an account deleted -->
     <string name="title_account_notification_deleted">帐户已删除</string>
     <!-- Subtitle of the historic notification for an account deleted -->
@@ -2310,7 +2308,7 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">继续</string>
     <!-- one of the payment methods -->
-    <string name="payment_method_google_wallet">[A]Google Pay[/A] （订阅）</string>
+    <string name="payment_method_google_wallet">[A]Google Pay[/A]（订阅）</string>
     <!-- one of the payment methods -->
     <string name="payment_method_huawei_wallet">[A]HUAWEI Pay[/A]（订阅）</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
@@ -2409,8 +2407,6 @@
     <string name="allow_access_contact_explanation">MEGA不会将这些数据用于任何其他目的，并且未经您的允许绝不会与您的联系人互动。</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">允许访问您的麦克风以进行加密通话。</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">授予权限</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">已分享文件</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3115,10 +3111,6 @@
     <string name="file_created">文件已创建</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">创建文件失败。请重试。</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">文件已保存到%1$s</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">文件未保存到%1$s。请重试。</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">文件已更新</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -3390,7 +3382,7 @@
     <!-- The content of dialog when failed for creating meeting-->
     <string name="meeting_is_failed_content">创建会议失败。</string>
     <!-- Word next to own user’s name on participant list -->
-    <string name="meeting_me_text_bracket">%1s[A](我)[/A]</string>
+    <string name="meeting_me_text_bracket">%1s[A]（我）[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">主视图</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
@@ -3901,4 +3893,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">当有人加入或离开通话时播放提示音。</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">现在不用</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">文件已保存到云盘。</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">文件未保存到云盘。请重试。</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">幻灯片</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">选择类型</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">所有媒体</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">显示来自以下的项目</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">所有位置</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">云盘</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">未找到[B]媒体[/B]</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">未找到[B]图片[/B]</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">未找到[B]视频[/B]</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">现在不用</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">开启通知</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA将向您发送通话、聊天和文件传输通知。</string>
 </resources>

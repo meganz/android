@@ -315,7 +315,7 @@ interface SettingsRepository {
      *
      * @return flow of start screen preference
      */
-    fun monitorPreferredStartScreen(): Flow<StartScreen>
+    fun monitorPreferredStartScreen(): Flow<StartScreen?>
 
     /**
      * Set preferred start screen

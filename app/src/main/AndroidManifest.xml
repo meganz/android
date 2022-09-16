@@ -567,12 +567,17 @@
                 android:resource="@xml/filepaths" />
         </provider>
 
-<!--    remove default WorkManager initializer-->
         <provider
             tools:replace="android:authorities"
             android:name="androidx.startup.InitializationProvider"
-            android:authorities="mega.privacy.android.app.androidx-startup"
-            tools:node="remove">
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <!--    remove default WorkManager initializer-->
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
         </provider>
 
         <activity
@@ -625,7 +630,7 @@
         </receiver>
 
         <activity
-            android:name=".activities.AskForDisplayOverActivity"
+            android:name=".presentation.chat.dialog.AskForDisplayOverActivity"
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
         <activity
@@ -644,6 +649,11 @@
 
         <activity
             android:name="mega.privacy.android.app.uploadFolder.UploadFolderActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustNothing"/>
+
+        <activity
+            android:name="mega.privacy.android.app.presentation.startconversation.StartConversationActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing"/>
 

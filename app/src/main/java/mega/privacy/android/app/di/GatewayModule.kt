@@ -2,11 +2,11 @@ package mega.privacy.android.app.di
 
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
+import mega.privacy.android.app.data.facade.CacheFacade
 import mega.privacy.android.app.data.facade.CacheFolderFacade
 import mega.privacy.android.app.data.facade.MegaApiFacade
 import mega.privacy.android.app.data.facade.MegaApiFolderFacade
@@ -14,6 +14,7 @@ import mega.privacy.android.app.data.facade.MegaChatApiFacade
 import mega.privacy.android.app.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.app.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
+import mega.privacy.android.app.data.gateway.CacheGateway
 import mega.privacy.android.app.data.gateway.DeviceGateway
 import mega.privacy.android.app.data.gateway.FileCompressionGateway
 import mega.privacy.android.app.data.gateway.ZipFileCompressionGateway
@@ -39,6 +40,8 @@ import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
+import mega.privacy.android.app.meeting.facade.RTCAudioManagerFacade
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import javax.inject.Singleton
 
 /**
@@ -102,6 +105,12 @@ abstract class GatewayModule {
     abstract fun bindCacheFolderGateway(implementation: CacheFolderFacade): CacheFolderGateway
 
     /**
+     * Provides CacheGateway implementation
+     */
+    @Binds
+    abstract fun bindCacheGateway(implementation: CacheFacade): CacheGateway
+
+    /**
      * Provide MediaPlayerGateway implementation
      */
     @AudioPlayer
@@ -124,4 +133,7 @@ abstract class GatewayModule {
     @Binds
     abstract fun bindUIPreferencesGateway(implementation: UIPreferencesDatastore): UIPreferencesGateway
 
+    @Binds
+    @Singleton
+    abstract fun bindRTCAudioManagerGateway(implementation: RTCAudioManagerFacade): RTCAudioManagerGateway
 }

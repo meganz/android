@@ -20,7 +20,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.CallUtil.checkCameraPermission
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO
-import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -76,9 +75,10 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
     }
 
     private lateinit var binding: ActivityContactsBinding
-    private val showGroups by extraNotNull(EXTRA_SHOW_GROUPS, false)
-    private val showSentRequests by extraNotNull(EXTRA_SHOW_SENT_REQUESTS, false)
-    private val showReceivedRequests by extraNotNull(EXTRA_SHOW_RECEIVED_REQUESTS, false)
+    private val showGroups by lazy { intent.getBooleanExtra(EXTRA_SHOW_GROUPS, false) }
+    private val showSentRequests by lazy { intent.getBooleanExtra(EXTRA_SHOW_SENT_REQUESTS, false) }
+    private val showReceivedRequests by lazy { intent.getBooleanExtra(EXTRA_SHOW_RECEIVED_REQUESTS, false) }
+
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val appBarConfiguration by lazy {
         AppBarConfiguration(

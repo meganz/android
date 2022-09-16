@@ -31,7 +31,7 @@ import java.util.List;
 
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
-import mega.privacy.android.app.main.megachat.data.FileGalleryItem;
+import mega.privacy.android.domain.entity.chat.FileGalleryItem;
 import timber.log.Timber;
 
 
@@ -185,7 +185,7 @@ public class ShareInfo implements Serializable {
         for (int i = 0; i < files.size(); i++) {
             ShareInfo shareInfo = new ShareInfo();
             FileGalleryItem file = files.get(i);
-            Uri dataUri = file.getFileUri();
+            Uri dataUri = Uri.parse(file.getFileUri());
             if (dataUri == null) {
                 Timber.w("Data uri is null");
                 continue;

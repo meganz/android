@@ -106,7 +106,7 @@ class ImageViewerViewModel @Inject constructor(
 
     private val images = MutableLiveData<List<ImageItem>?>()
     private val currentImageId = MutableLiveData<Long?>()
-    private val showToolbar = MutableLiveData<Boolean>()
+    private val showToolbar = MutableLiveData<Boolean>(true)
     private val snackBarMessage = SingleLiveEvent<String>()
     private val actionBarMessage = SingleLiveEvent<Int>()
     private val copyMoveException = SingleLiveEvent<Throwable>()
@@ -202,6 +202,10 @@ class ImageViewerViewModel @Inject constructor(
 
     fun isToolbarShown(): Boolean = showToolbar.value ?: false
 
+    fun showToolbar(show: Boolean) {
+        showToolbar.value = show
+    }
+
     fun retrieveSingleImage(nodeHandle: Long, isOffline: Boolean = false) {
         getImageHandlesUseCase.get(nodeHandles = longArrayOf(nodeHandle), isOffline = isOffline)
             .subscribeAndUpdateImages()
@@ -227,10 +231,9 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun retrieveImagesFromTimeline(
-        childOrder: Int? = null,
         currentNodeHandle: Long? = null,
     ) {
-        getImageHandlesUseCase.get(isTimeline = true, sortOrder = childOrder)
+        getImageHandlesUseCase.get(isTimeline = true)
             .subscribeAndUpdateImages(currentNodeHandle)
     }
 
@@ -715,10 +718,6 @@ class ImageViewerViewModel @Inject constructor(
                 ?.getOrNull(position)
                 ?.id
         }
-    }
-
-    fun switchToolbar(show: Boolean? = null) {
-        showToolbar.value = show ?: showToolbar.value?.not() ?: true
     }
 
     private fun getExistingNode(nodeHandle: Long): MegaNode? =

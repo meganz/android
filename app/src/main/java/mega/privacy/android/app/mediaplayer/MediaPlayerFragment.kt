@@ -74,7 +74,7 @@ class MediaPlayerFragment : Fragment() {
                 playerServiceViewModelGateway = service.playerServiceViewModelGateway
 
                 setupPlayer()
-                tryObservePlaylist()
+                observeFlow()
             }
         }
     }
@@ -108,7 +108,7 @@ class MediaPlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tryObservePlaylist()
+        observeFlow()
 
         if (!isVideoPlayer()) {
             delayHideToolbar()
@@ -133,7 +133,9 @@ class MediaPlayerFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        setupPlayer()
+        if (serviceGateway != null && playerServiceViewModelGateway != null) {
+            setupPlayer()
+        }
 
         if (!toolbarVisible) {
             showToolbar()
@@ -174,10 +176,19 @@ class MediaPlayerFragment : Fragment() {
         requireContext().unbindService(connection)
     }
 
-    /**
-     * Observe playlist LiveData when view is created and service is connected.
-     */
-    private fun tryObservePlaylist() {
+    private fun observeFlow() {
+        serviceGateway?.run {
+            metadataUpdate().flowWithLifecycle(
+                viewLifecycleOwner.lifecycle,
+                Lifecycle.State.RESUMED
+            ).onEach { metadata ->
+                if (isAudioPlayer) {
+                    audioPlayerVH?.displayMetadata(metadata)
+                } else {
+                    videoPlayerVH?.displayMetadata(metadata)
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+        }
         playerServiceViewModelGateway?.run {
             if (!playlistObserved && view != null) {
                 playlistObserved = true
@@ -241,12 +252,6 @@ class MediaPlayerFragment : Fragment() {
             serviceGateway?.run {
                 setupPlayerView(this, viewHolder.binding.playerView, false)
                 viewHolder.layoutArtwork()
-                metadataUpdate().flowWithLifecycle(
-                    viewLifecycleOwner.lifecycle,
-                    Lifecycle.State.RESUMED
-                ).onEach { metadata ->
-                    viewHolder.displayMetadata(metadata)
-                }.launchIn(viewLifecycleOwner.lifecycleScope)
             }
 
             playerServiceViewModelGateway?.run {
@@ -259,12 +264,6 @@ class MediaPlayerFragment : Fragment() {
             videoPlayerView = viewHolder.binding.playerView
             serviceGateway?.run {
                 setupPlayerView(this, viewHolder.binding.playerView, true)
-                metadataUpdate().flowWithLifecycle(
-                    viewLifecycleOwner.lifecycle,
-                    Lifecycle.State.RESUMED
-                ).onEach { metadata ->
-                    viewHolder.displayMetadata(metadata)
-                }.launchIn(viewLifecycleOwner.lifecycleScope)
 
                 if (videoPlayerPausedForPlaylist) {
                     setPlayWhenReady(true)

@@ -372,9 +372,10 @@ import mega.privacy.android.app.main.listeners.AudioFocusListener;
 import mega.privacy.android.app.main.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
-import mega.privacy.android.app.main.megachat.data.FileGalleryItem;
+import mega.privacy.android.domain.entity.chat.FileGalleryItem;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatRoomToolbarBottomSheetDialogFragment;
@@ -563,6 +564,8 @@ public class ChatActivity extends PasscodeActivity
     ActivityLifecycleHandler activityLifecycleHandler;
     @Inject
     MegaChatRequestHandler chatRequestHandler;
+    @Inject
+    RTCAudioManagerGateway rtcAudioManagerGateway;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -9762,7 +9765,7 @@ public class ChatActivity extends PasscodeActivity
     }
 
     private void createSpeakerAudioManger() {
-        rtcAudioManager = app.getAudioManager();
+        rtcAudioManager = rtcAudioManagerGateway.getAudioManager();
 
         if (rtcAudioManager == null) {
             speakerWasActivated = true;
@@ -9800,7 +9803,7 @@ public class ChatActivity extends PasscodeActivity
             if (call != null) {
                 if (!MegaApplication.getChatManagement().getSpeakerStatus(call.getChatid())) {
                     MegaApplication.getChatManagement().setSpeakerStatus(call.getChatid(), true);
-                    app.updateSpeakerStatus(true, AUDIO_MANAGER_CALL_IN_PROGRESS);
+                    rtcAudioManagerGateway.updateSpeakerStatus(true, AUDIO_MANAGER_CALL_IN_PROGRESS);
                 }
             } else {
                 rtcAudioManager.updateSpeakerStatus(true, AUDIO_MANAGER_PLAY_VOICE_CLIP);

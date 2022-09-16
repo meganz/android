@@ -2115,8 +2115,6 @@
     <string name="title_file_explorer_send_link">Kirim tautan ke&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Kirim ke&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">Unggah ke &#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">Selebihnya</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2409,8 +2407,6 @@
     <string name="allow_access_contact_explanation">MEGA tidak akan menggunakan data ini untuk tujuan lain apa pun dan tidak akan pernah berinteraksi dengan kontak anda tanpa persetujuan anda.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Untuk membuat panggilan terenkripsi memungkinkan akses ke mikrofon anda.</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">Berikan akses</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">File bersama</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3115,10 +3111,6 @@
     <string name="file_created">File dibuat</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Pembuatan berkas gagal. Silakan coba lagi.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">File disimpan ke %1$s</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">File tidak disimpan ke %1$s. Coba lagi.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">File diperbarui</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -3901,4 +3893,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">Dengar suara saat seseorang bergabung atau meninggalkan panggilan.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Tidak sekarang</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">File saved to Cloud drive.</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">File not saved to Cloud drive. Try again.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">Tampilan slide</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">Pilih tipe</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">Semua media</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">Tampilkan item dari</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">Semua Lokasi</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">Cloud drive</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">Tidak ada [B]media[/B] ditemukan</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">Tidak ada [B]gambar[/B] ditemukan</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">Tidak ada [B]video[/B] ditemukan</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">Tidak sekarang</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">Dapatkan pemberitahuan</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">MEGA akan mengirimi anda panggilan, obrolan, dan pemberitahuan transfer file.</string>
 </resources>

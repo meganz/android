@@ -33,6 +33,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import collectAsStateWithLifecycle
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
@@ -122,7 +123,7 @@ class PhotosFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val mode by getThemeMode()
-                    .collectAsState(initial = ThemeMode.System)
+                    .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 AndroidTheme(isDark = mode.isDarkMode()) {
                     PhotosBody()
                 }
@@ -256,9 +257,9 @@ class PhotosFragment : Fragment() {
 
     @Composable
     private fun PhotosBody() {
-        val photosViewState by photosViewModel.state.collectAsState()
-        val timelineViewState by timelineViewModel.state.collectAsState()
-        val albumsViewState by albumsViewModel.state.collectAsState()
+        val photosViewState by photosViewModel.state.collectAsStateWithLifecycle()
+        val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
+        val albumsViewState by albumsViewModel.state.collectAsStateWithLifecycle()
 
         pagerState = rememberPagerState()
         lazyGridState =
@@ -442,13 +443,9 @@ class PhotosFragment : Fragment() {
     }
 
     private fun openPhoto(photo: Photo) {
-        val nodeId = photo.id
-        val workaroundArray = LongArray(1)
-        workaroundArray[0] = nodeId
-        val intent = ImageViewerActivity.getIntentForChildren(
+        val intent = ImageViewerActivity.getIntentForTimeline(
             requireContext(),
-            workaroundArray,
-            nodeId
+            currentNodeHandle = photo.id,
         )
 
         startActivity(intent)

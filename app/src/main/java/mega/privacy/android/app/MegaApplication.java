@@ -1,6 +1,5 @@
 package mega.privacy.android.app;
 
-import static android.app.ApplicationExitInfo.REASON_CRASH_NATIVE;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
@@ -24,56 +23,43 @@ import static mega.privacy.android.app.utils.Constants.ACTION_LOG_OUT;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_IN_PROGRESS;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_OUTGOING;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_RINGING;
-import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
-import static mega.privacy.android.app.utils.Constants.EXTRA_VOLUME_STREAM_TYPE;
-import static mega.privacy.android.app.utils.Constants.EXTRA_VOLUME_STREAM_VALUE;
-import static mega.privacy.android.app.utils.Constants.INVALID_VOLUME;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
 import static mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS;
-import static mega.privacy.android.app.utils.Constants.VOLUME_CHANGED_ACTION;
 import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
 import static mega.privacy.android.app.utils.DBUtil.callToExtendedAccountDetails;
 import static mega.privacy.android.app.utils.DBUtil.callToPaymentMethods;
 import static mega.privacy.android.app.utils.IncomingCallNotification.shouldNotify;
 import static mega.privacy.android.app.utils.IncomingCallNotification.toSystemSettingNotification;
-import static mega.privacy.android.app.utils.Util.checkAppUpgrade;
 import static mega.privacy.android.app.utils.Util.isSimplifiedChinese;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ApplicationExitInfo;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.os.StrictMode;
 import android.text.Spanned;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
@@ -93,10 +79,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.webrtc.ContextUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -127,16 +110,15 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.CallSoundsController;
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter;
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.logging.InitialiseLoggingUseCaseJavaWrapper;
 import mega.privacy.android.app.presentation.theme.ThemeModeState;
-import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase;
 import mega.privacy.android.app.utils.CallUtil;
@@ -208,6 +190,8 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
     BackgroundRequestListener requestListener;
     @Inject
     MegaChatRequestHandler chatRequestHandler;
+    @Inject
+    RTCAudioManagerGateway rtcAudioManagerGateway;
 
     String localIpAddress = "";
     final static public String APP_KEY = "6tioyn8ka5l6hty";
@@ -249,13 +233,9 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
     private static boolean isBlockedDueToWeakAccount = false;
     private static boolean isWebOpenDueToEmailVerification = false;
     private static boolean isWaitingForCall = false;
-    private static boolean areAdvertisingCookiesEnabled = false;
     private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
     private BroadcastReceiver logoutReceiver;
-    private AppRTCAudioManager rtcAudioManager = null;
-
-    private AppRTCAudioManager rtcAudioManagerRingInCall;
     private static MegaApplication singleApplicationInstance;
     private PowerManager.WakeLock wakeLock;
 
@@ -331,7 +311,7 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
         switch (callStatus) {
             case MegaChatCall.CALL_STATUS_CONNECTING:
                 if ((isOutgoing && getChatManagement().isRequestSent(callId)))
-                    removeRTCAudioManager();
+                    rtcAudioManagerGateway.removeRTCAudioManager();
                 break;
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
             case MegaChatCall.CALL_STATUS_JOINING:
@@ -358,7 +338,7 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
                 if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
                     getChatManagement().addNotificationShown(chatId);
                     Timber.d("Is ongoing call");
-                    ongoingCall(chatId, callId, (isOutgoing && getChatManagement().isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
+                    ongoingCall(rtcAudioManagerGateway, chatId, callId, (isOutgoing && getChatManagement().isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
                 }
                 break;
 
@@ -422,54 +402,10 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
                     (chat.isGroup() || chat.isMeeting() || session.getPeerid() != megaApi.getMyUserHandleBinary())) {
                 Timber.d("Session is in progress");
                 getChatManagement().setRequestSentCall(call.getCallId(), false);
-                updateRTCAudioMangerTypeStatus(AUDIO_MANAGER_CALL_IN_PROGRESS);
+                rtcAudioManagerGateway.updateRTCAudioMangerTypeStatus(AUDIO_MANAGER_CALL_IN_PROGRESS);
             }
         }
     };
-
-    /**
-     * Broadcast for controlling changes in the volume.
-     */
-    BroadcastReceiver volumeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
-                return;
-
-            if (intent.getAction().equals(VOLUME_CHANGED_ACTION) && rtcAudioManagerRingInCall != null) {
-                int type = (Integer) intent.getExtras().get(EXTRA_VOLUME_STREAM_TYPE);
-                if (type != AudioManager.STREAM_RING)
-                    return;
-
-                int newVolume = (Integer) intent.getExtras().get(EXTRA_VOLUME_STREAM_VALUE);
-                if (newVolume != INVALID_VOLUME) {
-                    rtcAudioManagerRingInCall.checkVolume(newVolume);
-                }
-            }
-        }
-    };
-
-    public boolean isAnIncomingCallRinging() {
-        return rtcAudioManagerRingInCall != null;
-    }
-
-    BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
-                return;
-
-            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-                muteOrUnmute(true);
-            }
-        }
-    };
-
-    public void muteOrUnmute(boolean mute) {
-        if (rtcAudioManagerRingInCall != null) {
-            rtcAudioManagerRingInCall.muteOrUnmuteIncomingCall(mute);
-        }
-    }
 
     public static MegaApplication getInstance() {
         return singleApplicationInstance;
@@ -480,8 +416,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
         singleApplicationInstance = this;
 
         super.onCreate();
-
-        setStrictModePolicies();
 
         initialiseLogging();
 
@@ -497,13 +431,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
         keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis() + interval);
         keepAliveHandler.postDelayed(keepAliveRunnable, interval);
-
-        checkAppUpgrade();
-        checkMegaStandbyBucket();
-        getTombstoneInfo();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            checkForUnsafeIntentLaunch();
-        }
 
         setupMegaApi();
         setupMegaApiFolder();
@@ -595,24 +522,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
         initFresco();
 
-    }
-
-    private void setStrictModePolicies() {
-        if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(
-                    new StrictMode.ThreadPolicy.Builder()
-                            .detectAll()
-                            .penaltyLog()
-                            .build()
-            );
-
-            StrictMode.setVmPolicy(
-                    new StrictMode.VmPolicy.Builder()
-                            .detectAll()
-                            .penaltyLog()
-                            .build()
-            );
-        }
     }
 
     private void initialiseLogging() {
@@ -828,8 +737,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((cookies, throwable) -> {
                     if (throwable == null) {
-                        setAdvertisingCookiesEnabled(cookies.contains(CookieType.ADVERTISEMENT));
-
                         boolean analyticsCookiesEnabled = cookies.contains(CookieType.ANALYTICS);
                         crashReporter.setEnabled(analyticsCookiesEnabled);
                         performanceReporter.setEnabled(analyticsCookiesEnabled);
@@ -1172,196 +1079,26 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
         }
     }
 
-    /**
-     * Get the current standby bucket of the app.
-     * The system determines the standby state of the app based on app usage patterns.
-     *
-     * @return the current standby bucket of the app：
-     * STANDBY_BUCKET_ACTIVE,
-     * STANDBY_BUCKET_WORKING_SET,
-     * STANDBY_BUCKET_FREQUENT,
-     * STANDBY_BUCKET_RARE,
-     * STANDBY_BUCKET_RESTRICTED,
-     * STANDBY_BUCKET_NEVER
-     */
-    public int checkMegaStandbyBucket() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(USAGE_STATS_SERVICE);
-            if (usageStatsManager != null) {
-                int standbyBucket = usageStatsManager.getAppStandbyBucket();
-                Timber.d("getAppStandbyBucket(): %s", standbyBucket);
-                return standbyBucket;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Get the tombstone information.
-     */
-    public void getTombstoneInfo() {
-        new Thread(() -> {
-            Timber.d("getTombstoneInfo");
-            ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-            List<ApplicationExitInfo> exitReasons;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                exitReasons = activityManager.getHistoricalProcessExitReasons(/* packageName = */ null, /* pid = */ 0, /* maxNum = */ 3);
-                for (ApplicationExitInfo aei : exitReasons) {
-                    if (aei.getReason() == REASON_CRASH_NATIVE) {
-                        // Get the tombstone input stream.
-                        try {
-                            InputStream tombstoneInputStream = aei.getTraceInputStream();
-                            if (tombstoneInputStream != null) {
-                                // The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
-                                TombstoneProtos.Tombstone tombstone = TombstoneProtos.Tombstone.parseFrom(tombstoneInputStream);
-                                Timber.e("Tombstone Info%s", tombstone.toString());
-                                tombstoneInputStream.close();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }).start();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.S)
-    private void checkForUnsafeIntentLaunch() {
-        boolean isDebug = ((this.getApplicationInfo().flags &
-                ApplicationInfo.FLAG_DEBUGGABLE) != 0);
-        if (isDebug) {
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    // Other StrictMode checks that you've previously added.
-                    .detectUnsafeIntentLaunch()
-                    .penaltyLog()
-                    .build());
-        }
-    }
-
-    public AppRTCAudioManager getAudioManager() {
-        return rtcAudioManager;
-    }
-
     public void createOrUpdateAudioManager(boolean isSpeakerOn, int type) {
         Timber.d("Create or update audio manager, type is %s", type);
         chatManagement.registerScreenReceiver();
-
-        if (type == AUDIO_MANAGER_CALL_RINGING) {
-            if (rtcAudioManagerRingInCall != null) {
-                removeRTCAudioManagerRingIn();
-            }
-
-            registerReceiver(volumeReceiver, new IntentFilter(VOLUME_CHANGED_ACTION));
-            registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-            Timber.d("Creating RTC Audio Manager (ringing mode)");
-            rtcAudioManagerRingInCall = AppRTCAudioManager.create(this, false, AUDIO_MANAGER_CALL_RINGING);
-        } else {
-            if (rtcAudioManager != null) {
-                rtcAudioManager.setTypeAudioManager(type);
-                return;
-            }
-
-            Timber.d("Creating RTC Audio Manager (%d mode)", type);
-            removeRTCAudioManagerRingIn();
-            rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, type);
-            if (type != AUDIO_MANAGER_CREATING_JOINING_MEETING) {
-                startProximitySensor();
-            }
-        }
+        rtcAudioManagerGateway.createOrUpdateAudioManager(isSpeakerOn, type);
     }
 
     /**
      * Remove the incoming call AppRTCAudioManager.
      */
     public void removeRTCAudioManagerRingIn() {
-        if (rtcAudioManagerRingInCall == null)
-            return;
-
-        try {
-            Timber.d("Removing RTC Audio Manager");
-            rtcAudioManagerRingInCall.stop();
-            rtcAudioManagerRingInCall = null;
-            unregisterReceiver(volumeReceiver);
-            unregisterReceiver(becomingNoisyReceiver);
-        } catch (Exception e) {
-            Timber.e(e, "Exception stopping speaker audio manager");
-        }
-    }
-
-    /**
-     * Remove the ongoing call AppRTCAudioManager.
-     */
-    public void removeRTCAudioManager() {
-        if (rtcAudioManager == null)
-            return;
-
-        try {
-            Timber.d("Removing RTC Audio Manager");
-            rtcAudioManager.stop();
-            rtcAudioManager = null;
-        } catch (Exception e) {
-            Timber.e(e, "Exception stopping speaker audio manager");
-        }
-    }
-
-    /**
-     * Method for updating the call status of the Audio Manger.
-     *
-     * @param callStatus Call status.
-     */
-    private void updateRTCAudioMangerTypeStatus(int callStatus) {
-        removeRTCAudioManagerRingIn();
-        stopSounds();
-        if (rtcAudioManager != null) {
-            rtcAudioManager.setTypeAudioManager(callStatus);
-        }
-    }
-
-    /**
-     * Method for updating the call status of the Speaker status .
-     *
-     * @param isSpeakerOn If the speaker is on.
-     * @param typeStatus  type AudioManager.
-     */
-    public void updateSpeakerStatus(boolean isSpeakerOn, int typeStatus) {
-        if (rtcAudioManager != null) {
-            rtcAudioManager.updateSpeakerStatus(isSpeakerOn, typeStatus);
-        }
+        rtcAudioManagerGateway.removeRTCAudioManagerRingIn();
     }
 
     /**
      * Activate the proximity sensor.
      */
     public void startProximitySensor() {
-        if (rtcAudioManager != null && rtcAudioManager.startProximitySensor()) {
-            Timber.d("Proximity sensor started");
-            rtcAudioManager.setOnProximitySensorListener(isNear -> {
-                chatManagement.controlProximitySensor(isNear);
-            });
-        }
-    }
-
-    /**
-     * Deactivates the proximity sensor
-     */
-    public void unregisterProximitySensor() {
-        if (rtcAudioManager != null) {
-            Timber.d("Stopping proximity sensor...");
-            rtcAudioManager.unregisterProximitySensor();
-        }
-    }
-
-    /*
-     * Method for stopping the sound of incoming or outgoing calls.
-     */
-    public void stopSounds() {
-        if (rtcAudioManager != null) {
-            rtcAudioManager.stopAudioSignals();
-        }
-        if (rtcAudioManagerRingInCall != null) {
-            rtcAudioManagerRingInCall.stopAudioSignals();
-        }
+        rtcAudioManagerGateway.startProximitySensor(isNear -> {
+            chatManagement.controlProximitySensor(isNear);
+        });
     }
 
     public void openCallService(long chatId) {
@@ -1513,13 +1250,5 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
     public static void setUserWaitingForCall(long userWaitingForCall) {
         MegaApplication.userWaitingForCall = userWaitingForCall;
-    }
-
-    public static boolean areAdvertisingCookiesEnabled() {
-        return areAdvertisingCookiesEnabled;
-    }
-
-    public static void setAdvertisingCookiesEnabled(boolean enabled) {
-        areAdvertisingCookiesEnabled = enabled;
     }
 }

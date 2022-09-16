@@ -383,6 +383,7 @@ import mega.privacy.android.app.presentation.shares.SharesPageAdapter;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
+import mega.privacy.android.app.presentation.startconversation.StartConversationActivity;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
@@ -6581,7 +6582,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             break;
                         }
                     }
-                } else if (drawerItem == DrawerItem.CHAT) {
+                } else if (drawerItem == DrawerItem.CHAT || MEETING_TYPE.equals(MEETING_ACTION_JOIN)) {
                     if (openLinkText.getText().toString().isEmpty()) {
                         openLinkErrorText.setText(chatLinkDialogType == LINK_DIALOG_CHAT ?
                                 R.string.invalid_chat_link_empty : R.string.invalid_meeting_link_empty);
@@ -6656,7 +6657,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 }
             }
-        } else if (drawerItem == DrawerItem.CHAT) {
+        } else if (drawerItem == DrawerItem.CHAT || MEETING_TYPE.equals(MEETING_ACTION_JOIN)) {
             megaChatApi.checkChatLink(link, new LoadPreviewListener(ManagerActivity.this, ManagerActivity.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
         }
     }
@@ -6702,13 +6703,15 @@ public class ManagerActivity extends TransfersManagementActivity
         openLinkError = v.findViewById(R.id.error);
         openLinkErrorText = v.findViewById(R.id.error_text);
 
+        boolean isJoinMeeting = MEETING_TYPE.equals(MEETING_ACTION_JOIN);
+
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
             builder.setTitle(R.string.action_open_link);
             openLinkText.setHint(R.string.hint_paste_link);
-        } else if (drawerItem == DrawerItem.CHAT) {
+        } else if (drawerItem == DrawerItem.CHAT || isJoinMeeting) {
             Fragment fragment = getSupportFragmentManager()
                     .findFragmentByTag(MeetingBottomSheetDialogFragment.TAG);
-            if (fragment != null) {
+            if (fragment != null || isJoinMeeting) {
                 builder.setTitle(R.string.paste_meeting_link_guest_dialog_title)
                         .setMessage(StringResourcesUtils.getString(
                                 R.string.paste_meeting_link_guest_instruction));
@@ -7034,9 +7037,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public void chooseAddContactDialog() {
         Timber.d("chooseAddContactDialog");
         if (megaApi != null && megaApi.getRootNode() != null) {
-            Intent intent = new Intent(this, AddContactActivity.class);
-            intent.putExtra("contactType", CONTACT_TYPE_MEGA);
-            startActivityForResult(intent, REQUEST_CREATE_CHAT);
+            startActivityForResult(StartConversationActivity.getChatIntent(this), REQUEST_CREATE_CHAT);
         } else {
             Timber.w("Online but not megaApi");
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
@@ -8356,11 +8357,26 @@ public class ManagerActivity extends TransfersManagementActivity
                 Timber.w("Intent NULL");
                 return;
             }
-            boolean isMeeting = intent.getBooleanExtra(AddContactActivity.EXTRA_MEETING, false);
-            if (isMeeting) {
-                handler.post(() -> showMeetingOptionsPanel(false));
+
+            boolean isNewMeeting = intent.getBooleanExtra(StartConversationActivity.EXTRA_NEW_MEETING, false);
+            if (isNewMeeting) {
+                onCreateMeeting();
                 return;
             }
+
+            boolean isJoinMeeting = intent.getBooleanExtra(StartConversationActivity.EXTRA_JOIN_MEETING, false);
+            if (isJoinMeeting) {
+                onJoinMeeting();
+                return;
+            }
+
+            long chatId = intent.getLongExtra(StartConversationActivity.EXTRA_NEW_CHAT_ID, MEGACHAT_INVALID_HANDLE);
+            if (chatId != MEGACHAT_INVALID_HANDLE) {
+                startActivity(new Intent(this, ChatActivity.class)
+                        .setAction(ACTION_CHAT_SHOW_MESSAGES).putExtra(CHAT_ID, chatId));
+                return;
+            }
+
             final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS);
 
             final boolean isGroup = intent.getBooleanExtra(AddContactActivity.EXTRA_GROUP_CHAT, false);

@@ -22,11 +22,16 @@ class DefaultInitialiseLogging @Inject constructor(
     private val loggingRepository: LoggingRepository,
     private val areSdkLogsEnabled: AreSdkLogsEnabled,
     private val areChatLogsEnabled: AreChatLogsEnabled,
+    private val startupLogging: StartupLogging,
     private val coroutineDispatcher: CoroutineDispatcher,
 ) : InitialiseLogging {
 
     override suspend fun invoke(isDebug: Boolean) {
-        if (isDebug) loggingRepository.enableLogAllToConsole()
+        if (isDebug) {
+            loggingRepository.enableLogAllToConsole()
+            loggingRepository.enableStrictMode()
+        }
+        startupLogging()
 
         coroutineScope {
             launch(coroutineDispatcher) { monitorSdkLoggingSetting() }

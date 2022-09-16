@@ -33,6 +33,7 @@ import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
@@ -70,7 +71,9 @@ class InMeetingViewModel @Inject constructor(
     private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
     private val endCallUseCase: EndCallUseCase,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
-) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway,
+) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
+    GetUserEmailListener.OnUserEmailUpdateCallback {
 
     /**
      * Enum defining the type of call subtitle.
@@ -118,7 +121,8 @@ class InMeetingViewModel @Inject constructor(
     val showWaitingForOthersBanner: StateFlow<Boolean> get() = _showWaitingForOthersBanner
 
     private val _showEndMeetingAsModeratorBottomPanel = MutableLiveData<Boolean>()
-    val showEndMeetingAsModeratorBottomPanel: LiveData<Boolean> = _showEndMeetingAsModeratorBottomPanel
+    val showEndMeetingAsModeratorBottomPanel: LiveData<Boolean> =
+        _showEndMeetingAsModeratorBottomPanel
 
     private val _showAssignModeratorBottomPanel = MutableLiveData<Boolean>()
     val showAssignModeratorBottomPanel: LiveData<Boolean> = _showAssignModeratorBottomPanel
@@ -1613,7 +1617,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun removeIncomingCallNotification(chatId: Long) {
         inMeetingRepository.getMeeting(chatId)?.let { call ->
-            MegaApplication.getInstance().stopSounds()
+            rtcAudioManagerGateway.stopSounds()
             CallUtil.clearIncomingCallNotification(call.callId)
         }
     }

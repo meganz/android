@@ -5,16 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.presentation.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.presentation.theme.AndroidTheme
 import javax.inject.Inject
 
 /**
@@ -35,7 +35,7 @@ class SettingsCallsFragment : Fragment() {
     ): View = ComposeView(requireContext()).apply {
         setContent {
             val themeMode by getThemeMode()
-                .collectAsState(initial = ThemeMode.System)
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             AndroidTheme(isDark = themeMode.isDarkMode()) {
                 CallsSettingBody()
             }
@@ -44,7 +44,7 @@ class SettingsCallsFragment : Fragment() {
 
     @Composable
     private fun CallsSettingBody() {
-        val uiState by viewModel.uiState.collectAsState()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         SettingsCallsView(
             settingsCallsState = uiState,
             onCheckedChange = viewModel::setNewCallsSoundNotifications
