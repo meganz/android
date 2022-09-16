@@ -4,7 +4,7 @@ import android.content.Intent
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.ShareInfo
-import mega.privacy.android.app.main.megachat.data.FileGalleryItem
+import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import javax.inject.Inject
 
 /**
