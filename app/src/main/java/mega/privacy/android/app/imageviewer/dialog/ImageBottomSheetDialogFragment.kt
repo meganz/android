@@ -121,8 +121,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.loadSingleNode(itemId!!)
-        viewModel.onImage(itemId!!).observe(viewLifecycleOwner, ::showNodeData)
+        viewModel.loadSingleNode(itemId)
+        viewModel.onImage(itemId).observe(viewLifecycleOwner, ::showNodeData)
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -450,7 +450,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      * @param type  Alert Dialog Type of action
      */
     private fun showAlertDialog(type: AlertDialogType) {
-        val imageItem = viewModel.getImageItem(itemId!!) ?: return
+        val imageItem = viewModel.getImageItem(itemId) ?: return
         val nodeHandle = imageItem.getNodeHandle() ?: return
         alertDialog?.dismiss()
         alertDialogType = type
