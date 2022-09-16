@@ -1143,8 +1143,8 @@ class MediaPlayerServiceViewModel(
 
     override fun backgroundPlayEnabled() = backgroundPlayEnabled
 
-    override fun toggleBackgroundPlay(): Boolean {
-        backgroundPlayEnabled = !backgroundPlayEnabled
+    override fun toggleBackgroundPlay(isEnable: Boolean): Boolean {
+        backgroundPlayEnabled = isEnable
         preferences.edit()
             .putBoolean(KEY_AUDIO_BACKGROUND_PLAY_ENABLED, backgroundPlayEnabled)
             .apply()

@@ -130,9 +130,10 @@ interface PlayerServiceViewModelGateway {
     /**
      * Toggle backgroundPlayEnabled
      *
+     * @param isEnable true is enable, otherwise is disable
      * @return backgroundPlayEnabled after toggled
      */
-    fun toggleBackgroundPlay(): Boolean
+    fun toggleBackgroundPlay(isEnable: Boolean): Boolean
 
     /**
      * Get background play if is enable
