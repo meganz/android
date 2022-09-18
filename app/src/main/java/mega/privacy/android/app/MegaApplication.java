@@ -248,10 +248,7 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
         isVerifySMSShowed = isShowed;
     }
 
-    public void sendBroadcastUpdateAccountDetails() {
-        sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-                .putExtra(ACTION_TYPE, UPDATE_ACCOUNT_DETAILS));
-    }
+
 
     private final int interval = 3000;
     private Handler keepAliveHandler = new Handler();
@@ -834,72 +831,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
     public void setLocalIpAddress(String ip) {
         localIpAddress = ip;
-    }
-
-    public void showSharedFolderNotification(MegaNode n) {
-        Timber.d("showSharedFolderNotification");
-
-        try {
-            ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-            String name = "";
-            for (int j = 0; j < sharesIncoming.size(); j++) {
-                MegaShare mS = sharesIncoming.get(j);
-                if (mS.getNodeHandle() == n.getHandle()) {
-                    MegaUser user = megaApi.getContact(mS.getUser());
-
-                    name = getMegaUserNameDB(user);
-                    if (name == null) name = "";
-                }
-            }
-
-            String source = "<b>" + n.getName() + "</b> " + getString(R.string.incoming_folder_notification) + " " + toCDATA(name);
-            Spanned notificationContent = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY);
-
-            String notificationChannelId = NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
-
-            Intent intent = new Intent(this, ManagerActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    .setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
-
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                    PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-
-            String notificationTitle = getString(n.hasChanged(MegaNode.CHANGE_TYPE_NEW)
-                    ? R.string.title_incoming_folder_notification
-                    : R.string.context_permissions_changed);
-
-            NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                NotificationChannel channel = new NotificationChannel(notificationChannelId,
-                        NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME, NotificationManager.IMPORTANCE_HIGH);
-
-                channel.setShowBadge(true);
-                notificationManager.createNotificationChannel(channel);
-            }
-
-            Drawable d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, notificationChannelId)
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentTitle(notificationTitle)
-                    .setContentText(notificationContent)
-                    .setStyle(new NotificationCompat.BigTextStyle()
-                            .bigText(notificationContent))
-                    .setAutoCancel(true)
-                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                    .setContentIntent(pendingIntent)
-                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                    .setLargeIcon(((BitmapDrawable) d).getBitmap())
-                    .setPriority(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                            // Use NotificationManager for devices running Android Nougat or above (API >= 24)
-                            ? NotificationManager.IMPORTANCE_HIGH
-                            // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
-                            : NotificationCompat.PRIORITY_HIGH);
-
-            notificationManager.notify(NOTIFICATION_PUSH_CLOUD_DRIVE, notificationBuilder.build());
-        } catch (Exception e) {
-            Timber.e(e);
-        }
     }
 
     public void sendSignalPresenceActivity() {
