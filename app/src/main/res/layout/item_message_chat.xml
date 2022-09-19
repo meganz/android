@@ -464,7 +464,7 @@
                                 android:id="@+id/content_own_message_voice_clip_duration"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textAlignment="center"
+                                android:textAlignment="gravity"
                                 android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
                                 android:layout_gravity="center_vertical"
                                 tools:text="00:00" />
@@ -1467,7 +1467,7 @@
                             android:id="@+id/content_contact_message_voice_clip_duration"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAlignment="center"
+                            android:textAlignment="gravity"
                             android:textAppearance="@style/TextAppearance.Mega.Body2.Variant4"
                             android:layout_gravity="center_vertical"
                             tools:text="00:00" />

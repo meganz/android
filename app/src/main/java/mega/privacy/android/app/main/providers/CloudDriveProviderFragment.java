@@ -37,9 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import mega.privacy.android.app.DatabaseHandler;
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.main.CheckScrollInterface;
@@ -50,7 +49,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
-
+@AndroidEntryPoint
 public class CloudDriveProviderFragment extends Fragment implements CheckScrollInterface {
 
     Context context;
@@ -59,8 +58,6 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
     long parentHandle = -1;
 
     MegaProviderAdapter adapter;
-    MegaPreferences prefs;
-    DatabaseHandler dbH;
 
     public String name;
 
@@ -225,7 +222,6 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
         lastPositionStack = new Stack<>();
 
         parentHandle = -1;
-        dbH = DatabaseHandler.getDbHandler(context);
         handler = new Handler();
     }
 

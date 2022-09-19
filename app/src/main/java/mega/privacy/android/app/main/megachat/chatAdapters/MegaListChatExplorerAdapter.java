@@ -34,7 +34,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
 import java.util.ArrayList;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
@@ -59,7 +58,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     ChatController cC;
-    DatabaseHandler dbH = null;
 
     ViewHolderChatExplorerList holder;
     RecyclerView listView;
@@ -127,8 +125,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-
-        dbH = DatabaseHandler.getDbHandler(context);
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_explorer_list, parent, false);
         holder = new ViewHolderChatExplorerList(v);

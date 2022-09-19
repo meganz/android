@@ -9,16 +9,6 @@
         app:duration="250" />
 
     <ConstraintSet android:id="@+id/end">
-        <Constraint android:id="@id/toolbar">
-            <PropertySet android:alpha="1" />
-            <Layout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </Constraint>
-
         <Constraint android:id="@id/bg_bottom">
             <PropertySet android:alpha="1" />
             <Layout
@@ -45,16 +35,6 @@
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/start">
-        <Constraint android:id="@id/toolbar">
-            <PropertySet android:alpha="0" />
-            <Layout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-        </Constraint>
-
         <Constraint android:id="@id/bg_bottom">
             <PropertySet android:alpha="0" />
             <Layout

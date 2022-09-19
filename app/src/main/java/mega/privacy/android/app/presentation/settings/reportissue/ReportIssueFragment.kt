@@ -7,10 +7,13 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -26,8 +29,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
+import mega.privacy.android.app.presentation.settings.reportissue.view.DiscardReportDialog
 import mega.privacy.android.app.presentation.settings.reportissue.view.ReportIssueView
-import mega.privacy.android.app.presentation.theme.AndroidTheme
+import mega.privacy.android.presentation.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
@@ -62,7 +66,7 @@ class ReportIssueFragment : Fragment() {
         val valid = viewModel.state.value.canSubmit
         menu.findItem(R.id.menu_report_issue_submit)?.let {
             it.isEnabled = valid
-            it.icon.alpha = if (valid) 255 else 125
+            it.icon?.alpha = if (valid) 255 else 125
         }
     }
 
@@ -79,7 +83,7 @@ class ReportIssueFragment : Fragment() {
                 true
             }
             android.R.id.home -> {
-                requireActivity().onBackPressed()
+                activity?.onBackPressedDispatcher?.onBackPressed()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -90,7 +94,6 @@ class ReportIssueFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        setBackPressHandler()
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state
@@ -104,19 +107,6 @@ class ReportIssueFragment : Fragment() {
                     }
             }
         }
-    }
-
-    private val onBackPress = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            if (!viewModel.interceptNavigation()) {
-                isEnabled = false
-                requireActivity().onBackPressed()
-            }
-        }
-    }
-
-    private fun setBackPressHandler() {
-        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, onBackPress)
     }
 
     private fun finishWithResult(result: SubmitIssueResult) {
@@ -138,17 +128,37 @@ class ReportIssueFragment : Fragment() {
         viewModel: ReportIssueViewModel = viewModel(),
     ) {
         val uiState by viewModel.state.collectAsState()
+
         ReportIssueView(
             state = uiState,
             onDescriptionChanged = viewModel::setDescription,
             onIncludeLogsChanged = viewModel::setIncludeLogsEnabled,
             cancelUpload = viewModel::cancelUpload,
-            onNavigationCancelled = viewModel::navigationCancelled,
-            onDiscard = {
-                onBackPress.isEnabled = false
-                requireActivity().onBackPressed()
-            },
         )
+
+        backHandler(
+            isEnabled = uiState.description.isNotBlank(),
+            onDiscard = parentFragmentManager::popBackStack,
+        )
+    }
+
+    @Composable
+    private fun backHandler(
+        isEnabled: Boolean,
+        onDiscard: () -> Unit,
+    ) {
+        var showDiscardDialog by remember { mutableStateOf(false) }
+
+        BackHandler(isEnabled) {
+            showDiscardDialog = true
+        }
+
+        if (showDiscardDialog) {
+            DiscardReportDialog(
+                onDiscardCancelled = { showDiscardDialog = false },
+                onDiscard = onDiscard
+            )
+        }
     }
 
 }

@@ -8,17 +8,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.extensions.failWithException
 import mega.privacy.android.app.data.extensions.isTypeWithParam
+import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.MonitorHideRecentActivityFacade
 import mega.privacy.android.app.data.gateway.MonitorStartScreenFacade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil
+import mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.SharedPreferenceConstants
@@ -54,11 +57,13 @@ class DefaultSettingsRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val apiFacade: MegaApiGateway,
     private val monitorStartScreenFacade: MonitorStartScreenFacade,
+    private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val monitorHideRecentActivityFacade: MonitorHideRecentActivityFacade,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val chatPreferencesGateway: ChatPreferencesGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val appPreferencesGateway: AppPreferencesGateway,
+    private val cacheFolderGateway: CacheFolderGateway,
 ) : SettingsRepository {
     init {
         initialisePreferences()
@@ -75,11 +80,14 @@ class DefaultSettingsRepository @Inject constructor(
     }
 
     override fun isPasscodeLockPreferenceEnabled() =
-        databaseHandler.preferences.passcodeLockEnabled.toBoolean()
+        databaseHandler.preferences?.passcodeLockEnabled.toBoolean()
 
     override fun setPasscodeLockEnabled(enabled: Boolean) {
-        databaseHandler.isPasscodeLockEnabled = enabled
+        megaLocalStorageGateway.setPasscodeLockEnabled(enabled)
     }
+
+    override suspend fun setPasscodeLockCode(passcodeLockCode: String) =
+        megaLocalStorageGateway.setPasscodeLockCode(passcodeLockCode)
 
     override suspend fun fetchContactLinksOption(): Boolean = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
@@ -170,6 +178,62 @@ class DefaultSettingsRepository @Inject constructor(
 
     override fun isCameraSyncPreferenceEnabled(): Boolean =
         databaseHandler.preferences?.camSyncEnabled.toBoolean()
+
+    override suspend fun setEnableCameraUpload(enable: Boolean) {
+        megaLocalStorageGateway.setCamSyncEnabled(enable)
+    }
+
+    override suspend fun setCameraUploadVideoQuality(quality: Int) {
+        megaLocalStorageGateway.setCameraUploadVideoQuality(quality)
+    }
+
+    override suspend fun setCameraUploadFileType(syncVideo: Boolean) {
+        val fileUpload =
+            if (syncVideo) MegaPreferences.PHOTOS_AND_VIDEOS else MegaPreferences.ONLY_PHOTOS
+        megaLocalStorageGateway.setCamSyncFileUpload(fileUpload)
+    }
+
+    override suspend fun setCamSyncWifi(enableCellularSync: Boolean) {
+        megaLocalStorageGateway.setCamSyncWifi(enableCellularSync)
+    }
+
+    override suspend fun setCameraUploadLocalPath(path: String?) {
+        megaLocalStorageGateway.setCamSyncLocalPath(path)
+    }
+
+    override suspend fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean) =
+        megaLocalStorageGateway.setCameraFolderExternalSDCard(cameraFolderExternalSDCard)
+
+    override suspend fun setConversionOnCharging(onCharging: Boolean) =
+        megaLocalStorageGateway.setConversionOnCharging(onCharging)
+
+    override suspend fun setChargingOnSize(size: Int) {
+        megaLocalStorageGateway.setChargingOnSize(size)
+    }
+
+    override suspend fun setStorageAskAlways(isStorageAskAlways: Boolean) =
+        megaLocalStorageGateway.setStorageAskAlways(isStorageAskAlways)
+
+    override suspend fun setDefaultStorageDownloadLocation() {
+        val defaultDownloadLocation = cacheFolderGateway.buildDefaultDownloadDir()
+        defaultDownloadLocation.mkdirs()
+        megaLocalStorageGateway.setStorageDownloadLocation(defaultDownloadLocation.absolutePath)
+    }
+
+
+    override suspend fun setStorageDownloadLocation(storageDownloadLocation: String) =
+        megaLocalStorageGateway.setStorageDownloadLocation(storageDownloadLocation)
+
+    override suspend fun setShowCopyright() {
+        if (apiFacade.getPublicLinks().isEmpty()) {
+            Timber.d("No public links: showCopyright set true")
+            megaLocalStorageGateway.setShowCopyright(true)
+        } else {
+            Timber.d("Already public links: showCopyright set false")
+            megaLocalStorageGateway.setShowCopyright(false)
+        }
+    }
+
 
     override suspend fun isUseHttpsPreferenceEnabled(): Boolean =
         databaseHandler.useHttpsOnly.toBoolean()

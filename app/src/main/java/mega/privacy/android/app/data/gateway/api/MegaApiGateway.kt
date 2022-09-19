@@ -1,10 +1,13 @@
 package mega.privacy.android.app.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
 import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
@@ -128,6 +131,11 @@ interface MegaApiGateway {
      * Global updates
      */
     val globalUpdates: Flow<GlobalUpdate>
+
+    /**
+     * Global transfer
+     */
+    val globalTransfer: Flow<GlobalTransfer>
 
     /**
      * Get favourites
@@ -283,7 +291,7 @@ interface MegaApiGateway {
     fun getThumbnail(
         node: MegaNode,
         thumbnailFilePath: String,
-        listener: MegaRequestListenerInterface,
+        listener: MegaRequestListenerInterface? = null,
     )
 
     /**
@@ -425,4 +433,88 @@ interface MegaApiGateway {
      * @param message
      */
     suspend fun sendEvent(eventID: Int, message: String)
+
+    /**
+     * Acknowledge user alerts
+     */
+    suspend fun acknowledgeUserAlerts()
+
+    /**
+     * Get incoming contact requests
+     *
+     * @return all incoming contact requests or null
+     */
+    suspend fun getIncomingContactRequests(): ArrayList<MegaContactRequest>?
+
+    /**
+     * get user avatar color
+     *
+     * @param megaUser
+     */
+    suspend fun getUserAvatarColor(megaUser: MegaUser): String
+
+    /**
+     * Get user avatar
+     *
+     * @param user
+     * @param dstPath destination path file
+     *
+     * @return true if success
+     */
+    suspend fun getUserAvatar(user: MegaUser, dstPath: String): Boolean
+
+    /**
+     * Allow to search nodes with the specific options, [order] & [type] & [target]
+     *
+     * @param cancelToken
+     * @param order
+     * @param type
+     * @param target
+     * @return Mega list
+     */
+    suspend fun searchByType(
+        cancelToken: MegaCancelToken,
+        order: Int,
+        type: Int,
+        target: Int,
+    ): List<MegaNode>
+
+    /**
+     * Get children nodes by megaNodeList
+     * @param parentNodes parent nodes
+     * @param order order for the returned list
+     * @return children nodes list
+     */
+    suspend fun getChildren(
+        parentNodes: MegaNodeList,
+        order: Int,
+    ): List<MegaNode>
+
+    /**
+     * Get a list with all public links
+     *
+     * @return List of MegaNode objects that are shared with everyone via public link
+     */
+    suspend fun getPublicLinks(): List<MegaNode>
+
+    /**
+     * Get preview from server
+     *
+     * @param node
+     * @param previewFilePath preview file path
+     * @param listener
+     */
+    fun getPreview(
+        node: MegaNode,
+        previewFilePath: String,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Check is megaNode in Rubbish bin
+     *
+     * @param node MegaNode
+     * @return True in, else not in
+     */
+    suspend fun isInRubbish(node: MegaNode): Boolean
 }

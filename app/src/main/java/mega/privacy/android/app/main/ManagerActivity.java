@@ -35,18 +35,17 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOG
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
 import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CHAT_BNV;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.NO_BNV;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.PHOTOS_BNV;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.SHARED_ITEMS_BNV;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.getStartBottomNavigationItem;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.getStartDrawerItem;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldCloseApp;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.CHAT_BNV;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.HOME_BNV;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.NO_BNV;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.PHOTOS_BNV;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.SHARED_ITEMS_BNV;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.getStartBottomNavigationItem;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.getStartDrawerItem;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.shouldCloseApp;
 import static mega.privacy.android.app.main.FileInfoActivity.NODE_HANDLE;
-import static mega.privacy.android.app.main.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
@@ -55,6 +54,7 @@ import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogF
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.incomingSharesState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.linksState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.outgoingSharesState;
+import static mega.privacy.android.app.presentation.permissions.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
@@ -219,6 +219,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -278,7 +279,6 @@ import kotlin.Unit;
 import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
@@ -309,7 +309,6 @@ import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
@@ -371,8 +370,11 @@ import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
+import mega.privacy.android.app.presentation.permissions.PermissionsFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
+import mega.privacy.android.app.presentation.photos.PhotosFragment;
+import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment;
@@ -387,6 +389,7 @@ import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
+import mega.privacy.android.app.sync.BackupState;
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
@@ -421,6 +424,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
 import mega.privacy.android.domain.entity.ContactRequest;
 import mega.privacy.android.domain.entity.ContactRequestStatus;
@@ -637,13 +641,15 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isInMDMode = false;
 
     private static final String STATE_KEY_IS_IN_ALBUM_CONTENT = "isInAlbumContent";
+    private static final String STATE_KEY_IS_IN_PHOTOS_FILTER = "isInFilterPage";
+    public boolean isInFilterPage = false;
     private boolean isInAlbumContent;
     public boolean fromAlbumContent = false;
 
     public enum FragmentTag {
         CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SEARCH, TRANSFERS, COMPLETED_TRANSFERS,
         RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
-        LINKS, MEDIA_DISCOVERY, ALBUM_CONTENT;
+        LINKS, MEDIA_DISCOVERY, ALBUM_CONTENT, PHOTOS_FILTER;
 
         public String getTag() {
             switch (this) {
@@ -683,6 +689,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     return "mediaDiscoveryFragment";
                 case ALBUM_CONTENT:
                     return "fragmentAlbumContent";
+                case PHOTOS_FILTER:
+                    return "fragmentPhotosFilter";
             }
             return null;
         }
@@ -731,6 +739,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     long lastTimeOnTransferUpdate = Calendar.getInstance().getTimeInMillis();
 
+    boolean requestNotificationsPermissionFirstLogin;
     private boolean askPermissions = false;
 
     boolean megaContacts = true;
@@ -758,6 +767,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private SearchFragment searchFragment;
     private PhotosFragment photosFragment;
     private AlbumContentFragment albumContentFragment;
+    private PhotosFilterFragment photosFilterFragment;
     private ChatTabsFragment chatTabsFragment;
     private NotificationsFragment notificationsFragment;
     private TurnOnNotificationsFragment turnOnNotificationsFragment;
@@ -1133,6 +1143,13 @@ public class ManagerActivity extends TransfersManagementActivity
         if (finish) finish();
     };
 
+    private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            goBack();
+        }
+    };
+
     private FileBackupManager fileBackupManager;
 
     /**
@@ -1361,6 +1378,12 @@ public class ManagerActivity extends TransfersManagementActivity
             getSupportFragmentManager().putFragment(outState, FragmentTag.ALBUM_CONTENT.getTag(), albumContentFragment);
         }
 
+        outState.putBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, isInFilterPage);
+        photosFilterFragment = (PhotosFilterFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PHOTOS_FILTER.getTag());
+        if (photosFilterFragment != null) {
+            getSupportFragmentManager().putFragment(outState, FragmentTag.PHOTOS_FILTER.getTag(), photosFilterFragment);
+        }
+
         backupWarningDialog = fileBackupManager.getBackupWarningDialog();
         if (backupWarningDialog != null && backupWarningDialog.isShowing()) {
             backupHandleList = fileBackupManager.getBackupHandleList();
@@ -1434,6 +1457,8 @@ public class ManagerActivity extends TransfersManagementActivity
 
         getTransfersViewModel().onGetShouldCompletedTab().observe(this, this::updateTransfersTab);
 
+        getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
+
         // This block for solving the issue below:
         // Android is installed for the first time. Press the “Open” button on the system installation dialog, press the home button to switch the app to background,
         // and then switch the app to foreground, causing the app to create a new instantiation.
@@ -1498,6 +1523,8 @@ public class ManagerActivity extends TransfersManagementActivity
             isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
             isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false);
             isInAlbumContent = savedInstanceState.getBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, false);
+            isInFilterPage = savedInstanceState.getBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, false);
+
 
             nodeAttacher.restoreState(savedInstanceState);
             nodeSaver.restoreState(savedInstanceState);
@@ -1580,8 +1607,6 @@ public class ManagerActivity extends TransfersManagementActivity
         aC = new AccountController(this);
 
         CacheFolderManager.createCacheFolders(this);
-
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
         managerActivity = this;
         app = (MegaApplication) getApplication();
@@ -2448,6 +2473,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
                     boolean firstLogin = getIntent().getBooleanExtra(EXTRA_FIRST_LOGIN, false);
                     viewModel.setIsFirstLogin(firstLogin);
+                    setRequestNotificationsPermissionFirstLogin(savedInstanceState);
                     askPermissions = getIntent().getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
 
                     //reset flag to fix incorrect view loaded when orientation changes
@@ -2485,6 +2511,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     getIntent().removeExtra(EXTRA_UPGRADE_ACCOUNT);
                     boolean firstLogin = intentRec.getBooleanExtra(EXTRA_FIRST_LOGIN, false);
                     viewModel.setIsFirstLogin(firstLogin);
+                    setRequestNotificationsPermissionFirstLogin(savedInstanceState);
                     askPermissions = intentRec.getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
                     if (upgradeAccount) {
                         drawerLayout.closeDrawer(Gravity.LEFT);
@@ -2592,12 +2619,14 @@ public class ManagerActivity extends TransfersManagementActivity
 
     /**
      * Checks which screen should be shown when an user is logins.
-     * There are three different screens or warnings:
-     * - Business warning: it takes priority over the other two
-     * - SMS verification screen: it takes priority over the other one
-     * - Onboarding permissions screens: it has to be only shown when account is logged in after the installation,
-     * some of the permissions required have not been granted
-     * and the business warnings and SMS verification have not to be shown.
+     * There are four different screens or warnings:
+     * - Business warning: it takes priority over the other three.
+     * - SMS verification screen: it takes priority over the other two.
+     * - Onboarding permissions screens: it has to be only shown when account is logged in after
+     *   the installation, and some of the permissions required have not been granted and
+     *   the business warning and SMS verification have not to be shown.
+     * - Notifications permission screen: it has to be shown if the onboarding permissions screens
+     *   have not been shown.
      */
     private void checkInitialScreens() {
         if (checkBusinessStatus()) {
@@ -2615,6 +2644,8 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         } else if (getFirstLogin() && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
             askForSMSVerification();
+        } else if(requestNotificationsPermissionFirstLogin) {
+            askForNotificationsPermission();
         }
     }
 
@@ -2706,7 +2737,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     private void enableCUClicked() {
         if (getPhotosFragment() != null) {
-            if (photosFragment.isEnablePhotosFragmentShown()) {
+            if (photosFragment.isEnablePhotosViewShown()) {
                 photosFragment.enableCameraUpload();
             } else {
                 photosFragment.enableCameraUploadClick();
@@ -2873,13 +2904,34 @@ public class ManagerActivity extends TransfersManagementActivity
             Timber.d("Mobile only portrait mode");
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
+
+        boolean notificationsGranted = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+                || hasPermissions(this, Manifest.permission.POST_NOTIFICATIONS);
+
         boolean writeStorageGranted = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        boolean readStorageGranted = hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        String[] PERMISSIONS = new String[] {
+                PermissionUtils.getImagePermissionByVersion(),
+                PermissionUtils.getAudioPermissionByVersion(),
+                PermissionUtils.getVideoPermissionByVersion(),
+                PermissionUtils.getReadExternalStoragePermission()
+        };
+        boolean readStorageGranted = hasPermissions(this, PERMISSIONS);
         boolean cameraGranted = hasPermissions(this, Manifest.permission.CAMERA);
         boolean microphoneGranted = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
+        boolean bluetoothGranted = Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+                || hasPermissions(this, Manifest.permission.BLUETOOTH_CONNECT);
 
-        if (!writeStorageGranted || !readStorageGranted || !cameraGranted || !microphoneGranted/* || !writeCallsGranted*/) {
-            deleteCurrentFragment();
+        boolean contactsGranted = hasPermissions(this, Manifest.permission.READ_CONTACTS);
+
+        if (!notificationsGranted || !writeStorageGranted || !readStorageGranted || !cameraGranted
+                || !microphoneGranted || !bluetoothGranted /*|| !writeCallsGranted*/|| !contactsGranted) {
+
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+            if (currentFragment != null
+                    && !currentFragment.getTag().equals(FragmentTag.PERMISSIONS.getTag())) {
+                deleteCurrentFragment();
+            }
 
             if (permissionsFragment == null) {
                 permissionsFragment = new PermissionsFragment();
@@ -2979,12 +3031,12 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
     }
 
-    void queryIfNotificationsAreOn() {
-        Timber.d("queryIfNotificationsAreOn");
-
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        void queryIfNotificationsAreOn() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return;
         }
+
+        Timber.d("queryIfNotificationsAreOn");
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
@@ -3104,8 +3156,7 @@ public class ManagerActivity extends TransfersManagementActivity
         managerActivity = this;
 
         Intent intent = getIntent();
-
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        
         if (dbH.getCredentials() == null) {
             if (!openLink) {
                 return;
@@ -3531,6 +3582,7 @@ public class ManagerActivity extends TransfersManagementActivity
         replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
         viewModel.onMediaDiscoveryOpened(mediaHandle);
         isInMDMode = true;
+        viewModel.setIsFirstNavigationLevel(false);
     }
 
     public void skipToAlbumContentFragment(Fragment f) {
@@ -3539,6 +3591,14 @@ public class ManagerActivity extends TransfersManagementActivity
         isInAlbumContent = true;
         viewModel.setIsFirstNavigationLevel(false);
 
+        showHideBottomNavigationView(true);
+    }
+
+    public void skipToFilterFragment(Fragment f) {
+        photosFilterFragment = (PhotosFilterFragment) f;
+        replaceFragment(f, FragmentTag.PHOTOS_FILTER.getTag());
+        isInFilterPage = true;
+        viewModel.setIsFirstNavigationLevel(false);
         showHideBottomNavigationView(true);
     }
 
@@ -3683,7 +3743,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 MegaNode parentNode = megaApi.getNodeByHandle(viewModel.getState().getValue().getBrowserParentHandle());
                 if (parentNode != null) {
                     if (megaApi.getRootNode() != null) {
-                        if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || viewModel.getState().getValue().getBrowserParentHandle() == -1) {
+                        if ((parentNode.getHandle() == megaApi.getRootNode().getHandle()
+                                || viewModel.getState().getValue().getBrowserParentHandle() == -1)
+                                && !isInMDMode) {
                             aB.setTitle(getString(R.string.section_cloud_drive));
                             viewModel.setIsFirstNavigationLevel(true);
                         } else {
@@ -3838,17 +3900,19 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case PHOTOS: {
                 aB.setSubtitle(null);
-                if (getPhotosFragment() != null && photosFragment.isEnablePhotosFragmentShown()) {
+                if (isInAlbumContent) {
+                    aB.setTitle(getString(R.string.title_favourites_album));
+                } else if (isInFilterPage) {
+                    aB.setTitle(getString(R.string.photos_action_filter));
+                } else if (getPhotosFragment() != null && photosFragment.shouldUpdateTitle()) {
                     setFirstNavigationLevel(false);
-                    aB.setTitle(getString(R.string.settings_camera_upload_on));
-                } else {
-                    if (isInAlbumContent) {
-                        aB.setTitle(getString(R.string.title_favourites_album));
-                    } else {
-                        setFirstNavigationLevel(true);
-                        aB.setTitle(getString(R.string.sortby_type_photo_first));
-                    }
+                    aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
                 }
+                else {
+                    setFirstNavigationLevel(true);
+                    aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
+                }
+
                 break;
             }
             case HOMEPAGE: {
@@ -3943,6 +4007,10 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (drawerItem == DrawerItem.PHOTOS && isInAlbumContent) {
             aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+        }
+
+        if (drawerItem == DrawerItem.PHOTOS && isInFilterPage) {
+            aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white));
         }
     }
 
@@ -4231,6 +4299,7 @@ public class ManagerActivity extends TransfersManagementActivity
         replaceFragment(ChatTabsFragment.newInstance(), FragmentTag.RECENT_CHAT.getTag());
 
         drawerLayout.closeDrawer(Gravity.LEFT);
+        PermissionUtils.checkNotificationsPermission(this);
     }
 
     public void setBottomNavigationMenuItemChecked(int item) {
@@ -4552,6 +4621,8 @@ public class ManagerActivity extends TransfersManagementActivity
             case PHOTOS: {
                 if (isInAlbumContent) {
                     skipToAlbumContentFragment(AlbumContentFragment.getInstance());
+                } else if (isInFilterPage) {
+                    skipToFilterFragment(PhotosFilterFragment.getInstance());
                 } else {
                     abL.setVisibility(View.VISIBLE);
                     if (getPhotosFragment() == null) {
@@ -4953,6 +5024,27 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
+     * Launches an intent to open NotificationsPermissionActivity in order to check if should ask
+     * for notifications permission.
+     */
+    private void askForNotificationsPermission() {
+        requestNotificationsPermissionFirstLogin = false;
+        PermissionUtils.checkNotificationsPermission(this);
+    }
+
+    /**
+     * Sets requestNotificationsPermissionFirstLogin as firstLogin only if savedInstanceState
+     * is null.
+     *
+     * @param savedInstanceState Saved state.
+     */
+    private void setRequestNotificationsPermissionFirstLogin(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            requestNotificationsPermissionFirstLogin = getFirstLogin();
+        }
+    }
+
+    /**
      * Launches a MyAccountActivity intent without any intent action, data and extra.
      */
     public void showMyAccount() {
@@ -5319,16 +5411,6 @@ public class ManagerActivity extends TransfersManagementActivity
         setSearchDrawerItem();
         selectDrawerItem(drawerItem);
         resetActionBar(aB);
-
-        searchViewModel.performSearch(
-                viewModel.getState().getValue().getBrowserParentHandle(),
-                viewModel.getState().getValue().getRubbishBinParentHandle(),
-                viewModel.getState().getValue().getInboxParentHandle(),
-                incomingSharesState(this).getIncomingHandle(),
-                outgoingSharesState(this).getOutgoingHandle(),
-                linksState(this).getLinksHandle(),
-                viewModel.getState().getValue().isFirstNavigationLevel()
-        );
     }
 
     private void setFullscreenOfflineFragmentSearchQuery(String searchQuery) {
@@ -5425,7 +5507,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                         //Check media discovery mode
                         if (isInMDMode) {
-                            onBackPressed();
+                            getOnBackPressedDispatcher().onBackPressed();
                         } else {
                             //Cloud Drive
                             if (isCloudAdded()) {
@@ -5447,7 +5529,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                     } else if (drawerItem == DrawerItem.PHOTOS) {
                         if (getPhotosFragment() != null) {
-                            if (photosFragment.isEnablePhotosFragmentShown()) {
+                            if (photosFragment.isEnablePhotosViewShown()) {
                                 photosFragment.onBackPressed();
                                 return true;
                             }
@@ -5455,9 +5537,9 @@ public class ManagerActivity extends TransfersManagementActivity
                             setToolbarTitle();
                             invalidateOptionsMenu();
                             return true;
-                        } else if (isInAlbumContent) {
+                        } else if (isInAlbumContent || isInFilterPage) {
                             // When current fragment is AlbumContentFragment, the photosFragment will be null due to replaceFragment.
-                            onBackPressed();
+                            getOnBackPressedDispatcher().onBackPressed();
                         }
                     } else if (drawerItem == DrawerItem.INBOX) {
                         inboxFragment = (InboxFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
@@ -5467,7 +5549,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                     } else if (drawerItem == DrawerItem.SEARCH) {
                         if (getSearchFragment() != null) {
-                            onBackPressed();
+                            getOnBackPressedDispatcher().onBackPressed();
                             return true;
                         }
                     } else if (drawerItem == DrawerItem.TRANSFERS) {
@@ -5479,12 +5561,12 @@ public class ManagerActivity extends TransfersManagementActivity
                             handleBackPressIfFullscreenOfflineFragmentOpened();
                         } else if (mNavController.getCurrentDestination() != null &&
                                 mNavController.getCurrentDestination().getId() == R.id.favouritesFolderFragment) {
-                            onBackPressed();
+                            getOnBackPressedDispatcher().onBackPressed();
                         } else {
                             mNavController.navigateUp();
                         }
                     } else {
-                        super.onBackPressed();
+                        handleSuperBackPressed();
                     }
                 }
                 return true;
@@ -5868,12 +5950,8 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshSearch();
     }
 
-    @Override
-    public void onBackPressed() {
-        Timber.d("onBackPressed");
-
-        // Let the PSA web browser fragment (if visible) to consume the back key event
-        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
+    private void goBack() {
+        Timber.d("goBack");
 
         retryConnectionsAndSignalPresence();
 
@@ -5896,7 +5974,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (mNavController.getCurrentDestination() != null &&
                 mNavController.getCurrentDestination().getId() == R.id.favouritesFolderFragment) {
-            super.onBackPressed();
+            handleSuperBackPressed();
             return;
         }
 
@@ -5967,6 +6045,13 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else {
                     photosFragment.switchToAlbum();
                 }
+            } else if (isInFilterPage) {
+                isInFilterPage = false;
+
+                backToDrawerItem(bottomNavigationCurrentItem);
+                if (photosFragment == null) {
+                    backToDrawerItem(bottomNavigationCurrentItem);
+                }
             } else if (getPhotosFragment() == null || photosFragment.onBackPressed() == 0) {
                 performOnBack();
             }
@@ -6023,7 +6108,7 @@ public class ManagerActivity extends TransfersManagementActivity
             } else {
                 drawerItem = DrawerItem.HOMEPAGE;
             }
-            super.onBackPressed();
+            handleSuperBackPressed();
         }
     }
 
@@ -6127,7 +6212,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case R.id.bottom_navigation_item_homepage: {
                 drawerItem = DrawerItem.HOMEPAGE;
                 if (fullscreenOfflineFragment != null) {
-                    super.onBackPressed();
+                    handleSuperBackPressed();
                     return true;
                 } else {
                     setBottomNavigationMenuItemChecked(HOME_BNV);
@@ -7184,6 +7269,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void saveNodesToDevice(List<MegaNode> nodes, boolean highPriority, boolean isFolderLink,
                                   boolean fromMediaViewer, boolean fromChat) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodes(nodes, highPriority, isFolderLink, fromMediaViewer, fromChat);
     }
 
@@ -7194,6 +7280,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param node Node to be downloaded.
      */
     public Unit saveNodeByTap(MegaNode node) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, false, true);
         return null;
     }
@@ -7209,6 +7296,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void saveHandlesToDevice(List<Long> handles, boolean highPriority, boolean isFolderLink,
                                     boolean fromMediaViewer, boolean fromChat) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveHandles(handles, highPriority, isFolderLink, fromMediaViewer, fromChat);
     }
 
@@ -7218,6 +7306,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param nodes nodes to save
      */
     public void saveOfflineNodesToDevice(List<MegaOffline> nodes) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveOfflineNodes(nodes, false);
     }
 
@@ -7327,7 +7416,7 @@ public class ManagerActivity extends TransfersManagementActivity
     /**
      * Refresh PhotosFragment's UI after CU is enabled.
      */
-    public void refreshTimelineFragment() {
+    public void refreshPhotosFragment() {
         drawerItem = DrawerItem.PHOTOS;
         setBottomNavigationMenuItemChecked(PHOTOS_BNV);
         setToolbarTitle();
@@ -7450,7 +7539,8 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void showUploadPanel(int uploadType) {
         if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+            String[] PERMISSIONS = getReadAndWritePermissions();
+            requestPermission(this, REQUEST_READ_WRITE_STORAGE, PERMISSIONS);
             return;
         }
 
@@ -7470,7 +7560,8 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void showUploadPanelForBackup(int uploadType, int actionType) {
         if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+            String[] PERMISSIONS = getReadAndWritePermissions();
+            requestPermission(this, REQUEST_READ_WRITE_STORAGE, PERMISSIONS);
             return;
         }
 
@@ -7480,6 +7571,16 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         showUploadPanel(uploadType);
+    }
+
+    private String[] getReadAndWritePermissions() {
+        return new String[] {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                PermissionUtils.getImagePermissionByVersion(),
+                PermissionUtils.getAudioPermissionByVersion(),
+                PermissionUtils.getVideoPermissionByVersion(),
+                PermissionUtils.getReadExternalStoragePermission()
+        };
     }
 
     public void updateAccountDetailsVisibleInfo() {
@@ -7984,6 +8085,7 @@ public class ManagerActivity extends TransfersManagementActivity
             //Now, call to the DownloadService
 
             if (handleToDownload != 0 && handleToDownload != -1) {
+                PermissionUtils.checkNotificationsPermission(this);
                 Intent service = new Intent(this, DownloadService.class);
                 service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
                 service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
@@ -8206,6 +8308,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                         if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
                                             showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
                                         } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+                                            PermissionUtils.checkNotificationsPermission(this);
                                             uploadUseCase.upload(this, file, parentHandle)
                                                     .subscribeOn(Schedulers.io())
                                                     .observeOn(AndroidSchedulers.mainThread())
@@ -9021,6 +9124,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 if (info.isContact) {
                                     requestContactsPermissions(info, parentNode);
                                 } else {
+                                    PermissionUtils.checkNotificationsPermission(this);
                                     uploadUseCase.upload(this, info, null, parentNode.getHandle())
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
@@ -9053,16 +9157,37 @@ public class ManagerActivity extends TransfersManagementActivity
             if (cursorID.moveToFirst()) {
                 Timber.d("It is a contact");
 
-                String id = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                int hasPhone = cursorID.getInt(cursorID.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+                String id = null;
+                try {
+                    id = cursorID.getString(cursorID.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+                } catch (IllegalArgumentException exception) {
+                    Timber.w(exception, "Exception getting contact ID.");
+                }
+
+                String name = null;
+                try {
+                    name = cursorID.getString(cursorID.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
+                } catch (IllegalArgumentException exception) {
+                    Timber.w(exception, "Exception getting contact display name.");
+                }
+
+                int hasPhone = -1;
+                try {
+                    hasPhone = cursorID.getInt(cursorID.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+                } catch (IllegalArgumentException exception) {
+                    Timber.w(exception, "Exception getting contact details.");
+                }
 
                 // get the user's email address
                 String email = null;
                 Cursor ce = getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null,
                         ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?", new String[]{id}, null);
                 if (ce != null && ce.moveToFirst()) {
-                    email = ce.getString(ce.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+                    try {
+                        email = ce.getString(ce.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Email.DATA));
+                    } catch (IllegalArgumentException exception) {
+                        Timber.w(exception, "Exception getting contact email.");
+                    }
                     ce.close();
                 }
 
@@ -9072,7 +9197,11 @@ public class ManagerActivity extends TransfersManagementActivity
                     Cursor cp = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
                             ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
                     if (cp != null && cp.moveToFirst()) {
-                        phone = cp.getString(cp.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        try {
+                            phone = cp.getString(cp.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        } catch (IllegalArgumentException exception) {
+                            Timber.w(exception, "Exception getting contact phone number.");
+                        }
                         cp.close();
                     }
                 }
@@ -9120,6 +9249,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
                                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
                             } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+                                PermissionUtils.checkNotificationsPermission(this);
                                 String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, 1, 1);
 
                                 uploadUseCase.upload(this, file, parentNode.getHandle())
@@ -9385,12 +9515,12 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
 
                 // Update CU backup state.
-                int newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-                        ? CameraUploadSyncManager.State.CU_SYNC_STATE_PAUSE_UP
-                        : CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE;
+                BackupState newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+                        ? BackupState.PAUSE_UPLOADS
+                        : BackupState.ACTIVE;
 
-                CameraUploadSyncManager.INSTANCE.updatePrimaryBackupState(newBackupState);
-                CameraUploadSyncManager.INSTANCE.updateSecondaryBackupState(newBackupState);
+                CameraUploadSyncManager.INSTANCE.updatePrimaryFolderBackupState(newBackupState);
+                CameraUploadSyncManager.INSTANCE.updateSecondaryFolderBackupState(newBackupState);
             }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
             Timber.d("One MegaRequest.TYPE_PAUSE_TRANSFER");
@@ -9548,11 +9678,6 @@ public class ManagerActivity extends TransfersManagementActivity
         myAccountInfo.updateMyData(firstName, newName, e);
         updateUserNameNavigationView(myAccountInfo.getFullName());
         LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean.class).post(true);
-    }
-
-    public void updateAccountStorageInfo() {
-        Timber.d("updateAccountStorageInfo");
-        megaApi.getFolderInfo(megaApi.getRootNode(), this);
     }
 
     @Override
@@ -9819,7 +9944,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 setInboxNavigationDrawer();
             }
         }
-        
+
         checkCameraUploadFolder(false, updatedNodes);
 
         LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
@@ -10860,6 +10985,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 throwable -> Timber.e(throwable, "Retry transfer failed."));
             }
         } else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+            PermissionUtils.checkNotificationsPermission(this);
             File file = new File(transfer.getOriginalPath());
             uploadUseCase.upload(this, file, transfer.getParentHandle())
                     .subscribeOn(Schedulers.io())
@@ -11383,5 +11509,11 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             inboxSection.setVisibility(View.GONE);
         }
+    }
+
+    private void handleSuperBackPressed() {
+        onBackPressedCallback.setEnabled(false);
+        getOnBackPressedDispatcher().onBackPressed();
+        onBackPressedCallback.setEnabled(true);
     }
 }

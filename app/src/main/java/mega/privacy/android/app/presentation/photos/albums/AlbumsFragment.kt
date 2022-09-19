@@ -21,10 +21,10 @@ import mega.privacy.android.app.fragments.managerFragments.cu.PhotosTabCallback
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.photos.albums.adapter.AlbumCoverAdapter
-import mega.privacy.android.app.presentation.photos.model.AlbumsLoadState
+import mega.privacy.android.app.presentation.photos.albums.model.AlbumsLoadState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.callManager
-import mega.privacy.android.domain.entity.Album
+import mega.privacy.android.domain.entity.photos.Album
 
 /**
  * AlbumsFragment is a sub fragment of PhotosFragment. Its sibling is TimelineFragment
@@ -73,7 +73,7 @@ class AlbumsFragment : Fragment(), PhotosTabCallback {
     private fun setupFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.albumsState.collect { favouritesState ->
+                viewModel.loadState.collect { favouritesState ->
                     when (favouritesState) {
                         is AlbumsLoadState.Success -> {
                             albumCoverAdapter.submitList(favouritesState.albums)

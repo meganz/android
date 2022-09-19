@@ -6,6 +6,7 @@ import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.FileUtil.isAudioOrVideo;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ThumbnailUtils.createThumbnailList;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder;
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder;
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromMegaList;
@@ -19,6 +20,7 @@ import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,17 +31,30 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.AbstractDraweeController;
+import com.facebook.drawee.generic.RoundingParams;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.fragments.homepage.NodeItem;
+import mega.privacy.android.app.fragments.recent.RecentsBucketDiffCallback;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.MegaNodeUtil;
@@ -47,18 +62,22 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
-public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAdapter.ViewHolderMultipleBucket> implements View.OnClickListener, SectionTitleProvider, DragThumbnailGetter {
+public class MultipleBucketAdapter
+        extends ListAdapter<NodeItem, MultipleBucketAdapter.ViewHolderMultipleBucket>
+        implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, DragThumbnailGetter
+{
 
     Context context;
     Object fragment;
     MegaApiAndroid megaApi;
 
-    private DisplayMetrics outMetrics;
+    private final DisplayMetrics outMetrics;
 
-    List<MegaNode> nodes;
+    List<NodeItem> nodes;
     boolean isMedia;
 
-    public MultipleBucketAdapter(Context context, Object fragment, List<MegaNode> nodes, boolean isMedia) {
+    public MultipleBucketAdapter(Context context, Object fragment, List<NodeItem> nodes, boolean isMedia, RecentsBucketDiffCallback diffCallback) {
+        super(diffCallback);
         this.context = context;
         this.fragment = fragment;
         this.isMedia = isMedia;
@@ -69,15 +88,16 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         outMetrics = context.getResources().getDisplayMetrics();
     }
 
+    // View Holder
     public class ViewHolderMultipleBucket extends RecyclerView.ViewHolder {
-
         private LinearLayout multipleBucketLayout;
         private long document;
         private RelativeLayout mediaView;
-        private ImageView thumbnailMedia;
+        private SimpleDraweeView thumbnailMedia;
         private RelativeLayout videoLayout;
         private TextView videoDuration;
         private RelativeLayout listView;
+        private ImageView selectedIcon;
         private ImageView thumbnailList;
         private TextView nameText;
         private TextView infoText;
@@ -97,9 +117,10 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             if (isMedia) {
                 this.thumbnailMedia.setImageBitmap(image);
             } else {
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.thumbnailList.getLayoutParams();
-                params.width = params.height = dp2px(36, outMetrics);
-                int margin = dp2px(18, outMetrics);
+                RelativeLayout.LayoutParams params =
+                        (RelativeLayout.LayoutParams) this.thumbnailList.getLayoutParams();
+                params.width = params.height = dp2px(ITEM_WIDTH, outMetrics);
+                int margin = dp2px(ITEM_MARGIN, outMetrics);
                 params.setMargins(margin, margin, margin, 0);
 
                 this.thumbnailList.setLayoutParams(params);
@@ -123,8 +144,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
     @Override
     public int getNodePosition(long handle) {
         for (int i = 0; i < nodes.size(); i++) {
-            MegaNode node = nodes.get(i);
-            if (node != null && node.getHandle() == handle) {
+            NodeItem node = nodes.get(i);
+            if (node != null && node.getNode().getHandle() == handle) {
                 return i;
             }
         }
@@ -134,7 +155,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
 
     @Nullable
     @Override
-    public View getThumbnail(@NonNull RecyclerView.ViewHolder viewHolder) {
+    public ImageView getThumbnail(@NonNull RecyclerView.ViewHolder viewHolder) {
         if (viewHolder instanceof ViewHolderMultipleBucket) {
             return isMedia ? ((ViewHolderMultipleBucket) viewHolder).thumbnailMedia
                     : ((ViewHolderMultipleBucket) viewHolder).thumbnailList;
@@ -152,6 +173,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         holder.multipleBucketLayout = v.findViewById(R.id.multiple_bucket_layout);
         holder.multipleBucketLayout.setTag(holder);
         holder.multipleBucketLayout.setOnClickListener(this);
+        holder.multipleBucketLayout.setOnLongClickListener(this);
         holder.mediaView = v.findViewById(R.id.media_layout);
         holder.thumbnailMedia = v.findViewById(R.id.thumbnail_media);
         holder.videoLayout = v.findViewById(R.id.video_layout);
@@ -162,6 +184,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         holder.infoText = v.findViewById(R.id.info_text);
         holder.imgLabel = v.findViewById(R.id.img_label);
         holder.imgFavourite = v.findViewById(R.id.img_favourite);
+        holder.selectedIcon = v.findViewById(R.id.icon_selected);
         holder.threeDots = v.findViewById(R.id.three_dots);
         holder.threeDots.setTag(holder);
         holder.threeDots.setOnClickListener(this);
@@ -171,26 +194,31 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
     }
 
     @Override
-    public void onBindViewHolder(ViewHolderMultipleBucket holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolderMultipleBucket holder, int position) {
         Timber.d("onBindViewHolder");
-        MegaNode node = getItemAtPosition(position);
-        if (node == null) return;
+        NodeItem node = getItemAtPosition(position);
+        MegaNode megaNode = node.getNode();
+        if (megaNode == null) return;
+        holder.document = megaNode.getHandle();
 
-        holder.document = node.getHandle();
-
-        Bitmap thumbnail = getThumbnailFromCache(node);
+        Bitmap thumbnail = getThumbnailFromCache(megaNode);
         if (thumbnail == null) {
-            thumbnail = getThumbnailFromFolder(node, context);
+            thumbnail = getThumbnailFromFolder(megaNode, context);
             if (thumbnail == null) {
                 try {
-                    if (node.hasThumbnail() || isMedia) {
-                        thumbnail = getThumbnailFromMegaList(node, context, holder, megaApi, this);
+                    if (megaNode.hasThumbnail() || isMedia) {
+                        thumbnail = getThumbnailFromMegaList(megaNode, context, holder, megaApi, this);
                     } else {
-                        createThumbnailList(context, node, holder, megaApi, this);
+                        createThumbnailList(context, megaNode, holder, megaApi, this);
                     }
                 } catch (Exception e) {
-                    Timber.e(e, "Error getting or creating node thumbnail");
+                    Timber.e(e, "Error getting or creating megaNode thumbnail");
                 }
+            }
+        } else if (node.getThumbnail() == null && (megaNode.hasThumbnail() || isMedia)) {
+            File thumbnailFile = new File(getThumbFolder(context), megaNode.getBase64Handle() + ".jpg");
+            if (thumbnailFile.exists()) {
+                node.setThumbnail(thumbnailFile);
             }
         }
 
@@ -199,10 +227,11 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             holder.listView.setVisibility(View.GONE);
             holder.imgLabel.setVisibility(View.GONE);
             holder.imgFavourite.setVisibility(View.GONE);
+            holder.selectedIcon.setVisibility(View.GONE);
 
-            if (isAudioOrVideo(node)) {
+            if (isAudioOrVideo(megaNode)) {
                 holder.videoLayout.setVisibility(View.VISIBLE);
-                holder.videoDuration.setText(getVideoDuration(node.getDuration()));
+                holder.videoDuration.setText(getVideoDuration(megaNode.getDuration()));
             } else {
                 holder.videoLayout.setVisibility(View.GONE);
             }
@@ -220,43 +249,91 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             holder.thumbnailMedia.getLayoutParams().width = size;
             holder.thumbnailMedia.getLayoutParams().height = size;
 
-            if (thumbnail != null) {
-                holder.setImageThumbnail(thumbnail);
+            if (node.getThumbnail() != null) {
+                ImageRequest request =
+                        ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(node.getThumbnail())).build();
+                AbstractDraweeController controller = Fresco.newDraweeControllerBuilder()
+                        .setImageRequest(request)
+                        .setOldController(holder.thumbnailMedia.getController())
+                        .build();
+                holder.thumbnailMedia.setController(controller);
             } else {
-                holder.thumbnailMedia.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                holder.thumbnailMedia.setImageResource(
+                    MimeTypeList.typeForName(megaNode.getName()).getIconResourceId()
+                );
+            }
+
+            if (node.getSelected()) {
+                holder.selectedIcon.setVisibility(View.VISIBLE);
+                holder.thumbnailMedia.getHierarchy().setRoundingParams(
+                    RoundingParams.fromCornersRadius((float) context.getResources().getDimensionPixelSize(
+                        R.dimen.cu_fragment_selected_round_corner_radius
+                    ))
+                );
+                holder.thumbnailMedia.setBackground(ContextCompat.getDrawable(
+                        holder.thumbnailMedia.getContext(),
+                        R.drawable.background_item_grid_selected
+                ));
+            } else {
+                holder.selectedIcon.setVisibility(View.GONE);
+                holder.thumbnailMedia.getHierarchy().setRoundingParams(
+                        RoundingParams.fromCornersRadius(0f)
+                );
+                holder.thumbnailMedia.setBackground(null);
             }
         } else {
             holder.mediaView.setVisibility(View.GONE);
             holder.listView.setVisibility(View.VISIBLE);
-            holder.nameText.setText(node.getName());
-            holder.infoText.setText(getSizeString(node.getSize()) + " · " + formatTime(node.getCreationTime()));
+            holder.nameText.setText(megaNode.getName());
+            holder.infoText.setText(getSizeString(megaNode.getSize()) + " · " + formatTime(megaNode.getCreationTime()));
 
             holder.thumbnailList.setVisibility(View.VISIBLE);
 
-            if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
-                Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
+            if (megaNode.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+                Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(megaNode.getLabel(), holder.itemView.getResources());
                 holder.imgLabel.setImageDrawable(drawable);
                 holder.imgLabel.setVisibility(View.VISIBLE);
             } else {
                 holder.imgLabel.setVisibility(View.GONE);
             }
 
-            holder.imgFavourite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
+            holder.imgFavourite.setVisibility(megaNode.isFavourite() ? View.VISIBLE : View.GONE);
 
             if (thumbnail != null) {
                 holder.setImageThumbnail(thumbnail);
             } else {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.thumbnailList.getLayoutParams();
-                params.width = params.height = dp2px(48, outMetrics);
-                int margin = dp2px(12, outMetrics);
+                params.width = params.height = dp2px(ITEM_WIDTH, outMetrics);
+                int margin = dp2px(ITEM_MARGIN, outMetrics);
                 params.setMargins(margin, margin, margin, 0);
                 holder.thumbnailList.setLayoutParams(params);
-                holder.thumbnailList.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                holder.thumbnailList.setImageResource(MimeTypeList.typeForName(megaNode.getName()).getIconResourceId());
+            }
+
+            if (node.getSelected()) {
+                holder.thumbnailList.setImageResource(R.drawable.ic_select_folder);
+            } else {
+                holder.thumbnailList.setImageDrawable(null);
+                int placeHolderRes = MimeTypeList.typeForName(node.getNode().getName()).getIconResourceId();
+
+                if (thumbnail != null) {
+                    holder.thumbnailList.setImageURI(Uri.fromFile(node.getThumbnail()));
+                } else {
+                    int imgResource;
+                    if (megaNode.isFolder()) {
+                        imgResource = R.drawable.ic_folder_list;
+                    } else {
+                        imgResource = placeHolderRes;
+                    }
+                    holder.thumbnailList.setImageResource(imgResource);
+                }
             }
         }
+
+        node.setUiDirty(false);
     }
 
-    private MegaNode getItemAtPosition(int pos) {
+    private NodeItem getItemAtPosition(int pos) {
         if (nodes == null || nodes.isEmpty() || pos >= nodes.size() || pos < 0) return null;
 
         return nodes.get(pos);
@@ -269,7 +346,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         return nodes.size();
     }
 
-    public void setNodes(List<MegaNode> nodes) {
+    public void setNodes(List<NodeItem> nodes) {
         this.nodes = nodes;
         notifyDataSetChanged();
     }
@@ -280,34 +357,64 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         MultipleBucketAdapter.ViewHolderMultipleBucket holder = (MultipleBucketAdapter.ViewHolderMultipleBucket) v.getTag();
         if (holder == null) return;
 
-        MegaNode node = getItemAtPosition(holder.getAbsoluteAdapterPosition());
+        List<NodeItem> selectedNodes = this.nodes.stream().filter(NodeItem::getSelected).collect(Collectors.toList());
+        NodeItem node = getItemAtPosition(holder.getAbsoluteAdapterPosition());
         if (node == null) return;
         switch (v.getId()) {
             case R.id.three_dots: {
-                if (!isOnline(context)) {
-                    ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-                    break;
+                if (selectedNodes.isEmpty()) {
+                    if (!isOnline(context)) {
+                        ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                        break;
+                    }
+                    ((ManagerActivity) context).showNodeOptionsPanel(node.getNode(), RECENTS_MODE);
+                } else {
+                    if (fragment instanceof RecentsBucketFragment) {
+                        ((RecentsBucketFragment) fragment).handleItemClick(holder.getAdapterPosition(), node, true);
+                    }
                 }
-                ((ManagerActivity) context).showNodeOptionsPanel(node, RECENTS_MODE);
                 break;
             }
             case R.id.multiple_bucket_layout: {
                 if (fragment instanceof RecentsBucketFragment) {
-                    ((RecentsBucketFragment) fragment).openFile(holder.getAdapterPosition(), node, true);
+                    ((RecentsBucketFragment) fragment).handleItemClick(holder.getAdapterPosition(), node, true);
                 }
                 break;
             }
         }
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean onLongClick(View v) {
+        Timber.d("onClick");
+        MultipleBucketAdapter.ViewHolderMultipleBucket holder = (MultipleBucketAdapter.ViewHolderMultipleBucket) v.getTag();
+        if (holder == null) return false;
+
+        NodeItem node = getItemAtPosition(holder.getAbsoluteAdapterPosition());
+        if (node == null) return false;
+
+        if (fragment instanceof RecentsBucketFragment) {
+            ((RecentsBucketFragment) fragment).onNodeLongClicked(
+                    holder.getAdapterPosition(),
+                    node
+            );
+        }
+
+        return true;
+    }
+
     @Override
     public String getSectionTitle(int position) {
-        MegaNode node = getItemAtPosition(position);
+        NodeItem node = getItemAtPosition(position);
         if (node == null) return "";
 
-        String name = node.getName();
+        String name = node.getNode().getName();
         if (!isTextEmpty(name)) return name.substring(0, 1);
 
         return "";
     }
+
+    private static final int ITEM_WIDTH = 48;
+    private static final int ITEM_MARGIN = 12;
 }

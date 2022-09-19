@@ -10,15 +10,18 @@ import mega.privacy.android.domain.entity.ContactChangeAccountDeletedAlert
 import mega.privacy.android.domain.entity.ContactChangeBlockedYouAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.ContactChangeDeletedYouAlert
+import mega.privacy.android.domain.entity.CustomAlert
 import mega.privacy.android.domain.entity.DeletedShareAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactCancelledAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactReminderAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
+import mega.privacy.android.domain.entity.IncomingShareAlert
 import mega.privacy.android.domain.entity.NewShareAlert
 import mega.privacy.android.domain.entity.NewSharedNodesAlert
 import mega.privacy.android.domain.entity.PaymentFailedAlert
 import mega.privacy.android.domain.entity.PaymentReminderAlert
 import mega.privacy.android.domain.entity.PaymentSucceededAlert
+import mega.privacy.android.domain.entity.RemovedFromShareByOwnerAlert
 import mega.privacy.android.domain.entity.RemovedSharedNodesAlert
 import mega.privacy.android.domain.entity.TakeDownAlert
 import mega.privacy.android.domain.entity.TakeDownReinstatedAlert
@@ -29,6 +32,7 @@ import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingIgnoredAl
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingAcceptedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingDeniedAlert
 import mega.privacy.android.domain.entity.UserAlert
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUserAlert
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -66,7 +70,17 @@ class UserAlertMapperTest {
             -1 to UnknownAlert::class.java,
         ).forEach { (id, expectedType) ->
             val megaUserAlert = createMegaUserAlert(typeId = id)
-            val actual = toUserAlert(megaUserAlert, { null }, { null })
+            val actual =
+                toUserAlert(megaUserAlert = megaUserAlert,
+                    contactProvider = { _, _ ->
+                        Contact(
+                            userId = id.toLong(),
+                            email = null,
+                            nickname = null,
+                            isVisible = false,
+                            hasPendingRequest = false)
+                    }
+                ) { null }
             assertThat(actual).isInstanceOf(expectedType)
         }
     }
@@ -86,29 +100,45 @@ class UserAlertMapperTest {
             MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED,
             MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED,
             MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_DENIED,
-        ).forEach { type ->
+        ).forEachIndexed() { index, type ->
             val megaUserAlert = createMegaUserAlert(typeId = type)
             val expectedEmail = type.toString()
-            val expectedContact = Contact(true)
+            val expectedContact = Contact(
+                userId = index.toLong(),
+                email = expectedEmail,
+                nickname = "nickName",
+                isVisible = false,
+                hasPendingRequest = false,
+            )
 
             val actual =
-                toUserAlert(megaUserAlert, { expectedEmail }, { expectedContact })
+                toUserAlert(megaUserAlert = megaUserAlert,
+                    contactProvider = { _, _ -> expectedContact }
+                ) { null }
 
-            assertThat((actual as ContactAlert).email).isEqualTo(expectedEmail)
+            assertThat((actual as ContactAlert).contact.email).isEqualTo(expectedEmail)
             assertThat((actual as ContactAlert).contact).isEqualTo(expectedContact)
         }
     }
 
+    private val testContact = Contact(
+        userId = 1L,
+        email = null,
+        nickname = null,
+        isVisible = false,
+        hasPendingRequest = false,
+    )
+
     @Test
-    fun `test that new share has an email and node id`() = runTest {
+    fun `test that new share has a node id`() = runTest {
         val expectedNodeId = 123L
         val megaUserAlert =
             createMegaUserAlert(typeId = MegaUserAlert.TYPE_NEWSHARE, nodeId = expectedNodeId)
-        val expectedEmail = "Expected@email"
         val actual =
-            toUserAlert(megaUserAlert, { expectedEmail }, { null }) as NewShareAlert
+            toUserAlert(megaUserAlert = megaUserAlert,
+                contactProvider = { _, _ -> testContact }
+            ) { mock { on { handle }.thenReturn(expectedNodeId) } } as NewShareAlert
 
-        assertThat(actual.email).isEqualTo(expectedEmail)
         assertThat(actual.nodeId).isEqualTo(expectedNodeId)
     }
 
@@ -128,18 +158,14 @@ class UserAlertMapperTest {
             MegaUserAlert.TYPE_REMOVEDSHAREDNODES to { alert: UserAlert ->
                 assertThat((alert as RemovedSharedNodesAlert).nodeId).isEqualTo(MegaUserAlert.TYPE_REMOVEDSHAREDNODES.toLong())
             },
-            MegaUserAlert.TYPE_TAKEDOWN to { alert: UserAlert ->
-                assertThat((alert as TakeDownAlert).nodeId).isEqualTo(MegaUserAlert.TYPE_TAKEDOWN.toLong())
-            },
-            MegaUserAlert.TYPE_TAKEDOWN_REINSTATED to { alert: UserAlert ->
-                assertThat((alert as TakeDownReinstatedAlert).nodeId).isEqualTo(MegaUserAlert.TYPE_TAKEDOWN_REINSTATED.toLong())
-            },
         ).forEach { (typeId, assertion) ->
             val megaUserAlert =
                 createMegaUserAlert(typeId = typeId, nodeId = typeId.toLong())
 
             val actual =
-                toUserAlert(megaUserAlert, { null }, { null })
+                toUserAlert(megaUserAlert = megaUserAlert,
+                    contactProvider = { _, _ -> testContact }
+                ) { _ -> mock { on { handle }.thenReturn(typeId.toLong()) } }
 
             assertion(actual)
         }
@@ -154,14 +180,14 @@ class UserAlertMapperTest {
             MegaUserAlert.TYPE_NEWSHARE to { alert: UserAlert -> assertThat((alert as NewShareAlert).nodeId).isNull() },
             MegaUserAlert.TYPE_DELETEDSHARE to { alert: UserAlert -> assertThat((alert as DeletedShareAlert).nodeId).isNull() },
             MegaUserAlert.TYPE_REMOVEDSHAREDNODES to { alert: UserAlert -> assertThat((alert as RemovedSharedNodesAlert).nodeId).isNull() },
-            MegaUserAlert.TYPE_TAKEDOWN to { alert: UserAlert -> assertThat((alert as TakeDownAlert).nodeId).isNull() },
-            MegaUserAlert.TYPE_TAKEDOWN_REINSTATED to { alert: UserAlert -> assertThat((alert as TakeDownReinstatedAlert).nodeId).isNull() },
         ).forEach { (typeId, assertion) ->
             val megaUserAlert =
                 createMegaUserAlert(typeId = typeId, nodeId = invalidNodeId)
 
             val actual =
-                toUserAlert(megaUserAlert, { null }, { null })
+                toUserAlert(megaUserAlert = megaUserAlert,
+                    contactProvider = { _, _ -> testContact }
+                ) { null }
 
             assertion(actual)
         }
@@ -177,7 +203,9 @@ class UserAlertMapperTest {
                 path = expectedPath)
 
         val actual =
-            toUserAlert(megaUserAlert, { null }, { null }) as TakeDownAlert
+            toUserAlert(megaUserAlert = megaUserAlert,
+                contactProvider = { _, _ -> testContact }
+            ) { null } as TakeDownAlert
 
         assertThat(actual.name).isEqualTo(expectedName)
         assertThat(actual.path).isEqualTo(expectedPath)
@@ -193,7 +221,9 @@ class UserAlertMapperTest {
                 path = expectedPath)
 
         val actual =
-            toUserAlert(megaUserAlert, { null }, { null }) as TakeDownReinstatedAlert
+            toUserAlert(megaUserAlert = megaUserAlert, contactProvider = { _, _ ->
+                testContact
+            }) { null } as TakeDownReinstatedAlert
 
         assertThat(actual.name).isEqualTo(expectedName)
         assertThat(actual.path).isEqualTo(expectedPath)
@@ -209,7 +239,9 @@ class UserAlertMapperTest {
                 title = expectedTitle)
 
         val actual =
-            toUserAlert(megaUserAlert, { null }, { null }) as PaymentReminderAlert
+            toUserAlert(megaUserAlert = megaUserAlert, contactProvider = { _, _ ->
+                testContact
+            }) { null } as PaymentReminderAlert
 
         assertThat(actual.heading).isEqualTo(expectedHeading)
         assertThat(actual.title).isEqualTo(expectedTitle)
@@ -225,7 +257,9 @@ class UserAlertMapperTest {
                 title = expectedTitle)
 
         val actual =
-            toUserAlert(megaUserAlert, { null }, { null }) as PaymentFailedAlert
+            toUserAlert(megaUserAlert = megaUserAlert, contactProvider = { _, _ ->
+                testContact
+            }) { null } as PaymentFailedAlert
 
         assertThat(actual.heading).isEqualTo(expectedHeading)
         assertThat(actual.title).isEqualTo(expectedTitle)
@@ -241,7 +275,9 @@ class UserAlertMapperTest {
                 title = expectedTitle)
 
         val actual =
-            toUserAlert(megaUserAlert, { null }, { null }) as PaymentSucceededAlert
+            toUserAlert(megaUserAlert = megaUserAlert, contactProvider = { _, _ ->
+                testContact
+            }) { null } as PaymentSucceededAlert
 
         assertThat(actual.heading).isEqualTo(expectedHeading)
         assertThat(actual.title).isEqualTo(expectedTitle)
@@ -255,7 +291,9 @@ class UserAlertMapperTest {
                 numberResult = listOf(Pair(0L, expectedCount)))
 
         val actual =
-            toUserAlert(megaUserAlert, { null }, { null }) as RemovedSharedNodesAlert
+            toUserAlert(megaUserAlert = megaUserAlert, contactProvider = { _, _ ->
+                testContact
+            }) { null } as RemovedSharedNodesAlert
 
         assertThat(actual.itemCount).isEqualTo(expectedCount)
     }
@@ -269,7 +307,9 @@ class UserAlertMapperTest {
                 numberResult = listOf(Pair(0L, expectedFolderCount), Pair(1L, expectedFileCount)))
 
         val actual =
-            toUserAlert(megaUserAlert, { null }, { null }) as NewSharedNodesAlert
+            toUserAlert(megaUserAlert = megaUserAlert, contactProvider = { _, _ ->
+                testContact
+            }) { null } as NewSharedNodesAlert
 
         assertThat(actual.folderCount).isEqualTo(expectedFolderCount)
         assertThat(actual.fileCount).isEqualTo(expectedFileCount)
@@ -283,14 +323,60 @@ class UserAlertMapperTest {
                 handleResult = childNodeList.map { Pair(it, it) })
 
         val actual =
-            toUserAlert(megaUserAlert, { null }, { null }) as NewSharedNodesAlert
+            toUserAlert(megaUserAlert = megaUserAlert, contactProvider = { _, _ ->
+                testContact
+            }) { null } as NewSharedNodesAlert
 
         assertThat(actual.childNodes).containsExactlyElementsIn(childNodeList)
 
     }
 
     @Test
-    fun `test that deleted shares alert does not return a node id if the reason is removed by owner`() =
+    fun `test that custom alerts has a header`() = runTest {
+        val expectedHeading = "expectedHeading"
+
+        listOf(
+            MegaUserAlert.TYPE_TAKEDOWN,
+            MegaUserAlert.TYPE_TAKEDOWN_REINSTATED,
+            MegaUserAlert.TYPE_PAYMENTREMINDER,
+            MegaUserAlert.TYPE_PAYMENT_SUCCEEDED,
+            MegaUserAlert.TYPE_PAYMENT_FAILED,
+        ).forEach {
+            val actual =
+                toUserAlert(megaUserAlert = createMegaUserAlert(typeId = it,
+                    heading = expectedHeading), contactProvider = { _, _ ->
+                    testContact
+                }) { null } as CustomAlert
+            assertThat(actual.heading).isEqualTo(expectedHeading)
+        }
+    }
+
+    @Test
+    fun `test that incoming share alerts have a contact`() = runTest {
+        val expectedEmail = "expected@Email"
+        listOf(
+            MegaUserAlert.TYPE_NEWSHAREDNODES,
+            MegaUserAlert.TYPE_NEWSHARE,
+            MegaUserAlert.TYPE_DELETEDSHARE,
+            MegaUserAlert.TYPE_REMOVEDSHAREDNODES,
+        ).forEachIndexed { index, type ->
+            val expectedContact = Contact(
+                userId = index.toLong(),
+                email = expectedEmail,
+                nickname = "nickName",
+                isVisible = false,
+                hasPendingRequest = false,
+            )
+            val actual =
+                toUserAlert(createMegaUserAlert(typeId = type),
+                    { _, _ -> expectedContact }
+                ) { null } as IncomingShareAlert
+            assertThat(actual.contact).isEqualTo(expectedContact)
+        }
+    }
+
+    @Test
+    fun `test that removed by user alert is returned if deleted share get number on 0 returns one`() =
         runTest {
             val expectedNodeId = 123L
             val megaUserAlert =
@@ -299,40 +385,189 @@ class UserAlertMapperTest {
                     numberResult = listOf(
                         Pair(0L, 1L)))
             val actual =
-                toUserAlert(megaUserAlert, { null }, { null }) as DeletedShareAlert
+                toUserAlert(
+                    megaUserAlert = megaUserAlert,
+                    contactProvider = { _, _ ->
+                        testContact
+                    }
+                ) { null }
 
-            assertThat(actual.nodeId).isNull()
+            assertThat(actual).isInstanceOf(RemovedFromShareByOwnerAlert::class.java)
         }
 
-    private fun createMegaUserAlert(
-        typeId: Int,
-        nodeId: Long? = null,
-        name: String? = null,
-        path: String? = null,
-        heading: String? = null,
-        title: String? = null,
-        numberResult: List<Pair<Long, Long>>? = null,
-        handleResult: List<Pair<Long, Long>>? = null,
-    ): MegaUserAlert {
-        val createdTimeIndex = 0L
-        val invalidHandle: Long = -1
-        return mock<MegaUserAlert> {
-            on { type }.thenReturn(typeId)
-            on { id }.thenReturn(1L)
-            on { seen }.thenReturn(false)
-            on { userHandle }.thenReturn(2L)
-            on { getTimestamp(createdTimeIndex) }.thenReturn(3L)
-            on { isOwnChange }.thenReturn(false)
-            on { nodeHandle }.thenReturn(nodeId ?: invalidHandle)
-            on { getHandle(any()) }.thenReturn(invalidHandle)
-            on { this.name }.thenReturn(name)
-            on { this.path }.thenReturn(path)
-            on { this.heading }.thenReturn(heading)
-            on { this.title }.thenReturn(title)
-        }.apply {
-            numberResult?.forEach { whenever(this.getNumber(it.first)).thenReturn(it.second) }
-            handleResult?.forEach { whenever(this.getHandle(it.first)).thenReturn(it.second) }
+    @Test
+    fun `test that deleted share alert is returned if deleted share get number on 0 returns 0`() =
+        runTest {
+            val megaUserAlert =
+                createMegaUserAlert(typeId = MegaUserAlert.TYPE_DELETEDSHARE,
+                    numberResult = listOf(
+                        Pair(0L, 0L)))
+            val actual =
+                toUserAlert(
+                    megaUserAlert = megaUserAlert,
+                    contactProvider = { _, _ ->
+                        testContact
+                    }
+                ) { null }
+
+            assertThat(actual).isInstanceOf(DeletedShareAlert::class.java)
+        }
+
+    @Test
+    fun `test that deleted share has null node name if node not found`() = runTest {
+        val megaUserAlert =
+            createMegaUserAlert(typeId = MegaUserAlert.TYPE_DELETEDSHARE,
+                numberResult = listOf(
+                    Pair(0L, 0L)))
+        val actual =
+            toUserAlert(megaUserAlert = megaUserAlert, contactProvider = { _, _ ->
+                testContact
+            }) { null } as DeletedShareAlert
+
+        assertThat(actual.nodeName).isNull()
+    }
+
+    @Test
+    fun `test that deleted share has node name if node found`() = runTest {
+        val megaUserAlert =
+            createMegaUserAlert(typeId = MegaUserAlert.TYPE_DELETEDSHARE,
+                nodeId = 12L,
+                numberResult = listOf(
+                    Pair(0L, 0L)))
+        val expectedNodeName = "ExpectedName"
+        val node = mock<MegaNode> { on { name }.thenReturn(expectedNodeName) }
+        val actual =
+            toUserAlert(megaUserAlert = megaUserAlert, contactProvider = { _, _ ->
+                testContact
+            }) { _ -> node } as DeletedShareAlert
+
+        assertThat(actual.nodeName).isEqualTo(expectedNodeName)
+    }
+
+    @Test
+    fun `test that takedown rootNodeId is null if nodeId is invalid`() = runTest {
+        val invalidNodeId = -1L
+        val node = mock<MegaNode> { on { handle }.thenReturn(2L) }
+        mapOf(
+            MegaUserAlert.TYPE_TAKEDOWN to { alert: UserAlert -> assertThat((alert as TakeDownAlert).rootNodeId).isNull() },
+            MegaUserAlert.TYPE_TAKEDOWN_REINSTATED to { alert: UserAlert -> assertThat((alert as TakeDownReinstatedAlert).rootNodeId).isNull() },
+        ).forEach { (typeId, assertion) ->
+            val megaUserAlert =
+                createMegaUserAlert(typeId = typeId, nodeId = invalidNodeId)
+
+            val actual =
+                toUserAlert(megaUserAlert = megaUserAlert,
+                    contactProvider = { _, _ -> testContact }
+                ) { _ -> node }
+
+            assertion(actual)
         }
     }
 
+    @Test
+    fun `test that takedown rootNodeId is null if node is null`() = runTest {
+        mapOf(
+            MegaUserAlert.TYPE_TAKEDOWN to { alert: UserAlert -> assertThat((alert as TakeDownAlert).rootNodeId).isNull() },
+            MegaUserAlert.TYPE_TAKEDOWN_REINSTATED to { alert: UserAlert -> assertThat((alert as TakeDownReinstatedAlert).rootNodeId).isNull() },
+        ).forEach { (typeId, assertion) ->
+            val megaUserAlert =
+                createMegaUserAlert(typeId = typeId, nodeId = 2L)
+
+            val actual =
+                toUserAlert(megaUserAlert = megaUserAlert,
+                    contactProvider = { _, _ -> testContact }
+                ) { null }
+
+            assertion(actual)
+        }
+    }
+
+    @Test
+    fun `test that rootNodeId is same as node id if it is a folder`() = runTest {
+        val expectedNodeId = 2L
+        val node = mock<MegaNode> {
+            on { handle }.thenReturn(expectedNodeId)
+            on { isFile }.thenReturn(false)
+            on { isFolder }.thenReturn(true)
+        }
+        mapOf(
+            MegaUserAlert.TYPE_TAKEDOWN to { alert: UserAlert ->
+                assertThat((alert as TakeDownAlert).rootNodeId).isEqualTo(expectedNodeId)
+            },
+            MegaUserAlert.TYPE_TAKEDOWN_REINSTATED to { alert: UserAlert ->
+                assertThat((alert as TakeDownReinstatedAlert).rootNodeId).isEqualTo(expectedNodeId)
+            },
+        ).forEach { (typeId, assertion) ->
+            val megaUserAlert =
+                createMegaUserAlert(typeId = typeId, nodeId = expectedNodeId)
+
+            val actual =
+                toUserAlert(megaUserAlert = megaUserAlert,
+                    contactProvider = { _, _ -> testContact }
+                ) { _ -> node }
+
+            assertion(actual)
+        }
+    }
+
+    @Test
+    fun `test that rootNodeId is same as parent node id if it is a file`() = runTest {
+        val expectedNodeId = 2L
+        val childNodeId = 4L
+        val node = mock<MegaNode> {
+            on { handle }.thenReturn(childNodeId)
+            on { parentHandle }.thenReturn(expectedNodeId)
+            on { isFile }.thenReturn(true)
+            on { isFolder }.thenReturn(false)
+        }
+        mapOf(
+            MegaUserAlert.TYPE_TAKEDOWN to { alert: UserAlert ->
+                assertThat((alert as TakeDownAlert).rootNodeId).isEqualTo(expectedNodeId)
+            },
+            MegaUserAlert.TYPE_TAKEDOWN_REINSTATED to { alert: UserAlert ->
+                assertThat((alert as TakeDownReinstatedAlert).rootNodeId).isEqualTo(expectedNodeId)
+            },
+        ).forEach { (typeId, assertion) ->
+            val megaUserAlert =
+                createMegaUserAlert(typeId = typeId, nodeId = childNodeId)
+
+            val actual =
+                toUserAlert(megaUserAlert = megaUserAlert,
+                    contactProvider = { _, _ -> testContact }
+                ) { _ -> node }
+
+            assertion(actual)
+        }
+    }
+}
+
+private fun createMegaUserAlert(
+    typeId: Int,
+    nodeId: Long? = null,
+    name: String? = null,
+    path: String? = null,
+    heading: String? = null,
+    title: String? = null,
+    numberResult: List<Pair<Long, Long>>? = null,
+    handleResult: List<Pair<Long, Long>>? = null,
+): MegaUserAlert {
+    val createdTimeIndex = 0L
+    val invalidHandle: Long = -1
+    return mock<MegaUserAlert> {
+        on { type }.thenReturn(typeId)
+        on { id }.thenReturn(1L)
+        on { seen }.thenReturn(false)
+        on { userHandle }.thenReturn(2L)
+        on { getTimestamp(createdTimeIndex) }.thenReturn(3L)
+        on { isOwnChange }.thenReturn(false)
+        on { nodeHandle }.thenReturn(nodeId ?: invalidHandle)
+        on { getHandle(any()) }.thenReturn(invalidHandle)
+        on { this.name }.thenReturn(name)
+        on { this.path }.thenReturn(path)
+        on { this.heading }.thenReturn(heading)
+        on { this.title }.thenReturn(title)
+    }.apply {
+        numberResult?.forEach { whenever(this.getNumber(it.first)).thenReturn(it.second) }
+        handleResult?.forEach { whenever(this.getHandle(it.first)).thenReturn(it.second) }
+    }
 }

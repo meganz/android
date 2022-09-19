@@ -47,15 +47,36 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmD
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.ANIMATION_DURATION
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.LONG_SNACKBAR_DURATION
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER
+import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
+import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
+import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
+import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Util.isDarkMode
+import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
@@ -112,7 +133,19 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            handleGoBack()
+            if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
+                binding.contentEditText.hideKeyboard()
+                showDiscardChangesConfirmationDialog()
+            } else {
+                if (viewModel.isCreateMode()) {
+                    viewModel.saveFile(this@TextEditorActivity,
+                        intent.getBooleanExtra(FROM_HOME_PAGE, false))
+                } else if (viewModel.isReadingContent()) {
+                    viewModel.finishBeforeClosing()
+                }
+                retryConnectionsAndSignalPresence()
+                finish()
+            }
         }
     }
 
@@ -226,31 +259,17 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         super.onDestroy()
     }
 
-    private fun handleGoBack() {
-        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
-        if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
-            binding.contentEditText.hideKeyboard()
-            showDiscardChangesConfirmationDialog()
-        } else {
-            if (viewModel.isCreateMode()) {
-                viewModel.saveFile(this, intent.getBooleanExtra(FROM_HOME_PAGE, false))
-            } else if (viewModel.isReadingContent()) {
-                viewModel.finishBeforeClosing()
-            }
-            onBackPressedCallback.isEnabled = false
-
-            super.onBackPressed()
-        }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> onBackPressed()
+            android.R.id.home -> onBackPressedDispatcher.onBackPressed()
             R.id.action_save -> viewModel.saveFile(
                 this,
                 intent.getBooleanExtra(FROM_HOME_PAGE, false)
             )
-            R.id.action_download -> viewModel.downloadFile(nodeSaver)
+            R.id.action_download -> {
+                checkNotificationsPermission(this)
+                viewModel.downloadFile(nodeSaver)
+            }
             R.id.action_get_link, R.id.action_remove_link -> viewModel.manageLink(this)
             R.id.action_send_to_chat -> nodeAttacher.attachNode(viewModel.getNode()!!)
             R.id.action_share -> viewModel.share(this, intent.getStringExtra(URL_FILE_LINK) ?: "")
@@ -264,12 +283,16 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 this
             )
             R.id.chat_action_import -> importNode()
-            R.id.chat_action_save_for_offline -> ChatController(this).saveForOffline(
-                viewModel.getMsgChat()!!.megaNodeList,
-                viewModel.getChatRoom(),
-                true,
-                this
-            )
+            R.id.chat_action_save_for_offline -> {
+                checkNotificationsPermission(this)
+
+                ChatController(this).saveForOffline(
+                    viewModel.getMsgChat()!!.megaNodeList,
+                    viewModel.getChatRoom(),
+                    true,
+                    this
+                )
+            }
             R.id.chat_action_remove -> removeAttachmentMessage(
                 this,
                 viewModel.getChatRoom()!!.chatId,

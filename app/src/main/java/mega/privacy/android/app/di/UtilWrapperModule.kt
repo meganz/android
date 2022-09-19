@@ -13,10 +13,12 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
+import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
+import mega.privacy.android.app.utils.wrapper.AvatarWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
@@ -110,5 +112,14 @@ class UtilWrapperModule {
     fun provideTimeWrapper() = object : TimeWrapper {
         override val now: Long
             get() = System.currentTimeMillis()
+    }
+
+    /**
+     * provide Avatar Wrapper
+     */
+    @Provides
+    fun provideAvatarWrapper() = object : AvatarWrapper {
+        override fun getSpecificAvatarColor(typeColor: String): Int =
+            AvatarUtil.getSpecificAvatarColor(typeColor)
     }
 }

@@ -11,10 +11,9 @@ import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.sync.SyncListener
-import mega.privacy.android.app.sync.camerauploads.callback.RemoveBackupCallback
-import mega.privacy.android.app.sync.camerauploads.callback.SetBackupCallback
-import mega.privacy.android.app.sync.camerauploads.callback.UpdateBackupCallback
+import mega.privacy.android.app.sync.Backup
+import mega.privacy.android.app.sync.BackupState
+import mega.privacy.android.app.sync.HeartbeatStatus
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -41,50 +40,6 @@ import java.util.concurrent.TimeUnit.SECONDS
 object CameraUploadSyncManager {
 
     private const val PROGRESS_FINISHED = 100
-
-    /**
-     * Backup state,
-     * originally defined in heartbeats.h
-    enum State {
-    ACTIVE = 1,             // Working fine (enabled)
-    FAILED = 2,             // Failed (permanently disabled)
-    TEMPORARY_DISABLED = 3, // Temporarily disabled due to a transient situation (e.g: account blocked). Will be resumed when the condition passes
-    DISABLED = 4,           // Disabled by the user
-    PAUSE_UP = 5,           // Active but upload transfers paused in the SDK
-    PAUSE_DOWN = 6,         // Active but download transfers paused in the SDK
-    PAUSE_FULL = 7,         // Active but transfers paused in the SDK
-    };
-     */
-    object State {
-        const val CU_SYNC_STATE_ACTIVE = 1
-        const val CU_SYNC_STATE_FAILED = 2
-        const val CU_SYNC_STATE_TEMPORARY_DISABLED = 3
-        const val CU_SYNC_STATE_DISABLED = 4
-        const val CU_SYNC_STATE_PAUSE_UP = 5
-        const val CU_SYNC_STATE_PAUSE_DOWN = 6
-        const val CU_SYNC_STATE_PAUSE_FULL = 7
-    }
-
-    /**
-     * Heartbeat status,
-     * originally defined in heartbeats.h
-    enum Status {
-    STATE_NOT_INITIALIZED,
-    UPTODATE = 1, // Up to date: local and remote paths are in sync
-    SYNCING = 2, // The sync engine is working, transfers are in progress
-    PENDING = 3, // The sync engine is working, e.g: scanning local folders
-    INACTIVE = 4, // Sync is not active. A state != ACTIVE should have been sent through '''sp'''
-    UNKNOWN = 5, // Unknown status
-    };
-     */
-    object Status {
-        const val CU_SYNC_STATUS_NOT_INITIALIZED = -1
-        const val CU_SYNC_STATUS_UPTODATE = 1
-        const val CU_SYNC_STATUS_SYNCING = 2
-        const val CU_SYNC_STATUS_PENDING = 3
-        const val CU_SYNC_STATUS_INACTIVE = 4
-        const val CU_SYNC_STATUS_UNKNOWN = 5
-    }
 
     /**
      * While CU process is running, send heartbeat every 30s.
@@ -143,44 +98,40 @@ object CameraUploadSyncManager {
     private var muLastUploadedHandle = INVALID_HANDLE
 
     /**
-     * Create CU(Camera Uploads) backup. Should be called only when CU is enabled.
+     * Create CU (Camera Uploads) backup. Should be called only when CU is enabled.
      */
-    fun setPrimaryBackup() =
-        setBackup(
-            BACKUP_TYPE_CAMERA_UPLOADS,
-            databaseHandler.preferences?.camSyncHandle?.toLong(),
-            databaseHandler.preferences?.camSyncLocalPath
-        )
+    fun setPrimaryBackup() = setBackup(
+        backupType = BACKUP_TYPE_CAMERA_UPLOADS,
+        targetNode = databaseHandler.preferences?.camSyncHandle?.toLong(),
+        localFolder = databaseHandler.preferences?.camSyncLocalPath
+    )
 
     /**
-     * Create CU(Media Uploads) backup. Should be called only when MU is enabled.
+     * Create MU (Media Uploads) backup. Should be called only when MU is enabled.
      */
-    fun setSecondaryBackup() =
-        setBackup(
-            BACKUP_TYPE_MEDIA_UPLOADS,
-            databaseHandler.preferences?.megaHandleSecondaryFolder?.toLong(),
-            databaseHandler.preferences?.localPathSecondaryFolder
-        )
+    fun setSecondaryBackup() = setBackup(
+        backupType = BACKUP_TYPE_MEDIA_UPLOADS,
+        targetNode = databaseHandler.preferences?.megaHandleSecondaryFolder?.toLong(),
+        localFolder = databaseHandler.preferences?.localPathSecondaryFolder
+    )
 
     /**
      * Create backup with given info.
      *
-     * @param backupType Type of the backup,
-     * should be MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD or MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
-     * @param targetNode Handle of the MegaNode where the backup targets to.
-     * @param localFolder Path of the local folder where the backup uploads from.
-     * @param state state Should be MegaApiJava.CU_SYNC_STATE_ACTIVE when create.
-     * @param subState subState Valid value definitions
+     * The Backup State is set as [BackupState.ACTIVE] and the
+     * Sub-State as [MegaError.API_OK]
+     *
+     * @param backupType Either [MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS] or [MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS]
+     * @param targetNode The [MegaNode] handle where the Backup targets to.
+     * @param localFolder The local folder path where the Backup uploads from.
      * @see MegaError
      */
     private fun setBackup(
         backupType: Int,
         targetNode: Long?,
         localFolder: String?,
-        state: Int = State.CU_SYNC_STATE_ACTIVE,
-        subState: Int = MegaError.API_OK,
     ) {
-        if (isInvalid(targetNode?.toString())) {
+        if (targetNode == null || isInvalid(targetNode.toString())) {
             Timber.w("Target handle is invalid, value: $targetNode")
             reEnableCameraUploadsPreference(backupType)
             return
@@ -200,27 +151,115 @@ object CameraUploadSyncManager {
 
         megaApi.setBackup(
             backupType,
-            targetNode!!,
+            targetNode,
             localFolder,
             backupName,
-            state,
-            subState,
-            SyncListener(SetBackupCallback(), megaApplication)
+            BackupState.ACTIVE.value,
+            MegaError.API_OK,
+            onBackupSet(backupType),
         )
     }
 
     /**
-     * Update CU backup's target node when target node changes.
-     * There're two cases:
-     * 1. The change is made on the same device(trigger set CU attribute)
-     * 2. The change is made on another device login with the same account.(trigger get CU attribute)
+     * The listener for when the Backup is set
      *
-     * This method will be called when get/set CU attribute successfully, and update local database.
-     * @see DatabaseHandler.setCamSyncHandle
+     * @param backupType The Backup type
      */
-    fun updatePrimaryTargetNode(newTargetNode: Long) {
+    private fun onBackupSet(backupType: Int) =
+        OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
+            if (error.errorCode == MegaError.API_OK) {
+                Timber.d("Request ${request.type}: ${request.requestString} successfully")
+                with(request) {
+                    val backup = Backup(
+                        backupId = parentHandle,
+                        backupType = totalBytes.toInt(),
+                        targetNode = nodeHandle,
+                        localFolder = file,
+                        backupName = name,
+                        state = BackupState.fromValue(access),
+                        subState = numDetails,
+                    )
+                    Timber.d("Save Backup $backup to local cache.")
+                    databaseHandler.saveBackup(backup)
+                    reEnableCameraUploadsPreference(totalBytes.toInt())
+
+                    // After setting up the Backup folder, immediately send an Unknown Heartbeat
+                    when (backupType) {
+                        BACKUP_TYPE_CAMERA_UPLOADS -> sendPrimaryFolderHeartbeat(HeartbeatStatus.UNKNOWN)
+                        BACKUP_TYPE_MEDIA_UPLOADS -> sendSecondaryFolderHeartbeat(HeartbeatStatus.UNKNOWN)
+                        else -> Unit
+                    }
+                }
+            } else {
+                Timber.w("Request ${request.type}: ${request.requestString} failed, ${error.errorString}: ${error.errorCode}")
+                // Re-enable preference in settings fragment.
+                reEnableCameraUploadsPreference(request.totalBytes.toInt())
+            }
+        })
+
+    /**
+     * Sends a Heartbeat for the Primary Folder
+     *
+     * @param heartbeatStatus The heartbeat status
+     */
+    private fun sendPrimaryFolderHeartbeat(heartbeatStatus: HeartbeatStatus) {
+        val cuBackup = databaseHandler.cuBackup
+
+        if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
+            Timber.d("Sending Primary Folder Heartbeat, backupId = ${cuBackup.backupId}, Heartbeat Status = ${heartbeatStatus.name}")
+            megaApi.sendBackupHeartbeat(
+                cuBackup.backupId,
+                heartbeatStatus.value,
+                INVALID_VALUE,
+                0,
+                0,
+                0,
+                cuLastUploadedHandle,
+                createHeartbeatListener()
+            )
+        }
+    }
+
+    /**
+     * Sends a Heartbeat for the Secondary Folder
+     *
+     * @param heartbeatStatus The heartbeat status
+     */
+    private fun sendSecondaryFolderHeartbeat(heartbeatStatus: HeartbeatStatus) {
+        val muBackup = databaseHandler.muBackup
+
+        if (muBackup != null && CameraUploadUtil.isSecondaryEnabled()) {
+            Timber.d("Sending Secondary Folder Heartbeat, backupId = ${muBackup.backupId}, Heartbeat Status = ${heartbeatStatus.name}")
+            megaApi.sendBackupHeartbeat(
+                muBackup.backupId,
+                heartbeatStatus.value,
+                INVALID_VALUE,
+                0,
+                0,
+                0,
+                muLastUploadedHandle,
+                createHeartbeatListener()
+            )
+        }
+    }
+
+    /**
+     * Update the Primary Folder target node when it changes
+     *
+     * There are two cases:
+     * 1. The change is made on the same device(trigger set CU attribute)
+     * 2. The change is made on another device login with the same account (trigger get CU attribute)
+     *
+     * This method will be called when get/set CU attribute is called successfully, and the
+     * local database has been updated
+     *
+     * @see DatabaseHandler.setCamSyncHandle
+     *
+     * @param newTargetNode The new target node
+     */
+    fun updatePrimaryFolderTargetNode(newTargetNode: Long) {
         if (!CameraUploadUtil.isPrimaryEnabled()) {
-            Timber.d("CU is not enabled.")
+            Timber.d("Primary Folder is disabled. Unable to update Primary Folder node")
             return
         }
 
@@ -229,33 +268,37 @@ object CameraUploadSyncManager {
             return
         }
 
-        // If hasn't created one, set one instead.
         val cuSync = databaseHandler.cuBackup
         if (cuSync == null) {
             setPrimaryBackup()
         } else {
             updateBackup(
-                cuSync.backupId,
-                newTargetNode,
-                null,
-                StringResourcesUtils.getString(R.string.section_photo_sync),
-                INVALID_VALUE
+                backupId = cuSync.backupId,
+                targetNode = newTargetNode,
+                localFolder = null,
+                backupName = StringResourcesUtils.getString(R.string.section_photo_sync),
+                backupState = BackupState.INVALID,
             )
         }
     }
 
     /**
-     * Update MU backup's target node when target node changes.
-     * There're two cases:
-     * 1. The change is made on the same device(trigger set MU attribute)
-     * 2. The change is made on another device login with the same account.(trigger get MU attribute)
+     * Update the Secondary Folder target node when it changes
      *
-     * This method will be called when get/set MU attribute successfully, and update local database.
+     * There are two cases:
+     * 1. The change is made on the same device (trigger set MU attribute)
+     * 2. The change is made on another device login with the same account (trigger get MU attribute)
+     *
+     * This method will be called when get/set MU attribute is called successfully, and the
+     * local database has been updated.
+     *
      * @see DatabaseHandler.setSecondaryFolderHandle
+     *
+     * @param newTargetNode The new target node
      */
-    fun updateSecondaryTargetNode(newTargetNode: Long) {
+    fun updateSecondaryFolderTargetNode(newTargetNode: Long) {
         if (!CameraUploadUtil.isSecondaryEnabled()) {
-            Timber.d("MU is not enabled.")
+            Timber.d("Secondary Folder is disabled. Unable to update Secondary Folder node")
             return
         }
 
@@ -265,29 +308,30 @@ object CameraUploadSyncManager {
         }
 
         val muSync = databaseHandler.muBackup
-        // If hasn't created one, set one instead.
         if (muSync == null) {
             setSecondaryBackup()
         } else {
             updateBackup(
-                muSync.backupId,
-                newTargetNode,
-                null,
-                StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
-                INVALID_VALUE,
+                backupId = muSync.backupId,
+                targetNode = newTargetNode,
+                localFolder = null,
+                backupName = StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
+                backupState = BackupState.INVALID,
             )
         }
     }
 
     /**
-     * Update CU backup's local folder when set to another local folder.
+     * Update the Primary local folder, when set to another local folder
      * This method will be called when a local folder is selected.
      *
      * @see SettingsConstants.REQUEST_CAMERA_FOLDER
+     *
+     * @param newLocalFolder The path of the new Primary local folder
      */
     fun updatePrimaryLocalFolder(newLocalFolder: String?) {
         if (!CameraUploadUtil.isPrimaryEnabled()) {
-            Timber.d("CU is not enabled.")
+            Timber.d("Primary Folder is disabled. Unable to update primary local folder")
             return
         }
 
@@ -301,24 +345,26 @@ object CameraUploadSyncManager {
             setPrimaryBackup()
         } else {
             updateBackup(
-                cuSync.backupId,
-                INVALID_HANDLE,
-                newLocalFolder!!,
-                StringResourcesUtils.getString(R.string.section_photo_sync),
-                INVALID_VALUE
+                backupId = cuSync.backupId,
+                targetNode = INVALID_HANDLE,
+                localFolder = newLocalFolder,
+                backupName = StringResourcesUtils.getString(R.string.section_photo_sync),
+                backupState = BackupState.INVALID,
             )
         }
     }
 
     /**
-     * Update MU backup's local folder when set to another local folder.
+     * Update the Secondary local folder, when set to another local folder
      * This method will be called when a local folder is selected.
      *
      * @see SettingsConstants.REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER
+     *
+     * @param newLocalFolder The path of the new Secondary local folder
      */
     fun updateSecondaryLocalFolder(newLocalFolder: String?) {
         if (!CameraUploadUtil.isSecondaryEnabled()) {
-            Timber.d("MU is not enabled, no need to update.")
+            Timber.d("Secondary Folder is disabled. Unable to update secondary local folder")
             return
         }
 
@@ -332,103 +378,103 @@ object CameraUploadSyncManager {
             setSecondaryBackup()
         } else {
             updateBackup(
-                muSync.backupId,
-                INVALID_HANDLE,
-                newLocalFolder!!,
-                StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
-                INVALID_VALUE
+                backupId = muSync.backupId,
+                targetNode = INVALID_HANDLE,
+                localFolder = newLocalFolder,
+                backupName = StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
+                backupState = BackupState.INVALID,
             )
         }
     }
 
     /**
-     * Update CU backup's name.
+     * Updates the Primary Folder Backup name
      *
      * @see MegaApiJava
      */
     fun updatePrimaryBackupName() {
         if (!CameraUploadUtil.isPrimaryEnabled()) {
-            Timber.d("CU is not enabled, no need to update.")
+            Timber.d("Primary Folder is disabled. Unable to update Primary Folder backup name")
             return
         }
 
         val cuSync = databaseHandler.cuBackup
         if (cuSync != null) {
             updateBackup(
-                cuSync.backupId,
-                INVALID_HANDLE,
-                null,
-                StringResourcesUtils.getString(R.string.section_photo_sync),
-                INVALID_VALUE
+                backupId = cuSync.backupId,
+                targetNode = INVALID_HANDLE,
+                localFolder = null,
+                backupName = StringResourcesUtils.getString(R.string.section_photo_sync),
+                backupState = BackupState.INVALID,
             )
         }
     }
 
     /**
-     * Update MU backup's name.
+     * Updates the Secondary Folder Backup name
      *
      * @see MegaApiJava
      */
     fun updateSecondaryBackupName() {
         if (!CameraUploadUtil.isSecondaryEnabled()) {
-            Timber.d("MU is not enabled, no need to update.")
+            Timber.d("Secondary Folder is disabled. Unable to update Secondary Folder backup name")
             return
         }
 
         val muSync = databaseHandler.muBackup
         if (muSync != null) {
             updateBackup(
-                muSync.backupId,
-                INVALID_HANDLE,
-                null,
-                StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
-                INVALID_VALUE
+                backupId = muSync.backupId,
+                targetNode = INVALID_HANDLE,
+                localFolder = null,
+                backupName = StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
+                backupState = BackupState.INVALID,
             )
         }
     }
 
     /**
-     * Update CU backup's state.
+     * Update the Backup State of the Primary Folder (Camera Uploads)
      *
-     * @see MegaApiJava
+     * @param backupState The Backup State
      */
-    fun updatePrimaryBackupState(newState: Int) {
+    fun updatePrimaryFolderBackupState(backupState: BackupState) {
         if (!CameraUploadUtil.isPrimaryEnabled()) {
-            Timber.d("CU is not enabled, no need to update.")
+            Timber.d("Primary Folder is disabled. Unable to update Primary Folder backup state")
             return
         }
 
         val cuSync = databaseHandler.cuBackup
-        if (cuSync != null && newState != cuSync.state) {
+        if (cuSync != null && backupState != cuSync.state) {
             updateBackup(
-                cuSync.backupId,
-                INVALID_HANDLE,
-                null,
-                StringResourcesUtils.getString(R.string.section_photo_sync),
-                newState
+                backupId = cuSync.backupId,
+                targetNode = INVALID_HANDLE,
+                localFolder = null,
+                backupName = StringResourcesUtils.getString(R.string.section_photo_sync),
+                backupState = backupState,
             )
         }
     }
 
     /**
-     * Update MU backup's state.
+     * Update the Backup State of the Secondary Folder
      *
-     * @see MegaApiJava
+     * @param backupState The Backup State
      */
-    fun updateSecondaryBackupState(newState: Int) {
+    fun updateSecondaryFolderBackupState(backupState: BackupState) {
         if (!CameraUploadUtil.isSecondaryEnabled()) {
-            Timber.d("MU is not enabled, no need to update.")
+            Timber.d("Secondary Folder is disabled. Unable to update Secondary Folder backup state")
             return
         }
 
         val muSync = databaseHandler.muBackup
-        if (muSync != null && newState != muSync.state) {
+        if (muSync != null && backupState != muSync.state) {
             updateBackup(
-                muSync.backupId,
-                INVALID_HANDLE,
-                null,
-                StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
-                newState
+                backupId = muSync.backupId,
+                targetNode = INVALID_HANDLE,
+                localFolder = null,
+                backupName = StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
+                backupState = backupState,
             )
         }
     }
@@ -442,14 +488,14 @@ object CameraUploadSyncManager {
      * @param targetNode Handle of the MegaNode where the backup targets to.
      * @param localFolder Path of the local folder where the backup uploads from.
      * @param backupName Name of the backup. Should be "Camera Uploads" for CU and "Media Uploads" for MU.
-     * @param state state Current state of the backup.
+     * @param backupState The current [BackupState]
      */
     private fun updateBackup(
         backupId: Long,
         targetNode: Long,
         localFolder: String?,
         backupName: String,
-        state: Int,
+        backupState: BackupState,
     ) {
         if (isInvalid(backupId.toString())) {
             Timber.w("Invalid sync id, value: $backupId")
@@ -462,11 +508,37 @@ object CameraUploadSyncManager {
             targetNode,
             localFolder,
             backupName,
-            state,
+            backupState.value,
             MegaError.API_OK,
-            SyncListener(UpdateBackupCallback(), megaApplication)
+            onBackupUpdated,
         )
     }
+
+    /**
+     * The listener for when the Backup is updated
+     */
+    private val onBackupUpdated =
+        OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
+            if (error.errorCode == MegaError.API_OK) {
+                // Update local cache
+                with(request) {
+                    val backup = databaseHandler.getBackupById(parentHandle)
+
+                    if (backup != null && !backup.outdated) {
+                        backup.apply {
+                            if (nodeHandle != INVALID_HANDLE) this.targetNode = nodeHandle
+                            if (file != null) this.localFolder = file
+                            if (access != INVALID_VALUE) state = BackupState.fromValue(access)
+                            if (name != null) this.backupName = name
+                        }
+                        databaseHandler.updateBackup(backup)
+                        Timber.d("Successful callback: update $backup")
+                    }
+                }
+            } else {
+                Timber.w("Request ${request.type}: ${request.requestString} failed, ${error.errorString}: ${error.errorCode}")
+            }
+        })
 
     /**
      * Remove CU backup.
@@ -483,15 +555,28 @@ object CameraUploadSyncManager {
     }
 
     /**
-     * Remove backup by its ID.
+     * Remove a Backup by its ID
      *
-     * @param id ID of the backup to be removed.
+     * @param id the ID of the Backup to be removed
      */
     private fun removeBackup(id: Long?) {
-        id?.let {
-            megaApi.removeBackup(id, SyncListener(RemoveBackupCallback(), megaApplication))
-        }
+        id?.let { megaApi.removeBackup(id, onBackupRemoved) }
     }
+
+    /**
+     * The listener for when the Backup is removed
+     */
+    private val onBackupRemoved =
+        OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
+            if (error.errorCode == MegaError.API_OK) {
+                // Remove local cache
+                databaseHandler.deleteBackupById(request.parentHandle)
+                Timber.d("Successful callback: delete ${request.parentHandle}")
+            } else {
+                Timber.w("Delete backup with id ${request.parentHandle} failed. Set it as outdated.")
+                databaseHandler.setBackupAsOutdated(request.parentHandle)
+            }
+        })
 
     /**
      * Check if a string is invalid value, including null check and value check(whether a non-null invalid value).
@@ -530,23 +615,25 @@ object CameraUploadSyncManager {
         Timber.d("CU pending upload file $cuPendingUploads, size: $cuTotalUploadBytes; MU pending upload file $muPendingUploads, size: $muTotalUploadBytes")
 
         if (CameraUploadUtil.isPrimaryEnabled()) {
-            updatePrimaryBackupState(State.CU_SYNC_STATE_ACTIVE)
+            updatePrimaryFolderBackupState(BackupState.ACTIVE)
             cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
         }
 
         if (CameraUploadUtil.isSecondaryEnabled()) {
-            updateSecondaryBackupState(State.CU_SYNC_STATE_ACTIVE)
+            updateSecondaryFolderBackupState(BackupState.ACTIVE)
             muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
         }
 
         activeHeartbeatTask = Observable.interval(0L, ACTIVE_HEARTBEAT_INTERVAL_SECONDS, SECONDS)
             .subscribe({
                 val cuBackup = databaseHandler.cuBackup
-                if (CameraUploadUtil.isPrimaryEnabled() && cuBackup != null && cuTotalUploadBytes != 0L && cuBackup.state != State.CU_SYNC_STATE_PAUSE_UP) {
+                if (CameraUploadUtil.isPrimaryEnabled() && cuBackup != null
+                    && cuTotalUploadBytes != 0L && cuBackup.state != BackupState.PAUSE_UPLOADS
+                ) {
                     Timber.d("Send CU heartbeat.")
                     megaApi.sendBackupHeartbeat(
                         cuBackup.backupId,
-                        Status.CU_SYNC_STATUS_SYNCING,
+                        HeartbeatStatus.SYNCING.value,
                         (cuUploadedBytes / cuTotalUploadBytes.toFloat() * 100).toInt(),
                         cuPendingUploads,
                         0,
@@ -557,11 +644,13 @@ object CameraUploadSyncManager {
                 }
 
                 val muBackup = databaseHandler.muBackup
-                if (CameraUploadUtil.isSecondaryEnabled() && muBackup != null && muTotalUploadBytes != 0L && muBackup.state != State.CU_SYNC_STATE_PAUSE_UP) {
+                if (CameraUploadUtil.isSecondaryEnabled() && muBackup != null
+                    && muTotalUploadBytes != 0L && muBackup.state != BackupState.PAUSE_UPLOADS
+                ) {
                     Timber.d("Send MU heartbeat.")
                     megaApi.sendBackupHeartbeat(
                         muBackup.backupId,
-                        Status.CU_SYNC_STATUS_SYNCING,
+                        HeartbeatStatus.SYNCING.value,
                         (muUploadedBytes / muTotalUploadBytes.toFloat() * 100).toInt(),
                         muPendingUploads,
                         0,
@@ -603,7 +692,7 @@ object CameraUploadSyncManager {
             cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
-                Status.CU_SYNC_STATUS_UPTODATE,
+                HeartbeatStatus.UP_TO_DATE.value,
                 PROGRESS_FINISHED,
                 0,
                 0,
@@ -619,7 +708,7 @@ object CameraUploadSyncManager {
             muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
-                Status.CU_SYNC_STATUS_UPTODATE,
+                HeartbeatStatus.UP_TO_DATE.value,
                 PROGRESS_FINISHED,
                 0,
                 0,
@@ -640,7 +729,7 @@ object CameraUploadSyncManager {
             cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
-                Status.CU_SYNC_STATUS_INACTIVE,
+                HeartbeatStatus.INACTIVE.value,
                 INVALID_VALUE,
                 cuPendingUploads,
                 0,
@@ -656,7 +745,7 @@ object CameraUploadSyncManager {
             muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
-                Status.CU_SYNC_STATUS_INACTIVE,
+                HeartbeatStatus.INACTIVE.value,
                 INVALID_VALUE,
                 muPendingUploads,
                 0,
@@ -680,7 +769,7 @@ object CameraUploadSyncManager {
     }
 
     /**
-     * When the CU service has nothing to upload, send heartbeat as well.
+     * When the CU service has nothing to upload, send [HeartbeatStatus.UP_TO_DATE]
      * Before sending, check the account state and login again when the rootNode is null.
      * Only call in Worker class.
      */
@@ -689,16 +778,17 @@ object CameraUploadSyncManager {
         if (megaApi.rootNode == null && !isLoggingIn) {
             Timber.w("RootNode = null, need to login again")
             val dbH = DatabaseHandler.getDbHandler(megaApplication)
-            val credentials: UserCredentials = dbH.credentials
-            val gSession = credentials.session
+            val gSession = dbH.credentials?.session
             MegaApplication.setLoggingIn(true)
-            megaApi.fastLogin(gSession, createOnFinishListener(onSuccess = {
+            megaApi.fastLogin(gSession, createHeartbeatListener(onSuccess = {
                 saveCredentials()
                 Timber.d("CameraUploadSyncManager: fast logged in and saved session")
-                megaApi.fetchNodes(createOnFinishListener(onSuccess = {
+                megaApi.fetchNodes(createHeartbeatListener(onSuccess = {
                     MegaApplication.setLoggingIn(false)
                     MegaApplication.setHeartBeatAlive(true)
-                    sendRegularHeartbeat()
+
+                    sendPrimaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
+                    sendSecondaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
                 }, onError = {
                     MegaApplication.setLoggingIn(false)
                 }))
@@ -706,7 +796,8 @@ object CameraUploadSyncManager {
                 MegaApplication.setLoggingIn(false)
             }))
         } else {
-            sendRegularHeartbeat()
+            sendPrimaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
+            sendSecondaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
         }
     }
 
@@ -730,50 +821,14 @@ object CameraUploadSyncManager {
     }
 
     /**
-     * When the Camera Upload Service has nothing to upload, send heartbeat as well.
-     */
-    private fun sendRegularHeartbeat() {
-        val cuBackup = databaseHandler.cuBackup
-
-        Timber.d("sendRegularHeartbeat() in progress")
-        if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
-            Timber.d("Sending CameraUploads Heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
-            megaApi.sendBackupHeartbeat(
-                cuBackup.backupId,
-                Status.CU_SYNC_STATUS_UPTODATE,
-                INVALID_VALUE,
-                0,
-                0,
-                0,
-                cuLastUploadedHandle,
-                createOnFinishListener()
-            )
-        }
-
-        val muBackup = databaseHandler.muBackup
-        if (muBackup != null && CameraUploadUtil.isSecondaryEnabled()) {
-            Timber.d("Sending MediaUploads Heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
-            megaApi.sendBackupHeartbeat(
-                muBackup.backupId,
-                Status.CU_SYNC_STATUS_UPTODATE,
-                INVALID_VALUE,
-                0,
-                0,
-                0,
-                muLastUploadedHandle,
-                createOnFinishListener()
-            )
-        }
-    }
-
-    /**
-     * Create a listener to listen to the send inactive heartbeat event.
+     * The listener for Heartbeat events
      *
-     * @param onSuccess Callback when the request finished.
+     * @param onSuccess Lambda that is invoked when the request is successful
+     * @param onError Lambda that is invoked when the request failed
      *
-     * @return MegaRequestListenerInterface object listen to the request.
+     * @return [OptionalMegaRequestListenerInterface] to listen for events from [MegaApiJava.sendBackupHeartbeat]
      */
-    private fun createOnFinishListener(
+    private fun createHeartbeatListener(
         onSuccess: (() -> Unit)? = null,
         onError: (() -> Unit)? = null,
     ) =
@@ -786,7 +841,6 @@ object CameraUploadSyncManager {
                 onError?.invoke()
             }
         })
-
 
     /**
      * Check if CU process is running by checking if there's a non-null active send heartbeat task.

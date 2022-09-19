@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/multiple_bucket_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -15,9 +16,9 @@
             android:id="@+id/thumbnail_list"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:layout_alignParentLeft="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"/>
 
         <ImageButton
@@ -28,7 +29,7 @@
             android:background="@android:color/transparent"
             android:padding="16dp"
             android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"/>
+            android:layout_alignParentEnd="true"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -107,10 +108,26 @@
         android:layout_height="wrap_content"
         android:layout_margin="1dp">
 
-        <ImageView
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/thumbnail_media"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="@dimen/grid_node_item_width"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="1dp"
+            android:paddingTop="1dp"
+            android:paddingRight="1dp"
+            android:paddingBottom="1dp"
+            app:actualImageScaleType="centerCrop"/>
+
+        <ImageView
+            android:id="@+id/icon_selected"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginTop="7dp"
+            android:src="@drawable/ic_select_folder"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <RelativeLayout
             android:id="@+id/video_layout"
@@ -138,11 +155,10 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:paddingRight="4dp"
+                android:paddingEnd="4dp"
                 android:paddingBottom="2dp"/>
-
         </RelativeLayout>
 
     </RelativeLayout>

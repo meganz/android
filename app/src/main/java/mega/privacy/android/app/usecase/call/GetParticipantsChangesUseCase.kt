@@ -141,7 +141,10 @@ class GetParticipantsChangesUseCase @Inject constructor(
     fun getChangesFromParticipants(): Flowable<ParticipantsChangesResult> =
         Flowable.create({ emitter ->
             val callCompositionObserver = Observer<MegaChatCall> { call ->
-                emitter.checkParticipantsChanges(call)
+                megaChatApi.getChatRoom(call.chatid)?.let { chat ->
+                    if (chat.isGroup || chat.isMeeting)
+                        emitter.checkParticipantsChanges(call)
+                }
             }
 
             LiveEventBus.get(EventConstants.EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)

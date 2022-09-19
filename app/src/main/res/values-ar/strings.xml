@@ -2360,8 +2360,6 @@
     <string name="title_file_explorer_send_link">إرسال الرابط إلى&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">ارسل الى&#8230;</string>
-    <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">ترفيع الى&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">المزيد</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2699,8 +2697,6 @@
     <string name="allow_access_contact_explanation">لن تستخدم ميغا MEGA هذه البيانات لأي غرض آخر ولن تتفاعل أبداً مع جهات الاتصال الخاصة بك دون موافقتك.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">السماح بالوصول إلى ميكروفونك لإجراء مكالمات مشفرة.</string>
-    <!-- General enable access -->
-    <string name="general_enable_access">منح حق الوصول</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">الملفات المشاركة</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3530,10 +3526,6 @@
     <string name="file_created">تم إنشاء الملف</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">فشل إنشاء الملف. حاول مرة أخرى.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
-    <string name="file_saved_to">تم حفظ الملف في %1$s</string>
-    <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">لم يتم حفظ الملف في %1$s. حاول مرة أخرى.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">تم تحديث الملف</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -4426,4 +4418,32 @@
     <string name="settings_calls_preferences_sound_notifications_text">تسمع صوتًا عندما ينضم شخص ما إلى مكالمة أو يغادرها.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">ليس الآن</string>
+    <!-- Text indicating a text file was saved to Cloud drive -->
+    <string name="text_editor_creation_success">تم حفظ الملف في السواقة السحابية.</string>
+    <!-- Warning indicating a text file was not saved to Cloud Drive. -->
+    <string name="text_editor_creation_error">لم يتم حفظ الملف في السواقة السحابية. حاول مرة أخرى.</string>
+    <!-- Action label to start images slideshow -->
+    <string name="action_slideshow">عرض الشرائح</string>
+    <!-- Filter page: Prompt to choose media type -->
+    <string name="filter_prompt_media_type">اختر النوع</string>
+    <!-- Filter page: Button text for all media type -->
+    <string name="filter_button_all_media_type">كل الوسائط</string>
+    <!-- Filter page: Prompt to choose photos source -->
+    <string name="filter_prompt_media_source">إظهار العناصر من</string>
+    <!-- Filter page: Radio button text for CD + CU source -->
+    <string name="filter_button_all_source">جميع المواقع</string>
+    <!-- Filter page: Radio button text for CD only source -->
+    <string name="filter_button_cd_only">السواقة السحابية</string>
+    <!-- Timeline: Empty state for No Media (No Images and Videos) -->
+    <string name="timeline_empty_media">لم يتم العثور على أي [B]وسائط[/B]</string>
+    <!-- Timeline: Empty state for No Images -->
+    <string name="timeline_empty_images">لم يتم العثور على أي [B]صور[/B]</string>
+    <!-- Timeline: Empty state for No Videos -->
+    <string name="timeline_empty_videos">لم يتم العثور على أي [B]مقاطع فيديو[/B]</string>
+    <!-- Button to skip asking permissions. -->
+    <string name="permissions_not_now_button">ليس الآن</string>
+    <!-- Title of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_title">الحصول على إشعار</string>
+    <!-- Description of the screen asking for enabling notifications permission. -->
+    <string name="permissions_notifications_description">ستقوم ميغا MEGA بإرسال إشعارات المكالمات والمحادثة و تراسل الملفات.</string>
 </resources>

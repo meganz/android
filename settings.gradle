@@ -1,3 +1,5 @@
 include ':app'
 include ':domain'
 include ':sdk'
+include ':presentation'
+include ':screenshot'

@@ -5,7 +5,7 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import androidx.annotation.StringRes
 import timber.log.Timber
-import java.util.*
+import java.util.Locale
 
 /**
  * Get formatted string or default
@@ -27,4 +27,16 @@ private fun Context.getEnglishResources(): Resources {
     val configuration = Configuration(resources.configuration)
     configuration.setLocale(Locale(Locale.ENGLISH.language))
     return createConfigurationContext(configuration).resources
+}
+
+fun Context.getQuantityStringOrDefault(resId: Int, quantity: Int, vararg formatArgs: Any?): String {
+    return runCatching {
+        resources.getQuantityString(resId, quantity, *formatArgs)
+    }.getOrElse { exception ->
+        Timber.w(exception,
+            "Error getting a translated and formatted string with quantity modifier.")
+        getEnglishResources().getQuantityString(resId, quantity, *formatArgs).also {
+            Timber.i("Using the original English string: $it")
+        }
+    }
 }

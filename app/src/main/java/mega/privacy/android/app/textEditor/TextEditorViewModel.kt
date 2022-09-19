@@ -47,6 +47,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAva
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -560,6 +561,7 @@ class TextEditorViewModel @Inject constructor(
         tempFile: File,
         parentHandle: Long,
     ) {
+        PermissionUtils.checkNotificationsPermission(activity)
         activity.startService(
             Intent(activity, UploadService::class.java)
                 .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)

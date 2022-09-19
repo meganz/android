@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.PorterDuff.Mode.SRC_IN
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.os.Build.VERSION_CODES
 import android.view.View
 import android.view.Window
 import android.view.WindowInsetsController
@@ -16,12 +17,14 @@ import android.widget.ImageView
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatDrawableManager
 import androidx.appcompat.widget.DrawableUtils
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.elevation.ElevationOverlayProvider
 import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.MaterialShapeUtils
 import com.google.android.material.shape.ShapeAppearanceModel
 import mega.privacy.android.app.R
 import kotlin.math.roundToInt
@@ -143,6 +146,23 @@ object ColorUtils {
         ElevationOverlayProvider(context).compositeOverlayWithThemeSurfaceColorIfNeeded(
             elevation
         )
+
+    /**
+     * Set elevation with right color for light/dark mode
+     *
+     * @param elevation Elevation value of the view
+     */
+    @JvmStatic
+    @RequiresApi(VERSION_CODES.LOLLIPOP)
+    fun View.setElevationWithColor(elevation: Float) {
+        if (elevation != 0F) {
+            setBackgroundColor(getColorForElevation(context, elevation))
+        } else {
+            setBackgroundColor(resources.getColor(android.R.color.transparent, null))
+        }
+        MaterialShapeUtils.setElevation(this, elevation)
+        setElevation(elevation)
+    }
 
     /**
      * Set status bar text and icon colours for good visibility in light/dark mode accordingly

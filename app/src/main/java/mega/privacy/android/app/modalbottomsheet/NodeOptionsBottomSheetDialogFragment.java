@@ -51,6 +51,7 @@ import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -83,6 +84,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileContactListActivity;
@@ -237,6 +239,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView optionMove = contentView.findViewById(R.id.move_option);
         TextView optionCopy = contentView.findViewById(R.id.copy_option);
         TextView optionRestoreFromRubbish = contentView.findViewById(R.id.restore_option);
+//      slideShow
+        TextView optionSlideshow = contentView.findViewById(R.id.option_slideshow);
 //      counterOpen
         TextView optionOpenFolder = contentView.findViewById(R.id.open_folder_option);
         TextView optionOpenWith = contentView.findViewById(R.id.open_with_option);
@@ -269,6 +273,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionRestoreFromRubbish.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
         optionOpenFolder.setOnClickListener(this);
+        optionSlideshow.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
         optionMoveBackup.setOnClickListener(this);
         optionCopyBackup.setOnClickListener(this);
@@ -313,6 +318,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         } else {
             counterOpen--;
             optionOpenWith.setVisibility(View.GONE);
+        }
+
+        if (MegaNodeUtil.isValidForImageViewer(node)) {
+            optionSlideshow.setVisibility(View.VISIBLE);
+        } else {
+            optionSlideshow.setVisibility(View.GONE);
         }
 
         if (isOnline(requireContext())) {
@@ -908,6 +919,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case R.id.remove_option:
             case R.id.option_backup_rubbish_bin_layout:
                 ((ManagerActivity) requireActivity()).askConfirmationMoveToRubbish(handleList);
+                break;
+
+            case R.id.option_slideshow:
+                Intent intent = ImageViewerActivity.getIntentForParentNode(
+                        requireContext(),
+                        megaApi.getParentNode(node).getHandle(),
+                        ORDER_PHOTO_ASC,
+                        node.getHandle(),
+                        true
+                );
+                startActivity(intent);
+                dismissAllowingStateLoss();
                 break;
 
             case R.id.open_folder_option:

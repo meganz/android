@@ -177,7 +177,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
         ShareContactInfo contact = getItem(position);
 
-        holder.currentPosition = position;
+        holder.currentPosition = holder.getBindingAdapterPosition();
 
         holder.itemProgress.setVisibility(View.GONE);
         holder.verifiedIcon.setVisibility(View.GONE);

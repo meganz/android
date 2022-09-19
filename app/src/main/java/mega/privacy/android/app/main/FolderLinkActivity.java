@@ -119,6 +119,7 @@ import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFrag
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -135,6 +136,8 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+    @Inject
+    DatabaseHandler dbH;
 
     private static final String TAG_DECRYPT = "decrypt";
 
@@ -181,7 +184,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
     AlertDialog statusDialog;
     private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
-    DatabaseHandler dbH = null;
+
     MegaPreferences prefs = null;
 
     boolean decryptionIntroduced = false;
@@ -376,8 +379,6 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
         handler = new Handler();
 
-        dbH = DatabaseHandler.getDbHandler(FolderLinkActivity.this);
-
         Intent intentReceived = getIntent();
 
         if (intentReceived != null) {
@@ -471,9 +472,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
         importButton = (Button) findViewById(R.id.folder_link_import_button);
         importButton.setOnClickListener(this);
 
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-        }
+
         if (dbH != null) {
             if (dbH.getCredentials() != null) {
                 importButton.setVisibility(View.VISIBLE);
@@ -576,10 +575,6 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
         setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout));
 
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-        }
-
         observeDragSupportEvents(this, listView, VIEWER_FROM_FOLDER_LINK);
 
         fragmentContainer.post(() -> cookieDialogHandler.showDialogIfNeeded(this));
@@ -651,6 +646,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
     }
 
     public void downloadNodes(List<MegaNode> nodes) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodes(nodes, false, true, false, false);
     }
 
@@ -869,9 +865,6 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
             if (e.getErrorCode() == MegaError.API_OK) {
                 Timber.d("DOCUMENTNODEHANDLEPUBLIC: %s", request.getNodeHandle());
-                if (dbH == null) {
-                    dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-                }
 
                 if (request.getNodeHandle() != MegaApiJava.INVALID_HANDLE) {
                     dbH.setLastPublicHandle(request.getNodeHandle());
@@ -945,9 +938,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                                     fileLinkIconView.setImageResource(MimeTypeList.typeForName(pN.getName()).getIconResourceId());
 
                                     fileLinkDownloadButton.setVisibility(View.VISIBLE);
-                                    if (dbH == null) {
-                                        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-                                    }
+
                                     if (dbH != null) {
                                         if (dbH.getCredentials() != null) {
                                             fileLinkImportButton.setVisibility(View.VISIBLE);

@@ -36,7 +36,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -59,8 +58,6 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
     ArrayList<Integer> imageIds;
     ArrayList<String> names;
     ArrayList<MegaNode> nodes;
-
-    DatabaseHandler dbH = null;
 
     long parentHandle = -1;
 
@@ -103,8 +100,6 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
-
-        dbH = DatabaseHandler.getDbHandler(context);
     }
 
     ViewHolderProvider holder = null;
@@ -162,7 +157,7 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
     public void onBindViewHolder(ViewHolderProvider holder, int position) {
         Timber.d("onBindViewHolder");
 
-        holder.currentPosition = position;
+        holder.currentPosition = holder.getBindingAdapterPosition();
 
         MegaNode node = (MegaNode) getItem(position);
         holder.document = node.getHandle();

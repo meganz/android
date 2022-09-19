@@ -186,6 +186,7 @@ import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -311,7 +312,7 @@ public class ContactInfoActivity extends PasscodeActivity
     float scaleW;
     float scaleH;
 
-    DatabaseHandler dbH = null;
+
 
     Drawable drawableShare;
     Drawable drawableSend;
@@ -528,8 +529,6 @@ public class ContactInfoActivity extends PasscodeActivity
             aB.setDisplayHomeAsUpEnabled(true);
 
             contactPropertiesImage = findViewById(R.id.toolbar_image);
-
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
             appBarLayout.post(new Runnable() {
                 @Override
@@ -1779,6 +1778,7 @@ public class ContactInfoActivity extends PasscodeActivity
     }
 
     public void downloadFile(List<MegaNode> nodes) {
+        PermissionUtils.checkNotificationsPermission(this);
         nodeSaver.saveNodes(nodes, true, false, false, false);
     }
 

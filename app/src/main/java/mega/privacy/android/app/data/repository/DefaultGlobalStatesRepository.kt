@@ -13,5 +13,6 @@ class DefaultGlobalStatesRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
 ) : GlobalStatesRepository {
 
+    @Deprecated("See documentation for individual replacements to use instead.")
     override fun monitorGlobalUpdates(): Flow<GlobalUpdate> = megaApiGateway.globalUpdates
 }

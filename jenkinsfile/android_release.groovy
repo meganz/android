@@ -28,7 +28,7 @@ ARTIFACTORY_BASE_URL = 'https://artifactory.developers.mega.co.nz/artifactory/an
 ARTIFACTORY_BUILD_INFO = "buildinfo.txt"
 
 pipeline {
-    agent { label 'mac-jenkins-slave' }
+    agent { label 'mac-jenkins-slave-android || mac-jenkins-slave' }
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()

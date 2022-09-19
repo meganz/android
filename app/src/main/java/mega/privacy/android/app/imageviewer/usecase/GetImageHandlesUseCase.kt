@@ -6,13 +6,13 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
+import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.utils.FileUtil
-
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.OfflineUtils
@@ -20,8 +20,11 @@ import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -35,6 +38,7 @@ import javax.inject.Inject
  * @property getChatMessageUseCase      ChatMessageUseCase required to retrieve chat node information
  * @property getNodeUseCase             NodeUseCase required to retrieve node information
  * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
+ * @property dbHandler                  Database handler needed to retrieve timeline nodes
  */
 class GetImageHandlesUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -42,6 +46,7 @@ class GetImageHandlesUseCase @Inject constructor(
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val getNodeUseCase: GetNodeUseCase,
     private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
+    private val dbHandler: DatabaseHandler,
 ) {
 
     /**
@@ -56,6 +61,7 @@ class GetImageHandlesUseCase @Inject constructor(
      * @param showNearbyFiles   Show nearby image files from current parent file
      * @param sortOrder         Node search order
      * @param isOffline         Flag to check if it's offline node
+     * @param isTimeline        Flag to check if should get timeline images
      * @return                  Single with image nodes
      */
     fun get(
@@ -68,10 +74,13 @@ class GetImageHandlesUseCase @Inject constructor(
         showNearbyFiles: Boolean? = false,
         sortOrder: Int? = ORDER_PHOTO_ASC,
         isOffline: Boolean? = false,
+        isTimeline: Boolean? = false,
     ): Single<List<ImageItem>> =
         Single.fromCallable {
             val items = mutableListOf<ImageItem>()
             when {
+                isTimeline == true ->
+                    items.addTimelineNodes()
                 parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
                     val parentNode = getNodeUseCase.get(parentNodeHandle).blockingGetOrNull()
                     if (parentNode != null && megaApi.hasChildren(parentNode)) {
@@ -258,5 +267,48 @@ class GetImageHandlesUseCase @Inject constructor(
                 Timber.w("File ($imageUri) can't be read or isn't valid for Image Viewer")
             }
         }
+    }
+
+    /**
+     * Add Image timeline nodes
+     */
+    private fun MutableList<ImageItem>.addTimelineNodes() {
+        val timelineNodes = mutableListOf<MegaNode>()
+        val cancelToken = MegaCancelToken.createInstance()
+
+        megaApi.searchByType(
+            cancelToken,
+            MegaApiAndroid.ORDER_MODIFICATION_DESC,
+            MegaApiJava.FILE_TYPE_PHOTO,
+            MegaApiJava.SEARCH_TARGET_ROOTNODE
+        ).forEach { node ->
+            if (node.isValidForImageViewer()) {
+                timelineNodes.add(node)
+            }
+        }
+
+        megaApi.searchByType(
+            cancelToken,
+            MegaApiAndroid.ORDER_MODIFICATION_DESC,
+            MegaApiJava.FILE_TYPE_VIDEO,
+            MegaApiJava.SEARCH_TARGET_ROOTNODE
+        ).forEach { node ->
+            if (node.isValidForImageViewer()) {
+                timelineNodes.add(node)
+            }
+        }
+
+        timelineNodes
+            .sortedByDescending { it.modificationTime }
+            .forEach { node ->
+                this.add(
+                    ImageItem.Node(
+                        id = node.handle,
+                        handle = node.handle,
+                        name = node.name,
+                        infoText = node.getInfoText()
+                    )
+                )
+            }
     }
 }

@@ -43,6 +43,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.ListIterator;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
@@ -64,6 +67,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class ChatExplorerFragment extends Fragment implements CheckScrollInterface {
 
     private static final int RECENTS_MAX_SIZE = 6;
@@ -73,9 +77,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
-
-    private DatabaseHandler dbH;
-
     private Context context;
     private ActionBar aB;
     private RecyclerView listView;
@@ -125,8 +126,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
 
-        dbH = DatabaseHandler.getDbHandler(getActivity());
-
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             if (context instanceof ChatExplorerActivity) {
@@ -167,7 +166,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             addLayout.setVisibility(View.VISIBLE);
             addedLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
             addedList.setLayoutManager(addedLayoutManager);
-            addedList.setHasFixedSize(true);
             addedList.setItemAnimator(new DefaultItemAnimator());
             addedList.setClipToPadding(false);
 
@@ -185,7 +183,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
-        listView.setHasFixedSize(true);
         listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
         listView.setClipToPadding(false);
         listView.setPadding(0, scaleHeightPx(8, outMetrics), 0, 0);

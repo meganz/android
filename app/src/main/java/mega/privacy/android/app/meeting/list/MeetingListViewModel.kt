@@ -10,6 +10,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.usecase.chat.ArchiveChatUseCase
+import mega.privacy.android.app.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.app.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.app.usecase.chat.SignalChatPresenceUseCase
 import mega.privacy.android.app.usecase.meeting.GetMeetingListUseCase
@@ -26,6 +27,7 @@ import javax.inject.Inject
  * @property archiveChatUseCase         Use case to archive chats
  * @property leaveChatUseCase           Use case to leave chats
  * @property signalChatPresenceUseCase  Use case to signal chat presence
+ * @property clearChatHistoryUseCase    Use case to clear chat history
  */
 @HiltViewModel
 class MeetingListViewModel @Inject constructor(
@@ -33,6 +35,7 @@ class MeetingListViewModel @Inject constructor(
     private val archiveChatUseCase: ArchiveChatUseCase,
     private val leaveChatUseCase: LeaveChatUseCase,
     private val signalChatPresenceUseCase: SignalChatPresenceUseCase,
+    private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -40,7 +43,7 @@ class MeetingListViewModel @Inject constructor(
     }
 
     private var queryString: String? = null
-    private val meetings: MutableLiveData<List<MeetingItem>> = MutableLiveData()
+    private val meetings: MutableLiveData<List<MeetingItem>> = MutableLiveData(emptyList())
 
     init {
         retrieveMeetings()
@@ -68,19 +71,28 @@ class MeetingListViewModel @Inject constructor(
      */
     fun getMeetings(): LiveData<List<MeetingItem>> =
         meetings.map { items ->
-            if (!queryString.isNullOrBlank()) {
-                items.filter { (_, title, lastMessage, _, _, firstUser, lastUser, _, _) ->
-                    title.contains(queryString!!, true)
-                            || lastMessage?.contains(queryString!!, true) == true
-                            || firstUser.firstName?.contains(queryString!!, true) == true
-                            || lastUser?.firstName?.contains(queryString!!, true) == true
-                            || firstUser.email?.contains(queryString!!, true) == true
-                            || lastUser?.email?.contains(queryString!!, true) == true
+            val searchQuery = queryString
+            if (!searchQuery.isNullOrBlank() && !items.isNullOrEmpty()) {
+                items.filter { (_, title, lastMessage, _, _, _, firstUser, lastUser, _, _, _) ->
+                    title.contains(searchQuery, true)
+                            || lastMessage?.contains(searchQuery, true) == true
+                            || firstUser.firstName?.contains(searchQuery, true) == true
+                            || lastUser?.firstName?.contains(searchQuery, true) == true
+                            || firstUser.email?.contains(searchQuery, true) == true
+                            || lastUser?.email?.contains(searchQuery, true) == true
                 }
             } else {
                 items
             }
         }
+
+    /**
+     * Check if search query is empty
+     *
+     * @return  true if search query is empty, false otherwise
+     */
+    fun isSearchQueryEmpty(): Boolean =
+        queryString.isNullOrBlank()
 
     /**
      * Get specific meeting given its chat id
@@ -120,6 +132,18 @@ class MeetingListViewModel @Inject constructor(
      */
     fun leaveChat(chatId: Long) {
         leaveChatUseCase.leave(chatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onError = Timber::e)
+    }
+
+    /**
+     * Clear chat history
+     *
+     * @param chatId    Chat id to leave
+     */
+    fun clearChatHistory(chatId: Long) {
+        clearChatHistoryUseCase.clear(chatId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onError = Timber::e)

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.imageviewer
 
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -8,16 +9,16 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
-import androidx.viewpager2.widget.MarginPageTransformer
-import androidx.viewpager2.widget.ViewPager2
-import androidx.viewpager2.widget.ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.navigateUp
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
@@ -26,7 +27,6 @@ import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityImageViewerBinding
-import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
 import mega.privacy.android.app.imageviewer.util.shouldShowDownloadOption
@@ -34,6 +34,7 @@ import mega.privacy.android.app.imageviewer.util.shouldShowForwardOption
 import mega.privacy.android.app.imageviewer.util.shouldShowManageLinkOption
 import mega.privacy.android.app.imageviewer.util.shouldShowSendToContactOption
 import mega.privacy.android.app.imageviewer.util.shouldShowShareOption
+import mega.privacy.android.app.imageviewer.util.shouldShowSlideshowOption
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -56,16 +57,15 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_NEARBY_FILES
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_URI
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
-import mega.privacy.android.app.utils.ContextUtils.isLowMemory
+import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
-
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.ViewUtils.waitForLayout
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
@@ -80,7 +80,9 @@ import javax.inject.Inject
 class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower {
 
     companion object {
-        private const val IMAGE_OFFSCREEN_PAGE_LIMIT = 2
+        const val IMAGE_OFFSCREEN_PAGE_LIMIT = 2
+        private const val EXTRA_SHOW_SLIDESHOW = "EXTRA_SHOW_SLIDESHOW"
+        private const val EXTRA_IS_TIMELINE = "EXTRA_IS_TIMELINE"
 
         /**
          * Get Image Viewer intent to show a single image node.
@@ -164,11 +166,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             parentNodeHandle: Long,
             childOrder: Int = ORDER_PHOTO_ASC,
             currentNodeHandle: Long? = null,
+            showSlideshow: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentNodeHandle)
                 putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, childOrder)
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
             }
 
         /**
@@ -185,10 +189,33 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             context: Context,
             childrenHandles: LongArray,
             currentNodeHandle: Long? = null,
+            showSlideshow: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(NODE_HANDLES, childrenHandles)
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
+            }
+
+        /**
+         * Get Image Viewer intent to show Timeline image nodes.
+         *
+         * @param context           Required to build the Intent.
+         * @param childOrder        Node search order.
+         * @param currentNodeHandle Current node handle to show.
+         * @return                  Image Viewer Intent.
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun getIntentForTimeline(
+            context: Context,
+            currentNodeHandle: Long? = null,
+            showSlideshow: Boolean = false,
+        ): Intent =
+            Intent(context, ImageViewerActivity::class.java).apply {
+                putExtra(EXTRA_IS_TIMELINE, true)
+                putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
             }
 
         /**
@@ -207,11 +234,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             chatRoomId: Long,
             messageIds: LongArray,
             currentNodeHandle: Long? = null,
+            showSlideshow: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatRoomId)
                 putExtra(INTENT_EXTRA_KEY_MSG_ID, messageIds)
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
             }
 
         /**
@@ -227,10 +256,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             context: Context,
             childrenHandles: LongArray,
             currentNodeHandle: Long? = null,
+            showSlideshow: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE, childrenHandles)
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
             }
 
         /**
@@ -246,10 +277,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             context: Context,
             imageFileUri: Uri,
             showNearbyFiles: Boolean = false,
+            showSlideshow: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_URI, imageFileUri)
                 putExtra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES, showNearbyFiles)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
             }
     }
 
@@ -258,8 +291,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
     private val nodeOfflineHandle: Long? by extra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, INVALID_HANDLE)
-    private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-        INVALID_HANDLE)
+    private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
     private val nodeFileLink: String? by extra(EXTRA_LINK)
     private val childrenHandles: LongArray? by extra(NODE_HANDLES)
     private val childrenOfflineHandles: LongArray? by extra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
@@ -268,22 +300,21 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val chatMessagesId: LongArray? by extra(INTENT_EXTRA_KEY_MSG_ID)
     private val imageFileUri: Uri? by extra(INTENT_EXTRA_KEY_URI)
     private val showNearbyFiles: Boolean? by extra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES)
-    private val isFileVersion by lazy {
-        intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_FILE_VERSION,
-            false)
-    }
+    private val showSlideshow: Boolean by extraNotNull(EXTRA_SHOW_SLIDESHOW, false)
+    private val isTimeline: Boolean by extraNotNull(EXTRA_IS_TIMELINE, false)
+    private val isFileVersion by lazy { intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_FILE_VERSION, false) }
 
     private val viewModel by viewModels<ImageViewerViewModel>()
-    private val pagerAdapter by lazy { ImageViewerAdapter(this) }
-    private val pageChangeCallback by lazy {
-        object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                viewModel.updateCurrentPosition(position, false)
+    private val appBarConfiguration by lazy {
+        AppBarConfiguration(
+            topLevelDestinationIds = setOf(),
+            fallbackOnNavigateUpListener = {
+                onBackPressed()
+                true
             }
-        }
+        )
     }
 
-    private var pageCallbackSet = false
     private var bottomSheet: ImageBottomSheetDialogFragment? = null
     private var nodeSaver: NodeSaver? = null
     private var nodeAttacher: MegaAttacher? = null
@@ -300,21 +331,17 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         setContentView(dragToExit?.wrapContentView(binding.root) ?: binding.root)
 
         setupView()
+        setupNavigation()
         setupObservers(savedInstanceState == null)
 
         if (savedInstanceState == null) {
             if (!Fresco.hasBeenInitialized()) Fresco.initialize(this)
             binding.root.post {
                 dragToExit?.runEnterAnimation(intent, binding.root) { startAnimation ->
-                    changeToolbarVisibility(!startAnimation, true)
+                    changeToolbarVisibility(!startAnimation)
                 }
             }
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_image_viewer, menu)
-        return true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -325,14 +352,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     override fun onLowMemory() {
         Timber.w("onLowMemory")
-        if (binding.viewPager.offscreenPageLimit != OFFSCREEN_PAGE_LIMIT_DEFAULT) {
-            binding.viewPager.offscreenPageLimit = OFFSCREEN_PAGE_LIMIT_DEFAULT
-        }
         viewModel.onLowMemory()
     }
 
     override fun onDestroy() {
-        binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
         if (isFinishing) dragToExit?.showPreviousHiddenThumbnail()
         dragToExit = null
         nodeSaver?.destroy()
@@ -346,20 +369,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        binding.viewPager.apply {
-            isSaveEnabled = false
-            offscreenPageLimit =
-                if (isLowMemory()) OFFSCREEN_PAGE_LIMIT_DEFAULT else IMAGE_OFFSCREEN_PAGE_LIMIT
-            setPageTransformer(MarginPageTransformer(resources.getDimensionPixelSize(R.dimen.image_viewer_pager_margin)))
-            adapter = pagerAdapter
-        }
-
         binding.root.post {
             // Apply system bars top and bottom insets
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
                 binding.toolbar.updatePadding(0, insets.top, 0, 0)
-                binding.motion.updatePadding(insets.left, 0, insets.right, insets.bottom)
+                binding.imagesNavHostFragment.updatePadding(insets.left, 0, insets.right, insets.bottom)
                 WindowInsetsCompat.CONSUMED
             }
         }
@@ -369,6 +384,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private fun setupObservers(requestImagesData: Boolean) {
         if (requestImagesData) {
             when {
+                isTimeline ->
+                    viewModel.retrieveImagesFromTimeline(nodeHandle)
                 parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE ->
                     viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder, nodeHandle)
                 childrenHandles?.isNotEmpty() == true ->
@@ -392,24 +409,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
         }
 
-        viewModel.onImagesIds().observe(this) { items ->
-            if (items.isNullOrEmpty()) {
-                Timber.e("Null or empty image items")
-                finish()
-            } else {
-                binding.viewPager.waitForLayout {
-                    val sizeDifference = pagerAdapter.itemCount != items.size
-                    pagerAdapter.submitList(items) {
-                        if (sizeDifference) {
-                            pagerAdapter.notifyDataSetChanged()
-                        }
-                    }
-                    true
-                }
-            }
-            binding.progress.hide()
-        }
-        viewModel.onCurrentImageItem().observe(this, ::showCurrentImageInfo)
         viewModel.onShowToolbar().observe(this, ::changeToolbarVisibility)
         viewModel.onSnackBarMessage().observe(this) { message ->
             bottomSheet?.dismissAllowingStateLoss()
@@ -425,34 +424,28 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             bottomSheet?.dismissAllowingStateLoss()
             showTransfersSnackBar(StringResourcesUtils.getString(message))
         }
-        viewModel.onCurrentPosition().observe(this) { (first, second) ->
-            binding.txtPageCount.apply {
-                text = StringResourcesUtils.getString(
-                    R.string.wizard_steps_indicator,
-                    first + 1,
-                    second
-                )
-                isVisible = second > 1
-            }
+    }
 
-            binding.viewPager.apply {
-                waitForLayout {
-                    if (currentItem != first) {
-                        setCurrentItem(first, false)
-                    }
-
-                    if (!pageCallbackSet) {
-                        pageCallbackSet = true
-                        registerOnPageChangeCallback(pageChangeCallback)
-                    }
-                    true
-                }
-            }
+    private fun setupNavigation() {
+        getNavController().let { navController ->
+            NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
+            navController.setGraph(
+                navController.navInflater.inflate(R.navigation.nav_image_viewer).apply {
+                    setStartDestination(
+                        if (showSlideshow) {
+                            R.id.image_slideshow
+                        } else {
+                            R.id.image_viewer
+                        }
+                    )
+                },
+                null
+            )
         }
     }
 
     private fun setupAttachers(savedInstanceState: Bundle?) {
-        dragToExit = DragToExitSupport(this, { changeToolbarVisibility(!it, true) }) {
+        dragToExit = DragToExitSupport(this, { changeToolbarVisibility(!it) }) {
             finish()
             overridePendingTransition(0, android.R.anim.fade_out)
         }
@@ -470,51 +463,37 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     /**
-     * Populate current image information to bottom texts and toolbar options.
+     * Change toolbar visibility with animation.
      *
-     * @param imageItem  Image item to show
+     * @param show                  Show or hide toolbar/bottombar
      */
-    private fun showCurrentImageInfo(imageItem: ImageItem?) {
-        binding.txtTitle.text = imageItem?.name
-        if (imageItem?.nodeItem != null) {
-            binding.toolbar.menu?.apply {
-                findItem(R.id.action_forward)?.isVisible =
-                    imageItem.shouldShowForwardOption() && !isFileVersion
-                findItem(R.id.action_share)?.isVisible =
-                    imageItem is ImageItem.ChatNode && imageItem.shouldShowShareOption() && !isFileVersion
-                findItem(R.id.action_download)?.isVisible = imageItem.shouldShowDownloadOption()
-                findItem(R.id.action_get_link)?.isVisible =
-                    imageItem.shouldShowManageLinkOption() && !isFileVersion
-                findItem(R.id.action_send_to_chat)?.isVisible =
-                    imageItem.shouldShowSendToContactOption(viewModel.isUserLoggedIn()) && !isFileVersion
-                findItem(R.id.action_more)?.isVisible = imageItem.nodeItem != null && !isFileVersion
+    private fun changeToolbarVisibility(show: Boolean) {
+        binding.toolbar.post {
+            val value = if (!show) -binding.toolbar.height.toFloat() else 0f
+            ObjectAnimator.ofFloat(binding.toolbar, "translationY", value).apply {
+                duration = 250
+                start()
             }
         }
     }
 
-    /**
-     * Change toolbar/bottomBar visibility with animation.
-     *
-     * @param show                  Show or hide toolbar/bottombar
-     * @param enableTransparency    Enable transparency change
-     */
-    private fun changeToolbarVisibility(show: Boolean, enableTransparency: Boolean = false) {
-        binding.motion.post {
-            val color: Int
-            if (show) {
-                color = R.color.white_black
-                binding.motion.transitionToEnd()
-            } else {
-                color = android.R.color.black
-                binding.motion.transitionToStart()
-            }
-            binding.motion.setBackgroundColor(ContextCompat.getColor(this,
-                if (enableTransparency && !show) {
-                    android.R.color.transparent
-                } else {
-                    color
-                }))
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val imageItem = viewModel.getCurrentImageItem() ?: return super.onPrepareOptionsMenu(menu)
+        menu?.apply {
+            findItem(R.id.action_slideshow)?.isVisible =
+                imageItem.shouldShowSlideshowOption() && viewModel.getImagesSize(false) > 1
+            findItem(R.id.action_forward)?.isVisible =
+                imageItem.shouldShowForwardOption() && !isFileVersion
+            findItem(R.id.action_share)?.isVisible =
+                imageItem is ImageItem.ChatNode && imageItem.shouldShowShareOption() && !isFileVersion
+            findItem(R.id.action_download)?.isVisible = imageItem.shouldShowDownloadOption()
+            findItem(R.id.action_get_link)?.isVisible =
+                imageItem.shouldShowManageLinkOption() && !isFileVersion
+            findItem(R.id.action_send_to_chat)?.isVisible =
+                imageItem.shouldShowSendToContactOption(viewModel.isUserLoggedIn()) && !isFileVersion
+            findItem(R.id.action_more)?.isVisible = imageItem.nodeItem != null && !isFileVersion
         }
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -523,7 +502,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
         return when (item.itemId) {
             android.R.id.home -> {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
+                true
+            }
+            R.id.action_slideshow -> {
+                getNavController().navigate(ImageViewerFragmentDirections.actionViewerToSlideshow())
                 true
             }
             R.id.action_forward -> {
@@ -577,6 +560,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     fun saveNode(node: MegaNode) {
+        PermissionUtils.checkNotificationsPermission(this)
         nodeSaver?.saveNode(
             node,
             highPriority = false,
@@ -587,6 +571,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     fun saveOfflineNode(nodeHandle: Long) {
+        PermissionUtils.checkNotificationsPermission(this)
         nodeSaver?.saveOfflineNode(nodeHandle, true)
     }
 
@@ -653,4 +638,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     override fun shouldSetStatusBarTextColor(): Boolean = false
+
+    override fun onSupportNavigateUp(): Boolean =
+        getNavController().navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+
+    private fun getNavController(): NavController =
+        (supportFragmentManager.findFragmentById(R.id.images_nav_host_fragment) as NavHostFragment).navController
 }

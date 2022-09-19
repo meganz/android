@@ -23,7 +23,7 @@ import mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
-import java.util.*
+import mega.privacy.android.app.utils.permission.PermissionUtils
 
 /**
  * Activity that represents the entire UI around contacts for the current user.
@@ -96,6 +96,8 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return
         }
+
+        PermissionUtils.checkNotificationsPermission(this)
 
         binding = ActivityContactsBinding.inflate(layoutInflater)
         setContentView(binding.root)

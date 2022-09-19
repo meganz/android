@@ -1,5 +1,8 @@
 package mega.privacy.android.app.utils;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
+import static mega.privacy.android.app.utils.Util.isAndroid10;
+
 import android.annotation.TargetApi;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -11,22 +14,14 @@ import android.provider.Settings;
 import android.service.notification.StatusBarNotification;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import mega.privacy.android.app.activities.AskForDisplayOverActivity;
 import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatRoom;
-
-import static android.content.Context.NOTIFICATION_SERVICE;
-import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
-import static mega.privacy.android.app.utils.Util.isAndroid10;
+import mega.privacy.android.app.activities.AskForDisplayOverActivity;
 
 public class IncomingCallNotification {
 

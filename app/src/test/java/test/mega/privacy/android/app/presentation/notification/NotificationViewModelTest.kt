@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.notification
 
+import androidx.compose.ui.unit.dp
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 
@@ -38,12 +38,15 @@ class NotificationViewModelTest {
 
     private val scheduler = TestCoroutineScheduler()
 
+    private val notificationMapper = mock<(UserAlert) -> Notification>()
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
         underTest = NotificationViewModel(
             monitorUserAlerts = monitorUserAlerts,
             acknowledgeUserAlerts = acknowledgeUserAlerts,
+            notificationMapper = notificationMapper,
         )
     }
 
@@ -64,12 +67,28 @@ class NotificationViewModelTest {
 
     @Test
     fun `test that subsequent values are returned`() = runTest {
+
+        val expected = Notification(
+            sectionTitle = { "" },
+            sectionColour = 0,
+            sectionIcon = null,
+            title = { "" },
+            titleTextSize = 16.dp,
+            description = { "" },
+            dateText = { "" },
+            isNew = true,
+            onClick = {},
+        )
+
         val alert = mock<UserAlert>()
         whenever(monitorUserAlerts()).thenReturn(flowOf(listOf(alert)))
+        whenever(notificationMapper(alert)).thenReturn(expected)
+
+
         underTest.state.drop(1).test {
             val (notifications, _) = awaitItem()
             assertWithMessage("Expected returned user alerts").that(notifications)
-                .containsExactly(Notification(alert))
+                .containsExactly(expected)
         }
     }
 
@@ -77,6 +96,21 @@ class NotificationViewModelTest {
     fun `test that should scroll is updated to true if new items appear`() = runTest {
         val initialAlert = mock<UserAlert>()
         val newAlert = mock<UserAlert>()
+        val initialNotification = Notification(
+            sectionTitle = { "" },
+            sectionColour = 0,
+            sectionIcon = null,
+            title = { "Initial" },
+            titleTextSize = 16.dp,
+            description = { "" },
+            dateText = { "" },
+            isNew = true,
+            onClick = {},
+        )
+        val newNotification = initialNotification.copy(title = {"New title"})
+        whenever(notificationMapper(initialAlert)).thenReturn(initialNotification)
+        whenever(notificationMapper(newAlert)).thenReturn(newNotification)
+
         whenever(monitorUserAlerts()).thenReturn(
             flowOf(
                 listOf(initialAlert),

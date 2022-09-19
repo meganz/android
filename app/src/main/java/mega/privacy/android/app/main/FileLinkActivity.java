@@ -96,6 +96,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -111,6 +112,8 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+    @Inject
+    DatabaseHandler dbH;
 
     private static final String TAG_DECRYPT = "decrypt";
 
@@ -141,7 +144,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
     Button downloadButton;
     Button buttonPreviewContent;
     MegaNode document = null;
-    DatabaseHandler dbH = null;
+
 
     boolean decryptionIntroduced = false;
 
@@ -182,8 +185,6 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
         Intent intentReceived = getIntent();
         if (intentReceived != null) {
@@ -488,9 +489,6 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
                 long handle = document.getHandle();
 
                 Timber.d("DOCUMENTNODEHANDLEPUBLIC: %s", handle);
-                if (dbH == null) {
-                    dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-                }
 
                 if (handle != MegaApiJava.INVALID_HANDLE) {
                     dbH.setLastPublicHandle(handle);
@@ -654,6 +652,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 
         switch (v.getId()) {
             case R.id.file_link_button_download: {
+                PermissionUtils.checkNotificationsPermission(this);
                 nodeSaver.saveNode(document, false, false, false, true);
                 break;
             }

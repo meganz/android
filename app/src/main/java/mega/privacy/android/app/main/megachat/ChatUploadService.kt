@@ -163,7 +163,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         val wifiManager = applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
         lock = wifiManager.createWifiLock(wifiLockMode, "MegaUploadServiceWifiLock")
         val pm = getSystemService(POWER_SERVICE) as PowerManager
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaUploadServicePowerLock")
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Mega:UploadServicePowerLock")
         @Suppress("DEPRECATION")
         mBuilder = Notification.Builder(this@ChatUploadService)
         mBuilderCompat = NotificationCompat.Builder(

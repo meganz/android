@@ -48,6 +48,11 @@ class MeetingListFragment : Fragment() {
         setupObservers()
     }
 
+    override fun onResume() {
+        super.onResume()
+        checkElevation()
+    }
+
     override fun onDestroyView() {
         binding.list.clearOnScrollListeners()
         super.onDestroyView()
@@ -61,13 +66,7 @@ class MeetingListFragment : Fragment() {
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
-                    if (recyclerView.canScrollVertically(RecyclerView.NO_POSITION)) {
-                        (activity as? ManagerActivity?)?.changeAppBarElevation(Util.isDarkMode(context))
-                        (parentFragment as? ChatTabsFragment?)?.showElevation(Util.isDarkMode(context))
-                    } else {
-                        (activity as? ManagerActivity?)?.changeAppBarElevation(false)
-                        (parentFragment as? ChatTabsFragment?)?.showElevation(false)
-                    }
+                    checkElevation()
                 }
             })
         }
@@ -80,8 +79,20 @@ class MeetingListFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.getMeetings().observe(viewLifecycleOwner) { items ->
-            meetingsAdapter.submitList(items)
-            binding.viewEmpty.isVisible = items.isNullOrEmpty()
+            val currentFirstChat = meetingsAdapter.currentList.firstOrNull()?.chatId
+            meetingsAdapter.submitList(items) {
+                if (currentFirstChat != items.firstOrNull()?.chatId) {
+                    binding.list.smoothScrollToPosition(0)
+                }
+            }
+            if (items.isNullOrEmpty()) {
+                val searchQueryEmpty = viewModel.isSearchQueryEmpty()
+                binding.viewEmpty.isVisible = searchQueryEmpty
+                binding.viewEmptySearch.root.isVisible = !searchQueryEmpty
+            } else {
+                binding.viewEmpty.isVisible = false
+                binding.viewEmptySearch.root.isVisible = false
+            }
         }
     }
 
@@ -93,6 +104,19 @@ class MeetingListFragment : Fragment() {
     fun setSearchQuery(query: String?) {
         viewModel.setSearchQuery(query)
         viewModel.signalChatPresence()
+    }
+
+    /**
+     * Check tabs proper elevation given the current RecyclerView's position
+     */
+    private fun checkElevation() {
+        if (binding.list.canScrollVertically(RecyclerView.NO_POSITION)) {
+            (activity as? ManagerActivity?)?.changeAppBarElevation(Util.isDarkMode(context))
+            (parentFragment as? ChatTabsFragment?)?.showElevation(true)
+        } else {
+            (activity as? ManagerActivity?)?.changeAppBarElevation(false)
+            (parentFragment as? ChatTabsFragment?)?.showElevation(false)
+        }
     }
 
     private fun onItemClick(chatId: Long) {

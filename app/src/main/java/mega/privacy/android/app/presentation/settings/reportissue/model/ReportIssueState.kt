@@ -10,7 +10,6 @@ package mega.privacy.android.app.presentation.settings.reportissue.model
  * @property error string resource id for on screen error
  * @property result string resource id for result text
  * @property uploadProgress progress of the log upload
- * @property navigationRequested true if navigation request needs to be handled
  * @constructor Create empty Report issue state
  */
 data class ReportIssueState(
@@ -21,5 +20,4 @@ data class ReportIssueState(
     val error: Int? = null,
     val result: SubmitIssueResult? = null,
     val uploadProgress: Float? = null,
-    val navigationRequested: Boolean = false,
 )

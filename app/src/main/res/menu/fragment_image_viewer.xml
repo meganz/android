@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="AlwaysShowAction">
+
+    <item
+        android:id="@+id/action_slideshow"
+        android:icon="@drawable/ic_slideshow"
+        android:orderInCategory="100"
+        android:title="@string/action_slideshow"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_forward"
+        android:icon="@drawable/ic_forward"
+        android:orderInCategory="100"
+        android:title="@string/forward_menu_item"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_social_share_white"
+        android:orderInCategory="100"
+        android:title="@string/general_share"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_download"
+        android:icon="@drawable/ic_download_white"
+        android:orderInCategory="110"
+        android:title="@string/general_save_to_device"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_get_link"
+        android:icon="@drawable/link_ic_white"
+        android:orderInCategory="130"
+        android:title="@{@plurals/get_links(one)}"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_send_to_chat"
+        android:icon="@drawable/ic_send_to_contact"
+        android:orderInCategory="140"
+        android:title="@string/context_send_file_to_chat"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_more"
+        android:icon="@drawable/ic_dots_vertical_white"
+        android:orderInCategory="150"
+        android:title="@string/label_more"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+</menu>

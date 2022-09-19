@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.database.Cursor
 import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.WifiLock
 import android.os.BatteryManager
@@ -56,15 +57,15 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
+import mega.privacy.android.app.sync.BackupState
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.isActive
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.onUploadSuccess
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.reportUploadFinish
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.reportUploadInterrupted
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.startActiveHeartbeat
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.stopActiveHeartbeat
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryBackupState
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryBackupState
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryFolderBackupState
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryFolderBackupState
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
@@ -79,6 +80,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback
+import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -199,8 +201,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
          */
         const val CU_CACHE_FOLDER = "cu"
 
-        private var PAGE_SIZE = 200
-        private var PAGE_SIZE_VIDEO = 10
         private var ignoreAttr = false
         private var running = false
 
@@ -473,11 +473,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var createFolderListener: CreateFolderListener? = null
     private val cuTransfers: MutableList<MegaTransfer> = mutableListOf()
 
-    private class Media {
-        var filePath: String? = null
-        var timestamp: Long = 0
-    }
-
     private val pauseReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             @Suppress("DEPRECATION")
@@ -543,8 +538,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         // Camera Upload process is running, but interrupted.
         if (isActive()) {
             // Update backups' state.
-            updatePrimaryBackupState(CameraUploadSyncManager.State.CU_SYNC_STATE_TEMPORARY_DISABLED)
-            updateSecondaryBackupState(CameraUploadSyncManager.State.CU_SYNC_STATE_TEMPORARY_DISABLED)
+            updatePrimaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
+            updateSecondaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
             // Send failed heartbeat.
             reportUploadInterrupted()
         }
@@ -711,187 +706,167 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         filesFromMediaStore()
     }
 
-    private fun extractMedia(cursor: Cursor, parentPath: String?): Queue<Media> {
-        val queuedMedia: Queue<Media> = LinkedList()
-        try {
-            @Suppress("DEPRECATION")
-            val dataColumn = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
-            var modifiedColumn = 0
-            var addedColumn = 0
-            if (cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED) != -1) {
-                modifiedColumn = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED)
-            }
-            if (cursor.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED) != -1) {
-                addedColumn = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED)
-            }
-            while (cursor.moveToNext()) {
-                val media = Media()
-                media.filePath = cursor.getString(dataColumn)
-                val addedTime = cursor.getLong(addedColumn) * 1000
-                val modifiedTime = cursor.getLong(modifiedColumn) * 1000
-                media.timestamp = max(addedTime, modifiedTime)
-                Timber.d("Extract from cursor, add time: %d, modify time: %d, chosen time: %d",
-                    addedTime,
-                    modifiedTime,
-                    media.timestamp)
-                val isFileValid =
-                    media.filePath != null && !parentPath.isNullOrBlank()
-                            && media.filePath!!.startsWith(parentPath)
-                if (isFileValid) {
-                    queuedMedia.add(media)
+    private fun isFilePathValid(media: CameraUploadMedia, parentPath: String?) =
+        media.filePath != null && !parentPath.isNullOrBlank()
+                && media.filePath!!.startsWith(parentPath)
+
+    private fun getUploadMediaFromCursor(
+        cursor: Cursor,
+        dataColumn: Int,
+        addedColumn: Int,
+        modifiedColumn: Int,
+    ): CameraUploadMedia {
+        val filePath = cursor.getString(dataColumn)
+        val addedTime = cursor.getLong(addedColumn) * 1000
+        val modifiedTime = cursor.getLong(modifiedColumn) * 1000
+        val timestamp = max(addedTime, modifiedTime)
+        val media = CameraUploadMedia(filePath = filePath, timestamp = timestamp)
+        Timber.d("Extract from cursor, add time: $addedTime, modify time: $modifiedTime, chosen time: $timestamp")
+        return media
+    }
+
+    private fun extractMedia(cursor: Cursor, parentPath: String?): Queue<CameraUploadMedia> {
+        return LinkedList<CameraUploadMedia>().apply {
+            try {
+                @Suppress("DEPRECATION")
+                val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+                val addedColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED)
+                val modifiedColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED)
+                while (cursor.moveToNext()) {
+                    getUploadMediaFromCursor(cursor,
+                        dataColumn,
+                        addedColumn,
+                        modifiedColumn).takeIf {
+                        isFilePathValid(it, parentPath)
+                    }?.let(this::add)
                 }
+            } catch (exception: Exception) {
+                Timber.e(exception)
             }
-        } catch (exception: Exception) {
-            Timber.e(exception)
         }
-        return queuedMedia
+    }
+
+    private fun buildMediaQueue(
+        uri: Uri,
+        parentPath: String?,
+        pageSize: Int,
+        selectionQuery: String?,
+    ): Queue<CameraUploadMedia> =
+        createMediaCursor(parentPath, selectionQuery, pageSize, uri)?.let {
+            Timber.d("Extract ${it.count} Media from Cursor")
+            extractMedia(it, parentPath)
+        } ?: LinkedList<CameraUploadMedia>().also {
+            Timber.d("Extract 0 Media - Cursor is NULL")
+        }
+
+    private fun createMediaCursor(
+        parentPath: String?,
+        selectionQuery: String?,
+        pageSize: Int,
+        uri: Uri,
+    ): Cursor? {
+        val projection = getProjection()
+        val mediaOrder = MediaStore.MediaColumns.DATE_MODIFIED + " ASC "
+        return if (shouldPageCursor(parentPath)) {
+            mediaOrder.getPagedMediaCursor(selectionQuery, pageSize, uri, projection)
+        } else {
+            app?.contentResolver?.query(uri, projection, selectionQuery, null, mediaOrder)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun getProjection() = arrayOf(
+        MediaStore.MediaColumns.DATA,
+        MediaStore.MediaColumns.DATE_ADDED,
+        MediaStore.MediaColumns.DATE_MODIFIED
+    )
+
+    /**
+     *  Only paging for files in internal storage
+     *  Files on SD card usually have the same timestamp (the time when the SD is loaded)
+     */
+    private fun shouldPageCursor(parentPath: String?) =
+        !SDCardUtils.isLocalFolderOnSDCard(this, parentPath)
+
+    private fun String.getPagedMediaCursor(
+        selectionQuery: String?,
+        pageSize: Int,
+        uri: Uri,
+        projection: Array<String>,
+    ): Cursor? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val args = Bundle()
+            args.putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, this)
+            args.putString(ContentResolver.QUERY_ARG_OFFSET, "0")
+            args.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selectionQuery)
+            args.putString(ContentResolver.QUERY_ARG_SQL_LIMIT, pageSize.toString())
+            app?.contentResolver?.query(uri, projection, args, null)
+        } else {
+            val mediaOrderPreR = "$this LIMIT 0,$pageSize"
+            app?.contentResolver?.query(uri, projection, selectionQuery, null, mediaOrderPreR)
+        }
     }
 
     private suspend fun filesFromMediaStore() {
-        Timber.d("Get pending files from media store database.")
+        Timber.d("Get Pending Files from Media Store Database")
         cameraUploadNode = megaApi?.getNodeByHandle(cameraUploadHandle)
         if (cameraUploadNode == null) {
-            Timber.d("ERROR: primary parent folder is null.")
+            Timber.d("ERROR: Primary Parent Folder is NULL")
             finish()
             return
         }
         val secondaryEnabled = isSecondaryFolderEnabled()
         if (secondaryEnabled) {
-            Timber.d("Secondary upload is enabled.")
+            Timber.d("Secondary Upload is ENABLED")
             secondaryUploadNode = megaApi?.getNodeByHandle(secondaryUploadHandle)
         }
 
-        val primaryPhotos: Queue<Media> = LinkedList()
-        val primaryVideos: Queue<Media> = LinkedList()
-        val secondaryPhotos: Queue<Media> = LinkedList()
-        val secondaryVideos: Queue<Media> = LinkedList()
+        val primaryPhotos: Queue<CameraUploadMedia> = LinkedList()
+        val primaryVideos: Queue<CameraUploadMedia> = LinkedList()
+        val secondaryPhotos: Queue<CameraUploadMedia> = LinkedList()
+        val secondaryVideos: Queue<CameraUploadMedia> = LinkedList()
 
-        @Suppress("DEPRECATION") val projection = arrayOf(
-            MediaStore.MediaColumns.DATA,
-            MediaStore.MediaColumns.DATE_ADDED,
-            MediaStore.MediaColumns.DATE_MODIFIED
-        )
-
-        val selectionPrimaryPhoto = selectionQuery(SyncTimeStamp.PRIMARY_PHOTO)
-        val selectionPrimaryVideo = selectionQuery(SyncTimeStamp.PRIMARY_VIDEO)
-        val selectionSecondaryPhoto = selectionQuery(SyncTimeStamp.SECONDARY_PHOTO)
-        val selectionSecondaryVideo = selectionQuery(SyncTimeStamp.SECONDARY_VIDEO)
-
+        val pageSize = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) 1000 else 400
+        val pageSizeVideo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) 50 else 10
         val uris = getSyncFileUploadUris()
-        val cameraLocalPath = localPath()
 
-        for (i in uris.indices) {
-            val uri = uris[i]
-            val isVideo =
-                uri == MediaStore.Video.Media.EXTERNAL_CONTENT_URI || uri == MediaStore.Video.Media.INTERNAL_CONTENT_URI
-
-            //Primary Media Folder
-            var cursorPrimary: Cursor?
-            var orderVideo = MediaStore.MediaColumns.DATE_MODIFIED + " ASC "
-            var orderImage = MediaStore.MediaColumns.DATE_MODIFIED + " ASC "
-
-            // Only paging for files in internal storage, because files on SD card usually have same timestamp(the time when the SD is loaded).
-            val shouldPagingPrimary = !SDCardUtils.isLocalFolderOnSDCard(this, cameraLocalPath)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && shouldPagingPrimary) {
-                val args = Bundle()
-                args.putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, orderVideo)
-                args.putString(ContentResolver.QUERY_ARG_OFFSET, "0")
-                if (isVideo) {
-                    args.putString(ContentResolver.QUERY_ARG_SQL_SELECTION,
-                        selectionPrimaryVideo)
-                    args.putString(ContentResolver.QUERY_ARG_SQL_LIMIT, PAGE_SIZE_VIDEO.toString())
-                } else {
-                    args.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selectionPrimaryPhoto)
-                    args.putString(ContentResolver.QUERY_ARG_SQL_LIMIT, PAGE_SIZE.toString())
+        for (uri in uris) {
+            if (uri == MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                || uri == MediaStore.Images.Media.INTERNAL_CONTENT_URI
+            ) {
+                // Photos
+                primaryPhotos.addAll(
+                    buildMediaQueue(uri,
+                        localPath(),
+                        pageSize,
+                        selectionQuery(SyncTimeStamp.PRIMARY_PHOTO))
+                )
+                if (secondaryEnabled) {
+                    secondaryPhotos.addAll(
+                        buildMediaQueue(uri,
+                            localPathSecondary(),
+                            pageSize,
+                            selectionQuery(SyncTimeStamp.SECONDARY_PHOTO))
+                    )
                 }
-                cursorPrimary = app?.contentResolver?.query(uri, projection, args, null)
-            } else {
-                if (shouldPagingPrimary) {
-                    orderVideo = "$orderVideo LIMIT 0,$PAGE_SIZE_VIDEO"
-                    orderImage = "$orderImage LIMIT 0,$PAGE_SIZE"
-                }
-                cursorPrimary = if (isVideo) {
-                    app?.contentResolver?.query(uri,
-                        projection,
-                        selectionPrimaryVideo,
-                        null,
-                        orderVideo)
-                } else {
-                    app?.contentResolver?.query(uri,
-                        projection,
-                        selectionPrimaryPhoto,
-                        null,
-                        orderImage)
-                }
-            }
-            if (cursorPrimary != null) {
-                Timber.d("Extract %d media from cursor, is secondary: %s, is video: %s",
-                    cursorPrimary.count,
-                    false,
-                    isVideo)
-                val parentPath = localPath()
-                if (!isVideo) {
-                    primaryPhotos.addAll(extractMedia(cursorPrimary, parentPath))
-                } else {
-                    primaryVideos.addAll(extractMedia(cursorPrimary, parentPath))
-                }
-            }
-
-            //Secondary Media Folder
-            if (secondaryEnabled) {
-                Timber.d("Secondary is enabled.")
-                var cursorSecondary: Cursor?
-                var orderVideoSecondary = MediaStore.MediaColumns.DATE_MODIFIED + " ASC "
-                var orderImageSecondary = MediaStore.MediaColumns.DATE_MODIFIED + " ASC "
-                val shouldPagingSecondary =
-                    !SDCardUtils.isLocalFolderOnSDCard(this, localPathSecondary())
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && shouldPagingSecondary) {
-                    val args = Bundle()
-                    args.putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, orderVideo)
-                    args.putString(ContentResolver.QUERY_ARG_OFFSET, "0")
-                    if (isVideo) {
-                        args.putString(ContentResolver.QUERY_ARG_SQL_SELECTION,
-                            selectionSecondaryVideo)
-                        args.putString(ContentResolver.QUERY_ARG_SQL_LIMIT,
-                            PAGE_SIZE_VIDEO.toString())
-                    } else {
-                        args.putString(ContentResolver.QUERY_ARG_SQL_SELECTION,
-                            selectionSecondaryPhoto)
-                        args.putString(ContentResolver.QUERY_ARG_SQL_LIMIT, PAGE_SIZE.toString())
-                    }
-                    cursorSecondary = app?.contentResolver?.query(uri, projection, args, null)
-                } else {
-                    if (shouldPagingSecondary) {
-                        orderVideoSecondary = "$orderVideoSecondary LIMIT 0,$PAGE_SIZE_VIDEO"
-                        orderImageSecondary = "$orderImageSecondary LIMIT 0,$PAGE_SIZE"
-                    }
-                    cursorSecondary = if (isVideo) {
-                        app?.contentResolver?.query(uri,
-                            projection,
-                            selectionSecondaryVideo,
-                            null,
-                            orderVideoSecondary)
-                    } else {
-                        app?.contentResolver?.query(uri,
-                            projection,
-                            selectionSecondaryPhoto,
-                            null,
-                            orderImageSecondary)
-                    }
-                }
-                if (cursorSecondary != null) {
-                    Timber.d("Extract %d media from cursor, is secondary: %s, is video: %s",
-                        cursorSecondary.count,
-                        true,
-                        isVideo)
-                    val parentPath = localPathSecondary()
-                    if (!isVideo) {
-                        secondaryPhotos.addAll(extractMedia(cursorSecondary, parentPath))
-                    } else {
-                        secondaryVideos.addAll(extractMedia(cursorSecondary, parentPath))
-                    }
+            } else if (uri == MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                || uri == MediaStore.Video.Media.INTERNAL_CONTENT_URI
+            ) {
+                // Videos
+                primaryVideos.addAll(
+                    buildMediaQueue(uri,
+                        localPath(),
+                        pageSizeVideo,
+                        selectionQuery(SyncTimeStamp.PRIMARY_VIDEO))
+                )
+                if (secondaryEnabled) {
+                    secondaryVideos.addAll(
+                        buildMediaQueue(uri,
+                            localPathSecondary(),
+                            pageSizeVideo,
+                            selectionQuery(SyncTimeStamp.SECONDARY_VIDEO))
+                    )
                 }
             }
         }
@@ -905,10 +880,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     private suspend fun prepareUpload(
-        primaryPhotos: Queue<Media>,
-        primaryVideos: Queue<Media>,
-        secondaryPhotos: Queue<Media>,
-        secondaryVideos: Queue<Media>,
+        primaryPhotos: Queue<CameraUploadMedia>,
+        primaryVideos: Queue<CameraUploadMedia>,
+        secondaryPhotos: Queue<CameraUploadMedia>,
+        secondaryVideos: Queue<CameraUploadMedia>,
         secondaryEnabled: Boolean,
     ) {
         Timber.d("\nPrimary photo count from media store database: %d\nSecondary photo count from media store database: %d\nPrimary video count from media store database: %d\nSecondary video count from media store database: %d",
@@ -949,8 +924,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         updateTimeStamp(null, SyncTimeStamp.SECONDARY_VIDEO)
 
         // Reset backup state as active.
-        updatePrimaryBackupState(CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE)
-        updateSecondaryBackupState(CameraUploadSyncManager.State.CU_SYNC_STATE_ACTIVE)
+        updatePrimaryFolderBackupState(BackupState.ACTIVE)
+        updateSecondaryFolderBackupState(BackupState.ACTIVE)
 
         val finalList = getPendingSyncRecords()
         if (finalList.isEmpty()) {
@@ -1197,7 +1172,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     private suspend fun getPendingList(
-        mediaList: Queue<Media>,
+        mediaList: Queue<CameraUploadMedia>,
         isSecondary: Boolean,
         isVideo: Boolean,
     ): List<SyncRecord> {
@@ -1318,8 +1293,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             MegaApplication.setLoggingIn(true)
             // TODO Remove DbHandler and Refactor in MegaApi dependency removal with use cases:
             // GetSession, FastLogin, InitMegaChat (already provided)
-            megaApi?.fastLogin(tempDbHandler.credentials.session, this)
-            ChatUtil.initMegaChatApi(tempDbHandler.credentials.session)
+            megaApi?.fastLogin(tempDbHandler.credentials?.session, this)
+            ChatUtil.initMegaChatApi(tempDbHandler.credentials?.session)
             return LOGIN_IN
         }
         cameraUploadHandle = CameraUploadUtil.getPrimaryFolderHandle()
@@ -1466,14 +1441,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         running = true
         @Suppress("DEPRECATION")
         handler = Handler()
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            PAGE_SIZE = 1000
-            PAGE_SIZE_VIDEO = 50
-        } else {
-            PAGE_SIZE = 400
-            PAGE_SIZE_VIDEO = 10
-        }
 
         megaApi = app?.megaApi
         megaApiFolder = app?.megaApiFolder

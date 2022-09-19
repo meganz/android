@@ -83,6 +83,7 @@ class WebViewActivity : BaseActivity() {
             setLayerType(LAYER_TYPE_HARDWARE, null)
 
             webViewClient = object : WebViewClient() {
+                @Deprecated("Deprecated in Java")
                 override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                     view.loadUrl(url)
                     return true

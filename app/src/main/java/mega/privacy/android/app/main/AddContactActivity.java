@@ -142,6 +142,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
+    @Inject
+    DatabaseHandler dbH;
 
     private static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
     public static final String EXTRA_MEGA_CONTACTS = "mega_contacts";
@@ -156,7 +158,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     public static final String EXTRA_ONLY_CREATE_GROUP = "onlyCreateGroup";
 
     private DisplayMetrics outMetrics;
-    private DatabaseHandler dbH = null;
+
     private int contactType = 0;
     // Determine if open this page from meeting
     private boolean isFromMeeting;
@@ -1598,7 +1600,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
         checkChatChanges();
 
-        dbH = DatabaseHandler.getDbHandler(this);
         setContentView(R.layout.activity_add_contact);
 
         tB = (Toolbar) findViewById(R.id.add_contact_toolbar);
@@ -1690,7 +1691,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerViewList = (RecyclerView) findViewById(R.id.add_contact_list);
         recyclerViewList.setClipToPadding(false);
-        recyclerViewList.setHasFixedSize(true);
         recyclerViewList.addOnItemTouchListener(this);
         recyclerViewList.setItemAnimator(new DefaultItemAnimator());
         fastScroller.setRecyclerView(recyclerViewList);
@@ -1771,7 +1771,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         newGroupHeaderList = (TextView) findViewById(R.id.new_group_text_header_list);
         newGroupRecyclerView = (RecyclerView) findViewById(R.id.new_group_add_contact_list);
         newGroupRecyclerView.setClipToPadding(false);
-        newGroupRecyclerView.setHasFixedSize(true);
         newGroupRecyclerView.addOnItemTouchListener(this);
         newGroupRecyclerView.setItemAnimator(new DefaultItemAnimator());
         newGrouplinearLayoutManager = new LinearLayoutManager(this);
@@ -2541,18 +2540,22 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     String name = cursor.getString(1);
 
                     String emailAddress = null;
-                    Cursor cursore = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                    Cursor cursor2 = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
                             null,
                             ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
                             new String[]{String.valueOf(id)},
                             ContactsContract.Contacts.SORT_KEY_PRIMARY);
 
-                    if (cursore != null && cursore.moveToFirst()) {
-                        emailAddress = cursore.getString(cursore.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-                        cursore.close();
+                    if (cursor2 != null && cursor2.moveToFirst()) {
+                        try {
+                            emailAddress = cursor2.getString(cursor2.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Email.DATA));
+                        } catch (IllegalArgumentException exception) {
+                            Timber.w(exception, "Exception getting contact email");
+                        }
+                        cursor2.close();
                     }
 
-                    if (emailAddress != null && !emailAddress.isEmpty() && emailAddress.contains("@") && !emailAddress.contains("s.whatsapp.net")) {
+                    if (emailAddress != null && emailAddress.contains("@") && !emailAddress.contains("s.whatsapp.net")) {
                         contactList.add(new PhoneContactInfo(id, name, emailAddress, null));
                     }
                 }

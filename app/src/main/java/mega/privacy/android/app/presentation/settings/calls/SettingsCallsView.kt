@@ -23,8 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.calls.model.SettingsCallsState
-import mega.privacy.android.app.presentation.theme.AndroidTheme
-import mega.privacy.android.app.presentation.theme.Typography
+import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.presentation.theme.Typography
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 
 @Composable

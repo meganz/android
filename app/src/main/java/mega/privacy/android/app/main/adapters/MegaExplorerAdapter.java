@@ -49,7 +49,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -83,8 +82,6 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
     ArrayList<Integer> imageIds;
     ArrayList<String> names;
     ArrayList<MegaNode> nodes;
-
-    DatabaseHandler dbH = null;
 
     Object fragment;
 
@@ -188,8 +185,6 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
-
-        dbH = DatabaseHandler.getDbHandler(context);
 
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();

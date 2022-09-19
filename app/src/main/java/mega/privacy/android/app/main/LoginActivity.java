@@ -5,7 +5,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE;
 import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.presentation.settings.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
 import static mega.privacy.android.app.utils.Constants.ACTION_CANCEL_CAM_SYNC;
 import static mega.privacy.android.app.utils.Constants.ACTION_CANCEL_DOWNLOAD;
 import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_TRANSFER;
@@ -54,6 +54,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -93,6 +95,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
 
     public String accountBlocked = null;
 
+    @Inject
     DatabaseHandler dbH;
 
     Handler handler = new Handler();
@@ -181,7 +184,6 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
         scaleW = getScaleW(outMetrics, density);
         scaleH = getScaleH(outMetrics, density);
 
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         if (megaApi == null) {
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
         }

@@ -129,6 +129,8 @@ public class UploadService extends Service {
     GetGlobalTransferUseCase getGlobalTransferUseCase;
     @Inject
     TransfersManagement transfersManagement;
+    @Inject
+    DatabaseHandler dbH;
 
     private boolean isForeground = false;
     private boolean canceled;
@@ -139,7 +141,7 @@ public class UploadService extends Service {
 
     private WifiLock lock;
     private WakeLock wl;
-    private DatabaseHandler dbH = null;
+
 
     private Notification.Builder mBuilder;
     private NotificationCompat.Builder mBuilderCompat;
@@ -183,7 +185,6 @@ public class UploadService extends Service {
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
         mapProgressFileTransfers = new HashMap<>();
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         isForeground = false;
         canceled = false;
         isOverquota = NOT_OVERQUOTA_STATE;
@@ -759,8 +760,9 @@ public class UploadService extends Service {
                     String appData = transfer.getAppData();
 
                     if (!isTextEmpty(appData) && appData.contains(APP_DATA_TXT_FILE)) {
+                        String message = getCreationOrEditorText(appData, error.getErrorCode() == MegaError.API_OK);
                         sendBroadcast(new Intent(BROADCAST_ACTION_SHOW_SNACKBAR)
-                                .putExtra(SNACKBAR_TEXT, getCreationOrEditorText(transfer, error)));
+                                .putExtra(SNACKBAR_TEXT, message));
                     }
 
                     if (transfer.getState() == MegaTransfer.STATE_FAILED) {

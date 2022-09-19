@@ -29,4 +29,9 @@ interface NotificationsRepository {
      * @return list of current user alerts
      */
     suspend fun getUserAlerts(): List<UserAlert>
+
+    /**
+     * Acknowledge user alerts have been seen
+     */
+    suspend fun acknowledgeUserAlerts()
 }

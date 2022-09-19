@@ -1,10 +1,13 @@
 package mega.privacy.android.app.meeting.list.adapter
 
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.drawable.ScalingUtils
+import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemMeetingBinding
 import mega.privacy.android.app.meeting.list.MeetingItem
+import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.setImageRequestFromUri
 
 class MeetingsViewHolder(
@@ -18,6 +21,14 @@ class MeetingsViewHolder(
         binding.txtLastMessage.isVisible = !item.lastMessage.isNullOrBlank()
         binding.imgMute.isVisible = item.isMuted
         binding.imgPrivate.isVisible = !item.isPublic
+        binding.txtUnreadCount.text = item.unreadCount.toString()
+        binding.txtUnreadCount.isVisible = item.unreadCount > 0
+        val lastMessageColor = if (item.highlight) {
+            ContextCompat.getColor(itemView.context, R.color.teal_300_teal_200)
+        } else {
+            getThemeColor(itemView.context, android.R.attr.textColorSecondary)
+        }
+        binding.txtLastMessage.setTextColor(lastMessageColor)
 
         val firstUserPlaceholder = item.firstUser.getImagePlaceholder(itemView.context)
         if (item.isSingleMeeting() || item.lastUser == null) {

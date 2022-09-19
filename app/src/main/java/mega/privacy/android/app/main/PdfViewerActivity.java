@@ -141,6 +141,7 @@ import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaContactRequest;
@@ -169,6 +170,8 @@ public class PdfViewerActivity extends PasscodeActivity
     MoveNodeUseCase moveNodeUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+    @Inject
+    DatabaseHandler dbH;
 
     public ProgressBar progressBar;
 
@@ -181,7 +184,7 @@ public class PdfViewerActivity extends PasscodeActivity
     public ActionBar aB;
     UserCredentials credentials;
     private String lastEmail;
-    DatabaseHandler dbH = null;
+
     boolean isUrl;
     DefaultScrollHandle defaultScrollHandle;
 
@@ -348,10 +351,6 @@ public class PdfViewerActivity extends PasscodeActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
-        }
-
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         }
 
         if (!isOffLine && type != ZIP_ADAPTER) {
@@ -854,6 +853,7 @@ public class PdfViewerActivity extends PasscodeActivity
     }
 
     public void download() {
+        PermissionUtils.checkNotificationsPermission(this);
         if (type == OFFLINE_ADAPTER) {
             MegaOffline node = dbH.findByHandle(handle);
             if (node != null) {
@@ -1353,6 +1353,7 @@ public class PdfViewerActivity extends PasscodeActivity
                     chatC = new ChatController(this);
                 }
                 if (msgChat != null) {
+                    PermissionUtils.checkNotificationsPermission(this);
                     chatC.saveForOffline(msgChat.getMegaNodeList(), megaChatApi.getChatRoom(chatId),
                             true, this);
                 }
@@ -1789,7 +1790,7 @@ public class PdfViewerActivity extends PasscodeActivity
         if (uri.getScheme().equals("content")) {
             try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                    result = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
                 }
             } catch (Exception e) {
                 Timber.w(e, "Exception getting PDF file name.");

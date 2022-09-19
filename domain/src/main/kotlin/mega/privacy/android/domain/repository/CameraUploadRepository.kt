@@ -240,7 +240,7 @@ interface CameraUploadRepository {
      *
      * @return external SD card URI
      */
-    suspend fun getUriExternalSd(): String
+    suspend fun getUriExternalSd(): String?
 
     /**
      * Is secondary media folder enabled
@@ -261,7 +261,7 @@ interface CameraUploadRepository {
      *
      * @return media folder on external SD card URI
      */
-    suspend fun getUriMediaFolderExternalSd(): String
+    suspend fun getUriMediaFolderExternalSd(): String?
 
     /**
      * Get maximum timestamp or null

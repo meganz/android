@@ -1,5 +1,6 @@
 package mega.privacy.android.app.data.gateway
 
+import nz.mega.sdk.MegaNode
 import java.io.File
 
 interface CacheFolderGateway {
@@ -61,4 +62,26 @@ interface CacheFolderGateway {
      * @param folderName Name of the folder
      */
     fun getOldTempFolder(folderName: String): File
+
+    /**
+     * return the avatar file
+     *
+     * @param fileName name of the file
+     */
+    fun buildAvatarFile(fileName: String?): File?
+
+    /**
+     * create a default download location file
+     */
+    suspend fun buildDefaultDownloadDir(): File
+
+    /**
+     * Return node thumbnail file path
+     */
+    fun getThumbnailCacheFilePath(megaNode: MegaNode): String?
+
+    /**
+     * Return node preview file path
+     */
+    fun getPreviewCacheFilePath(megaNode: MegaNode): String?
 }

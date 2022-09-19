@@ -88,7 +88,7 @@ class GetContactRequestsUseCase @Inject constructor(
                             emitter.onNext(requestItems)
                         }
                     } else {
-                        Timber.e(error.toThrowable())
+                        Timber.w(error.toThrowable())
                     }
                 },
                 onRequestTemporaryError = { _, error ->

@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.MegaApplication;
@@ -40,10 +41,10 @@ import timber.log.Timber;
 public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaCompletedTransfersAdapter.ViewHolderTransfer> implements OnClickListener {
 
     private Context context;
-    private ArrayList<AndroidCompletedTransfer> tL;
+    private List<AndroidCompletedTransfer> tL;
     private MegaApiAndroid megaApi;
 
-    public MegaCompletedTransfersAdapter(Context _context, ArrayList<AndroidCompletedTransfer> _transfers) {
+    public MegaCompletedTransfersAdapter(Context _context, List<AndroidCompletedTransfer> _transfers) {
         this.context = _context;
         this.tL = _transfers;
 
@@ -72,7 +73,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
         public TextView speedText;
     }
 
-    public void setTransfers(ArrayList<AndroidCompletedTransfer> transfers) {
+    public void setTransfers(List<AndroidCompletedTransfer> transfers) {
         this.tL = transfers;
         notifyDataSetChanged();
     }
@@ -100,7 +101,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
     @Override
     public void onBindViewHolder(ViewHolderTransfer holder, int position) {
-        holder.currentPosition = position;
+        holder.currentPosition = holder.getBindingAdapterPosition();
 
         AndroidCompletedTransfer transfer = getItem(position);
 

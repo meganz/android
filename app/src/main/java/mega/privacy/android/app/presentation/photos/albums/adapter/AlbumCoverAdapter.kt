@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.databinding.ItemAlbumCoverBinding
-import mega.privacy.android.app.presentation.photos.model.titleId
-import mega.privacy.android.domain.entity.Album
+import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.app.presentation.photos.albums.model.titleId
 
 /**
  * Adapter to show albums grid list.

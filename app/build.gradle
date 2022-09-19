@@ -107,7 +107,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion composeVersion
+        kotlinCompilerExtensionVersion composeCompilerVersion
     }
 
     defaultConfig {
@@ -175,6 +175,7 @@ android {
         qa {
             initWith debug
             debuggable true
+            matchingFallbacks = ['debug', 'release']
         }
     }
 
@@ -188,8 +189,9 @@ android {
 
     kotlinOptions {
         jvmTarget = "11"
-        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
+
 //    task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
 //        workingDir 'src/main/jni'
 //        commandLine './build.sh', 'all'
@@ -260,12 +262,20 @@ android {
         abortOnError false
         xmlOutput = file("build/reports/lint-results.xml")
     }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
 }
 
 dependencies {
     implementation fileTree(dir: "$rootProject.projectDir/sdk/src/main/jni/ExoPlayer/", include: ['*.aar'])
     implementation project(':domain')
     implementation project(':sdk')
+    implementation project(':presentation')
+
+    qaImplementation project(':screenshot')
 
     // App dependencies
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
@@ -404,12 +414,20 @@ dependencies {
     implementation "com.jakewharton.timber:timber:$timberVersion"
 
     // Compose
-    implementation "androidx.compose.compiler:compiler:$composeVersion"
+    implementation "androidx.compose.compiler:compiler:$composeCompilerVersion"
     implementation "androidx.activity:activity-compose:$activityComposeVersion"
     implementation "androidx.compose.material:material:$composeVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$viewModelComposeVersion"
     debugImplementation "androidx.compose.ui:ui-tooling:$composeVersion"
     implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
+
+    // accompanist compose
+    // pager
+    implementation "com.google.accompanist:accompanist-pager:$accompanistVersion"
+    implementation "com.google.accompanist:accompanist-flowlayout:$accompanistLayoutVersion"
+
+    // Coil Compose
+    implementation "io.coil-kt:coil-compose:$coilComposeVersion"
 
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"
@@ -463,20 +481,18 @@ dependencies {
     // Live Data testing
     testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
 
-    //Showkase
-    implementation "com.airbnb.android:showkase-annotation:$showkaseVersion"
+
 
 
     //QA
-    qaImplementation "com.airbnb.android:showkase:$showkaseVersion"
-    kaptQa "com.airbnb.android:showkase-processor:$showkaseVersion"
+
     qaImplementation 'com.google.firebase:firebase-appdistribution:16.0.0-beta03'
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()
 if (taskRequests.contains("Hms")) {
     apply plugin: 'com.huawei.agconnect'
-} else if (taskRequests.contains("Gms")) {
+} else {
     apply plugin: 'com.google.gms.google-services'
 }
 

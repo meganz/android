@@ -170,6 +170,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -196,6 +197,8 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     MoveNodeUseCase moveNodeUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+    @Inject
+    DatabaseHandler dbH;
 
     public static int MAX_WIDTH_FILENAME_LAND = 400;
     public static int MAX_WIDTH_FILENAME_LAND_2 = 400;
@@ -345,8 +348,6 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
     boolean shareIt = true;
     int from;
-
-    DatabaseHandler dbH = null;
 
     AlertDialog permissionsDialog;
 
@@ -580,7 +581,6 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         }
 
         cC = new ContactController(this);
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
         adapterType = getIntent().getIntExtra("adapterType", FILE_BROWSER_ADAPTER);
 
@@ -1059,6 +1059,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 break;
             }
             case R.id.cab_menu_file_info_download: {
+                PermissionUtils.checkNotificationsPermission(this);
                 nodeSaver.saveNode(node, false, false, false, false);
                 break;
             }

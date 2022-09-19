@@ -1,6 +1,5 @@
 package mega.privacy.android.app.meeting.list
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -132,6 +131,20 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             dismissAllowingStateLoss()
         }
 
+        binding.btnClearHistory.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.title_properties_chat_clear)
+                .setMessage(StringResourcesUtils.getString(R.string.confirmation_clear_chat_history))
+                .setPositiveButton(R.string.general_clear) { _, _ ->
+                    viewModel.clearChatHistory(chatId)
+                    dismissAllowingStateLoss()
+                }
+                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                .show()
+        }
+        binding.btnClearHistory.isVisible = meeting.hasPermissions
+        binding.dividerClear.isVisible = meeting.hasPermissions
+
         binding.btnArchive.setOnClickListener {
             viewModel.archiveChat(chatId)
             dismissAllowingStateLoss()
@@ -150,8 +163,9 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
             .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
-            .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave)) { _: DialogInterface?, _: Int ->
+            .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave)) { _, _ ->
                 viewModel.leaveChat(chatId)
+                dismissAllowingStateLoss()
             }
             .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
             .show()

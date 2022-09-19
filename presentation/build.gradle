@@ -13,7 +13,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion composeVersion
+        kotlinCompilerExtensionVersion composeCompilerVersion
     }
 
     defaultConfig {
@@ -24,29 +24,16 @@ android {
         consumerProguardFiles "consumer-rules.pro"
     }
 
-    buildTypes {
-        debug {
-            debuggable true
-        }
-
-        release {}
-
-        qa {
-            initWith debug
-            debuggable true
-        }
-    }
-
     compileOptions {
         // Flag to enable support for the new language APIs
-        coreLibraryDesugaringEnabled true
+//        coreLibraryDesugaringEnabled true
         // Sets Java compatibility to Java 11
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
         jvmTarget = "11"
-        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 }
 
@@ -58,11 +45,12 @@ dependencies {
     implementation "androidx.compose.ui:ui:$composeVersion"
     implementation "androidx.compose.material:material:$composeVersion"
     implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
-    implementation "androidx.compose.compiler:compiler:$composeVersion"
+    implementation "androidx.compose.compiler:compiler:$composeCompilerVersion"
     implementation "androidx.compose.ui:ui-tooling:$composeVersion"
 
     //Showkase
-    implementation "com.airbnb.android:showkase-annotation:$showkaseVersion"
+    implementation "com.airbnb.android:showkase:$showkaseVersion"
+    kapt "com.airbnb.android:showkase-processor:$showkaseVersion"
 
     testImplementation 'junit:junit:4.13.2'
 
