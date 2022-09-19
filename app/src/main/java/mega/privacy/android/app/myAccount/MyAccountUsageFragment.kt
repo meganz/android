@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -133,12 +132,12 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
         binding.cloudStorageText.text = viewModel.getCloudStorage()
 
-        val inboxStorage = viewModel.getInboxStorage()
-        if (inboxStorage.isEmpty()) {
-            binding.inboxStorageContainer.isVisible = false
+        val backupsStorage = viewModel.getBackupsStorage()
+        if (backupsStorage.isEmpty()) {
+            binding.backupsStorageContainer.isVisible = false
         } else {
-            binding.inboxStorageContainer.isVisible = true
-            binding.inboxStorageText.text = inboxStorage
+            binding.backupsStorageContainer.isVisible = true
+            binding.backupsStorageText.text = backupsStorage
         }
 
         binding.incomingStorageText.text = viewModel.getIncomingStorage()

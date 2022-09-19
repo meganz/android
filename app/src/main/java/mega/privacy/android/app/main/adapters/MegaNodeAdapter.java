@@ -17,12 +17,10 @@ import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
 import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
-import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeBackupDeviceInfo;
 import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
 import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderLinkInfo;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getNumberOfFolders;
-import static mega.privacy.android.app.utils.MegaNodeUtil.myBackupHandle;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownDialog;
 import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
@@ -1013,21 +1011,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.imageView.setLayoutParams(params);
 
             holder.textViewFileSize.setVisibility(View.VISIBLE);
-            if (node.getHandle() == myBackupHandle) {
-                ArrayList<MegaNode> subBackupNodes = megaApi.getChildren(node);
-                if (subBackupNodes != null && subBackupNodes.size() > 0) {
-                    int device = getMegaNodeBackupDeviceInfo(subBackupNodes);
-                    holder.textViewFileSize.setText(getQuantityString(R.plurals.num_devices, device, device));
-                } else {
-                    holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
-                            ? getMegaNodeFolderLinkInfo(node)
-                            : getMegaNodeFolderInfo(node));
-                }
-            } else {
-                holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
-                        ? getMegaNodeFolderLinkInfo(node)
-                        : getMegaNodeFolderInfo(node));
-            }
+            holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
+                    ? getMegaNodeFolderLinkInfo(node)
+                    : getMegaNodeFolderInfo(node));
             holder.versionsIcon.setVisibility(View.GONE);
 
             setFolderListSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? DrawerItem.SHARED_ITEMS : DrawerItem.CLOUD_DRIVE));
