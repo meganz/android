@@ -6,6 +6,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.Product
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase
 import mega.privacy.android.app.middlelayer.iab.MegaSku
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -17,8 +18,10 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER
 import nz.mega.sdk.MegaCurrency
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaPricing
 import timber.log.Timber
 import java.nio.charset.StandardCharsets
@@ -64,7 +67,7 @@ class MyAccountInfo @Inject constructor(
     var usedFormatted = ""
     var totalFormatted = ""
     var formattedUsedCloud = ""
-    var formattedUsedInbox = ""
+    var formattedUsedBackups = ""
     var formattedUsedIncoming = ""
     var formattedUsedRubbish = ""
     private var formattedAvailableSpace = ""
@@ -123,7 +126,7 @@ class MyAccountInfo @Inject constructor(
         usedFormatted = ""
         totalFormatted = ""
         formattedUsedCloud = ""
-        formattedUsedInbox = ""
+        formattedUsedBackups = ""
         formattedUsedIncoming = ""
         formattedUsedRubbish = ""
         formattedAvailableSpace = ""
@@ -177,7 +180,6 @@ class MyAccountInfo @Inject constructor(
         if (storage) {
             val totalStorage = accountInfo.storageMax
             val usedCloudDrive: Long
-            val usedInbox: Long
             val usedRubbish: Long
             var usedIncoming: Long = 0
 
@@ -187,10 +189,19 @@ class MyAccountInfo @Inject constructor(
                 formattedUsedCloud = getSizeString(usedCloudDrive)
             }
 
-            if (megaApi.inboxNode != null) {
-                usedInbox = accountInfo.getStorageUsed(megaApi.inboxNode.handle)
-                formattedUsedInbox = if (usedInbox < 1) "" else getSizeString(usedInbox)
-            }
+            // Check the My Backups root folder
+            megaApi.getUserAttribute(USER_ATTR_MY_BACKUPS_FOLDER,
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        if (error.errorCode == MegaError.API_OK) {
+                            // The Backups Root Folder may be null if
+                            // the user has not setup his/her Backups
+                            megaApi.getNodeByHandle(request.nodeHandle)
+                                ?.let { setUsedBackupsStorage(it) }
+                        }
+                    }
+                )
+            )
 
             if (megaApi.rubbishNode != null) {
                 usedRubbish = accountInfo.getStorageUsed(megaApi.rubbishNode.handle)
@@ -249,6 +260,22 @@ class MyAccountInfo @Inject constructor(
 
         isAccountDetailsFinished = true
         Timber.d("LEVELACCOUNTDETAILS: $levelAccountDetails; LEVELINVENTORY: $levelInventory; INVENTORYFINISHED: $isInventoryFinished")
+    }
+
+    /**
+     * Displays the total storage used by the My Backups root folder
+     * @param rootFolder The My Backups root folder which may be nullable
+     */
+    private fun setUsedBackupsStorage(rootFolder: MegaNode) {
+        megaApi.getFolderInfo(rootFolder, OptionalMegaRequestListenerInterface(
+            onRequestFinish = { request, error ->
+                if (error.errorCode == MegaError.API_OK) {
+                    val totalStorage = request.megaFolderInfo.currentSize
+                    formattedUsedBackups =
+                        if (totalStorage < 1) "" else getSizeString(totalStorage)
+                }
+            }
+        ))
     }
 
     /**
