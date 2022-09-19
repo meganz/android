@@ -1,9 +1,10 @@
 package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
-import mega.privacy.android.app.data.gateway.CacheFolderGateway
+import mega.privacy.android.app.data.gateway.CacheGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -23,12 +24,12 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @param megaApiGateway MegaApiGateway
  * @param ioDispatcher CoroutineDispatcher
- * @param cacheFolder CacheFolderGateway
+ * @param cacheGateway CacheGateway
  */
 class DefaultImageRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val cacheFolder: CacheFolderGateway,
+    private val cacheGateway: CacheGateway,
 ) : ImageRepository {
 
     private var thumbnailFolderPath: String? = null
@@ -36,8 +37,12 @@ class DefaultImageRepository @Inject constructor(
     private var previewFolderPath: String? = null
 
     init {
-        thumbnailFolderPath = cacheFolder.getCacheFolder(CacheFolderManager.THUMBNAIL_FOLDER)?.path
-        previewFolderPath = cacheFolder.getCacheFolder(CacheFolderManager.PREVIEW_FOLDER)?.path
+        runBlocking(ioDispatcher) {
+            thumbnailFolderPath =
+                cacheGateway.getOrCreateCacheFolder(CacheFolderManager.THUMBNAIL_FOLDER)?.path
+            previewFolderPath =
+                cacheGateway.getOrCreateCacheFolder(CacheFolderManager.PREVIEW_FOLDER)?.path
+        }
     }
 
     override suspend fun getThumbnailFromLocal(handle: Long): File? =
@@ -49,8 +54,8 @@ class DefaultImageRepository @Inject constructor(
             }
         }
 
-    private fun getThumbnailFile(node: MegaNode): File? =
-        cacheFolder.getCacheFile(CacheFolderManager.THUMBNAIL_FOLDER,
+    private suspend fun getThumbnailFile(node: MegaNode): File? =
+        cacheGateway.getCacheFile(CacheFolderManager.THUMBNAIL_FOLDER,
             "${node.base64Handle}${FileUtil.JPG_EXTENSION}")
 
     override suspend fun getThumbnailFromServer(handle: Long): File? =
@@ -74,8 +79,8 @@ class DefaultImageRepository @Inject constructor(
             }
         }
 
-    private fun getPreviewFile(node: MegaNode): File? =
-        cacheFolder.getCacheFile(CacheFolderManager.PREVIEW_FOLDER,
+    private suspend fun getPreviewFile(node: MegaNode): File? =
+        cacheGateway.getCacheFile(CacheFolderManager.PREVIEW_FOLDER,
             "${node.base64Handle}${FileUtil.JPG_EXTENSION}")
 
     override suspend fun getPreviewFromLocal(handle: Long): File? =
@@ -118,7 +123,7 @@ class DefaultImageRepository @Inject constructor(
         } else {
             megaApiGateway.getThumbnail(
                 node,
-                getThumbnailPath(thumbnailFolderPath!!, node),
+                getThumbnailPath(thumbnailFolderPath ?: return@withContext, node),
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = { _, error ->
                         callback(error.errorCode == MegaError.API_OK)
@@ -138,7 +143,7 @@ class DefaultImageRepository @Inject constructor(
         } else {
             megaApiGateway.getPreview(
                 node,
-                getPreviewPath(previewFolderPath!!, node),
+                getPreviewPath(previewFolderPath ?: return@withContext, node),
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = { _, error ->
                         callback(error.errorCode == MegaError.API_OK)

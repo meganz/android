@@ -1,6 +1,5 @@
 package mega.privacy.android.app.imageviewer
 
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -9,6 +8,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -57,7 +57,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_NEARBY_FILES
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_URI
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
-import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
@@ -66,7 +65,6 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
@@ -289,19 +287,19 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
 
-    private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
-    private val nodeOfflineHandle: Long? by extra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, INVALID_HANDLE)
-    private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
-    private val nodeFileLink: String? by extra(EXTRA_LINK)
-    private val childrenHandles: LongArray? by extra(NODE_HANDLES)
-    private val childrenOfflineHandles: LongArray? by extra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
-    private val childOrder: Int? by extra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN)
-    private val chatRoomId: Long? by extra(INTENT_EXTRA_KEY_CHAT_ID)
-    private val chatMessagesId: LongArray? by extra(INTENT_EXTRA_KEY_MSG_ID)
-    private val imageFileUri: Uri? by extra(INTENT_EXTRA_KEY_URI)
-    private val showNearbyFiles: Boolean? by extra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES)
-    private val showSlideshow: Boolean by extraNotNull(EXTRA_SHOW_SLIDESHOW, false)
-    private val isTimeline: Boolean by extraNotNull(EXTRA_IS_TIMELINE, false)
+    private val nodeHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE) }
+    private val nodeOfflineHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, INVALID_HANDLE) }
+    private val parentNodeHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE) }
+    private val nodeFileLink by lazy { intent.getStringExtra(EXTRA_LINK) }
+    private val childrenHandles by lazy { intent.getLongArrayExtra(NODE_HANDLES) }
+    private val childrenOfflineHandles by lazy { intent.getLongArrayExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE) }
+    private val childOrder by lazy { intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_PHOTO_ASC) }
+    private val chatRoomId by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_CHAT_ID, INVALID_HANDLE) }
+    private val chatMessagesId by lazy { intent.getLongArrayExtra(INTENT_EXTRA_KEY_MSG_ID) }
+    private val imageFileUri by lazy { intent.getParcelableExtra(INTENT_EXTRA_KEY_URI, Uri::class.java) }
+    private val showNearbyFiles by lazy { intent.getBooleanExtra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES, false) }
+    private val showSlideshow by lazy { intent.getBooleanExtra(EXTRA_SHOW_SLIDESHOW, false) }
+    private val isTimeline by lazy { intent.getBooleanExtra(EXTRA_IS_TIMELINE, false) }
     private val isFileVersion by lazy { intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_FILE_VERSION, false) }
 
     private val viewModel by viewModels<ImageViewerViewModel>()
@@ -319,6 +317,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private var nodeSaver: NodeSaver? = null
     private var nodeAttacher: MegaAttacher? = null
     private var dragToExit: DragToExitSupport? = null
+    private var dragStarted: Boolean = false
 
     private lateinit var binding: ActivityImageViewerBinding
 
@@ -337,8 +336,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         if (savedInstanceState == null) {
             if (!Fresco.hasBeenInitialized()) Fresco.initialize(this)
             binding.root.post {
-                dragToExit?.runEnterAnimation(intent, binding.root) { startAnimation ->
-                    changeToolbarVisibility(!startAnimation)
+                dragToExit?.runEnterAnimation(intent, binding.root) { activate ->
+                    viewModel.showToolbar(!activate)
+                    val color = if (activate) android.R.color.transparent else R.color.white_black
+                    binding.imagesNavHostFragment.setBackgroundResource(color)
                 }
             }
         }
@@ -386,30 +387,32 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             when {
                 isTimeline ->
                     viewModel.retrieveImagesFromTimeline(nodeHandle)
-                parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE ->
-                    viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder, nodeHandle)
+                parentNodeHandle != INVALID_HANDLE ->
+                    viewModel.retrieveImagesFromParent(parentNodeHandle, childOrder, nodeHandle)
                 childrenHandles?.isNotEmpty() == true ->
                     viewModel.retrieveImages(childrenHandles!!, nodeHandle)
                 childrenOfflineHandles?.isNotEmpty() == true ->
                     viewModel.retrieveImages(childrenOfflineHandles!!, nodeHandle, isOffline = true)
-                nodeOfflineHandle != null && nodeOfflineHandle != INVALID_HANDLE ->
-                    viewModel.retrieveSingleImage(nodeOfflineHandle!!, isOffline = true)
-                chatRoomId != null && chatMessagesId?.isNotEmpty() == true ->
-                    viewModel.retrieveChatImages(chatRoomId!!, chatMessagesId!!, nodeHandle)
+                nodeOfflineHandle != INVALID_HANDLE && nodeOfflineHandle != INVALID_HANDLE ->
+                    viewModel.retrieveSingleImage(nodeOfflineHandle, isOffline = true)
+                chatRoomId != INVALID_HANDLE && chatMessagesId?.isNotEmpty() == true ->
+                    viewModel.retrieveChatImages(chatRoomId, chatMessagesId!!, nodeHandle)
                 !nodeFileLink.isNullOrBlank() ->
                     viewModel.retrieveSingleImage(nodeFileLink!!)
-                nodeHandle != null && nodeHandle != INVALID_HANDLE ->
-                    viewModel.retrieveSingleImage(nodeHandle!!)
+                nodeHandle != INVALID_HANDLE ->
+                    viewModel.retrieveSingleImage(nodeHandle)
                 imageFileUri != null ->
-                    viewModel.retrieveFileImage(imageFileUri!!,
+                    viewModel.retrieveFileImage(
+                        imageFileUri!!,
                         showNearbyFiles,
-                        imageFileUri.hashCode().toLong())
+                        imageFileUri.hashCode().toLong()
+                    )
                 else ->
                     error("Invalid params")
             }
         }
 
-        viewModel.onShowToolbar().observe(this, ::changeToolbarVisibility)
+        viewModel.onShowToolbar().observe(this, ::animateToolbar)
         viewModel.onSnackBarMessage().observe(this) { message ->
             bottomSheet?.dismissAllowingStateLoss()
             showSnackbar(message)
@@ -445,7 +448,17 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     private fun setupAttachers(savedInstanceState: Bundle?) {
-        dragToExit = DragToExitSupport(this, { changeToolbarVisibility(!it) }) {
+        dragToExit = DragToExitSupport(this, { activate ->
+            if (activate) {
+                dragStarted = true
+                binding.imagesNavHostFragment.setBackgroundResource(android.R.color.transparent)
+                viewModel.showToolbar(false)
+            } else if (dragStarted) {
+                dragStarted = false
+                binding.imagesNavHostFragment.setBackgroundResource(R.color.white_black)
+                viewModel.showToolbar(true)
+            }
+        }) {
             finish()
             overridePendingTransition(0, android.R.anim.fade_out)
         }
@@ -465,14 +478,25 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     /**
      * Change toolbar visibility with animation.
      *
-     * @param show                  Show or hide toolbar/bottombar
+     * @param show  Show or hide toolbar
      */
-    private fun changeToolbarVisibility(show: Boolean) {
-        binding.toolbar.post {
-            val value = if (!show) -binding.toolbar.height.toFloat() else 0f
-            ObjectAnimator.ofFloat(binding.toolbar, "translationY", value).apply {
-                duration = 250
-                start()
+    private fun animateToolbar(show: Boolean) {
+        binding.toolbar.apply {
+            post {
+                val newAlpha: Float
+                val newTranslationY: Float
+                if (show) {
+                    newAlpha = 1f
+                    newTranslationY = 0f
+                } else {
+                    newAlpha = 0f
+                    newTranslationY = -height.toFloat()
+                }
+                animate()
+                    .alpha(newAlpha)
+                    .translationY(newTranslationY)
+                    .setDuration(250)
+                    .start()
             }
         }
     }
@@ -496,11 +520,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         return super.onPrepareOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val imageItem = viewModel.getCurrentImageItem() ?: return true
-        val nodeItem = imageItem.nodeItem ?: return true
-
-        return when (item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
+        when (item.itemId) {
             android.R.id.home -> {
                 onBackPressedDispatcher.onBackPressed()
                 true
@@ -509,23 +530,24 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 getNavController().navigate(ImageViewerFragmentDirections.actionViewerToSlideshow())
                 true
             }
-            R.id.action_forward -> {
-                nodeItem.node?.let(::attachNode)
+            R.id.action_forward, R.id.action_send_to_chat -> {
+                viewModel.getCurrentImageItem()?.nodeItem?.node?.let(::attachNode)
                 true
             }
             R.id.action_share -> {
+                val imageItem = viewModel.getCurrentImageItem()
                 when {
+                    imageItem == null ->
+                        Timber.w("Image Item is null")
                     imageItem is ImageItem.OfflineNode ->
-                        OfflineUtils.shareOfflineNode(this, nodeItem.handle)
+                        OfflineUtils.shareOfflineNode(this, imageItem.nodeItem!!.handle)
                     imageItem.imageResult?.fullSizeUri?.toFile()?.exists() == true ->
                         FileUtil.shareFile(this, imageItem.imageResult!!.fullSizeUri!!.toFile())
                     imageItem is ImageItem.PublicNode ->
                         MegaNodeUtil.shareLink(this, imageItem.nodePublicLink)
                     imageItem.nodeItem?.node != null ->
                         viewModel.exportNode(imageItem.nodeItem!!.node!!).observe(this) { link ->
-                            if (!link.isNullOrBlank()) {
-                                MegaNodeUtil.shareLink(this, link)
-                            }
+                            if (!link.isNullOrBlank()) MegaNodeUtil.shareLink(this, link)
                         }
                     else ->
                         Timber.w("Node cannot be shared")
@@ -533,31 +555,32 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_download -> {
-                viewModel.executeTransfer {
-                    if (nodeItem.isAvailableOffline) {
-                        saveOfflineNode(nodeItem.handle)
-                    } else if (nodeItem.node != null) {
-                        saveNode(nodeItem.node)
+                viewModel.getCurrentImageItem()?.nodeItem?.let { nodeItem ->
+                    viewModel.executeTransfer {
+                        if (nodeItem.isAvailableOffline) {
+                            saveOfflineNode(nodeItem.handle)
+                        } else if (nodeItem.node != null) {
+                            saveNode(nodeItem.node)
+                        }
                     }
                 }
                 true
             }
             R.id.action_get_link -> {
-                LinksUtil.showGetLinkActivity(this, nodeItem.handle)
-                true
-            }
-            R.id.action_send_to_chat -> {
-                nodeItem.node?.let(::attachNode)
+                viewModel.getCurrentImageItem()?.nodeItem?.handle?.let { nodeHandle ->
+                    LinksUtil.showGetLinkActivity(this, nodeHandle)
+                }
                 true
             }
             R.id.action_more -> {
-                bottomSheet = ImageBottomSheetDialogFragment.newInstance(imageItem.id)
-                    .apply { show(supportFragmentManager) }
+                bottomSheet = viewModel.getCurrentImageItem()?.id?.let { itemId ->
+                    ImageBottomSheetDialogFragment.newInstance(itemId)
+                        .apply { show(supportFragmentManager) }
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
 
     fun saveNode(node: MegaNode) {
         PermissionUtils.checkNotificationsPermission(this)
