@@ -25,5 +25,5 @@ data class ContactItem(
     val timestamp: Long,
     val areCredentialsVerified: Boolean,
     val status: UserStatus,
-    val lastSeen: String? = null,
+    val lastSeen: Int? = null,
 ) : Serializable

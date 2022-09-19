@@ -15,7 +15,7 @@ typealias ContactItemMapper = (
     @JvmSuppressWildcards String,
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards Int,
-    @JvmSuppressWildcards String?,
+    @JvmSuppressWildcards Int?,
 ) -> @JvmSuppressWildcards ContactItem
 
 internal fun toContactItem(
@@ -24,7 +24,7 @@ internal fun toContactItem(
     defaultAvatarColor: String,
     areCredentialsVerified: Boolean,
     status: Int,
-    lastSeen: String?,
+    lastSeen: Int?,
 ) = ContactItem(
     handle = user.handle,
     email = user.email,

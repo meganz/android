@@ -1,7 +1,5 @@
 package mega.privacy.android.app.data.repository
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -9,7 +7,6 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.extensions.findItemByHandle
 import mega.privacy.android.app.data.extensions.getDecodedAliases
@@ -30,7 +27,6 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -55,7 +51,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaApiGateway         [MegaApiGateway]
  * @property megaChatApiGateway     [MegaChatApiGateway]
  * @property ioDispatcher           [CoroutineDispatcher]
- * @property context                [Context]
  * @property cacheFolderGateway     [CacheFolderGateway]
  * @property contactRequestMapper   [ContactRequestMapper]
  * @property userLastGreenMapper    [UserLastGreenMapper]
@@ -69,7 +64,6 @@ class DefaultContactsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @ApplicationContext private val context: Context,
     private val cacheFolderGateway: CacheFolderGateway,
     private val contactRequestMapper: ContactRequestMapper,
     private val userLastGreenMapper: UserLastGreenMapper,
@@ -87,7 +81,7 @@ class DefaultContactsRepository @Inject constructor(
 
     override fun monitorChatPresenceLastGreenUpdates() = megaChatApiGateway.chatUpdates
         .filterIsInstance<ChatUpdate.OnChatPresenceLastGreen>()
-        .map { userLastGreenMapper(context, it.userHandle, it.lastGreen) }
+        .map { userLastGreenMapper(it.userHandle, it.lastGreen) }
 
     override suspend fun requestLastGreen(userHandle: Long) {
         megaChatApiGateway.requestLastGreen(userHandle)
@@ -147,12 +141,8 @@ class DefaultContactsRepository @Inject constructor(
                 val status = megaChatApiGateway.getUserOnlineStatus(megaUser.handle)
                 val avatarUri = cacheFolderGateway.getCacheFile(CacheFolderManager.AVATAR_FOLDER,
                     "${megaUser.email}.jpg")?.absolutePath
-                val lastSeen = if (status == MegaChatApi.STATUS_ONLINE) {
-                    context.getFormattedStringOrDefault(R.string.online_status)
-                } else {
-                    megaChatApiGateway.requestLastGreen(megaUser.handle)
-                    null
-                }
+
+                checkLastGreen(status, megaUser.handle)
 
                 val contactData = contactDataMapper(
                     fullName?.ifEmpty { null },
@@ -166,10 +156,22 @@ class DefaultContactsRepository @Inject constructor(
                     megaApiGateway.getUserAvatarColor(megaUser),
                     megaApiGateway.areCredentialsVerified(megaUser),
                     status,
-                    lastSeen
+                    null
                 )
             }
             .sortList()
+    }
+
+    /**
+     * Requests last green if the user is not online.
+     *
+     * @param status User online status.
+     * @param userHandle User handle.
+     */
+    private suspend fun checkLastGreen(status: Int, userHandle: Long) {
+        if (status != MegaChatApi.STATUS_ONLINE) {
+            megaChatApiGateway.requestLastGreen(userHandle)
+        }
     }
 
     override suspend fun getContactData(contactItem: ContactItem): ContactData =
@@ -351,12 +353,7 @@ class DefaultContactsRepository @Inject constructor(
         val fullName = getFullName(megaUser.email)
         val alias = getAlias(megaUser.handle)
         val status = megaChatApiGateway.getUserOnlineStatus(megaUser.handle)
-        val lastSeen = if (status == MegaChatApi.STATUS_ONLINE) {
-            context.getFormattedStringOrDefault(R.string.online_status)
-        } else {
-            megaChatApiGateway.requestLastGreen(megaUser.handle)
-            null
-        }
+        checkLastGreen(status, megaUser.handle)
 
         val contactData = contactDataMapper(
             fullName,
@@ -370,7 +367,7 @@ class DefaultContactsRepository @Inject constructor(
             megaApiGateway.getUserAvatarColor(megaUser),
             megaApiGateway.areCredentialsVerified(megaUser),
             status,
-            lastSeen
+            null
         )
     }
 
