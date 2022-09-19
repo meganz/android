@@ -14,6 +14,7 @@ import mega.privacy.android.app.main.FileContactListActivity;
 import mega.privacy.android.app.main.FileInfoActivity;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
@@ -27,9 +28,19 @@ import androidx.annotation.Nullable;
 
 public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
-    private MegaUser contact = null;
-    private MegaShare share = null;
+    private MegaUser contact;
+    private final MegaShare share;
     private String nonContactEmail;
+    private MegaNode node;
+
+    public FileContactsListBottomSheetDialogFragment(MegaShare share, MegaUser contact, MegaNode node) {
+        this.share = share;
+        this.contact = contact;
+        this.node = node;
+        if (this.contact == null) {
+            nonContactEmail = this.share.getUser();
+        }
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -44,22 +55,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
                     nonContactEmail = email;
                 }
             }
-        } else if (requireActivity() instanceof FileContactListActivity) {
-            share = ((FileContactListActivity) requireActivity()).getSelectedShare();
-            contact = ((FileContactListActivity) requireActivity()).getSelectedContact();
-
-            if (contact == null) {
-                nonContactEmail = share.getUser();
-            }
-        } else if (requireActivity() instanceof FileInfoActivity) {
-            share = ((FileInfoActivity) requireActivity()).getSelectedShare();
-            contact = ((FileInfoActivity) requireActivity()).getSelectedContact();
-
-            if (contact == null) {
-                nonContactEmail = share.getUser();
-            }
         }
-
         return contentView;
     }
 
@@ -81,6 +77,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         titleMailContactPanel.setMaxWidth(scaleWidthPx(200, getResources().getDisplayMetrics()));
 
         View separatorInfo = contentView.findViewById(R.id.separator_info);
+        View separatorChangePermissions = contentView.findViewById(R.id.separator_change_permissions);
 
         String fullName = contact != null ? getMegaUserNameDB(contact) : nonContactEmail;
 
@@ -117,6 +114,12 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
             }
         } else {
             titleMailContactPanel.setText(contact != null ? contact.getEmail() : nonContactEmail);
+        }
+
+        // Disable changing permissions if the node came from Backups
+        if (node != null && megaApi.isInInbox(node)) {
+            optionChangePermissions.setVisibility(View.GONE);
+            separatorChangePermissions.setVisibility(View.GONE);
         }
 
         super.onViewCreated(view, savedInstanceState);

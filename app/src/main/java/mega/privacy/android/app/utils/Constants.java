@@ -287,6 +287,7 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_USER_DATA = "BROADCAST_ACTION_INTENT_UPDATE_USER_DATA";
 
+    public static final String INTENT_EXTRA_KEY_PLACEHOLDER = "placeholder";
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
     public static final String INTENT_EXTRA_KEY_OFFLINE_HANDLE = "INTENT_EXTRA_KEY_OFFLINE_HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
