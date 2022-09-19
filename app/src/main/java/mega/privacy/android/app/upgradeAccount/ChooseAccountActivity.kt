@@ -17,7 +17,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION
 import mega.privacy.android.app.constants.IntentConstants
-import mega.privacy.android.app.databinding.ActivityChooseUpgradeAccountBinding
+import mega.privacy.android.app.databinding.ActivityChooseAccountBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -42,7 +42,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         private const val BILLING_WARNING_SHOWN = "BILLING_WARNING_SHOWN"
     }
 
-    private lateinit var binding: ActivityChooseUpgradeAccountBinding
+    private lateinit var binding: ActivityChooseAccountBinding
     private val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
 
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -70,7 +70,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityChooseUpgradeAccountBinding.inflate(layoutInflater)
+        binding = ActivityChooseAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
