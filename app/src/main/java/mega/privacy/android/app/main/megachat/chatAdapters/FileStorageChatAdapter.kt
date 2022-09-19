@@ -3,11 +3,12 @@ package mega.privacy.android.app.main.megachat.chatAdapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemFileStorageCameraBinding
 import mega.privacy.android.app.databinding.ItemFileStorageImageBinding
-import mega.privacy.android.app.main.megachat.data.FileGalleryItem
+import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
 /**
@@ -21,7 +22,7 @@ class FileStorageChatAdapter(
     private val onClickItemCallback: (FileGalleryItem) -> Unit,
     private val onLongClickItemCallback: (FileGalleryItem) -> Unit,
     private val customLifecycle: LifecycleOwner,
-) : ListAdapter<FileGalleryItem, RecyclerView.ViewHolder>(FileGalleryItem.DiffCallback()) {
+) : ListAdapter<FileGalleryItem, RecyclerView.ViewHolder>(FileGalleryItemDiffCallback()) {
 
     companion object {
         private const val VIEW_TYPE_CAMERA = 0
@@ -95,7 +96,8 @@ class FileStorageChatAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         when (getItemViewType(position)) {
-            VIEW_TYPE_CAMERA -> (holder as FileStorageChatCameraViewHolder).bind(item.hasCameraPermissions ?: false)
+            VIEW_TYPE_CAMERA -> (holder as FileStorageChatCameraViewHolder).bind(item.hasCameraPermissions
+                ?: false)
             else -> (holder as FileStorageChatImageViewHolder).bind(item)
         }
     }
@@ -108,4 +110,16 @@ class FileStorageChatAdapter(
      */
     override fun getItemId(position: Int): Long =
         getItem(position).id
+
+    class FileGalleryItemDiffCallback : DiffUtil.ItemCallback<FileGalleryItem>() {
+
+        override fun areItemsTheSame(oldItem: FileGalleryItem, newItem: FileGalleryItem): Boolean =
+            oldItem.id == newItem.id
+
+        override fun areContentsTheSame(
+            oldItem: FileGalleryItem,
+            newItem: FileGalleryItem,
+        ): Boolean =
+            oldItem == newItem
+    }
 }

@@ -19,7 +19,7 @@ import mega.privacy.android.app.databinding.BottomSheetChatRoomToolbarBinding
 import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActionListener
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.chatAdapters.FileStorageChatAdapter
-import mega.privacy.android.app.main.megachat.data.FileGalleryItem
+import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.Util

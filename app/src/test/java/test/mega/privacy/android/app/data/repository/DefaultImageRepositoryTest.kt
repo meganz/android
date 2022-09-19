@@ -4,12 +4,12 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.gateway.CacheFolderGateway
+import mega.privacy.android.app.data.gateway.CacheGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.repository.DefaultImageRepository
-import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.repository.ImageRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -28,16 +28,16 @@ class DefaultImageRepositoryTest {
     private lateinit var underTest: ImageRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
-    private val cacheFolderGateway = mock<CacheFolderGateway>()
+    private val cacheGateway = mock<CacheGateway>()
 
     private val cacheDir = File("cache")
 
     @Before
     fun setUp() {
         underTest = DefaultImageRepository(
-                megaApiGateway = megaApiGateway,
-                ioDispatcher = UnconfinedTestDispatcher(),
-                cacheFolder = cacheFolderGateway
+            megaApiGateway = megaApiGateway,
+            ioDispatcher = UnconfinedTestDispatcher(),
+            cacheGateway = cacheGateway
         )
     }
 
@@ -52,7 +52,7 @@ class DefaultImageRepositoryTest {
 
             whenever(node.base64Handle).thenReturn(thumbnailName)
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(node)
-            whenever(cacheFolderGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnail)
+            whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnail)
 
             val api = mock<MegaApiJava>()
             val request = mock<MegaRequest>()
@@ -84,7 +84,7 @@ class DefaultImageRepositoryTest {
 
             whenever(node.base64Handle).thenReturn(thumbnailName)
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(node)
-            whenever(cacheFolderGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnail)
+            whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnail)
 
             val api = mock<MegaApiJava>()
             val request = mock<MegaRequest>()
