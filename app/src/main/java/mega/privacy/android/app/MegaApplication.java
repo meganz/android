@@ -1,53 +1,36 @@
 package mega.privacy.android.app;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER_PREFERENCES;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.PRODUCTION_SERVER_VALUE;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.SANDBOX3_SERVER_VALUE;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFromValue;
-import static mega.privacy.android.app.utils.Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION;
 import static mega.privacy.android.app.utils.Constants.ACTION_LOG_OUT;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME;
-import static mega.privacy.android.app.utils.Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
-import static mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS;
-import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
 import static mega.privacy.android.app.utils.DBUtil.callToExtendedAccountDetails;
 import static mega.privacy.android.app.utils.DBUtil.callToPaymentMethods;
 import static mega.privacy.android.app.utils.Util.isSimplifiedChinese;
-import static mega.privacy.android.app.utils.Util.toCDATA;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.app.Activity;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
-import android.os.Handler;
-import android.text.Spanned;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
-import androidx.core.text.HtmlCompat;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.hilt.work.HiltWorkerFactory;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.multidex.MultiDexApplication;
 import androidx.work.Configuration;
 
@@ -59,7 +42,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.webrtc.ContextUtils;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -89,7 +71,6 @@ import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import mega.privacy.android.app.listeners.GlobalListener;
-import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.CallSoundsController;
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
@@ -111,13 +92,10 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
 @HiltAndroidApp
-public class MegaApplication extends MultiDexApplication implements Configuration.Provider {
+public class MegaApplication extends MultiDexApplication implements Configuration.Provider, DefaultLifecycleObserver {
 
     @MegaApi
     @Inject
@@ -227,45 +205,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
         isVerifySMSShowed = isShowed;
     }
 
-
-
-    private final int interval = 3000;
-    private Handler keepAliveHandler = new Handler();
-    int backgroundStatus = -1;
-
-    private Runnable keepAliveRunnable = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                if (activityLifecycleHandler.isActivityVisible()) {
-                    Timber.d("KEEPALIVE: %s", System.currentTimeMillis());
-                    if (megaChatApi != null) {
-                        backgroundStatus = megaChatApi.getBackgroundStatus();
-                        Timber.d("backgroundStatus_activityVisible: %s", backgroundStatus);
-                        if (backgroundStatus != -1 && backgroundStatus != 0) {
-                            megaChatApi.setBackgroundStatus(false);
-                        }
-                    }
-
-                } else {
-                    Timber.d("KEEPALIVEAWAY: %s", System.currentTimeMillis());
-                    if (megaChatApi != null) {
-                        backgroundStatus = megaChatApi.getBackgroundStatus();
-                        Timber.d("backgroundStatus_!activityVisible: %s", backgroundStatus);
-                        if (backgroundStatus != -1 && backgroundStatus != 1) {
-                            megaChatApi.setBackgroundStatus(true);
-                        }
-                    }
-                }
-
-                keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis() + interval);
-                keepAliveHandler.postDelayed(keepAliveRunnable, interval);
-            } catch (Exception exc) {
-                Timber.e(exc, "Exception in keepAliveRunnable");
-            }
-        }
-    };
-
     public void handleUncaughtException(Throwable throwable) {
         Timber.e(throwable, "UNCAUGHT EXCEPTION");
         crashReporter.report(throwable);
@@ -281,6 +220,7 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
         super.onCreate();
 
+        ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
         initialiseLogging();
 
         themeModeState.initialise();
@@ -293,9 +233,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
         registerActivityLifecycleCallbacks(activityLifecycleHandler);
 
         isVerifySMSShowed = false;
-
-        keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis() + interval);
-        keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 
         setupMegaApi();
         setupMegaApiFolder();
@@ -382,6 +319,24 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
         initFresco();
 
+    }
+
+    @Override
+    public void onStart(@NonNull LifecycleOwner owner) {
+        int backgroundStatus = megaChatApi.getBackgroundStatus();
+        Timber.d("Application start with backgroundStatus: %s", backgroundStatus);
+        if (backgroundStatus != -1 && backgroundStatus != 0) {
+            megaChatApi.setBackgroundStatus(false);
+        }
+    }
+
+    @Override
+    public void onStop(@NonNull LifecycleOwner owner) {
+        int backgroundStatus = megaChatApi.getBackgroundStatus();
+        Timber.d("Application stop with backgroundStatus: %s", backgroundStatus);
+        if (backgroundStatus != -1 && backgroundStatus != 1) {
+            megaChatApi.setBackgroundStatus(true);
+        }
     }
 
     private void initialiseLogging() {
