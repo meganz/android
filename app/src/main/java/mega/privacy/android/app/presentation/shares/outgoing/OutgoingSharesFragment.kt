@@ -349,6 +349,15 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             }
             control.selectAll().isVisible = notAllNodesSelected()
             control.trash().isVisible = canMoveToRubbish(selected)
+
+            // If there is at least one Backup folder found, then apply read-only restrictions
+            // for all selected items
+            if (selected.any { node -> megaApi.isInInbox(node) }) {
+                control.rename().isVisible = false
+                control.move().isVisible = false
+                control.trash().isVisible = false
+            }
+
             CloudStorageOptionControlUtil.applyControl(menu, control)
             return true
         }

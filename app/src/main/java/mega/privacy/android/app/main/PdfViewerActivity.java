@@ -258,7 +258,6 @@ public class PdfViewerActivity extends PasscodeActivity
         Timber.d("onCreate");
 
         super.onCreate(savedInstanceState);
-
         Window window = getWindow();
         window.setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
@@ -310,6 +309,13 @@ public class PdfViewerActivity extends PasscodeActivity
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
         type = intent.getIntExtra("adapterType", 0);
         path = intent.getStringExtra("path");
+
+        app = (MegaApplication) getApplication();
+        megaApi = app.getMegaApi();
+        if (isFolderLink) {
+            megaApiFolder = app.getMegaApiFolder();
+        }
+        megaChatApi = app.getMegaChatApi();
 
         if (type == OFFLINE_ADAPTER) {
             isOffLine = true;
@@ -954,14 +960,14 @@ public class PdfViewerActivity extends PasscodeActivity
         MenuItem downloadMenuItem = menu.findItem(R.id.pdf_viewer_download);
         MenuItem chatMenuItem = menu.findItem(R.id.pdf_viewer_chat);
         MenuItem propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties);
-        MenuItem getlinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link);
-        getlinkMenuItem.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
+        MenuItem getLinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link);
+        getLinkMenuItem.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
         MenuItem renameMenuItem = menu.findItem(R.id.pdf_viewer_rename);
         MenuItem moveMenuItem = menu.findItem(R.id.pdf_viewer_move);
         MenuItem copyMenuItem = menu.findItem(R.id.pdf_viewer_copy);
         MenuItem moveToTrashMenuItem = menu.findItem(R.id.pdf_viewer_move_to_trash);
         MenuItem removeMenuItem = menu.findItem(R.id.pdf_viewer_remove);
-        MenuItem removelinkMenuItem = menu.findItem(R.id.pdf_viewer_remove_link);
+        MenuItem removeLinkMenuItem = menu.findItem(R.id.pdf_viewer_remove_link);
         MenuItem importMenuItem = menu.findItem(R.id.chat_pdf_viewer_import);
         MenuItem saveForOfflineMenuItem = menu.findItem(R.id.chat_pdf_viewer_save_for_offline);
         MenuItem chatRemoveMenuItem = menu.findItem(R.id.chat_pdf_viewer_remove);
@@ -970,13 +976,13 @@ public class PdfViewerActivity extends PasscodeActivity
             propertiesMenuItem.setVisible(false);
             chatMenuItem.setVisible(false);
             downloadMenuItem.setVisible(false);
-            getlinkMenuItem.setVisible(false);
+            getLinkMenuItem.setVisible(false);
             renameMenuItem.setVisible(false);
             moveMenuItem.setVisible(false);
             copyMenuItem.setVisible(false);
             moveToTrashMenuItem.setVisible(false);
             removeMenuItem.setVisible(false);
-            removelinkMenuItem.setVisible(false);
+            removeLinkMenuItem.setVisible(false);
             importMenuItem.setVisible(false);
             saveForOfflineMenuItem.setVisible(false);
             chatRemoveMenuItem.setVisible(false);
@@ -993,8 +999,8 @@ public class PdfViewerActivity extends PasscodeActivity
             shareMenuItem.setVisible(showShareOption(type, isFolderLink, handle));
 
             if (type == OFFLINE_ADAPTER) {
-                getlinkMenuItem.setVisible(false);
-                removelinkMenuItem.setVisible(false);
+                getLinkMenuItem.setVisible(false);
+                removeLinkMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(true);
                 downloadMenuItem.setVisible(true);
                 renameMenuItem.setVisible(false);
@@ -1009,8 +1015,8 @@ public class PdfViewerActivity extends PasscodeActivity
             } else if (type == RUBBISH_BIN_ADAPTER
                     || (megaApi.isInRubbish(megaApi.getNodeByHandle(handle)))) {
                 shareMenuItem.setVisible(false);
-                getlinkMenuItem.setVisible(false);
-                removelinkMenuItem.setVisible(false);
+                getLinkMenuItem.setVisible(false);
+                removeLinkMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(true);
                 downloadMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
@@ -1026,11 +1032,11 @@ public class PdfViewerActivity extends PasscodeActivity
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
                 if (node.isExported()) {
-                    removelinkMenuItem.setVisible(true);
-                    getlinkMenuItem.setVisible(false);
+                    removeLinkMenuItem.setVisible(true);
+                    getLinkMenuItem.setVisible(false);
                 } else {
-                    removelinkMenuItem.setVisible(false);
-                    getlinkMenuItem.setVisible(true);
+                    removeLinkMenuItem.setVisible(false);
+                    getLinkMenuItem.setVisible(true);
                 }
 
                 downloadMenuItem.setVisible(true);
@@ -1056,8 +1062,8 @@ public class PdfViewerActivity extends PasscodeActivity
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             } else if (type == FROM_CHAT) {
-                getlinkMenuItem.setVisible(false);
-                removelinkMenuItem.setVisible(false);
+                getLinkMenuItem.setVisible(false);
+                removeLinkMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
                 moveMenuItem.setVisible(false);
@@ -1092,8 +1098,8 @@ public class PdfViewerActivity extends PasscodeActivity
                 }
             } else if (type == FILE_LINK_ADAPTER) {
                 Timber.d("FILE_LINK_ADAPTER");
-                getlinkMenuItem.setVisible(false);
-                removelinkMenuItem.setVisible(false);
+                getLinkMenuItem.setVisible(false);
+                removeLinkMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(false);
                 downloadMenuItem.setVisible(true);
                 renameMenuItem.setVisible(false);
@@ -1109,13 +1115,13 @@ public class PdfViewerActivity extends PasscodeActivity
                 propertiesMenuItem.setVisible(false);
                 chatMenuItem.setVisible(false);
                 downloadMenuItem.setVisible(false);
-                getlinkMenuItem.setVisible(false);
+                getLinkMenuItem.setVisible(false);
                 renameMenuItem.setVisible(false);
                 moveMenuItem.setVisible(false);
                 copyMenuItem.setVisible(false);
                 moveToTrashMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
-                removelinkMenuItem.setVisible(false);
+                removeLinkMenuItem.setVisible(false);
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
@@ -1127,8 +1133,8 @@ public class PdfViewerActivity extends PasscodeActivity
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
-                getlinkMenuItem.setVisible(false);
-                removelinkMenuItem.setVisible(false);
+                getLinkMenuItem.setVisible(false);
+                removeLinkMenuItem.setVisible(false);
                 downloadMenuItem.setVisible(true);
 
                 MegaNode node = megaApi.getNodeByHandle(handle);
@@ -1145,6 +1151,7 @@ public class PdfViewerActivity extends PasscodeActivity
                     }
                     case MegaShare.ACCESS_READ:
                         Timber.d("Access read");
+                        break;
                     case MegaShare.ACCESS_READWRITE: {
                         Timber.d("Access read & write");
                         renameMenuItem.setVisible(false);
@@ -1152,13 +1159,15 @@ public class PdfViewerActivity extends PasscodeActivity
                         moveToTrashMenuItem.setVisible(false);
                         break;
                     }
+                    default:
+                        break;
                 }
             } else if (type == RECENTS_ADAPTER) {
                 MegaNode node = megaApi.getNodeByHandle(handle);
                 chatRemoveMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
-                getlinkMenuItem.setVisible(false);
-                removelinkMenuItem.setVisible(false);
+                getLinkMenuItem.setVisible(false);
+                removeLinkMenuItem.setVisible(false);
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
 
@@ -1179,99 +1188,140 @@ public class PdfViewerActivity extends PasscodeActivity
                         moveToTrashMenuItem.setVisible(true);
                         break;
                     }
+                    default:
+                        break;
                 }
             } else {
-                MegaNode node = megaApi.getNodeByHandle(handle);
-
-                if (node == null) {
-                    getlinkMenuItem.setVisible(false);
-                    removelinkMenuItem.setVisible(false);
-                    propertiesMenuItem.setVisible(false);
-                    downloadMenuItem.setVisible(false);
-                    renameMenuItem.setVisible(false);
-                    moveMenuItem.setVisible(false);
-                    copyMenuItem.setVisible(false);
-                    moveToTrashMenuItem.setVisible(false);
-                    removeMenuItem.setVisible(false);
-                    chatMenuItem.setVisible(false);
-                    importMenuItem.setVisible(false);
-                    saveForOfflineMenuItem.setVisible(false);
-                    chatRemoveMenuItem.setVisible(false);
-                } else {
-                    copyMenuItem.setVisible(true);
-
-                    if (node.isExported()) {
-                        getlinkMenuItem.setVisible(false);
-                        removelinkMenuItem.setVisible(true);
-                    } else if (type == CONTACT_FILE_ADAPTER || isFolderLink || type == VERSIONS_ADAPTER) {
-                        getlinkMenuItem.setVisible(false);
-                        removelinkMenuItem.setVisible(false);
-                    } else {
-                        getlinkMenuItem.setVisible(true);
-                        removelinkMenuItem.setVisible(false);
-                    }
-
-                    if (isFolderLink || type == VERSIONS_ADAPTER) {
-                        propertiesMenuItem.setVisible(false);
-                        moveToTrashMenuItem.setVisible(false);
-                        removeMenuItem.setVisible(false);
-                        renameMenuItem.setVisible(false);
-                        moveMenuItem.setVisible(false);
-                        copyMenuItem.setVisible(false);
-                        chatMenuItem.setVisible(false);
-                    } else {
-                        propertiesMenuItem.setVisible(true);
-
-                        if (type == CONTACT_FILE_ADAPTER) {
-                            removeMenuItem.setVisible(false);
-                            node = megaApi.getNodeByHandle(handle);
-                            int accessLevel = megaApi.getAccess(node);
-                            switch (accessLevel) {
-                                case MegaShare.ACCESS_OWNER:
-                                case MegaShare.ACCESS_FULL: {
-                                    renameMenuItem.setVisible(true);
-                                    moveMenuItem.setVisible(true);
-                                    moveToTrashMenuItem.setVisible(true);
-                                    chatMenuItem.setVisible(true);
-                                    break;
-                                }
-                                case MegaShare.ACCESS_READWRITE:
-                                case MegaShare.ACCESS_READ: {
-                                    renameMenuItem.setVisible(false);
-                                    moveMenuItem.setVisible(false);
-                                    moveToTrashMenuItem.setVisible(false);
-                                    chatMenuItem.setVisible(false);
-                                    break;
-                                }
-                            }
-                        } else {
-                            chatMenuItem.setVisible(true);
-                            renameMenuItem.setVisible(true);
-                            moveMenuItem.setVisible(true);
-
-                            node = megaApi.getNodeByHandle(handle);
-
-                            final long handle = node.getHandle();
-                            MegaNode parent = megaApi.getNodeByHandle(handle);
-
-                            while (megaApi.getParentNode(parent) != null) {
-                                parent = megaApi.getParentNode(parent);
-                            }
-
-                            moveToTrashMenuItem.setVisible(true);
-                            removeMenuItem.setVisible(false);
-                        }
-                    }
-
-                    downloadMenuItem.setVisible(true);
-                    importMenuItem.setVisible(false);
-                    saveForOfflineMenuItem.setVisible(false);
-                    chatRemoveMenuItem.setVisible(false);
-                }
+                setDefaultOptionsToolbar(menu);
             }
         }
 
+        // After establishing the Options menu, check if read-only properties should be applied
+        checkIfShouldApplyReadOnlyState(menu);
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * Checks and applies read-only restrictions (unable to Favourite, Rename, Move, or Move to Rubbish Bin)
+     * on the Options toolbar if the MegaNode is a Backup node.
+     *
+     * @param menu The Options Menu
+     */
+    private void checkIfShouldApplyReadOnlyState(Menu menu) {
+        MegaNode node = megaApi.getNodeByHandle(handle);
+        if (node != null && megaApi.isInInbox(node)) {
+            menu.findItem(R.id.pdf_viewer_rename).setVisible(false);
+            menu.findItem(R.id.pdf_viewer_move).setVisible(false);
+            menu.findItem(R.id.pdf_viewer_move_to_trash).setVisible(false);
+        }
+    }
+
+    /**
+     * Sets up the default items to be displayed on the Toolbar Menu
+     * @param menu Menu object
+     */
+    private void setDefaultOptionsToolbar(Menu menu) {
+        MenuItem downloadMenuItem = menu.findItem(R.id.pdf_viewer_download);
+        MenuItem chatMenuItem = menu.findItem(R.id.pdf_viewer_chat);
+        MenuItem propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties);
+        MenuItem getLinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link);
+        MenuItem renameMenuItem = menu.findItem(R.id.pdf_viewer_rename);
+        MenuItem moveMenuItem = menu.findItem(R.id.pdf_viewer_move);
+        MenuItem copyMenuItem = menu.findItem(R.id.pdf_viewer_copy);
+        MenuItem moveToTrashMenuItem = menu.findItem(R.id.pdf_viewer_move_to_trash);
+        MenuItem removeMenuItem = menu.findItem(R.id.pdf_viewer_remove);
+        MenuItem removeLinkMenuItem = menu.findItem(R.id.pdf_viewer_remove_link);
+        MenuItem importMenuItem = menu.findItem(R.id.chat_pdf_viewer_import);
+        MenuItem saveForOfflineMenuItem = menu.findItem(R.id.chat_pdf_viewer_save_for_offline);
+        MenuItem chatRemoveMenuItem = menu.findItem(R.id.chat_pdf_viewer_remove);
+
+        MegaNode node = megaApi.getNodeByHandle(handle);
+
+        if (node == null) {
+            getLinkMenuItem.setVisible(false);
+            removeLinkMenuItem.setVisible(false);
+            propertiesMenuItem.setVisible(false);
+            downloadMenuItem.setVisible(false);
+            renameMenuItem.setVisible(false);
+            moveMenuItem.setVisible(false);
+            copyMenuItem.setVisible(false);
+            moveToTrashMenuItem.setVisible(false);
+            removeMenuItem.setVisible(false);
+            chatMenuItem.setVisible(false);
+        } else {
+            copyMenuItem.setVisible(true);
+
+            if (node.isExported()) {
+                getLinkMenuItem.setVisible(false);
+                removeLinkMenuItem.setVisible(true);
+            } else if (type == CONTACT_FILE_ADAPTER || isFolderLink || type == VERSIONS_ADAPTER) {
+                getLinkMenuItem.setVisible(false);
+                removeLinkMenuItem.setVisible(false);
+            } else {
+                getLinkMenuItem.setVisible(true);
+                removeLinkMenuItem.setVisible(false);
+            }
+
+        if (isFolderLink || type == VERSIONS_ADAPTER) {
+            propertiesMenuItem.setVisible(false);
+            moveToTrashMenuItem.setVisible(false);
+            removeMenuItem.setVisible(false);
+            renameMenuItem.setVisible(false);
+            moveMenuItem.setVisible(false);
+            copyMenuItem.setVisible(false);
+            chatMenuItem.setVisible(false);
+        } else {
+            propertiesMenuItem.setVisible(true);
+
+            if (type == CONTACT_FILE_ADAPTER) {
+                removeMenuItem.setVisible(false);
+                node = megaApi.getNodeByHandle(handle);
+                int accessLevel = megaApi.getAccess(node);
+                switch (accessLevel) {
+                    case MegaShare.ACCESS_OWNER:
+                    case MegaShare.ACCESS_FULL: {
+                        renameMenuItem.setVisible(true);
+                        moveMenuItem.setVisible(true);
+                        moveToTrashMenuItem.setVisible(true);
+                        chatMenuItem.setVisible(true);
+                        break;
+                    }
+                    case MegaShare.ACCESS_READWRITE:
+                    case MegaShare.ACCESS_READ: {
+                        renameMenuItem.setVisible(false);
+                        moveMenuItem.setVisible(false);
+                        moveToTrashMenuItem.setVisible(false);
+                        chatMenuItem.setVisible(false);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            } else {
+                chatMenuItem.setVisible(true);
+                renameMenuItem.setVisible(true);
+                moveMenuItem.setVisible(true);
+
+                node = megaApi.getNodeByHandle(handle);
+
+                final long handle = node.getHandle();
+                MegaNode parent = megaApi.getNodeByHandle(handle);
+
+                while (megaApi.getParentNode(parent) != null) {
+                    parent = megaApi.getParentNode(parent);
+                }
+
+                moveToTrashMenuItem.setVisible(true);
+                removeMenuItem.setVisible(false);
+            }
+        }
+
+        downloadMenuItem.setVisible(true);
+        }
+        importMenuItem.setVisible(false);
+        saveForOfflineMenuItem.setVisible(false);
+        chatRemoveMenuItem.setVisible(false);
     }
 
     @SuppressLint("NonConstantResourceId")

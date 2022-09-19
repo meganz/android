@@ -285,7 +285,7 @@ class MyAccountViewModel @Inject constructor(
 
     fun getCloudStorage(): String = myAccountInfo.formattedUsedCloud
 
-    fun getInboxStorage(): String = myAccountInfo.formattedUsedInbox
+    fun getBackupsStorage(): String = myAccountInfo.formattedUsedBackups
 
     fun getIncomingStorage(): String = myAccountInfo.formattedUsedIncoming
 
