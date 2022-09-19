@@ -102,8 +102,9 @@ fun StartConversationView(
                 )
             }
         }
-    ) {
-        LazyColumn(state = listState) {
+    ) { paddingValues ->
+        LazyColumn(state = listState,
+            modifier = Modifier.padding(paddingValues)) {
             state.apply {
                 if (buttonsVisible) {
                     if (fromChat) {
