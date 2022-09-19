@@ -3,8 +3,12 @@ package mega.privacy.android.app.meeting.list
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -12,7 +16,10 @@ import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentMeetingListBinding
 import mega.privacy.android.app.main.ManagerActivity
@@ -22,9 +29,10 @@ import mega.privacy.android.app.meeting.list.adapter.MeetingItemDetailsLookup
 import mega.privacy.android.app.meeting.list.adapter.MeetingItemKeyProvider
 import mega.privacy.android.app.meeting.list.adapter.MeetingsAdapter
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
+import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
-import timber.log.Timber
 
 @AndroidEntryPoint
 class MeetingListFragment : Fragment() {
@@ -36,6 +44,7 @@ class MeetingListFragment : Fragment() {
     }
 
     private lateinit var binding: FragmentMeetingListBinding
+    private var actionMode: ActionMode? = null
 
     private val viewModel by viewModels<MeetingListViewModel>()
     private val meetingsAdapter by lazy { MeetingsAdapter(::onItemClick, ::onItemMoreClick) }
@@ -59,7 +68,13 @@ class MeetingListFragment : Fragment() {
         checkElevation()
     }
 
+    override fun onPause() {
+        actionMode?.finish()
+        super.onPause()
+    }
+
     override fun onDestroyView() {
+        meetingsAdapter.tracker?.clearSelection()
         binding.list.clearOnScrollListeners()
         super.onDestroyView()
     }
@@ -87,7 +102,22 @@ class MeetingListFragment : Fragment() {
                     addObserver(object : SelectionTracker.SelectionObserver<Long>() {
                         override fun onSelectionChanged() {
                             super.onSelectionChanged()
-                            Timber.wtf("Selection size: ${selection.size()}")
+                            if (selection.size() > 0) {
+                                if (actionMode == null) {
+                                    actionMode = (activity as? AppCompatActivity?)
+                                        ?.startSupportActionMode(buildActionMode())
+                                } else {
+                                    actionMode?.invalidate()
+                                }
+                                actionMode?.title = selection.size().toString()
+                            } else {
+                                actionMode?.finish()
+                            }
+                        }
+
+                        override fun onSelectionRefresh() {
+                            super.onSelectionRefresh()
+                            actionMode?.invalidate()
                         }
                     })
                 }
@@ -141,6 +171,97 @@ class MeetingListFragment : Fragment() {
             (parentFragment as? ChatTabsFragment?)?.showElevation(false)
         }
     }
+
+    private fun buildActionMode(): ActionMode.Callback =
+        object : ActionMode.Callback {
+            override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+                mode.menuInflater.inflate(R.menu.recent_chat_action, menu)
+                return true
+            }
+
+            override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+                menu.findItem(R.id.cab_menu_delete).isVisible = false // Not implemented
+                menu.findItem(R.id.cab_menu_unarchive).isVisible = false // Not implemented
+
+                val selectedItems = meetingsAdapter.tracker?.selection
+                    ?.map { id -> meetingsAdapter.currentList.first { it.chatId == id } }
+                    ?: return true
+
+                if (selectedItems.size == meetingsAdapter.currentList.size) {
+                    menu.findItem(R.id.cab_menu_select_all).isVisible = false
+                }
+                if (selectedItems.all { it.hasPermissions }) {
+                    menu.findItem(R.id.chat_list_leave_chat_layout).isVisible = true
+                }
+                if (selectedItems.all { it.isMuted }) {
+                    menu.findItem(R.id.cab_menu_unmute).isVisible = true
+                    menu.findItem(R.id.cab_menu_mute).isVisible = false
+                } else if (selectedItems.all { !it.isMuted }) {
+                    menu.findItem(R.id.cab_menu_mute).isVisible = true
+                    menu.findItem(R.id.cab_menu_unmute).isVisible = false
+                } else {
+                    menu.findItem(R.id.cab_menu_mute).isVisible = false
+                    menu.findItem(R.id.cab_menu_unmute).isVisible = false
+                }
+                return true
+            }
+
+            override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+                return when (item.itemId) {
+                    R.id.cab_menu_select_all -> {
+                        val allItems = meetingsAdapter.currentList.map { it.chatId }
+                        meetingsAdapter.tracker?.setItemsSelected(allItems, true)
+                        true
+                    }
+                    R.id.cab_menu_unselect_all -> {
+                        meetingsAdapter.tracker?.clearSelection()
+                        true
+                    }
+                    R.id.cab_menu_mute -> {
+                        val chats = meetingsAdapter.tracker?.selection?.toList() ?: return true
+                        ChatUtil.createMuteNotificationsAlertDialogOfChats(requireActivity(), chats)
+                        meetingsAdapter.tracker?.clearSelection()
+                        true
+                    }
+                    R.id.cab_menu_unmute -> {
+                        meetingsAdapter.tracker?.selection?.forEach { chatId ->
+                            MegaApplication.getPushNotificationSettingManagement()
+                                .controlMuteNotificationsOfAChat(
+                                    requireContext(),
+                                    Constants.NOTIFICATIONS_ENABLED,
+                                    chatId)
+                        }
+                        meetingsAdapter.tracker?.clearSelection()
+                        true
+                    }
+                    R.id.cab_menu_archive -> {
+                        val chatsToArchive = meetingsAdapter.tracker?.selection?.toList() ?: return true
+                        viewModel.archiveChats(chatsToArchive)
+                        meetingsAdapter.tracker?.clearSelection()
+                        true
+                    }
+                    R.id.chat_list_leave_chat_layout -> {
+                        val chatsToLeave = meetingsAdapter.tracker?.selection?.toList() ?: return true
+                        MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                            .setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
+                            .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
+                            .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave)) { _, _ ->
+                                viewModel.leaveChats(chatsToLeave)
+                            }
+                            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                            .show()
+                        meetingsAdapter.tracker?.clearSelection()
+                        true
+                    }
+                    else -> false
+                }
+            }
+
+            override fun onDestroyActionMode(mode: ActionMode) {
+                meetingsAdapter.tracker?.clearSelection()
+                actionMode = null
+            }
+        }
 
     private fun onItemClick(chatId: Long) {
         viewModel.signalChatPresence()
