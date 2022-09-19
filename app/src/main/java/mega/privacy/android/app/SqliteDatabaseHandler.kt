@@ -2397,13 +2397,13 @@ open class SqliteDatabaseHandler(
                             val incoming = cursor.getInt(6)
                             val handleIncoming = decrypt(cursor.getString(7))
                             val offline = MegaOffline(id,
-                                handle,
-                                path,
-                                name,
+                                handle.toString(),
+                                path.toString(),
+                                name.toString(),
                                 parent,
                                 type,
                                 incoming,
-                                handleIncoming)
+                                handleIncoming.toString())
                             listOffline.add(offline)
                         } while (cursor.moveToNext())
                     }
@@ -2478,8 +2478,14 @@ open class SqliteDatabaseHandler(
                     val type = decrypt(cursor.getString(5))
                     val incoming = cursor.getInt(6)
                     val handleIncoming = decrypt(cursor.getString(7))
-                    return MegaOffline(id, nodeHandle, path, name, parent, type, incoming,
-                        handleIncoming)
+                    return MegaOffline(id,
+                        nodeHandle.toString(),
+                        path.toString(),
+                        name.toString(),
+                        parent,
+                        type,
+                        incoming,
+                        handleIncoming.toString())
                 }
             }
         } catch (e: Exception) {
@@ -2506,13 +2512,13 @@ open class SqliteDatabaseHandler(
                         val _incoming = cursor.getInt(6)
                         val _handleIncoming = decrypt(cursor.getString(7))
                         listOffline.add(MegaOffline(_id,
-                            _handle,
-                            _path,
-                            _name,
+                            _handle.toString(),
+                            _path.toString(),
+                            _name.toString(),
                             _parent,
                             _type,
                             _incoming,
-                            _handleIncoming))
+                            _handleIncoming.toString()))
                     } while (cursor.moveToNext())
                 }
             }
@@ -2538,13 +2544,13 @@ open class SqliteDatabaseHandler(
                         val _incoming = cursor.getInt(6)
                         val _handleIncoming = decrypt(cursor.getString(7))
                         offline = MegaOffline(_id,
-                            _handle,
-                            _path,
-                            _name,
+                            _handle.toString(),
+                            _path.toString(),
+                            _name.toString(),
                             _parent,
                             _type,
                             _incoming,
-                            _handleIncoming)
+                            _handleIncoming.toString())
                     } while (cursor.moveToNext())
                 }
             }
@@ -2576,13 +2582,13 @@ open class SqliteDatabaseHandler(
                         val _incoming = cursor.getInt(6)
                         val _handleIncoming = decrypt(cursor.getString(7))
                         listOffline.add(MegaOffline(_id,
-                            _handle,
-                            _path,
-                            _name,
+                            _handle.toString(),
+                            _path.toString(),
+                            _name.toString(),
                             _parent,
                             _type,
                             _incoming,
-                            _handleIncoming))
+                            _handleIncoming.toString()))
                     } while (cursor.moveToNext())
                 }
             }
@@ -2611,13 +2617,13 @@ open class SqliteDatabaseHandler(
                         val _incoming = cursor.getInt(6)
                         val _handleIncoming = decrypt(cursor.getString(7))
                         offline = MegaOffline(_id,
-                            _handle,
-                            _path,
-                            _name,
+                            _handle.toString(),
+                            _path.toString(),
+                            _name.toString(),
                             _parent,
                             _type,
                             _incoming,
-                            _handleIncoming)
+                            _handleIncoming.toString())
                     } while (cursor.moveToNext())
                 }
             }
