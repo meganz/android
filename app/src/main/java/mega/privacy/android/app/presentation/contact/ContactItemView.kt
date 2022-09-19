@@ -30,6 +30,7 @@ import androidx.core.graphics.toColorInt
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.text
+import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
@@ -38,6 +39,10 @@ import mega.privacy.android.presentation.theme.grey_alpha_012
 import mega.privacy.android.presentation.theme.grey_alpha_054
 import mega.privacy.android.presentation.theme.white_alpha_012
 import mega.privacy.android.presentation.theme.white_alpha_054
+import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
@@ -76,7 +81,7 @@ fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
                         if (contactItem.status == UserStatus.Online) {
                             statusText
                         } else {
-                            contactItem.lastSeen ?: statusText
+                            getLastSeenString(contactItem.lastSeen) ?: statusText
                         }
 
                     MarqueeText(text = secondLineText,
@@ -90,6 +95,39 @@ fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
             color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
             thickness = 1.dp)
     }
+}
+
+@Composable
+fun getLastSeenString(lastGreen: Int?): String? {
+    if (lastGreen == null) return null
+
+    val calGreen = Calendar.getInstance().apply { add(Calendar.MINUTE, -lastGreen) }
+    val calToday = Calendar.getInstance()
+    val tc = TimeUtils(TimeUtils.DATE)
+    val ts = calGreen.timeInMillis
+    val timeToConsiderAsLongTimeAgo = 65535
+
+    Timber.d("Ts last green: %s", ts)
+
+    return when {
+        lastGreen >= timeToConsiderAsLongTimeAgo -> {
+            stringResource(id = R.string.last_seen_long_time_ago)
+        }
+        tc.compare(calGreen, calToday) == 0 -> {
+            val tz = calGreen.timeZone
+            val df = SimpleDateFormat("HH:mm", Locale.getDefault()).apply { timeZone = tz }
+            val time = df.format(calGreen.time)
+            stringResource(R.string.last_seen_today, time)
+        }
+        else -> {
+            val tz = calGreen.timeZone
+            var df = SimpleDateFormat("HH:mm", Locale.getDefault()).apply { timeZone = tz }
+            val time = df.format(calGreen.time)
+            df = SimpleDateFormat("dd MMM", Locale.getDefault())
+            val day = df.format(calGreen.time)
+            stringResource(R.string.last_seen_general, day, time)
+        }
+    }.replace("[A]", "").replace("[/A]", "")
 }
 
 @Composable
