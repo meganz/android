@@ -701,6 +701,10 @@
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
+    <style name="TextAppearance.Mega.Caption.Medium.GreyWhite87">
+        <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
     <style name="TextAppearance.Mega.Caption.Accent" parent="TextAppearance.Mega.Caption.Medium">
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
