@@ -448,6 +448,27 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             menu.findItem(R.id.action_save).isVisible = true
             updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
         }
+
+        // After establishing the Options menu, check if read-only properties should be applied
+        checkIfShouldApplyReadOnlyState(menu)
+    }
+
+    /**
+     * Checks and applies read-only restrictions (unable to Favourite, Rename, Move, or Move to Rubbish Bin)
+     * on the Options toolbar if the MegaNode is a Backup node.
+     *
+     * @param menu The Options Menu
+     */
+    private fun checkIfShouldApplyReadOnlyState(menu: Menu) {
+        viewModel.getNode()?.let {
+            if (megaApi.isInInbox(it)) {
+                with(menu) {
+                    findItem(R.id.action_rename).isVisible = false
+                    findItem(R.id.action_move).isVisible = false
+                    findItem(R.id.action_move_to_trash).isVisible = false
+                }
+            }
+        }
     }
 
     private fun updateLineNumbersMenuOption(lineNumbersOption: MenuItem) {
