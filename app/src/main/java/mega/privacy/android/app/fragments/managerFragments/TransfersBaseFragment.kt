@@ -1,27 +1,29 @@
 package mega.privacy.android.app.fragments.managerFragments
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
+import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentTransfersBinding
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.RotatableAdapter
+import mega.privacy.android.app.main.managerSections.ActiveTransfersState
 import mega.privacy.android.app.main.managerSections.RotatableFragment
+import mega.privacy.android.app.main.managerSections.TransfersViewModel
+import mega.privacy.android.app.main.managerSections.WrapContentLinearLayoutManager
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
-import javax.inject.Inject
 
 /**
  * The base transfer fragment
@@ -30,27 +32,9 @@ import javax.inject.Inject
 open class TransfersBaseFragment : RotatableFragment() {
 
     /**
-     * [TransfersManagement] injection
+     * [TransfersViewModel] instance
      */
-    @Inject
-    lateinit var transfersManagement: TransfersManagement
-
-    /**
-     * The empty image
-     */
-    protected lateinit var emptyImage: ImageView
-
-    /**
-     * The empty text
-     */
-    protected lateinit var emptyText: TextView
-
-    private var getMoreQuotaView: RelativeLayout? = null
-
-    /**
-     * The recycler view
-     */
-    protected var listView: RecyclerView? = null
+    protected val viewModel by viewModels<TransfersViewModel>()
 
     /**
      * LayoutManager
@@ -58,16 +42,14 @@ open class TransfersBaseFragment : RotatableFragment() {
     protected lateinit var mLayoutManager: LinearLayoutManager
 
     /**
-     * [ManagerActivity]
+     * [ChatDividerItemDecoration]
      */
-    protected lateinit var managerActivity: ManagerActivity
+    protected lateinit var itemDecoration: ChatDividerItemDecoration
 
     /**
-     * [SimpleDividerItemDecoration]
+     * FragmentTransfersBinding
      */
-    protected lateinit var itemDecoration: SimpleDividerItemDecoration
-
-    private lateinit var binding: FragmentTransfersBinding
+    protected lateinit var binding: FragmentTransfersBinding
 
 
     /**
@@ -81,10 +63,10 @@ open class TransfersBaseFragment : RotatableFragment() {
     protected open fun initView(inflater: LayoutInflater, container: ViewGroup?): View {
         binding = FragmentTransfersBinding.inflate(inflater, container, false)
 
-        itemDecoration = SimpleDividerItemDecoration(requireContext())
+        itemDecoration = ChatDividerItemDecoration(requireContext())
 
-        mLayoutManager = LinearLayoutManager(requireContext())
-        listView = binding.transfersListView.apply {
+        mLayoutManager = WrapContentLinearLayoutManager(requireContext())
+        binding.transfersListView.run {
             addItemDecoration(itemDecoration)
             layoutManager = mLayoutManager
             setHasFixedSize(true)
@@ -97,30 +79,45 @@ open class TransfersBaseFragment : RotatableFragment() {
             })
         }
 
-        emptyImage = binding.transfersEmptyImage
-        emptyText = binding.transfersEmptyText
-        getMoreQuotaView = binding.layoutGetMoreQuotaView.getMoreQuotaView
         binding.layoutGetMoreQuotaView.getMoreQuotaUpgradeButton.setOnClickListener {
             (requireActivity() as ManagerActivity).navigateToUpgradeAccount()
         }
-
+        setupFlow()
         setGetMoreQuotaViewVisibility()
-        managerActivity.invalidateOptionsMenu()
-
+        requireActivity().invalidateOptionsMenu()
         return binding.root
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        managerActivity = context as ManagerActivity
+    private fun setupFlow() {
+        viewModel.activeState.flowWithLifecycle(
+            lifecycle = viewLifecycleOwner.lifecycle,
+            minActiveState = Lifecycle.State.RESUMED
+        ).onEach { transfersState ->
+            when (transfersState) {
+                is ActiveTransfersState.GetMoreQuotaViewVisibility -> {
+                    val getMoreQuotaView = binding.layoutGetMoreQuotaView.getMoreQuotaView
+                    getMoreQuotaView.isVisible = transfersState.isVisible
+                    if (transfersState.isVisible) {
+                        if (Util.isDarkMode(requireContext())) {
+                            getMoreQuotaView.setBackgroundColor(ColorUtils.getColorForElevation(
+                                requireContext(),
+                                DARK_MODE_ELEVATION))
+                        } else {
+                            getMoreQuotaView.setBackgroundResource(
+                                R.drawable.white_layout_with_broder_shadow)
+                        }
+                    }
+                }
+                else -> {}
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     /**
      * Update elevation when scrolling if needed.
      */
-    open fun updateElevation() = managerActivity.changeAppBarElevation(
-        listView?.canScrollVertically(DEFAULT_SCROLL_DIRECTION) == true)
-
+    open fun updateElevation() = (requireActivity() as ManagerActivity).changeAppBarElevation(
+        binding.transfersListView.canScrollVertically(DEFAULT_SCROLL_DIRECTION))
 
     /**
      * Shows an empty view if there are not transfers
@@ -129,15 +126,12 @@ open class TransfersBaseFragment : RotatableFragment() {
      * @param size  the size of the list of transfers
      */
     protected open fun setEmptyView(size: Int) {
-        if (size == 0) {
-            emptyImage.visibility = VISIBLE
-            emptyText.visibility = VISIBLE
-            listView?.visibility = GONE
-            updateElevation()
-        } else {
-            emptyImage.visibility = GONE
-            emptyText.visibility = GONE
-            listView?.visibility = VISIBLE
+        with(binding) {
+            val isEmpty = size == 0
+            transfersEmptyImage.isVisible = isEmpty
+            transfersEmptyText.isVisible = isEmpty
+            transfersListView.isVisible = isEmpty.not()
+            if (isEmpty) updateElevation()
         }
     }
 
@@ -145,20 +139,7 @@ open class TransfersBaseFragment : RotatableFragment() {
      * Sets the visibility of the view "Get more quota".
      */
     fun setGetMoreQuotaViewVisibility() {
-        getMoreQuotaView?.let {
-            if (transfersManagement.isOnTransferOverQuota()) {
-                it.visibility = VISIBLE
-                if (Util.isDarkMode(requireContext())) {
-                    getMoreQuotaView?.setBackgroundColor(ColorUtils.getColorForElevation(
-                        requireContext(),
-                        DARK_MODE_ELEVATION))
-                } else {
-                    getMoreQuotaView?.setBackgroundResource(R.drawable.white_layout_with_broder_shadow)
-                }
-            } else {
-                getMoreQuotaView?.visibility = GONE
-            }
-        }
+        viewModel.setGetMoreQuotaViewVisibility()
     }
 
     override fun getAdapter(): RotatableAdapter? = null
@@ -176,7 +157,6 @@ open class TransfersBaseFragment : RotatableFragment() {
     }
 
     companion object {
-
         /**
          * The default value for scroll direction
          */

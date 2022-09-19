@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.user.UserLastGreen
@@ -54,4 +56,43 @@ interface ContactsRepository {
      * @return A flow of [OnlineStatus].
      */
     fun monitorChatOnlineStatusUpdates(): Flow<OnlineStatus>
+
+    /**
+     * Gets visible contacts.
+     *
+     * @return A list with all visible contacts.
+     */
+    suspend fun getVisibleContacts(): List<ContactItem>
+
+    /**
+     * Gets the updated main data of a contact.
+     *
+     * @param contactItem [ContactItem] whose data is going to be requested.
+     * @return [ContactData] containing the updated data.
+     */
+    suspend fun getContactData(contactItem: ContactItem): ContactData
+
+    /**
+     * Updates the contact list with the received contact updates.
+     *
+     * @param outdatedContactList Outdated contact list.
+     * @param contactUpdates      Map with all contact updates.
+     * @return The updated contact list.
+     */
+    suspend fun applyContactUpdates(
+        outdatedContactList: List<ContactItem>,
+        contactUpdates: UserUpdate,
+    ): List<ContactItem>
+
+    /**
+     * Updates the contact list with the new contact.
+     *
+     * @param outdatedContactList Outdated contact list.
+     * @param newContacts         List with new contacts.
+     * @return The updated contact list.
+     */
+    suspend fun addNewContacts(
+        outdatedContactList: List<ContactItem>,
+        newContacts: List<ContactRequest>,
+    ): List<ContactItem>
 }

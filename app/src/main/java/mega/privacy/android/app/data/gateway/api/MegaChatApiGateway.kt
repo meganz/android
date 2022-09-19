@@ -108,4 +108,30 @@ interface MegaChatApiGateway {
      * @return The chat conversation.
      */
     fun getChatRoomByUser(userHandle: Long): MegaChatRoom?
+
+    /**
+     * Returns the known alias given to the user.
+     * Returns NULL if data is not cached yet or it's not possible to get.
+     *
+     * @param userHandle Handle of the user whose alias is requested.
+     * @return The user alias.
+     */
+    fun getUserAliasFromCache(userHandle: Long): String?
+
+    /**
+     *  Returns the current full name of the user.
+     *  Returns NULL if data is not cached yet or it's not possible to get.
+     *
+     * @param userHandle Handle of the user whose full name is requested.
+     * @return The user full name.
+     */
+    fun getUserFullNameFromCache(userHandle: Long): String?
+
+    /**
+     * Gets the online status of a user.
+     *
+     * @param userHandle Handle of user whose status is requested.
+     * @return Online status of the user.
+     */
+    fun getUserOnlineStatus(userHandle: Long): Int
 }

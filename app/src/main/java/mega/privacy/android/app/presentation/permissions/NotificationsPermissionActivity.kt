@@ -7,17 +7,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.permissions.view.NotificationsPermissionView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.presentation.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.presentation.theme.AndroidTheme
 import javax.inject.Inject
 
 /**
@@ -58,7 +58,7 @@ class NotificationsPermissionActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
+            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             AndroidTheme(isDark = themeMode.isDarkMode()) {
                 NotificationsPermissionView()
             }

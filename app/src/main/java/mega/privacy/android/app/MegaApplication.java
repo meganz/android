@@ -1,19 +1,7 @@
 package mega.privacy.android.app;
 
-import static android.app.ApplicationExitInfo.REASON_CRASH_NATIVE;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE;
 import static mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache;
-import static mega.privacy.android.app.utils.CallUtil.callStatusToString;
-import static mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification;
-import static mega.privacy.android.app.utils.CallUtil.incomingCall;
-import static mega.privacy.android.app.utils.CallUtil.ongoingCall;
-import static mega.privacy.android.app.utils.CallUtil.openMeetingRinging;
-import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER_PREFERENCES;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.PRODUCTION_SERVER_VALUE;
@@ -21,9 +9,6 @@ import static mega.privacy.android.app.utils.ChangeApiServerUtil.SANDBOX3_SERVER
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFromValue;
 import static mega.privacy.android.app.utils.Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION;
 import static mega.privacy.android.app.utils.Constants.ACTION_LOG_OUT;
-import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_IN_PROGRESS;
-import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_OUTGOING;
-import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_RINGING;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
@@ -34,40 +19,28 @@ import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
 import static mega.privacy.android.app.utils.DBUtil.callToExtendedAccountDetails;
 import static mega.privacy.android.app.utils.DBUtil.callToPaymentMethods;
-import static mega.privacy.android.app.utils.IncomingCallNotification.shouldNotify;
-import static mega.privacy.android.app.utils.IncomingCallNotification.toSystemSettingNotification;
-import static mega.privacy.android.app.utils.Util.checkAppUpgrade;
 import static mega.privacy.android.app.utils.Util.isSimplifiedChinese;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ApplicationExitInfo;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Handler;
-import android.os.PowerManager;
-import android.os.StrictMode;
 import android.text.Spanned;
-import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
@@ -75,7 +48,6 @@ import androidx.core.text.HtmlCompat;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.hilt.work.HiltWorkerFactory;
-import androidx.lifecycle.Observer;
 import androidx.multidex.MultiDexApplication;
 import androidx.work.Configuration;
 
@@ -87,10 +59,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.webrtc.ContextUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -108,11 +77,11 @@ import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.di.ApplicationScope;
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.di.MegaApiFolder;
-import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.BackgroundRequestListener;
+import mega.privacy.android.app.globalmanagement.CallChangesObserver;
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler;
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
@@ -121,7 +90,6 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.CallSoundsController;
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
@@ -131,10 +99,8 @@ import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.logging.InitialiseLoggingUseCaseJavaWrapper;
 import mega.privacy.android.app.presentation.theme.ThemeModeState;
-import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase;
-import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams;
 import mega.privacy.android.domain.usecase.InitialiseLogging;
 import nz.mega.sdk.MegaApiAndroid;
@@ -144,7 +110,6 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -205,6 +170,8 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
     MegaChatRequestHandler chatRequestHandler;
     @Inject
     RTCAudioManagerGateway rtcAudioManagerGateway;
+    @Inject
+    CallChangesObserver callChangesObserver;
 
     String localIpAddress = "";
     final static public String APP_KEY = "6tioyn8ka5l6hty";
@@ -246,12 +213,10 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
     private static boolean isBlockedDueToWeakAccount = false;
     private static boolean isWebOpenDueToEmailVerification = false;
     private static boolean isWaitingForCall = false;
-    private static boolean areAdvertisingCookiesEnabled = false;
     private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
     private BroadcastReceiver logoutReceiver;
     private static MegaApplication singleApplicationInstance;
-    private PowerManager.WakeLock wakeLock;
 
     private MeetingListener meetingListener = new MeetingListener();
     private GlobalChatListener globalChatListener = new GlobalChatListener(this);
@@ -262,10 +227,7 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
         isVerifySMSShowed = isShowed;
     }
 
-    public void sendBroadcastUpdateAccountDetails() {
-        sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-                .putExtra(ACTION_TYPE, UPDATE_ACCOUNT_DETAILS));
-    }
+
 
     private final int interval = 3000;
     private Handler keepAliveHandler = new Handler();
@@ -309,118 +271,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
         crashReporter.report(throwable);
     }
 
-    private final Observer<MegaChatCall> callStatusObserver = call -> {
-        int callStatus = call.getStatus();
-        boolean isOutgoing = call.isOutgoing();
-        boolean isRinging = call.isRinging();
-        long callId = call.getCallId();
-        long chatId = call.getChatid();
-        if (chatId == MEGACHAT_INVALID_HANDLE || callId == MEGACHAT_INVALID_HANDLE) {
-            Timber.e("Error in chatId or callId");
-            return;
-        }
-
-        Timber.d("Call status is %s, chat id is %d, call id is %d", callStatusToString(callStatus), chatId, callId);
-
-        switch (callStatus) {
-            case MegaChatCall.CALL_STATUS_CONNECTING:
-                if ((isOutgoing && getChatManagement().isRequestSent(callId)))
-                    rtcAudioManagerGateway.removeRTCAudioManager();
-                break;
-            case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-            case MegaChatCall.CALL_STATUS_JOINING:
-            case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                MegaHandleList listAllCalls = megaChatApi.getChatCalls();
-                if (listAllCalls == null || listAllCalls.size() == 0) {
-                    Timber.e("Calls not found");
-                    return;
-                }
-
-                if (callStatus == CALL_STATUS_USER_NO_PRESENT) {
-                    if (isRinging) {
-                        Timber.d("Is incoming call");
-                        incomingCall(listAllCalls, chatId, callStatus);
-                    } else {
-                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-                        if (chatRoom != null && chatRoom.isGroup()) {
-                            Timber.d("Check if the incoming group call notification should be displayed");
-                            getChatManagement().checkActiveGroupChat(chatId);
-                        }
-                    }
-                }
-
-                if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
-                    getChatManagement().addNotificationShown(chatId);
-                    Timber.d("Is ongoing call");
-                    ongoingCall(rtcAudioManagerGateway, chatId, callId, (isOutgoing && getChatManagement().isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
-                }
-                break;
-
-            case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-                Timber.d("The user participation in the call has ended. The termination code is %s", CallUtil.terminationCodeForCallToString(call.getTermCode()));
-                getChatManagement().controlCallFinished(callId, chatId);
-                break;
-
-            case MegaChatCall.CALL_STATUS_DESTROYED:
-                int endCallReason = call.getEndCallReason();
-                Timber.d("Call has ended. End call reason is %s", CallUtil.endCallReasonToString(endCallReason));
-                getChatManagement().controlCallFinished(callId, chatId);
-                boolean isIgnored = call.isIgnored();
-                checkCallDestroyed(chatId, callId, endCallReason, isIgnored);
-                break;
-        }
-    };
-
-    private final
-    Observer<MegaChatCall> callCompositionObserver = call -> {
-        MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
-        if (chatRoom != null && call.getCallCompositionChange() == 1 && call.getNumParticipants() > 1) {
-            Timber.d("Stop sound");
-            if (megaChatApi.getMyUserHandle() == call.getPeeridCallCompositionChange()) {
-                clearIncomingCallNotification(call.getCallId());
-                getChatManagement().removeValues(call.getChatid());
-                if (call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
-                    LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
-                }
-            }
-        }
-    };
-
-    private final Observer<MegaChatCall> callRingingStatusObserver = call -> {
-        int callStatus = call.getStatus();
-        boolean isRinging = call.isRinging();
-        MegaHandleList listAllCalls = megaChatApi.getChatCalls();
-        if (listAllCalls == null || listAllCalls.size() == 0) {
-            Timber.e("Calls not found");
-            return;
-        }
-        if (isRinging) {
-            Timber.d("Is incoming call");
-            incomingCall(listAllCalls, call.getChatid(), callStatus);
-        } else {
-            clearIncomingCallNotification(call.getCallId());
-            getChatManagement().removeValues(call.getChatid());
-        }
-    };
-
-    private final Observer<Pair> sessionStatusObserver = callAndSession -> {
-        MegaChatSession session = (MegaChatSession) callAndSession.second;
-        int sessionStatus = session.getStatus();
-        MegaChatCall call = (MegaChatCall) callAndSession.first;
-        if (call == null)
-            return;
-
-        MegaChatRoom chat = megaChatApi.getChatRoom(call.getChatid());
-        if (chat != null) {
-            if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS &&
-                    (chat.isGroup() || chat.isMeeting() || session.getPeerid() != megaApi.getMyUserHandleBinary())) {
-                Timber.d("Session is in progress");
-                getChatManagement().setRequestSentCall(call.getCallId(), false);
-                rtcAudioManagerGateway.updateRTCAudioMangerTypeStatus(AUDIO_MANAGER_CALL_IN_PROGRESS);
-            }
-        }
-    };
-
     public static MegaApplication getInstance() {
         return singleApplicationInstance;
     }
@@ -431,11 +281,10 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
         super.onCreate();
 
-        setStrictModePolicies();
-
         initialiseLogging();
 
         themeModeState.initialise();
+        callChangesObserver.init();
 
         // Setup handler and RxJava for uncaught exceptions.
         Thread.setDefaultUncaughtExceptionHandler((thread, e) -> handleUncaughtException(e));
@@ -447,13 +296,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
         keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis() + interval);
         keepAliveHandler.postDelayed(keepAliveRunnable, interval);
-
-        checkAppUpgrade();
-        checkMegaStandbyBucket();
-        getTombstoneInfo();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            checkForUnsafeIntentLaunch();
-        }
 
         setupMegaApi();
         setupMegaApiFolder();
@@ -493,11 +335,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
         }
 
         registerReceiver(new NetworkStateReceiver(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
-        LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observeForever(callRingingStatusObserver);
-        LiveEventBus.get(EVENT_SESSION_STATUS_CHANGE, Pair.class).observeForever(sessionStatusObserver);
-        LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall.class).observeForever(callCompositionObserver);
 
         logoutReceiver = new BroadcastReceiver() {
             @Override
@@ -545,24 +382,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
         initFresco();
 
-    }
-
-    private void setStrictModePolicies() {
-        if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(
-                    new StrictMode.ThreadPolicy.Builder()
-                            .detectAll()
-                            .penaltyLog()
-                            .build()
-            );
-
-            StrictMode.setVmPolicy(
-                    new StrictMode.VmPolicy.Builder()
-                            .detectAll()
-                            .penaltyLog()
-                            .build()
-            );
-        }
     }
 
     private void initialiseLogging() {
@@ -778,8 +597,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((cookies, throwable) -> {
                     if (throwable == null) {
-                        setAdvertisingCookiesEnabled(cookies.contains(CookieType.ADVERTISEMENT));
-
                         boolean analyticsCookiesEnabled = cookies.contains(CookieType.ANALYTICS);
                         crashReporter.setEnabled(analyticsCookiesEnabled);
                         performanceReporter.setEnabled(analyticsCookiesEnabled);
@@ -845,15 +662,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
         MegaApplication.openChatId = openChatId;
     }
 
-    public static long getOpenCallChatId() {
-        return openCallChatId;
-    }
-
-    public static void setOpenCallChatId(long value) {
-        Timber.d("New open call chat ID: %s", value);
-        openCallChatId = value;
-    }
-
     public boolean isRecentChatVisible() {
         if (activityLifecycleHandler.isActivityVisible()) {
             return recentChatVisible;
@@ -879,72 +687,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
         localIpAddress = ip;
     }
 
-    public void showSharedFolderNotification(MegaNode n) {
-        Timber.d("showSharedFolderNotification");
-
-        try {
-            ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-            String name = "";
-            for (int j = 0; j < sharesIncoming.size(); j++) {
-                MegaShare mS = sharesIncoming.get(j);
-                if (mS.getNodeHandle() == n.getHandle()) {
-                    MegaUser user = megaApi.getContact(mS.getUser());
-
-                    name = getMegaUserNameDB(user);
-                    if (name == null) name = "";
-                }
-            }
-
-            String source = "<b>" + n.getName() + "</b> " + getString(R.string.incoming_folder_notification) + " " + toCDATA(name);
-            Spanned notificationContent = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY);
-
-            String notificationChannelId = NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
-
-            Intent intent = new Intent(this, ManagerActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    .setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
-
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                    PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-
-            String notificationTitle = getString(n.hasChanged(MegaNode.CHANGE_TYPE_NEW)
-                    ? R.string.title_incoming_folder_notification
-                    : R.string.context_permissions_changed);
-
-            NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                NotificationChannel channel = new NotificationChannel(notificationChannelId,
-                        NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME, NotificationManager.IMPORTANCE_HIGH);
-
-                channel.setShowBadge(true);
-                notificationManager.createNotificationChannel(channel);
-            }
-
-            Drawable d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, notificationChannelId)
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentTitle(notificationTitle)
-                    .setContentText(notificationContent)
-                    .setStyle(new NotificationCompat.BigTextStyle()
-                            .bigText(notificationContent))
-                    .setAutoCancel(true)
-                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                    .setContentIntent(pendingIntent)
-                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                    .setLargeIcon(((BitmapDrawable) d).getBitmap())
-                    .setPriority(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                            // Use NotificationManager for devices running Android Nougat or above (API >= 24)
-                            ? NotificationManager.IMPORTANCE_HIGH
-                            // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
-                            : NotificationCompat.PRIORITY_HIGH);
-
-            notificationManager.notify(NOTIFICATION_PUSH_CLOUD_DRIVE, notificationBuilder.build());
-        } catch (Exception e) {
-            Timber.e(e);
-        }
-    }
-
     public void sendSignalPresenceActivity() {
         Timber.d("sendSignalPresenceActivity");
         if (megaChatApi != null) {
@@ -960,11 +702,7 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
      * @param incomingCall The incoming call
      */
     public void showOneCallNotification(MegaChatCall incomingCall) {
-        Timber.d("Show incoming call notification and start to sound. Chat ID is %s", incomingCall.getChatid());
-        createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
-        getChatManagement().addNotificationShown(incomingCall.getChatid());
-        ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
-        notificationBuilder.showOneCallNotification(incomingCall);
+        callChangesObserver.showOneCallNotification(incomingCall);
     }
 
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
@@ -985,208 +723,11 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
     }
 
     public void checkOneCall(long incomingCallChatId) {
-        Timber.d("One call : Chat ID is %d, openCall Chat ID is %d", incomingCallChatId, openCallChatId);
-        if (openCallChatId == incomingCallChatId) {
-            Timber.d("The call is already opened");
-            return;
-        }
-
-        MegaChatCall callToLaunch = megaChatApi.getChatCall(incomingCallChatId);
-        if (callToLaunch == null) {
-            Timber.w("Call is null");
-            return;
-        }
-
-        int callStatus = callToLaunch.getStatus();
-        if (callStatus > MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-            Timber.w("Launch not in correct status: %s", callStatus);
-            return;
-        }
-
-        MegaChatRoom chatRoom = megaChatApi.getChatRoom(incomingCallChatId);
-        if (chatRoom == null) {
-            Timber.w("Chat room is null");
-            return;
-        }
-
-        if (!CallUtil.isOneToOneCall(chatRoom) && callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && (!getChatManagement().isOpeningMeetingLink(incomingCallChatId))) {
-            Timber.d("Group call or meeting, the notification should be displayed");
-            showOneCallNotification(callToLaunch);
-            return;
-        }
-
-        checkOneToOneIncomingCall(callToLaunch);
-    }
-
-    /**
-     * Check whether an incoming 1-to-1 call should show notification or incoming call screen
-     *
-     * @param callToLaunch The incoming call
-     */
-    private void checkOneToOneIncomingCall(MegaChatCall callToLaunch) {
-        if (shouldNotify(this) && !activityLifecycleHandler.isActivityVisible()) {
-            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-            if (pm != null) {
-                wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":MegaIncomingCallPowerLock");
-            }
-            if (!wakeLock.isHeld()) {
-                wakeLock.acquire(10 * 1000);
-            }
-
-            Timber.d("The notification should be displayed. Chat ID of incoming call %s", callToLaunch.getChatid());
-            showOneCallNotification(callToLaunch);
-        } else {
-            Timber.d("The call screen should be displayed. Chat ID of incoming call %s", callToLaunch.getChatid());
-            MegaApplication.getInstance().createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
-            launchCallActivity(callToLaunch);
-        }
+        callChangesObserver.checkOneCall(incomingCallChatId);
     }
 
     public void checkSeveralCall(MegaHandleList listAllCalls, int callStatus, boolean isRinging, long incomingCallChatId) {
-        Timber.d("Several calls = %d- Current call Status: %s", listAllCalls.size(), callStatusToString(callStatus));
-        if (isRinging) {
-            if (participatingInACall()) {
-                Timber.d("Several calls: show notification");
-                checkQueuedCalls(incomingCallChatId);
-                return;
-            }
-
-            MegaChatRoom chatRoom = megaChatApi.getChatRoom(incomingCallChatId);
-            if (callStatus == CALL_STATUS_USER_NO_PRESENT && chatRoom != null) {
-                if (!CallUtil.isOneToOneCall(chatRoom) && !getChatManagement().isOpeningMeetingLink(incomingCallChatId)) {
-                    Timber.d("Show incoming group call notification");
-                    MegaChatCall incomingCall = megaChatApi.getChatCall(incomingCallChatId);
-                    if (incomingCall != null) {
-                        showOneCallNotification(incomingCall);
-                    }
-                    return;
-                }
-
-                if (CallUtil.isOneToOneCall(chatRoom) && openCallChatId != chatRoom.getChatId()) {
-                    Timber.d("Show incoming one to one call screen");
-                    MegaChatCall callToLaunch = megaChatApi.getChatCall(chatRoom.getChatId());
-                    checkOneToOneIncomingCall(callToLaunch);
-                    return;
-                }
-            }
-        }
-
-        MegaHandleList handleList = megaChatApi.getChatCalls(callStatus);
-        if (handleList == null || handleList.size() == 0)
-            return;
-
-        MegaChatCall callToLaunch = null;
-
-        for (int i = 0; i < handleList.size(); i++) {
-            if (openCallChatId != handleList.get(i)) {
-                if (megaChatApi.getChatCall(handleList.get(i)) != null && !megaChatApi.getChatCall(handleList.get(i)).isOnHold()) {
-                    callToLaunch = megaChatApi.getChatCall(handleList.get(i));
-                }
-            } else {
-                Timber.d("The call is already opened");
-            }
-        }
-
-        if (callToLaunch != null) {
-            checkOneToOneIncomingCall(callToLaunch);
-        }
-    }
-
-    private void checkCallDestroyed(long chatId, long callId, int endCallReason, boolean isIgnored) {
-        getChatManagement().setOpeningMeetingLink(chatId, false);
-
-        if (shouldNotify(this)) {
-            toSystemSettingNotification(this);
-        }
-
-        if (wakeLock != null && wakeLock.isHeld()) {
-            wakeLock.release();
-        }
-        getChatManagement().removeNotificationShown(chatId);
-
-        try {
-            if (endCallReason == MegaChatCall.END_CALL_REASON_NO_ANSWER && !isIgnored) {
-                MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-                if (chatRoom != null && !chatRoom.isGroup() && !chatRoom.isMeeting() && megaApi.isChatNotifiable(chatId)) {
-                    try {
-                        Timber.d("Show missed call notification");
-                        ChatAdvancedNotificationBuilder.newInstance(this)
-                                .showMissedCallNotification(chatId, callId);
-                    } catch (Exception e) {
-                        Timber.e(e, "EXCEPTION when showing missed call notification");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Timber.e(e, "EXCEPTION when showing missed call notification");
-        }
-    }
-
-    /**
-     * Get the current standby bucket of the app.
-     * The system determines the standby state of the app based on app usage patterns.
-     *
-     * @return the current standby bucket of the app：
-     * STANDBY_BUCKET_ACTIVE,
-     * STANDBY_BUCKET_WORKING_SET,
-     * STANDBY_BUCKET_FREQUENT,
-     * STANDBY_BUCKET_RARE,
-     * STANDBY_BUCKET_RESTRICTED,
-     * STANDBY_BUCKET_NEVER
-     */
-    public int checkMegaStandbyBucket() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(USAGE_STATS_SERVICE);
-            if (usageStatsManager != null) {
-                int standbyBucket = usageStatsManager.getAppStandbyBucket();
-                Timber.d("getAppStandbyBucket(): %s", standbyBucket);
-                return standbyBucket;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Get the tombstone information.
-     */
-    public void getTombstoneInfo() {
-        new Thread(() -> {
-            Timber.d("getTombstoneInfo");
-            ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-            List<ApplicationExitInfo> exitReasons;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                exitReasons = activityManager.getHistoricalProcessExitReasons(/* packageName = */ null, /* pid = */ 0, /* maxNum = */ 3);
-                for (ApplicationExitInfo aei : exitReasons) {
-                    if (aei.getReason() == REASON_CRASH_NATIVE) {
-                        // Get the tombstone input stream.
-                        try {
-                            InputStream tombstoneInputStream = aei.getTraceInputStream();
-                            if (tombstoneInputStream != null) {
-                                // The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
-                                TombstoneProtos.Tombstone tombstone = TombstoneProtos.Tombstone.parseFrom(tombstoneInputStream);
-                                Timber.e("Tombstone Info%s", tombstone.toString());
-                                tombstoneInputStream.close();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }).start();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.S)
-    private void checkForUnsafeIntentLaunch() {
-        boolean isDebug = ((this.getApplicationInfo().flags &
-                ApplicationInfo.FLAG_DEBUGGABLE) != 0);
-        if (isDebug) {
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    // Other StrictMode checks that you've previously added.
-                    .detectUnsafeIntentLaunch()
-                    .penaltyLog()
-                    .build());
-        }
+        callChangesObserver.checkSeveralCall(listAllCalls, callStatus, isRinging, incomingCallChatId);
     }
 
     public void createOrUpdateAudioManager(boolean isSpeakerOn, int type) {
@@ -1222,20 +763,6 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
                 this.startService(intentService);
             }
         }
-    }
-
-    public void checkQueuedCalls(long incomingCallChatId) {
-        try {
-            ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
-            notificationBuilder.checkQueuedCalls(incomingCallChatId);
-        } catch (Exception e) {
-            Timber.e(e);
-        }
-    }
-
-    public void launchCallActivity(MegaChatCall call) {
-        Timber.d("Show the call screen: %s, callId = %d", callStatusToString(call.getStatus()), call.getCallId());
-        openMeetingRinging(this, call.getChatid(), passcodeManagement);
     }
 
     public static boolean isShowRichLinkWarning() {
@@ -1360,13 +887,5 @@ public class MegaApplication extends MultiDexApplication implements Configuratio
 
     public static void setUserWaitingForCall(long userWaitingForCall) {
         MegaApplication.userWaitingForCall = userWaitingForCall;
-    }
-
-    public static boolean areAdvertisingCookiesEnabled() {
-        return areAdvertisingCookiesEnabled;
-    }
-
-    public static void setAdvertisingCookiesEnabled(boolean enabled) {
-        areAdvertisingCookiesEnabled = enabled;
     }
 }

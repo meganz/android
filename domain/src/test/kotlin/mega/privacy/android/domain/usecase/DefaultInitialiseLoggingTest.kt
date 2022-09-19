@@ -22,6 +22,7 @@ class DefaultInitialiseLoggingTest {
     private lateinit var underTest: InitialiseLogging
     private val areSdkLogsEnabled = mock<AreSdkLogsEnabled>()
     private val areChatLogsEnabled = mock<AreChatLogsEnabled>()
+    private val startupLogging = mock<StartupLogging>()
     private val sdkMessage = LogEntry(message = "sdk", priority = 1)
     private val chatMessage = LogEntry(message = "chat", priority = 1)
 
@@ -36,6 +37,7 @@ class DefaultInitialiseLoggingTest {
             loggingRepository = loggingRepository,
             areSdkLogsEnabled = areSdkLogsEnabled,
             areChatLogsEnabled = areChatLogsEnabled,
+            startupLogging = startupLogging,
             coroutineDispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -44,9 +46,11 @@ class DefaultInitialiseLoggingTest {
     fun `test that debug enables console logs`() = runTest {
         whenever(areSdkLogsEnabled()).thenReturn(emptyFlow())
         whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
+        whenever(startupLogging()).thenReturn(Unit)
         underTest(true)
 
         verify(loggingRepository, times(1)).enableLogAllToConsole()
+        verify(loggingRepository, times(1)).enableStrictMode()
         verifyNoMoreInteractions(loggingRepository)
     }
 

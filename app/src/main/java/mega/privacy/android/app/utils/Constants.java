@@ -287,6 +287,7 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_USER_DATA = "BROADCAST_ACTION_INTENT_UPDATE_USER_DATA";
 
+    public static final String INTENT_EXTRA_KEY_PLACEHOLDER = "placeholder";
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
     public static final String INTENT_EXTRA_KEY_OFFLINE_HANDLE = "INTENT_EXTRA_KEY_OFFLINE_HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
@@ -898,7 +899,6 @@ public class Constants {
 
     public static final String EVENT_FAB_CHANGE = "fab_change";
 
-    public static final String KEY_HINT_IS_SHOWING = "hint_is_showing";
     public static final String KEY_IS_SHOWED_WARNING_MESSAGE = "is_showed_meeting_warning_message_";
 
     /** In database, invalid value is defined as '-1' */

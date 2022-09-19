@@ -33,8 +33,8 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.setImageRequestFromUri
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 
@@ -70,7 +70,8 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     lateinit var passcodeManagement: PasscodeManagement
 
     private val viewModel by viewModels<ContactListViewModel>({ requireParentFragment() })
-    private val userHandle by extraNotNull<Long>(USER_HANDLE)
+    private val userHandle by lazy { arguments?.getLong(USER_HANDLE, INVALID_HANDLE) ?: INVALID_HANDLE }
+
     private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
     private var removeContactDialog: AlertDialog? = null
     private var nodePermissionsDialog: AlertDialog? = null

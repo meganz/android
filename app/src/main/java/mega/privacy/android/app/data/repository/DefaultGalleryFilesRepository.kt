@@ -1,75 +1,41 @@
-package mega.privacy.android.app.main.megachat.usecase
+package mega.privacy.android.app.data.repository
 
 import android.content.ContentUris
 import android.content.Context
 import android.media.MediaMetadataRetriever
-import android.media.MediaMetadataRetriever.METADATA_KEY_DURATION
 import android.net.Uri
 import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.core.BackpressureStrategy
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.main.megachat.data.FileGalleryItem
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.domain.entity.chat.FileGalleryItem
+import mega.privacy.android.domain.repository.GalleryFilesRepository
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Use case to retrieve images and videos from the gallery.
+ * The repository implementation class regarding gallery files
  */
-class GetGalleryFilesUseCase @Inject constructor(
+class DefaultGalleryFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-) {
+) : GalleryFilesRepository {
 
     companion object {
+        /**
+         * To get data of file
+         */
         const val DATA = "_data"
     }
 
     /**
-     * Get list of images and videos
-     *
-     * @return MutableList<FileGalleryItem>
-     */
-    fun getFiles(): Flowable<List<FileGalleryItem>> =
-        Flowable.create({ emitter ->
-            val files = mutableListOf<FileGalleryItem>()
-
-            fetchVideos()
-                .subscribeOn(Schedulers.newThread())
-                .subscribeBy(
-                    onNext = { item ->
-                        files.add(item)
-                        emitter.onNext(files.sortedByDescending { it.dateAdded })
-                    },
-                    onError = Timber::e,
-                    onComplete = {
-                        Timber.d("All videos have been loaded")
-                    }
-                )
-
-            fetchImages()
-                .subscribeOn(Schedulers.newThread())
-                .subscribeBy(
-                    onNext = { item ->
-                        files.add(item)
-                        emitter.onNext(files.sortedByDescending { it.dateAdded })
-                    },
-                    onError = Timber::e,
-                    onComplete = {
-                        Timber.d("All images have been loaded")
-                    }
-                )
-        }, BackpressureStrategy.LATEST)
-
-    /**
      * Method to get the images from the gallery
      *
-     * @return ArrayList<FileGalleryItem> List of images
+     * @return  Flow of List of [FileGalleryItem].
      */
-    fun fetchImages(): Flowable<FileGalleryItem> =
-        Flowable.create({ emitter ->
+    override fun getAllGalleryImages(): Flow<FileGalleryItem> =
+        callbackFlow {
             val queryUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
             val projection = arrayOf(
@@ -106,33 +72,31 @@ class GetGalleryFilesUseCase @Inject constructor(
                         isImage = true,
                         isTakePicture = false,
                         title = title,
-                        fileUri = contentUri,
-                        dateAdded = date,
+                        fileUri = contentUri.toString(),
+                        dateAdded = date.toLong(),
                         duration = "",
                         isSelected = false,
                         filePath = path
                     )
 
-                    emitter.onNext(file)
+                    trySend(file)
                 }
 
             } ?: kotlin.run {
                 Timber.e("Cursor is null")
             }
 
-            emitter.onComplete()
-
-        }, BackpressureStrategy.BUFFER)
+            awaitClose {}
+        }
 
     /**
-     * Method to get the videos from the gallery
+     * Method to get the images from the gallery
      *
-     * @return ArrayList<FileGalleryItem> List of videos
+     * @return  Flow of List of [FileGalleryItem].
      */
-    fun fetchVideos(): Flowable<FileGalleryItem> =
-        Flowable.create({ emitter ->
+    override fun getAllGalleryVideos(): Flow<FileGalleryItem> =
+        callbackFlow {
             val queryUri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-
             val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
             val projection = arrayOf(
                 MediaStore.Video.Media._ID,
@@ -166,8 +130,8 @@ class GetGalleryFilesUseCase @Inject constructor(
                     val path = cursor.getString(dataColumn)
                     val retriever = MediaMetadataRetriever()
                     retriever.setDataSource(context, contentUri)
-                    val duration = retriever.extractMetadata(METADATA_KEY_DURATION)
-                    retriever.release()
+                    val duration =
+                        retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                     val durationText =
                         TimeUtils.getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)
                     val file = FileGalleryItem(
@@ -175,19 +139,19 @@ class GetGalleryFilesUseCase @Inject constructor(
                         isImage = false,
                         isTakePicture = false,
                         title = title,
-                        fileUri = contentUri,
-                        dateAdded = date,
+                        fileUri = contentUri.toString(),
+                        dateAdded = date.toLong(),
                         duration = durationText,
                         isSelected = false,
                         filePath = path
                     )
-                    emitter.onNext(file)
-                }
 
+                    trySend(file)
+                }
             } ?: kotlin.run {
                 Timber.e("Cursor is null")
             }
-            emitter.onComplete()
 
-        }, BackpressureStrategy.BUFFER)
+            awaitClose {}
+        }
 }

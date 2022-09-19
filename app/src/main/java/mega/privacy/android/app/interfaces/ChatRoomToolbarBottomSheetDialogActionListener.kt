@@ -1,6 +1,6 @@
 package mega.privacy.android.app.interfaces
 
-import mega.privacy.android.app.main.megachat.data.FileGalleryItem
+import mega.privacy.android.domain.entity.chat.FileGalleryItem
 
 /*
  * This interface is to define what methods should

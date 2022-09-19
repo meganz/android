@@ -4,6 +4,7 @@ import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.view.LayoutInflater
 import android.widget.TextView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -50,7 +51,15 @@ object MegaProgressDialogUtil {
         var isPlural = false
 
         if (intent != null) {
-            val imageUris = intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
+            val imageUris = with(intent) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    getParcelableArrayListExtra(Intent.EXTRA_STREAM)
+                }
+            }
+
             isPlural = imageUris != null && imageUris.size > 1
 
             if (!isPlural) {

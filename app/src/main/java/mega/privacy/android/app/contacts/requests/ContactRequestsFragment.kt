@@ -16,7 +16,6 @@ import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdap
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs
 import mega.privacy.android.app.databinding.FragmentContactRequestsBinding
 import mega.privacy.android.app.utils.ColorUtils.setElevationWithColor
-import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.Util
 
@@ -33,7 +32,8 @@ class ContactRequestsFragment : Fragment() {
 
     private lateinit var binding: FragmentContactRequestsBinding
 
-    private val isOutgoing by extraNotNull(EXTRA_IS_OUTGOING, false)
+    private val isOutgoing by lazy { arguments?.getBoolean(EXTRA_IS_OUTGOING, false) ?: false }
+
     private val viewModel by viewModels<ContactRequestsViewModel>()
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
 

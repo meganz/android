@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.drawable.Animatable
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -107,10 +108,24 @@ class NameCollisionActivity : PasscodeActivity() {
 
         if (savedInstanceState == null) {
             @Suppress("UNCHECKED_CAST")
-            val collisionsList =
-                intent.getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS) as ArrayList<NameCollision>?
-            val singleCollision =
-                intent.getSerializableExtra(INTENT_EXTRA_SINGLE_COLLISION_RESULT) as NameCollision?
+            val collisionsList = with(intent) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS, ArrayList::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS)
+                } as ArrayList<NameCollision>?
+            }
+
+            val singleCollision = with(intent) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    getSerializableExtra(INTENT_EXTRA_SINGLE_COLLISION_RESULT,
+                        NameCollision::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    getSerializableExtra(INTENT_EXTRA_SINGLE_COLLISION_RESULT)
+                } as NameCollision?
+            }
 
             when {
                 collisionsList != null -> viewModel.setData(collisionsList)

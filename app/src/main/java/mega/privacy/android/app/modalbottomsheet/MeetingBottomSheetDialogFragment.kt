@@ -12,7 +12,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
 import mega.privacy.android.app.databinding.BottomSheetMeetingSimpleBinding
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
-import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 
 class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClickListener {
 
@@ -29,7 +28,7 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
             }
     }
 
-    private val showSimpleList by extraNotNull<Boolean>(SHOW_SIMPLE_LIST)
+    private val showSimpleList by lazy { arguments?.getBoolean(SHOW_SIMPLE_LIST, false) ?: false }
     private var listener: MeetingBottomSheetDialogActionListener? = null
 
     @SuppressLint("RestrictedApi")

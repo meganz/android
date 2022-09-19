@@ -55,8 +55,12 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.globalmanagement.CallChangesObserver;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -66,8 +70,11 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class CallService extends Service {
 
+    @Inject
+    CallChangesObserver callChangesObserver;
     MegaApplication app;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -158,8 +165,8 @@ public class CallService extends Service {
         if (currentChatId == MEGACHAT_INVALID_HANDLE)
             stopSelf();
 
-        if (MegaApplication.getOpenCallChatId() != currentChatId) {
-            MegaApplication.setOpenCallChatId(currentChatId);
+        if (callChangesObserver.getOpenCallChatId() != currentChatId) {
+            callChangesObserver.setOpenCallChatId(currentChatId);
         }
         showCallInProgressNotification();
         return START_NOT_STICKY;
@@ -341,8 +348,8 @@ public class CallService extends Service {
         cancelNotification();
         currentChatId = newChatIdCall;
 
-        if (MegaApplication.getOpenCallChatId() != currentChatId) {
-            MegaApplication.setOpenCallChatId(currentChatId);
+        if (callChangesObserver.getOpenCallChatId() != currentChatId) {
+            callChangesObserver.setOpenCallChatId(currentChatId);
         }
         showCallInProgressNotification();
     }
@@ -471,7 +478,7 @@ public class CallService extends Service {
         LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).removeObserver(callAnsweredInAnotherClientObserver);
 
         cancelNotification();
-        MegaApplication.setOpenCallChatId(MEGACHAT_INVALID_HANDLE);
+        callChangesObserver.setOpenCallChatId(MEGACHAT_INVALID_HANDLE);
 
         super.onDestroy();
     }

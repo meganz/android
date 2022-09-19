@@ -20,15 +20,6 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_invite_contact"
-        android:icon="@drawable/ic_add_contact"
-        android:orderInCategory="100"
-        android:title="@string/invite_contacts"
-        android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/action_send_invitation"
         android:icon="@drawable/ic_send_white"
         android:orderInCategory="100"

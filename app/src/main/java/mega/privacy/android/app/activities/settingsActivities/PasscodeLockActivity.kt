@@ -151,7 +151,7 @@ class PasscodeLockActivity : BaseActivity() {
             secondRound = savedInstanceState.getBoolean(SECOND_ROUND, false)
 
             if (secondRound) {
-                sbFirst.append(savedInstanceState.get(SB_FIRST))
+                sbFirst.append(savedInstanceState.getString(SB_FIRST))
             }
 
             attempts = savedInstanceState.getInt(ATTEMPTS, 0)
