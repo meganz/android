@@ -31,10 +31,10 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +46,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.presentation.controls.SearchAppBar
 import mega.privacy.android.presentation.controls.SimpleTopAppBar
@@ -80,7 +79,6 @@ fun StartConversationView(
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -169,7 +167,7 @@ fun StartConversationView(
 
         if (state.error != null) {
             val error = stringResource(id = state.error)
-            scope.launch {
+            LaunchedEffect(scaffoldState.snackbarHostState) {
                 scaffoldState.snackbarHostState.showSnackbar(message = error,
                     duration = SnackbarDuration.Long)
             }
