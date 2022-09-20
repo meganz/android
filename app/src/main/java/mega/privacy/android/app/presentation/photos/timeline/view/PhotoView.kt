@@ -172,18 +172,24 @@ fun PhotoCoverView(
                         color = colorResource(id = R.color.grey_alpha_032)
                     )
                 )
-                if (currentZoomLevel == ZoomLevel.Grid_1 || currentZoomLevel == ZoomLevel.Grid_3) {
-                    Text(
-                        text = TimeUtils.getVideoDuration(photo.duration),
-                        color = colorResource(id = R.color.white),
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .align(Alignment.BottomEnd)
-                            .padding(16.dp),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+
+                Text(
+                    text = TimeUtils.getVideoDuration(photo.duration),
+                    color = colorResource(id = R.color.white),
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .align(Alignment.BottomEnd)
+                        .padding(
+                            if (currentZoomLevel == ZoomLevel.Grid_5) {
+                                4.dp
+                            } else {
+                                16.dp
+                            }
+                        ),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
             }
         }
     }
