@@ -10005,11 +10005,10 @@ public class ManagerActivity extends TransfersManagementActivity
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setMessage(R.string.confirmation_to_clear_completed_transfers)
                 .setPositiveButton(R.string.general_clear, (dialog, which) -> {
-                    dbH.emptyCompletedTransfers();
-
                     if (isTransfersCompletedAdded()) {
                         completedTransfersFragment.clearCompletedTransfers();
                     }
+                    dbH.emptyCompletedTransfers();
                     supportInvalidateOptionsMenu();
                 })
                 .setNegativeButton(R.string.general_dismiss, null);
@@ -10967,12 +10966,13 @@ public class ManagerActivity extends TransfersManagementActivity
      * Removes a completed transfer from Completed tab in Transfers section.
      *
      * @param transfer the completed transfer to remove
+     * @param isRemovedCache If ture, remove cache file, otherwise doesn't remove cache file
      */
-    public void removeCompletedTransfer(AndroidCompletedTransfer transfer) {
+    public void removeCompletedTransfer(AndroidCompletedTransfer transfer, boolean isRemovedCache) {
         dbH.deleteTransfer(transfer.getId());
 
         if (isTransfersCompletedAdded()) {
-            completedTransfersFragment.transferRemoved(transfer);
+            completedTransfersFragment.transferRemoved(transfer, isRemovedCache);
         }
     }
 
@@ -11008,7 +11008,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     .subscribe(() -> Timber.d("Transfer retried."), Timber::e);
         }
 
-        removeCompletedTransfer(transfer);
+        removeCompletedTransfer(transfer, false);
     }
 
     /**
@@ -11156,7 +11156,7 @@ public class ManagerActivity extends TransfersManagementActivity
         dbH.removeFailedOrCancelledTransfers();
         for (AndroidCompletedTransfer transfer : failedOrCancelledTransfers) {
             if (isTransfersCompletedAdded()) {
-                completedTransfersFragment.transferRemoved(transfer);
+                completedTransfersFragment.transferRemoved(transfer, false);
             }
 
             retryTransfer(transfer);
@@ -11170,7 +11170,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param transfer AndroidCompletedTransfer to retry.
      */
     public void retrySingleTransfer(AndroidCompletedTransfer transfer) {
-        removeCompletedTransfer(transfer);
+        removeCompletedTransfer(transfer, false);
         retryTransfer(transfer);
     }
 

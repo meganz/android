@@ -16,7 +16,6 @@ import android.graphics.PorterDuff;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -25,7 +24,6 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
@@ -38,19 +36,17 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
-public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaCompletedTransfersAdapter.ViewHolderTransfer> implements OnClickListener {
+public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaCompletedTransfersAdapter.ViewHolderTransfer> {
 
-    private Context context;
+    private final Context context;
     private List<AndroidCompletedTransfer> tL;
-    private MegaApiAndroid megaApi;
+    private final MegaApiAndroid megaApi;
 
     public MegaCompletedTransfersAdapter(Context _context, List<AndroidCompletedTransfer> _transfers) {
         this.context = _context;
         this.tL = _transfers;
 
-        if (megaApi == null) {
-            megaApi = MegaApplication.getInstance().getMegaApi();
-        }
+        megaApi = MegaApplication.getInstance().getMegaApi();
     }
 
     /*private view holder class*/
@@ -67,7 +63,6 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
         public RelativeLayout itemLayout;
         public ImageView optionReorder;
         public ImageView optionPause;
-        public int currentPosition;
         public long document;
         public TextView progressText;
         public TextView speedText;
@@ -84,7 +79,6 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
         ViewHolderTransfer holder = new ViewHolderTransfer(v);
         holder.itemLayout = v.findViewById(R.id.transfers_list_item_layout);
-        holder.itemLayout.setOnClickListener(this);
         holder.imageView = v.findViewById(R.id.transfers_list_thumbnail);
         holder.iconDownloadUploadView = v.findViewById(R.id.transfers_list_small_icon);
         holder.textViewFileName = v.findViewById(R.id.transfers_list_filename);
@@ -101,7 +95,10 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
     @Override
     public void onBindViewHolder(ViewHolderTransfer holder, int position) {
-        holder.currentPosition = holder.getBindingAdapterPosition();
+        holder.itemLayout.setOnClickListener(view -> {
+            Timber.d("onClick");
+            ((ManagerActivity) context).showManageTransferOptionsPanel(getItem(holder.getAbsoluteAdapterPosition()));
+        });
 
         AndroidCompletedTransfer transfer = getItem(position);
 
@@ -195,23 +192,8 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
         return position;
     }
 
-    @Override
-    public void onClick(View v) {
-        Timber.d("onClick");
-
-        ViewHolderTransfer holder = (ViewHolderTransfer) v.getTag();
-
-        switch (v.getId()) {
-            case R.id.transfers_list_item_layout:
-                if (holder.currentPosition >= 0 && holder.currentPosition < getItemCount()) {
-                    ((ManagerActivity) context).showManageTransferOptionsPanel(getItem(holder.currentPosition));
-                }
-                break;
-        }
-    }
-
-    public void removeItemData(int position) {
+    public void removeItemData(int position, List<AndroidCompletedTransfer> transfers) {
+        tL = transfers;
         notifyItemRemoved(position);
-        notifyItemRangeChanged(position, getItemCount());
     }
 }
