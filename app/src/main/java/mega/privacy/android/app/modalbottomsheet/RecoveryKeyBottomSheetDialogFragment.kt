@@ -2,7 +2,7 @@ package mega.privacy.android.app.modalbottomsheet
 
 import mega.privacy.android.app.main.controllers.AccountController.Companion.saveRkToFileSystem
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.di.ApplicationScope
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import android.view.LayoutInflater

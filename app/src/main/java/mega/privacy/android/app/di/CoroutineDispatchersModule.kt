@@ -6,6 +6,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
+import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 
 @InstallIn(SingletonComponent::class)
 @Module

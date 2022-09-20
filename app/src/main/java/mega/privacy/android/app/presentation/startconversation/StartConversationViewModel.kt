@@ -19,7 +19,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.findItemByHandle
 import mega.privacy.android.app.data.extensions.replaceIfExists
 import mega.privacy.android.app.data.extensions.sortList
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -165,12 +165,12 @@ class StartConversationViewModel @Inject constructor(
         typedSearch: String,
     ): List<ContactItem>? =
         if (typedSearch.isEmpty()) null
-        else contactList.filter { (_, email, fullName, alias) ->
+        else contactList.filter { (_, email, contactData) ->
             val filter = typedSearch.lowercase()
 
             email.lowercase().contains(filter)
-                    || fullName?.lowercase()?.contains(filter) == true
-                    || alias?.lowercase()?.contains(filter) == true
+                    || contactData.fullName?.lowercase()?.contains(filter) == true
+                    || contactData.alias?.lowercase()?.contains(filter) == true
         }
 
     private fun getContacts() {
@@ -186,12 +186,7 @@ class StartConversationViewModel @Inject constructor(
                 val contactData = getContactData(contactItem)
                 contactList.value.findItemByHandle(contactItem.handle)?.apply {
                     contactList.value.toMutableList().apply {
-                        replaceIfExists(copy(
-                            fullName = contactData.fullName,
-                            alias = contactData.alias,
-                            avatarUri = contactData.avatarUri,
-                            defaultAvatarContent = contactData.defaultAvatarContent
-                        ))
+                        replaceIfExists(copy(contactData = contactData))
                         contactList.update { this.sortList() }
                     }
                 }

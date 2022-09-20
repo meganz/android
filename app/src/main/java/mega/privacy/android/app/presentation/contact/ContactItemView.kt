@@ -29,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.text
+import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
@@ -64,7 +66,11 @@ fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
             }
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = contactItem.alias ?: contactItem.fullName ?: contactItem.email,
+                    val contactName = with(contactItem) {
+                        contactData.alias ?: contactData.fullName ?: email
+                    }
+
+                    Text(text = contactName,
                         style = MaterialTheme.typography.subtitle1,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
@@ -178,12 +184,14 @@ fun ContactAvatar(
         .clip(CircleShape),
     contactItem: ContactItem,
 ) {
-    if (contactItem.avatarUri != null) {
-        UriAvatar(modifier = modifier, uri = contactItem.avatarUri ?: return)
+    val avatarUri = contactItem.contactData.avatarUri
+
+    if (avatarUri != null) {
+        UriAvatar(modifier = modifier, uri = avatarUri)
     } else {
         DefaultContactAvatar(modifier = modifier,
             color = Color(contactItem.defaultAvatarColor.toColorInt()),
-            content = contactItem.defaultAvatarContent)
+            content = contactItem.getAvatarFirstLetter())
     }
 }
 
@@ -225,14 +233,11 @@ fun PreviewContactItem() {
     ContactItemView(contactItem = ContactItem(
         handle = -1,
         email = "email@mega.nz",
-        fullName = "Full name",
-        alias = "Alias",
-        defaultAvatarContent = "A",
+        contactData = ContactData("Full name", "Alias", null),
         defaultAvatarColor = "",
         visibility = UserVisibility.Visible,
         timestamp = 2345262L,
         areCredentialsVerified = true,
         status = UserStatus.Online,
-        avatarUri = null,
         lastSeen = null)) { }
 }

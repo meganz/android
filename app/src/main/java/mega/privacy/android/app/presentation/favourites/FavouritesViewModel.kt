@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper

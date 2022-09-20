@@ -5,7 +5,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AlbumsRepository
 import javax.inject.Inject
 

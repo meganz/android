@@ -10,6 +10,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
 import mega.privacy.android.app.di.*
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
+import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 
 /**
  * Test coroutine dispatchers module

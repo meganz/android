@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.domain.usecase.GetLastContactPermissionDismissedTime

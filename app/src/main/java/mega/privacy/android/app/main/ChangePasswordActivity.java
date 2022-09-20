@@ -53,7 +53,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
-import mega.privacy.android.app.di.ApplicationScope;
+import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;

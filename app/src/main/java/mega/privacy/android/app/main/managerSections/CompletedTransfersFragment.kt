@@ -22,7 +22,7 @@ import mega.privacy.android.app.utils.Util
  */
 @AndroidEntryPoint
 class CompletedTransfersFragment : TransfersBaseFragment() {
-    private var adapter: MegaCompletedTransfersAdapter? = null
+    private lateinit var adapter: MegaCompletedTransfersAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,11 +43,10 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
         binding.transfersEmptyText.text = TextUtil.formatEmptyScreenText(requireContext(),
             getString(R.string.completed_transfers_empty_new))
 
-        setupFlow()
-        setCompletedTransfers()
-
         adapter =
             MegaCompletedTransfersAdapter(requireActivity(), viewModel.getCompletedTransfers())
+        setupFlow()
+        setCompletedTransfers()
         binding.transfersListView.adapter = adapter
     }
 
@@ -64,14 +63,14 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
                 }
                 is CompletedTransfersState.TransferFinishUpdated -> {
                     setEmptyView(transfersState.newTransfers.size)
-                    adapter?.setTransfers(transfersState.newTransfers)
+                    adapter.setTransfers(transfersState.newTransfers)
                     requireActivity().invalidateOptionsMenu()
                 }
                 is CompletedTransfersState.TransferRemovedUpdated -> {
-                    adapter?.removeItemData(transfersState.index)
+                    adapter.removeItemData(transfersState.index, transfersState.newTransfers)
                 }
                 is CompletedTransfersState.ClearTransfersUpdated -> {
-                    adapter?.setTransfers(emptyList())
+                    adapter.setTransfers(emptyList())
                     setEmptyView(0)
                 }
                 else -> {}
@@ -99,9 +98,10 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
      * Removes a completed transfer.
      *
      * @param transfer transfer to remove
+     * @param isRemovedCache If ture, remove cache file, otherwise doesn't remove cache file
      */
-    fun transferRemoved(transfer: AndroidCompletedTransfer) =
-        viewModel.completedTransferRemoved(transfer)
+    fun transferRemoved(transfer: AndroidCompletedTransfer, isRemovedCache: Boolean) =
+        viewModel.completedTransferRemoved(transfer, isRemovedCache)
 
     /**
      * Removes all completed transfers.

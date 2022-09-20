@@ -4,12 +4,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.di.ApplicationScope
-import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.domain.usecase.DetectShake
 import mega.privacy.android.app.domain.usecase.VibrateDevice
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Inject
 
 /**

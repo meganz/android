@@ -4024,6 +4024,10 @@
     <string name="permissions_notifications_title">Get notified</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA will send you call, chat, and file transfer notifications.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Account suspended due to copyright violations. We sent you an email with more information about this.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Account terminated due to a breach of MEGA’s Terms of Service, such as abuse of others’ rights, sharing and importing illegal data, or system abuse.</string>
     <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
     <string name="home_side_menu_backups_title">Backups</string>
     <!-- Title of the Backups feature when no Backup files or folders exist -->

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.data.repository
 
-import com.vdurmont.emoji.EmojiParser
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -8,8 +7,6 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.components.twemoji.EmojiUtils
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.extensions.findItemByHandle
 import mega.privacy.android.app.data.extensions.getDecodedAliases
@@ -27,7 +24,7 @@ import mega.privacy.android.app.data.mapper.UserLastGreenMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.model.ChatUpdate
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -44,7 +41,6 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
-import java.util.Locale
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -148,15 +144,18 @@ class DefaultContactsRepository @Inject constructor(
 
                 checkLastGreen(status, megaUser.handle)
 
-                contactItemMapper(
-                    megaUser,
+                val contactData = contactDataMapper(
                     fullName?.ifEmpty { null },
                     alias?.ifEmpty { null },
-                    getAvatarFirstLetter(alias ?: fullName ?: megaUser.email),
+                    avatarUri
+                )
+
+                contactItemMapper(
+                    megaUser,
+                    contactData,
                     megaApiGateway.getUserAvatarColor(megaUser),
                     megaApiGateway.areCredentialsVerified(megaUser),
                     status,
-                    avatarUri,
                     null
                 )
             }
@@ -175,93 +174,14 @@ class DefaultContactsRepository @Inject constructor(
         }
     }
 
-    /**
-     * Retrieve the first letter of a String.
-     *
-     * @param text String to obtain the first letter.
-     * @return The first letter of the string to be painted in the default avatar.
-     */
-    private fun getAvatarFirstLetter(text: String): String {
-        val unknown = "U"
-
-        if (text.isEmpty()) {
-            return unknown
-        }
-
-        val result = text.trim { it <= ' ' }
-        if (result.length == 1) {
-            return result[0].toString().uppercase(Locale.getDefault())
-        }
-
-        val resultTitle = EmojiUtilsShortcodes.emojify(result)
-        if (resultTitle.isNullOrEmpty()) {
-            return unknown
-        }
-
-        val emojis = EmojiUtils.emojis(resultTitle)
-
-        if (emojis.size > 0 && emojis[0].start == 0) {
-            return resultTitle.substring(emojis[0].start, emojis[0].end)
-        }
-
-        val resultEmojiCompat = getEmojiCompatAtFirst(resultTitle)
-        if (resultEmojiCompat != null) {
-            return resultEmojiCompat
-        }
-
-        val resultChar = resultTitle[0].toString().uppercase(Locale.getDefault())
-        return if (resultChar.trim { it <= ' ' }
-                .isEmpty() || resultChar == "(" || !isRecognizableCharacter(
-                resultChar[0])
-        ) {
-            unknown
-        } else resultChar
-
-    }
-
-    /**
-     * Gets the first character as an emoji if any.
-     *
-     * @param text Text to check.
-     * @return The emoji if any, null otherwise.
-     */
-    private fun getEmojiCompatAtFirst(text: String?): String? {
-        if (text.isNullOrEmpty()) {
-            return null
-        }
-
-        val listEmojis = EmojiParser.extractEmojis(text)
-
-        if (listEmojis != null && listEmojis.isNotEmpty()) {
-            val substring = text.substring(0, listEmojis[0].length)
-            val sublistEmojis = EmojiParser.extractEmojis(substring)
-            if (sublistEmojis != null && sublistEmojis.isNotEmpty()) {
-                return substring
-            }
-        }
-
-        return null
-    }
-
-    /**
-     * Retrieve if a char is recognizable.
-     *
-     * @param inputChar The char to be examined.
-     * @return True if the char is recognizable. Otherwise false.
-     */
-    private fun isRecognizableCharacter(inputChar: Char): Boolean =
-        inputChar.code in 48..57 || inputChar.code in 65..90 || inputChar.code in 97..122
-
-
     override suspend fun getContactData(contactItem: ContactItem): ContactData =
         withContext(ioDispatcher) {
             val email = contactItem.email
             val fullName = getFullName(email)
             val alias = getAlias(contactItem.handle)
             val avatarUri = getAvatarUri(email, "${email}.jpg")
-            val defaultAvatarContent = getAvatarFirstLetter(alias ?: fullName ?: email)
 
-            contactDataMapper(fullName, alias, avatarUri, defaultAvatarContent)
+            contactDataMapper(fullName, alias, avatarUri)
         }
 
     private suspend fun getFullName(email: String): String? =
@@ -394,23 +314,21 @@ class DefaultContactsRepository @Inject constructor(
                         onSuccess = { aliases -> aliases },
                         onFailure = { null }
                     )?.let { aliases ->
-                        outdatedContactList.forEach { (userHandle) ->
-                            val updatedAlias = updatedList.findItemByHandle(userHandle)
-                                ?.copy(alias = if (aliases.containsKey(userHandle)) aliases[userHandle] else null)
+                        outdatedContactList.forEach { (handle, _, contactData) ->
+                            val newContactData = contactData.copy(
+                                alias = if (aliases.containsKey(handle)) aliases[handle] else null)
 
-                            if (updatedAlias != null) {
-                                updatedList.replaceIfExists(updatedAlias.copy(
-                                    defaultAvatarContent = getAvatarFirstLetter(
-                                        updatedAlias.alias ?: updatedAlias.fullName
-                                        ?: updatedAlias.email)))
-                            }
+                            updatedContact = updatedList.findItemByHandle(handle)
+                                ?.copy(contactData = newContactData)
                         }
                     }
                 }
 
                 if (changes.contains(UserChanges.Firstname) || changes.contains(UserChanges.Lastname)) {
                     val fullName = getFullName(megaUser.email)
-                    updatedContact = updatedContact?.copy(fullName = fullName)
+                    updatedContact?.contactData?.copy(fullName = fullName)?.let { contactData ->
+                        updatedContact = updatedContact?.copy(contactData = contactData)
+                    }
                 }
 
                 if (changes.contains(UserChanges.Email)) {
@@ -419,15 +337,12 @@ class DefaultContactsRepository @Inject constructor(
 
                 if (changes.contains(UserChanges.Avatar)) {
                     val avatarUri = getAvatarUri(megaUser.email, "${megaUser.email}.jpg")
-                    updatedContact = updatedContact?.copy(avatarUri = avatarUri)
+                    updatedContact?.contactData?.copy(avatarUri = avatarUri)?.let { contactData ->
+                        updatedContact = updatedContact?.copy(contactData = contactData)
+                    }
                 }
 
-                if (updatedContact != null) {
-                    updatedList.replaceIfExists(updatedContact.copy(
-                        defaultAvatarContent = getAvatarFirstLetter(
-                            updatedContact.alias ?: updatedContact.fullName
-                            ?: updatedContact.email)))
-                }
+                updatedContact?.let { updatedList.replaceIfExists(it) }
             }
         }
 
@@ -440,15 +355,18 @@ class DefaultContactsRepository @Inject constructor(
         val status = megaChatApiGateway.getUserOnlineStatus(megaUser.handle)
         checkLastGreen(status, megaUser.handle)
 
-        return contactItemMapper(
-            megaUser,
+        val contactData = contactDataMapper(
             fullName,
             alias,
-            getAvatarFirstLetter(alias ?: fullName ?: megaUser.email),
+            getAvatarUri(megaUser.email, "${megaUser.email}.jpg")
+        )
+
+        return contactItemMapper(
+            megaUser,
+            contactData,
             megaApiGateway.getUserAvatarColor(megaUser),
             megaApiGateway.areCredentialsVerified(megaUser),
             status,
-            getAvatarUri(megaUser.email, "${megaUser.email}.jpg"),
             null
         )
     }

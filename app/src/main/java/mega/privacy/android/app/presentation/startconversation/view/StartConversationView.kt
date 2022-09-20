@@ -51,6 +51,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.presentation.controls.SearchAppBar
 import mega.privacy.android.presentation.controls.SimpleTopAppBar
 import mega.privacy.android.app.presentation.contact.ContactItemView
+import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.search.view.EmptySearchView
@@ -102,8 +103,9 @@ fun StartConversationView(
                 )
             }
         }
-    ) {
-        LazyColumn(state = listState) {
+    ) { paddingValues ->
+        LazyColumn(state = listState,
+            modifier = Modifier.padding(paddingValues)) {
             state.apply {
                 if (buttonsVisible) {
                     if (fromChat) {
@@ -132,10 +134,12 @@ fun StartConversationView(
                             }
                         }
 
-                        header = contactsList[0].defaultAvatarContent
+                        val defaultAvatarContent = contactsList[0].getAvatarFirstLetter()
 
-                        item(key = contactsList[0].defaultAvatarContent) {
-                            HeaderItem(text = contactsList[0].defaultAvatarContent)
+                        header = defaultAvatarContent
+
+                        item(key = defaultAvatarContent) {
+                            HeaderItem(text = defaultAvatarContent)
                         }
                     }
                     typedSearch.isNotEmpty() -> {
@@ -148,10 +152,13 @@ fun StartConversationView(
                 }
 
                 contactsList.forEach { contact ->
-                    if (header != contact.defaultAvatarContent) {
-                        header = contact.defaultAvatarContent
-                        item(key = contact.defaultAvatarContent) {
-                            HeaderItem(text = contact.defaultAvatarContent)
+                    val defaultAvatarContent = contact.getAvatarFirstLetter()
+
+                    if (header != defaultAvatarContent) {
+                        header = defaultAvatarContent
+
+                        item(key = defaultAvatarContent) {
+                            HeaderItem(text = defaultAvatarContent)
                         }
                     }
 

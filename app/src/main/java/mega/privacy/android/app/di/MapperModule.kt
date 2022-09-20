@@ -23,6 +23,8 @@ import mega.privacy.android.app.data.mapper.MimeTypeMapper
 import mega.privacy.android.app.data.mapper.NodeUpdateMapper
 import mega.privacy.android.app.data.mapper.OnlineStatusMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
+import mega.privacy.android.app.data.mapper.SortOrderIntMapper
+import mega.privacy.android.app.data.mapper.SortOrderMapper
 import mega.privacy.android.app.data.mapper.StartScreenMapper
 import mega.privacy.android.app.data.mapper.TransferEventMapper
 import mega.privacy.android.app.data.mapper.UserAlertMapper
@@ -43,10 +45,12 @@ import mega.privacy.android.app.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.app.data.mapper.toFavouriteInfo
 import mega.privacy.android.app.data.mapper.toFeatureFlag
 import mega.privacy.android.app.data.mapper.toImage
+import mega.privacy.android.app.data.mapper.toInt
 import mega.privacy.android.app.data.mapper.toMegaChatPeerList
 import mega.privacy.android.app.data.mapper.toMegaExceptionModel
 import mega.privacy.android.app.data.mapper.toOnlineStatus
 import mega.privacy.android.app.data.mapper.toPushMessage
+import mega.privacy.android.app.data.mapper.toSortOrder
 import mega.privacy.android.app.data.mapper.toTransferEventModel
 import mega.privacy.android.app.data.mapper.toTransferModel
 import mega.privacy.android.app.data.mapper.toUserAlert
@@ -168,9 +172,22 @@ class MapperModule {
     @Provides
     fun provideOnlineStatusMapper(): OnlineStatusMapper = ::toOnlineStatus
 
+    /**
+     * Provide sort order mapper
+     */
+    @Provides
+    fun provideSortOrderMapper(): SortOrderMapper = ::toSortOrder
+
+    /**
+     * Provide sort order int mapper
+     */
+    @Provides
+    fun provideSortOrderIntMapper(): SortOrderIntMapper = ::toInt
+
     @Provides
     fun provideContactItemMapper(): ContactItemMapper = ::toContactItem
 
     @Provides
     fun provideContactDataMapper(): ContactDataMapper = ::toContactData
+
 }
