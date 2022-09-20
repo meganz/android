@@ -8,8 +8,8 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @return The ordered list.
  */
 fun List<ContactItem>.sortList(): List<ContactItem> =
-    sortedBy { (_, email, fullName, alias) ->
-        alias?.lowercase() ?: fullName?.lowercase() ?: email.lowercase()
+    sortedBy { (_, email, contactData) ->
+        contactData.alias?.lowercase() ?: contactData.fullName?.lowercase() ?: email.lowercase()
     }
 
 /**
