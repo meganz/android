@@ -4,7 +4,7 @@ import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.main.DrawerItem

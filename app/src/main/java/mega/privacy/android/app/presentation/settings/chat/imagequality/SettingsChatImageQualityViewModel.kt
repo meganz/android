@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.presentation.settings.chat.imagequality.model.SettingsChatImageQualityState
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.usecase.GetChatImageQuality

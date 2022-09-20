@@ -14,6 +14,7 @@ import mega.privacy.android.app.domain.usecase.GetCurrentTimeStringFromCalendar
 import mega.privacy.android.app.logging.ChatLogger
 import mega.privacy.android.app.logging.SdkLogger
 import mega.privacy.android.app.presentation.logging.tree.LogFlowTree
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled

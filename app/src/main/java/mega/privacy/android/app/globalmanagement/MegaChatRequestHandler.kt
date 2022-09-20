@@ -9,7 +9,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY
 import mega.privacy.android.app.data.mapper.toChatRequest
-import mega.privacy.android.app.di.ApplicationScope
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
 import mega.privacy.android.app.main.LoginActivity

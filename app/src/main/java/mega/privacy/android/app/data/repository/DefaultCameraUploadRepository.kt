@@ -3,7 +3,7 @@ package mega.privacy.android.app.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.repository.CameraUploadRepository

@@ -27,7 +27,7 @@ import mega.privacy.android.app.data.mapper.UserLastGreenMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.model.ChatUpdate
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager

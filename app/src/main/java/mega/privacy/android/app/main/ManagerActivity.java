@@ -300,7 +300,7 @@ import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
-import mega.privacy.android.app.di.ApplicationScope;
+import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
