@@ -29,10 +29,9 @@ fun ErrorBanner(
                     id = R.color.yellow_100
                 )
             )
-            .padding(8.dp)
     ) {
         Text(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             text = errorMessage,
             color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.yellow_700) else Color.Black,
         )
