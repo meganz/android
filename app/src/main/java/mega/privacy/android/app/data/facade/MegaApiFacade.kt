@@ -10,7 +10,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.di.ApplicationScope
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface

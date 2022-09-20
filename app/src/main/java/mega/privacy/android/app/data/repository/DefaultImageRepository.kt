@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.CacheGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.FileUtil

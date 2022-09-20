@@ -29,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.text
+import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
@@ -38,6 +40,10 @@ import mega.privacy.android.presentation.theme.grey_alpha_012
 import mega.privacy.android.presentation.theme.grey_alpha_054
 import mega.privacy.android.presentation.theme.white_alpha_012
 import mega.privacy.android.presentation.theme.white_alpha_054
+import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
@@ -60,7 +66,11 @@ fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
             }
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = contactItem.alias ?: contactItem.fullName ?: contactItem.email,
+                    val contactName = with(contactItem) {
+                        contactData.alias ?: contactData.fullName ?: email
+                    }
+
+                    Text(text = contactName,
                         style = MaterialTheme.typography.subtitle1,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
@@ -76,7 +86,7 @@ fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
                         if (contactItem.status == UserStatus.Online) {
                             statusText
                         } else {
-                            contactItem.lastSeen ?: statusText
+                            getLastSeenString(contactItem.lastSeen) ?: statusText
                         }
 
                     MarqueeText(text = secondLineText,
@@ -89,6 +99,54 @@ fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
         Divider(modifier = Modifier.padding(start = 72.dp),
             color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
             thickness = 1.dp)
+    }
+}
+
+@Composable
+fun getLastSeenString(lastGreen: Int?): String? {
+    if (lastGreen == null) return null
+
+    val lastGreenCalendar = Calendar.getInstance().apply { add(Calendar.MINUTE, -lastGreen) }
+    val timeToConsiderAsLongTimeAgo = 65535
+
+    Timber.d("Ts last green: %s", lastGreenCalendar.timeInMillis)
+
+    return when {
+        lastGreen >= timeToConsiderAsLongTimeAgo -> {
+            stringResource(id = R.string.last_seen_long_time_ago)
+        }
+        compareLastSeenWithToday(lastGreenCalendar) == 0 -> {
+            val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
+                timeZone = lastGreenCalendar.timeZone
+            }
+            val time = dateFormat.format(lastGreenCalendar.time)
+            stringResource(R.string.last_seen_today, time)
+        }
+        else -> {
+            var dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
+                timeZone = lastGreenCalendar.timeZone
+            }
+            val time = dateFormat.format(lastGreenCalendar.time)
+            dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+            val day = dateFormat.format(lastGreenCalendar.time)
+            stringResource(R.string.last_seen_general, day, time)
+        }
+    }.replace("[A]", "").replace("[/A]", "")
+}
+
+private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
+    val today = Calendar.getInstance()
+
+    return when {
+        lastGreen.get(Calendar.YEAR) != today.get(Calendar.YEAR) -> {
+            lastGreen.get(Calendar.YEAR) - today.get(Calendar.YEAR)
+        }
+        lastGreen.get(Calendar.MONTH) != today.get(Calendar.MONTH) -> {
+            lastGreen.get(Calendar.MONTH) - today.get(Calendar.MONTH)
+        }
+        else -> {
+            lastGreen.get(Calendar.DAY_OF_MONTH) - today.get(Calendar.DAY_OF_MONTH)
+        }
     }
 }
 
@@ -126,12 +184,14 @@ fun ContactAvatar(
         .clip(CircleShape),
     contactItem: ContactItem,
 ) {
-    if (contactItem.avatarUri != null) {
-        UriAvatar(modifier = modifier, uri = contactItem.avatarUri ?: return)
+    val avatarUri = contactItem.contactData.avatarUri
+
+    if (avatarUri != null) {
+        UriAvatar(modifier = modifier, uri = avatarUri)
     } else {
         DefaultContactAvatar(modifier = modifier,
             color = Color(contactItem.defaultAvatarColor.toColorInt()),
-            content = contactItem.defaultAvatarContent)
+            content = contactItem.getAvatarFirstLetter())
     }
 }
 
@@ -173,14 +233,11 @@ fun PreviewContactItem() {
     ContactItemView(contactItem = ContactItem(
         handle = -1,
         email = "email@mega.nz",
-        fullName = "Full name",
-        alias = "Alias",
-        defaultAvatarContent = "A",
+        contactData = ContactData("Full name", "Alias", null),
         defaultAvatarColor = "",
         visibility = UserVisibility.Visible,
         timestamp = 2345262L,
         areCredentialsVerified = true,
         status = UserStatus.Online,
-        avatarUri = null,
         lastSeen = null)) { }
 }

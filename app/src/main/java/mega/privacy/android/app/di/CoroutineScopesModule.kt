@@ -7,6 +7,8 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)

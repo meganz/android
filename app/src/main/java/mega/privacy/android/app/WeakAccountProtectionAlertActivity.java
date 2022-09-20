@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.di.ApplicationScope;
+import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener;
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener;
 import mega.privacy.android.app.main.LoginActivity;

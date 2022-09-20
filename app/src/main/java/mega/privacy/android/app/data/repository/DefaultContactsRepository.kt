@@ -1,8 +1,5 @@
 package mega.privacy.android.app.data.repository
 
-import android.content.Context
-import com.vdurmont.emoji.EmojiParser
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -10,9 +7,6 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.R
-import mega.privacy.android.app.components.twemoji.EmojiUtils
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.extensions.findItemByHandle
 import mega.privacy.android.app.data.extensions.getDecodedAliases
@@ -30,10 +24,9 @@ import mega.privacy.android.app.data.mapper.UserLastGreenMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.model.ChatUpdate
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -48,7 +41,6 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
-import java.util.Locale
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -59,7 +51,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaApiGateway         [MegaApiGateway]
  * @property megaChatApiGateway     [MegaChatApiGateway]
  * @property ioDispatcher           [CoroutineDispatcher]
- * @property context                [Context]
  * @property cacheFolderGateway     [CacheFolderGateway]
  * @property contactRequestMapper   [ContactRequestMapper]
  * @property userLastGreenMapper    [UserLastGreenMapper]
@@ -73,7 +64,6 @@ class DefaultContactsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @ApplicationContext private val context: Context,
     private val cacheFolderGateway: CacheFolderGateway,
     private val contactRequestMapper: ContactRequestMapper,
     private val userLastGreenMapper: UserLastGreenMapper,
@@ -91,7 +81,7 @@ class DefaultContactsRepository @Inject constructor(
 
     override fun monitorChatPresenceLastGreenUpdates() = megaChatApiGateway.chatUpdates
         .filterIsInstance<ChatUpdate.OnChatPresenceLastGreen>()
-        .map { userLastGreenMapper(context, it.userHandle, it.lastGreen) }
+        .map { userLastGreenMapper(it.userHandle, it.lastGreen) }
 
     override suspend fun requestLastGreen(userHandle: Long) {
         megaChatApiGateway.requestLastGreen(userHandle)
@@ -151,105 +141,38 @@ class DefaultContactsRepository @Inject constructor(
                 val status = megaChatApiGateway.getUserOnlineStatus(megaUser.handle)
                 val avatarUri = cacheFolderGateway.getCacheFile(CacheFolderManager.AVATAR_FOLDER,
                     "${megaUser.email}.jpg")?.absolutePath
-                val lastSeen = if (status == MegaChatApi.STATUS_ONLINE) {
-                    context.getFormattedStringOrDefault(R.string.online_status)
-                } else {
-                    megaChatApiGateway.requestLastGreen(megaUser.handle)
-                    null
-                }
+
+                checkLastGreen(status, megaUser.handle)
+
+                val contactData = contactDataMapper(
+                    fullName?.ifEmpty { null },
+                    alias?.ifEmpty { null },
+                    avatarUri
+                )
 
                 contactItemMapper(
                     megaUser,
-                    fullName?.ifEmpty { null },
-                    alias?.ifEmpty { null },
-                    getAvatarFirstLetter(alias ?: fullName ?: megaUser.email),
+                    contactData,
                     megaApiGateway.getUserAvatarColor(megaUser),
                     megaApiGateway.areCredentialsVerified(megaUser),
                     status,
-                    avatarUri,
-                    lastSeen
+                    null
                 )
             }
             .sortList()
     }
 
     /**
-     * Retrieve the first letter of a String.
+     * Requests last green if the user is not online.
      *
-     * @param text String to obtain the first letter.
-     * @return The first letter of the string to be painted in the default avatar.
+     * @param status User online status.
+     * @param userHandle User handle.
      */
-    private fun getAvatarFirstLetter(text: String): String {
-        val unknown = "U"
-
-        if (text.isEmpty()) {
-            return unknown
+    private suspend fun checkLastGreen(status: Int, userHandle: Long) {
+        if (status != MegaChatApi.STATUS_ONLINE) {
+            megaChatApiGateway.requestLastGreen(userHandle)
         }
-
-        val result = text.trim { it <= ' ' }
-        if (result.length == 1) {
-            return result[0].toString().uppercase(Locale.getDefault())
-        }
-
-        val resultTitle = EmojiUtilsShortcodes.emojify(result)
-        if (resultTitle.isNullOrEmpty()) {
-            return unknown
-        }
-
-        val emojis = EmojiUtils.emojis(resultTitle)
-
-        if (emojis.size > 0 && emojis[0].start == 0) {
-            return resultTitle.substring(emojis[0].start, emojis[0].end)
-        }
-
-        val resultEmojiCompat = getEmojiCompatAtFirst(resultTitle)
-        if (resultEmojiCompat != null) {
-            return resultEmojiCompat
-        }
-
-        val resultChar = resultTitle[0].toString().uppercase(Locale.getDefault())
-        return if (resultChar.trim { it <= ' ' }
-                .isEmpty() || resultChar == "(" || !isRecognizableCharacter(
-                resultChar[0])
-        ) {
-            unknown
-        } else resultChar
-
     }
-
-    /**
-     * Gets the first character as an emoji if any.
-     *
-     * @param text Text to check.
-     * @return The emoji if any, null otherwise.
-     */
-    private fun getEmojiCompatAtFirst(text: String?): String? {
-        if (text.isNullOrEmpty()) {
-            return null
-        }
-
-        val listEmojis = EmojiParser.extractEmojis(text)
-
-        if (listEmojis != null && listEmojis.isNotEmpty()) {
-            val substring = text.substring(0, listEmojis[0].length)
-            val sublistEmojis = EmojiParser.extractEmojis(substring)
-            if (sublistEmojis != null && sublistEmojis.isNotEmpty()) {
-                return substring
-            }
-        }
-
-        return null
-    }
-
-    /**
-     * Retrieve if a char is recognizable.
-     *
-     * @param inputChar The char to be examined.
-     * @return True if the char is recognizable. Otherwise false.
-     */
-    private fun isRecognizableCharacter(inputChar: Char): Boolean =
-        inputChar.code in 48..57 || inputChar.code in 65..90 || inputChar.code in 97..122
-
 
     override suspend fun getContactData(contactItem: ContactItem): ContactData =
         withContext(ioDispatcher) {
@@ -257,9 +180,8 @@ class DefaultContactsRepository @Inject constructor(
             val fullName = getFullName(email)
             val alias = getAlias(contactItem.handle)
             val avatarUri = getAvatarUri(email, "${email}.jpg")
-            val defaultAvatarContent = getAvatarFirstLetter(alias ?: fullName ?: email)
 
-            contactDataMapper(fullName, alias, avatarUri, defaultAvatarContent)
+            contactDataMapper(fullName, alias, avatarUri)
         }
 
     private suspend fun getFullName(email: String): String? =
@@ -392,23 +314,21 @@ class DefaultContactsRepository @Inject constructor(
                         onSuccess = { aliases -> aliases },
                         onFailure = { null }
                     )?.let { aliases ->
-                        outdatedContactList.forEach { (userHandle) ->
-                            val updatedAlias = updatedList.findItemByHandle(userHandle)
-                                ?.copy(alias = if (aliases.containsKey(userHandle)) aliases[userHandle] else null)
+                        outdatedContactList.forEach { (handle, _, contactData) ->
+                            val newContactData = contactData.copy(
+                                alias = if (aliases.containsKey(handle)) aliases[handle] else null)
 
-                            if (updatedAlias != null) {
-                                updatedList.replaceIfExists(updatedAlias.copy(
-                                    defaultAvatarContent = getAvatarFirstLetter(
-                                        updatedAlias.alias ?: updatedAlias.fullName
-                                        ?: updatedAlias.email)))
-                            }
+                            updatedContact = updatedList.findItemByHandle(handle)
+                                ?.copy(contactData = newContactData)
                         }
                     }
                 }
 
                 if (changes.contains(UserChanges.Firstname) || changes.contains(UserChanges.Lastname)) {
                     val fullName = getFullName(megaUser.email)
-                    updatedContact = updatedContact?.copy(fullName = fullName)
+                    updatedContact?.contactData?.copy(fullName = fullName)?.let { contactData ->
+                        updatedContact = updatedContact?.copy(contactData = contactData)
+                    }
                 }
 
                 if (changes.contains(UserChanges.Email)) {
@@ -417,15 +337,12 @@ class DefaultContactsRepository @Inject constructor(
 
                 if (changes.contains(UserChanges.Avatar)) {
                     val avatarUri = getAvatarUri(megaUser.email, "${megaUser.email}.jpg")
-                    updatedContact = updatedContact?.copy(avatarUri = avatarUri)
+                    updatedContact?.contactData?.copy(avatarUri = avatarUri)?.let { contactData ->
+                        updatedContact = updatedContact?.copy(contactData = contactData)
+                    }
                 }
 
-                if (updatedContact != null) {
-                    updatedList.replaceIfExists(updatedContact.copy(
-                        defaultAvatarContent = getAvatarFirstLetter(
-                            updatedContact.alias ?: updatedContact.fullName
-                            ?: updatedContact.email)))
-                }
+                updatedContact?.let { updatedList.replaceIfExists(it) }
             }
         }
 
@@ -436,23 +353,21 @@ class DefaultContactsRepository @Inject constructor(
         val fullName = getFullName(megaUser.email)
         val alias = getAlias(megaUser.handle)
         val status = megaChatApiGateway.getUserOnlineStatus(megaUser.handle)
-        val lastSeen = if (status == MegaChatApi.STATUS_ONLINE) {
-            context.getFormattedStringOrDefault(R.string.online_status)
-        } else {
-            megaChatApiGateway.requestLastGreen(megaUser.handle)
-            null
-        }
+        checkLastGreen(status, megaUser.handle)
+
+        val contactData = contactDataMapper(
+            fullName,
+            alias,
+            getAvatarUri(megaUser.email, "${megaUser.email}.jpg")
+        )
 
         return contactItemMapper(
             megaUser,
-            fullName,
-            alias,
-            getAvatarFirstLetter(alias ?: fullName ?: megaUser.email),
+            contactData,
             megaApiGateway.getUserAvatarColor(megaUser),
             megaApiGateway.areCredentialsVerified(megaUser),
             status,
-            getAvatarUri(megaUser.email, "${megaUser.email}.jpg"),
-            lastSeen
+            null
         )
     }
 

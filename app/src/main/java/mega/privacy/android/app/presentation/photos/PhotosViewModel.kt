@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.PhotosViewState
 import mega.privacy.android.domain.entity.photos.Photo

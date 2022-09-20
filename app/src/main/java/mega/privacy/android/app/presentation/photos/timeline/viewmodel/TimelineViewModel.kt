@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.di.IoDispatcher
-import mega.privacy.android.app.di.MainDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.Sort

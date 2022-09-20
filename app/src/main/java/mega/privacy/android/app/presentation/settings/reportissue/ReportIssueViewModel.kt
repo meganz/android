@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueState
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult

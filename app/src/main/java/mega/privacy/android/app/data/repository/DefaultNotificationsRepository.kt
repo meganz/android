@@ -10,7 +10,7 @@ import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.mapper.EventMapper
 import mega.privacy.android.app.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Event

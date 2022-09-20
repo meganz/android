@@ -2,7 +2,7 @@ package mega.privacy.android.app.zippreview.domain
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import java.io.*
 import java.lang.Exception
 import java.util.zip.ZipFile

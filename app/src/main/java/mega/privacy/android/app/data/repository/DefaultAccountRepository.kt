@@ -15,7 +15,7 @@ import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.domain.entity.UserAccount

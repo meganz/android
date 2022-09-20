@@ -959,7 +959,14 @@ public class UploadService extends Service {
                         localFile.delete();
                     }
 
-                    removeUploadedFileFromCacheAfterUploaded(transfer);
+                    if (error.getErrorCode() == MegaError.API_OK) {
+                        // Get the uploaded file from cache root directory.
+                        File uploadedFile = CacheFolderManager.getCacheFile(getApplicationContext(), "", transfer.getFileName());
+                        if (isFileAvailable(uploadedFile)) {
+                            Timber.d("Delete file!: %s", uploadedFile.getAbsolutePath());
+                            uploadedFile.delete();
+                        }
+                    }
 
                     File tempPic = CacheFolderManager.getCacheFolder(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
                     Timber.d("IN Finish: %spath? %s", transfer.getFileName(), transfer.getPath());
@@ -1027,8 +1034,6 @@ public class UploadService extends Service {
             if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
                 if (isCUOrChatTransfer(transfer)) return null;
 
-                removeUploadedFileFromCacheAfterUploaded(transfer);
-
                 switch (e.getErrorCode()) {
                     case MegaError.API_EOVERQUOTA:
                     case MegaError.API_EGOINGOVERQUOTA:
@@ -1053,19 +1058,6 @@ public class UploadService extends Service {
             }
             return null;
         });
-    }
-
-    /**
-     * Remove the uploaded files from cache folder after files are uploaded.
-     * @param transfer MegaTransfer
-     */
-    private void removeUploadedFileFromCacheAfterUploaded(MegaTransfer transfer) {
-        // Get the uploaded file from cache root directory.
-        File uploadedFile = CacheFolderManager.getCacheFile(getApplicationContext(), "", transfer.getFileName());
-        if (isFileAvailable(uploadedFile) && uploadedFile.exists()) {
-            Timber.d("Delete file!: %s", uploadedFile.getAbsolutePath());
-            uploadedFile.delete();
-        }
     }
 
     private void showStorageOverQuotaNotification() {

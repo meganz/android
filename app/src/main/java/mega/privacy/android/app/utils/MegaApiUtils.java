@@ -3,7 +3,6 @@ package mega.privacy.android.app.utils;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 import android.app.Activity;
 import android.app.Service;
@@ -35,7 +34,7 @@ public class MegaApiUtils {
         Timber.d("getFolderSize: %s", parent.getName());
         MegaApiAndroid megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         long size = 0;
-//        File[] files = dir.listFiles();
+
         ArrayList<MegaNode> nodeList = megaApi.getChildren(parent);
         for (MegaNode node : nodeList) {
             if (node.isFile()) {
@@ -57,22 +56,6 @@ public class MegaApiUtils {
         MegaApiJava megaApi = MegaApplication.getInstance().getMegaApi();
 
         return getFolderInfo(megaApi.getNumChildFolders(n), megaApi.getNumChildFiles(n));
-    }
-
-    /**
-     * Get the number of device node in backup folder
-     *
-     * @param subBackupNodes The node list of MyBackup folder
-     * @return the number of device node
-     */
-    public static int getMegaNodeBackupDeviceInfo(ArrayList<MegaNode> subBackupNodes) {
-        int device = 0;
-        for (MegaNode n : subBackupNodes) {
-            if (!isTextEmpty(n.getDeviceId())) {
-                device++;
-            }
-        }
-        return device;
     }
 
     /**
@@ -154,17 +137,6 @@ public class MegaApiUtils {
 
         if (node.getType() != MegaNode.TYPE_ROOT) {
             parentNode = megaApi.getParentNode(nodeTemp);
-
-//			if(parentNode!=null){
-//				while (parentNode.getType() != MegaNode.TYPE_ROOT){
-//					if(parentNode!=null){
-//						dTreeList.add(parentNode);
-//						dTree.insert(0, parentNode.getName()+"/");
-//						nodeTemp=parentNode;
-//						parentNode=megaApi.getParentNode(nodeTemp);
-//					}
-//				}
-//			}
 
             if (parentNode != null) {
 

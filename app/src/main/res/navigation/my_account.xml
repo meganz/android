@@ -68,7 +68,7 @@
     <activity
         android:id="@+id/upgrade"
         android:name="mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity"
-        tools:layout="@layout/activity_choose_upgrade_account"/>
+        tools:layout="@layout/activity_upgrade_account"/>
 
     <activity
         android:id="@+id/achievements"
