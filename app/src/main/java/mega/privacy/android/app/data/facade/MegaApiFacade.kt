@@ -24,6 +24,7 @@ import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
+import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
@@ -427,4 +428,8 @@ class MegaApiFacade @Inject constructor(
         type: Int,
         listener: MegaRequestListenerInterface,
     ) = megaApi.getUserAttribute(user, type, listener)
+
+    override suspend fun getRecentActions(): List<MegaRecentActionBucket> =
+        megaApi.recentActions
+
 }
