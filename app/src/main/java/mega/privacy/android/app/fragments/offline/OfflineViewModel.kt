@@ -22,8 +22,8 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.di.DefaultDispatcher
-import mega.privacy.android.app.di.MainDispatcher
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
@@ -42,7 +42,6 @@ import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
-import java.util.Locale
 import java.util.Stack
 import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Inject

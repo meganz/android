@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.di.ApplicationScope
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.wrapper.AvatarWrapper
