@@ -526,13 +526,13 @@ object MegaNodeUtil {
         } else if (isOutShare(node)) {
             R.drawable.ic_folder_outgoing
         } else if (isRootBackupFolder(node)) {
-            R.drawable.backup
+            R.drawable.ic_folder_list
         } else if (isDeviceBackupFolder(node)) {
             getMyBackupSubFolderIcon(node)
         } else if (isSubRootBackupFolder(node)) {
             val nodeType = checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi, node)
             if (nodeType == BACKUP_FOLDER_CHILD || nodeType == BACKUP_FOLDER) {
-                R.drawable.ic_folder_backup
+                R.drawable.ic_folder_list
             } else {
                 R.drawable.ic_folder_list
             }
@@ -1361,7 +1361,7 @@ object MegaNodeUtil {
         return when (parent.handle) {
             megaApi.rootNode.handle -> getString(R.string.section_cloud_drive)
             megaApi.rubbishNode.handle -> getString(R.string.section_rubbish_bin)
-            megaApi.inboxNode.handle -> getString(R.string.section_inbox)
+            megaApi.inboxNode.handle -> getString(R.string.home_side_menu_backups_title)
             else -> parent.name
         }
     }
@@ -1892,60 +1892,46 @@ object MegaNodeUtil {
      * @return The type of MyBackup folder, if the folder is not belong to the "My Backups" folder, return BACKUP_NONE
      */
     @JvmStatic
-    fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, node: MegaNode?): Int {
-        var nodeType = BACKUP_NONE
-
-        if (node != null) {
+    fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, node: MegaNode?): Int =
+        node?.let { selectedNode ->
             Timber.d("MyBackup + node.handle = ${node.handle}")
-            if (isNodeInRubbishOrDeleted(node.handle)) {
-                nodeType = BACKUP_NONE
-            } else if (node.handle == myBackupHandle) {
-                nodeType = BACKUP_ROOT
-            } else if (node.parentHandle == myBackupHandle && !node.deviceId.isNullOrBlank()) {
-                nodeType = BACKUP_DEVICE
-            } else {
-                var index = 0
-                var p = node
-                var q = megaApi.getParentNode(p)
-                var isInBackupFolder = false
-                if (q != null && q.parentHandle == myBackupHandle) {
-                    nodeType = if (!p.deviceId.isNullOrBlank()) {
-                        BACKUP_FOLDER
-                    } else {
-                        BACKUP_NONE
-                    }
-                } else {
-                    while (megaApi.getParentNode(p) != null) {
-                        q = p
-                        p = megaApi.getParentNode(p)
-                        index++
-                        if (p != null
-                            && p.parentHandle == myBackupHandle
-                            && !p.deviceId.isNullOrBlank()
-                            && !q.deviceId.isNullOrBlank()
-                        ) {
-                            isInBackupFolder = true
-                            break
-                        }
-                    }
 
-                    nodeType = if (!isInBackupFolder) {
-                        BACKUP_NONE
-                    } else {
-                        if (index > 1) {
-                            BACKUP_FOLDER_CHILD
-                        } else if (!node.deviceId.isNullOrBlank() && index == 1) {
-                            BACKUP_FOLDER
-                        } else {
-                            BACKUP_NONE
-                        }
-                    }
-                }
+            // First, check if the node exists in Backups.
+            // If the node doesn't exist in Backups, or is in Rubbish Bin, return BACKUP_NONE
+            if (!megaApi.isInInbox(selectedNode) || isNodeInRubbishOrDeleted(selectedNode.handle)) {
+                Timber.d("MyBackup + checkBackupNodeTypeByHandle return nodeType = $BACKUP_NONE")
+                return BACKUP_NONE
             }
-        }
-        Timber.d("MyBackup + checkBackupNodeTypeByHandle return nodeType = $nodeType")
-        return nodeType
-    }
+
+            // If the node exists in Backups, check and return BACKUP_ROOT
+            // if the node's handle is the same with the root Backup handle
+            if (selectedNode.handle == myBackupHandle) {
+                Timber.d("MyBackup + checkBackupNodeTypeByHandle return nodeType = $BACKUP_ROOT")
+                return BACKUP_ROOT
+            }
+
+            // If the node is not a Backup Root node, check and return BACKUP_DEVICE
+            // if the node's parent handle is the same with the root Backup handle, and
+            // if the node's device ID exists
+            if (selectedNode.parentHandle == myBackupHandle && !selectedNode.deviceId.isNullOrBlank()) {
+                Timber.d("MyBackup + checkBackupNodeTypeByHandle return nodeType = $BACKUP_DEVICE")
+                return BACKUP_DEVICE
+            }
+
+            // If the node is not a Device node, check and return BACKUP_FOLDER
+            // if the node's parent node is a Device Node, and if the Device Node's ID exists
+            val deviceNode = megaApi.getNodeByHandle(selectedNode.parentHandle)
+            if ((selectedNode.parentHandle == deviceNode.handle) && !deviceNode.deviceId.isNullOrBlank()) {
+                Timber.d("MyBackup + checkBackupNodeTypeByHandle return nodeType = $BACKUP_FOLDER")
+                return BACKUP_FOLDER
+            }
+
+            // Otherwise, the node is considered to be a Child Folder of a Backup Folder underneath
+            // the Device Node
+            Timber.d("MyBackup + checkBackupNodeTypeByHandle return nodeType = $BACKUP_FOLDER_CHILD")
+            return BACKUP_FOLDER_CHILD
+
+        } ?: BACKUP_NONE
 
     @JvmStatic
     fun containsMediaFile(handle: Long): Boolean {

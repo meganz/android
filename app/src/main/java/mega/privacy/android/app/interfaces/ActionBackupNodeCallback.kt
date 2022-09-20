@@ -17,12 +17,7 @@ interface ActionBackupNodeCallback {
      * Makes the necessary UI changes after confirm the action.
      * @param handleList The handles list of the nodes that selected
      * @param pNodeBackup Can not be null, for the actions:
-     * ACTION_COPY_TO_BACKUP            - The destination node belongs to "My backups"
-     * ACTION_BACKUP_REMOVE             - The root of backup node in handleList,
-     *                                    otherwise one of the node in handleList
-     * ACTION_MOVE_TO_BACKUP            - The destination node belongs to "My backups"
-     * ACTION_BACKUP_MOVE               - The root of backup node in handleList,
-     *                                    otherwise one of the node in handleList
+
      * ACTION_MENU_BACKUP_SHARE_FOLDER  - The root of backup node
      * ACTION_BACKUP_SHARE_FOLDER       - The node that select for share.
      * ACTION_BACKUP_FAB                - if the folder is empty, pNodeBackup is the parent node of empty folder,
@@ -30,10 +25,7 @@ interface ActionBackupNodeCallback {
      *
      * @param nodeType The type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
      * @param actionType Indicates the action to backup folder or file:
-     *                                  - ACTION_COPY_TO_BACKUP
      *                                  - ACTION_BACKUP_REMOVE
-     *                                  - ACTION_MOVE_TO_BACKUP
-     *                                  - ACTION_BACKUP_MOVE
      *                                  - ACTION_MENU_BACKUP_SHARE_FOLDER
      *                                  - ACTION_BACKUP_SHARE_FOLDER
      *                                  - ACTION_BACKUP_FAB
@@ -49,12 +41,7 @@ interface ActionBackupNodeCallback {
      * Makes the necessary UI changes after execute the action.
      * @param handleList The handles list of the nodes that selected
      * @param pNodeBackup Can not be null, for the actions:
-     * ACTION_COPY_TO_BACKUP            - The destination node belongs to "My backups"
-     * ACTION_BACKUP_REMOVE             - The root of backup node in handleList,
-     *                                    otherwise one of the node in handleList
-     * ACTION_MOVE_TO_BACKUP            - The destination node belongs to "My backups"
-     * ACTION_BACKUP_MOVE               - The root of backup node in handleList,
-     *                                    otherwise one of the node in handleList
+
      * ACTION_MENU_BACKUP_SHARE_FOLDER  - The root of backup node
      * ACTION_BACKUP_SHARE_FOLDER       - The node that select for share.
      * ACTION_BACKUP_FAB                - if the folder is empty, pNodeBackup is the parent node of empty folder,
@@ -62,10 +49,7 @@ interface ActionBackupNodeCallback {
      *
      * @param nodeType The type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
      * @param actionType Indicates the action to backup folder or file:
-     *                                  - ACTION_COPY_TO_BACKUP
      *                                  - ACTION_BACKUP_REMOVE
-     *                                  - ACTION_MOVE_TO_BACKUP
-     *                                  - ACTION_BACKUP_MOVE
      *                                  - ACTION_MENU_BACKUP_SHARE_FOLDER
      *                                  - ACTION_BACKUP_SHARE_FOLDER
      *                                  - ACTION_BACKUP_FAB
@@ -80,10 +64,6 @@ interface ActionBackupNodeCallback {
      * Makes the necessary UI changes after cancel the action.
      * @param dialog The warning dialog
      * @param actionType Indicates the action to backup folder or file:
-     *              - ACTION_COPY_TO_BACKUP
-     *              - ACTION_BACKUP_REMOVE
-     *              - ACTION_MOVE_TO_BACKUP
-     *              - ACTION_BACKUP_MOVE
      *              - ACTION_MENU_BACKUP_SHARE_FOLDER
      *              - ACTION_BACKUP_SHARE_FOLDER
      *              - ACTION_BACKUP_FAB

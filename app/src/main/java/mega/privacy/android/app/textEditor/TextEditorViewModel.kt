@@ -134,6 +134,13 @@ class TextEditorViewModel @Inject constructor(
 
     fun getNode(): MegaNode? = textEditorData.value?.node
 
+    /**
+     * Checks whether the [MegaNode] is a Backup Node or not
+     */
+    fun isNodeInInbox(): Boolean = getNode()?.let {
+        megaApi.isInInbox(it)
+    } ?: false
+
     fun getNodeAccess(): Int = megaApi.getAccess(getNode())
 
     fun updateNode() {
@@ -204,7 +211,7 @@ class TextEditorViewModel @Inject constructor(
 
     fun canShowEditFab(): Boolean =
         isViewMode() && isEditableAdapter() && !needsReadOrIsReadingContent()
-                && thereIsNoErrorSettingContent()
+                && thereIsNoErrorSettingContent() && !isNodeInInbox()
 
     /**
      * Checks if the file can be editable depending on the current adapter.

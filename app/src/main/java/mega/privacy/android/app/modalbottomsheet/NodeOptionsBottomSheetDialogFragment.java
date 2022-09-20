@@ -32,7 +32,6 @@ import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
-import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeInList;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor;
@@ -50,6 +49,7 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityStr
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC;
 
@@ -63,7 +63,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -97,7 +96,6 @@ import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.ViewUtils;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -146,6 +144,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     public static final int FAVOURITES_MODE = 8;
 
     private static final String SAVED_STATE_KEY_MODE = "MODE";
+
+    /** Values used to control the display of option separators*/
+    private int counterOpen = 2;
+    private int counterSave = 2;
+    private int counterShares = 6;
+    private int counterModify = 4;
 
     private int mMode;
 
@@ -248,10 +252,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView optionLeaveShares = contentView.findViewById(R.id.leave_share_option);
         TextView optionRubbishBin = contentView.findViewById(R.id.rubbish_bin_option);
         TextView optionRemove = contentView.findViewById(R.id.remove_option);
-//      backup
-        RelativeLayout optionMoveBackup = contentView.findViewById(R.id.option_backup_move_layout);
-        TextView optionCopyBackup = contentView.findViewById(R.id.backup_copy_option);
-        RelativeLayout optionRubbishBinBackup = contentView.findViewById(R.id.option_backup_rubbish_bin_layout);
 
         optionEdit.setOnClickListener(this);
         optionLabel.setOnClickListener(this);
@@ -275,9 +275,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionOpenFolder.setOnClickListener(this);
         optionSlideshow.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
-        optionMoveBackup.setOnClickListener(this);
-        optionCopyBackup.setOnClickListener(this);
-        optionRubbishBinBackup.setOnClickListener(this);
+
         optionVersionsLayout.setOnClickListener(this);
 
         TextView viewInFolder = contentView.findViewById(R.id.view_in_folder_option);
@@ -288,11 +286,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             viewInFolder.setVisibility(View.GONE);
             viewInFolder.setOnClickListener(null);
         }
-
-        int counterOpen = 2;
-        int counterSave = 2;
-        int counterShares = 6;
-        int counterModify = 4;
 
         LinearLayout separatorOpen = contentView.findViewById(R.id.separator_open_options);
         LinearLayout separatorDownload = contentView.findViewById(R.id.separator_download_options);
@@ -450,29 +443,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         switch (mMode) {
             case CLOUD_DRIVE_MODE:
-            case INBOX_MODE:
             case SEARCH_MODE:
                 Timber.d("show Cloud bottom sheet");
-
-                // Check if sub folder of "My Backup"
-                ArrayList<Long> handleList = new ArrayList<>();
-                handleList.add(node.getHandle());
-                int nodeType = checkBackupNodeTypeInList(megaApi, handleList);
-                if (nodeType != BACKUP_NONE) {
-                    counterModify--;
-                    optionRename.setVisibility(View.GONE);
-                    counterModify--;
-                    optionMove.setVisibility(View.GONE);
-                    if (ViewUtils.isVisible(optionCopy)) {
-                        counterModify--;
-                        optionCopy.setVisibility(View.GONE);
-                    }
-                    optionRubbishBin.setVisibility(View.GONE);
-
-                    optionMoveBackup.setVisibility(View.VISIBLE);
-                    optionCopyBackup.setVisibility(isTakenDown ? View.GONE : View.VISIBLE);
-                    optionRubbishBinBackup.setVisibility(View.VISIBLE);
-                }
 
                 optionRemove.setVisibility(View.GONE);
                 optionLeaveShares.setVisibility(View.GONE);
@@ -480,6 +452,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionOpenFolder.setVisibility(View.GONE);
                 counterModify--;
                 optionRestoreFromRubbish.setVisibility(View.GONE);
+                break;
+            case INBOX_MODE:
+                Timber.d("show My Backups bottom sheet");
                 break;
 
             case RUBBISH_BIN_MODE:
@@ -490,7 +465,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 long restoreHandle = node.getRestoreHandle();
                 MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
                 if (restoreHandle == INVALID_HANDLE || !megaApi.isInRubbish(node)
-                        || restoreNode == null || megaApi.isInRubbish(restoreNode)) {
+                        || restoreNode == null || megaApi.isInRubbish(restoreNode) || megaApi.isInInbox(restoreNode)) {
                     counterModify--;
                     optionRestoreFromRubbish.setVisibility(View.GONE);
                 }
@@ -591,6 +566,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                                 Timber.d("LEVEL 0 - readwrite");
                                 permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
                                 break;
+                            default:
+                                break;
                         }
                     }
 
@@ -636,6 +613,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             optionMove.setVisibility(View.GONE);
                             optionRubbishBin.setVisibility(View.GONE);
                             break;
+                        default:
+                            break;
                     }
                 } else if (tabSelected == SharesTab.OUTGOING_TAB) {
                     Timber.d("showOptionsPanelOutgoing");
@@ -644,11 +623,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             && ViewUtils.isVisible(optionClearShares)) {
                         //Show the number of contacts who shared the folder
                         ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-                        if (sl != null) {
-                            if (sl.size() != 0) {
-                                nodeInfo.setText(getQuantityString(R.plurals.general_num_shared_with,
-                                        sl.size(), sl.size()));
-                            }
+                        if (sl != null && sl.size() != 0) {
+                            nodeInfo.setText(getQuantityString(R.plurals.general_num_shared_with,
+                                    sl.size(), sl.size()));
                         }
                     } else if (ViewUtils.isVisible(optionClearShares)) {
                         counterShares--;
@@ -683,45 +660,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case RECENTS_MODE:
             case FAVOURITES_IN_TAB_MODE:
             case FAVOURITES_MODE:
-                if (ViewUtils.isVisible(optionShareFolder)) {
-                    counterShares--;
-                    optionShareFolder.setVisibility(View.GONE);
-                }
-                if (ViewUtils.isVisible(optionClearShares)) {
-                    counterShares--;
-                    optionClearShares.setVisibility(View.GONE);
-                }
-
-                optionRemove.setVisibility(View.GONE);
-                optionLeaveShares.setVisibility(View.GONE);
-                counterOpen--;
-                optionOpenFolder.setVisibility(View.GONE);
-                counterModify--;
-                optionRestoreFromRubbish.setVisibility(View.GONE);
-
-                switch (accessLevel) {
-                    case MegaShare.ACCESS_READWRITE:
-                    case MegaShare.ACCESS_READ:
-                    case MegaShare.ACCESS_UNKNOWN:
-                        optionLabel.setVisibility(View.GONE);
-                        optionFavourite.setVisibility(View.GONE);
-                        counterModify--;
-                        optionRename.setVisibility(View.GONE);
-                        counterModify--;
-                        optionMove.setVisibility(View.GONE);
-                        optionRubbishBin.setVisibility(View.GONE);
-                        if (ViewUtils.isVisible(optionLink)) {
-                            counterShares--;
-                            optionLink.setVisibility(View.GONE);
-                        }
-                        if (ViewUtils.isVisible(optionRemoveLink)) {
-                            counterShares--;
-                            optionRemoveLink.setVisibility(View.GONE);
-                        }
-                        break;
-                }
+                // If the Dialog Fragment is opened from the Favourites page, handle the display
+                // of Dialog options accordingly
+                handleRecentsAndFavouritesOptionsDisplay(accessLevel);
+                break;
+            default:
                 break;
         }
+
+        // After setting up the content to be displayed in the Options Dialog, check if
+        // read-only properties should be applied.
+        checkIfShouldApplyReadOnlyState();
 
         separatorOpen.setVisibility(counterOpen <= 0 ? View.GONE : View.VISIBLE);
         separatorDownload.setVisibility(counterSave <= 0 ? View.GONE : View.VISIBLE);
@@ -765,6 +714,113 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     public void onDestroyView() {
         AlertDialogUtil.dismissAlertDialogIfExists(cannotOpenFileDialog);
         super.onDestroyView();
+    }
+
+    /**
+     * Apply read-only Restrictions for Backup Nodes by hiding the following options:
+     *
+     * 1.) Rename
+     * 2.) Move to
+     * 3.) Move to Rubbish Bin
+     * 4.) Favourite
+     * 5.) Label
+     * 6.) Versions
+     *
+     * Hiding the aforementioned options will reduce the counter values for the Modify and Open
+     * group options
+     */
+    private void checkIfShouldApplyReadOnlyState() {
+        LinearLayout optionEdit = contentView.findViewById(R.id.edit_file_option);
+        TextView optionFavourite = contentView.findViewById(R.id.favorite_option);
+        LinearLayout optionLabel = contentView.findViewById(R.id.option_label_layout);
+        TextView optionRename = contentView.findViewById(R.id.rename_option);
+        TextView optionMove = contentView.findViewById(R.id.move_option);
+        TextView optionLeaveShares = contentView.findViewById(R.id.leave_share_option);
+        TextView optionOpenFolder = contentView.findViewById(R.id.open_folder_option);
+        TextView optionRestoreFromRubbish = contentView.findViewById(R.id.restore_option);
+        TextView optionRubbishBin = contentView.findViewById(R.id.rubbish_bin_option);
+        TextView optionRemove = contentView.findViewById(R.id.remove_option);
+        LinearLayout optionVersions = contentView.findViewById(R.id.option_versions_layout);
+
+        if (node != null && megaApi.isInInbox(node)) {
+            optionEdit.setVisibility(View.GONE);
+            optionFavourite.setVisibility(View.GONE);
+            optionLabel.setVisibility(View.GONE);
+            optionRename.setVisibility(View.GONE);
+            optionMove.setVisibility(View.GONE);
+            optionRubbishBin.setVisibility(View.GONE);
+            optionVersions.setVisibility(View.GONE);
+
+            optionRemove.setVisibility(View.GONE);
+            optionLeaveShares.setVisibility(View.GONE);
+            optionOpenFolder.setVisibility(View.GONE);
+            optionRestoreFromRubbish.setVisibility(View.GONE);
+
+            counterModify -= 3;
+            counterOpen--;
+        }
+    }
+
+    /**
+     * Displays specific actions when the Dialog Fragment is accessed from the Recents or Favourites page.
+     * This will also reduce the counter values of different group options
+     *
+     * @param accessLevel - Access Level of the Node
+     */
+    private void handleRecentsAndFavouritesOptionsDisplay(int accessLevel) {
+        TextView optionFavourite = contentView.findViewById(R.id.favorite_option);
+        LinearLayout optionLabel = contentView.findViewById(R.id.option_label_layout);
+        TextView optionRename = contentView.findViewById(R.id.rename_option);
+        TextView optionMove = contentView.findViewById(R.id.move_option);
+        TextView optionLeaveShares = contentView.findViewById(R.id.leave_share_option);
+        TextView optionOpenFolder = contentView.findViewById(R.id.open_folder_option);
+        TextView optionRestoreFromRubbish = contentView.findViewById(R.id.restore_option);
+        TextView optionRubbishBin = contentView.findViewById(R.id.rubbish_bin_option);
+        TextView optionRemove = contentView.findViewById(R.id.remove_option);
+        TextView optionLink = contentView.findViewById(R.id.link_option);
+        TextView optionRemoveLink = contentView.findViewById(R.id.remove_link_option);
+        TextView optionShareFolder = contentView.findViewById(R.id.share_folder_option);
+        TextView optionClearShares = contentView.findViewById(R.id.clear_share_option);
+
+        if (ViewUtils.isVisible(optionShareFolder)) {
+            counterShares--;
+            optionShareFolder.setVisibility(View.GONE);
+        }
+        if (ViewUtils.isVisible(optionClearShares)) {
+            counterShares--;
+            optionClearShares.setVisibility(View.GONE);
+        }
+
+        optionRemove.setVisibility(View.GONE);
+        optionLeaveShares.setVisibility(View.GONE);
+        counterOpen--;
+        optionOpenFolder.setVisibility(View.GONE);
+        counterModify--;
+        optionRestoreFromRubbish.setVisibility(View.GONE);
+
+        switch (accessLevel) {
+            case MegaShare.ACCESS_READWRITE:
+            case MegaShare.ACCESS_READ:
+            case MegaShare.ACCESS_UNKNOWN:
+                optionLabel.setVisibility(View.GONE);
+                optionFavourite.setVisibility(View.GONE);
+                counterModify--;
+                optionRename.setVisibility(View.GONE);
+                counterModify--;
+                optionMove.setVisibility(View.GONE);
+                optionRubbishBin.setVisibility(View.GONE);
+                if (ViewUtils.isVisible(optionLink)) {
+                    counterShares--;
+                    optionLink.setVisibility(View.GONE);
+                }
+                if (ViewUtils.isVisible(optionRemoveLink)) {
+                    counterShares--;
+                    optionRemoveLink.setVisibility(View.GONE);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     private void showOwnerSharedFolder() {
@@ -815,8 +871,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 if (availableOffline(requireContext(), node)) {
                     MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
                     removeFromOffline(mOffDelete);
-                    Util.showSnackbar(
-                            getActivity(), getResources().getString(R.string.file_removed_offline));
+                    showSnackbar(getActivity(), getResources().getString(R.string.file_removed_offline));
                 } else {
                     saveForOffline();
                 }
@@ -838,12 +893,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     if (((ManagerActivity) requireActivity()).getTabItemShares() == SharesTab.INCOMING_TAB) {
                         i.putExtra("from", FROM_INBOX);
                     }
-                } else if (drawerItem == DrawerItem.SEARCH) {
-                    if (nC.nodeComesFromIncoming(node)) {
-                        i.putExtra("from", FROM_INCOMING_SHARES);
-                        int dBT = nC.getIncomingLevel(node);
-                        i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, dBT <= FIRST_NAVIGATION_LEVEL);
-                    }
+                } else if (drawerItem == DrawerItem.SEARCH && nC.nodeComesFromIncoming(node)) {
+                    i.putExtra("from", FROM_INCOMING_SHARES);
+                    int dBT = nC.getIncomingLevel(node);
+                    i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, dBT <= FIRST_NAVIGATION_LEVEL);
                 }
                 i.putExtra(NAME, node.getName());
 
@@ -865,13 +918,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.share_folder_option:
                 nodeType = checkBackupNodeTypeByHandle(megaApi, node);
-                if (nodeType != BACKUP_NONE) {
-                    ((ManagerActivity) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE_FOLDER);
+                if (isOutShare(node)) {
+                    i = new Intent(requireContext(), FileContactListActivity.class);
+                    i.putExtra(NAME, node.getHandle());
+                    startActivity(i);
                 } else {
-                    if (isOutShare(node)) {
-                        i = new Intent(requireContext(), FileContactListActivity.class);
-                        i.putExtra(NAME, node.getHandle());
-                        startActivity(i);
+                    if (nodeType != BACKUP_NONE) {
+                        ((ManagerActivity) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE_FOLDER);
                     } else {
                         nC.selectContactToShareFolder(node);
                     }
@@ -904,20 +957,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 dismissAllowingStateLoss();
                 break;
 
-            case R.id.option_backup_move_layout:
-                ((ManagerActivity) requireActivity()).moveBackupNode(handleList);
-                dismissAllowingStateLoss();
-                break;
-
             case R.id.copy_option:
-            case R.id.backup_copy_option:
                 nC.chooseLocationToCopyNodes(handleList);
                 dismissAllowingStateLoss();
                 break;
 
             case R.id.rubbish_bin_option:
             case R.id.remove_option:
-            case R.id.option_backup_rubbish_bin_layout:
                 ((ManagerActivity) requireActivity()).askConfirmationMoveToRubbish(handleList);
                 break;
 
@@ -961,6 +1007,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 version.putExtra("handle", node.getHandle());
                 requireActivity().startActivityForResult(version, REQUEST_CODE_DELETE_VERSIONS_HISTORY);
                 break;
+            default:
+                break;
         }
 
         setStateBottomSheetBehaviorHidden();
@@ -997,7 +1045,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     }
 
     private void saveForOffline() {
-        int adapterType;
+        int adapterType = FROM_OTHERS;
 
         switch (drawerItem) {
             case INBOX:
@@ -1007,11 +1055,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case SHARED_ITEMS:
                 if (((ManagerActivity) requireActivity()).getTabItemShares() == SharesTab.INCOMING_TAB) {
                     adapterType = FROM_INCOMING_SHARES;
-                    break;
                 }
+                break;
 
             default:
-                adapterType = FROM_OTHERS;
+                break;
         }
 
         File offlineParent = getOfflineParentFile(requireActivity(), adapterType, node, megaApi);
@@ -1082,6 +1130,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         return OUTGOING_SHARES_ADAPTER;
                     case LINKS_TAB:
                         return LINKS_ADAPTER;
+                    default:
+                        return INVALID_VALUE;
                 }
             case SEARCH_MODE:
                 return SEARCH_ADAPTER;

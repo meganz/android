@@ -141,6 +141,7 @@
         </LinearLayout>
 
         <View
+            android:id="@+id/separator_change_permissions"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="72dp"

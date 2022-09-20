@@ -11,12 +11,9 @@ import static mega.privacy.android.app.utils.Constants.THUMB_MARGIN_DP;
 import static mega.privacy.android.app.utils.Constants.THUMB_SIZE_DP;
 import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
-import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeBackupDeviceInfo;
 import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getNumberOfFolders;
-import static mega.privacy.android.app.utils.MegaNodeUtil.myBackupHandle;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
@@ -320,17 +317,7 @@ public class MegaExplorerAdapter extends RecyclerView.Adapter<MegaExplorerAdapte
             setImageParams(holder.imageView, ICON_SIZE_DP, ICON_MARGIN_DP);
             holder.itemView.setOnClickListener(this);
             holder.permissionsIcon.setVisibility(View.GONE);
-            if (node.getHandle() == myBackupHandle) {
-                ArrayList<MegaNode> subBackupNodes = megaApi.getChildren(node);
-                if (subBackupNodes != null && subBackupNodes.size() > 0) {
-                    int device = getMegaNodeBackupDeviceInfo(subBackupNodes);
-                    holder.textViewFileSize.setText(getQuantityString(R.plurals.num_devices, device, device));
-                } else {
-                    holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
-                }
-            } else {
-                holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
-            }
+            holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
             holder.imageView.setImageResource(getFolderIcon(node, DrawerItem.CLOUD_DRIVE));
 
             if (node.isInShare()) {
