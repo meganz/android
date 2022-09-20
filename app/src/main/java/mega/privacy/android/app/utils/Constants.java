@@ -836,8 +836,8 @@ public class Constants {
 
     //Types of blocked accounts
     public static final String ACCOUNT_NOT_BLOCKED = "0";
-    public static final String COPYRIGHT_ACCOUNT_BLOCK = "200";
-    public static final String MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK = "300";
+    public static final String TOS_COPYRIGHT_ACCOUNT_BLOCK = "200";
+    public static final String TOS_NON_COPYRIGHT_ACCOUNT_BLOCK = "300";
     public static final String DISABLED_BUSINESS_ACCOUNT_BLOCK = "400";
     public static final String REMOVED_BUSINESS_ACCOUNT_BLOCK = "401";
     public static final String SMS_VERIFICATION_ACCOUNT_BLOCK = "500";
