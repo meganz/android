@@ -4322,7 +4322,7 @@ public class ManagerActivity extends TransfersManagementActivity
             refreshFragment(FragmentTag.RECENT_CHAT.getTag());
         }
 
-        replaceFragment(ChatTabsFragment.newInstance(), FragmentTag.RECENT_CHAT.getTag());
+        replaceFragment(chatTabsFragment, FragmentTag.RECENT_CHAT.getTag());
 
         drawerLayout.closeDrawer(Gravity.LEFT);
         PermissionUtils.checkNotificationsPermission(this);

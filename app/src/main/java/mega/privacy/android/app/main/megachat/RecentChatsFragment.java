@@ -1312,7 +1312,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         Timber.d("onPause");
         lastFirstVisiblePosition = ((LinearLayoutManager) listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
         MegaApplication.setRecentChatVisible(false);
-        if (actionMode != null) actionMode.finish();
         super.onPause();
     }
 
