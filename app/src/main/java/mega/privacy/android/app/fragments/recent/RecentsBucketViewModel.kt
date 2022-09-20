@@ -6,9 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
@@ -16,12 +17,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetThumbnail
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaRecentActionBucket
@@ -268,25 +269,34 @@ class RecentsBucketViewModel @Inject constructor(
     private suspend fun getNodes(bucket: MegaRecentActionBucket): List<NodeItem> =
         withContext(ioDispatcher) {
             val size = bucket.nodes.size()
+            val coroutineScope = CoroutineScope(SupervisorJob())
             val deferredNodeItems = mutableListOf<Deferred<NodeItem>>().apply {
                 for (i in 0 until size) {
-                    val node = bucket.nodes[i]
-                    add(
-                        async {
-                            NodeItem(
-                                node = node,
-                                thumbnail = getThumbnail(node.handle),
-                                index = -1,
-                                isVideo = node.isVideo(),
-                                modifiedDate = node.modificationTime.toString(),
-                            )
-                        }
-                    )
+                    bucket.nodes[i]?.let { node ->
+                        add(
+                            coroutineScope.async {
+                                NodeItem(
+                                    node = node,
+                                    thumbnail = getThumbnail(node.handle),
+                                    index = -1,
+                                    isVideo = node.isVideo(),
+                                    modifiedDate = node.modificationTime.toString(),
+                                )
+                            }
+                        )
+                    }
                 }
             }
 
-            val nodesList = ArrayList<NodeItem>(size).apply {
-                addAll(deferredNodeItems.awaitAll())
+            val nodesList = ArrayList<NodeItem>().apply {
+                deferredNodeItems.forEach {
+                    try {
+                        add(it.await())
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                    }
+                }
+
             }
 
             return@withContext nodesList
