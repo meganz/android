@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -296,7 +297,14 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val childOrder by lazy { intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_PHOTO_ASC) }
     private val chatRoomId by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_CHAT_ID, INVALID_HANDLE) }
     private val chatMessagesId by lazy { intent.getLongArrayExtra(INTENT_EXTRA_KEY_MSG_ID) }
-    private val imageFileUri by lazy { intent.getParcelableExtra(INTENT_EXTRA_KEY_URI, Uri::class.java) }
+    private val imageFileUri by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(INTENT_EXTRA_KEY_URI, Uri::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(INTENT_EXTRA_KEY_URI)
+        }
+    }
     private val showNearbyFiles by lazy { intent.getBooleanExtra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES, false) }
     private val showSlideshow by lazy { intent.getBooleanExtra(EXTRA_SHOW_SLIDESHOW, false) }
     private val isTimeline by lazy { intent.getBooleanExtra(EXTRA_IS_TIMELINE, false) }

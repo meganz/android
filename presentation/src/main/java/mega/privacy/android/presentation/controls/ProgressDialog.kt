@@ -72,7 +72,8 @@ fun ProgressDialog(
                         .align(Alignment.End)
                 ) {
                     Text(
-                        text = cancelButtonText,
+                        text = cancelButtonText.uppercase(),
+                        style = MaterialTheme.typography.button,
                         color = if (!MaterialTheme.colors.isLight) teal_200 else teal_300
                     )
                 }

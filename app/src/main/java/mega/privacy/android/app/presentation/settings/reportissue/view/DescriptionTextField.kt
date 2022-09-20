@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.settings.reportissue.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,9 +18,9 @@ internal fun DescriptionTextField(
     modifier: Modifier = Modifier,
 ) {
     MegaTextField(
-        label = stringResource(R.string.settings_help_report_issue_description_label),
-        description = description,
-        onTextChanged = onDescriptionChanged,
+        placeholder = { Text(text = stringResource(R.string.settings_help_report_issue_description_label)) },
+        value = description,
+        onValueChange = onDescriptionChanged,
         modifier = modifier
     )
 }

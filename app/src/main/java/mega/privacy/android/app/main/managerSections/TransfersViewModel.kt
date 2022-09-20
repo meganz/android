@@ -14,7 +14,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.listeners.MoveTransferListener
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -22,6 +22,7 @@ import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
+import java.io.File
 import java.util.Collections
 import javax.inject.Inject
 
@@ -33,7 +34,7 @@ class TransfersViewModel @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val transfersManagement: TransfersManagement,
     private val dbH: DatabaseHandler,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val _activeState = MutableStateFlow<ActiveTransfersState>(ActiveTransfersState.Default)
 
@@ -268,20 +269,35 @@ class TransfersViewModel @Inject constructor(
      * Removes a completed transfer.
      *
      * @param transfer transfer to remove
+     * @param isRemovedCache If ture, remove cache file, otherwise doesn't remove cache file
      */
-    fun completedTransferRemoved(transfer: AndroidCompletedTransfer) {
-        val index = completedTransfers.indexOfFirst { completedTransfer ->
-            completedTransfer?.let {
-                areTheSameTransfer(transfer, it)
-            } ?: false
-        }
-        if (index != INVALID_POSITION) {
-            completedTransfers.removeAt(index)
-            _completedState.update {
-                CompletedTransfersState.TransferRemovedUpdated(index)
+    fun completedTransferRemoved(transfer: AndroidCompletedTransfer, isRemovedCache: Boolean) =
+        viewModelScope.launch(ioDispatcher) {
+            if (isRemovedCache) {
+                File(transfer.originalPath).let { cacheFile ->
+                    if (cacheFile.exists()) {
+                        if (cacheFile.delete()) {
+                            Timber.d("Deleted success, path is $cacheFile")
+                        } else {
+                            Timber.d("Deleted failed, path is $cacheFile")
+                        }
+                    }
+                }
+
+            }
+            val index = completedTransfers.indexOfFirst { completedTransfer ->
+                completedTransfer?.let {
+                    areTheSameTransfer(transfer, it)
+                } ?: false
+            }
+            if (index != INVALID_POSITION) {
+                completedTransfers.removeAt(index)
+                _completedState.update {
+                    CompletedTransfersState.TransferRemovedUpdated(index,
+                        completedTransfers.toList())
+                }
             }
         }
-    }
 
     private fun areTheSameTransfer(
         transfer1: AndroidCompletedTransfer,
@@ -300,12 +316,25 @@ class TransfersViewModel @Inject constructor(
      * @return True if the transfer has a valid handle, false otherwise.
      */
     private fun isValidHandle(transfer: AndroidCompletedTransfer) =
-        !TextUtil.isTextEmpty(transfer.nodeHandle) && transfer.nodeHandle == MegaApiJava.INVALID_HANDLE.toString()
+        !TextUtil.isTextEmpty(transfer.nodeHandle) && transfer.nodeHandle != MegaApiJava.INVALID_HANDLE.toString()
 
     /**
      * Removes all completed transfers.
      */
-    fun clearCompletedTransfers() {
+    fun clearCompletedTransfers() = viewModelScope.launch(ioDispatcher) {
+        dbH.failedOrCancelledTransfers.mapNotNull { transfer ->
+            transfer?.let {
+                File(it.originalPath)
+            }
+        }.forEach { cacheFile ->
+            if (cacheFile.exists()) {
+                if (cacheFile.delete()) {
+                    Timber.d("Deleted success, path is $cacheFile")
+                } else {
+                    Timber.d("Deleted failed, path is $cacheFile")
+                }
+            }
+        }
         completedTransfers.clear()
         _completedState.update {
             CompletedTransfersState.ClearTransfersUpdated

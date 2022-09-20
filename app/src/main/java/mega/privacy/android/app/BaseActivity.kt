@@ -86,7 +86,7 @@ import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.app.utils.Constants.CHAT_ID
-import mega.privacy.android.app.utils.Constants.COPYRIGHT_ACCOUNT_BLOCK
+import mega.privacy.android.app.utils.Constants.TOS_COPYRIGHT_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.DISABLED_BUSINESS_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
 import mega.privacy.android.app.utils.Constants.EVENT_PSA
@@ -94,7 +94,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
-import mega.privacy.android.app.utils.Constants.MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK
+import mega.privacy.android.app.utils.Constants.TOS_NON_COPYRIGHT_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE
@@ -975,15 +975,16 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * @param stringError string shown as an alert in case there is not any specific action for the event
      */
     fun checkWhyAmIBlocked(eventNumber: Long, stringError: String?) {
+
         val intent: Intent
         when (eventNumber.toString()) {
             ACCOUNT_NOT_BLOCKED -> {}
-            COPYRIGHT_ACCOUNT_BLOCK -> megaChatApi.logout(ChatLogoutListener(this,
-                StringResourcesUtils.getString(R.string.account_suspended_breache_ToS),
+            TOS_COPYRIGHT_ACCOUNT_BLOCK -> megaChatApi.logout(ChatLogoutListener(this,
+                StringResourcesUtils.getString(R.string.dialog_account_suspended_ToS_copyright_message),
                 loggingSettings))
-            MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK -> megaChatApi.logout(ChatLogoutListener(
+            TOS_NON_COPYRIGHT_ACCOUNT_BLOCK -> megaChatApi.logout(ChatLogoutListener(
                 this,
-                StringResourcesUtils.getString(R.string.account_suspended_multiple_breaches_ToS),
+                StringResourcesUtils.getString(R.string.dialog_account_suspended_ToS_non_copyright_message),
                 loggingSettings))
             DISABLED_BUSINESS_ACCOUNT_BLOCK -> megaChatApi.logout(ChatLogoutListener(
                 this,

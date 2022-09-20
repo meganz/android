@@ -21,7 +21,7 @@ import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
-import mega.privacy.android.app.di.ApplicationScope
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL

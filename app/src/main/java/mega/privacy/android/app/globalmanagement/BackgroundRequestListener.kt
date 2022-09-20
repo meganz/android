@@ -8,7 +8,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.setLoggingOut
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
-import mega.privacy.android.app.di.ApplicationScope
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener

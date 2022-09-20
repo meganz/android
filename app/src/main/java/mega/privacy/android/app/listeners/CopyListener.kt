@@ -20,14 +20,23 @@ import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 
+/**
+ * CopyListener
+ *
+ * @property action : Integer
+ * @property snackbarShower : SnackbarShower
+ * @property activityLauncher : ActivityLauncher
+ * @property context : Context
+ */
 class CopyListener(
     private val action: Int,
     private val snackbarShower: SnackbarShower,
     private val activityLauncher: ActivityLauncher?,
-    context: Context,
-) : BaseListener(context) {
+    private val context: Context,
+) : MegaRequestListenerInterface {
 
     private val messagesSelected = ArrayList<MegaChatMessage>()
 
@@ -77,94 +86,130 @@ class CopyListener(
         this.exportListener = exportListener
     }
 
+    /**
+     * Callback function for onRequestStart
+     *
+     * @param api : MegaApiJava
+     * @param request : MegaRequest
+     */
+    override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {
+        // Do nothing
+    }
+
+    /**
+     * Callback function for onRequestUpdate
+     *
+     * @param api : MegaApiJava
+     * @param request : MegaRequest
+     */
+    override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {
+        // Do nothing
+    }
+
+    /**
+     * Callback function for onRequestFinish
+     *
+     * @param api : MegaApiJava
+     * @param request : MegaRequest
+     * @param e: MegaError
+     */
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        if (request.type != MegaRequest.TYPE_COPY) {
-            return
-        }
+        if (request.type == MegaRequest.TYPE_COPY) {
+            counter--
 
-        counter--
+            if (e.errorCode != MegaError.API_OK) {
+                Timber.e("Error copying")
+                error++
+            }
 
-        if (e.errorCode != MegaError.API_OK) {
-            Timber.e("Error copying")
-            error++
-        }
+            when (action) {
+                COPY -> {
+                    when (e.errorCode) {
+                        MegaError.API_OK -> {
+                            snackbarShower.showSnackbar(getString(R.string.context_correctly_copied))
+                        }
+                        MegaError.API_EOVERQUOTA -> {
+                            if (api.isForeignNode(request.parentHandle)) {
+                                showForeignStorageOverQuotaWarningDialog(context)
+                                return
+                            }
 
-        when (action) {
-            COPY -> {
-                when (e.errorCode) {
-                    MegaError.API_OK -> {
-                        snackbarShower.showSnackbar(getString(R.string.context_correctly_copied))
-                    }
-                    MegaError.API_EOVERQUOTA -> {
-                        if (api.isForeignNode(request.parentHandle)) {
-                            showForeignStorageOverQuotaWarningDialog(context)
-                            return
+                            Intent(context, ManagerActivity::class.java).run {
+                                action = ACTION_OVERQUOTA_STORAGE
+                                activityLauncher?.launchActivity(this)
+                            }
                         }
 
-                        val intent = Intent(context, ManagerActivity::class.java)
-                        intent.action = ACTION_OVERQUOTA_STORAGE
-                        activityLauncher?.launchActivity(intent)
-                    }
-                    MegaError.API_EGOINGOVERQUOTA -> {
-                        val intent = Intent(context, ManagerActivity::class.java)
-                        intent.action = ACTION_PRE_OVERQUOTA_STORAGE
-                        activityLauncher?.launchActivity(intent)
-                    }
-                    else -> {
-                        snackbarShower.showSnackbar(getString(R.string.context_no_copied))
+                        MegaError.API_EGOINGOVERQUOTA -> {
+                            Intent(context, ManagerActivity::class.java).run {
+                                action = ACTION_PRE_OVERQUOTA_STORAGE
+                                activityLauncher?.launchActivity(this)
+                            }
+                        }
+                        else -> {
+                            snackbarShower.showSnackbar(getString(R.string.context_no_copied))
+                        }
                     }
                 }
-            }
-            MULTIPLE_FORWARD_MESSAGES -> {
-                if (counter == 0) {
-                    if (error > 0) {
-                        val message = getQuantityString(R.plurals.error_forwarding_messages, error)
-                        val intent = Intent(BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES)
-                        intent.putExtra(BroadcastConstants.ERROR_MESSAGE_TEXT, message)
-                        context.sendBroadcast(intent)
-                    } else {
-                        Timber.d("Forward message")
-                        chatController?.forwardMessages(messagesSelected, chatId)
-                    }
-                }
-            }
-            MULTIPLE_IMPORT_CONTACT_MESSAGES -> {
-                if (counter == 0) {
-                    if (error > 0) {
-                        if (exportListener != null) {
-                            exportListener!!.errorImportingNodes()
+                MULTIPLE_FORWARD_MESSAGES -> {
+                    if (counter == 0) {
+                        if (error > 0) {
+                            Intent(BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES).run {
+                                putExtra(BroadcastConstants.ERROR_MESSAGE_TEXT,
+                                    getQuantityString(R.plurals.error_forwarding_messages, error))
+                                context.sendBroadcast(this)
+                            }
                         } else {
-                            snackbarShower.showSnackbar(
-                                getQuantityString(R.plurals.context_link_export_error, error)
-                            )
+                            Timber.d("Forward message")
+                            chatController?.forwardMessages(messagesSelected, chatId)
                         }
-                    } else {
-                        val node = api.getNodeByHandle(request.nodeHandle)
-
-                        if (node == null) {
-                            Timber.w("Node is NULL")
-                            return
-                        }
-
-                        if (exportListener != null) {
-                            exportListener!!.updateNodeHandle(
-                                messagesSelected[0].msgId,
-                                node.handle
-                            )
-
-                            Timber.d("Export Node")
-                            api.exportNode(node, exportListener)
+                    }
+                }
+                MULTIPLE_IMPORT_CONTACT_MESSAGES -> {
+                    if (counter == 0) {
+                        if (error > 0) {
+                            exportListener?.errorImportingNodes() ?: run {
+                                snackbarShower.showSnackbar(
+                                    getQuantityString(R.plurals.context_link_export_error, error)
+                                )
+                            }
                         } else {
-                            Timber.d("Share Node")
+                            val node = api.getNodeByHandle(request.nodeHandle)
 
-                            ChatUtil.shareNodeFromChat(
-                                context, node, chatId, messagesSelected[0].msgId
-                            )
+                            if (node == null) {
+                                Timber.w("Node is NULL")
+                                return
+                            }
+                            exportListener?.let {
+                                it.updateNodeHandle(
+                                    messagesSelected[0].msgId,
+                                    node.handle
+                                )
+                                Timber.d("Export Node")
+                                api.exportNode(node, it)
+                            } ?: run {
+                                Timber.d("Share Node")
+
+                                ChatUtil.shareNodeFromChat(
+                                    context, node, chatId, messagesSelected[0].msgId
+                                )
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Callback function for onRequestTemporaryError
+     *
+     * @param api : MegaApiJava
+     * @param request : MegaRequest
+     * @param e: MegaError
+     */
+    override fun onRequestTemporaryError(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
+        // Do nothing
     }
 
     companion object {

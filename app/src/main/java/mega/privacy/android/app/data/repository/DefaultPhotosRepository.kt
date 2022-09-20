@@ -14,7 +14,7 @@ import mega.privacy.android.app.data.mapper.ImageMapper
 import mega.privacy.android.app.data.mapper.NodeUpdateMapper
 import mega.privacy.android.app.data.mapper.VideoMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.presentation.favourites.facade.DateUtilWrapper
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.MegaNodeUtil.getPreviewFileName
