@@ -1,4 +1,5 @@
 package test.mega.privacy.android.app.presentation.startconversation
+
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
@@ -54,7 +55,6 @@ class StartConversationViewModelTest {
     private val testContact = ContactItem(
         handle = Random.nextLong(),
         email = "email@mega.nz",
-        defaultAvatarContent = "A",
         defaultAvatarColor = "0asf80",
         visibility = UserVisibility.Visible,
         timestamp = Random.nextLong(),
@@ -66,7 +66,6 @@ class StartConversationViewModelTest {
             add(ContactItem(
                 handle = Random.nextLong(),
                 email = "email$i@mega.nz",
-                defaultAvatarContent = "$i",
                 defaultAvatarColor = "0asf80",
                 visibility = UserVisibility.Visible,
                 timestamp = Random.nextLong(),

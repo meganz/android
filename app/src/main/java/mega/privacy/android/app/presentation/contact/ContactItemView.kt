@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -169,7 +170,7 @@ fun ContactAvatar(
     } else {
         DefaultContactAvatar(modifier = modifier,
             color = Color(contactItem.defaultAvatarColor.toColorInt()),
-            content = contactItem.defaultAvatarContent)
+            content = contactItem.getAvatarFirstLetter())
     }
 }
 
@@ -213,7 +214,6 @@ fun PreviewContactItem() {
         email = "email@mega.nz",
         fullName = "Full name",
         alias = "Alias",
-        defaultAvatarContent = "A",
         defaultAvatarColor = "",
         visibility = UserVisibility.Visible,
         timestamp = 2345262L,
