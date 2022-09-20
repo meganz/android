@@ -172,7 +172,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 break;
 
             case R.id.option_clear_layout:
-                managerActivity.removeCompletedTransfer(transfer);
+                managerActivity.removeCompletedTransfer(transfer, true);
                 break;
 
             case R.id.option_retry_layout:
