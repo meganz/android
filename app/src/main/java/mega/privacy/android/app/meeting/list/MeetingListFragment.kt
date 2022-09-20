@@ -89,7 +89,7 @@ class MeetingListFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        meetingsAdapter.tracker?.clearSelection()
+        clearSelections()
         binding.list.clearOnScrollListeners()
         super.onDestroyView()
     }
@@ -206,15 +206,19 @@ class MeetingListFragment : Fragment() {
                 if (selectedItems.size == meetingsAdapter.currentList.size) {
                     menu.findItem(R.id.cab_menu_select_all).isVisible = false
                 }
-                if (selectedItems.all { it.isMuted }) {
-                    menu.findItem(R.id.cab_menu_unmute).isVisible = true
-                    menu.findItem(R.id.cab_menu_mute).isVisible = false
-                } else if (selectedItems.all { !it.isMuted }) {
-                    menu.findItem(R.id.cab_menu_mute).isVisible = true
-                    menu.findItem(R.id.cab_menu_unmute).isVisible = false
-                } else {
-                    menu.findItem(R.id.cab_menu_mute).isVisible = false
-                    menu.findItem(R.id.cab_menu_unmute).isVisible = false
+                when {
+                    selectedItems.all { it.isMuted } -> {
+                        menu.findItem(R.id.cab_menu_unmute).isVisible = true
+                        menu.findItem(R.id.cab_menu_mute).isVisible = false
+                    }
+                    selectedItems.all { !it.isMuted } -> {
+                        menu.findItem(R.id.cab_menu_mute).isVisible = true
+                        menu.findItem(R.id.cab_menu_unmute).isVisible = false
+                    }
+                    else -> {
+                        menu.findItem(R.id.cab_menu_mute).isVisible = false
+                        menu.findItem(R.id.cab_menu_unmute).isVisible = false
+                    }
                 }
                 return true
             }
@@ -227,13 +231,13 @@ class MeetingListFragment : Fragment() {
                         true
                     }
                     R.id.cab_menu_unselect_all -> {
-                        meetingsAdapter.tracker?.clearSelection()
+                        clearSelections()
                         true
                     }
                     R.id.cab_menu_mute -> {
                         val chats = meetingsAdapter.tracker?.selection?.toList() ?: return true
                         ChatUtil.createMuteNotificationsAlertDialogOfChats(requireActivity(), chats)
-                        meetingsAdapter.tracker?.clearSelection()
+                        clearSelections()
                         true
                     }
                     R.id.cab_menu_unmute -> {
@@ -244,13 +248,13 @@ class MeetingListFragment : Fragment() {
                                     Constants.NOTIFICATIONS_ENABLED,
                                     chatId)
                         }
-                        meetingsAdapter.tracker?.clearSelection()
+                        clearSelections()
                         true
                     }
                     R.id.cab_menu_archive -> {
                         val chatsToArchive = meetingsAdapter.tracker?.selection?.toList() ?: return true
                         viewModel.archiveChats(chatsToArchive)
-                        meetingsAdapter.tracker?.clearSelection()
+                        clearSelections()
                         true
                     }
                     R.id.chat_list_leave_chat_layout -> {
@@ -263,7 +267,7 @@ class MeetingListFragment : Fragment() {
                             }
                             .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
                             .show()
-                        meetingsAdapter.tracker?.clearSelection()
+                        clearSelections()
                         true
                     }
                     else -> false
@@ -271,7 +275,7 @@ class MeetingListFragment : Fragment() {
             }
 
             override fun onDestroyActionMode(mode: ActionMode) {
-                meetingsAdapter.tracker?.clearSelection()
+                clearSelections()
                 actionMode = null
             }
         }
@@ -290,5 +294,16 @@ class MeetingListFragment : Fragment() {
 
     private fun onItemMoreClick(chatId: Long) {
         MeetingListBottomSheetDialogFragment.newInstance(chatId).show(childFragmentManager)
+    }
+
+    /**
+     * Clear item selections
+     *
+     * @param forceUpdate   Flag to force items layout update
+     */
+    @JvmOverloads
+    fun clearSelections(forceUpdate: Boolean = false) {
+        meetingsAdapter.tracker?.clearSelection()
+        if (forceUpdate) meetingsAdapter.notifyDataSetChanged()
     }
 }

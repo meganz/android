@@ -36,11 +36,23 @@ class ChatTabsFragment : Fragment() {
 
     private lateinit var binding: FragmentChatTabsBinding
 
+    private var skipClearSelection = false
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 (activity as? ManagerActivity?)?.closeSearchView()
+
+                if (!skipClearSelection) {
+                    childFragmentManager.fragments.forEach { fragment ->
+                        when (fragment) {
+                            is RecentChatsFragment -> fragment.clearSelections()
+                            is MeetingListFragment -> fragment.clearSelections(true)
+                        }
+                    }
+                } else {
+                    skipClearSelection = false
+                }
             }
         }
     }
@@ -61,8 +73,11 @@ class ChatTabsFragment : Fragment() {
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        val position = savedInstanceState?.getInt(STATE_PAGER_POSITION) ?: 0
-        binding.pager.setCurrentItem(position, false)
+        if (savedInstanceState?.containsKey(STATE_PAGER_POSITION) == true) {
+            skipClearSelection = true
+            val position = savedInstanceState.getInt(STATE_PAGER_POSITION)
+            binding.pager.setCurrentItem(position, false)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
