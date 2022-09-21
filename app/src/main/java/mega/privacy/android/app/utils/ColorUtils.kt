@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
@@ -71,6 +72,7 @@ object ColorUtils {
         color: Int,
     ) {
         var editTextBackground = editText.background ?: return
+        @SuppressLint("RestrictedApi")
         if (DrawableUtils.canSafelyMutateDrawable(editTextBackground)) {
             editTextBackground = editTextBackground.mutate()
         }
@@ -79,6 +81,7 @@ object ColorUtils {
             DrawableCompat.clearColorFilter(editTextBackground)
             editText.refreshDrawableState()
         } else {
+            @SuppressLint("RestrictedApi")
             editTextBackground.colorFilter = AppCompatDrawableManager.getPorterDuffColorFilter(
                 color, SRC_IN
             )
