@@ -35,6 +35,13 @@ interface FilesRepository {
     suspend fun getRootNode(): MegaNode?
 
     /**
+     * Get the inbox node
+     *
+     * @return A node corresponding to the rubbish bin node, null if cannot be retrieved
+     */
+    suspend fun getInboxNode(): MegaNode?
+
+    /**
      * Get the rubbish root node
      *
      * @return A node corresponding to the rubbish bin node, null if cannot be retrieved

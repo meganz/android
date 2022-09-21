@@ -85,6 +85,10 @@ class DefaultFilesRepository @Inject constructor(
         megaApiGateway.getRootNode()
     }
 
+    override suspend fun getInboxNode(): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.getInboxNode()
+    }
+
     override suspend fun getRubbishBinNode(): MegaNode? = withContext(ioDispatcher) {
         megaApiGateway.getRubbishBinNode()
     }

@@ -35,16 +35,6 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOG
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
 import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CHAT_BNV;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.HOME_BNV;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.NO_BNV;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.PHOTOS_BNV;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.SHARED_ITEMS_BNV;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartBottomNavigationItem;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartDrawerItem;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldCloseApp;
 import static mega.privacy.android.app.main.FileInfoActivity.NODE_HANDLE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
@@ -55,6 +45,16 @@ import static mega.privacy.android.app.presentation.manager.ManagerActivityExten
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.linksState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.outgoingSharesState;
 import static mega.privacy.android.app.presentation.permissions.PermissionsFragment.PERMISSIONS_FRAGMENT;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CHAT_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.HOME_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.NO_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.PHOTOS_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.SHARED_ITEMS_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartBottomNavigationItem;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartDrawerItem;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldCloseApp;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
@@ -291,6 +291,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
@@ -300,7 +301,6 @@ import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
-import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
@@ -371,10 +371,10 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment;
-import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
-import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.photos.PhotosFragment;
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
+import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
+import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment;
@@ -430,6 +430,7 @@ import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
 import mega.privacy.android.domain.entity.transfer.TransferType;
+import mega.privacy.android.domain.qualifier.ApplicationScope;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -568,8 +569,6 @@ public class ManagerActivity extends TransfersManagementActivity
     TextView addPhoneNumberLabel;
     FloatingActionButton fabButton;
     FloatingActionButton fabMaskButton;
-
-    MegaNode inboxNode = null;
 
     MegaNode rootNode = null;
 
@@ -1446,7 +1445,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }));
         viewModel.getUpdateNodes().observe(this,
                 new EventObserver<>(nodes -> {
-                    updateNodes(nodes);
+                    onUpdateNodes(nodes);
                     return null;
                 }));
         viewModel.getUpdateContactsRequests().observe(this,
@@ -1455,11 +1454,9 @@ public class ManagerActivity extends TransfersManagementActivity
                     return null;
                 }));
 
-        ManagerActivityExtensionKt.observer(this, viewModel);
+        collectFlows();
 
         viewModel.onGetNumUnreadUserAlerts().observe(this, this::updateNumUnreadUserAlerts);
-
-        viewModel.onInboxSectionUpdate().observe(this, this::updateInboxSectionVisibility);
 
         getTransfersViewModel().onGetShouldCompletedTab().observe(this, this::updateTransfersTab);
 
@@ -2208,7 +2205,7 @@ public class ManagerActivity extends TransfersManagementActivity
             refreshSession();
             return;
         } else {
-            inboxNode = megaApi.getInboxNode();
+            viewModel.setInboxNode();
             attr = dbH.getAttributes();
             if (attr != null) {
                 if (attr.getInvalidateSdkCache() != null) {
@@ -2634,16 +2631,32 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
+
+    /**
+     * collecting Flows from ViewModels
+     */
+    private void collectFlows() {
+        ViewExtensionsKt.collectFlow(this, viewModel.getOnMyAvatarFileChanged(), Lifecycle.State.STARTED, isAvatarChanged -> {
+            setProfileAvatar();
+            return Unit.INSTANCE;
+        });
+
+        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
+            updateInboxSectionVisibility(managerState.getHasInboxChildren());
+            return Unit.INSTANCE;
+        });
+    }
+
     /**
      * Checks which screen should be shown when an user is logins.
      * There are four different screens or warnings:
      * - Business warning: it takes priority over the other three.
      * - SMS verification screen: it takes priority over the other two.
      * - Onboarding permissions screens: it has to be only shown when account is logged in after
-     *   the installation, and some of the permissions required have not been granted and
-     *   the business warning and SMS verification have not to be shown.
+     * the installation, and some of the permissions required have not been granted and
+     * the business warning and SMS verification have not to be shown.
      * - Notifications permission screen: it has to be shown if the onboarding permissions screens
-     *   have not been shown.
+     * have not been shown.
      */
     private void checkInitialScreens() {
         if (checkBusinessStatus()) {
@@ -2661,7 +2674,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         } else if (getFirstLogin() && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
             askForSMSVerification();
-        } else if(requestNotificationsPermissionFirstLogin) {
+        } else if (requestNotificationsPermissionFirstLogin) {
             askForNotificationsPermission();
         }
     }
@@ -2933,7 +2946,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 || hasPermissions(this, Manifest.permission.POST_NOTIFICATIONS);
 
         boolean writeStorageGranted = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        String[] PERMISSIONS = new String[] {
+        String[] PERMISSIONS = new String[]{
                 PermissionUtils.getImagePermissionByVersion(),
                 PermissionUtils.getAudioPermissionByVersion(),
                 PermissionUtils.getVideoPermissionByVersion(),
@@ -2948,7 +2961,7 @@ public class ManagerActivity extends TransfersManagementActivity
         boolean contactsGranted = hasPermissions(this, Manifest.permission.READ_CONTACTS);
 
         if (!notificationsGranted || !writeStorageGranted || !readStorageGranted || !cameraGranted
-                || !microphoneGranted || !bluetoothGranted /*|| !writeCallsGranted*/|| !contactsGranted) {
+                || !microphoneGranted || !bluetoothGranted /*|| !writeCallsGranted*/ || !contactsGranted) {
 
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
@@ -3055,7 +3068,7 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
     }
 
-        void queryIfNotificationsAreOn() {
+    void queryIfNotificationsAreOn() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return;
         }
@@ -3180,7 +3193,7 @@ public class ManagerActivity extends TransfersManagementActivity
         managerActivity = this;
 
         Intent intent = getIntent();
-        
+
         if (dbH.getCredentials() == null) {
             if (!openLink) {
                 return;
@@ -3933,8 +3946,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else if (getPhotosFragment() != null && photosFragment.shouldUpdateTitle()) {
                     setFirstNavigationLevel(false);
                     aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
-                }
-                else {
+                } else {
                     setFirstNavigationLevel(true);
                     aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
                 }
@@ -7593,7 +7605,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private String[] getReadAndWritePermissions() {
-        return new String[] {
+        return new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 PermissionUtils.getImagePermissionByVersion(),
                 PermissionUtils.getAudioPermissionByVersion(),
@@ -8602,7 +8614,7 @@ public class ManagerActivity extends TransfersManagementActivity
             ((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.grey_038_white_038));
         }
 
-        viewModel.checkInboxSectionVisibility();
+        viewModel.updateInboxSectionVisibility();
 
         if (contactsSection != null) {
             contactsSection.setEnabled(false);
@@ -8677,7 +8689,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         if (inboxSection != null) {
-            viewModel.checkInboxSectionVisibility();
+            viewModel.updateInboxSectionVisibility();
         }
 
         if (contactsSection != null) {
@@ -8709,13 +8721,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (upgradeAccount != null) {
             upgradeAccount.setEnabled(true);
-        }
-    }
-
-    public void setInboxNavigationDrawer() {
-        Timber.d("setInboxNavigationDrawer");
-        if (nV != null && inboxSection != null) {
-            viewModel.checkInboxSectionVisibility();
         }
     }
 
@@ -9931,18 +9936,8 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshSharesPageAdapter();
     }
 
-    public void updateNodes(@NonNull List<MegaNode> updatedNodes) {
+    private void onUpdateNodes(@NonNull List<MegaNode> updatedNodes) {
         dismissAlertDialogIfExists(statusDialog);
-
-        //Verify is it is a new item to the inbox
-        for (int i = 0; i < updatedNodes.size(); i++) {
-            MegaNode updatedNode = updatedNodes.get(i);
-
-            if (updatedNode.getParentHandle() == inboxNode.getHandle()) {
-                Timber.d("New element to Inbox!!");
-                setInboxNavigationDrawer();
-            }
-        }
 
         checkCameraUploadFolder(false, updatedNodes);
 
@@ -10965,7 +10960,7 @@ public class ManagerActivity extends TransfersManagementActivity
     /**
      * Removes a completed transfer from Completed tab in Transfers section.
      *
-     * @param transfer the completed transfer to remove
+     * @param transfer       the completed transfer to remove
      * @param isRemovedCache If ture, remove cache file, otherwise doesn't remove cache file
      */
     public void removeCompletedTransfer(AndroidCompletedTransfer transfer, boolean isRemovedCache) {
@@ -11511,7 +11506,8 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param hasChildren True if the Inbox node has children, false otherwise.
      */
     private void updateInboxSectionVisibility(boolean hasChildren) {
-        if (inboxSection == null) {
+        Timber.d("updateInboxSectionVisibility");
+        if (nV == null || inboxSection == null) {
             return;
         }
 
