@@ -206,8 +206,6 @@
     <string name="section_recents">Baru-baru ini</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Unggahan Media</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">Kotak Masuk</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -1148,7 +1146,7 @@
     <!-- More button in contact info page -->
     <string name="label_more">Selebihnya</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">Tempat penyimpanan</string>
+    <string name="storage_space">Penyimpanan</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Hapus dari Nonaktif?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1371,7 +1369,7 @@
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">Transfer dihentikan</string>
     <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state_uploading">Mengunggah&#8230;</string>
+    <string name="attachment_uploading_state_uploading">Sedang mengunggah&#8230;</string>
     <!--  -->
     <string name="attachment_uploading_state_compressing">Mengecilkan&#8230;</string>
     <!--  -->
@@ -1620,8 +1618,6 @@
     <string name="context_share">Bagikan menggunakan</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Kosongkan [/B][A]Sampah[/A]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[B]Tidak ada file di [/B][A]Kotak Masuk[/A] anda</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Tidak ada file di [/B][A]Cloud Drive[/A] anda</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1680,10 +1676,6 @@
     <string name="contacts_mega">Pada MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Kontak telepon</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">Akun anda telah ditangguhkan karena beberapa pelanggaran Persyaratan Layanan MEGA. Silakan periksa kotak masuk email anda.</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Akun anda dihentikan karena pelanggaran Persyaratan Layanan MEGA termasuk, namun tidak terbatas pada, klausul 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Memuat file</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1792,7 +1784,7 @@
     <!-- Title of the dialog ‘Do you remember your password?’ -->
     <string name="remember_pwd_dialog_title">Apa anda ingat password anda?</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
-    <string name="remember_pwd_dialog_text_logout">Anda akan keluar, silakan uji kata sandi anda untuk memastikan anda mengingatnya. \n Jika anda kehilangan kata sandi, anda akan kehilangan akses ke data MEGA anda.</string>
+    <string name="remember_pwd_dialog_text_logout">Anda akan keluar, silakan uji kata sandi anda untuk memastikan anda mengingatnya. \nJika anda kehilangan kata sandi, anda akan kehilangan akses ke data MEGA anda.</string>
     <!-- Text of the dialog ‘Do you remember your password?’ -->
     <string name="remember_pwd_dialog_text">Silakan uji kata sandi anda untuk memastikan anda mengingatnya. Jika anda kehilangan kata sandi, anda akan kehilangan akses ke data MEGA anda.</string>
     <!-- Dialog option that permits user do not show it again -->
@@ -2607,8 +2599,6 @@
     <string name="text_join_another_call">Untuk bergabung dengan panggilan ini, anda harus mengakhiri atau menahan panggilan saat ini.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Orang-orang dapat bergabung dengan grup anda dengan menggunakan tautan ini.</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">Tautan obrolan baru</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Masukan nama grup</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -3467,26 +3457,12 @@
     <string name="settings_mobile_data_resoluton_title">Gunakan data seluler untuk melihat pratinjau gambar resolusi tinggi</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Izinkan penggunaan data seluler untuk memuat gambar resolusi tinggi saat melihat pratinjau. Jika dinonaktifkan, gambar asli hanya akan dimuat saat anda memperbesar.</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">Anda mengubah lokasi folder cadangan default. Ini dapat memengaruhi kemampuan anda untuk menemukan folder cadangan di masa mendatang. Harap ingat di mana letaknya sehingga anda dapat menemukannya di masa depan.</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Memindahkan folder ini akan mengubah tujuan dari satu atau beberapa cadangan yang dikonfigurasi dan mungkin memiliki konsekuensi yang tidak diinginkan. Pencadangan akan dimatikan demi keselamatan anda. Pencadangan dapat diaktifkan kembali dengan Aplikasi Desktop MEGA. Apakah anda ingin melanjutkan??</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Anda menghapus folder cadangan anda. Ini akan menghapus semua cadangan yang telah anda atur. Apakah anda yakin ingin melakukan ini?</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">Apakah anda yakin ingin menghapus folder cadangan dan menonaktifkan cadangan terkait?</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">Pindahkan “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Pindahkan “%1s” ke Tempat Sampah</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">Pindahkan folder cadangan</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">Pindahkan folder cadangan ke Tempat Sampah</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Nonaktifkan cadangan</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">Pindahkan cadangan</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">Tolong ketik “%1s” untuk mengkonfirmasi tindakan ini</string>
     <!-- when checking the input -->
@@ -3507,10 +3483,6 @@
     <string name="backup_multi_share_permission_text">Folder ini hanya dapat dibagikan sebagai hanya-baca; karena merupakan folder cadangan, perubahan apa pun pada kontennya dapat menonaktifkan pencadangan.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Beberapa folder yang dibagikan adalah folder cadangan dan hanya-baca. Apakah anda ingin melanjutkan?</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="other">%d perangkat</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Jawab panggilan</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3783,8 +3755,6 @@
     <string name="settings_help_report_issue_discard_button">Buang</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">Ubah pesan</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">Galeri</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">Suara</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -3793,8 +3763,6 @@
     <string name="chat_room_toolbar_voice_clip_option">Klip suara</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Undang teman ke [/B][A]Obrolan[/A][B] dan nikmati platform terenkripsi kami dengan privasi dan keamanan[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filter</string>
     <!-- Filter option to show all photos -->
@@ -3844,7 +3812,7 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">[A]%1$s[/A] penyimpanan</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] kuota pemindahan</string>
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] pemindahan</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">Penyimpanan</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
@@ -3894,9 +3862,9 @@
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Tidak sekarang</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
-    <string name="text_editor_creation_success">File saved to Cloud drive.</string>
+    <string name="text_editor_creation_success">File disimpan ke drive Cloud.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
-    <string name="text_editor_creation_error">File not saved to Cloud drive. Try again.</string>
+    <string name="text_editor_creation_error">File tidak disimpan ke drive Cloud. Coba lagi.</string>
     <!-- Action label to start images slideshow -->
     <string name="action_slideshow">Tampilan slide</string>
     <!-- Filter page: Prompt to choose media type -->
@@ -3921,4 +3889,14 @@
     <string name="permissions_notifications_title">Dapatkan pemberitahuan</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA akan mengirimi anda panggilan, obrolan, dan pemberitahuan transfer file.</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">Cadangan</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[B]Tidak ada item di [/B][A]cadangan[/A]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">Di sinilah file dan folder yang dicadangkan disimpan. Item yang dicadangkan adalah “hanya baca” untuk melindunginya agar tidak dimodifikasi secara tidak sengaja di drive cloud anda.\nAnda dapat mencadangkan item dari komputer anda ke MEGA menggunakan aplikasi desktop kami.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Account suspended due to copyright violations. We sent you an email with more information about this.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Account terminated due to a breach of MEGA’s Terms of Service, such as abuse of others’ rights, sharing and importing illegal data, or system abuse.</string>
 </resources>

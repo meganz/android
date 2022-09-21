@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Nie wykryto zewnętrznego dysku</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Wyloguj się</string>
+    <string name="action_logout">Wyloguj&#160;się</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Wgrywane</string>
     <!-- Menu item -->
@@ -133,7 +133,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Czy na pewno chcesz anulować bieżący proces logowania?</string>
     <!-- Login button -->
-    <string name="login_text">Zaloguj się</string>
+    <string name="login_text">Zaloguj&#160;się</string>
     <!-- email label -->
     <string name="email_text">Email</string>
     <!-- password label -->
@@ -215,8 +215,6 @@
     <string name="section_recents">Niedawne</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Wgrywanie plików</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">Skrzynka</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Niedostępny</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -1217,7 +1215,7 @@
     <!-- More button in contact info page -->
     <string name="label_more">Więcej</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">Wielkość pamięci</string>
+    <string name="storage_space">Powierzchnia</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Usunąć z trybu offline?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1731,8 +1729,6 @@
     <string name="context_share">Udostępnij za pomocą</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Pusty [/B][A]kosz na śmieci[/A]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[B]Brak plików w twojej [/B][A]skrzynce odbiorczej[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Brak plików w twoim [/B][A]Cloud Drive[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1791,10 +1787,6 @@
     <string name="contacts_mega">Na MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Kontakty z telefonu</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">Twoje konto zostało zawieszone ze względu na liczne naruszenia regulaminu MEGA. Sprawdź swoją skrzynkę odbiorczą.</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Twoje konto zostało zlikwidowane z powodu naruszenia warunków korzystania z usług firmy MEGA, w tym między innymi klauzuli 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Ładowanie plików</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2019,7 +2011,7 @@
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[B]Pusty[/B][A] katalog[/A]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
-    <string name="type_message_hint_with_customized_title">Napisz wiadomość do „%s”&#8230;</string>
+    <string name="type_message_hint_with_customized_title">Napisz wiadomość do “%s”&#8230;</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
     <string name="type_message_hint_with_default_title">Napisz wiadomość do %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
@@ -2507,9 +2499,9 @@
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
         <item quantity="one">%1$d katalog&#160;·&#160;</item>
-        <item quantity="few">%1$d katalogów&#160;·&#160;</item>
-        <item quantity="many">%1$d katalogów&#160;·&#160;</item>
-        <item quantity="other">%1$d katalogów&#160;·&#160;</item>
+        <item quantity="few">%1$d katalogi&#160;·&#160;</item>
+        <item quantity="many">%1$d katalogi&#160;·&#160;</item>
+        <item quantity="other">%1$d katalogi&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] dodane %2$s i %3$s[/B]</string>
@@ -2811,8 +2803,6 @@
     <string name="text_join_another_call">Aby dołączyć do tej rozmowy, musisz zakończyć lub zawiesić bieżące połączenie.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Ludzie mogą dołączyć do Twojej grupy za pomocą tego linku.</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">Nowy link do czatu</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Wprowadź nazwę grupy</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -3761,26 +3751,12 @@
     <string name="settings_mobile_data_resoluton_title">Wykorzystaj dane mobilne do podglądu obrazów w wysokiej rozdzielczości</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Zezwalaj na używanie danych mobilnych do ładowania obrazów o wysokiej rozdzielczości podczas podglądu. Jeśli wyłączone, oryginalny obraz zostanie załadowany tylko po powiększeniu.</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">Zmieniasz domyślną lokalizację folderu kopii zapasowych. Może to wpłynąć na możliwość znalezienia folderu kopii zapasowych w przyszłości. Zapamiętaj, gdzie on się znajduje, aby móc go znaleźć w przyszłości.</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Przeniesienie tego folderu zmienia miejsce docelowe jednej lub więcej skonfigurowanych kopii zapasowych i może mieć niezamierzone skutki. Kopie zapasowe zostaną wyłączone dla Twojego bezpieczeństwa. Kopie zapasowe mogą być ponownie włączone za pomocą aplikacji MEGA Desktop App. Czy chcesz kontynuować?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Usuwasz folder kopii zapasowych. Spowoduje to usunięcie wszystkich kopii zapasowych, które ustawiłeś. Czy na pewno chcesz to zrobić?</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">Czy na pewno chcesz usunąć folder kopii zapasowej i wyłączyć powiązaną z nim kopię zapasową?</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">Przenieś „%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Przenieś „%1s” do kosza</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">Przenoszenie folderów kopii zapasowych</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">Przenieś foldery kopii zapasowych do Kosza</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Wyłączenie tworzenia kopii zapasowej</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">Przenieść kopię zapasową</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">Proszę wpisać „%1s”, aby potwierdzić tę czynność</string>
     <!-- when checking the input -->
@@ -3801,13 +3777,6 @@
     <string name="backup_multi_share_permission_text">Te foldery mogą być udostępniane tylko do odczytu, ponieważ są to foldery kopii zapasowych, wszelkie zmiany w ich zawartości mogą uniemożliwić tworzenie kopii zapasowych.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Niektóre udostępnione foldery to foldery kopii zapasowych i tylko do odczytu. Czy chcesz kontynuować?</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="one">%d urządzenie</item>
-        <item quantity="few">%d urządzenia</item>
-        <item quantity="many">%d urządzenia</item>
-        <item quantity="other">%d urządzenia</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Odbierz połączenie</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -4086,8 +4055,6 @@
     <string name="settings_help_report_issue_discard_button">Odrzuć</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">Edytuj wiadomość</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">Galeria</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">Głos</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -4096,8 +4063,6 @@
     <string name="chat_room_toolbar_voice_clip_option">Klip głosowy</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Zaproś przyjaciół do [/B][A]Czatu[/A][B] i ciesz się naszą zaszyfrowaną platformą z prywatnością i bezpieczeństwem[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filtr</string>
     <!-- Filter option to show all photos -->
@@ -4153,7 +4118,7 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">[A]%1$s[/A] pojemności</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] limit transferu</string>
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] transfer</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">Powierzchnia</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
@@ -4236,4 +4201,14 @@
     <string name="permissions_notifications_title">Bądź poinformowany</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA wyśle Ci powiadomienia o połączeniach, czacie i transferze plików.</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">Kopie zapasowe</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[B]Brak [/B][A]kopii zapasowych[/A]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">W tym miejscu są przechowywane pliki i foldery, których kopie zapasowe zostały utworzone. Kopie zapasowe są dostępne “tylko do odczytu”, co chroni je przed przypadkową modyfikacją na dysku w chmurze.\nKopię zapasową elementów z komputera możesz utworzyć na MEGA za pomocą naszej aplikacji desktopowej.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Konto zawieszone z powodu naruszenia praw autorskich. Wysłaliśmy do Ciebie maila z większą ilością informacji na ten temat.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Konto zostało usunięte z powodu naruszenia warunków korzystania z usług firmy MEGA, takich jak nadużywanie praw innych osób, udostępnianie i importowanie nielegalnych danych lub nadużywanie systemu.</string>
 </resources>

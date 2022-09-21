@@ -206,8 +206,6 @@
     <string name="section_recents">최근</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">미디어 업로드</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">수신함</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">오프라인</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -1141,14 +1139,15 @@
     <string name="no_conversation_history">대화 기록 없음</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="other">%1$s님이 [A]입력중&#8230;[/A]</item>
+        <item quantity="one">%1$s [A]is typing&#8230;[/A]</item>
+        <item quantity="other">%1$s [A]are typing&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s님 외 다수가 [A]입력중&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">더 보기</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">저장소 공간</string>
+    <string name="storage_space">저장소</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">오프라인에서 제거할까요?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1620,8 +1619,6 @@
     <string name="context_share">앱을 사용하여 공유</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]휴지통[/A] [B]비우기[/B]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[A]수신함[/A][B]에 파일 없음[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[A]클라우드 드라이브[/A][B]에 파일 없음[/B]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1680,10 +1677,6 @@
     <string name="contacts_mega">MEGA에서</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">휴대 전화 연락처</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">당신의 계정은 MEGA 이용 약관을 다수 위반하여 정지되었습니다. 이메일 수신함을 확인하세요.</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">당신의 계정은 MEGA 이용 약관 제15조를 포함한 위반 행위로 인하여 제거되었습니다.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">파일 불러오는 중</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2347,7 +2340,8 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="other">폴더 %1$d개&#160;.&#160;</item>
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s님이[/A][B] %2$s와/과 %3$s을/를 추가하였습니다[/B]</string>
@@ -2607,8 +2601,6 @@
     <string name="text_join_another_call">이 통화에 참여하려면 현재 통화를 종료하거나 보류해야합니다.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">사람들이 이 링크를 이용하여 당신의 그룹에 참여할 수 있습니다.</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">새 대화 링크</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">그룹 이름을 입력하세요</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -2663,7 +2655,8 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="other">이미지 %1$d개&#160;</item>
+        <item quantity="one">%1$d image&#160;</item>
+        <item quantity="other">%1$d images&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]생성인[/A] %s</string>
@@ -3467,26 +3460,12 @@
     <string name="settings_mobile_data_resoluton_title">고해상도 이미지를 미리 보기하는 데에 모바일 데이터 사용</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">미리 보기를 할 때 고해상도 이미지를 불러오기 위해 모바일 데이터를 사용하는 것을 허용하세요. 만약 비활성화 하면, 확대할 때만 원래 이미지를 불러옵니다.</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">기본 백업 폴더 위치를 변경하려고 합니다. 이것은 나중에 당신의 백업 폴더를 찾을 수 있는지 여부에 영향을 미칩니다. 나중에 찾을 수 있도록 어디에 위치했는지 기억하세요.</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">이 폴더의 이동은 하나 이상의 구성된 백업의 대상을 변경하며 의도하지 않은 결과를 초래할 수 있습니다. 안전을 위해 백업을 꺼야 합니다. 백업은 MEGA 데스크톱 앱에서 다시 활성화할 수 있습니다. 진행하시겠습니까?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">백업 폴더를 삭제하려고 합니다. 이것은 당신이 설정한 모든 백업을 삭제합니다. 정말 하시겠습니까?</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">정말 백업 폴더를 삭제하고 연관된 백업을 비활성화 하시겠습니까?</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">“%1s” 이동</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">“%1s”을/를 휴지통으로 이동</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">백업 폴더 이동</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">백업 폴더를 휴지통으로 이동</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">백업 비활성화</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">백업 이동</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">이 행동을 승인하려면 “%1s”을/를 입력하세요</string>
     <!-- when checking the input -->
@@ -3507,10 +3486,6 @@
     <string name="backup_multi_share_permission_text">이 폴더들은 읽기 전용으로만 공유할 수 있습니다; 이 폴더들은 백업 폴더이므로, 이 항목에 대한 어떠한 변경은 백업을 비활성화 할 수 있습니다.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">일부 공유된 폴더가 백업 폴더이거나 읽기 전용입니다. 계속 하시겠습니까?</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="other">장치 %d개</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">전화 받기</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3658,7 +3633,7 @@
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
     <string name="warning_scanning_transfers">애플리케이션을 닫지 마세요.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
-    <string name="scanning_transfers">검사 중&#8230;</string>
+    <string name="scanning_transfers">스캔 중...</string>
     <!-- Label cancel transfers. -->
     <string name="cancel_transfers">전송 취소</string>
     <!-- Warning informing what will happen if proceed on cancelling transfers. -->
@@ -3783,8 +3758,6 @@
     <string name="settings_help_report_issue_discard_button">폐기</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">메시지 편집</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">갤러리</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">음성</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -3793,8 +3766,6 @@
     <string name="chat_room_toolbar_voice_clip_option">음성 클립</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[A]대화[/A]에 [B]친구들을 초대하여[/B] [B]보안과 프라이버시를 갖춘 우리의 암호화된 플랫폼을 즐기세요[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">필터</string>
     <!-- Filter option to show all photos -->
@@ -3844,7 +3815,7 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">[A]%1$s[/A] 저장소</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] 전송 할당량</string>
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] transfer</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">저장소</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
@@ -3921,4 +3892,14 @@
     <string name="permissions_notifications_title">알림 받기</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA가 통화, 대화, 그리고 파일 전송 알림을 보낼 것입니다.</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">백업</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[A]백업[/A][B]에 항목이 존재하지 않습니다[/B]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">이곳은 백업된 파일과 폴더가 보관되는 곳입니다. 백업된 항목은 실수로 클라우드 드라이브에서 수정되는 것을 방지하지 위해 “읽기 전용”이 됩니다.\n데스크톱 앱을 이용하여 컴퓨터에서 MEGA로 항목들을 백업할 수 있습니다.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Account suspended due to copyright violations. We sent you an email with more information about this.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Account terminated due to a breach of MEGA’s Terms of Service, such as abuse of others’ rights, sharing and importing illegal data, or system abuse.</string>
 </resources>
