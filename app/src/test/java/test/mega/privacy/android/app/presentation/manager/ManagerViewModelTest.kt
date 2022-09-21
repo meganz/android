@@ -18,6 +18,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
@@ -56,6 +57,7 @@ class ManagerViewModelTest {
     private val sendStatisticsMediaDiscovery = mock<SendStatisticsMediaDiscovery>()
     private val savedStateHandle = SavedStateHandle(mapOf())
     private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
+    private val getInboxNode = mock<GetInboxNode>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -82,7 +84,8 @@ class ManagerViewModelTest {
             sendStatisticsMediaDiscovery = sendStatisticsMediaDiscovery,
             savedStateHandle = savedStateHandle,
             monitorMyAvatarFile = monitorMyAvatarFile,
-            ioDispatcher = StandardTestDispatcher()
+            ioDispatcher = StandardTestDispatcher(),
+            getInboxNode = getInboxNode,
         )
     }
 
