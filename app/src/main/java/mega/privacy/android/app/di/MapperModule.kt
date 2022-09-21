@@ -26,6 +26,7 @@ import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.data.mapper.SortOrderMapper
 import mega.privacy.android.app.data.mapper.StartScreenMapper
+import mega.privacy.android.app.data.mapper.StorageStateMapper
 import mega.privacy.android.app.data.mapper.TransferEventMapper
 import mega.privacy.android.app.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.mapper.UserLastGreenMapper
@@ -35,6 +36,7 @@ import mega.privacy.android.app.data.mapper.getFileTypeInfo
 import mega.privacy.android.app.data.mapper.getMimeType
 import mega.privacy.android.app.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
+import mega.privacy.android.app.data.mapper.toStorageState
 import mega.privacy.android.app.data.mapper.toChatRequest
 import mega.privacy.android.app.data.mapper.toContactData
 import mega.privacy.android.app.data.mapper.toContactItem
@@ -189,5 +191,8 @@ class MapperModule {
 
     @Provides
     fun provideContactDataMapper(): ContactDataMapper = ::toContactData
+    
+    @Provides
+    fun provideStorageStateMapper(): StorageStateMapper = ::toStorageState
 
 }

@@ -1587,10 +1587,6 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.recent_chat_action, menu);
             adapterList.setMultipleSelect(true);
-            if (context instanceof ManagerActivity) {
-                ((ManagerActivity) context).hideFabButton();
-                ((ManagerActivity) context).showHideBottomNavigationView(true);
-            }
             checkScroll();
             return true;
         }
@@ -1599,15 +1595,13 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         public void onDestroyActionMode(ActionMode arg0) {
             clearSelections();
             adapterList.setMultipleSelect(false);
-            if (context instanceof ManagerActivity) {
-                ((ManagerActivity) context).showFabButton();
-                ((ManagerActivity) context).showHideBottomNavigationView(false);
-            }
             checkScroll();
 
             if (showInviteBanner()) {
                 bannerContainer.setVisibility(View.VISIBLE);
             }
+
+            actionMode = null;
         }
 
         @Override

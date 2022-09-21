@@ -1,7 +1,10 @@
 package mega.privacy.android.app.meeting.list.adapter
 
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.recyclerview.selection.ItemDetailsLookup
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.drawable.ScalingUtils
 import mega.privacy.android.app.R
@@ -14,7 +17,11 @@ class MeetingsViewHolder(
     private val binding: ItemMeetingBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: MeetingItem) {
+    private val selectAnimation by lazy {
+        AnimationUtils.loadAnimation(itemView.context, R.anim.multiselect_flip)
+    }
+
+    fun bind(item: MeetingItem, isSelected: Boolean) {
         binding.txtTitle.text = item.title
         binding.txtTimestamp.text = item.formattedTimestamp
         binding.txtLastMessage.text = item.lastMessage
@@ -38,7 +45,7 @@ class MeetingsViewHolder(
             )
             binding.imgThumbnail.setImageRequestFromUri(item.firstUser.avatar)
             binding.groupThumbnails.isVisible = false
-            binding.imgThumbnail.isVisible = true
+            binding.imgThumbnail.isVisible = !isSelected
         } else {
             val lastUserPlaceholder = item.lastUser.getImagePlaceholder(itemView.context)
             binding.imgThumbnailGroupFirst.hierarchy.setPlaceholderImage(
@@ -51,8 +58,35 @@ class MeetingsViewHolder(
             )
             binding.imgThumbnailGroupFirst.setImageRequestFromUri(item.firstUser.avatar)
             binding.imgThumbnailGroupLast.setImageRequestFromUri(item.lastUser.avatar)
-            binding.groupThumbnails.isVisible = true
+            binding.groupThumbnails.isVisible = !isSelected
             binding.imgThumbnail.isVisible = false
         }
+
+        binding.imgSelectState.apply {
+            if ((isSelected && !isVisible) || (!isSelected && isVisible)) {
+                isVisible = true
+                startAnimation(selectAnimation.apply {
+                    setAnimationListener(object : Animation.AnimationListener {
+                        override fun onAnimationEnd(animation: Animation?) {
+                            isVisible = isSelected
+                        }
+
+                        override fun onAnimationStart(animation: Animation?) {
+                        }
+
+                        override fun onAnimationRepeat(animation: Animation?) {
+                        }
+                    })
+                })
+            } else {
+                isVisible = isSelected
+            }
+        }
     }
+
+    fun getItemDetails(): ItemDetailsLookup.ItemDetails<Long> =
+        object : ItemDetailsLookup.ItemDetails<Long>() {
+            override fun getPosition(): Int = bindingAdapterPosition
+            override fun getSelectionKey(): Long = itemId
+        }
 }

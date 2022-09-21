@@ -2,23 +2,34 @@ package mega.privacy.android.app.data.mapper
 
 import mega.privacy.android.domain.entity.Event
 import mega.privacy.android.domain.entity.EventType
+import mega.privacy.android.domain.entity.NormalEvent
+import mega.privacy.android.domain.entity.StorageStateEvent
 import nz.mega.sdk.MegaEvent
 
 /**
  * Map [MegaEvent] to [Event]
  */
-typealias EventMapper = (@JvmSuppressWildcards MegaEvent) -> Event
+typealias EventMapper = (@JvmSuppressWildcards MegaEvent) -> @JvmSuppressWildcards Event
 
 /**
- * Map [MegaEvent] to [Event]
+ * Map [MegaEvent] to [Event]. Return value can be subclass of [Event]
  */
-internal fun toEvent(megaEvent: MegaEvent) = Event(
-    handle = megaEvent.handle,
-    eventString = megaEvent.eventString,
-    number = megaEvent.number,
-    text = megaEvent.text,
-    type = mapType(megaEvent.type),
-)
+internal fun toEvent(megaEvent: MegaEvent): Event = when (mapType(megaEvent.type)) {
+    EventType.Storage -> StorageStateEvent(
+        handle = megaEvent.handle,
+        eventString = megaEvent.eventString,
+        number = megaEvent.number,
+        text = megaEvent.text,
+        type = EventType.Storage,
+        storageState = toStorageState(megaEvent.number.toInt()))
+    else -> NormalEvent(
+        handle = megaEvent.handle,
+        eventString = megaEvent.eventString,
+        number = megaEvent.number,
+        text = megaEvent.text,
+        type = mapType(megaEvent.type))
+}
+
 
 private fun mapType(type: Int): EventType = when (type) {
     MegaEvent.EVENT_COMMIT_DB -> EventType.CommitDb

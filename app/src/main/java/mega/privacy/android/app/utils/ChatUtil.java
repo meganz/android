@@ -91,6 +91,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -999,6 +1001,21 @@ public class ChatUtil {
             createMuteNotificationsChatAlertDialog(context, chats);
         }
     }
+
+    /**
+     * Method to display a dialog to mute a list of chats.
+     *
+     * @param context Context of Activity.
+     * @param chatIds  Chat IDs.
+     */
+    public static void createMuteNotificationsAlertDialogOfChats(Activity context, List<Long> chatIds) {
+        ArrayList<MegaChatListItem> chats = (ArrayList<MegaChatListItem>) chatIds.stream().map(chatId ->
+                MegaApplication.getInstance().getMegaChatApi().getChatListItem(chatId)).collect(Collectors.toList());
+        if (!chats.isEmpty()) {
+            createMuteNotificationsChatAlertDialog(context, chats);
+        }
+    }
+
 
     /**
      * Method to display a dialog to mute general chat notifications or several specific chats.

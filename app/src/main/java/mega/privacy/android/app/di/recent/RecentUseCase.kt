@@ -2,11 +2,14 @@ package mega.privacy.android.app.di.recent
 
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import mega.privacy.android.app.domain.repository.RecentActionsRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetRecentActionNodes
 import mega.privacy.android.app.domain.usecase.DefaultUpdateRecentAction
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
+import mega.privacy.android.app.domain.usecase.GetRecentActions
 import mega.privacy.android.app.domain.usecase.UpdateRecentAction
 
 /**
@@ -33,4 +36,13 @@ abstract class RecentUseCase {
      */
     @Binds
     abstract fun bindGetNodes(useCase: DefaultGetRecentActionNodes): GetRecentActionNodes
+
+    companion object {
+        /**
+         * Provide [GetRecentActions]
+         */
+        @Provides
+        fun provideRecentActions(recentActionsRepository: RecentActionsRepository): GetRecentActions =
+            GetRecentActions(recentActionsRepository::getRecentActions)
+    }
 }

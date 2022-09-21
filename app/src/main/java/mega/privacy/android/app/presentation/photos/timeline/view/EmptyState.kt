@@ -119,7 +119,10 @@ fun EmptyState(
             FilterFAB(
                 timelineViewState = timelineViewState,
                 onClick = onFABClick,
-            )
+            ) {
+                timelineViewState.currentMediaSource == TimelinePhotosSource.ALL_PHOTOS &&
+                        timelineViewState.currentMediaSource == TimelinePhotosSource.CAMERA_UPLOAD
+            }
         }
     }
 }
