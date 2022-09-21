@@ -197,7 +197,10 @@ class MeetingListFragment : Fragment() {
             override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
                 menu.findItem(R.id.cab_menu_delete).isVisible = false // Not implemented
                 menu.findItem(R.id.cab_menu_unarchive).isVisible = false // Not implemented
-                menu.findItem(R.id.chat_list_leave_chat_layout).isVisible = true
+                menu.findItem(R.id.chat_list_leave_chat_layout).apply {
+                    setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    isVisible = true
+                }
 
                 val selectedItems = meetingsAdapter.tracker?.selection
                     ?.map { id -> meetingsAdapter.currentList.first { it.chatId == id } }
@@ -206,6 +209,7 @@ class MeetingListFragment : Fragment() {
                 if (selectedItems.size == meetingsAdapter.currentList.size) {
                     menu.findItem(R.id.cab_menu_select_all).isVisible = false
                 }
+
                 when {
                     selectedItems.all { it.isMuted } -> {
                         menu.findItem(R.id.cab_menu_unmute).isVisible = true
