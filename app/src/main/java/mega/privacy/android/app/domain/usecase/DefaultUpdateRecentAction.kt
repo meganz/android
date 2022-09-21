@@ -28,23 +28,12 @@ class DefaultUpdateRecentAction @Inject constructor(
             return@withContext it
         }
 
-        // Compare the list of recentActions with the new list of recent actions
-        // and only keep the actions that differs from each other
-        cachedActionList?.forEach { b ->
-            val iterator = recentActions.iterator()
-            while (iterator.hasNext()) {
-                if (isSameBucket(iterator.next(), b)) {
-                    iterator.remove()
-                }
-            }
-        }
+        // Compare the previous list of actions with the new list of recent actions
+        // and only keep the actions from the previous list that differs from the new one
+        cachedActionList?.filter { it !in recentActions.filter { item -> isSameBucket(it, item) } }
 
         // The last one is the changed one
-        if (recentActions.size == 1) {
-            return@withContext recentActions[0]
-        }
-
-        return@withContext null
+        return@withContext if (recentActions.size == 1) recentActions[0] else null
     }
 
     /**
