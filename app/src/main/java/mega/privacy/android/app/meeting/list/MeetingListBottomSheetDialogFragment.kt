@@ -146,7 +146,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 .show()
         }
         binding.btnClearHistory.isVisible = meeting.hasPermissions
-        binding.dividerClear.isVisible = meeting.hasPermissions
+        binding.dividerClear.isVisible = binding.btnClearHistory.isVisible
 
         binding.btnArchive.setOnClickListener {
             viewModel.archiveChat(chatId)
