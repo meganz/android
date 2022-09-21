@@ -8,6 +8,7 @@ import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
+import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
@@ -678,4 +679,11 @@ interface MegaApiGateway {
      * @param type Attribute type.
      */
     fun getUserAttribute(user: MegaUser, type: Int, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get the list of recent actions
+     *
+     * @return a list of recent actions
+     */
+    suspend fun getRecentActions(): List<MegaRecentActionBucket>
 }
