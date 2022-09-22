@@ -22,33 +22,32 @@ class DefaultUpdateRecentAction @Inject constructor(
         val recentActions = getRecentActions()
 
         // Update the current bucket
-        recentActions.firstOrNull { isSameBucket(it, currentBucket) }?.let {
+        recentActions.firstOrNull { currentBucket.isSameBucket(it) }?.let {
             return@withContext it
         }
 
         // Compare the previous list of actions with the new list of recent actions
-        // and only keep the actions from the previous list that differs from the new one
-        cachedActionList?.filter { it !in recentActions.filter { item -> isSameBucket(it, item) } }
+        // and only keep the actions from the updated list that differs from the previous cached one
+        val filteredActions =
+            cachedActionList?.let { cachedList ->
+                recentActions.filter { it !in cachedList.filter { item -> item.isSameBucket(it) } }
+            } ?: return@withContext null
 
         // The last one is the changed one
-        return@withContext if (recentActions.size == 1) recentActions[0] else null
+        return@withContext if (filteredActions.size == 1) filteredActions[0] else null
     }
+}
 
-    /**
-     * Compare two MegaRecentActionBucket
-     *
-     * @param selected the first MegaRecentActionBucket to compare
-     * @param other the second MegaRecentActionBucket to compare
-     * @return true if the two MegaRecentActionBucket are the same
-     */
-    private fun isSameBucket(
-        selected: MegaRecentActionBucket,
-        other: MegaRecentActionBucket,
-    ): Boolean {
-        return selected.isMedia == other.isMedia &&
-                selected.isUpdate == other.isUpdate &&
-                selected.timestamp == other.timestamp &&
-                selected.parentHandle == other.parentHandle &&
-                selected.userEmail == other.userEmail
-    }
+/**
+ * Compare two MegaRecentActionBucket
+ *
+ * @param bucket the MegaRecentActionBucket to compare with the current object
+ * @return true if the two MegaRecentActionBucket are the same
+ */
+fun MegaRecentActionBucket.isSameBucket(bucket: MegaRecentActionBucket): Boolean {
+    return isMedia == bucket.isMedia &&
+            isUpdate == bucket.isUpdate &&
+            timestamp == bucket.timestamp &&
+            parentHandle == bucket.parentHandle &&
+            userEmail == bucket.userEmail
 }
