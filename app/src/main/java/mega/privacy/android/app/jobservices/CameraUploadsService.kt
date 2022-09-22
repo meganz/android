@@ -513,8 +513,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var lastUpdated: Long = 0
     private var cameraUploadHandle = MegaApiJava.INVALID_HANDLE
     private var secondaryUploadHandle = MegaApiJava.INVALID_HANDLE
-    private var cameraUploadNode: MegaNode? = null
-    private var secondaryUploadNode: MegaNode? = null
     private var getAttrUserListener: GetCameraUploadAttributeListener? = null
     private var setAttrUserListener: SetAttrUserListener? = null
     private var createFolderListener: CreateFolderListener? = null
@@ -897,16 +895,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private suspend fun filesFromMediaStore() {
         Timber.d("Get Pending Files from Media Store Database")
-        cameraUploadNode = getNodeByHandle(cameraUploadHandle)
-        if (cameraUploadNode == null) {
+        val primaryUploadNode = getNodeByHandle(cameraUploadHandle)
+        if (primaryUploadNode == null) {
             Timber.d("ERROR: Primary Parent Folder is NULL")
             finish()
             return
         }
         val secondaryEnabled = isSecondaryFolderEnabled()
-        if (secondaryEnabled) {
+        val secondaryUploadNode = if (secondaryEnabled) {
             Timber.d("Secondary Upload is ENABLED")
-            secondaryUploadNode = getNodeByHandle(secondaryUploadHandle)
+            getNodeByHandle(secondaryUploadHandle)
+        } else {
+            null
         }
 
         val primaryPhotos: Queue<CameraUploadMedia> = LinkedList()
@@ -963,7 +963,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             primaryVideos,
             secondaryPhotos,
             secondaryVideos,
-            secondaryEnabled)
+            secondaryEnabled,
+            primaryUploadNode,
+            secondaryUploadNode)
     }
 
     private suspend fun prepareUpload(
@@ -972,6 +974,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         secondaryPhotos: Queue<CameraUploadMedia>,
         secondaryVideos: Queue<CameraUploadMedia>,
         secondaryEnabled: Boolean,
+        primaryUploadNode: MegaNode?,
+        secondaryUploadNode: MegaNode?,
     ) {
         Timber.d("\nPrimary photo count from media store database: %d\nSecondary photo count from media store database: %d\nPrimary video count from media store database: %d\nSecondary video count from media store database: %d",
             primaryPhotos.size,
@@ -982,27 +986,27 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         val pendingUploadsList =
             getPendingList(primaryPhotos, isSecondary = false, isVideo = false)
         Timber.d("Primary photo pending list size: %s", pendingUploadsList.size)
-        saveDataToDB(pendingUploadsList)
+        saveDataToDB(pendingUploadsList, primaryUploadNode, secondaryUploadNode)
 
         val pendingVideoUploadsList = getPendingList(primaryVideos,
             isSecondary = false,
             isVideo = true)
         Timber.d("Primary video pending list size: %s", pendingVideoUploadsList.size)
-        saveDataToDB(pendingVideoUploadsList)
+        saveDataToDB(pendingVideoUploadsList, primaryUploadNode, secondaryUploadNode)
 
         if (secondaryEnabled) {
             val pendingUploadsListSecondary = getPendingList(secondaryPhotos,
                 isSecondary = true,
                 isVideo = false)
             Timber.d("Secondary photo pending list size: %s", pendingUploadsListSecondary.size)
-            saveDataToDB(pendingUploadsListSecondary)
+            saveDataToDB(pendingUploadsListSecondary, primaryUploadNode, secondaryUploadNode)
 
             val pendingVideoUploadsListSecondary = getPendingList(secondaryVideos,
                 isSecondary = true,
                 isVideo = true)
             Timber.d("Secondary video pending list size: %s",
                 pendingVideoUploadsListSecondary.size)
-            saveDataToDB(pendingVideoUploadsListSecondary)
+            saveDataToDB(pendingVideoUploadsListSecondary, primaryUploadNode, secondaryUploadNode)
         }
         yield()
 
@@ -1048,11 +1052,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             updatePrimaryFolderBackupState(BackupState.PAUSE_UPLOADS)
             updateSecondaryFolderBackupState(BackupState.PAUSE_UPLOADS)
         }
+        val primaryUploadNode = getNodeByHandle(cameraUploadHandle)
+        val secondaryUploadNode = getNodeByHandle(secondaryUploadHandle)
+
         startActiveHeartbeat(finalList)
         for (file in finalList) {
             if (!running) break
-            val isSec = file.isSecondary
-            val parent = (if (isSec) secondaryUploadNode else cameraUploadNode) ?: continue
+            val isSecondary = file.isSecondary
+            val parent = (if (isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
 
             if (file.type == SyncRecordType.TYPE_PHOTO.value && !file.isCopyOnly) {
                 if (getRemoveGps()) {
@@ -1126,7 +1133,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                         Timber.d("Node with handle: %d already exists, delete record from database.",
                             node.handle)
                         path?.let {
-                            deleteSyncRecord(it, isSec)
+                            deleteSyncRecord(it, isSecondary)
                         }
                     } else {
                         totalToUpload++
@@ -1137,7 +1144,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 } else {
                     Timber.d("Local file is unavailable, delete record from database.")
                     path?.let {
-                        deleteSyncRecord(it, isSec)
+                        deleteSyncRecord(it, isSecondary)
                     }
                 }
             }
@@ -1169,7 +1176,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         return source?.lastModified() ?: 0
     }
 
-    private suspend fun saveDataToDB(list: List<SyncRecord>) {
+    private suspend fun saveDataToDB(
+        list: List<SyncRecord>,
+        primaryUploadNode: MegaNode?,
+        secondaryUploadNode: MegaNode?,
+    ) {
         for (file in list) {
             run {
                 Timber.d("Handle with local file which timestamp is: %s", file.timestamp)
@@ -1194,14 +1205,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     }
                 }
 
-                val isSec = file.isSecondary
-                val parent = if (isSec) secondaryUploadNode else cameraUploadNode
+                val isSecondary = file.isSecondary
+                val parent = if (isSecondary) secondaryUploadNode else primaryUploadNode
                 if (!file.isCopyOnly) {
                     val resFile = file.localPath?.let { File(it) }
                     if (resFile != null && !resFile.exists()) {
                         Timber.w("File does not exist, remove from database.")
                         file.localPath?.let {
-                            deleteSyncRecordByLocalPath(it, isSec)
+                            deleteSyncRecordByLocalPath(it, isSecondary)
                         }
                         return@run
                     }
@@ -1221,7 +1232,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                         photoIndex++
                         inCloud = getChildMegaNode(parent, fileName) != null
                         fileName?.let {
-                            inDatabase = fileNameExists(it, isSec)
+                            inDatabase = fileNameExists(it, isSecondary)
                         }
                     } while (inCloud || inDatabase)
                 } else {
@@ -1233,7 +1244,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                         Timber.d("Use MEGA name, name index is: %s", photoIndex)
                         photoIndex++
                         inCloud = getChildMegaNode(parent, fileName) != null
-                        inDatabase = fileNameExists(fileName, isSec)
+                        inDatabase = fileNameExists(fileName, isSecondary)
                     } while (inCloud || inDatabase)
                 }
 
