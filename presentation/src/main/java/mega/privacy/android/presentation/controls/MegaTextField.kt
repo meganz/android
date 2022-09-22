@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import mega.privacy.android.presentation.theme.AndroidTheme
 import mega.privacy.android.presentation.theme.grey_alpha_012
+import mega.privacy.android.presentation.theme.white_alpha_012
 
 @Composable
 fun MegaTextField(
@@ -57,7 +58,7 @@ fun MegaTextField(
         MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize),
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(
         backgroundColor = MaterialTheme.colors.surface,
-        unfocusedIndicatorColor = grey_alpha_012,
+        unfocusedIndicatorColor = if (!MaterialTheme.colors.isLight) white_alpha_012 else grey_alpha_012,
         textColor = MaterialTheme.colors.onSurface,
         cursorColor = MaterialTheme.colors.secondary,
         focusedLabelColor = MaterialTheme.colors.secondary,
