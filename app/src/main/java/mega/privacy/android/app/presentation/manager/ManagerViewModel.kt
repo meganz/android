@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.manager
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -16,13 +15,14 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
@@ -34,6 +34,7 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
@@ -65,6 +66,7 @@ class ManagerViewModel @Inject constructor(
     getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
     getBrowserChildrenNode: GetBrowserChildrenNode,
     monitorContactRequestUpdates: MonitorContactRequestUpdates,
+    private val getInboxNode: GetInboxNode,
     private val getRootFolder: GetRootFolder,
     private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
     private val hasInboxChildren: HasInboxChildren,
@@ -85,6 +87,11 @@ class ManagerViewModel @Inject constructor(
     val state: StateFlow<ManagerState> = _state
 
     internal val isFirstLoginKey = "EXTRA_FIRST_LOGIN"
+
+    /**
+     * private Inbox Node
+     */
+    private var inboxNode: MegaNode? = null
 
     private val isFirstLogin = savedStateHandle.getStateFlow(
         viewModelScope,
@@ -151,8 +158,20 @@ class ManagerViewModel @Inject constructor(
         _updateNodes
             .also { Timber.d("onNodesUpdate") }
             .filterNotNull()
+            .onEach {
+                checkItemForInbox(it)
+            }
             .map { Event(it) }
             .asLiveData()
+
+
+    private fun checkItemForInbox(updatedNodes: List<MegaNode>) {
+        //Verify is it is a new item to the inbox
+        inboxNode?.let { node ->
+            updatedNodes.find { node.handle == it.parentHandle }
+                ?.run { updateInboxSectionVisibility() }
+        }
+    }
 
     /**
      * Monitor contact request updates and dispatch to observers
@@ -276,19 +295,14 @@ class ManagerViewModel @Inject constructor(
         }
     }
 
-    private val inboxSectionVisible: MutableLiveData<Boolean> = MutableLiveData()
-
-    /**
-     * Notifies about updates on Inbox section visibility.
-     */
-    fun onInboxSectionUpdate(): LiveData<Boolean> = inboxSectionVisible
-
     /**
      * Checks the Inbox section visibility.
      */
-    fun checkInboxSectionVisibility() {
+    fun updateInboxSectionVisibility() {
         viewModelScope.launch {
-            inboxSectionVisible.value = hasInboxChildren()
+            _state.update {
+                it.copy(hasInboxChildren = hasInboxChildren())
+            }
         }
     }
 
@@ -307,6 +321,15 @@ class ManagerViewModel @Inject constructor(
     fun setIsFirstLogin(newIsFirstLogin: Boolean) {
         isFirstLogin.update {
             newIsFirstLogin
+        }
+    }
+
+    /**
+     * Set Inbox Node state in ViewModel initially
+     */
+    fun setInboxNode() {
+        viewModelScope.launch {
+            inboxNode = getInboxNode()
         }
     }
 }

@@ -15,7 +15,8 @@ data class ManagerState(
     val rubbishBinParentHandle: Long = -1L,
     val inboxParentHandle: Long = -1L,
     val isFirstNavigationLevel: Boolean = true,
-    var sharesTab: SharesTab = SharesTab.INCOMING_TAB,
-    var transfersTab: TransfersTab = TransfersTab.NONE,
-    var isFirstLogin: Boolean = false
+    val sharesTab: SharesTab = SharesTab.INCOMING_TAB,
+    val transfersTab: TransfersTab = TransfersTab.NONE,
+    val isFirstLogin: Boolean = false,
+    val hasInboxChildren:Boolean = false
 )
