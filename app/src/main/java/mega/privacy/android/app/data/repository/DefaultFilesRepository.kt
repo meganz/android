@@ -10,6 +10,7 @@ import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.app.data.mapper.SortOrderMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.domain.repository.FilesRepository
@@ -19,6 +20,7 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
 import mega.privacy.android.domain.entity.FolderVersionInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
 import nz.mega.sdk.MegaError
@@ -44,6 +46,7 @@ class DefaultFilesRepository @Inject constructor(
     private val megaApiFolderGateway: MegaApiFolderGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
+    private val sortOrderMapper: SortOrderMapper,
 ) : FilesRepository {
 
     @Throws(MegaException::class)
@@ -157,8 +160,8 @@ class DefaultFilesRepository @Inject constructor(
         megaLocalStorageGateway.getCloudSortOrder()
     }
 
-    override suspend fun getCameraSortOrder(): Int = withContext(ioDispatcher) {
-        megaLocalStorageGateway.getCameraSortOrder()
+    override suspend fun getCameraSortOrder(): SortOrder = withContext(ioDispatcher) {
+        sortOrderMapper(megaLocalStorageGateway.getCameraSortOrder())
     }
 
     override suspend fun getOthersSortOrder(): Int = withContext(ioDispatcher) {
