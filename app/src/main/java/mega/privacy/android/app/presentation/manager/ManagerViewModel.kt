@@ -300,7 +300,9 @@ class ManagerViewModel @Inject constructor(
      */
     fun updateInboxSectionVisibility() {
         viewModelScope.launch {
-            _state.emit(_state.value.copy(hasInboxChildren = hasInboxChildren()))
+            _state.update {
+                it.copy(hasInboxChildren = hasInboxChildren())
+            }
         }
     }
 
