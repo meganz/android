@@ -8,11 +8,10 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 
 /**
- * A action mode callback class for RecentsBucket
+ * A action mode callback class for [RecentsBucketFragment]
  */
 class RecentsBucketActionModeCallback constructor(
     private val managerActivity: ManagerActivity,
@@ -26,12 +25,18 @@ class RecentsBucketActionModeCallback constructor(
 
         inflater.inflate(R.menu.recents_bucket_action, menu)
 
-        if (isInShareBucket) {
-            menu!!.findItem(R.id.cab_menu_share_link).isVisible = false
-            menu.findItem(R.id.cab_menu_send_to_chat).isVisible = false
-            menu.findItem(R.id.cab_menu_share_out).isVisible = false
-            menu.findItem(R.id.cab_menu_move).isVisible = false
-            menu.findItem(R.id.cab_menu_trash).isVisible = false
+        val isAnyNodeInBackups = viewModel.isAnyNodeInBackups()
+
+        menu?.let {
+            it.findItem(R.id.cab_menu_share_link).isVisible = !isInShareBucket
+            it.findItem(R.id.cab_menu_send_to_chat).isVisible = !isInShareBucket
+            it.findItem(R.id.cab_menu_share_out).isVisible = !isInShareBucket
+            // The "Move" and "Move to Rubbish Bin" Menu Options are automatically hidden
+            // if at least one Node in the Selection belongs to Backups
+            if (isInShareBucket || isAnyNodeInBackups) {
+                it.findItem(R.id.cab_menu_move).isVisible = false
+                it.findItem(R.id.cab_menu_trash).isVisible = false
+            }
         }
 
         return true
@@ -48,8 +53,7 @@ class RecentsBucketActionModeCallback constructor(
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         Timber.d("ActionBarCallBack::onActionItemClicked")
-        val selectedNodes = viewModel.getSelectedNodes().map { it.node }
-        val selectedMegaNodes: List<MegaNode> = selectedNodes.mapNotNull { it }
+        val selectedMegaNodes = viewModel.getSelectedMegaNodes()
         val nodesHandles: ArrayList<Long> = ArrayList(selectedMegaNodes.map { it.handle })
         when (item!!.itemId) {
             R.id.cab_menu_download -> {
