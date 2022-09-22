@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main.megachat;
 
 
+import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
 import static mega.privacy.android.app.utils.Constants.ACTION_FORWARD_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
 import static mega.privacy.android.app.utils.Constants.ID_MESSAGES;
@@ -312,21 +313,23 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
                     Timber.d("Create group chat with participants: %s", peers.size());
 
                     final String chatTitle = intent.getStringExtra(AddContactActivity.EXTRA_CHAT_TITLE);
+                    boolean allowAddParticipants = intent.getBooleanExtra(ALLOW_ADD_PARTICIPANTS, false);
+
                     final boolean isEKR = intent.getBooleanExtra(AddContactActivity.EXTRA_EKR, false);
                     if (isEKR) {
-                        megaChatApi.createChat(true, peers, chatTitle, this);
+                        megaChatApi.createGroupChat(peers, chatTitle,  false, false, allowAddParticipants, this);
                     } else {
                         final boolean chatLink = intent.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false);
 
                         if (chatLink) {
                             if (chatTitle != null && !chatTitle.isEmpty()) {
                                 CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
-                                megaChatApi.createPublicChat(peers, chatTitle, listener);
+                                megaChatApi.createPublicChat(peers, chatTitle,  false, false, allowAddParticipants, listener);
                             } else {
                                 showAlert(this, getString(R.string.message_error_set_title_get_link), null);
                             }
                         } else {
-                            megaChatApi.createPublicChat(peers, chatTitle, this);
+                            megaChatApi.createPublicChat(peers, chatTitle,  false, false, allowAddParticipants, this);
                         }
                     }
                 }

@@ -146,6 +146,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     public static final String EXTRA_CHAT_TITLE = "chatTitle";
     public static final String EXTRA_GROUP_CHAT = "groupChat";
     public static final String EXTRA_EKR = "EKR";
+    public static final String ALLOW_ADD_PARTICIPANTS = "ALLOW_ADD_PARTICIPANTS";
     public static final String EXTRA_CHAT_LINK = "chatLink";
     public static final String EXTRA_CONTACT_TYPE = "contactType";
     public static final String EXTRA_ONLY_CREATE_GROUP = "onlyCreateGroup";
@@ -266,6 +267,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     private boolean isEKREnabled = false;
     private RelativeLayout getChatLinkLayout;
     private CheckBox getChatLinkBox;
+    private SwitchCompat allowAddParticipantsSwitch;
+    private boolean isAllowAddParticipantsEnabled = false;
     private LinearLayoutManager newGrouplinearLayoutManager;
     private RecyclerView newGroupRecyclerView;
     private TextView newGroupHeaderList;
@@ -1361,6 +1364,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 break;
             }
             case R.id.action_send_invitation: {
+                //viewmodel mio
                 if (contactType == CONTACT_TYPE_MEGA) {
                     setResultContacts(addedContactsMEGA, true);
                 } else {
@@ -1427,6 +1431,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         outState.putBoolean("createNewGroup", createNewGroup);
         outState.putBoolean("queryPermissions", queryPermissions);
         outState.putBoolean("isEKREnabled", isEKREnabled);
+        outState.putBoolean("isAllowAddParticipants", isAllowAddParticipantsEnabled);
         outState.putBoolean("newGroup", newGroup);
         outState.putBoolean("onlyCreateGroup", onlyCreateGroup);
 
@@ -1713,6 +1718,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         getChatLinkBox = (CheckBox) findViewById(R.id.get_chat_link_checkbox);
         getChatLinkLayout = (RelativeLayout) findViewById(R.id.get_chat_link_layout);
         newGroupHeaderList = (TextView) findViewById(R.id.new_group_text_header_list);
+        allowAddParticipantsSwitch = findViewById(R.id.allow_add_participants_switch);
+        allowAddParticipantsSwitch.setOnClickListener(this);
         newGroupRecyclerView = (RecyclerView) findViewById(R.id.new_group_add_contact_list);
         newGroupRecyclerView.setClipToPadding(false);
         newGroupRecyclerView.addOnItemTouchListener(this);
@@ -1735,6 +1742,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             queryPermissions = savedInstanceState.getBoolean("queryPermissions", true);
             isEKREnabled = savedInstanceState.getBoolean("isEKREnabled", false);
             ekrSwitch.setChecked(isEKREnabled);
+            isAllowAddParticipantsEnabled = savedInstanceState.getBoolean("isAllowAddParticipants", false);
+            allowAddParticipantsSwitch.setChecked(isAllowAddParticipantsEnabled);
             onlyCreateGroup = savedInstanceState.getBoolean("onlyCreateGroup", false);
 
             if (contactType == CONTACT_TYPE_MEGA || contactType == CONTACT_TYPE_BOTH) {
@@ -1792,6 +1801,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         } else {
             isEKREnabled = false;
             ekrSwitch.setChecked(isEKREnabled);
+            isAllowAddParticipantsEnabled = false;
+            allowAddParticipantsSwitch.setChecked(isAllowAddParticipantsEnabled);
             setAddedAdapterContacts();
 
             if (contactType == CONTACT_TYPE_MEGA) {
@@ -1842,11 +1853,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     }
 
     private void setGetChatLinkVisibility() {
-        if (isEKREnabled) {
-            getChatLinkLayout.setVisibility(View.GONE);
-        } else {
-            getChatLinkLayout.setVisibility(View.VISIBLE);
-        }
+        getChatLinkLayout.setVisibility(isEKREnabled? View.GONE:View.VISIBLE);
     }
 
     private void queryIfHasReadContactsPermissions() {
@@ -2866,6 +2873,9 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 setGetChatLinkVisibility();
                 break;
             }
+            case R.id.allow_add_participants_switch:
+                isAllowAddParticipantsEnabled = allowAddParticipantsSwitch.isChecked();
+                break;
             case R.id.fab_button_next: {
                 if (contactType == CONTACT_TYPE_DEVICE) {
                     inviteContacts(addedContactsPhone);
@@ -3082,6 +3092,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
         if (onNewGroup) {
             intent.putExtra(EXTRA_EKR, isEKREnabled);
+            intent.putExtra(ALLOW_ADD_PARTICIPANTS, isAllowAddParticipantsEnabled);
+
             intent.putExtra(EXTRA_GROUP_CHAT, onNewGroup);
             intent.putExtra(EXTRA_CHAT_LINK, getChatLinkBox.isChecked());
         }

@@ -35,6 +35,7 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOG
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
 import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
+import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
 import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CHAT_BNV;
 import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
 import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.HOME_BNV;
@@ -8410,8 +8411,9 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (!isEKR) {
                         chatLink = intent.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false);
                     }
+                    boolean allowAddParticipants = intent.getBooleanExtra(ALLOW_ADD_PARTICIPANTS, false);
 
-                    createGroupChat(peers, chatTitle, chatLink, isEKR);
+                    createGroupChat(peers, chatTitle, chatLink, isEKR, allowAddParticipants);
                 }
             }
         } else if (requestCode == REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
@@ -8529,22 +8531,23 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    public void createGroupChat(MegaChatPeerList peers, String chatTitle, boolean chatLink, boolean isEKR) {
+    public void createGroupChat(MegaChatPeerList peers, String chatTitle, boolean chatLink, boolean isEKR, boolean allowAddParticipants) {
 
         Timber.d("Create group chat with participants: %s", peers.size());
 
         if (isEKR) {
-            megaChatApi.createChat(true, peers, chatTitle, this);
+            megaChatApi.createGroupChat(peers, chatTitle,  false, false, allowAddParticipants, this);
         } else {
             if (chatLink) {
                 if (chatTitle != null && !chatTitle.isEmpty()) {
                     CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
-                    megaChatApi.createPublicChat(peers, chatTitle, listener);
+                    megaChatApi.createPublicChat(peers, chatTitle,  false, false, allowAddParticipants, listener);
+
                 } else {
                     showAlert(this, getString(R.string.message_error_set_title_get_link), null);
                 }
             } else {
-                megaChatApi.createPublicChat(peers, chatTitle, this);
+                megaChatApi.createPublicChat(peers, chatTitle,  false, false, allowAddParticipants, this);
             }
         }
     }

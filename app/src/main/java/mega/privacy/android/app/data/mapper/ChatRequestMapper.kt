@@ -88,6 +88,7 @@ private fun mapChatRequestType(chatRequestType: Int): ChatRequestType = when (ch
     MegaChatRequest.TYPE_REQUEST_HIRES_QUALITY -> ChatRequestType.RequestHiresQuality
     MegaChatRequest.TYPE_DEL_SPEAKER -> ChatRequestType.DeleteSpeaker
     MegaChatRequest.TYPE_REQUEST_SVC_LAYERS -> ChatRequestType.RequestSVCLayers
+    MegaChatRequest.TYPE_SET_CHATROOM_OPTIONS -> ChatRequestType.SetChatRoomOptions
     else -> ChatRequestType.InvalidRequest
 }
 

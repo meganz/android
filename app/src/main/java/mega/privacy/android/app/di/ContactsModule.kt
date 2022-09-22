@@ -14,6 +14,7 @@ import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorLastGreenUpdates
 import mega.privacy.android.domain.usecase.MonitorOnlineStatusUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
+import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.StartConversation
 
 /**
@@ -44,6 +45,10 @@ class ContactsModule {
     @Provides
     fun provideStartConversation(contactsRepository: ContactsRepository): StartConversation =
         StartConversation(contactsRepository::startConversation)
+
+    @Provides
+    fun provideSetOpenInvite(contactsRepository: ContactsRepository): SetOpenInvite =
+        SetOpenInvite(contactsRepository::setOpenInvite)
 
     @Provides
     fun provideMonitorChatOnlineStatusUpdates(contactsRepository: ContactsRepository): MonitorOnlineStatusUpdates =

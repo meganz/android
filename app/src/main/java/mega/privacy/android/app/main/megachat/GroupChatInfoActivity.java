@@ -47,6 +47,7 @@ import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApi.CHAT_OPTION_OPEN_INVITE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.content.BroadcastReceiver;
@@ -94,6 +95,7 @@ import java.util.ListIterator;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import hilt_aggregated_deps._mega_privacy_android_app_presentation_chat_dialog_AskForDisplayOverActivity_GeneratedInjector;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -1027,6 +1029,17 @@ public class GroupChatInfoActivity extends PasscodeActivity
             }
 
             showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
+        } else if (request.getType() == MegaChatRequest.TYPE_SET_CHATROOM_OPTIONS) {
+            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
+                if (request.getPrivilege() == CHAT_OPTION_OPEN_INVITE) {
+                    if (adapter != null) {
+                        adapter.updateAllowAddParticipants(request.getFlag());
+                    }
+                }
+            } else {
+                Timber.e("Error set chatroom option " + e.getErrorCode());
+                showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
+            }
         }
     }
 
@@ -1052,7 +1065,6 @@ public class GroupChatInfoActivity extends PasscodeActivity
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         Timber.d("onRequestFinish %s", request.getRequestString());
-
         if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT) {
             Timber.d("MegaRequest.TYPE_INVITE_CONTACT finished: %s", request.getNumber());
             if (request.getNumber() == MegaContactRequest.INVITE_ACTION_REMIND) {

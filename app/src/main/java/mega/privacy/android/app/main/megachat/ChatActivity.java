@@ -3011,7 +3011,6 @@ public class ChatActivity extends PasscodeActivity
                 Timber.d("Permission in the chat: %s", permission);
                 if (chatRoom.isGroup()) {
                     if (permission == MegaChatRoom.PRIV_MODERATOR) {
-
                         inviteMenuItem.setVisible(true);
 
                         int lastMessageIndex = messages.size() - 1;
@@ -3037,26 +3036,26 @@ public class ChatActivity extends PasscodeActivity
                         Timber.d("Group chat PRIV_RM");
                         leaveMenuItem.setVisible(false);
                         clearHistoryMenuItem.setVisible(false);
-                        inviteMenuItem.setVisible(false);
+                        inviteMenuItem.setVisible(chatRoom.isOpenInvite());
                         callMenuItem.setVisible(false);
                         videoMenuItem.setVisible(false);
                     } else if (permission == MegaChatRoom.PRIV_RO) {
                         Timber.d("Group chat PRIV_RO");
                         leaveMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
-                        inviteMenuItem.setVisible(false);
+                        inviteMenuItem.setVisible(chatRoom.isOpenInvite());
                         callMenuItem.setVisible(false);
                         videoMenuItem.setVisible(false);
                     } else if (permission == MegaChatRoom.PRIV_STANDARD) {
                         Timber.d("Group chat PRIV_STANDARD");
                         leaveMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
-                        inviteMenuItem.setVisible(false);
+                        inviteMenuItem.setVisible(chatRoom.isOpenInvite());
                     } else {
                         Timber.d("Permission: %s", permission);
                         leaveMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
-                        inviteMenuItem.setVisible(false);
+                        inviteMenuItem.setVisible(chatRoom.isOpenInvite());
                     }
 
                     contactInfoMenuItem.setTitle(getString(R.string.general_info));
@@ -5996,7 +5995,6 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
-        Timber.d("onChatRoomUpdate!");
         this.chatRoom = chat;
         if (adapter != null) {
             adapter.updateChatRoom(chatRoom);
@@ -6183,7 +6181,11 @@ public class ChatActivity extends PasscodeActivity
             Intent intentRetentionTime = new Intent(ACTION_UPDATE_RETENTION_TIME);
             intentRetentionTime.putExtra(RETENTION_TIME, chat.getRetentionTime());
             MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
+        } else if (chat.hasChanged(MegaChatRoom.CHANGE_TYPE_OPEN_INVITE)) {
+            inviteMenuItem.setVisible(chat.isOpenInvite());
         }
+
+
     }
 
     void setPreviewersView() {

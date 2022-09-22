@@ -273,4 +273,9 @@ enum class ChatRequestType {
      * Invalid request
      */
     InvalidRequest,
+
+    /**
+     * Set chat room options request
+     */
+    SetChatRoomOptions,
 }
