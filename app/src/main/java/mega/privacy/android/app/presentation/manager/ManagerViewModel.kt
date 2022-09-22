@@ -167,12 +167,9 @@ class ManagerViewModel @Inject constructor(
 
     private fun checkItemForInbox(updatedNodes: List<MegaNode>) {
         //Verify is it is a new item to the inbox
-        for (i in updatedNodes.indices) {
-            val updatedNode: MegaNode = updatedNodes[i]
-            if (updatedNode.parentHandle == inboxNode?.handle) {
-                Timber.d("New element to Inbox!!")
-                updateInboxSectionVisibility()
-            }
+        inboxNode?.let { node ->
+            updatedNodes.find { node.handle == it.parentHandle }
+                ?.run { updateInboxSectionVisibility() }
         }
     }
 
@@ -325,6 +322,9 @@ class ManagerViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Set Inbox Node state in ViewModel initially
+     */
     fun setInboxNode() {
         viewModelScope.launch {
             inboxNode = getInboxNode()
