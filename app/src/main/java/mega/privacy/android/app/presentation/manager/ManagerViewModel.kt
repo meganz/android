@@ -329,6 +329,5 @@ class ManagerViewModel @Inject constructor(
         viewModelScope.launch {
             inboxNode = getInboxNode()
         }
-
     }
 }
