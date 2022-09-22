@@ -191,7 +191,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionCall.setOnClickListener {
-            MegaApplication.setUserWaitingForCall(megaUser.handle)
+            MegaApplication.userWaitingForCall = megaUser.handle
             if (CallUtil.canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
                 viewModel.startCall()
             }
