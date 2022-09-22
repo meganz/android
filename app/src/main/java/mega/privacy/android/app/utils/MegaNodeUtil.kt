@@ -431,7 +431,7 @@ object MegaNodeUtil {
         val dbH = MegaApplication.getInstance().dbH
         val megaApi: MegaApiJava = MegaApplication.getInstance().megaApi
 
-        if (dbH != null && dbH.myChatFilesFolderHandle != INVALID_HANDLE) {
+        if (dbH.myChatFilesFolderHandle != INVALID_HANDLE) {
             val myChatFilesFolder = megaApi.getNodeByHandle(dbH.myChatFilesFolderHandle)
 
             return myChatFilesFolder != null &&
