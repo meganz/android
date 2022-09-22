@@ -406,7 +406,7 @@ class AccountController(private val context: Context) {
         @JvmStatic
         fun logout(context: Context, megaApi: MegaApiAndroid, sharingScope: CoroutineScope) {
             Timber.d("logout")
-            MegaApplication.setLoggingOut(true)
+            MegaApplication.isLoggingOut = true
             removeBackupsBeforeLogout()
 
             when (context) {

@@ -436,7 +436,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private val chatConnectionStatusObserver =
         Observer<Pair<Long, Int>> { chatAndState ->
-            if (inMeetingViewModel.isSameChatRoom(chatAndState.first) && MegaApplication.isWaitingForCall()) {
+            if (inMeetingViewModel.isSameChatRoom(chatAndState.first) && MegaApplication.isWaitingForCall) {
                 startCall()
             }
         }

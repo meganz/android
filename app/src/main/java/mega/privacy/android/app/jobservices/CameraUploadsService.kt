@@ -1385,10 +1385,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             notificationManager?.cancel(LOCAL_FOLDER_REMINDER_SECONDARY)
         }
 
-        if (megaApi?.rootNode == null && !MegaApplication.isLoggingIn()) {
+        if (megaApi?.rootNode == null && !MegaApplication.isLoggingIn) {
             Timber.w("RootNode = null")
             running = true
-            MegaApplication.setLoggingIn(true)
+            MegaApplication.isLoggingIn = true
             // TODO Remove DbHandler and Refactor in MegaApi dependency removal with use cases:
             // GetSession, FastLogin, InitMegaChat (already provided)
             megaApi?.fastLogin(tempDbHandler.credentials?.session, this)
@@ -1654,18 +1654,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 MegaApplication.getInstance().checkEnabledCookies()
             } else {
                 Timber.d("ERROR: %s", e.errorString)
-                MegaApplication.setLoggingIn(false)
+                MegaApplication.isLoggingIn = false
                 finish()
             }
         } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
             if (e.errorCode == MegaError.API_OK) {
                 Timber.d("fetch nodes ok")
-                MegaApplication.setLoggingIn(false)
+                MegaApplication.isLoggingIn = false
                 Timber.d("Start service here MegaRequest.TYPE_FETCH_NODES")
                 coroutineScope?.launch { startWorker() }
             } else {
                 Timber.d("ERROR: %s", e.errorString)
-                MegaApplication.setLoggingIn(false)
+                MegaApplication.isLoggingIn = false
                 finish()
             }
         } else if (request.type == MegaRequest.TYPE_CANCEL_TRANSFER) {

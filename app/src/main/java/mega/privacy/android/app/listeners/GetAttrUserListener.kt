@@ -143,10 +143,10 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                             Timber.w("Attribute USER_ATTR_RICH_PREVIEWS not set")
                         }
                         if (numDetails == 1) {
-                            MegaApplication.setShowRichLinkWarning(flag)
-                            MegaApplication.setCounterNotNowRichLinkWarning(number.toInt())
+                            MegaApplication.isShowRichLinkWarning = flag
+                            MegaApplication.counterNotNowRichLinkWarning = number.toInt()
                         } else if (numDetails == 0) {
-                            MegaApplication.setEnabledRichLinks(flag)
+                            MegaApplication.isEnabledRichLinks = flag
                             MegaApplication.getInstance()
                                 .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE))
                         }

@@ -56,7 +56,7 @@ public class WeakAccountProtectionAlertActivity extends PasscodeActivity impleme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        app.setIsBlockedDueToWeakAccount(true);
+        MegaApplication.setBlockedDueToWeakAccount(true);
 
         setContentView(R.layout.activity_weak_account_protection_alert);
 
@@ -122,7 +122,7 @@ public class WeakAccountProtectionAlertActivity extends PasscodeActivity impleme
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        app.setIsBlockedDueToWeakAccount(false);
+        MegaApplication.setBlockedDueToWeakAccount(false);
     }
 
     @Override

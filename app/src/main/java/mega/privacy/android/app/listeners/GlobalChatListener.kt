@@ -1,13 +1,16 @@
 package mega.privacy.android.app.listeners
 
+import android.app.Application
 import android.content.Intent
 import android.util.Pair
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
@@ -21,8 +24,13 @@ import nz.mega.sdk.MegaChatListenerInterface
 import nz.mega.sdk.MegaChatPresenceConfig
 import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
+import javax.inject.Inject
 
-class GlobalChatListener(private val application: MegaApplication) : MegaChatListenerInterface {
+class GlobalChatListener @Inject constructor(
+    private val application: Application,
+    private val chatManagement: ChatManagement,
+    private val activityLifecycleHandler: ActivityLifecycleHandler,
+) : MegaChatListenerInterface {
     override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {
         if (item != null) {
             if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) || item.hasChanged(
@@ -46,7 +54,7 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
                 }
             }
 
-            application.onChatListItemUpdate(api, item)
+            onChatListItemUpdate(item)
         }
     }
 
@@ -102,16 +110,31 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
     override fun onDbError(api: MegaChatApiJava?, error: Int, msg: String?) {
         Timber.e("MEGAChatSDK onDBError occurred. Error $error with message $msg")
         when (error) {
-            MegaChatApi.DB_ERROR_IO -> application.currentActivity?.finishAndRemoveTask()
+            MegaChatApi.DB_ERROR_IO -> activityLifecycleHandler.getCurrentActivity()
+                ?.finishAndRemoveTask()
 
             MegaChatApi.DB_ERROR_FULL -> post {
-                application.currentActivity?.let {
+                activityLifecycleHandler.getCurrentActivity()?.let {
                     Util.showErrorAlertDialog(
                         StringResourcesUtils.getString(R.string.error_not_enough_free_space),
                         true, it
                     )
                 }
             }
+        }
+    }
+
+    private fun onChatListItemUpdate(item: MegaChatListItem) {
+        if (!item.isGroup) return
+        if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
+            if (item.ownPrivilege != MegaChatRoom.PRIV_RM) {
+                chatManagement.checkActiveGroupChat(item.chatId)
+            } else {
+                chatManagement.removeActiveChatAndNotificationShown(item.chatId)
+            }
+        }
+        if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
+            chatManagement.removeActiveChatAndNotificationShown(item.chatId)
         }
     }
 }
