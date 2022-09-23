@@ -1,14 +1,11 @@
 package mega.privacy.android.app.utils
 
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.USER_ATTR_DEVICE_NAMES
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_ENOENT
-import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequest.TYPE_GET_ATTR_USER
 import timber.log.Timber
 
@@ -28,7 +25,25 @@ class CUBackupInitializeChecker(
      */
     fun initCuSync() {
         // Check device name.
-        setDefaultDeviceName()
+        megaApi.getDeviceName(OptionalMegaRequestListenerInterface(
+            onRequestFinish = { request, e ->
+                if (request.type == TYPE_GET_ATTR_USER || request.paramType == USER_ATTR_DEVICE_NAMES) {
+                    Timber.d("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
+                    if (request.name == null || e.errorCode == API_ENOENT) {
+                        megaApi.setDeviceName(Util.getDeviceName(),
+                            OptionalMegaRequestListenerInterface(
+                                onRequestFinish = { setDeviceNameRequest, setDeviceNameError ->
+                                    Timber.d("${setDeviceNameRequest.requestString} " +
+                                            "finished with ${setDeviceNameError.errorCode}" +
+                                            ": ${setDeviceNameError.errorString}")
+                                }
+                            ))
+                    } else {
+                        Timber.d("Already set device name.")
+                    }
+                }
+            }
+        ))
 
         val dbH = MegaApplication.getInstance().dbH
 
@@ -45,37 +60,5 @@ class CUBackupInitializeChecker(
             // Update to make sure backup name is applied on startup.
             CameraUploadSyncManager.updateSecondaryBackupName()
         }
-    }
-
-    /**
-     * Set default device name for the account, only set it when no device name hasn't been set before.
-     * Otherwise will overwrite the device name set by the user.
-     *
-     * Will try to set when login successfully for backward compatibility.
-     */
-    private fun setDefaultDeviceName() {
-        megaApi.getDeviceName(object : BaseListener(null) {
-
-            override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-                if (request.type != TYPE_GET_ATTR_USER || request.paramType != USER_ATTR_DEVICE_NAMES) return
-                Timber.d("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
-
-                // Haven't set device name yet, should set a default name. Otherwise do nothing.
-                if (request.name == null || e.errorCode == API_ENOENT) {
-                    api.setDeviceName(Util.getDeviceName(), object : BaseListener(null) {
-
-                        override fun onRequestFinish(
-                            api: MegaApiJava,
-                            request: MegaRequest,
-                            e: MegaError,
-                        ) {
-                            Timber.d("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
-                        }
-                    })
-                } else {
-                    Timber.d("Already set device name.")
-                }
-            }
-        })
     }
 }
