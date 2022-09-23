@@ -23,10 +23,6 @@ abstract class NotificationUseCases {
     @Binds
     abstract fun bindMonitorUserAlerts(implementation: DefaultMonitorUserAlerts): MonitorUserAlerts
 
-    @Singleton
-    @Binds
-    abstract fun bindStorageStateEventMonitor(implementation: DefaultMonitorStorageStateEvent): MonitorStorageStateEvent
-
     companion object {
         @Provides
         fun provideAcknowledgeUserAlerts(repository: NotificationsRepository): AcknowledgeUserAlerts =
