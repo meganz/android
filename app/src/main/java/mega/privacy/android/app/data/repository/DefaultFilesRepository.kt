@@ -10,6 +10,7 @@ import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.app.data.mapper.MegaExceptionMapper
 import mega.privacy.android.app.data.mapper.MegaShareMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.repository.FilesRepository
@@ -39,6 +40,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaApiGateway
  * @property ioDispatcher
  * @property megaLocalStorageGateway
+ * @property megaLocalStorageGateway
  */
 class DefaultFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -47,6 +49,7 @@ class DefaultFilesRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val megaShareMapper: MegaShareMapper,
+    private val megaExceptionMapper: MegaExceptionMapper,
 ) : FilesRepository, FileRepository {
 
     @Throws(MegaException::class)
@@ -206,5 +209,10 @@ class DefaultFilesRepository @Inject constructor(
                     )
                 )
             }
+        }
+
+    override suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException =
+        withContext(ioDispatcher) {
+            megaExceptionMapper(megaApiGateway.checkAccessErrorExtended(node, level))
         }
 }

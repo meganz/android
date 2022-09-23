@@ -51,7 +51,7 @@ class DefaultToggleAutoAcceptQRLinksTest {
     @Test
     fun `test that if current value throws a SettingNotFoundException, it is set to true`() =
         runTest {
-            whenever(fetchAutoAcceptQRLinks()).thenAnswer { throw SettingNotFoundException() }
+            whenever(fetchAutoAcceptQRLinks()).thenAnswer { throw SettingNotFoundException(-1) }
             assertThat(underTest()).isTrue()
 
             verify(settingsRepository).setAutoAcceptQR(true)
