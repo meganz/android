@@ -18,6 +18,7 @@ import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.app.data.mapper.ImageMapper
 import mega.privacy.android.app.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.app.data.mapper.MegaExceptionMapper
+import mega.privacy.android.app.data.mapper.MegaShareMapper
 import mega.privacy.android.app.data.mapper.MegaTransferMapper
 import mega.privacy.android.app.data.mapper.MimeTypeMapper
 import mega.privacy.android.app.data.mapper.NodeUpdateMapper
@@ -36,7 +37,6 @@ import mega.privacy.android.app.data.mapper.getFileTypeInfo
 import mega.privacy.android.app.data.mapper.getMimeType
 import mega.privacy.android.app.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
-import mega.privacy.android.app.data.mapper.toStorageState
 import mega.privacy.android.app.data.mapper.toChatRequest
 import mega.privacy.android.app.data.mapper.toContactData
 import mega.privacy.android.app.data.mapper.toContactItem
@@ -52,7 +52,9 @@ import mega.privacy.android.app.data.mapper.toMegaChatPeerList
 import mega.privacy.android.app.data.mapper.toMegaExceptionModel
 import mega.privacy.android.app.data.mapper.toOnlineStatus
 import mega.privacy.android.app.data.mapper.toPushMessage
+import mega.privacy.android.app.data.mapper.toShareModel
 import mega.privacy.android.app.data.mapper.toSortOrder
+import mega.privacy.android.app.data.mapper.toStorageState
 import mega.privacy.android.app.data.mapper.toTransferEventModel
 import mega.privacy.android.app.data.mapper.toTransferModel
 import mega.privacy.android.app.data.mapper.toUserAlert
@@ -195,4 +197,9 @@ class MapperModule {
     @Provides
     fun provideStorageStateMapper(): StorageStateMapper = ::toStorageState
 
+    /**
+     * Provide mega share mapper
+     */
+    @Provides
+    fun provideMegaShareMapper(): MegaShareMapper = ::toShareModel
 }
