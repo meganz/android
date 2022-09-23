@@ -10,7 +10,6 @@ import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
 import static mega.privacy.android.app.utils.ChatUtil.converterShortCodes;
 import static mega.privacy.android.app.utils.ChatUtil.getInvalidMetaMessage;
 import static mega.privacy.android.app.utils.ChatUtil.getMaxAllowed;
-import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
 import static mega.privacy.android.app.utils.ChatUtil.getUserStatus;
 import static mega.privacy.android.app.utils.ChatUtil.getVoiceClipDuration;
 import static mega.privacy.android.app.utils.ChatUtil.isEnableChatNotifications;
@@ -260,7 +259,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                     ((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_chat_avatar_select);
                 } else {
                     holder.itemLayout.setBackground(null);
-                    createGroupChatAvatar(holder, getTitleChat(chat));
+                    createGroupChatAvatar(holder, chat.getTitle());
                 }
             }
 
@@ -913,7 +912,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
         if (holder != null) {
 
             MegaChatListItem chat = chats.get(position);
-            String title = getTitleChat(chat);
+            String title = chat.getTitle();
 
             if (title != null) {
                 Timber.d("ChatRoom id: %s", chat.getChatId());
