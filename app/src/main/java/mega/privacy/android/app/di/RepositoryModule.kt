@@ -15,6 +15,7 @@ import mega.privacy.android.app.data.repository.DefaultEnvironmentRepository
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.app.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.app.data.repository.DefaultFilesRepository
+import mega.privacy.android.app.data.repository.DefaultFolderRepository
 import mega.privacy.android.app.data.repository.DefaultGalleryFilesRepository
 import mega.privacy.android.app.data.repository.DefaultGlobalStatesRepository
 import mega.privacy.android.app.data.repository.DefaultImageRepository
@@ -43,6 +44,7 @@ import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FolderRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.LoggingRepository
@@ -155,4 +157,8 @@ abstract class RepositoryModule {
      */
     @Binds
     abstract fun bindRecentActionsRepository(repository: DefaultRecentActionsRepository): RecentActionsRepository
+
+    @Binds
+    abstract fun bindFolderRepository(repository: DefaultFolderRepository): FolderRepository
+
 }
