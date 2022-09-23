@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.user.UserId
  * @property isBusinessAccount
  * @property isMasterBusinessAccount
  * @property accountTypeIdentifier
+ * @property accountTypeString
  */
 data class UserAccount(
     val userId: UserId?,

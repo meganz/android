@@ -42,6 +42,7 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
+import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.LoggingRepository
@@ -86,6 +87,9 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindFilesRepository(repository: DefaultFilesRepository): FilesRepository
+
+    @Binds
+    abstract fun bindDomainFilesRepository(repository: DefaultFilesRepository): FileRepository
 
     @Binds
     abstract fun bindFavouritesRepository(repository: DefaultFavouritesRepository): FavouritesRepository

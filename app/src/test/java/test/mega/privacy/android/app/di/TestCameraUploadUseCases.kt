@@ -19,6 +19,7 @@ import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
+import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
@@ -177,4 +178,7 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideIsChargingRequired() = mock<IsChargingRequired>()
+
+    @Provides
+    fun provideSaveSyncRecordsToDB() = mock<SaveSyncRecordsToDB>()
 }

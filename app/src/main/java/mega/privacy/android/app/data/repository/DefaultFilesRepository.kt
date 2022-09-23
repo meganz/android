@@ -10,8 +10,10 @@ import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.app.data.mapper.SortOrderMapper
+import mega.privacy.android.app.data.mapper.MegaExceptionMapper
+import mega.privacy.android.app.data.mapper.MegaShareMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
@@ -19,13 +21,16 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
 import mega.privacy.android.domain.entity.FolderVersionInfo
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.repository.FileRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaShare
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -37,6 +42,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaApiGateway
  * @property ioDispatcher
  * @property megaLocalStorageGateway
+ * @property megaLocalStorageGateway
  */
 class DefaultFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -44,7 +50,11 @@ class DefaultFilesRepository @Inject constructor(
     private val megaApiFolderGateway: MegaApiFolderGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
-) : FilesRepository {
+    private val sortOrderMapper: SortOrderMapper,
+    private val megaShareMapper: MegaShareMapper,
+    private val megaExceptionMapper: MegaExceptionMapper,
+) : FilesRepository, FileRepository {
+
 
     @Throws(MegaException::class)
     override suspend fun getRootFolderVersionInfo(): FolderVersionInfo =
@@ -83,6 +93,10 @@ class DefaultFilesRepository @Inject constructor(
 
     override suspend fun getRootNode(): MegaNode? = withContext(ioDispatcher) {
         megaApiGateway.getRootNode()
+    }
+
+    override suspend fun getInboxNode(): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.getInboxNode()
     }
 
     override suspend fun getRubbishBinNode(): MegaNode? = withContext(ioDispatcher) {
@@ -135,9 +149,9 @@ class DefaultFilesRepository @Inject constructor(
             megaApiGateway.getIncomingSharesNode(order)
         }
 
-    override suspend fun getOutgoingSharesNode(order: Int?): List<MegaShare> =
+    override suspend fun getOutgoingSharesNode(order: Int): List<ShareData> =
         withContext(ioDispatcher) {
-            megaApiGateway.getOutgoingSharesNode(order)
+            megaApiGateway.getOutgoingSharesNode(order).map { megaShareMapper(it) }
         }
 
     override suspend fun authorizeNode(handle: Long): MegaNode? = withContext(ioDispatcher) {
@@ -153,8 +167,8 @@ class DefaultFilesRepository @Inject constructor(
         megaLocalStorageGateway.getCloudSortOrder()
     }
 
-    override suspend fun getCameraSortOrder(): Int = withContext(ioDispatcher) {
-        megaLocalStorageGateway.getCameraSortOrder()
+    override suspend fun getCameraSortOrder(): SortOrder = withContext(ioDispatcher) {
+        sortOrderMapper(megaLocalStorageGateway.getCameraSortOrder())
     }
 
     override suspend fun getOthersSortOrder(): Int = withContext(ioDispatcher) {
@@ -199,5 +213,10 @@ class DefaultFilesRepository @Inject constructor(
                     )
                 )
             }
+        }
+
+    override suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException =
+        withContext(ioDispatcher) {
+            megaExceptionMapper(megaApiGateway.checkAccessErrorExtended(node, level))
         }
 }

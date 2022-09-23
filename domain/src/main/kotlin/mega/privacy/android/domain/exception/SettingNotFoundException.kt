@@ -7,5 +7,5 @@ package mega.privacy.android.domain.exception
  * @param errorCode
  * @param errorString
  */
-class SettingNotFoundException(errorCode: Int? = null, errorString: String? = null) :
+class SettingNotFoundException(errorCode: Int, errorString: String? = null) :
     MegaException(errorCode, errorString)

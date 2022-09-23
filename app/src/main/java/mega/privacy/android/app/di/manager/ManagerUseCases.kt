@@ -16,6 +16,7 @@ import mega.privacy.android.app.domain.usecase.DefaultGetPublicLinks
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultMonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
@@ -90,5 +91,9 @@ abstract class ManagerUseCases {
         @Provides
         fun provideAuthorizeNode(filesRepository: FilesRepository): AuthorizeNode =
             AuthorizeNode(filesRepository::authorizeNode)
+
+        @Provides
+        fun provideGetInboxNode(filesRepository: FilesRepository): GetInboxNode =
+            GetInboxNode(filesRepository::getInboxNode)
     }
 }

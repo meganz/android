@@ -307,8 +307,8 @@ class SettingsFragment :
             KEY_ABOUT_APP_VERSION -> {
                 if (++numberOfClicksAppVersion == 5) {
                     numberOfClicksAppVersion = 0
-                    if (!MegaApplication.isShowInfoChatMessages()) {
-                        MegaApplication.setShowInfoChatMessages(true)
+                    if (!MegaApplication.isShowInfoChatMessages) {
+                        MegaApplication.isShowInfoChatMessages = true
                         view?.let {
                             Snackbar.make(
                                 it,
@@ -317,7 +317,7 @@ class SettingsFragment :
                             ).show()
                         }
                     } else {
-                        MegaApplication.setShowInfoChatMessages(false)
+                        MegaApplication.isShowInfoChatMessages = false
                         view?.let {
                             Snackbar.make(
                                 it,

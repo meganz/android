@@ -2,6 +2,7 @@ package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FolderVersionInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -33,6 +34,13 @@ interface FilesRepository {
      * @return A node corresponding to the root node, null if cannot be retrieved
      */
     suspend fun getRootNode(): MegaNode?
+
+    /**
+     * Get the inbox node
+     *
+     * @return A node corresponding to the Inbox node, null if cannot be retrieved
+     */
+    suspend fun getInboxNode(): MegaNode?
 
     /**
      * Get the rubbish root node
@@ -120,14 +128,6 @@ interface FilesRepository {
     suspend fun getIncomingSharesNode(order: Int? = null): List<MegaNode>
 
     /**
-     * Get a list of all outgoing shares
-     *
-     * @param order sort order, if null the default order is applied
-     * @return List of MegaNode of all active and pending outbound shared by current user
-     */
-    suspend fun getOutgoingSharesNode(order: Int? = null): List<MegaShare>
-
-    /**
      * Authorize and return a MegaNode can be downloaded with any instance of MegaApi
      *
      * @param handle the handle of the node to authorize
@@ -158,7 +158,7 @@ interface FilesRepository {
      * Get camera sort order
      * @return camera sort order
      */
-    suspend fun getCameraSortOrder(): Int
+    suspend fun getCameraSortOrder(): SortOrder
 
     /**
      * Get others sort order
@@ -187,4 +187,20 @@ interface FilesRepository {
      * @return The local path of the downloaded file.
      */
     suspend fun downloadBackgroundFile(node: MegaNode): String
+
+    /**
+     * Check access error extended
+     *
+     * @param node
+     * @param level
+     *
+     * - [MegaShare.ACCESS_UNKNOWN]
+     * - [MegaShare.ACCESS_READ]
+     * - [MegaShare.ACCESS_READWRITE]
+     * - [MegaShare.ACCESS_FULL]
+     * - [MegaShare.ACCESS_OWNER]
+     *
+     * @return success or failed
+     */
+    suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException
 }

@@ -43,7 +43,7 @@ class MeetingListener : MegaChatCallListenerInterface {
             return
         }
 
-        if (MegaApplication.isLoggingOut()) {
+        if (MegaApplication.isLoggingOut) {
             Timber.w("Logging out")
             return
         }
@@ -120,7 +120,7 @@ class MeetingListener : MegaChatCallListenerInterface {
             return
         }
 
-        if (MegaApplication.isLoggingOut()) {
+        if (MegaApplication.isLoggingOut) {
             Timber.w("Logging out")
             return
         }
