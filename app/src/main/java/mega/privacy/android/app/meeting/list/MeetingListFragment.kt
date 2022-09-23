@@ -47,6 +47,7 @@ class MeetingListFragment : Fragment() {
 
     private lateinit var binding: FragmentMeetingListBinding
     private var actionMode: ActionMode? = null
+    private var actionModeRestored = false
 
     private val viewModel by viewModels<MeetingListViewModel>()
     private val meetingsAdapter by lazy { MeetingsAdapter(::onItemClick, ::onItemMoreClick) }
@@ -62,24 +63,12 @@ class MeetingListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
-        setupObservers()
+        setupObservers(savedInstanceState)
     }
 
     override fun onResume() {
         super.onResume()
         checkElevation()
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-        val initActionMode = savedInstanceState?.getBoolean(STATE_ACTION_MODE) ?: false
-        if (initActionMode) {
-            actionMode = (activity as? AppCompatActivity?)?.startSupportActionMode(buildActionMode())
-        }
-        meetingsAdapter.tracker?.apply {
-            onRestoreInstanceState(savedInstanceState)
-            actionMode?.title = selection.size().toString()
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -145,12 +134,24 @@ class MeetingListFragment : Fragment() {
         }
     }
 
-    private fun setupObservers() {
+    private fun setupObservers(savedInstanceState: Bundle?) {
         viewModel.getMeetings().observe(viewLifecycleOwner) { items ->
             val currentFirstChat = meetingsAdapter.currentList.firstOrNull()?.chatId
             meetingsAdapter.submitList(items) {
                 if (currentFirstChat != items.firstOrNull()?.chatId) {
                     binding.list.smoothScrollToPosition(0)
+                }
+
+                if (savedInstanceState != null && !actionModeRestored) {
+                    meetingsAdapter.tracker?.onRestoreInstanceState(savedInstanceState)
+                    if (savedInstanceState.getBoolean(STATE_ACTION_MODE)) {
+                        actionMode = (activity as? AppCompatActivity?)
+                            ?.startSupportActionMode(buildActionMode())
+                            ?.apply {
+                                title = meetingsAdapter.tracker?.selection?.size()?.toString()
+                            }
+                    }
+                    actionModeRestored = true
                 }
             }
             if (items.isNullOrEmpty()) {
