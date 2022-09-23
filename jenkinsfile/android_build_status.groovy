@@ -14,6 +14,8 @@ LINT_REPORT_SUMMARY = ""
 
 APP_UNIT_TEST_SUMMARY = ""
 DOMAIN_UNIT_TEST_SUMMARY = ""
+APP_UNIT_TEST_RESULT = ""
+DOMAIN_UNIT_TEST_RESULT = ""
 APP_UNIT_TEST_REPORT_ARCHIVE = "app_unit_test_result_${env.GIT_COMMIT}.zip"
 DOMAIN_UNIT_TEST_REPORT_ARCHIVE = "domain_unit_test_result_${env.GIT_COMMIT}.zip"
 
@@ -50,17 +52,17 @@ def shouldSkipBuild() {
 def getSDKBranch() {
     def description = env.GITLAB_OA_DESCRIPTION
     if (description != null) {
-        String[] lines = description.split("\n");
-        String KEY = "SDK_BRANCH=";
+        String[] lines = description.split("\n")
+        String KEY = "SDK_BRANCH="
         for (String line : lines) {
-            line = line.trim();
+            line = line.trim()
             if (line.startsWith(KEY)) {
-                print("SDK_BRANCH line found!!! --> " + line);
-                String value = line.substring(KEY.length());
+                print("SDK_BRANCH line found!!! --> " + line)
+                String value = line.substring(KEY.length())
                 if (!value.isEmpty()) {
-                    print("Setting SDK_BRANCH value --> " + value);
-                    SDK_BRANCH = value;
-                    return;
+                    print("Setting SDK_BRANCH value --> " + value)
+                    SDK_BRANCH = value
+                    return
                 }
             }
         }
@@ -77,17 +79,17 @@ def getSDKBranch() {
 def getMEGAChatBranch() {
     def description = env.GITLAB_OA_DESCRIPTION
     if (description != null) {
-        String[] lines = description.split("\n");
-        String KEY = "MEGACHAT_BRANCH=";
+        String[] lines = description.split("\n")
+        String KEY = "MEGACHAT_BRANCH="
         for (String line : lines) {
-            line = line.trim();
+            line = line.trim()
             if (line.startsWith(KEY)) {
                 print("MEGACHAT_BRANCH line found!!! --> " + line)
-                String value = line.substring(KEY.length());
+                String value = line.substring(KEY.length())
                 if (!value.isEmpty()) {
-                    MEGACHAT_BRANCH = value;
+                    MEGACHAT_BRANCH = value
                     print("Setting MEGACHAT_BRANCH value --> " + value)
-                    return;
+                    return
                 }
             }
         }
@@ -223,9 +225,11 @@ pipeline {
                                 "<br/><b>App Unit Test:</b>" +
                                 "<br/>${HTML_INDENT}${APP_UNIT_TEST_SUMMARY}" +
                                 "<br/>${HTML_INDENT}Line Coverage: ${APP_COVERAGE}" +
+                                APP_UNIT_TEST_RESULT +
                                 "<br/><b>Domain Unit Test:</b>" +
                                 "<br/>${HTML_INDENT}${DOMAIN_UNIT_TEST_SUMMARY}" +
                                 "<br/>${HTML_INDENT}Line Coverage: ${DOMAIN_COVERAGE}" +
+                                DOMAIN_UNIT_TEST_RESULT +
                                 "<br/><b>Lint Summary</b>(${jsonLintReportLink}):${LINT_REPORT_SUMMARY}"
                         sendToMR(successMessage)
 
@@ -407,6 +411,8 @@ pipeline {
                         // We have to collect the report here, before they are cleaned in the last stage.
                         APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
                         DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
+                        APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports", "app_unit_test_result.zip")
+                        DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports", "domain_unit_test_result.zip")
                     }
                 }
             }
@@ -630,6 +636,23 @@ def unitTestSummaryWithArchiveLink(String testResultPath, String reportPath, Str
     }
     return unitTestResult
 //    }
+}
+
+/**
+ * Get the link of the HTML test report.
+ *
+ * @param reportPath relative path to the HTML format test report
+ * @param archiveTargetName file name of the test report zip file
+ */
+def unitTestArchiveLink(String reportPath, String archiveTargetName) {
+    String result
+    if (archiveUnitTestReport(reportPath, archiveTargetName)) {
+        unitTestFileLink = uploadFileToGitLab(archiveTargetName)
+        result = "<br/>${unitTestFileLink}"
+    } else {
+        result = "<br>Unit Test report not available, perhaps test code has compilation error. Please check full build log."
+    }
+    return result
 }
 
 /**
