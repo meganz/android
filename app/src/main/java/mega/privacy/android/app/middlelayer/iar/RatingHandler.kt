@@ -60,15 +60,13 @@ abstract class RatingHandler(val context: Context) {
         if (!meetBaseCondition()) return
 
         val app = MegaApplication.getInstance()
-        val condition = if (app != null && app.megaApi != null) {
+        val condition = run {
             val contact = app.megaApi.contacts
             if (contact.isNullOrEmpty()) {
                 false
             } else {
                 contact.size > CONTACTS_NUMBER_LIMIT
             }
-        } else {
-            false
         }
 
         if (condition) {
@@ -95,11 +93,9 @@ abstract class RatingHandler(val context: Context) {
         if (!meetBaseCondition()) return
 
         val app = MegaApplication.getInstance()
-        val condition = if (app != null && app.megaApi != null) {
+        val condition = run {
             val totalNum = app.megaApi.publicLinks.size + app.megaApi.outShares.size
             totalNum >= SHARED_NUM_LIMIT
-        } else {
-            false
         }
 
         if (condition) {
