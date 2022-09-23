@@ -13,6 +13,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -56,13 +57,11 @@ class DefaultGetRecentActionNodesTest {
     @Test
     fun `test that if one of getThumbnail throws an exception when looping over the nodes, under test stills returns the list of nodes except the one who failed`() =
         runTest {
-            whenever(getThumbnail.invoke(0L)).thenThrow(MegaException(null, null))
-            whenever(getThumbnail.invoke(1L)).thenReturn(null)
-
             val megaNode0 = mock<MegaNode> {
                 on { handle }.thenReturn(0L)
                 on { modificationTime }.thenReturn(0L)
-                on { isVideo() }.thenReturn(false)
+                on { isVideo() }.doAnswer { throw Exception() }
+
             }
             val megaNode1 = mock<MegaNode> {
                 on { handle }.thenReturn(1L)

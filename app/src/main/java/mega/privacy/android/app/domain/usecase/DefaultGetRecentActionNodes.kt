@@ -54,7 +54,7 @@ class DefaultGetRecentActionNodes @Inject constructor(
                 deferredNodeItems.forEach {
                     try {
                         add(it.await())
-                    } catch (e: Throwable) {
+                    } catch (e: Exception) {
                         Timber.e(e)
                     }
                 }

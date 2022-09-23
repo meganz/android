@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.repository
 
-import mega.privacy.android.domain.exception.MegaException
 import java.io.File
 
 /**
@@ -20,7 +19,6 @@ interface ImageRepository {
      * @param handle node handle
      * @return thumbnail file
      */
-    @Throws(MegaException::class)
     suspend fun getThumbnailFromServer(handle: Long): File?
 
     /**
