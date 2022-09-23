@@ -1,6 +1,6 @@
 package mega.privacy.android.app.domain.usecase
 
-import mega.privacy.android.app.domain.repository.FilesRepository
+import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import nz.mega.sdk.MegaApiJava
@@ -15,12 +15,12 @@ class DefaultGetOutgoingSharesChildrenNode @Inject constructor(
     private val getChildrenNode: GetChildrenNode,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
-    private val filesRepository: FilesRepository,
+    private val fileRepository: FileRepository,
 ) : GetOutgoingSharesChildrenNode {
 
     override suspend fun invoke(parentHandle: Long): List<MegaNode>? {
         return if (parentHandle == -1L || parentHandle == MegaApiJava.INVALID_HANDLE) {
-            filesRepository.getOutgoingSharesNode(getOthersSortOrder())
+            fileRepository.getOutgoingSharesNode(getOthersSortOrder())
                 .filter { it.user != null }
                 .distinctBy { it.nodeHandle }
                 .mapNotNull { getNodeByHandle(it.nodeHandle) }

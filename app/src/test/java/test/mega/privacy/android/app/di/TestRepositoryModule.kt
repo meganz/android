@@ -17,6 +17,7 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
+import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.repository.LoginRepository
@@ -101,4 +102,7 @@ object TestRepositoryModule {
 
     @Provides
     fun provideGalleryFilesRepository(): GalleryFilesRepository = mock()
+
+    @Provides
+    fun provideDomainFilesRepository(): FileRepository = mock()
 }

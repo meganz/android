@@ -32,6 +32,14 @@ class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getMegaHandleSecondaryFolder(): Long? =
         dbHandler.preferences?.megaHandleSecondaryFolder?.toLongOrNull()
 
+    override suspend fun setCamSyncHandle(primaryHandle: Long) {
+        dbHandler.preferences?.camSyncHandle = primaryHandle.toString()
+    }
+
+    override suspend fun setMegaHandleSecondaryFolder(secondaryHandle: Long) {
+        dbHandler.preferences?.megaHandleSecondaryFolder = secondaryHandle.toString()
+    }
+
     override suspend fun getCloudSortOrder(): Int =
         dbHandler.preferences?.preferredSortCloud?.toInt() ?: ORDER_DEFAULT_ASC
 

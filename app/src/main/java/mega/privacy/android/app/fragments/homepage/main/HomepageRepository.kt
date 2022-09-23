@@ -29,6 +29,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUtilsAndroid
 import timber.log.Timber
 import javax.inject.Inject
@@ -84,7 +85,7 @@ class HomepageRepository @Inject constructor(
     /**
      * Get the actual avatar from the server and save it to the cache folder
      */
-    suspend fun createAvatar(listener: BaseListener) = withContext(Dispatchers.IO) {
+    suspend fun createAvatar(listener: MegaRequestListenerInterface) = withContext(Dispatchers.IO) {
         megaApi.getUserAvatar(
             megaApi.myUser,
             CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + ".jpg")?.absolutePath,

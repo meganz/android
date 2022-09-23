@@ -11,9 +11,8 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_CHANGE
@@ -29,8 +28,8 @@ import javax.inject.Inject
 class HomePageViewModel @Inject constructor(
     private val repository: HomepageRepository,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
-    getCallUseCase: GetCallUseCase
-) : BaseRxViewModel() {
+    getCallUseCase: GetCallUseCase,
+) : BaseRxViewModel(){
 
     private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
@@ -107,13 +106,8 @@ class HomePageViewModel @Inject constructor(
             repository.loadAvatar()?.also {
                 when {
                     it.first -> _avatar.value = it.second
-                    retry -> repository.createAvatar(object :
-                        BaseListener(MegaApplication.getInstance()) {
-                        override fun onRequestFinish(
-                            api: MegaApiJava,
-                            request: MegaRequest,
-                            e: MegaError
-                        ) {
+                    retry -> repository.createAvatar(OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request, e ->
                             if (request.type == MegaRequest.TYPE_GET_ATTR_USER
                                 && request.paramType == MegaApiJava.USER_ATTR_AVATAR
                                 && e.errorCode == MegaError.API_OK
@@ -123,7 +117,7 @@ class HomePageViewModel @Inject constructor(
                                 showDefaultAvatar()
                             }
                         }
-                    })
+                    ))
                     else -> showDefaultAvatar()
                 }
             }
