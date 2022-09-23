@@ -13,6 +13,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.app.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
@@ -33,6 +34,7 @@ import javax.inject.Inject
 class MediaViewModel @Inject constructor(
     private val repository: MediaItemRepository,
     private val getCameraSortOrder: GetCameraSortOrder,
+    private val sortOrderIntMapper: SortOrderIntMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -55,7 +57,7 @@ class MediaViewModel @Inject constructor(
 
     var mZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
 
-    fun getOrder() = runBlocking { getCameraSortOrder() }
+    fun getOrder() = runBlocking { sortOrderIntMapper(getCameraSortOrder()) }
 
     var currentHandle: Long? = null
 
@@ -110,7 +112,7 @@ class MediaViewModel @Inject constructor(
         liveData(viewModelScope.coroutineContext) {
             if (forceUpdate) {
                 repository.getFiles(
-                    order = getCameraSortOrder(),
+                    order = sortOrderIntMapper(getCameraSortOrder()),
                     zoom = mZoom,
                     handle = currentHandle ?: return@liveData)
             } else {
