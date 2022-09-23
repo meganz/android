@@ -13,14 +13,24 @@ import mega.privacy.android.domain.entity.SyncRecord
 interface MegaLocalStorageGateway {
 
     /**
-     * Camera Uploads handle
+     * Get Camera Uploads Primary handle
      */
     suspend fun getCamSyncHandle(): Long?
 
     /**
-     * Media Uploads handle
+     * Get Camera Uploads Secondary handle
      */
     suspend fun getMegaHandleSecondaryFolder(): Long?
+
+    /**
+     * Set Camera Uploads Primary handle
+     */
+    suspend fun setCamSyncHandle(primaryHandle: Long)
+
+    /**
+     * Set Camera Uploads Secondary handle
+     */
+    suspend fun setMegaHandleSecondaryFolder(secondaryHandle: Long)
 
     /**
      * Get cloud sort order
