@@ -7,6 +7,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.app.data.mapper.MegaExceptionMapper
+import mega.privacy.android.app.data.mapper.MegaShareMapper
 import mega.privacy.android.app.data.mapper.SortOrderMapper
 import mega.privacy.android.app.data.repository.DefaultFilesRepository
 import mega.privacy.android.domain.entity.SortOrder
@@ -25,6 +27,8 @@ class DefaultFilesRepositoryTest {
     private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
     private val sortOrderMapper = mock<SortOrderMapper>()
+    private val megaShareMapper = mock<MegaShareMapper>()
+    private val megaExceptionMapper = mock<MegaExceptionMapper>()
 
     @Before
     fun setUp() {
@@ -34,7 +38,9 @@ class DefaultFilesRepositoryTest {
             megaApiFolderGateway = megaApiFolderGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             megaLocalStorageGateway = megaLocalStorageGateway,
-            sortOrderMapper = sortOrderMapper
+            sortOrderMapper = sortOrderMapper,
+            megaShareMapper = megaShareMapper,
+            megaExceptionMapper = megaExceptionMapper
         )
     }
 
@@ -46,10 +52,11 @@ class DefaultFilesRepositoryTest {
     }
 
     @Test
-    fun `test that get camera sort order calls get camera sort order of mega local storage gateway`() = runTest {
-        underTest.getCameraSortOrder()
-        verify(megaLocalStorageGateway).getCameraSortOrder()
-    }
+    fun `test that get camera sort order calls get camera sort order of mega local storage gateway`() =
+        runTest {
+            underTest.getCameraSortOrder()
+            verify(megaLocalStorageGateway).getCameraSortOrder()
+        }
 
     @Test
     fun `test that get camera sort order invokes sort order mapper`() = runTest {
