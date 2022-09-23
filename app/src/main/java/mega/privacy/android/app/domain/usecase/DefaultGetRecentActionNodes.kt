@@ -10,12 +10,12 @@ import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetThumbnail
-import nz.mega.sdk.MegaRecentActionBucket
+import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Get nodes from the recent action bucket
+ * Transform a [MegaNodeList] into a list of [NodeItem]
  */
 class DefaultGetRecentActionNodes @Inject constructor(
     private val getThumbnail: GetThumbnail,
@@ -23,18 +23,18 @@ class DefaultGetRecentActionNodes @Inject constructor(
 ) : GetRecentActionNodes {
 
     /**
-     * Get nodes from the recent action bucket
+     * Transform a [MegaNodeList] into a list of [NodeItem]
      *
-     * @param bucket the recent action that contains the nodes
-     * @return the list of NodeItem associated to the bucket
+     * @param nodes the nodes to convert
+     * @return a list of node item resulting from the conversion
      */
-    override suspend fun invoke(bucket: MegaRecentActionBucket): List<NodeItem> =
+    override suspend fun invoke(nodes: MegaNodeList): List<NodeItem> =
         withContext(ioDispatcher) {
-            val size = bucket.nodes.size()
+            val size = nodes.size()
             val coroutineScope = CoroutineScope(SupervisorJob())
             val deferredNodeItems = mutableListOf<Deferred<NodeItem>>().apply {
                 for (i in 0 until size) {
-                    bucket.nodes[i]?.let { node ->
+                    nodes[i]?.let { node ->
                         add(
                             coroutineScope.async {
                                 NodeItem(
@@ -54,7 +54,7 @@ class DefaultGetRecentActionNodes @Inject constructor(
                 deferredNodeItems.forEach {
                     try {
                         add(it.await())
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
                         Timber.e(e)
                     }
                 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase
 
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ImageRepository
 import java.io.File
 import javax.inject.Inject
@@ -11,6 +12,7 @@ import javax.inject.Inject
 class DefaultGetThumbnail @Inject constructor(private val repository: ImageRepository) :
     GetThumbnail {
 
+    @Throws(MegaException::class)
     override suspend fun invoke(nodeId: Long): File? {
         return repository.getThumbnailFromLocal(nodeId) ?: repository.getThumbnailFromServer(
             nodeId

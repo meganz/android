@@ -1,18 +1,18 @@
 package mega.privacy.android.app.domain.usecase
 
 import mega.privacy.android.app.fragments.homepage.NodeItem
-import nz.mega.sdk.MegaRecentActionBucket
+import nz.mega.sdk.MegaNodeList
 
 /**
- * Get the nodes from recent action bucket
+ * Transform a [MegaNodeList] into a list of [NodeItem]
  */
 fun interface GetRecentActionNodes {
 
     /**
-     * Get the nodes from recent action bucket
+     * Transform a [MegaNodeList] into a list of [NodeItem]
      *
-     * @param bucket the bucket containing the nodes
-     * @return a list of node item contained in the bucket
+     * @param nodes the nodes to convert
+     * @return a list of node item resulting from the conversion
      */
-    suspend operator fun invoke(bucket: MegaRecentActionBucket): List<NodeItem>
+    suspend operator fun invoke(nodes: MegaNodeList): List<NodeItem>
 }
