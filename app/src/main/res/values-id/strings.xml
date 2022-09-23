@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -958,7 +958,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Matikan pemberitahuan obrolan untuk</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Matikan notifikasi</string>
+    <string name="title_dialog_mute_chatroom_notifications">Bisukan pemberitahuan obrolan</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Nyala</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -3536,7 +3536,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">Anda memiliki langganan MEGA aktif dengan %1$s. Anda harus membatalkannya secara terpisah di %2$s, karena MEGA tidak dapat membatalkannya untuk anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription"></string>
+    <string name="message_other_platform_subscription">Anda memiliki langganan MEGA yang aktif. Ini akan dibatalkan secara otomatis setelah akun dihapus. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">Anda memiliki langganan MEGA aktif dengan Apple. Anda harus membatalkannya secara terpisah dari akun iTunes anda, karena MEGA tidak dapat membatalkannya untuk anda. Kunjungi Pusat Bantuan kami untuk informasi lebih lanjut.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
@@ -3894,9 +3894,9 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]Tidak ada item di [/B][A]cadangan[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">Di sinilah file dan folder yang dicadangkan disimpan. Item yang dicadangkan adalah “hanya baca” untuk melindunginya agar tidak dimodifikasi secara tidak sengaja di drive cloud anda.\nAnda dapat mencadangkan item dari komputer anda ke MEGA menggunakan aplikasi desktop kami.</string>
+    <string name="backups_empty_state_body">Di sinilah file dan folder yang dicadangkan disimpan. Item yang dicadangkan “hanya-baca” untuk melindunginya agar tidak dimodifikasi secara tidak sengaja di drive cloud anda.Anda dapat mencadangkan item dari komputer anda ke MEGA menggunakan aplikasi desktop kami.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Account suspended due to copyright violations. We sent you an email with more information about this.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Akun ditangguhkan karena pelanggaran hak cipta. Kami mengirimi anda email dengan informasi lebih lanjut tentang ini.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Account terminated due to a breach of MEGA’s Terms of Service, such as abuse of others’ rights, sharing and importing illegal data, or system abuse.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Akun dihentikan karena pelanggaran Persyaratan Layanan MEGA, seperti penyalahgunaan hak orang lain, berbagi dan mengimpor data ilegal, atau penyalahgunaan sistem.</string>
 </resources>

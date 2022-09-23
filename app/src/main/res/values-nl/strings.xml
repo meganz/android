@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Geen externe opslag gedetecteerd</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Uitloggen</string>
+    <string name="action_logout">Log&#160;uit</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Uploaden</string>
     <!-- Menu item -->
@@ -129,7 +129,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Weet u zeker dat u het huidige aanmeldingsproces wilt annuleren?</string>
     <!-- Login button -->
-    <string name="login_text">Inloggen</string>
+    <string name="login_text">Log&#160;in</string>
     <!-- email label -->
     <string name="email_text">E-mail</string>
     <!-- password label -->
@@ -974,7 +974,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Demp gesprek meldingen voor</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Meldingen dempen</string>
+    <string name="title_dialog_mute_chatroom_notifications">Demp gespreksmeldingen</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Aan</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -2725,8 +2725,8 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$dafbeelding&#160;</item>
-        <item quantity="other">%1$dafbeeldingen&#160;</item>
+        <item quantity="one">%1$d afbeelding &#160;</item>
+        <item quantity="other">%1$d afbeeldingen&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]gecreëerd door [/A]%s</string>
@@ -4000,7 +4000,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Dit is waar uw back-upbestanden en mappen worden opgeslagen. Uw back-upitems zijn “alleen-lezen” om te voorkomen dat ze per ongeluk worden gewijzigd in uw clouddrive.\nU kunt een back-up maken van items op uw computer naar MEGA met behulp van onze desktop-applicatie.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Account suspended due to copyright violations. We sent you an email with more information about this.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Account is geschorst vanwege copyright overtredingen. We hebben u een email gestuurd met meer informatie hierover.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Account terminated due to a breach of MEGA’s Terms of Service, such as abuse of others’ rights, sharing and importing illegal data, or system abuse.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Uw account was beëindigd door een schending van MEGA’s Algemene Voorwaarden, zoals misbruik van rechten van anderen; Het delen en/of importen van illegale gegevens; of systeem misbruik.</string>
 </resources>

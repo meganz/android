@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -990,7 +990,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Amuțește notificările de chat timp de</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Amuțește notificările</string>
+    <string name="title_dialog_mute_chatroom_notifications">Amuțește notificările de chat</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Activat</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1416,7 +1416,7 @@
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Anulează contul</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
-    <string name="delete_account_text">Dacă anulezi contul, nu vei putea accesa datele contului, contactele sau conversațiile MEGA.\nNu vei putea anula această acțiune.</string>
+    <string name="delete_account_text">Dacă ștergi contul, nu vei putea accesa datele contului, contactele sau conversațiile MEGA.\nNu vei putea anula această acțiune.</string>
     <!-- menu item -->
     <string name="delete_button">Șterge</string>
     <!--  -->
@@ -1871,7 +1871,7 @@
     <!-- Title of the dialog ‘Do you remember your password?’ -->
     <string name="remember_pwd_dialog_title">Îți mai aduci aminte parola?</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
-    <string name="remember_pwd_dialog_text_logout">Ești pe cale să te deconectezi, te rugăm să îți testezi parola pentru a te asigura că ți-o aduci aminte.\nDacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
+    <string name="remember_pwd_dialog_text_logout">Ești pe cale să te deconectezi, te rugăm să testezi parola pentru a te asigura că ți-o aduci aminte.\nDacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
     <!-- Text of the dialog ‘Do you remember your password?’ -->
     <string name="remember_pwd_dialog_text">Te rugăm să îți testezi parola pentru a te asigura că ți-o aduci aminte. Dacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
     <!-- Dialog option that permits user do not show it again -->
@@ -1881,7 +1881,7 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Parolă acceptată</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Parolă greșită.\nFă un backup al cheii de recuperare cât mai curând posibil!</string>
+    <string name="test_pwd_wrong">Parolă greșită.\nFă backup cheii de recuperare cât mai curând posibil!</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">Copiază în clipboard</string>
     <!-- Option that permits user logout -->
@@ -2137,7 +2137,7 @@
     <!-- subtitle of the option in Settings to delete all the versions of the account -->
     <string name="settings_file_management_subtitle_delete_versions">Toate fișierele actuale vor rămâne. Doar versiunile istorice ale fișierelor vor fi șterse.</string>
     <!-- Text of the dialog to delete all the file versions of the account -->
-    <string name="text_confirmation_dialog_delete_versions">Ești pe cale să ștergi istoricul versiunilor tuturor fișierelor. Orice versiune a vreunui fișier partajat ție de la un contact trebuie să fie șters de către acesta\n\nTe rugăm să reții că fișierele actuale nu vor fi șterse.</string>
+    <string name="text_confirmation_dialog_delete_versions">Ești pe cale să ștergi istoricul versiunilor tuturor fișierelor. Orice versiune a vreunui fișier partajat ție de la un contact trebuie să fie șters de către acesta.\n\nTe rugăm să reții că fișierele actuale nu vor fi șterse.</string>
     <!-- success message when deleting all the versions of the account -->
     <string name="success_delete_versions">Versiunile fișierelor șterse cu succes</string>
     <!-- error message when deleting all the versions of the account -->
@@ -3013,7 +3013,7 @@
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
     <string name="error_business_disabled">Contul tău a fost dezactivat de către administrator. Te rugăm să contactezi administratorul contului tău business pentru detalii suplimentare.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
-    <string name="error_business_removed">Contul tău a fost eliminat de către administrator. Te rugăm să contactezi administratorul contului tău business pentru detalii suplimentare.</string>
+    <string name="error_business_removed">Contul tău a fost eliminat de către administrator. Te rugăm să contactezi administratorul contului business pentru detalii suplimentare.</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
     <string name="option_modify_phone_number">Modifică</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
@@ -3729,7 +3729,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately at %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription"></string>
+    <string name="message_other_platform_subscription">Ai un abonament MEGA activ. Acesta va fi anulat automat după ștergerea contului. Vizitează centrul nostru de asistență pentru mai multe informații.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your iTunes account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->

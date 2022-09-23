@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">การสมัครใช้งานได้ถูกยกเลิกแล้ว</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">เราไม่สามารถยกเลิกการสมัครของคุณได้ โปรดติดต่อ support&#64;mega.nz เพื่อขอความช่วยเหลือ</string>
+    <string name="cancel_subscription_error">เราไม่สามารถยกเลิกการสมัครใช้งานของคุณได้ กรุณาติดต่อ support&#64;mega.nz เพื่อขอความช่วยเหลือ</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">ปิดเซสชั่นอื่น ๆ</string>
     <!-- Message after kill all opened sessions -->
@@ -890,7 +890,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">อีเมลและ/หรือรหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">บัญชีของคุณถูกระงับ เนื่องจากละเมิดเงื่อนไขการให้บริการกรุณาติดต่อ support&#64;mega.co.nz</string>
+    <string name="error_account_suspended">บัญชีของคุณถูกระงับ เนื่องจากละเมิดเงื่อนไขการให้บริการกรุณาติดต่อ support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">มีการเข้าสู่ระบบไม่สำเร็จหลายครั้งเกินไป กรุณารอประมาณหนึ่งชั่วโมง</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -958,7 +958,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">ปิดเสียงแจ้งเตือนแชทเป็นเวลา</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">ปิดเสียงการแจ้งเตือน</string>
+    <string name="title_dialog_mute_chatroom_notifications">ปิดเสียงการแจ้งเตือนแชท</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">เปิด</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -2257,7 +2257,7 @@
     <string name="error_download_takendown_node">ไม่สามารถเข้าถึงได้เนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="other">ดาวน์โหลดไฟล์ %d ไฟล์ไม่ได้ เนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</item>
+        <item quantity="other">ไม่สามารถดาวน์โหลดไฟล์ %d รายการนี้ได้ เนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]ไฟล์ที่แชร์แบบสาธารณะของคุณ [/A][B]%s[/B][C] ถูกคืนสถานะแล้ว[/C]</string>
@@ -3260,7 +3260,7 @@
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">การประชุม</string>
     <!-- Menu option that allows the user to start/join meeting. -->
-    <string name="start_join_meeting">เริ่ม/เข้าร่วมการประชุม</string>
+    <string name="start_join_meeting">เริ่มหรือเข้าร่วมการประชุม</string>
     <!-- Label that create a meeting -->
     <string name="new_meeting">ประชุมใหม่</string>
     <!-- Label that join a meeting -->
@@ -3536,9 +3536,9 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">คุณมีการสมัครใช้งาน MEGA กับ %1$s คุณต้องยกเลิกที่ %2$s ด้วยตนเอง เนื่องจาก MEGA ไม่สามารถยกเลิกให้คุณได้ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription"></string>
+    <string name="message_other_platform_subscription">คุณมีการสมัครใช้งาน MEGA อยู่ แต่เมื่อบัญชีคุณถูกลบออก ระบบจะยกเลิกการสมัครใช้งานของคุณโดยอัตโนมัติ สำหรับข้อมูลเพิ่มเติม กรุณาเยี่ยมชมได้ที่ศูนย์ช่วยเหลือของเรา</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">คุณมีการสมัครใช้งาน MEGA กับ Apple คุณต้องยกเลิกที่ iTunes ด้วยตนเอง เนื่องจาก MEGA ไม่สามารถยกเลิกให้คุณได้ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
+    <string name="message_itunes_platform_subscription">คุณมีการสมัครใช้งาน MEGA กับ Apple คุณต้องยกเลิกที่ iTunes ด้วยตนเอง เนื่องจาก MEGA ไม่สามารถยกเลิกให้คุณได้ สำหรับข้อมูลเพิ่มเติม กรุณาเยี่ยมชมได้ที่ศูนย์ช่วยเหลือของเรา</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">เยี่ยมชม %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -3546,7 +3546,7 @@
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">ไทม์ไลน์</string>
     <!-- Title of album tab in photos section. -->
-    <string name="tab_title_album">อัลบัม</string>
+    <string name="tab_title_album">อัลบั้ม</string>
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">รายการโปรด</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -1006,7 +1006,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Отключить уведомления чата на</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Отключить уведомления</string>
+    <string name="title_dialog_mute_chatroom_notifications">Отключить уведомления чата</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Вкл</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -3830,7 +3830,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">У вас есть активная подписка MEGA от %1$s. Вам нужно отменить её отдельно в %2$s, так как MEGA не может отменить её за вас. Посетите наш справочный центр для получения дополнительной информации.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription">У вас есть активная подписка MEGA. Она будет отменена автоматически после удаления аккаунта. Посетите наш Справочный центр для получения дополнительной информации.</string>
+    <string name="message_other_platform_subscription">У вас есть активная подписка MEGA. Она будет отменена автоматически после удаления аккаунта. Посетите наш справочный центр для получения дополнительной информации.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">У вас есть активная подписка MEGA от Apple. Вам нужно отменить её отдельно в своей учётной записи iTunes, так как MEGA не может отменить её за вас. Посетите наш справочный центр для получения дополнительной информации.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->

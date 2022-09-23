@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -1006,7 +1006,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Wycisz powiadomienia czatu dla</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Wycisz powiadomienia</string>
+    <string name="title_dialog_mute_chatroom_notifications">Wycisz powiadomienia czatu</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Wł</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1205,10 +1205,8 @@
     <string name="no_conversation_history">Brak historii rozmowy</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="one">%1$s [A]pisze&#8230;[/A]</item>
-        <item quantity="few">%1$s [A]piszą&#8230;[/A]</item>
-        <item quantity="many">%1$s [A]piszą&#8230;[/A]</item>
-        <item quantity="other">%1$s [A]piszą&#8230;[/A]</item>
+        <item quantity="one">%1$s [A]is typing&#8230;[/A]</item>
+        <item quantity="other">%1$s [A]are typing&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]i pozostali piszą&#8230;[/A]</string>
@@ -2498,10 +2496,8 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d katalog&#160;·&#160;</item>
-        <item quantity="few">%1$d katalogi&#160;·&#160;</item>
-        <item quantity="many">%1$d katalogi&#160;·&#160;</item>
-        <item quantity="other">%1$d katalogi&#160;·&#160;</item>
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] dodane %2$s i %3$s[/B]</string>
@@ -2869,10 +2865,8 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d zdjęcie&#160;</item>
-        <item quantity="few">%1$d zdjęć&#160;</item>
-        <item quantity="many">%1$d zdjęć&#160;</item>
-        <item quantity="other">%1$d zdjęć&#160;</item>
+        <item quantity="one">%1$d image&#160;</item>
+        <item quantity="other">%1$d images&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]utworzony przez [/A]%s</string>
@@ -4206,7 +4200,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]Brak [/B][A]kopii zapasowych[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">W tym miejscu są przechowywane pliki i foldery, których kopie zapasowe zostały utworzone. Kopie zapasowe są dostępne “tylko do odczytu”, co chroni je przed przypadkową modyfikacją na dysku w chmurze.\nKopię zapasową elementów z komputera możesz utworzyć na MEGA za pomocą naszej aplikacji desktopowej.</string>
+    <string name="backups_empty_state_body">W tym miejscu są przechowywane pliki i foldery, których kopie zapasowe zostały utworzone. Kopie zapasowe są dostępne „tylko do odczytu”, co chroni je przed przypadkową modyfikacją na dysku w chmurze.Kopię zapasową elementów z komputera możesz utworzyć na MEGA za pomocą naszej aplikacji desktopowej.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Konto zawieszone z powodu naruszenia praw autorskich. Wysłaliśmy do Ciebie maila z większą ilością informacji na ten temat.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->

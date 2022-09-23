@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -990,7 +990,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Mettre les notifications en sourdine pendant</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Mettre les notifications en sourdine</string>
+    <string name="title_dialog_mute_chatroom_notifications">Mettre en sourdine les notifications des conversations</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Activée</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -2797,9 +2797,9 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="many">%1$d images&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="one">%1$d&#160;image&#160;</item>
+        <item quantity="many">%1$d d’images&#160;</item>
+        <item quantity="other">%1$d&#160;images&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]créé par [/A]%s</string>
@@ -4102,7 +4102,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]Aucun élément dans les [/B][A]sauvegardes[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">Vos fichiers et dossiers sauvegardés y sont stockés. Vos éléments sauvegardés sont en «&#160;lecture seulement&#160;» pour empêcher qu’ils soient modifiés par accident dans votre disque nuagique.\nVous pouvez sauvegarder des éléments de votre ordinateur vers MEGA grâce à notre appli pour ordinateur.</string>
+    <string name="backups_empty_state_body">Vos fichiers et dossiers sauvegardés y sont stockés. Vos éléments sauvegardés sont en «&#160;lecture seulement&#160;» pour empêcher qu’ils soient modifiés par accident dans votre disque nuagique.Vous pouvez sauvegarder des éléments de votre ordinateur vers MEGA grâce à notre appli pour ordinateur.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Votre compte a été désactivé en raison de violations du droit d’auteur. Nous vous avons envoyé un courriel avec plus de renseignements à ce sujet.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->

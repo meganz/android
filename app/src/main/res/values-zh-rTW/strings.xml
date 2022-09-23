@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -858,7 +858,7 @@
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK_title">無效的還原金鑰</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
-    <string name="recovering_info">取得資訊中⋯</string>
+    <string name="recovering_info">正在取得資訊⋯</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
     <string name="email_verification_text_change_mail">您的新電子郵件地址需要驗證確認。請至您的電子信箱收信並進行驗證。</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
@@ -878,7 +878,7 @@
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="hint_confirm_password_protection_dialog">確認密碼</string>
     <!-- Status text at the beginning of getting a link -->
-    <string name="link_request_status">處理中⋯</string>
+    <string name="link_request_status">正在處理⋯</string>
     <!-- Option of the sliding panel to edit the link of a node -->
     <string name="edit_link_option">管理連結</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
@@ -958,7 +958,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">將所有對話通知靜音</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">通知設成靜音</string>
+    <string name="title_dialog_mute_chatroom_notifications">聊天通知靜音</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">開啟</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1349,7 +1349,7 @@
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">刪除帳戶</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
-    <string name="delete_account_text">如果您刪除帳戶，您將無法再存取您帳戶裡的資料、您的MEGA聯絡人或對話記錄。\n您將無法還原此操作。</string>
+    <string name="delete_account_text">如果您刪除帳戶，您將無法再存取您帳戶裡的資料、MEGA聯絡人或對話記錄。\n您將無法還原此操作。</string>
     <!-- menu item -->
     <string name="delete_button">刪除</string>
     <!--  -->
@@ -1794,7 +1794,7 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">密碼正確</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">密碼錯誤。\n盡快備份您的還原金鑰！</string>
+    <string name="test_pwd_wrong">密碼錯誤。\n請盡快備份您的還原金鑰！</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">複製到剪貼簿</string>
     <!-- Option that permits user logout -->
@@ -1806,7 +1806,7 @@
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">來電</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">MEGA背景彈窗通知停用中。\n點擊以更改設定。</string>
+    <string name="notification_enable_display">MEGA背景彈出式視窗已停用。\n點擊更改設定。</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s則未讀訊息</item>
@@ -2048,7 +2048,7 @@
     <!-- Title of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_title">檔案版本控制</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
-    <string name="settings_enable_file_versioning_subtitle">為您整個帳戶啟用或停用檔案版本控制。\n停用檔案版本控制並不會讓您的聯絡人無法在共享資料夾建立新版本的檔案。</string>
+    <string name="settings_enable_file_versioning_subtitle">啟用或停用您整個帳戶的檔案版本控制功能。\n停用檔案版本控制並不會讓您的聯絡人無法在共享資料夾建立新版本的檔案。</string>
     <!-- Hint shown to guide user on activity add contacts -->
     <string name="type_mail">點擊、輸入姓名或電子郵件</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
@@ -2622,7 +2622,7 @@
     <!-- Title of popup when user click ‘Share’ button on invite contact page -->
     <string name="invite_contact_chooser_title">邀請朋友</string>
     <!-- Action button label -->
-    <string name="invite_contact_action_button">透過⋯邀請朋友</string>
+    <string name="invite_contact_action_button">邀請朋友⋯</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
         <item quantity="other">%d個檔案已下載。</item>
@@ -3022,7 +3022,7 @@
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
     <string name="share_link_with_key">連結：%1$s\n\n金鑰：%2$s</string>
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
-    <string name="share_link_with_password">連結： %1$s\n\n密碼： %2$s</string>
+    <string name="share_link_with_password">連結：%1$s\n\n密碼：%2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
     <string name="files_required_permissions_warning">MEGA需要您的授權才能存取您的檔案進行共享。</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
@@ -3894,7 +3894,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[A]備份[/A]裡[B]沒有項目[/B]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">這是儲存您備份檔案和資料夾的地方。您備份的項目是「唯讀」的，以保護它們不會在您的雲端硬碟中被意外修改。\n您可以使用我們桌面應用程式將您電腦中的項目備份到MEGA。</string>
+    <string name="backups_empty_state_body">這是您備份檔案和資料夾存放的地方。您備份的項目是「唯讀」的，以避免它們在您的雲端硬碟中被意外竄改。您可以使用我們桌面應用程式將您電腦中的項目備份到MEGA。</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">帳戶因侵犯版權而被暫停。我們向您發送了一封電子郵件，其中包含有關此內容的更多訊息。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
