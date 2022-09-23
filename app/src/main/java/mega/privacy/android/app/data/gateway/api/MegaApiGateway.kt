@@ -5,6 +5,7 @@ import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -686,4 +687,20 @@ interface MegaApiGateway {
      * @return a list of recent actions
      */
     suspend fun getRecentActions(): List<MegaRecentActionBucket>
+
+    /**
+     * Check access error extended
+     *
+     * @param node
+     * @param level
+     *
+     * - [MegaShare.ACCESS_UNKNOWN]
+     * - [MegaShare.ACCESS_READ]
+     * - [MegaShare.ACCESS_READWRITE]
+     * - [MegaShare.ACCESS_FULL]
+     * - [MegaShare.ACCESS_OWNER]
+     *
+     * @return success or failed
+     */
+    fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaError
 }
