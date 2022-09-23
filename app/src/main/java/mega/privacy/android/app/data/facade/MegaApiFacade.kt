@@ -10,10 +10,10 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
@@ -31,7 +31,6 @@ import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
-import java.util.ArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -382,18 +381,18 @@ class MegaApiFacade @Inject constructor(
 
     override suspend fun moveTransferToLast(
         transfer: MegaTransfer,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.moveTransferToLast(transfer, listener)
 
     override suspend fun moveTransferBefore(
         transfer: MegaTransfer,
         prevTransfer: MegaTransfer,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.moveTransferBefore(transfer, prevTransfer, listener)
 
     override suspend fun moveTransferToFirst(
         transfer: MegaTransfer,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.moveTransferToFirst(transfer, listener)
 
     companion object {
@@ -432,4 +431,6 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getRecentActions(): List<MegaRecentActionBucket> =
         megaApi.recentActions
 
+    override fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaError =
+        megaApi.checkAccessErrorExtended(node, level)
 }

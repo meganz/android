@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
+import nz.mega.sdk.MegaShare
 
 /**
  * Files repository
@@ -186,4 +187,20 @@ interface FilesRepository {
      * @return The local path of the downloaded file.
      */
     suspend fun downloadBackgroundFile(node: MegaNode): String
+
+    /**
+     * Check access error extended
+     *
+     * @param node
+     * @param level
+     *
+     * - [MegaShare.ACCESS_UNKNOWN]
+     * - [MegaShare.ACCESS_READ]
+     * - [MegaShare.ACCESS_READWRITE]
+     * - [MegaShare.ACCESS_FULL]
+     * - [MegaShare.ACCESS_OWNER]
+     *
+     * @return success or failed
+     */
+    suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException
 }

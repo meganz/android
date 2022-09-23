@@ -123,7 +123,7 @@ internal class DefaultMonitorTransfersSizeTest {
     @Test
     fun `when monitorTransferEvents emit TransferFinishEvent then the transfer size info equal to transfer size`() =
         runTest {
-            val event = TransferEvent.TransferFinishEvent(transfer, MegaException(null, null))
+            val event = TransferEvent.TransferFinishEvent(transfer, MegaException(-1, null))
             underTest = DefaultMonitorTransfersSize(
                 repository = transferRepository
             )
