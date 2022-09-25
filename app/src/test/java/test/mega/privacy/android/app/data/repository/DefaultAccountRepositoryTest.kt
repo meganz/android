@@ -81,4 +81,17 @@ class DefaultAccountRepositoryTest {
             }
         }
 
+    @Test
+    fun `test that is business account active returns true if api returns true`() =
+        runTest {
+            whenever(megaApiGateway.isBusinessAccountActive()).thenReturn(true)
+            assertThat(underTest.isBusinessAccountActive()).isTrue()
+        }
+
+    @Test
+    fun `test that is business account active returns false if api returns false`() = runTest {
+        whenever(megaApiGateway.isBusinessAccountActive()).thenReturn(false)
+        assertThat(underTest.isBusinessAccountActive()).isFalse()
+    }
+
 }
