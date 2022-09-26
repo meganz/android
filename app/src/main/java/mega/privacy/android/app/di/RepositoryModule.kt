@@ -155,5 +155,4 @@ abstract class RepositoryModule {
      */
     @Binds
     abstract fun bindRecentActionsRepository(repository: DefaultRecentActionsRepository): RecentActionsRepository
-
 }
