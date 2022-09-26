@@ -149,7 +149,6 @@ class MediaPlayerFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-
         if (isVideoPlayer() && serviceGateway?.playing() == true) {
             serviceGateway?.setPlayWhenReady(false)
             videoPlayerPausedForPlaylist = true
@@ -158,13 +157,11 @@ class MediaPlayerFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-
         outState.putBoolean(KEY_VIDEO_PAUSED_FOR_PLAYLIST, videoPlayerPausedForPlaylist)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-
         playlistObserved = false
     }
 
@@ -177,70 +174,71 @@ class MediaPlayerFragment : Fragment() {
     }
 
     private fun observeFlow() {
-        serviceGateway?.run {
-            metadataUpdate().flowWithLifecycle(
-                viewLifecycleOwner.lifecycle,
-                Lifecycle.State.RESUMED
-            ).onEach { metadata ->
-                if (isAudioPlayer) {
-                    audioPlayerVH?.displayMetadata(metadata)
-                } else {
-                    videoPlayerVH?.displayMetadata(metadata)
-                }
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-        }
-        playerServiceViewModelGateway?.run {
-            if (!playlistObserved && view != null) {
-                playlistObserved = true
-
-                playlistUpdate().flowWithLifecycle(
+        if (view != null) {
+            serviceGateway?.run {
+                metadataUpdate().flowWithLifecycle(
                     viewLifecycleOwner.lifecycle,
                     Lifecycle.State.RESUMED
-                ).onEach {
-                    Timber.d("MediaPlayerService observed playlist ${it.first.size} items")
-
-                    audioPlayerVH?.togglePlaylistEnabled(it.first)
-                    videoPlayerVH?.togglePlaylistEnabled(it.first)
+                ).onEach { metadata ->
+                    if (isAudioPlayer) {
+                        audioPlayerVH?.displayMetadata(metadata)
+                    } else {
+                        videoPlayerVH?.displayMetadata(metadata)
+                    }
                 }.launchIn(viewLifecycleOwner.lifecycleScope)
+            }
+            playerServiceViewModelGateway?.run {
+                if (!playlistObserved) {
+                    playlistObserved = true
+                    playlistUpdate().flowWithLifecycle(
+                        viewLifecycleOwner.lifecycle,
+                        Lifecycle.State.RESUMED
+                    ).onEach {
+                        Timber.d("MediaPlayerService observed playlist ${it.first.size} items")
 
-                retryUpdate().flowWithLifecycle(
-                    viewLifecycleOwner.lifecycle,
-                    Lifecycle.State.RESUMED
-                ).onEach { isRetry ->
-                    when {
-                        !isRetry && retryFailedDialog == null -> {
-                            retryFailedDialog = MaterialAlertDialogBuilder(requireContext())
-                                .setCancelable(false)
-                                .setMessage(
-                                    StringResourcesUtils.getString(
-                                        if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
-                                        else R.string.error_fail_to_open_file_no_network
+                        audioPlayerVH?.togglePlaylistEnabled(it.first)
+                        videoPlayerVH?.togglePlaylistEnabled(it.first)
+                    }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+                    retryUpdate().flowWithLifecycle(
+                        viewLifecycleOwner.lifecycle,
+                        Lifecycle.State.RESUMED
+                    ).onEach { isRetry ->
+                        when {
+                            !isRetry && retryFailedDialog == null -> {
+                                retryFailedDialog = MaterialAlertDialogBuilder(requireContext())
+                                    .setCancelable(false)
+                                    .setMessage(
+                                        StringResourcesUtils.getString(
+                                            if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
+                                            else R.string.error_fail_to_open_file_no_network
+                                        )
                                     )
-                                )
-                                .setPositiveButton(
-                                    StringResourcesUtils.getString(R.string.general_ok)
-                                ) { _, _ ->
-                                    serviceGateway?.stopAudioPlayer()
-                                    requireActivity().finish()
-                                }
-                                .show()
+                                    .setPositiveButton(
+                                        StringResourcesUtils.getString(R.string.general_ok)
+                                    ) { _, _ ->
+                                        serviceGateway?.stopAudioPlayer()
+                                        requireActivity().finish()
+                                    }
+                                    .show()
+                            }
+                            isRetry -> {
+                                retryFailedDialog?.dismiss()
+                                retryFailedDialog = null
+                            }
                         }
-                        isRetry -> {
-                            retryFailedDialog?.dismiss()
-                            retryFailedDialog = null
-                        }
-                    }
-                }.launchIn(viewLifecycleOwner.lifecycleScope)
+                    }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-                mediaPlaybackUpdate().flowWithLifecycle(
-                    viewLifecycleOwner.lifecycle,
-                    Lifecycle.State.RESUMED
-                ).onEach { isPaused ->
-                    if (isVideoPlayer()) {
-                        // The keepScreenOn is true when the video is playing, otherwise it's false.
-                        videoPlayerView?.keepScreenOn = !isPaused
-                    }
-                }.launchIn(viewLifecycleOwner.lifecycleScope)
+                    mediaPlaybackUpdate().flowWithLifecycle(
+                        viewLifecycleOwner.lifecycle,
+                        Lifecycle.State.RESUMED
+                    ).onEach { isPaused ->
+                        if (isVideoPlayer()) {
+                            // The keepScreenOn is true when the video is playing, otherwise it's false.
+                            videoPlayerView?.keepScreenOn = !isPaused
+                        }
+                    }.launchIn(viewLifecycleOwner.lifecycleScope)
+                }
             }
         }
     }
