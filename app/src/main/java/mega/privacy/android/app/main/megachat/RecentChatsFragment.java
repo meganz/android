@@ -768,7 +768,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
      */
     public void clearSelections() {
         Timber.d("clearSelections");
-        if (adapterList.isMultipleSelect()) {
+        if (adapterList != null && adapterList.isMultipleSelect()) {
             adapterList.clearSelections();
         }
     }

@@ -15,6 +15,7 @@ import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
 import javax.inject.Inject
 
@@ -118,7 +119,21 @@ class RecentsBucketViewModel @Inject constructor(
             .removeObserver(nodesChangeObserver)
     }
 
-    fun getSelectedNodes(): List<NodeItem> = selectedNodes.toList()
+    /**
+     * Retrieves the list of non-null [MegaNode] objects from [selectedNodes]
+     *
+     * @return A list of nun-null [MegaNode] objects
+     */
+    fun getSelectedMegaNodes(): List<MegaNode> =
+        selectedNodes.toList().mapNotNull { it.node }
+
+    /**
+     * Checks whether any [MegaNode] in [getSelectedMegaNodes] belongs in Backups
+     *
+     * @return True if at least one [MegaNode] belongs in Backups, and False if otherwise
+     */
+    fun isAnyNodeInBackups(): Boolean =
+        getSelectedMegaNodes().any { node -> megaApi.isInInbox(node) }
 
     fun getSelectedNodesCount(): Int = selectedNodes.size
 

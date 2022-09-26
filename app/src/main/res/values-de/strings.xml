@@ -209,8 +209,6 @@
     <string name="section_recents">Neue/Geänderte Dateien</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Media-Uploads</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">Posteingang</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -976,7 +974,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Stummschalten für</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Benachrichtigungen stummschalten</string>
+    <string name="title_dialog_mute_chatroom_notifications">Chatbenachrichtigungen stummschalten</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">An</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1163,15 +1161,15 @@
     <string name="no_conversation_history">Keine Nachrichten vorhanden</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="one">%1$s [A]tippt&#8230;[/A]</item>
-        <item quantity="other">%1$s [A]tippen&#8230;[/A]</item>
+        <item quantity="one">%1$s [A]is typing&#8230;[/A]</item>
+        <item quantity="other">%1$s [A]are typing&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]und weitere tippen&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Weitere</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">Speicherplatz</string>
+    <string name="storage_space">Speicherung</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Aus Offline-Bereich entfernen?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1657,8 +1655,6 @@
     <string name="context_share">Teilen via</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Leerer [/B][A]Papierkorb[/A]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[B]Keine Dateien in Ihrer [/B][A]Inbox[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">Ihr [A]Cloud Drive[/A][B] ist leer[/B]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1717,10 +1713,6 @@
     <string name="contacts_mega">Auf MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Telefonkontakte</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">Ihr Account wurde wegen mehrfacher Verletzung der MEGA-Nutzungsbedingungen gesperrt. Wir haben Ihnen diesbezüglich eine E-Mail geschickt.</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Ihr Account wurde gekündigt aufgrund eines Verstoßes gegen die MEGA-Nutzungsbedingungen, einschließlich, aber nicht beschränkt auf Ziffer 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Dateien werden geladen</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2097,7 +2089,7 @@
     <!-- subtitle of the option in Settings to delete all the versions of the account -->
     <string name="settings_file_management_subtitle_delete_versions">Alle alten Dateiversionen werden gelöscht. Dateiversionen in Ordnerfreigaben eines Kontakts müssen vom Eigentümer entfernt werden.</string>
     <!-- Text of the dialog to delete all the file versions of the account -->
-    <string name="text_confirmation_dialog_delete_versions">Sie löschen die Versionshistorie aller Dateien. Dateiversionen in Ordnerfreigaben eines Kontakts müssen durch diesen gelöscht werden.\n\nDie aktuelle Version jeder Datei bleibt erhalte.</string>
+    <string name="text_confirmation_dialog_delete_versions">Sie löschen die Versionshistorie aller Dateien. Dateiversionen in Ordnerfreigaben eines Kontakts müssen durch diesen gelöscht werden.\n\nBitte beachten Sie: Die aktuelle Version jeder Datei bleibt erhalten.</string>
     <!-- success message when deleting all the versions of the account -->
     <string name="success_delete_versions">Dateiversionen erfolgreich gelöscht</string>
     <!-- error message when deleting all the versions of the account -->
@@ -2400,8 +2392,8 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d Ordner&#160;·&#160;</item>
-        <item quantity="other">%1$d Ordner&#160;·&#160;</item>
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] hat %2$s und %3$s hinzugefügt[/B]</string>
@@ -2584,7 +2576,7 @@
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
     <string name="title_delete_version_history">Ältere Versionen löschen?</string>
     <!-- Text of the dialog shown when it wants to delete the version history of a file -->
-    <string name="text_delete_version_history">Die aktuelle Version jeder Datei bleibt erhalten.</string>
+    <string name="text_delete_version_history">Bitte beachten Sie: Die aktuelle Version jeder Datei bleibt erhalten.</string>
     <!-- Alert shown when the version history was deleted correctly -->
     <string name="version_history_deleted">Ältere Versionen gelöscht.</string>
     <!-- Alert shown when the version history was deleted erroneously -->
@@ -2675,8 +2667,6 @@
     <string name="text_join_another_call">Zur Teilnahme müssen Sie das bestehende Gespräch beenden oder halten.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Über diesen Link können Dritte der Unterhaltung beitreten.</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">Neuer Chatlink</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Benennen Sie den Gruppenchat</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -2735,8 +2725,8 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d Bild&#160;</item>
-        <item quantity="other">%1$d Bilder&#160;</item>
+        <item quantity="one">%1$d image&#160;</item>
+        <item quantity="other">%1$d images&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]erstellt von [/A]%s</string>
@@ -3113,9 +3103,9 @@
     <!-- Button which action is share the password of a link -->
     <string name="button_share_password">Passwort teilen</string>
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
-    <string name="share_link_with_key">Link: %1$s\n\n Schlüssel: %2$s</string>
+    <string name="share_link_with_key">Link: %1$s\n\nKey: %2$s</string>
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
-    <string name="share_link_with_password">Link: %1$s\n\n Passwort: %2$s</string>
+    <string name="share_link_with_password">Link: %1$s\n\nPassword: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
     <string name="files_required_permissions_warning">Zum Freigeben muss MEGA auf Ihre Dateien zugreifen können.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
@@ -3565,26 +3555,12 @@
     <string name="settings_mobile_data_resoluton_title">Bei mobiler Datenverbindung hochauflösende Vorschaubilder anzeigen</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Originaldatei für ungezoomete Bildansicht verwenden. Das Deaktivieren dieser Option führt zu grobpixeliger Darstellung hochauflösender Bilder, bis Sie in sie hineinzoomen.</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">Sie sind dabei, den Speicherort eines Standard-Backup-Ordners zu ändern. Dies kann es Ihnen erschweren, Ihren Backup-Ordner später zu finden. Bitte merken Sie sich den Speicherort, damit Sie den Ordner in Zukunft wiederfinden.</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Durch Verschieben dieses Ordners wird das Ziel einer oder mehrerer konfigurierter Backups geändert. Dies kann unbeabsichtigte Folgen haben. Die Backups werden zur Sicherheit deaktiviert. Sie können die Backups in der MEGA-Desktop-App erneut aktivieren. Fortfahren?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Sie sind dabei, Ihren Backup-Ordner zu löschen. Dadurch werden alle eingerichteten Backups entfernt. Sind Sie sicher, dass Sie fortfahren möchten?</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">Möchten Sie Ihren Backup-Ordner wirklich löschen und das dazugehörige Backup deaktivieren?</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">„%1s“ verschieben</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">„%1s“ in den Papierkorb verschieben</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">Backup-Ordner verschieben</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">Backup-Ordner in den Papierkorb verschieben</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Backup deaktivieren</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">Backup verschieben</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">Bitte geben Sie „%1s“ ein, um diese Aktion zu bestätigen</string>
     <!-- when checking the input -->
@@ -3605,11 +3581,6 @@
     <string name="backup_multi_share_permission_text">Diese Ordner können nur schreibgeschützt freigegeben werden, da es sich um Backup-Ordner handelt. Änderungen am Inhalt der Ordner könnten dazu führen, dass die Backups deaktiviert werden.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Einige freigegebene Ordner sind Backup-Ordner und daher schreibgeschützt. Möchten Sie fortfahren?</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="one">%d Gerät</item>
-        <item quantity="other">%d Geräte</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Annehmen</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3884,8 +3855,6 @@
     <string name="settings_help_report_issue_discard_button">Verwerfen</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">Nachricht bearbeiten</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">Galerie</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">Sprachanruf</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -3894,8 +3863,6 @@
     <string name="chat_room_toolbar_voice_clip_option">Sprachnachricht</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Laden Sie Ihre Freunde in den [/B][A]Chat[/A][B] ein[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filter</string>
     <!-- Filter option to show all photos -->
@@ -3947,7 +3914,7 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">[A]%1$s[/A] Speicherplatz</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] Transfervolumen</string>
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] transfer</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">Speicherung</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
@@ -4026,4 +3993,14 @@
     <string name="permissions_notifications_title">Benachrichtigungen erhalten</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA sendet Ihnen Benachrichtigungen für Anrufe, Chats und Dateitransfers.</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">Backups</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[B]Keine Inhalte in [/B][A]Backups[/A]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">Hier werden Ihre gesicherten Dateien und Ordner gespeichert. Die gesicherten Objekte sind schreibgeschützt, damit sie nicht versehentlich in Ihrem Cloud Drive geändert werden.\nMit unserer Desktop-App können Sie die Inhalte Ihres Computers auf MEGA sichern.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Account suspended due to copyright violations. We sent you an email with more information about this.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Account terminated due to a breach of MEGA’s Terms of Service, such as abuse of others’ rights, sharing and importing illegal data, or system abuse.</string>
 </resources>
