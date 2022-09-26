@@ -41,7 +41,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property monitorMultiFactorAuth
  * @property ioDispatcher
  * @property userUpdateMapper
- * @property dbH
+ * @property localStorageGateway
  */
 @ExperimentalContracts
 class DefaultAccountRepository @Inject constructor(
@@ -157,5 +157,9 @@ class DefaultAccountRepository @Inject constructor(
     override fun retryPendingConnections(disconnect: Boolean) {
         megaApiGateway.retryPendingConnections()
         megaChatApiGateway.retryPendingConnections(disconnect)
+    }
+
+    override suspend fun isBusinessAccountActive(): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.isBusinessAccountActive()
     }
 }
