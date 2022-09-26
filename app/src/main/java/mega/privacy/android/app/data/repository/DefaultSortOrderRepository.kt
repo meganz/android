@@ -12,7 +12,6 @@ import javax.inject.Inject
 /**
  * Default implementation of [SortOrderRepository]
  *
- * @property context
  * @property ioDispatcher
  * @property megaLocalStorageGateway
  * @property sortOrderMapper
