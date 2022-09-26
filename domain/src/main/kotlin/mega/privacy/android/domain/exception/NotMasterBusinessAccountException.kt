@@ -7,5 +7,5 @@ package mega.privacy.android.domain.exception
  * @param errorCode
  * @param errorString
  */
-class NotMasterBusinessAccountException(errorCode: Int? = null, errorString: String? = null) :
+class NotMasterBusinessAccountException(errorCode: Int, errorString: String? = null) :
     MegaException(errorCode, errorString)

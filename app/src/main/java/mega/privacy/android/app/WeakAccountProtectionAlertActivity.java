@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.di.ApplicationScope;
+import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener;
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener;
 import mega.privacy.android.app.main.LoginActivity;
@@ -56,7 +56,7 @@ public class WeakAccountProtectionAlertActivity extends PasscodeActivity impleme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        app.setIsBlockedDueToWeakAccount(true);
+        MegaApplication.setBlockedDueToWeakAccount(true);
 
         setContentView(R.layout.activity_weak_account_protection_alert);
 
@@ -122,7 +122,7 @@ public class WeakAccountProtectionAlertActivity extends PasscodeActivity impleme
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        app.setIsBlockedDueToWeakAccount(false);
+        MegaApplication.setBlockedDueToWeakAccount(false);
     }
 
     @Override

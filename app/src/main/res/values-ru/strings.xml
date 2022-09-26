@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -215,8 +215,6 @@
     <string name="section_recents">Недавние</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Загрузки медиафайлов</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">Входящие</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Не в сети</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -584,7 +582,7 @@
     <!-- settings of the Features section -->
     <string name="settings_features">Особенности</string>
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
-    <string name="settings_storage">Хранилище</string>
+    <string name="settings_storage">Хранилище данных</string>
     <!-- Settings of the Passcode -->
     <string name="settings_passcode_lock">Код блокировки</string>
     <!-- Setting to allow the user to select the preferred passcode type -->
@@ -1008,7 +1006,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Отключить уведомления чата на</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Отключить уведомления</string>
+    <string name="title_dialog_mute_chatroom_notifications">Отключить уведомления чата</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Вкл</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1217,7 +1215,7 @@
     <!-- More button in contact info page -->
     <string name="label_more">Больше</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">Дисковое пространство</string>
+    <string name="storage_space">Хранилище данных</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Удалить из локальных?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1731,8 +1729,6 @@
     <string name="context_share">Поделиться через</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]Корзина [/A][B]пуста[/B]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[B]Нет файлов во [/B][A]«Входящих»[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Нет файлов на [/B][A]облачнов диске[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1791,10 +1787,6 @@
     <string name="contacts_mega">В MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Телефонные контакты</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">Ваш аккаунт был заблокирован из-за многочисленных нарушений Условий использования MEGA. Пожалуйста, проверьте свой почтовый ящик.</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Ваш аккаунт был заблокирован из-за нарушения условий использования MEGA, включая, помимо прочего, пункт 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Загрузка файлов</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2811,8 +2803,6 @@
     <string name="text_join_another_call">Чтобы присоединиться к этому вызову, вы должны завершить текущий вызов или удержать его.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Люди могут присоединиться к группе с помощью этой ссылки.</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">Новая ссылка на чат</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Введите имя группы</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -2923,7 +2913,7 @@
     <!-- Title of usage storage details section in My Account -->
     <string name="usage_storage_details_label">Распределение использования хранилища</string>
     <!-- Title of transfer section in Storage -->
-    <string name="transfer_label">Передача</string>
+    <string name="transfer_label">Передача данных</string>
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">Вы не можете удалить %1$s как контакт, поскольку он является частью вашего бизнес-аккаунта.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
@@ -3761,26 +3751,12 @@
     <string name="settings_mobile_data_resoluton_title">Использовать мобильные данные для превью изображений с высоким разрешением</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Разрешить использование мобильных данных для загрузки изображений с высоким разрешением при предварительном просмотре. Если этот параметр отключён, исходное изображение будет загружено только при увеличении масштаба.</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">Вы меняете расположение папки резервного копирования по умолчанию. Из-за этого её может быть сложнее найти в будущем. Пожалуйста, запомните, где она находится, чтобы не потерять.</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Перемещение этой папки изменяет место назначения одной или нескольких настроенных резервных копий и может иметь непредвиденные последствия. Резервное копирование будет отключено в целях вашей безопасности. Резервное копирование можно повторно включить с помощью настольного приложения MEGA. Хотите продолжить?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Вы удаляете папку с резервными копиями. Это удалит все созданные вами резервные копии. Вы уверены, что хотите это сделать?</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">Вы действительно хотите удалить папку резервного копирования и отключить связанное резервное копирование?</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">Перемещение папки «%1s»</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Перемещение папки «%1s» в корзину</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">Перемещение папок резервных копий</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">Перемещение папки резервных копий в корзину</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Отключить</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">Переместить</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">Пожалуйста, введите «%1s», чтобы продолжить</string>
     <!-- when checking the input -->
@@ -3801,13 +3777,6 @@
     <string name="backup_multi_share_permission_text">Эти папки могут быть доступны только для чтения; это папки резервных копий, поэтому любые изменения их содержимого могут отключить резервное копирование.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Некоторые папки, которыми вы собираетесь поделиться, являются папками резервных копий и предназначены только для чтения. Продолжить?</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="one">%d устройство</item>
-        <item quantity="few">%d устройства</item>
-        <item quantity="many">%d устройств</item>
-        <item quantity="other">%d устройства</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Ответить на звонок</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3861,7 +3830,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">У вас есть активная подписка MEGA от %1$s. Вам нужно отменить её отдельно в %2$s, так как MEGA не может отменить её за вас. Посетите наш справочный центр для получения дополнительной информации.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription">У вас есть активная подписка MEGA. Она будет отменена автоматически после удаления аккаунта. Посетите наш Справочный центр для получения дополнительной информации.</string>
+    <string name="message_other_platform_subscription">У вас есть активная подписка MEGA. Она будет отменена автоматически после удаления аккаунта. Посетите наш справочный центр для получения дополнительной информации.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">У вас есть активная подписка MEGA от Apple. Вам нужно отменить её отдельно в своей учётной записи iTunes, так как MEGA не может отменить её за вас. Посетите наш справочный центр для получения дополнительной информации.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
@@ -4086,8 +4055,6 @@
     <string name="settings_help_report_issue_discard_button">Не сохранять</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">Редактирование сообщения</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">Галерея</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">Голосовой звонок</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -4096,8 +4063,6 @@
     <string name="chat_room_toolbar_voice_clip_option">Голосовое сообщение</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Приглашайте друзей в [/B][A]чат[/A][B] и наслаждайтесь нашей зашифрованной платформой конфиденциально и безопасно[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Фильтр</string>
     <!-- Filter option to show all photos -->
@@ -4155,7 +4120,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
     <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] трафика</string>
     <!-- Label of storage in My account section. -->
-    <string name="account_storage_label">на диске</string>
+    <string name="account_storage_label">Хранилище данных</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
     <string name="account_choose_free_limited_transfer_quota">[A]Ограниченный[/A] трафик</string>
     <!-- Name of hots or hosts in the meeting info bottom panel -->
@@ -4236,4 +4201,14 @@
     <string name="permissions_notifications_title">Получайте уведомления</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA будет сообщать о звонках, чатах и передачах файлов.</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">Резервные копии</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[B]Нет [/B][A]резервных копий[/A]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">Здесь хранятся резервные копии файлов и папок. Резервные копии доступны «только для чтения», чтобы защитить их от случайного изменения на облачном диске.\nВы можете делать резервные копии элементов со своего компьютера в MEGA с помощью нашего настольного приложения.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Аккаунт заблокирован из-за нарушения авторских прав. Мы отправили вам электронное письмо с дополнительной информацией об этом.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Аккаунт заблокирован из-за нарушения условий использования MEGA, таких как злоупотребление правами других лиц, обмен и импорт незаконных данных или злоупотребление системой.</string>
 </resources>

@@ -174,7 +174,7 @@ class ContactListViewModel @Inject constructor(
      * Method for checking the necessary actions to start a call.
      */
     fun startCall() {
-        startCallUseCase.startCallFromUserHandle(MegaApplication.getUserWaitingForCall(), enableVideo = false, enableAudio = true)
+        startCallUseCase.startCallFromUserHandle(MegaApplication.userWaitingForCall, enableVideo = false, enableAudio = true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(

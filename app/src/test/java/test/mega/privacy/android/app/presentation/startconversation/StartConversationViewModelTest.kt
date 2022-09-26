@@ -1,4 +1,5 @@
 package test.mega.privacy.android.app.presentation.startconversation
+
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
@@ -16,21 +17,22 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.usecase.GetVisibleContacts
-import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.app.presentation.startconversation.StartConversationViewModel
+import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.presentation.controls.SearchWidgetState
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactData
+import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorLastGreenUpdates
 import mega.privacy.android.domain.usecase.MonitorOnlineStatusUpdates
+import mega.privacy.android.domain.usecase.StartConversation
+import mega.privacy.android.presentation.controls.SearchWidgetState
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -51,10 +53,11 @@ class StartConversationViewModelTest {
     var rule: TestRule = InstantTaskExecutorRule()
 
     private val savedStateHandle = SavedStateHandle(mapOf())
+    private val emptyContactData = ContactData(null, null, null)
     private val testContact = ContactItem(
         handle = Random.nextLong(),
         email = "email@mega.nz",
-        defaultAvatarContent = "A",
+        contactData = emptyContactData,
         defaultAvatarColor = "0asf80",
         visibility = UserVisibility.Visible,
         timestamp = Random.nextLong(),
@@ -66,7 +69,7 @@ class StartConversationViewModelTest {
             add(ContactItem(
                 handle = Random.nextLong(),
                 email = "email$i@mega.nz",
-                defaultAvatarContent = "$i",
+                contactData = emptyContactData,
                 defaultAvatarColor = "0asf80",
                 visibility = UserVisibility.Visible,
                 timestamp = Random.nextLong(),
@@ -134,7 +137,6 @@ class StartConversationViewModelTest {
             monitorOnlineStatusUpdates = monitorOnlineStatusUpdates,
             monitorContactRequestUpdates = monitorContactRequestUpdates,
             addNewContacts = addNewContacts,
-            ioDispatcher = StandardTestDispatcher(),
             monitorConnectivity = monitorConnectivity,
             savedStateHandle = savedStateHandle,
             requestLastGreen = mock()
@@ -165,19 +167,16 @@ class StartConversationViewModelTest {
     fun `test that saved state values are returned`() = runTest {
         val typedSearch = "Typed search"
 
-        savedStateHandle.set(underTest.contactListKey, testContactList)
         savedStateHandle.set(underTest.searchExpandedKey, SearchWidgetState.EXPANDED)
         savedStateHandle.set(underTest.typedSearchKey, typedSearch)
         savedStateHandle.set(underTest.fromChatKey, true)
 
         underTest.state.filter {
-            it.contactItemList == testContactList
-                    && it.searchWidgetState == SearchWidgetState.EXPANDED
+            it.searchWidgetState == SearchWidgetState.EXPANDED
                     && it.typedSearch == typedSearch
                     && it.fromChat
         }.test(200) {
             val latest = awaitItem()
-            assertThat(latest.contactItemList).isEqualTo(testContactList)
             assertThat(latest.searchWidgetState).isEqualTo(SearchWidgetState.EXPANDED)
             assertThat(latest.typedSearch).isEqualTo(typedSearch)
             assertThat(latest.fromChat).isTrue()

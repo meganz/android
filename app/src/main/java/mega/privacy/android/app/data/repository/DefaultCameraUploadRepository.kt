@@ -2,10 +2,11 @@ package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import javax.inject.Inject
 
@@ -17,8 +18,30 @@ import javax.inject.Inject
  */
 class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
+    private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CameraUploadRepository {
+
+    override fun getInvalidHandle(): Long {
+        return megaApiGateway.getInvalidHandle()
+    }
+
+
+    override suspend fun getPrimarySyncHandle(): Long? = withContext(ioDispatcher) {
+        localStorageGateway.getCamSyncHandle()
+    }
+
+    override suspend fun getSecondarySyncHandle(): Long? = withContext(ioDispatcher) {
+        localStorageGateway.getMegaHandleSecondaryFolder()
+    }
+
+    override suspend fun setPrimarySyncHandle(primaryHandle: Long) = withContext(ioDispatcher) {
+        localStorageGateway.setCamSyncHandle(primaryHandle)
+    }
+
+    override suspend fun setSecondarySyncHandle(secondaryHandle: Long) = withContext(ioDispatcher) {
+        localStorageGateway.setMegaHandleSecondaryFolder(secondaryHandle)
+    }
 
     override suspend fun isSyncByWifi() = withContext(ioDispatcher) {
         localStorageGateway.isSyncByWifi()

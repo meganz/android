@@ -10,10 +10,10 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
@@ -24,13 +24,13 @@ import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
+import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
-import java.util.ArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -47,6 +47,11 @@ class MegaApiFacade @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) : MegaApiGateway {
+
+    override fun getInvalidHandle(): Long {
+        return MegaApiAndroid.INVALID_HANDLE
+    }
+
     override fun multiFactorAuthAvailable(): Boolean {
         return megaApi.multiFactorAuthAvailable()
     }
@@ -381,19 +386,21 @@ class MegaApiFacade @Inject constructor(
 
     override suspend fun moveTransferToLast(
         transfer: MegaTransfer,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.moveTransferToLast(transfer, listener)
 
     override suspend fun moveTransferBefore(
         transfer: MegaTransfer,
         prevTransfer: MegaTransfer,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.moveTransferBefore(transfer, prevTransfer, listener)
 
     override suspend fun moveTransferToFirst(
         transfer: MegaTransfer,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.moveTransferToFirst(transfer, listener)
+
+    override suspend fun isBusinessAccountActive(): Boolean = megaApi.isBusinessAccountActive
 
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
@@ -427,4 +434,10 @@ class MegaApiFacade @Inject constructor(
         type: Int,
         listener: MegaRequestListenerInterface,
     ) = megaApi.getUserAttribute(user, type, listener)
+
+    override suspend fun getRecentActions(): List<MegaRecentActionBucket> =
+        megaApi.recentActions
+
+    override fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaError =
+        megaApi.checkAccessErrorExtended(node, level)
 }

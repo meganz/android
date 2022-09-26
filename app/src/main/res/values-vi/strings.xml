@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -206,8 +206,6 @@
     <string name="section_recents">Sử Dụng Gần Đây</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Đăng Tải Nội Dung Số</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">Hộp Thư</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Ngoại Tuyến</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -960,7 +958,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Im lặng tất cả các âm báo chát trong</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Tắt tiếng thông báo</string>
+    <string name="title_dialog_mute_chatroom_notifications">Tắt tiếng các âm báo chát</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Bật</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1141,14 +1139,15 @@
     <string name="no_conversation_history">Không có lịch sử trò chuyện</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="other">%1$s [A]đang viết tin nhắn&#8230;[/A]</item>
+        <item quantity="one">%1$s [A]is typing&#8230;[/A]</item>
+        <item quantity="other">%1$s [A]are typing&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]và vài người khác đang viết tin nhắn&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Thêm nữa</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">Không gian lưu trữ</string>
+    <string name="storage_space">Lưu Trữ</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Xóa khỏi Lưu Ngoại Tuyến?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1620,8 +1619,6 @@
     <string name="context_share">Chia sẻ thông qua</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Không có mục nào trong [/B][A]Thùng Rác[/A]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[B]Không có tệp nào trong [/B][A]Hộp Thư[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Không có tệp tin nào trong [/B][A]Ổ Mây[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1680,10 +1677,6 @@
     <string name="contacts_mega">Trên mạng MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Danh bạ điện thoại</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">Tài khoản của quý khách đã bị đình chỉ do vị phạm nhiều lỗi được nêu trong Điều Khoản Dịch Vụ của MEGA. Xin kiểm tra hộp thư email.</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Tài khoản quý khách đã bị chấm dứt do vi phạm nội quy trong Điều Khoản Dịch Vụ của MEGA, bao gồm nhưng không giới hạn ở điều khoản 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Đang tải tệp tin</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2347,7 +2340,8 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="other">%1$d thư mục&#160;·&#160;</item>
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] đã thêm vào %2$s và %3$s[/B]</string>
@@ -2607,8 +2601,6 @@
     <string name="text_join_another_call">Để tham gia vào cuộc gọi này, bạn cần phải kết thúc hoặc tạm dừng cuộc gọi hiện tại.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Mọi người có thể tham gia vào nhóm của bạn với đường liên kết này.</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">Tạo liên kết mới cho cuộc chát</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Điền tên nhóm</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -2663,7 +2655,8 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="other">%1$d hình ảnh&#160;</item>
+        <item quantity="one">%1$d image&#160;</item>
+        <item quantity="other">%1$d images&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]tạo bởi [/A]%s</string>
@@ -2820,7 +2813,7 @@
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Hết Không Gian Lưu Trữ</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
-    <string name="over_disk_quota_paywall_title">Dữ liệu đang gặp rủi ro!</string>
+    <string name="over_disk_quota_paywall_title">Dữ liệu của bạn đang gặp rủi ro!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
         <item quantity="other">Chúng tôi đã gửi thông báo vào địa chỉ email %1$s của quý khách vào ngày %2$s và ngày %3$s, nhưng quý khách vẫn còn %4$s tệp tin chiếm tới %5$s trong tài khoản MEGA, quý khách cần phải nâng câp lên %6$s để đáp ứng dung lượng.</item>
@@ -3467,26 +3460,12 @@
     <string name="settings_mobile_data_resoluton_title">Dùng mạng internet di động để tải ảnh xem trước độ phân giải cao</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Cho phép sử dụng mạng di động để tải độ phân giải cao khi duyệt hình ảnh. Nếu tắt đi, chất lượng ảnh gốc sẽ chỉ được tải khi bạn phóng vào hình ảnh để xem.</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">Bạn đang tiến hành thay đổi vị trí mặc định cho thư mục lưu trữ dự phòng. Việc này có thể ảnh hưởng đến khả năng truy tìm thư mục lưu trữ trong tương lai. Xin ghi nhớ vị trí mà bạn dời thư mục đi để không bị lạc mất dữ liệu.</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Di chuyển thư mục này sẽ thay đổi điểm đến của một hoặc nhiều việc sao lưu đã được cấu định từ trước và có thể gây ra những hậu quả không mong muốn. Các việc sao lưu đó sẽ tắt đi vì sự an toàn của bạn. Bạn có thể bật lại các việc sao lưu bằng các sử dụng App MEGA cho Máy Tính. Bạn có muốn tiếp tục không?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Bạn đang tiến hành xóa đi thư mục chứa bản lưu trữ. Việc này sẽ xóa tất cả các lưu dự phòng bạn đã đặt. Bạn có chắc muốn thực hiện việc này không?</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">Bạn có chắc muốn xóa thư mục chứa bản lưu trữ và tắt việc lưu dự phòng có liên quan hay không?</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">Di chuyển “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Di chuyển “%1s” vào Thùng Rác</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">Di chuyển các thư mục lưu dự phòng</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">Di chuyển các thư mục lưu dự phòng vào Thùng Rác</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Tat luu du phong</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">Di chuyen ban luu tru</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">Xin điền “%1s” để xác nhận hành động này</string>
     <!-- when checking the input -->
@@ -3507,10 +3486,6 @@
     <string name="backup_multi_share_permission_text">Các thư mục này được chia sẻ dưới dạng chỉ-được-xem bởi vì đây là các thư mục lưu dự phòng, bất kỳ thay đổi trong nội dung sẽ vô hiệu hóa việc sao lưu dự phòng.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Vài trong các thư mục chia sẻ này là thư mục lưu dự phòng và chỉ-được-xem. Bạn có muốn tiếp tục không?</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="other">%d thiết bị</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Trả lời cuộc gọi</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3564,7 +3539,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">Quý khách hiện đang có một gói đăng ký dịch vụ MEGA được mua với %1$s. Quý khách cần phải tự tiến hành hủy bỏ trong %2$s, vì MEGA không thể thực hiện cho quý khách được. Truy cập Thư Viện Hướng Dẫn để có thêm thông tin.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription"></string>
+    <string name="message_other_platform_subscription">Bạn hiện đang có một gói đăng ký dịch vụ với MEGA. Gói dịch vụ đó sẽ tự động huỷ sau khi tài khoản bị xóa. Truy cập Thư Viện Hướng Dẫn để có thêm thông tin.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">Quý khách hiện đang có một gói đăng ký dịch vụ MEGA được mua với Apple. Quý khách cần phải tự tiến hành hủy bỏ trong tài khoản iTunes của quý khách, vì MEGA không thể thực hiện cho quý khách được. Truy cập Thư Viện Hướng Dẫn để có thêm thông tin.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
@@ -3783,8 +3758,6 @@
     <string name="settings_help_report_issue_discard_button">Hủy bỏ</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">Sửa tin nhắn</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">Thư viện</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">Gọi điện</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -3793,8 +3766,6 @@
     <string name="chat_room_toolbar_voice_clip_option">Tin nhắn thoại</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Mời bạn bè vào [/B][A]Chát[/A][B] để cùng tận hưởng công cụ giao lưu với tính năng bảo mật mạnh mẽ[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Lọc</string>
     <!-- Filter option to show all photos -->
@@ -3844,7 +3815,7 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">[A]%1$s[/A] không gian lưu trữ</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] băng thông truyền tải</string>
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] truyền tải</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">Lưu Trữ</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
@@ -3860,13 +3831,13 @@
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] đã được đổi quyền hạn là chỉ-được-xem bởi [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
-    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] đã được đổi quyền hạn là thành viên bình thường bởi [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] đã được đổi quyền hạn là thành viên thông&#160;thường bởi [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] đã được đổi quyền hạn là người chủ trì bởi [/B][A]%2$s[/A]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
     <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%2$s đã đổi quyền hạn của %1$s thành chỉ-được-xem</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s đã đổi quyền hạn của %1$s thành bình thường</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%2$s đã đổi quyền hạn của %1$s thành thông thường</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
     <string name="chat_chats_list_last_message_permissions_changed_to_host">%2$s đã đổi quyền hạn của %1$s thành người chủ trì</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
@@ -3894,9 +3865,9 @@
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Không phải lúc này</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
-    <string name="text_editor_creation_success">File saved to Cloud drive.</string>
+    <string name="text_editor_creation_success">Tệp tin đã được lưu vào Ổ&#160;mây</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
-    <string name="text_editor_creation_error">File not saved to Cloud drive. Try again.</string>
+    <string name="text_editor_creation_error">Tệp tin chưa được lưu vào Ổ&#160;mây. Thử lại.</string>
     <!-- Action label to start images slideshow -->
     <string name="action_slideshow">Chạy trình chiếu</string>
     <!-- Filter page: Prompt to choose media type -->
@@ -3921,4 +3892,14 @@
     <string name="permissions_notifications_title">Nhận tin thông báo</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA sẽ gửi các thông báo cho bạn khi có cuộc gọi, chát, và truyền tải.</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">Sao lưu dự phòng</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[B]Không có tệp tin nào trong [/B][A]sao lưu dự phòng[/A]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">Đây là thư mục chứa các tệp tin và thư mục đã được sao lưu dự phòng. Các mục lưu dự phòng là dạng “chỉ-được-xem” để phòng tránh bị chỉnh sửa trong Ổ&#160;Mây của bạn.Bạn có thể lưu dự phòng dữ liệu của mình từ máy tính lên MEGA bằng cách sử dụng App MEGA cho Máy&#160;Tính.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Tài khoản bị đình chỉ do vi phạm bản quyền. Chúng tôi đã gửi cho bạn một email với nhiều thông tin hơn về việc này.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Tài khoản đã bị chấm dứt hoạt động do vi phạm lỗi có nêu trong Điều Khoản Dịch Vụ của MEGA; chẳng hạn như lạm dụng hệ thống, quyền hạn sử dụng của người khác hoặc chia sẻ nội dung cấm.</string>
 </resources>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -206,8 +206,6 @@
     <string name="section_recents">最近</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">メディアアップロード</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">受信箱</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">オフライン</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -960,7 +958,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">以下用のチャット通知をミュート</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">通知をミュート</string>
+    <string name="title_dialog_mute_chatroom_notifications">チャット通知をミュート</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">オン</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1148,7 +1146,7 @@
     <!-- More button in contact info page -->
     <string name="label_more">詳細</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">ストレージスペース</string>
+    <string name="storage_space">ストレージ</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">オフラインから削除しますか？</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1620,8 +1618,6 @@
     <string name="context_share">以下で共有</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]ごみ箱[/A]は[B]空[/B]です</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[A]受信箱[/A]に[B]ファイルはありません[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[A]クラウドドライブ[/A]に[B]ファイルはありません[/B]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1680,10 +1676,6 @@
     <string name="contacts_mega">MEGA上の</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">電話連絡先</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">あなたのアカウントは、MEGAのご利用規約に複数違反したため、凍結されました。メールの受信トレイを確認してください。</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">お客様のアカウントは、MEGAのご利用規約（第15条を含むがこれに限定されない）に違反したために終了しました。</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">ファイルを読み込んでいます</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2450,7 +2442,7 @@
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">エラーが発生したため、このアプリではファイルを開くことができません。</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
-    <string name="outgoing_call_starting">着信中&#8230;</string>
+    <string name="outgoing_call_starting">呼び出し中&#8230;</string>
     <!-- Content of a invalid meta message -->
     <string name="error_meta_message_invalid">メッセージに無効なメタデータが含まれています</string>
     <!-- Title of the activity that sends a location -->
@@ -2607,8 +2599,6 @@
     <string name="text_join_another_call">この通話に参加するには、現在の通話を終了または保留する必要があります。</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">このリンクを使用すると、人々はあなたのグループに参加できます。</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">新しいチャットリンク</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">グループ名を入力</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -3467,26 +3457,12 @@
     <string name="settings_mobile_data_resoluton_title">モバイルデータを利用して高解像度の画像をプレビュー</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">モバイルデータを利用して、プレビュー時に高解像度の画像を読み込みます。無効にすると、ズームインしたときに元の画像のみが読み込まれます。</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">デフォルトのバックアップフォルダの場所を変更しています。これにより、将来的にバックアップフォルダを見つけることが難しくなる場合があります。どこにあるのかを覚えておいて、今後も見つけられるようにしてください。</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">このフォルダを移動すると、1つまたは複数のバックアップ先が変更され、意図しない結果になる可能性があります。バックアップは安全のためにオフにされます。バックアップはMEGAデスクトップアプリで再度有効にすることができます。続行してもよろしいですか？</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">バックアップフォルダを削除します。これにより、設定したすべてのバックアップが削除されます。本当にこれを行ってもよろしいですか？</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">バックアップフォルダを削除して、関連するバックアップを無効にしてもよろしいですか？</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">「%1s」を移動</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">「%1s」をごみ箱に移動</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">バックアップフォルダを移動</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">バックアップフォルダをごみ箱に移動</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">バックアップを無効にする</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">バックアップを移動</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">このアクションを確認するために「%1s」を入力してください</string>
     <!-- when checking the input -->
@@ -3507,10 +3483,6 @@
     <string name="backup_multi_share_permission_text">これらのフォルダは読み取り専用としてのみ共有することができます。なぜなら、これらはバックアップ用のフォルダであり、コンテンツを変更するとバックアップが無効になる可能性があるからです。</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">共有されているフォルダの中には、バックアップフォルダや読み取り専用のフォルダもあります。続行しますか？</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="other">%d端末</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">通話に応答</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3783,8 +3755,6 @@
     <string name="settings_help_report_issue_discard_button">破棄する</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">メッセージの編集</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">ギャラリー</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">ボイス</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -3793,8 +3763,6 @@
     <string name="chat_room_toolbar_voice_clip_option">ボイスクリップ</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]友人[/B]を[A]チャット[/A]に招待し、[B]プライバシーとセキュリティが確保された当社の暗号化プラットフォームをお楽しみください[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">絞り込み</string>
     <!-- Filter option to show all photos -->
@@ -3844,7 +3812,7 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">[A]%1$s[/A]ストレージ</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A]転送容量</string>
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A]転送</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">ストレージ</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
@@ -3921,4 +3889,14 @@
     <string name="permissions_notifications_title">通知を受け取る</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGAは通話、チャット、ファイル転送の通知を送信します。</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">バックアップ</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[A]バックアップ[/A][B]にアイテムがありません[/B]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">ここにバックアップしたファイルやフォルダが保存されます。バックアップされたアイテムは、クラウドドライブ内で誤って変更されないように「読み取り専用」になります。\n当社のデスクトップアプリケーションを使用して、パソコンからMEGAにアイテムをバックアップすることができます。</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">著作権侵害によりアカウントが停止されました。これに関する詳細情報を記載したメールをお送りしました。</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">アカウントは、他人の権利の乱用、違法データの共有やインポート、システムの乱用など、MEGAのご利用規約に違反したために終了しました。</string>
 </resources>

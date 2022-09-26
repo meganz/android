@@ -5,9 +5,11 @@ import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
+import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
@@ -21,6 +23,12 @@ import nz.mega.sdk.MegaUserAlert
  * @constructor Create empty Mega api gateway
  */
 interface MegaApiGateway {
+
+    /**
+     * Get Invalid Handle
+     */
+    fun getInvalidHandle(): Long
+
     /**
      * Is Multi factor auth available
      *
@@ -678,4 +686,35 @@ interface MegaApiGateway {
      * @param type Attribute type.
      */
     fun getUserAttribute(user: MegaUser, type: Int, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get the list of recent actions
+     *
+     * @return a list of recent actions
+     */
+    suspend fun getRecentActions(): List<MegaRecentActionBucket>
+
+    /**
+     * Check access error extended
+     *
+     * @param node
+     * @param level
+     *
+     * - [MegaShare.ACCESS_UNKNOWN]
+     * - [MegaShare.ACCESS_READ]
+     * - [MegaShare.ACCESS_READWRITE]
+     * - [MegaShare.ACCESS_FULL]
+     * - [MegaShare.ACCESS_OWNER]
+     *
+     * @return success or failed
+     */
+    fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaError
+
+    /**
+     * Checks whether the user's Business Account is currently active or not
+     *
+     * @return True if the user's Business Account is currently active, or
+     * false if inactive or if the user is not under a Business Account
+     */
+    suspend fun isBusinessAccountActive(): Boolean
 }

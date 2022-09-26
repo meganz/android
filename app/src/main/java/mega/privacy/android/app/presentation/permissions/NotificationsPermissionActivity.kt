@@ -11,7 +11,7 @@ import androidx.compose.runtime.getValue
 import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.app.di.ApplicationScope
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.permissions.view.NotificationsPermissionView
 import mega.privacy.android.app.presentation.security.PasscodeCheck

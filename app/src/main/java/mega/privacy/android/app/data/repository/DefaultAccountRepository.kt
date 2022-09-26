@@ -15,7 +15,7 @@ import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.domain.entity.UserAccount
@@ -41,7 +41,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property monitorMultiFactorAuth
  * @property ioDispatcher
  * @property userUpdateMapper
- * @property dbH
+ * @property localStorageGateway
  */
 @ExperimentalContracts
 class DefaultAccountRepository @Inject constructor(
@@ -157,5 +157,9 @@ class DefaultAccountRepository @Inject constructor(
     override fun retryPendingConnections(disconnect: Boolean) {
         megaApiGateway.retryPendingConnections()
         megaChatApiGateway.retryPendingConnections(disconnect)
+    }
+
+    override suspend fun isBusinessAccountActive(): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.isBusinessAccountActive()
     }
 }

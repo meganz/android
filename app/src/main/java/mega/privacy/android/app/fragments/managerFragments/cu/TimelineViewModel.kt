@@ -21,7 +21,8 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.app.data.mapper.SortOrderIntMapper
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
@@ -56,6 +57,7 @@ class TimelineViewModel @Inject constructor(
     private val repository: PhotosItemRepository,
     private val mDbHandler: DatabaseHandler,
     private val getCameraSortOrder: GetCameraSortOrder,
+    private val sortOrderIntMapper: SortOrderIntMapper,
     private val jobUtilWrapper: JobUtilWrapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle? = null,
@@ -96,7 +98,7 @@ class TimelineViewModel @Inject constructor(
     /**
      * Get current sort rule from SortOrderManagement
      */
-    fun getOrder() = runBlocking { getCameraSortOrder() }
+    fun getOrder() = runBlocking { sortOrderIntMapper(getCameraSortOrder()) }
 
     private val camSyncEnabled = MutableLiveData<Boolean>()
     private var enableCUShown = false
@@ -145,7 +147,7 @@ class TimelineViewModel @Inject constructor(
             if (forceUpdate) {
                 cancelToken = initNewSearch()
                 repository.getFiles(cancelToken ?: return@liveData,
-                    getCameraSortOrder(),
+                    sortOrderIntMapper(getCameraSortOrder()),
                     mZoom)
             } else {
                 repository.emitFiles()

@@ -45,7 +45,6 @@ import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.showAlert;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.content.Context;
@@ -137,6 +136,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.ShareTextInfo;
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -1597,7 +1597,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 return;
             }
 
-            if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+            if (viewModel.getStorageState() == StorageState.PayWall) {
                 dismissAlertDialogIfExists(statusDialog);
                 showOverDiskQuotaPaywallWarning();
                 return;
@@ -1849,7 +1849,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
     }
 
     public void createFile(String name, String data, MegaNode parentNode, boolean isURL) {
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }

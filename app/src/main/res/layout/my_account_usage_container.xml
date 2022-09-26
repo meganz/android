@@ -72,7 +72,7 @@
             android:layout_below="@id/storage_progress"
             android:layout_toEndOf="@+id/storage_progress_layout"
             android:text="@string/account_storage_label"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87" />
+            android:textAppearance="@style/TextAppearance.Mega.Caption.Medium.GreyWhite87" />
 
     </RelativeLayout>
 
@@ -135,7 +135,7 @@
             android:layout_below="@id/transfer_progress"
             android:layout_toEndOf="@+id/transfer_progress_layout"
             android:text="@string/transfer_label"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87" />
+            android:textAppearance="@style/TextAppearance.Mega.Caption.Medium.GreyWhite87" />
 
     </RelativeLayout>
 

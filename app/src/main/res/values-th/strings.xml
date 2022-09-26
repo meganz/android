@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">การสมัครใช้งานได้ถูกยกเลิกแล้ว</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">เราไม่สามารถยกเลิกการสมัครของคุณได้ โปรดติดต่อ support&#64;mega.nz เพื่อขอความช่วยเหลือ</string>
+    <string name="cancel_subscription_error">เราไม่สามารถยกเลิกการสมัครใช้งานของคุณได้ กรุณาติดต่อ support&#64;mega.nz เพื่อขอความช่วยเหลือ</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">ปิดเซสชั่นอื่น ๆ</string>
     <!-- Message after kill all opened sessions -->
@@ -206,8 +206,6 @@
     <string name="section_recents">เมื่อเร็ว ๆ นี้</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">อัปโหลดสื่อ</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">กล่องขาเข้า</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">ออฟไลน์</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -892,7 +890,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">อีเมลและ/หรือรหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">บัญชีของคุณถูกระงับ เนื่องจากละเมิดเงื่อนไขการให้บริการกรุณาติดต่อ support&#64;mega.co.nz</string>
+    <string name="error_account_suspended">บัญชีของคุณถูกระงับ เนื่องจากละเมิดเงื่อนไขการให้บริการกรุณาติดต่อ support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">มีการเข้าสู่ระบบไม่สำเร็จหลายครั้งเกินไป กรุณารอประมาณหนึ่งชั่วโมง</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -960,7 +958,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">ปิดเสียงแจ้งเตือนแชทเป็นเวลา</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">ปิดเสียงการแจ้งเตือน</string>
+    <string name="title_dialog_mute_chatroom_notifications">ปิดเสียงการแจ้งเตือนแชท</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">เปิด</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1148,7 +1146,7 @@
     <!-- More button in contact info page -->
     <string name="label_more">เพิ่มเติม</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">พื้นที่เก็บข้อมูล</string>
+    <string name="storage_space">ที่เก็บข้อมูล</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">นำออกจากออฟไลน์หรือไม่</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1620,8 +1618,6 @@
     <string name="context_share">แชร์ไฟล์โดยใช้</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]ถังขยะ[/A][B]ว่างเปล่า[/B]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[B]ไม่มีไฟล์ใน[/B][A]กล่องขาเข้า[/A]ของคุณ</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]ไม่มีไฟล์ใน[/B][A]คลาวด์ไดร์ฟ[/A]ของคุณ</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1680,10 +1676,6 @@
     <string name="contacts_mega">บน MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">รายชื่อในโทรศัพท์</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">บัญชีของคุณถูกระงับเนื่องจากมีการละเมิดเงื่อนไขการให้บริการของ MEGA หลายครั้ง กรุณาตรวจสอบกล่องจดหมายอีเมลของคุณ</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">บัญชีของคุณถูกยกเลิกเนื่องจากการละเมิดเงื่อนไขการให้บริการของ MEGA รวมถึงแต่ไม่จำกัดเพียงข้อที่ 15</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">กำลังโหลดไฟล์</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2265,7 +2257,7 @@
     <string name="error_download_takendown_node">ไม่สามารถเข้าถึงได้เนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="other">ดาวน์โหลดไฟล์ %d ไฟล์ไม่ได้ เนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</item>
+        <item quantity="other">ไม่สามารถดาวน์โหลดไฟล์ %d รายการนี้ได้ เนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]ไฟล์ที่แชร์แบบสาธารณะของคุณ [/A][B]%s[/B][C] ถูกคืนสถานะแล้ว[/C]</string>
@@ -2607,8 +2599,6 @@
     <string name="text_join_another_call">หากต้องการเข้าร่วมสายนี้ คุณต้องวางสายหรือพักสายปัจจุบันไว้</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">ผู้คนสามารถเข้าร่วมกลุ่มของคุณโดยใช้ลิงก์นี้</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">ลิงก์แชทใหม่</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">กรอกชื่อกลุ่ม</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -3270,7 +3260,7 @@
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">การประชุม</string>
     <!-- Menu option that allows the user to start/join meeting. -->
-    <string name="start_join_meeting">เริ่ม/เข้าร่วมการประชุม</string>
+    <string name="start_join_meeting">เริ่มหรือเข้าร่วมการประชุม</string>
     <!-- Label that create a meeting -->
     <string name="new_meeting">ประชุมใหม่</string>
     <!-- Label that join a meeting -->
@@ -3467,26 +3457,12 @@
     <string name="settings_mobile_data_resoluton_title">ใช้ข้อมูลมือถือเพื่อดูตัวอย่างภาพความละเอียดสูง</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">อนุญาตให้ใช้ข้อมูลมือถือเพื่อโหลดภาพความละเอียดสูงเมื่อดูตัวอย่าง หากปิดใช้งาน รูปภาพต้นฉบับจะถูกโหลดเมื่อคุณซูมภาพเท่านั้น</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">คุณกำลังเปลี่ยนตำแหน่งโฟลเดอร์สำรองเริ่มต้น ซึ่งอาจส่งผลต่อความสามารถในการค้นหาโฟลเดอร์สำรองของคุณในอนาคตได้ กรุณาอย่าลืมว่าตำแหน่งโฟลเดอร์อยู่ที่ใดเพื่อให้คุณสามารถค้นหาได้ในอนาคต</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">การย้ายโฟลเดอร์นี้จะเปลี่ยนปลายทางการสำรองข้อมูลที่กำหนดค่าไว้ตั้งแต่หนึ่งรายการขึ้นไป และอาจมีผลตามมาที่ไม่คาดคิด การสำรองข้อมูลจะถูกปิดเพื่อความปลอดภัยของคุณ การสำรองข้อมูลสามารถเปิดใช้งานได้อีกครั้งด้วยแอป MEGA บนเดสก์ทอป คุณต้องการดำเนินการต่อหรือไม่</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">คุณกำลังลบโฟลเดอร์ข้อมูลสำรองของคุณ การดำเนินการนี้จะลบข้อมูลสำรองทั้งหมดที่คุณตั้งค่าไว้ คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">คุณแน่ใจหรือไม่ว่าต้องการลบโฟลเดอร์ข้อมูลสำรองและปิดใช้งานข้อมูลสำรองที่คุณตั้งค่าไว้</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">ย้าย “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">ย้าย “%1s” ไปที่ถังขยะ</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">ย้ายโฟลเดอร์สำรองข้อมูล</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">ย้ายโฟลเดอร์สำรองข้อมูลไปที่ถังขยะ</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">ปิดสำรองข้อมูล</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">ย้ายข้อมูลสำรอง</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">กรุณาพิมพ์ “%1s” เพื่อยืนยันการดำเนินการนี้</string>
     <!-- when checking the input -->
@@ -3507,10 +3483,6 @@
     <string name="backup_multi_share_permission_text">โฟลเดอร์เหล่านี้สามารถแชร์เป็นแบบอ่านอย่างเดียวเท่านั้น เนื่องจากเป็นโฟลเดอร์ที่ใช้สำรองข้อมูล การเปลี่ยนแปลงใด ๆ ในเนื้อหาอาจเป็นการปิดใช้งานสำรองข้อมูลได้</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">บางโฟลเดอร์ที่จะแชร์นั้น เป็นโฟลเดอร์ที่ใช้สำรองข้อมูลและจะเป็นแบบอ่านอย่างเดียวเท่านั้น คุณต้องการดำเนินการต่อหรือไม่</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="other">%d อุปกรณ์</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">รับสาย</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3564,9 +3536,9 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">คุณมีการสมัครใช้งาน MEGA กับ %1$s คุณต้องยกเลิกที่ %2$s ด้วยตนเอง เนื่องจาก MEGA ไม่สามารถยกเลิกให้คุณได้ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription"></string>
+    <string name="message_other_platform_subscription">คุณมีการสมัครใช้งาน MEGA อยู่ แต่เมื่อบัญชีคุณถูกลบออก ระบบจะยกเลิกการสมัครใช้งานของคุณโดยอัตโนมัติ สำหรับข้อมูลเพิ่มเติม กรุณาเยี่ยมชมได้ที่ศูนย์ช่วยเหลือของเรา</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">คุณมีการสมัครใช้งาน MEGA กับ Apple คุณต้องยกเลิกที่ iTunes ด้วยตนเอง เนื่องจาก MEGA ไม่สามารถยกเลิกให้คุณได้ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
+    <string name="message_itunes_platform_subscription">คุณมีการสมัครใช้งาน MEGA กับ Apple คุณต้องยกเลิกที่ iTunes ด้วยตนเอง เนื่องจาก MEGA ไม่สามารถยกเลิกให้คุณได้ สำหรับข้อมูลเพิ่มเติม กรุณาเยี่ยมชมได้ที่ศูนย์ช่วยเหลือของเรา</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">เยี่ยมชม %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -3574,7 +3546,7 @@
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">ไทม์ไลน์</string>
     <!-- Title of album tab in photos section. -->
-    <string name="tab_title_album">อัลบัม</string>
+    <string name="tab_title_album">อัลบั้ม</string>
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">รายการโปรด</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->
@@ -3783,8 +3755,6 @@
     <string name="settings_help_report_issue_discard_button">ละทิ้ง</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">แก้ไขข้อความ</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">แกลเลอรี่</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">เสียง</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -3793,8 +3763,6 @@
     <string name="chat_room_toolbar_voice_clip_option">คลิปเสียง</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]เชิญเพื่อนเพื่อร่วม[/B][A]แชท[/A][B]และเพลิดเพลินไปกับแพลตฟอร์มที่เข้ารหัส มาพร้อมความเป็นส่วนตัวและความปลอดภัยมากยิ่งขึ้น[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">ตัวกรอง</string>
     <!-- Filter option to show all photos -->
@@ -3844,7 +3812,7 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">พื้นที่เก็บข้อมูล [A]%1$s[/A]</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">โควต้าถ่ายโอน [A]%1$s[/A]</string>
+    <string name="account_upgrade_transfer_quota_label">ถ่ายโอน [A]%1$s[/A]</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">ที่เก็บข้อมูล</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
@@ -3921,4 +3889,14 @@
     <string name="permissions_notifications_title">รับการแจ้งเตือน</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA จะส่งการแจ้งเตือนการโทร แชท และการถ่ายโอนไฟล์ถึงคุณ</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">สำรองข้อมูล</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[B]ไม่มีรายการใน[/B][A]สำรองข้อมูล[/A]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">นี่คือที่จัดเก็บไฟล์และโฟลเดอร์สำหรับสำรองข้อมูล รายการที่สำรองไว้ของคุณเป็นแบบ \“อ่านอย่างเดียว\“ เพื่อป้องกันไม่ให้ถูกแก้ไขโดยไม่ได้ตั้งใจในไดรฟ์ระบบคลาวด์ของคุณ\nคุณสามารถสำรองข้อมูลไฟล์ต่าง ๆ ได้จากคอมพิวเตอร์ของคุณไปยัง MEGA โดยใช้แอปเดสก์ท็อปของเรา</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">บัญชีถูกระงับเนื่องจากละเมิดลิขสิทธิ์ เราได้ส่งอีเมลถึงคุณพร้อมข้อมูลเพิ่มเติมเกี่ยวกับเรื่องนี้แล้ว</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">บัญชีถูกยุติการใช้งานเนื่องจากการละเมิดเงื่อนไขการให้บริการของ MEGA เช่น การสวมสิทธิผู้อื่นในทางที่ผิด การแชร์และการนำเข้าข้อมูลอันเป็นเท็จ หรือการละเมิดระบบ</string>
 </resources>

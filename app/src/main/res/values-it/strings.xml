@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -212,8 +212,6 @@
     <string name="section_recents">Recenti</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Media caricati</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">In arrivo</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -992,7 +990,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Muta le notifiche delle chat per</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Muta le notifiche</string>
+    <string name="title_dialog_mute_chatroom_notifications">Muta le notifiche delle chat</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">On</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1126,7 +1124,7 @@
     <!-- Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="manual_resume_alert">I trasferimenti sono stati messi in pausa. Clicca per riprenderli.</string>
     <!-- message shown when the status of the user coudn’t be changed -->
-    <string name="changing_status_error">Errore. Il tuo status non è stato cambiato</string>
+    <string name="changing_status_error">Errore. Il tuo stato non è stato cambiato</string>
     <!-- message shown when a chat has not been created -->
     <string name="create_chat_error">Un errore è avvenuto durante la creazione della chat</string>
     <!-- settings of the chat to choose the status -->
@@ -1185,20 +1183,19 @@
     <string name="no_conversation_history">Nessuna conversazione</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="one">%1$s [A]sta scrivendo&#8230;[/A]</item>
-        <item quantity="many">%1$s [A]stanno scrivendo&#8230;[/A]</item>
-        <item quantity="other">%1$s [A]stanno scrivendo&#8230;[/A]</item>
+        <item quantity="one">%1$s [A]is typing&#8230;[/A]</item>
+        <item quantity="other">%1$s [A]are typing&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]ed altri stanno scrivendo&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Altro</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">Spazio di archiviazione</string>
+    <string name="storage_space">Archivio</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Rimuovere dall’Offline?</string>
     <!-- Label for the option of action menu to change the chat status -->
-    <string name="set_status_option_label">Imposta lo status</string>
+    <string name="set_status_option_label">Imposta lo stato</string>
     <!-- Label for the option of setting to change the colour theme -->
     <string name="set_color_theme_label">Tema dei colori</string>
     <!-- Answer for confirmation dialog. -->
@@ -1212,9 +1209,9 @@
     <!-- Value in the settings section of the autoaway chat presence -->
     <string name="settings_autoaway_value">%1d minuti</string>
     <!-- Title of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_title">Persistenza dello status</string>
+    <string name="settings_persistence_title">Persistenza dello stato</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">Mantieni il mio status scelto anche se non ho dispositivi connessi</string>
+    <string name="settings_persistence_subtitle">Mantieni il mio stato scelto anche se non ho dispositivi connessi</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">Imposta limite di tempo</string>
     <!-- Button to set a value -->
@@ -1694,8 +1691,6 @@
     <string name="context_share">Condividi utilizzando</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Svuota il [/B][A]Cestino[/A]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[B]Nessun file nel tuo[/B] [A]Inbox[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Nessun file nel tuo[/B] [A]Cloud Drive[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1754,10 +1749,6 @@
     <string name="contacts_mega">Su MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Contatti telefonici</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">Il tuo account è stato sospeso a causa di violazioni multiple dei Termini di Servizio di MEGA. Per favore, controlla la tua posta in arrivo.</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Il tuo account è stato chiuso a causa di una violazione dei Termini di Servizio di MEGA incluso, ma non limitato a, l\’articolo 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Caricamento dei file</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2453,9 +2444,8 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d cartella&#160;·&#160;</item>
-        <item quantity="many">%1$d di cartelle&#160;·&#160;</item>
-        <item quantity="other">%1$d cartelle&#160;·&#160;</item>
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A] [B]ha aggiunto %2$s e %3$s[/B]</string>
@@ -2743,8 +2733,6 @@
     <string name="text_join_another_call">Per unirti a questa chiamata devi terminare o mettere in pausa la precedente.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Le persone potranno unirsi al tuo gruppo utilizzando questo link.</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">Nuovo link della chat</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Inserisci nome gruppo</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -2807,9 +2795,8 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d immagine&#160;</item>
-        <item quantity="many">%1$d di immagini&#160;</item>
-        <item quantity="other">%1$d immagini&#160;</item>
+        <item quantity="one">%1$d image&#160;</item>
+        <item quantity="other">%1$d images&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]creato da[/A] %s</string>
@@ -3260,7 +3247,7 @@
     <!-- Message displayed when clicking on a contact attached to the chat that is not my contact -->
     <string name="user_is_not_contact">%s non è nella tua rubrica</string>
     <!-- Option of color theme, light mode. -->
-    <string name="theme_light">Leggero</string>
+    <string name="theme_light">Chiaro</string>
     <!-- Option of color theme, dark mode. -->
     <string name="theme_dark">Scuro</string>
     <!-- Option of color theme, follow the system setting. -->
@@ -3353,14 +3340,14 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 oggetto spostato nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
-        <item quantity="many">1 oggetto spostato nel Cestino e %d oggetti non spostati. Riprova più tardi.</item>
-        <item quantity="other">1 oggetto spostato nel Cestino e %d oggetti non spostati. Riprova più tardi.</item>
+        <item quantity="one">1 oggetto spostato nel cestino e 1 oggetto non spostato. Riprova più tardi.</item>
+        <item quantity="many">1 oggetto spostato nel cestino e %d oggetti non spostati. Riprova più tardi.</item>
+        <item quantity="other">1 oggetto spostato nel cestino e %d oggetti non spostati. Riprova più tardi.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
         <item quantity="one">1 oggetto spostato nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
-        <item quantity="many">%d oggetti spostati nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
+        <item quantity="many">%d di oggetti spostati nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
         <item quantity="other">%d oggetti spostati nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
@@ -3663,26 +3650,12 @@
     <string name="settings_mobile_data_resoluton_title">Usa i dati mobili per visualizzare anteprime ad alta risoluzione</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Permetti l\’utilizzo dei dati mobili per caricare le immagini ad alta risoluzione quando le vedi. Se disabilitato, l\’immagine originale verrà caricata solo quando effettui lo zoom.</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">Stai cambiando la posizione predefinita di una cartella di backup. Questo potrebbe influenzare la tua abilità nel trovare la tua cartella di backup in futuro. Per favore, ricorda dove è posizionata affinché tu possa trovarla in futuro.</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Spostare questa cartella cambia la destinazione di uno o più backup configurati e potrebbe avere conseguenze inaspettate. I backup verranno disattivati per la tua sicurezza. I backup possono essere riattivati dall\’app per desktop di MEGA. Vuoi procedere?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Stai eliminando le tue cartelle di backup. Questa azione rimuoverà tutti i backup che hai impostato. Vuoi fare ciò veramente?</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">Vuoi veramente eliminare la tua cartella di backup e disabilitare il backup associato?</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">Sposta “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Sposta “%1s” nel Cestino</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">Sposta le cartelle di backup</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">Sposta le cartelle di backup nel Cestino</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Disattiva backup</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">Sposta backup</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">Per favore, inserisci “%1s” per confermare questa azione</string>
     <!-- when checking the input -->
@@ -3703,12 +3676,6 @@
     <string name="backup_multi_share_permission_text">Queste cartelle possono essere condivise solo come di sola lettura; essendo cartelle di backup, qualsiasi modifica al loro contenuto potrebbe disabilitare i backup.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Alcune cartelle condivise e di backup sono di sola lettura. Vuoi continuare?</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="one">%d dispositivo</item>
-        <item quantity="many">%d dispositivi</item>
-        <item quantity="other">%d dispositivi</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Rispondi alla chiamata</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3985,8 +3952,6 @@
     <string name="settings_help_report_issue_discard_button">Scarta</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">Modifica messaggio</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">Galleria</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">Voce</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -3995,8 +3960,6 @@
     <string name="chat_room_toolbar_voice_clip_option">Messaggio vocale</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Invita amici nella [/B][A]Chat[/A][B] e apprezza la nostra piattaforma criptata con privacy e sicurezza[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filtro</string>
     <!-- Filter option to show all photos -->
@@ -4131,4 +4094,14 @@
     <string name="permissions_notifications_title">Ricevi una notifica</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA ti invierà notifiche per chiamate, messaggi, e trasferimenti di file.</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">Backup</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[B]Nessun oggetto in[/B] [A]backup[/A]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">Questo posto è dove vengono archiviati i backup di file e cartelle. I tuoi backup sono di “sola lettura” per proteggerli da modifiche accidentali nel tuo Cloud Drive.\nPuoi effettuare il backup degli oggetti dal tuo computer su MEGA utilizzando la nostra app per desktop.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Account sospeso a causa di violazioni del copyright. Ti abbiamo inviato un\’email con maggiori informazioni al riguardo.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Account chiuso a causa di una violazione dei Termini di Servizio di MEGA, come abuso di diritti altrui, condivisione ed importazione di dati illegali, o abuso del sistema.</string>
 </resources>

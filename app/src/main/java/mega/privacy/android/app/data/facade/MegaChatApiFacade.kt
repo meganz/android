@@ -7,17 +7,20 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.app.data.model.ChatRoomUpdate
 import mega.privacy.android.app.data.model.ChatUpdate
-import mega.privacy.android.app.di.ApplicationScope
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatListenerInterface
 import nz.mega.sdk.MegaChatLoggerInterface
+import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatPresenceConfig
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaChatRoomListenerInterface
 import javax.inject.Inject
 
 /**
@@ -110,6 +113,49 @@ class MegaChatApiFacade @Inject constructor(
             awaitClose { chatApi.removeChatListener(listener) }
         }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
+    override fun getChatRoomUpdates(chatId: Long): Flow<ChatRoomUpdate> = callbackFlow {
+        val listener = object : MegaChatRoomListenerInterface {
+            override fun onChatRoomUpdate(api: MegaChatApiJava?, chat: MegaChatRoom?) {
+                trySend(ChatRoomUpdate.OnChatRoomUpdate(chat))
+            }
+
+            override fun onMessageLoaded(api: MegaChatApiJava?, msg: MegaChatMessage) {
+                trySend(ChatRoomUpdate.OnMessageLoaded(msg))
+            }
+
+            override fun onMessageReceived(api: MegaChatApiJava?, msg: MegaChatMessage) {
+                trySend(ChatRoomUpdate.OnMessageReceived(msg))
+            }
+
+            override fun onMessageUpdate(api: MegaChatApiJava?, msg: MegaChatMessage) {
+                trySend(ChatRoomUpdate.OnMessageUpdate(msg))
+            }
+
+            override fun onHistoryReloaded(api: MegaChatApiJava?, chat: MegaChatRoom?) {
+                trySend(ChatRoomUpdate.OnHistoryReloaded(chat))
+            }
+
+            override fun onReactionUpdate(
+                api: MegaChatApiJava?,
+                msgId: Long,
+                reaction: String,
+                count: Int,
+            ) {
+                trySend(ChatRoomUpdate.OnReactionUpdate(msgId, reaction, count))
+            }
+
+            override fun onHistoryTruncatedByRetentionTime(
+                api: MegaChatApiJava?,
+                msg: MegaChatMessage,
+            ) {
+                trySend(ChatRoomUpdate.OnHistoryTruncatedByRetentionTime(msg))
+            }
+        }
+
+        chatApi.openChatRoom(chatId, listener)
+        awaitClose { chatApi.closeChatRoom(chatId, listener) }
+    }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
+
     override suspend fun requestLastGreen(userHandle: Long) =
         chatApi.requestLastGreen(userHandle, null)
 
@@ -118,6 +164,12 @@ class MegaChatApiFacade @Inject constructor(
         peers: MegaChatPeerList,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.createChat(isGroup, peers, listener)
+
+    override fun setOpenInvite(
+        chatId: Long,
+        enabled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.setOpenInvite(chatId, enabled, listener)
 
     override fun getChatRoomByUser(userHandle: Long): MegaChatRoom? =
         chatApi.getChatRoomByUser(userHandle)

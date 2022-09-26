@@ -77,8 +77,7 @@ fun EnableCU(
 
         Text(
             text = stringResource(id = R.string.settings_camera_upload_on),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.ExtraBold,
+            fontSize = 20.sp,
             color = colorResource(id = R.color.grey_087_white_087),
             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
         )

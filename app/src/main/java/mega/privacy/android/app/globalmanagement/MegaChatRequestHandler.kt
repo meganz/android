@@ -9,7 +9,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY
 import mega.privacy.android.app.data.mapper.toChatRequest
-import mega.privacy.android.app.di.ApplicationScope
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
 import mega.privacy.android.app.main.LoginActivity
@@ -113,17 +113,17 @@ class MegaChatRequestHandler @Inject constructor(
                 }
                 val loginIntent = Intent(application,
                     LoginActivity::class.java).apply {
-                    if (MegaApplication.getUrlConfirmationLink() != null) {
+                    if (MegaApplication.urlConfirmationLink != null) {
                         putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                             .putExtra(Constants.EXTRA_CONFIRMATION,
-                                MegaApplication.getUrlConfirmationLink())
+                                MegaApplication.urlConfirmationLink)
                         if (activityLifecycleHandler.isActivityVisible) {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                         } else {
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         }
                         action = Constants.ACTION_CONFIRM
-                        MegaApplication.setUrlConfirmationLink(null)
+                        MegaApplication.urlConfirmationLink = null
                     } else if (activityLifecycleHandler.isActivityVisible) {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     } else {

@@ -28,8 +28,12 @@ sealed class CompletedTransfersState {
      * Update when the transfer is removed
      *
      * @property index the index of removed item
+     * @property newTransfers updated [AndroidCompletedTransfer] list
      */
-    data class TransferRemovedUpdated(val index: Int) : CompletedTransfersState()
+    data class TransferRemovedUpdated(
+        val index: Int,
+        val newTransfers: List<AndroidCompletedTransfer?>,
+    ) : CompletedTransfersState()
 
     /**
      * Update when clear completed transfers

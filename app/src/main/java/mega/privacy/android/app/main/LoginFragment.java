@@ -128,7 +128,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.data.model.UserCredentials;
-import mega.privacy.android.app.di.ApplicationScope;
+import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.logging.LegacyLoggingSettings;
 import mega.privacy.android.app.main.controllers.AccountController;

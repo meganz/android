@@ -17,31 +17,31 @@ enum class SubscriptionMethod(
     ITUNES(
         MegaApiJava.PAYMENT_METHOD_ITUNES,
         "iTunes",
-        UpgradeAccountActivity.SUBSCRIPTION_FROM_ITUNES
+        UpgradeAccountFragment.SUBSCRIPTION_FROM_ITUNES
     ),
     GOOGLE_WALLET(
         MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET,
         "Google Play",
-        UpgradeAccountActivity.SUBSCRIPTION_FROM_ANDROID_PLATFORM
+        UpgradeAccountFragment.SUBSCRIPTION_FROM_ANDROID_PLATFORM
     ),
     STRIPE(
         MegaApiJava.PAYMENT_METHOD_STRIPE,
         "Stripe",
-        UpgradeAccountActivity.SUBSCRIPTION_FROM_OTHER_PLATFORM
+        UpgradeAccountFragment.SUBSCRIPTION_FROM_OTHER_PLATFORM
     ),
     ECP(
         MegaApiJava.PAYMENT_METHOD_ECP,
         "ECP",
-        UpgradeAccountActivity.SUBSCRIPTION_FROM_OTHER_PLATFORM
+        UpgradeAccountFragment.SUBSCRIPTION_FROM_OTHER_PLATFORM
     ),
     STRIPE2(
         MegaApiJava.PAYMENT_METHOD_STRIPE2,
         "Stripe2",
-        UpgradeAccountActivity.SUBSCRIPTION_FROM_OTHER_PLATFORM
+        UpgradeAccountFragment.SUBSCRIPTION_FROM_OTHER_PLATFORM
     ),
     HUAWEI_WALLET(
         MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET,
         "Huawei AppGallery",
-        UpgradeAccountActivity.SUBSCRIPTION_FROM_ANDROID_PLATFORM
+        UpgradeAccountFragment.SUBSCRIPTION_FROM_ANDROID_PLATFORM
     )
 }

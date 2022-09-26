@@ -2,7 +2,7 @@ package mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 

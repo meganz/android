@@ -5,10 +5,9 @@ import android.content.Intent
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaApplication.setLoggingOut
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
-import mega.privacy.android.app.di.ApplicationScope
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
@@ -271,7 +270,7 @@ class BackgroundRequestListener @Inject constructor(
         Timber.d("Logout finished: %s(%d)", e.errorString, e.errorCode)
         if (e.errorCode == MegaError.API_OK) {
             Timber.d("END logout sdk request - wait chat logout")
-            setLoggingOut(false)
+            MegaApplication.isLoggingOut = false
         } else if (e.errorCode == MegaError.API_EINCOMPLETE) {
             if (request.paramType == MegaError.API_ESSL) {
                 Timber.w("SSL verification failed")

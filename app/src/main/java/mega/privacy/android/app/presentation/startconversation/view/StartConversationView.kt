@@ -31,10 +31,10 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,11 +46,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.presentation.controls.SearchAppBar
 import mega.privacy.android.presentation.controls.SimpleTopAppBar
 import mega.privacy.android.app.presentation.contact.ContactItemView
+import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.search.view.EmptySearchView
@@ -79,7 +79,6 @@ fun StartConversationView(
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -102,8 +101,9 @@ fun StartConversationView(
                 )
             }
         }
-    ) {
-        LazyColumn(state = listState) {
+    ) { paddingValues ->
+        LazyColumn(state = listState,
+            modifier = Modifier.padding(paddingValues)) {
             state.apply {
                 if (buttonsVisible) {
                     if (fromChat) {
@@ -132,10 +132,12 @@ fun StartConversationView(
                             }
                         }
 
-                        header = contactsList[0].defaultAvatarContent
+                        val defaultAvatarContent = contactsList[0].getAvatarFirstLetter()
 
-                        item(key = contactsList[0].defaultAvatarContent) {
-                            HeaderItem(text = contactsList[0].defaultAvatarContent)
+                        header = defaultAvatarContent
+
+                        item(key = defaultAvatarContent) {
+                            HeaderItem(text = defaultAvatarContent)
                         }
                     }
                     typedSearch.isNotEmpty() -> {
@@ -148,10 +150,13 @@ fun StartConversationView(
                 }
 
                 contactsList.forEach { contact ->
-                    if (header != contact.defaultAvatarContent) {
-                        header = contact.defaultAvatarContent
-                        item(key = contact.defaultAvatarContent) {
-                            HeaderItem(text = contact.defaultAvatarContent)
+                    val defaultAvatarContent = contact.getAvatarFirstLetter()
+
+                    if (header != defaultAvatarContent) {
+                        header = defaultAvatarContent
+
+                        item(key = defaultAvatarContent) {
+                            HeaderItem(text = defaultAvatarContent)
                         }
                     }
 
@@ -162,7 +167,7 @@ fun StartConversationView(
 
         if (state.error != null) {
             val error = stringResource(id = state.error)
-            scope.launch {
+            LaunchedEffect(scaffoldState.snackbarHostState) {
                 scaffoldState.snackbarHostState.showSnackbar(message = error,
                     duration = SnackbarDuration.Long)
             }

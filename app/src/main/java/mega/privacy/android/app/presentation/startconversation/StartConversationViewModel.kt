@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,12 +13,10 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.findItemByHandle
 import mega.privacy.android.app.data.extensions.replaceIfExists
 import mega.privacy.android.app.data.extensions.sortList
-import mega.privacy.android.app.di.IoDispatcher
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -52,7 +49,6 @@ import javax.inject.Inject
  * @property monitorContactRequestUpdates [MonitorContactRequestUpdates]
  * @property addNewContacts               [AddNewContacts]
  * @property requestLastGreen             [RequestLastGreen]
- * @property ioDispatcher                 [CoroutineDispatcher]
  * @property state                        Current view state as [StartConversationState]
  */
 @HiltViewModel
@@ -67,7 +63,6 @@ class StartConversationViewModel @Inject constructor(
     private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val addNewContacts: AddNewContacts,
     private val requestLastGreen: RequestLastGreen,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivity: MonitorConnectivity,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -78,16 +73,9 @@ class StartConversationViewModel @Inject constructor(
     private val isConnected =
         monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    internal val contactListKey = "CONTACT_LIST"
     internal val searchExpandedKey = "SEARCH_EXPANDED"
     internal val typedSearchKey = "TYPED_SEARCH"
     internal val fromChatKey = "FROM_CHAT"
-
-    private val contactList = savedStateHandle.getStateFlow(
-        viewModelScope,
-        contactListKey,
-        listOf<ContactItem>()
-    )
 
     private val searchExpanded = savedStateHandle.getStateFlow(
         viewModelScope,
@@ -125,18 +113,8 @@ class StartConversationViewModel @Inject constructor(
     }
 
     private fun observeStateChanges() {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             merge(
-                contactList.map { list ->
-                    { state: StartConversationState ->
-                        state.copy(contactItemList = list,
-                            emptyViewVisible = list.isEmpty(),
-                            searchAvailable = list.isNotEmpty(),
-                            filteredContactList = getFilteredContactList(
-                                contactList = list,
-                                typedSearch = typedSearch.value))
-                    }
-                },
                 searchExpanded.map { widgetState ->
                     { state: StartConversationState ->
                         state.copy(searchWidgetState = widgetState,
@@ -147,7 +125,7 @@ class StartConversationViewModel @Inject constructor(
                     { state: StartConversationState ->
                         state.copy(typedSearch = typed,
                             filteredContactList = getFilteredContactList(
-                                contactList = contactList.value,
+                                contactList = state.contactItemList,
                                 typedSearch = typed))
                     }
                 },
@@ -165,34 +143,40 @@ class StartConversationViewModel @Inject constructor(
         typedSearch: String,
     ): List<ContactItem>? =
         if (typedSearch.isEmpty()) null
-        else contactList.filter { (_, email, fullName, alias) ->
+        else contactList.filter { (_, email, contactData) ->
             val filter = typedSearch.lowercase()
 
             email.lowercase().contains(filter)
-                    || fullName?.lowercase()?.contains(filter) == true
-                    || alias?.lowercase()?.contains(filter) == true
+                    || contactData.fullName?.lowercase()?.contains(filter) == true
+                    || contactData.alias?.lowercase()?.contains(filter) == true
         }
 
     private fun getContacts() {
-        viewModelScope.launch(ioDispatcher) {
-            contactList.update { getVisibleContacts() }
-            getContactsData()
+        viewModelScope.launch {
+            val contactList = getVisibleContacts()
+            _state.update {
+                it.copy(
+                    contactItemList = contactList,
+                    emptyViewVisible = contactList.isEmpty(),
+                    searchAvailable = contactList.isNotEmpty(),
+                    filteredContactList = getFilteredContactList(
+                        contactList = contactList,
+                        typedSearch = typedSearch.value
+                    )
+                )
+            }
+            getContactsData(contactList)
         }
     }
 
-    private suspend fun getContactsData() {
-        contactList.value.forEach { contactItem ->
-            withContext(ioDispatcher) {
-                val contactData = getContactData(contactItem)
-                contactList.value.findItemByHandle(contactItem.handle)?.apply {
-                    contactList.value.toMutableList().apply {
-                        replaceIfExists(copy(
-                            fullName = contactData.fullName,
-                            alias = contactData.alias,
-                            avatarUri = contactData.avatarUri,
-                            defaultAvatarContent = contactData.defaultAvatarContent
-                        ))
-                        contactList.update { this.sortList() }
+    private suspend fun getContactsData(contactList: List<ContactItem>) {
+        contactList.forEach { contactItem ->
+            val contactData = getContactData(contactItem)
+            _state.value.contactItemList.apply {
+                findItemByHandle(contactItem.handle)?.apply {
+                    toMutableList().apply {
+                        replaceIfExists(copy(contactData = contactData))
+                        _state.update { it.copy(contactItemList = this.sortList()) }
                     }
                 }
             }
@@ -200,20 +184,23 @@ class StartConversationViewModel @Inject constructor(
     }
 
     private fun observeContactUpdates() {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             monitorContactUpdates().collectLatest { userUpdates ->
-                contactList.update { applyContactUpdates(contactList.value, userUpdates) }
+                val contactList = applyContactUpdates(_state.value.contactItemList, userUpdates)
+                _state.update { it.copy(contactItemList = contactList) }
             }
         }
     }
 
     private fun observeLastGreenUpdates() {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             monitorLastGreenUpdates().collectLatest { (handle, lastGreen) ->
-                contactList.value.findItemByHandle(handle)?.apply {
-                    contactList.value.toMutableList().apply {
-                        replaceIfExists(copy(lastSeen = lastGreen))
-                        contactList.update { this.sortList() }
+                _state.value.contactItemList.apply {
+                    findItemByHandle(handle)?.apply {
+                        toMutableList().apply {
+                            replaceIfExists(copy(lastSeen = lastGreen))
+                            _state.update { it.copy(contactItemList = this.sortList()) }
+                        }
                     }
                 }
             }
@@ -221,16 +208,18 @@ class StartConversationViewModel @Inject constructor(
     }
 
     private fun observeOnlineStatusUpdates() {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             monitorOnlineStatusUpdates().collectLatest { (userHandle, status) ->
                 if (status != UserStatus.Online) {
                     requestLastGreen(userHandle)
                 }
 
-                contactList.value.findItemByHandle(userHandle)?.apply {
-                    contactList.value.toMutableList().apply {
-                        replaceIfExists(copy(status = status))
-                        contactList.update { this.sortList() }
+                _state.value.contactItemList.apply {
+                    findItemByHandle(userHandle)?.apply {
+                        toMutableList().apply {
+                            replaceIfExists(copy(status = status))
+                            _state.update { it.copy(contactItemList = this.sortList()) }
+                        }
                     }
                 }
             }
@@ -238,9 +227,10 @@ class StartConversationViewModel @Inject constructor(
     }
 
     private fun observeNewContacts() {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             monitorContactRequestUpdates().collectLatest { newContacts ->
-                contactList.update { addNewContacts(contactList.value, newContacts) }
+                val contactList = addNewContacts(_state.value.contactItemList, newContacts)
+                _state.update { it.copy(contactItemList = contactList.sortList()) }
             }
         }
     }
@@ -268,7 +258,7 @@ class StartConversationViewModel @Inject constructor(
      */
     fun onContactTap(contactItem: ContactItem) {
         if (isConnected.value) {
-            viewModelScope.launch(ioDispatcher) {
+            viewModelScope.launch {
                 runCatching {
                     startConversation(false, listOf(contactItem.handle))
                 }.onFailure { exception ->

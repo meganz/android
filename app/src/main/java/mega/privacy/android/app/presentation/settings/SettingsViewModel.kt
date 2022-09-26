@@ -100,7 +100,7 @@ class SettingsViewModel @Inject constructor(
             startScreen = 0,
             hideRecentActivityChecked = false,
             email = "",
-            accountType = 0
+            accountType = ""
         )
     }
 
@@ -172,7 +172,7 @@ class SettingsViewModel @Inject constructor(
             state.copy(
                 deleteAccountVisible = canDeleteAccount(userAccount),
                 email = userAccount.email,
-                accountType = userAccount.accountTypeIdentifier
+                accountType = userAccount.accountTypeString
             )
         }
 

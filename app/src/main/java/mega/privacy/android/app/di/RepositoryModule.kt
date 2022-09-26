@@ -23,6 +23,7 @@ import mega.privacy.android.app.data.repository.DefaultNetworkRepository
 import mega.privacy.android.app.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.app.data.repository.DefaultPhotosRepository
 import mega.privacy.android.app.data.repository.DefaultPushesRepository
+import mega.privacy.android.app.data.repository.DefaultRecentActionsRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
 import mega.privacy.android.app.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.app.data.repository.DefaultSupportRepository
@@ -30,6 +31,7 @@ import mega.privacy.android.app.data.repository.DefaultTransfersRepository
 import mega.privacy.android.app.data.repository.TimberLoggingRepository
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.repository.GlobalStatesRepository
+import mega.privacy.android.app.domain.repository.RecentActionsRepository
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
@@ -40,6 +42,7 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
+import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.LoggingRepository
@@ -84,6 +87,9 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindFilesRepository(repository: DefaultFilesRepository): FilesRepository
+
+    @Binds
+    abstract fun bindDomainFilesRepository(repository: DefaultFilesRepository): FileRepository
 
     @Binds
     abstract fun bindFavouritesRepository(repository: DefaultFavouritesRepository): FavouritesRepository
@@ -143,4 +149,10 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindGalleryFilesRepository(repository: DefaultGalleryFilesRepository): GalleryFilesRepository
+
+    /**
+     * Bind recent actions repository
+     */
+    @Binds
+    abstract fun bindRecentActionsRepository(repository: DefaultRecentActionsRepository): RecentActionsRepository
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -206,12 +206,10 @@
     <string name="section_recents">최근</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">미디어 업로드</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">수신함</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">오프라인</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
-    <string name="location_label">%1$s (%2$s)</string>
+    <string name="location_label">%1$s(%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
     <string name="title_shared_items">공유된 항목</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
@@ -892,7 +890,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">잘못된 이메일 또는 암호. 다시 시도하세요.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">당신의 계정은 이용 약관 위반으로 인해 정지되어 있습니다. support&#64;mega.co.nz로 연락주세요.</string>
+    <string name="error_account_suspended">당신의 계정은 이용 약관 위반으로 인해 정지되어 있습니다. support&#64;mega.nz로 연락주세요.</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">로그인 시도 실패가 너무 많습니다, 1시간 동안 기다려주세요.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -950,7 +948,7 @@
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d개의 초대 요청이 성공적으로 발송되었지만 %2$d개는 발송되지 않았습니다.</string>
     <!-- Word next to own user’s message in chat screen -->
-    <string name="chat_me_text_bracket">%1s (나)</string>
+    <string name="chat_me_text_bracket">%1s(나)</string>
     <!-- button -->
     <string name="general_mute">조용히</string>
     <!-- button -->
@@ -960,7 +958,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">대화 알림 끄기</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">알림 끄기</string>
+    <string name="title_dialog_mute_chatroom_notifications">대화 알림 끄기</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">켬</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1008,7 +1006,7 @@
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">참여자 제거</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">당신의 대화를 필수적인 안전 보증을 제공하는 종단간 (이용자 제어) 암호화로 보호하세요:</string>
+    <string name="mega_info_empty_screen">당신의 대화를 필수적인 안전 보증을 제공하는 종단간(이용자 제어) 암호화로 보호하세요:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">시스템이 명시된 발송자로부터 데이터를 수신하였으며, 그 내용이 전송중 조작되지 않았음을 보증합니다.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1148,7 +1146,7 @@
     <!-- More button in contact info page -->
     <string name="label_more">더 보기</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">저장소 공간</string>
+    <string name="storage_space">저장소</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">오프라인에서 제거할까요?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1219,7 +1217,7 @@
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">파일 업로드 중: %2$d 중 %1$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
-    <string name="upload_service_notification_paused">파일 업로드 중: %2$d 중 %1$d (일시정지됨)</string>
+    <string name="upload_service_notification_paused">파일 업로드 중: %2$d 중 %1$d(일시정지됨)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">파일 %1$d개 업로드됨</item>
@@ -1253,7 +1251,7 @@
     <!-- Text of the notification shown when the download service is running -->
     <string name="download_service_notification">파일 다운로드 중: %2$d 중 %1$d</string>
     <!-- Text of the notification shown when the download service is paused -->
-    <string name="download_service_notification_paused">파일 다운로드 중: %2$d 중 %1$d (일시정지됨)</string>
+    <string name="download_service_notification_paused">파일 다운로드 중: %2$d 중 %1$d(일시정지됨)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">전송 할당량 부족</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -1381,7 +1379,7 @@
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">첨부물을 제거할까요?</string>
     <!-- Menu option -->
-    <string name="general_view_with_revoke">파일 보기 (%1$d개 삭제됨)</string>
+    <string name="general_view_with_revoke">파일 보기(%1$d개 삭제됨)</string>
     <!-- Error message when the attachment cannot be sent -->
     <string name="error_attaching_node_from_cloud">오류. 파일이 전송되지 않았습니다</string>
     <!-- Error message when the attachment cannot be revoked -->
@@ -1620,8 +1618,6 @@
     <string name="context_share">앱을 사용하여 공유</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]휴지통[/A] [B]비우기[/B]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[A]수신함[/A][B]에 파일 없음[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[A]클라우드 드라이브[/A][B]에 파일 없음[/B]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1680,10 +1676,6 @@
     <string name="contacts_mega">MEGA에서</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">휴대 전화 연락처</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">당신의 계정은 MEGA 이용 약관을 다수 위반하여 정지되었습니다. 이메일 수신함을 확인하세요.</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">당신의 계정은 MEGA 이용 약관 제15조를 포함한 위반 행위로 인하여 제거되었습니다.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">파일 불러오는 중</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1998,7 +1990,7 @@
     <!-- Title of the section Archived chats -->
     <string name="archived_chats_title_section">보관된 대화</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">저장된 대화 (%d)</string>
+    <string name="archived_chats_show_option">저장된 대화(%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">대화 보관</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
@@ -2246,7 +2238,7 @@
     <!-- Item of the navigation title for the notification section when there is any unread -->
     <string name="section_notification_with_unread">알림 [A](%1$d)[/A]</string>
     <!-- Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown -->
-    <string name="section_notification_user_with_nickname">[A]%1$s (%2$s)[/A]</string>
+    <string name="section_notification_user_with_nickname">[A]%1$s(%2$s)[/A]</string>
     <!-- Title of the historic notification for an account deleted -->
     <string name="title_account_notification_deleted">계정 삭제됨</string>
     <!-- Subtitle of the historic notification for an account deleted -->
@@ -2308,9 +2300,9 @@
     <!-- dialog option continue in alert dialog -->
     <string name="button_continue">계속</string>
     <!-- one of the payment methods -->
-    <string name="payment_method_google_wallet">[A]Google Pay[/A] (구독)</string>
+    <string name="payment_method_google_wallet">[A]Google Pay[/A](구독)</string>
     <!-- one of the payment methods -->
-    <string name="payment_method_huawei_wallet">[A]HUAWEI Pay[/A] (구독)</string>
+    <string name="payment_method_huawei_wallet">[A]HUAWEI Pay[/A](구독)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">신규</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
@@ -2607,8 +2599,6 @@
     <string name="text_join_another_call">이 통화에 참여하려면 현재 통화를 종료하거나 보류해야합니다.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">사람들이 이 링크를 이용하여 당신의 그룹에 참여할 수 있습니다.</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">새 대화 링크</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">그룹 이름을 입력하세요</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -3062,7 +3052,7 @@
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">재생중</string>
     <!-- Text that indicates the song is now playing, but paused -->
-    <string name="audio_player_now_playing_paused">재생중 (일시정지)</string>
+    <string name="audio_player_now_playing_paused">재생중(일시정지)</string>
     <!-- Title of the song info screen -->
     <string name="audio_track_info">트랙 정보</string>
     <!-- Preferences screen item title for Cookie Policy -->
@@ -3072,7 +3062,7 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">당신의 사생활</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">우리는 제3자를 통한 것을 포함하여, 당신에게 서비스를 제공하고, 당신의 경험을 향상시키기 위하여 쿠키 그리고 이와 유사한 기술 (“쿠키”)을 사용합니다. 방문 초기에 우리의 쿠키 사용에 동의하거나 쿠키 설정에서 쿠키를 개인화 할 수 있습니다. 자세한 내용은 우리의 [A]쿠키 정책[/A]에서 읽어보세요.</string>
+    <string name="dialog_cookie_alert_message">우리는 제3자를 통한 것을 포함하여, 당신에게 서비스를 제공하고, 당신의 경험을 향상시키기 위하여 쿠키 그리고 이와 유사한 기술(“쿠키”)을 사용합니다. 방문 초기에 우리의 쿠키 사용에 동의하거나 쿠키 설정에서 쿠키를 개인화 할 수 있습니다. 자세한 내용은 우리의 [A]쿠키 정책[/A]에서 읽어보세요.</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">쿠키 설정이 저장되지 않았습니다.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -3118,7 +3108,7 @@
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">파일이 너무 커서 열거나 미리 볼 수 없습니다.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
-    <string name="file_without_extension">확장자가 없는 파일 (.%1$s)</string>
+    <string name="file_without_extension">확장자가 없는 파일(.%1$s)</string>
     <!-- Error shown when the user writes a file name without extension -->
     <string name="file_without_extension_warning">진행하려면 파일 확장자를 입력해야 합니다</string>
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
@@ -3312,7 +3302,7 @@
     <!-- Invite contacts as participants of the meeting-->
     <string name="invite_participants">참여자 초대</string>
     <!-- The number of participants in the meeting-->
-    <string name="participants_number">참여자 (%d)</string>
+    <string name="participants_number">참여자(%d)</string>
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">메인 보기에 표시</string>
     <!-- Make the participant as moderator in the meeting-->
@@ -3467,26 +3457,12 @@
     <string name="settings_mobile_data_resoluton_title">고해상도 이미지를 미리 보기하는 데에 모바일 데이터 사용</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">미리 보기를 할 때 고해상도 이미지를 불러오기 위해 모바일 데이터를 사용하는 것을 허용하세요. 만약 비활성화 하면, 확대할 때만 원래 이미지를 불러옵니다.</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">기본 백업 폴더 위치를 변경하려고 합니다. 이것은 나중에 당신의 백업 폴더를 찾을 수 있는지 여부에 영향을 미칩니다. 나중에 찾을 수 있도록 어디에 위치했는지 기억하세요.</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">이 폴더의 이동은 하나 이상의 구성된 백업의 대상을 변경하며 의도하지 않은 결과를 초래할 수 있습니다. 안전을 위해 백업을 꺼야 합니다. 백업은 MEGA 데스크톱 앱에서 다시 활성화할 수 있습니다. 진행하시겠습니까?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">백업 폴더를 삭제하려고 합니다. 이것은 당신이 설정한 모든 백업을 삭제합니다. 정말 하시겠습니까?</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">정말 백업 폴더를 삭제하고 연관된 백업을 비활성화 하시겠습니까?</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">“%1s” 이동</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">“%1s”을/를 휴지통으로 이동</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">백업 폴더 이동</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">백업 폴더를 휴지통으로 이동</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">백업 비활성화</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">백업 이동</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">이 행동을 승인하려면 “%1s”을/를 입력하세요</string>
     <!-- when checking the input -->
@@ -3507,10 +3483,6 @@
     <string name="backup_multi_share_permission_text">이 폴더들은 읽기 전용으로만 공유할 수 있습니다; 이 폴더들은 백업 폴더이므로, 이 항목에 대한 어떠한 변경은 백업을 비활성화 할 수 있습니다.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">일부 공유된 폴더가 백업 폴더이거나 읽기 전용입니다. 계속 하시겠습니까?</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="other">장치 %d개</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">전화 받기</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3658,7 +3630,7 @@
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
     <string name="warning_scanning_transfers">애플리케이션을 닫지 마세요.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
-    <string name="scanning_transfers">검사 중&#8230;</string>
+    <string name="scanning_transfers">스캔 중...</string>
     <!-- Label cancel transfers. -->
     <string name="cancel_transfers">전송 취소</string>
     <!-- Warning informing what will happen if proceed on cancelling transfers. -->
@@ -3783,8 +3755,6 @@
     <string name="settings_help_report_issue_discard_button">폐기</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">메시지 편집</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">갤러리</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">음성</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -3793,8 +3763,6 @@
     <string name="chat_room_toolbar_voice_clip_option">음성 클립</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[A]대화[/A]에 [B]친구들을 초대하여[/B] [B]보안과 프라이버시를 갖춘 우리의 암호화된 플랫폼을 즐기세요[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">필터</string>
     <!-- Filter option to show all photos -->
@@ -3844,7 +3812,7 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">[A]%1$s[/A] 저장소</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] 전송 할당량</string>
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] 전송</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">저장소</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
@@ -3921,4 +3889,14 @@
     <string name="permissions_notifications_title">알림 받기</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA가 통화, 대화, 그리고 파일 전송 알림을 보낼 것입니다.</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">백업</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[A]백업[/A][B]에 항목이 존재하지 않습니다[/B]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">이곳은 백업된 파일과 폴더가 보관되는 곳입니다. 백업된 항목은 실수로 클라우드 드라이브에서 수정되는 것을 방지하지 위해 “읽기 전용”이 됩니다.데스크톱 앱을 이용하여 컴퓨터에서 MEGA로 항목들을 백업할 수 있습니다.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">저작권 침해로 계정이 정지되었습니다. 이것에 대한 자세한 정보를 이메일로 보내드렸습니다.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">타인의 권리 침해, 불법 데이터의 공유 및 내보내기, 시스템 오용 등의 MEGA 이용 약관 위반으로 계정이 제거되었습니다.</string>
 </resources>
