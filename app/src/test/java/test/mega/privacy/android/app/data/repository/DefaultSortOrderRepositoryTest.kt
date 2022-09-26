@@ -24,7 +24,6 @@ class DefaultSortOrderRepositoryTest {
     @Before
     fun setUp() {
         underTest = DefaultSortOrderRepository(
-            context = mock(),
             ioDispatcher = UnconfinedTestDispatcher(),
             megaLocalStorageGateway = megaLocalStorageGateway,
             sortOrderMapper = sortOrderMapper,
