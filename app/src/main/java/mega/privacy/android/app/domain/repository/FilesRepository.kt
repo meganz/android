@@ -2,7 +2,6 @@ package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FolderVersionInfo
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -153,12 +152,6 @@ interface FilesRepository {
      * @return cloud sort order
      */
     suspend fun getCloudSortOrder(): Int
-
-    /**
-     * Get camera sort order
-     * @return camera sort order
-     */
-    suspend fun getCameraSortOrder(): SortOrder
 
     /**
      * Get others sort order
