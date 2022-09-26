@@ -58,7 +58,7 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileInfoActivity
 import mega.privacy.android.app.main.controllers.ChatController
@@ -864,19 +864,16 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 }
 
                 AlertsAndWarnings.showConfirmRemoveLinkDialog(this) {
-                    megaApi.disableExport(node, object : BaseListener(this) {
-                        override fun onRequestFinish(
-                            api: MegaApiJava, request: MegaRequest, e: MegaError,
-                        ) {
-                            if (e.errorCode == MegaError.API_OK) {
+                    megaApi.disableExport(node,
+                        OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
+                            if (error.errorCode == MegaError.API_OK) {
                                 // Some times checking node.isExported immediately will still
                                 // get true, so let's add some delay here.
                                 runDelay(100L) {
                                     refreshMenuOptionsVisibility()
                                 }
                             }
-                        }
-                    })
+                        }))
                 }
                 return true
             }
