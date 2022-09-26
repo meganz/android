@@ -102,6 +102,19 @@ interface MegaChatApiGateway {
     )
 
     /**
+     * Set open invite setting for a chat room, allowing participants to add more participants to the chat.
+     *
+     * @param chatId  The chat id.
+     * @param enabled  True if allow add participants, false otherwise.
+     * @param listener Listener.
+     */
+    fun setOpenInvite(
+        chatId: Long,
+        enabled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
      * Gets a 1to1 chat conversation if exists.
      *
      * @param userHandle The user handle.
