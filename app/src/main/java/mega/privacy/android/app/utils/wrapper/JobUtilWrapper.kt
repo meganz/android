@@ -7,7 +7,9 @@ import mega.privacy.android.app.utils.JobUtil
  * The interface for wrapping static [mega.privacy.android.app.utils.JobUtil] methods.
  */
 interface JobUtilWrapper {
-    fun isOverQuota(context: Context): Boolean = JobUtil.isOverQuota(context)
+
+    fun isOverQuota(): Boolean = JobUtil.isOverQuota()
+
     fun fireCameraUploadJob(context: Context, shouldIgnoreAttributes: Boolean): Int =
         JobUtil.fireCameraUploadJob(context, shouldIgnoreAttributes)
 }

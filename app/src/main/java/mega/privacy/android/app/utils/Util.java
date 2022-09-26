@@ -19,7 +19,6 @@ import static mega.privacy.android.app.utils.Constants.TAKE_PHOTO_CODE;
 import static mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.annotation.SuppressLint;
@@ -129,6 +128,8 @@ import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity;
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity;
+import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -902,7 +903,7 @@ public class Util {
 
     public static boolean canVoluntaryVerifyPhoneNumber() {
         // If account is in ODQ Paywall state avoid ask for SMS verification because request will fail.
-        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (StorageStateExtensionsKt.getStorageState() == StorageState.PayWall) {
             return false;
         }
 

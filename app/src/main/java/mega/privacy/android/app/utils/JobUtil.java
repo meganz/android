@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
@@ -23,7 +22,8 @@ import mega.privacy.android.app.jobservices.CancelCameraUploadWorker;
 import mega.privacy.android.app.jobservices.StartCameraUploadWorker;
 import mega.privacy.android.app.jobservices.StopCameraUploadWorker;
 import mega.privacy.android.app.jobservices.SyncHeartbeatCameraUploadWorker;
-import nz.mega.sdk.MegaApiJava;
+import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
+import mega.privacy.android.domain.entity.StorageState;
 import timber.log.Timber;
 
 public class JobUtil {
@@ -224,7 +224,7 @@ public class JobUtil {
         return !Boolean.parseBoolean(cameraUploadEnabled);
     }
 
-    public static boolean isOverQuota(Context context) {
-        return ((MegaApplication) context.getApplicationContext()).getStorageState() == MegaApiJava.STORAGE_STATE_RED;
+    public static boolean isOverQuota() {
+        return StorageStateExtensionsKt.getStorageState() == StorageState.Red;
     }
 }
