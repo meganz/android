@@ -2,6 +2,7 @@ package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncTimeStamp
@@ -17,8 +18,14 @@ import javax.inject.Inject
  */
 class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
+    private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CameraUploadRepository {
+
+    override fun getInvalidHandle(): Long {
+        return megaApiGateway.getInvalidHandle()
+    }
+
 
     override suspend fun getPrimarySyncHandle(): Long? = withContext(ioDispatcher) {
         localStorageGateway.getCamSyncHandle()

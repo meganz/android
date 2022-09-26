@@ -28,6 +28,7 @@ class DefaultCameraUploadRepositoryTest {
     fun setUp() {
         underTest = DefaultCameraUploadRepository(
             localStorageGateway = localStorageGateway,
+            megaApiGateway = mock(),
             ioDispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -220,5 +221,25 @@ class DefaultCameraUploadRepositoryTest {
     fun `test camera upload retrieves convert on charging setting`() = runTest {
         whenever(localStorageGateway.convertOnCharging()).thenReturn(false)
         assertThat(underTest.convertOnCharging()).isEqualTo(false)
+    }
+
+    @Test
+    fun `test that primary folder handle is returned successfully`() {
+        runTest {
+            val result = 1L
+            whenever(localStorageGateway.getCamSyncHandle()).thenReturn(result)
+            val actual = underTest.getPrimarySyncHandle()
+            assertThat(actual).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `test that secondary folder handle is returned successfully`() {
+        runTest {
+            val result = 2L
+            whenever(localStorageGateway.getMegaHandleSecondaryFolder()).thenReturn(result)
+            val actual = underTest.getSecondarySyncHandle()
+            assertThat(actual).isEqualTo(result)
+        }
     }
 }
