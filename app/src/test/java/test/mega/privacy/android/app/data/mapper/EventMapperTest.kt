@@ -80,5 +80,24 @@ class EventMapperTest {
         }
     }
 
+    @Test
+    fun `test that event mapping is successful when text in MegaNode is null`() {
+        megaEvent.stub {
+            on { text }.thenReturn(null)
+        }
+        assertThat(toEvent(megaEvent)).isInstanceOf(NormalEvent::class.java)
+        assertThat(toEvent(megaEvent).text).isEqualTo("")
+    }
+
+    @Test
+    fun `test that event mapping is successful when eventString in MegaNode is null`() {
+        megaEvent.stub {
+            on { eventString }.thenReturn(null)
+        }
+        assertThat(toEvent(megaEvent)).isInstanceOf(NormalEvent::class.java)
+        assertThat(toEvent(megaEvent).eventString).isEqualTo("")
+
+    }
+
 
 }

@@ -31,7 +31,10 @@ import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES
+import mega.privacy.android.app.utils.Constants.CHAT_ID
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
+import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.setImageRequestFromUri
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE

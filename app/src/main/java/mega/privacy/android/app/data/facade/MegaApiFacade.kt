@@ -400,6 +400,8 @@ class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.moveTransferToFirst(transfer, listener)
 
+    override suspend fun isBusinessAccountActive(): Boolean = megaApi.isBusinessAccountActive
+
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
     }

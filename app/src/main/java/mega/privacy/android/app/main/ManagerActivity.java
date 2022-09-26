@@ -10903,6 +10903,8 @@ public class ManagerActivity extends TransfersManagementActivity
 
     @Override
     public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+
         // Determine which lifecycle or system event was raised.
         //we will stop creating thumbnails while the phone is running low on memory to prevent OOM
         Timber.d("Level: %s", level);

@@ -4,6 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.repository.FilesRepository
@@ -34,8 +35,10 @@ import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
+import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
 import mega.privacy.android.domain.usecase.DefaultGetSyncRecordByPath
@@ -74,7 +77,7 @@ import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
  * Provides the use case implementation for camera upload
  */
 @Module(includes = [GetNodeModule::class])
-@InstallIn(SingletonComponent::class)
+@InstallIn(SingletonComponent::class, ViewModelComponent::class)
 abstract class CameraUploadUseCases {
 
     companion object {
@@ -279,6 +282,12 @@ abstract class CameraUploadUseCases {
         fun provideGetChildMegaNode(filesRepository: FilesRepository): GetChildMegaNode =
             GetChildMegaNode(filesRepository::getChildNode)
     }
+
+    /**
+     * Provides the [CheckEnableCameraUploadsStatus] implementation
+     */
+    @Binds
+    abstract fun bindCheckEnableCameraUploadsStatus(useCase: DefaultCheckEnableCameraUploadsStatus): CheckEnableCameraUploadsStatus
 
     /**
      * Provide the GetNodeFromCloud implementation

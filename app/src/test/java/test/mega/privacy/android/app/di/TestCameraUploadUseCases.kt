@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.di
 
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
@@ -20,6 +21,7 @@ import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
+import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
@@ -52,7 +54,7 @@ import org.mockito.kotlin.mock
 
 @TestInstallIn(
     replaces = [CameraUploadUseCases::class],
-    components = [SingletonComponent::class]
+    components = [SingletonComponent::class, ViewModelComponent::class]
 )
 @Module(includes = [TestGetNodeModule::class])
 object TestCameraUploadUseCases {
@@ -182,6 +184,9 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideSaveSyncRecordsToDB() = mock<SaveSyncRecordsToDB>()
+
+    @Provides
+    fun provideCheckEnableCameraUploadsStatus() = mock<CheckEnableCameraUploadsStatus>()
 
     @Provides
     fun provideGetUploadFolderHandle() = mock<GetUploadFolderHandle>()

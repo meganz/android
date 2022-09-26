@@ -20,13 +20,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.domain.entity.ShareTextInfo;
+import mega.privacy.android.domain.entity.StorageState;
+import mega.privacy.android.domain.usecase.MonitorStorageStateEvent;
 
 /**
  * ViewModel class responsible for preparing and managing the data for FileExplorerActivity
  */
+@HiltViewModel
 public class FileExplorerActivityViewModel extends ViewModel {
 
     public MutableLiveData<List<ShareInfo>> filesInfo = new MutableLiveData<>();
@@ -36,6 +43,14 @@ public class FileExplorerActivityViewModel extends ViewModel {
     private final ExecutorService executor = Executors.newFixedThreadPool(10);
 
     public boolean isImportingText;
+
+    @Inject
+    MonitorStorageStateEvent monitorStorageStateEvent;
+
+    @Inject
+    public FileExplorerActivityViewModel() {
+        super();
+    }
 
     /**
      * Get the ShareInfo list
@@ -193,5 +208,9 @@ public class FileExplorerActivityViewModel extends ViewModel {
         }
 
         return null;
+    }
+
+    public StorageState getStorageState() {
+        return StorageStateExtensionsKt.getState(monitorStorageStateEvent);
     }
 }
