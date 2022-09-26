@@ -13,7 +13,6 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class TypedFilesRepository @Inject constructor(
     @ApplicationContext val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid
