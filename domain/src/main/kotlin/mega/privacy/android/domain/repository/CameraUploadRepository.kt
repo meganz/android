@@ -9,6 +9,11 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 interface CameraUploadRepository {
 
     /**
+     * Get Invalid Handle
+     */
+    fun getInvalidHandle(): Long
+
+    /**
      * Get Camera Uploads Primary handle
      */
     suspend fun getPrimarySyncHandle(): Long?

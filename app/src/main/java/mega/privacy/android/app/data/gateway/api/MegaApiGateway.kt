@@ -23,6 +23,12 @@ import nz.mega.sdk.MegaUserAlert
  * @constructor Create empty Mega api gateway
  */
 interface MegaApiGateway {
+
+    /**
+     * Get Invalid Handle
+     */
+    fun getInvalidHandle(): Long
+
     /**
      * Is Multi factor auth available
      *

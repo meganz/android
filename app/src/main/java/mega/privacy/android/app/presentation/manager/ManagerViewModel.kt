@@ -36,6 +36,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
@@ -61,17 +62,18 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
-    monitorNodeUpdates: MonitorNodeUpdates,
-    monitorGlobalUpdates: MonitorGlobalUpdates,
-    getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
-    getBrowserChildrenNode: GetBrowserChildrenNode,
-    monitorContactRequestUpdates: MonitorContactRequestUpdates,
+    private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorGlobalUpdates: MonitorGlobalUpdates,
+    private val getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
+    private val getBrowserChildrenNode: GetBrowserChildrenNode,
+    private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
+    private val getUploadFolderHandle: GetUploadFolderHandle,
     private val getInboxNode: GetInboxNode,
     private val getRootFolder: GetRootFolder,
     private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
     private val hasInboxChildren: HasInboxChildren,
     private val sendStatisticsMediaDiscovery: SendStatisticsMediaDiscovery,
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
 ) : ViewModel() {

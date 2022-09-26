@@ -47,6 +47,11 @@ class MegaApiFacade @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) : MegaApiGateway {
+
+    override fun getInvalidHandle(): Long {
+        return MegaApiAndroid.INVALID_HANDLE
+    }
+
     override fun multiFactorAuthAvailable(): Boolean {
         return megaApi.multiFactorAuthAvailable()
     }
