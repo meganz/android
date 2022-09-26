@@ -7,10 +7,11 @@ import android.content.ServiceConnection
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+import android.content.res.Configuration
+import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.database.ContentObserver
 import android.graphics.Color
 import android.graphics.PixelFormat
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -21,14 +22,13 @@ import android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
 import android.provider.Settings.System.getUriFor
 import android.view.Menu
 import android.view.MenuItem
-import android.view.WindowInsets
-import android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -141,6 +141,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaShare
 import org.jetbrains.anko.configuration
 import timber.log.Timber
+import java.lang.Integer.max
 
 /**
  * Media player Activity
@@ -218,7 +219,6 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                                 SCREEN_ORIENTATION_SENSOR
                             } else {
                                 currentOrientation
-
                             }
                     }.launchIn(lifecycleScope)
 
@@ -281,6 +281,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         } else {
             setContentView(dragToExit.wrapContentView(binding.root))
             dragToExit.observeThumbnailLocation(this, intent)
+            binding.toolbar.run {
+                collapseIcon = AppCompatResources.getDrawable(this@MediaPlayerActivity,
+                    androidx.appcompat.R.drawable.abc_ic_ab_back_material)
+                collapseIcon?.setTint(Color.WHITE)
+            }
         }
 
         val navHostFragment =
@@ -463,7 +468,12 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         optionsMenu = menu
 
-        menuInflater.inflate(R.menu.media_player, menu)
+        menuInflater.inflate(
+            if (isAudioPlayer()) {
+                R.menu.media_player
+            } else {
+                R.menu.menu_video_player
+            }, menu)
 
         menu.findItem(R.id.get_link).title =
             StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
@@ -1082,13 +1092,6 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     private fun hideSystemUI() {
-        @Suppress("DEPRECATION")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.hide(WindowInsets.Type.statusBars())
-        } else {
-            window.setFlags(FLAG_FULLSCREEN, FLAG_FULLSCREEN)
-        }
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, binding.root).let { controller ->
             controller.hide(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior =
@@ -1097,13 +1100,6 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     private fun showSystemUI() {
-        @Suppress("DEPRECATION")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.show(WindowInsets.Type.statusBars())
-        } else {
-            window.clearFlags(FLAG_FULLSCREEN)
-        }
-        WindowCompat.setDecorFitsSystemWindows(window, true)
         WindowInsetsControllerCompat(window,
             binding.root).show(WindowInsetsCompat.Type.systemBars())
     }
@@ -1116,28 +1112,25 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     fun setupToolbarColors(showElevation: Boolean = false) {
         val isDarkMode = Util.isDarkMode(this)
         val isMainPlayer = navController.currentDestination?.id == R.id.main_player
+        val isPlaylist = navController.currentDestination?.id == R.id.playlist
         @ColorRes val toolbarBackgroundColor: Int
         @ColorInt val statusBarColor: Int
         val toolbarElevation: Float
         val isVideoPlayerMainView = !isAudioPlayer() && isMainPlayer
+        val isVideoPlaylist = !isAudioPlayer() && isPlaylist
 
+        WindowCompat.setDecorFitsSystemWindows(window,
+            !isVideoPlayerMainView || !isVideoPlaylist)
 
-        WindowCompat.setDecorFitsSystemWindows(window, !isVideoPlayerMainView)
+        updatePaddingForSystemUI(isVideoPlayerMainView, isVideoPlaylist)
 
-        binding.rootLayout.post {
-            // Apply system bars top and bottom insets
-            ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { _, windowInsets ->
-                val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-                binding.toolbar.updatePadding(0, if (isVideoPlayerMainView) insets.top else 0, 0, 0)
-                binding.rootLayout.updatePadding(
-                    if (isVideoPlayerMainView) insets.left else 0,
-                    0,
-                    if (isVideoPlayerMainView) insets.right else 0,
-                    if (isVideoPlayerMainView) insets.bottom else 0
-                )
-                WindowInsetsCompat.CONSUMED
+        binding.rootLayout.setBackgroundColor(getColor(
+            if (isAudioPlayer()) {
+                R.color.white_dark_grey
+            } else {
+                R.color.dark_grey
             }
-        }
+        ))
 
         when {
             isAudioPlayer() && isMainPlayer -> {
@@ -1145,10 +1138,26 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 toolbarBackgroundColor = android.R.color.transparent
                 statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
             }
-            isVideoPlayerMainView -> {
-                toolbarElevation = 0F
-                toolbarBackgroundColor = R.color.white_alpha_070_grey_alpha_070
-                statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+            (isVideoPlayerMainView || isVideoPlaylist) && !isDarkMode -> {
+                moveToDarkModeUI()
+                if (isVideoPlayerMainView) {
+                    toolbarElevation = 0F
+                    toolbarBackgroundColor = R.color.grey_alpha_070
+                    statusBarColor = ContextCompat.getColor(this, R.color.dark_grey)
+                } else {
+                    toolbarElevation = 0F
+                    toolbarBackgroundColor = if (showElevation) {
+                        R.color.action_mode_background
+                    } else {
+                        R.color.dark_grey
+                    }
+                    statusBarColor = if (showElevation) {
+                        val elevation = resources.getDimension(R.dimen.toolbar_elevation)
+                        ColorUtils.getColorForElevation(this, elevation)
+                    } else {
+                        ContextCompat.getColor(this, android.R.color.transparent)
+                    }
+                }
             }
             isDarkMode -> {
                 toolbarElevation = 0F
@@ -1182,6 +1191,51 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         window.statusBarColor = statusBarColor
         binding.toolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarBackgroundColor))
         binding.toolbar.elevation = toolbarElevation
+    }
+
+    private fun moveToDarkModeUI() {
+        binding.toolbar.context.setTheme(R.style.videoPlayerToolbarThemeDark)
+        binding.toolbar.navigationIcon?.setTint(Color.WHITE)
+        binding.toolbar.setTitleTextColor(Color.WHITE)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            isAppearanceLightNavigationBars = false
+            isAppearanceLightStatusBars = false
+        }
+        window.navigationBarColor = getColor(R.color.dark_grey)
+    }
+
+    private fun updatePaddingForSystemUI(
+        isVideoPlayerMainView: Boolean,
+        isVideoPlaylist: Boolean,
+    ) {
+        binding.rootLayout.post {
+            ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { _, windowInsets ->
+                if (isVideoPlayerMainView || isVideoPlaylist) {
+                    windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()).let { insets ->
+                        val horizontalInsets: Pair<Int, Int> =
+                            if (resources.configuration.orientation == ORIENTATION_LANDSCAPE) {
+                                // If the navigation bar at left side, add the padding that the
+                                // width is equals height of status bar for right side.
+                                if (insets.left > insets.right) {
+                                    Pair(insets.left, max(insets.top, insets.bottom))
+                                } else {
+                                    Pair(max(insets.top, insets.bottom), insets.right)
+                                }
+                            } else {
+                                Pair(0, 0)
+                            }
+                        binding.toolbar.updatePadding(0, insets.top, 0, 0)
+                        binding.rootLayout.updatePadding(
+                            horizontalInsets.first,
+                            0,
+                            horizontalInsets.second,
+                            insets.bottom
+                        )
+                    }
+                }
+                WindowInsetsCompat.CONSUMED
+            }
+        }
     }
 
     /**
