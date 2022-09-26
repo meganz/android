@@ -1,6 +1,7 @@
 package mega.privacy.android.app.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.data.model.ChatRoomUpdate
 import mega.privacy.android.app.data.model.ChatUpdate
 import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaChatPeerList
@@ -147,4 +148,9 @@ interface MegaChatApiGateway {
      * @return Online status of the user.
      */
     fun getUserOnlineStatus(userHandle: Long): Int
+
+    /**
+     * Gets chat Room updates.
+     */
+    fun getChatRoomUpdates(chatId: Long): Flow<ChatRoomUpdate>
 }
