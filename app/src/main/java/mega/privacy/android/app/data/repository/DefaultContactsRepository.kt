@@ -123,17 +123,6 @@ class DefaultContactsRepository @Inject constructor(
             }
         }
 
-    override suspend fun setOpenInvite(chatId: Long, enabled: Boolean): Long =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaChatApiGateway.setOpenInvite(chatId,
-                    enabled,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestCreateChatCompleted(continuation)
-                    ))
-            }
-        }
-
     private fun onRequestCreateChatCompleted(continuation: Continuation<Long>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {

@@ -47,10 +47,6 @@ class ContactsModule {
         StartConversation(contactsRepository::startConversation)
 
     @Provides
-    fun provideSetOpenInvite(contactsRepository: ContactsRepository): SetOpenInvite =
-        SetOpenInvite(contactsRepository::setOpenInvite)
-
-    @Provides
     fun provideMonitorChatOnlineStatusUpdates(contactsRepository: ContactsRepository): MonitorOnlineStatusUpdates =
         MonitorOnlineStatusUpdates(contactsRepository::monitorChatOnlineStatusUpdates)
 

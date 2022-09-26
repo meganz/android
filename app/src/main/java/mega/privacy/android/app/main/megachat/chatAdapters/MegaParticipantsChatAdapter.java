@@ -654,8 +654,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
             case R.id.chat_group_allow_participants_properties_layout:
                 ViewHolderParticipantsHeader holderHeader2 = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
                 if (holderHeader2 != null) {
-                    Timber.d("*************** clicado el switch -> setOpenInvite:: ");
-                    megaChatApi.setOpenInvite(getChat().getChatId(), !holderHeader2.allowParticipantsSwitch.isChecked(), groupChatInfoActivity);
+
                 }
                 break;
 

@@ -102,19 +102,6 @@ interface MegaChatApiGateway {
     )
 
     /**
-     * Update the possibility to add participants to a chat without being a moderator.
-     *
-     * @param chatId   The chat id.
-     * @param enabled  True if can add participants, false otherwise.
-     * @param listener Listener.
-     */
-    fun setOpenInvite(
-        chatId: Long,
-        enabled: Boolean,
-        listener: MegaChatRequestListenerInterface,
-    )
-
-    /**
      * Gets a 1to1 chat conversation if exists.
      *
      * @param userHandle The user handle.

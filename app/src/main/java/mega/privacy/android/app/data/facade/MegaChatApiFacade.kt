@@ -119,12 +119,6 @@ class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.createChat(isGroup, peers, listener)
 
-    override fun setOpenInvite(
-        chatid: Long,
-        enabled: Boolean,
-        listener: MegaChatRequestListenerInterface,
-    ) = chatApi.setOpenInvite(chatid, enabled, listener)
-
     override fun getChatRoomByUser(userHandle: Long): MegaChatRoom? =
         chatApi.getChatRoomByUser(userHandle)
 

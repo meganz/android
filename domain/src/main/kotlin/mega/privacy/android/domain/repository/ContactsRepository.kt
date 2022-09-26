@@ -51,15 +51,6 @@ interface ContactsRepository {
     suspend fun startConversation(isGroup: Boolean, userHandles: List<Long>): Long
 
     /**
-     * Set open invite.
-     *
-     * @param chatId
-     * @param enabled
-     * @return The chat conversation handle.
-     */
-    suspend fun setOpenInvite(chatId: Long, enabled: Boolean): Long
-
-    /**
      * Monitor updates on chat online statuses.
      *
      * @return A flow of [OnlineStatus].
