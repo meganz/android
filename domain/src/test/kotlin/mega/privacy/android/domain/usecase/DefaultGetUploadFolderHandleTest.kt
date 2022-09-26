@@ -24,21 +24,21 @@ class DefaultGetUploadFolderHandleTest {
     }
 
     @Test
-    fun `test that invoke with true returns Primary Upload Folder's handle `() = runTest {
+    fun `test that invoke with true returns primary upload folder handle`() = runTest {
         val primaryHandle = 123456789L
         whenever(cameraUploadRepository.getPrimarySyncHandle()).thenReturn(primaryHandle)
         assertThat(underTest(true)).isEqualTo(primaryHandle)
     }
 
     @Test
-    fun `test that invoke with false returns Secondary Upload Folder's handle `() = runTest {
+    fun `test that invoke with false returns secondary upload folder handle`() = runTest {
         val secondaryHandle = 123456789L
         whenever(cameraUploadRepository.getSecondarySyncHandle()).thenReturn(secondaryHandle)
         assertThat(underTest(false)).isEqualTo(secondaryHandle)
     }
 
     @Test
-    fun `test that invoke with true returns Invalid Handle when Primary Upload Handle is null `() =
+    fun `test that invoke with true returns invalid handle when primary upload handle is null`() =
         runTest {
             val invalidHandle = 0L
             whenever(cameraUploadRepository.getPrimarySyncHandle()).thenReturn(null)
@@ -48,7 +48,7 @@ class DefaultGetUploadFolderHandleTest {
         }
 
     @Test
-    fun `test that invoke with false returns Invalid Handle when Secondary Upload Handle is null `() =
+    fun `test that invoke with false returns invalid handle when secondary upload handle is null`() =
         runTest {
             val invalidHandle = 0L
             whenever(cameraUploadRepository.getSecondarySyncHandle()).thenReturn(null)
