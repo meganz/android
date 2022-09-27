@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
@@ -31,7 +32,7 @@ class DefaultMonitorAutoAcceptQRLinksTest {
         email = "email@email.com",
         isBusinessAccount = false,
         isMasterBusinessAccount = false,
-        accountTypeIdentifier = 1,
+        accountTypeIdentifier = AccountType.PRO_I,
         accountTypeString = "Free"
     )
 

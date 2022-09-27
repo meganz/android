@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AppInfo
 import mega.privacy.android.domain.entity.DeviceInfo
 import mega.privacy.android.domain.entity.SupportTicket
@@ -56,7 +57,7 @@ class DefaultCreateSupportTicketTest {
                     email = accountEmail,
                     isBusinessAccount = true,
                     isMasterBusinessAccount = true,
-                    accountTypeIdentifier = 0,
+                    accountTypeIdentifier = AccountType.FREE,
                     accountTypeString = accountTypeString,
                 )
             )
