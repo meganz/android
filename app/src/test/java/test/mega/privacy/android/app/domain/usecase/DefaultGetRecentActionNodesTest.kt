@@ -4,77 +4,62 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.app.domain.usecase.DefaultGetRecentActionNodes
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
-import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
-import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.usecase.GetThumbnail
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultGetRecentActionNodesTest {
     private lateinit var underTest: GetRecentActionNodes
-    private val getThumbnail = mock<GetThumbnail>()
+
+    private val getThumbnail = mock<GetThumbnail> {
+        onBlocking { invoke(any()) }.thenReturn(null)
+    }
+    private val mockNodes = (0L..5L).map { id ->
+        mock<MegaNode> { on { handle }.thenReturn(id) }
+    }
+    private val nodesList = mock<MegaNodeList> {
+        on { size() }.thenReturn(mockNodes.size)
+        on { get(any()) }.thenAnswer { mockNodes[it.arguments[0] as Int] }
+    }
+    private val fileTypeInfoMapper = mock<FileTypeInfoMapper> {
+        on { invoke(any()) }.thenReturn(
+            VideoFileTypeInfo("", ""))
+    }
 
     @Before
     fun setUp() {
         underTest = DefaultGetRecentActionNodes(
             getThumbnail = getThumbnail,
             ioDispatcher = UnconfinedTestDispatcher(),
+            fileTypeInfoMapper = fileTypeInfoMapper,
         )
     }
 
     @Test
     fun `test that if getThumbnail succeed for each element,the list returned contains as many elements as the list given in parameter`() =
         runTest {
-            val megaNode0 = mock<MegaNode> {
-                on { handle }.thenReturn(0L)
-                on { modificationTime }.thenReturn(0L)
-                on { isVideo() }.thenReturn(false)
-            }
-            val megaNode1 = mock<MegaNode> {
-                on { handle }.thenReturn(1L)
-                on { modificationTime }.thenReturn(0L)
-                on { isVideo() }.thenReturn(false)
-            }
-
-            val nodes = mock<MegaNodeList> {
-                on { get(0) }.thenReturn(megaNode0)
-                on { get(1) }.thenReturn(megaNode1)
-                on { size() }.thenReturn(2)
-            }
-
-            assertThat(underTest.invoke(nodes).size).isEqualTo(nodes.size())
+            assertThat(underTest.invoke(nodesList).size).isEqualTo(nodesList.size())
         }
 
 
     @Test
     fun `test that if one of getThumbnail throws an exception when looping over the nodes, under test stills returns the list of nodes except the one who failed`() =
         runTest {
-            val megaNode0 = mock<MegaNode> {
-                on { handle }.thenReturn(0L)
-                on { modificationTime }.thenReturn(0L)
-                on { isVideo() }.doAnswer { throw Exception() }
-
-            }
-            val megaNode1 = mock<MegaNode> {
-                on { handle }.thenReturn(1L)
-                on { modificationTime }.thenReturn(0L)
-                on { isVideo() }.thenReturn(false)
+            whenever(getThumbnail(3L)).thenAnswer {
+                throw IOException("Error!")
             }
 
-            val nodes = mock<MegaNodeList> {
-                on { get(0) }.thenReturn(megaNode0)
-                on { get(1) }.thenReturn(megaNode1)
-                on { size() }.thenReturn(2)
-            }
-
-            assertThat(underTest.invoke(nodes).size).isEqualTo(1)
+            assertThat(underTest.invoke(nodesList).size).isEqualTo(mockNodes.size - 1)
         }
 }

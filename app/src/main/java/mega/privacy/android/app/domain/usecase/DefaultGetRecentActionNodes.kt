@@ -1,15 +1,15 @@
 package mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetThumbnail
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
 import javax.inject.Inject
@@ -20,6 +20,7 @@ import javax.inject.Inject
 class DefaultGetRecentActionNodes @Inject constructor(
     private val getThumbnail: GetThumbnail,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val fileTypeInfoMapper: FileTypeInfoMapper,
 ) : GetRecentActionNodes {
 
     /**
@@ -30,37 +31,31 @@ class DefaultGetRecentActionNodes @Inject constructor(
      */
     override suspend fun invoke(nodes: MegaNodeList): List<NodeItem> =
         withContext(ioDispatcher) {
-            val size = nodes.size()
-            val coroutineScope = CoroutineScope(SupervisorJob())
-            val deferredNodeItems = mutableListOf<Deferred<NodeItem>>().apply {
-                for (i in 0 until size) {
-                    nodes[i]?.let { node ->
-                        add(
-                            coroutineScope.async {
-                                NodeItem(
-                                    node = node,
-                                    thumbnail = getThumbnail(node.handle),
-                                    index = -1,
-                                    isVideo = node.isVideo(),
-                                    modifiedDate = node.modificationTime.toString(),
-                                )
-                            }
-                        )
+            List(nodes.size()) { nodes[it] }
+                .map { node ->
+                    async {
+                        createNodeItem(node)
                     }
-                }
-            }
-
-            val nodesList = ArrayList<NodeItem>().apply {
-                deferredNodeItems.forEach {
-                    try {
-                        add(it.await())
-                    } catch (e: Exception) {
-                        Timber.e(e)
-                    }
-                }
-
-            }
-
-            return@withContext nodesList
+                }.awaitAll()
+                .filterNotNull()
         }
+
+    /**
+     * Create a single [NodeItem] from [MegaNode]
+     *
+     * @param node
+     * @return the corresponding [NodeItem], null if an error occured
+     */
+    private suspend fun createNodeItem(node: MegaNode): NodeItem? =
+        kotlin.runCatching {
+            NodeItem(
+                node = node,
+                thumbnail = getThumbnail(node.handle),
+                index = -1,
+                isVideo = fileTypeInfoMapper(node) is VideoFileTypeInfo,
+                modifiedDate = node.modificationTime.toString(),
+            )
+        }.onFailure {
+            Timber.e(it)
+        }.getOrNull()
 }
