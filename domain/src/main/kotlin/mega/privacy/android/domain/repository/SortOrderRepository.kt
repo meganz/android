@@ -12,4 +12,10 @@ interface SortOrderRepository {
      * @return camera sort order
      */
     suspend fun getCameraSortOrder(): SortOrder
+
+    /**
+     * Get cloud sort order
+     * @return cloud sort order
+     */
+    suspend fun getCloudSortOrder(): SortOrder
 }

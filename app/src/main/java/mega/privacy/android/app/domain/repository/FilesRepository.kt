@@ -2,6 +2,7 @@ package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FolderVersionInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -73,7 +74,7 @@ interface FilesRepository {
      * @param order order for the returned list
      * @return Children nodes of a parent node
      */
-    suspend fun getChildrenNode(parentNode: MegaNode, order: Int? = null): List<MegaNode>
+    suspend fun getChildrenNode(parentNode: MegaNode, order: SortOrder? = null): List<MegaNode>
 
     /**
      * Get the node corresponding to a handle
@@ -146,12 +147,6 @@ interface FilesRepository {
      * @return List of MegaNode corresponding of a public link
      */
     suspend fun getPublicLinks(order: Int?): List<MegaNode>?
-
-    /**
-     * Get cloud sort order
-     * @return cloud sort order
-     */
-    suspend fun getCloudSortOrder(): Int
 
     /**
      * Get others sort order

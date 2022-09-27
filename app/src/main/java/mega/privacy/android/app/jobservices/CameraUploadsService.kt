@@ -94,6 +94,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback
 import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -1177,7 +1178,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     private suspend fun checkExistBySize(parent: MegaNode, size: Long): MegaNode? {
-        val nodeList = getChildrenNode(parent, MegaApiJava.ORDER_ALPHABETICAL_ASC)
+        val nodeList = getChildrenNode(parent, SortOrder.ORDER_ALPHABETICAL_ASC)
         for (node in nodeList) {
             if (node.size == size) {
                 return node

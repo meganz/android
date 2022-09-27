@@ -11,6 +11,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
@@ -18,6 +19,7 @@ import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -30,12 +32,14 @@ import javax.inject.Inject
  *
  * @param repository
  * @param getCloudSortOrder
+ * @param sortOrderIntMapper
  * @param monitorNodeUpdates
  */
 @HiltViewModel
 class AudioViewModel @Inject constructor(
     private val repository: TypedFilesRepository,
     private val getCloudSortOrder: GetCloudSortOrder,
+    private val sortOrderIntMapper: SortOrderIntMapper,
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel(), SearchCallback.Data {
 
@@ -59,7 +63,7 @@ class AudioViewModel @Inject constructor(
     /**
      * Sort order used in the search function
      */
-    private var sortOrder: Int = 1
+    private var sortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC
 
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate || repository.fileNodeItems.value == null) {
@@ -68,7 +72,7 @@ class AudioViewModel @Inject constructor(
                 repository.getFiles(
                     cancelToken!!,
                     MegaApiJava.FILE_TYPE_AUDIO,
-                    sortOrder,
+                    sortOrderIntMapper(sortOrder),
                 )
             }
         } else {
