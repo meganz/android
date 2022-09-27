@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.user.UserId
@@ -28,7 +29,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
         email = "testemail@gmail.com",
         isBusinessAccount = false,
         isMasterBusinessAccount = false,
-        accountTypeIdentifier = 1,
+        accountTypeIdentifier = AccountType.PRO_I,
         accountTypeString = ""
     )
 

@@ -35,6 +35,7 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.presentation.settings.SettingsFragment
 import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueFragment
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.user.UserId
 import org.hamcrest.Matchers
@@ -115,7 +116,7 @@ class SettingsFragmentTest {
             email = "refreshEmail",
             isBusinessAccount = false,
             isMasterBusinessAccount = false,
-            accountTypeIdentifier = Constants.FREE,
+            accountTypeIdentifier = AccountType.FREE,
             accountTypeString = "free",
         )
 
