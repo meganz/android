@@ -16,7 +16,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAlbumBinding
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosTabCallback
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
 import mega.privacy.android.app.main.ManagerActivity
@@ -175,7 +174,6 @@ class AlbumsFragment : Fragment(), PhotosTabCallback {
     }
 
     override fun onBackPressed(): Int {
-        (parentFragment as PhotosFragment).switchToTimeline()
         return 1
     }
 }
