@@ -12,9 +12,12 @@ import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
@@ -25,6 +28,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import nz.mega.sdk.MegaApiJava
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -37,6 +41,7 @@ class MediaViewModel @Inject constructor(
     private val sortOrderIntMapper: SortOrderIntMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle,
+    monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
     companion object {
@@ -250,12 +255,9 @@ class MediaViewModel @Inject constructor(
         return dayCards.size - 1
     }
 
-    private val nodesChangeObserver = Observer<Boolean> {
-        if (it) {
-            loadPhotos(true)
-        } else {
+    private val nodesChangeObserver = Observer<Boolean> { forceUpdate ->
+        if (!forceUpdate)
             refreshUi()
-        }
     }
 
     private val loadFinishedObserver = Observer<List<GalleryItem>> {
@@ -275,6 +277,14 @@ class MediaViewModel @Inject constructor(
         // emitted accidentally between the Fragment's onDestroy and onCreate when rotating screen.
         LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
             .observeForever(nodesChangeObserver)
+
+        viewModelScope.launch {
+            monitorNodeUpdates().collectLatest {
+                Timber.d("Received node update")
+                loadPhotos(true)
+            }
+        }
+
         loadPhotos(true)
     }
 
