@@ -1,7 +1,10 @@
 package mega.privacy.android.app.data.facade
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
+import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.model.UserCredentials
@@ -13,6 +16,7 @@ import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -23,7 +27,8 @@ import javax.inject.Inject
  * @property dbHandler
  */
 class MegaLocalStorageFacade @Inject constructor(
-    val dbHandler: DatabaseHandler,
+    private val dbHandler: DatabaseHandler,
+    @ApplicationContext private val context: Context,
 ) : MegaLocalStorageGateway {
 
     override suspend fun getCamSyncHandle(): Long? =
@@ -275,5 +280,26 @@ class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun setCamSyncEnabled(enable: Boolean) {
         dbHandler.setCamSyncEnabled(enable)
+    }
+
+    override suspend fun backupTimestampsAndFolderHandle(
+        primaryUploadFolderHandle: Long,
+        secondaryUploadFolderHandle: Long,
+    ) {
+        val prefs = dbHandler.preferences
+        if (prefs == null) {
+            Timber.e("Preference is null, while backup.")
+            return
+        }
+        context.getSharedPreferences(SettingsConstants.LAST_CAM_SYNC_TIMESTAMP_FILE,
+            Context.MODE_PRIVATE)
+            .edit()
+            .putString(SettingsConstants.KEY_CAM_SYNC_TIMESTAMP, prefs.camSyncTimeStamp)
+            .putString(SettingsConstants.KEY_CAM_VIDEO_SYNC_TIMESTAMP, prefs.camVideoSyncTimeStamp)
+            .putString(SettingsConstants.KEY_SEC_SYNC_TIMESTAMP, prefs.secSyncTimeStamp)
+            .putString(SettingsConstants.KEY_SEC_VIDEO_SYNC_TIMESTAMP, prefs.secVideoSyncTimeStamp)
+            .putLong(SettingsConstants.KEY_PRIMARY_HANDLE, primaryUploadFolderHandle)
+            .putLong(SettingsConstants.KEY_SECONDARY_HANDLE, secondaryUploadFolderHandle)
+            .apply()
     }
 }

@@ -445,4 +445,16 @@ interface MegaLocalStorageGateway {
      * @param enable
      */
     suspend fun setCamSyncEnabled(enable: Boolean)
+
+    /**
+     * The method is to backup time stamps, primary upload folder and secondary folder in share preference after
+     * database records being cleaned
+     * @param primaryUploadFolderHandle
+     * @param secondaryUploadFolderHandle
+     */
+    suspend fun backupTimestampsAndFolderHandle(
+        primaryUploadFolderHandle: Long,
+        secondaryUploadFolderHandle: Long,
+    )
+
 }

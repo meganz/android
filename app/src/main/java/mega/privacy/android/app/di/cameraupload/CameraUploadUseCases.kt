@@ -41,6 +41,7 @@ import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
@@ -307,6 +308,13 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideSetSecondarySyncHandle(cameraUploadRepository: CameraUploadRepository): SetSecondarySyncHandle =
             SetSecondarySyncHandle(cameraUploadRepository::setSecondarySyncHandle)
+
+        /**
+         * Provide the BackupTimeStampsAndFolderHandle implementation
+         */
+        @Provides
+        fun provideBackupTimeStampsAndFolderHandle(cameraUploadRepository: CameraUploadRepository): BackupTimeStampsAndFolderHandle =
+            BackupTimeStampsAndFolderHandle(cameraUploadRepository::backupTimestampsAndFolderHandle)
     }
 
     /**
