@@ -185,6 +185,15 @@ interface MegaApiGateway {
     suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode?
 
     /**
+     * Get the MegaNode by path
+     *
+     * @param path
+     * @param megaNode Base node if the path is relative
+     * @return megaNode in the path or null
+     */
+    suspend fun getNodeByPath(path: String?, megaNode: MegaNode?): MegaNode?
+
+    /**
      * Get the fingerprint of a file by path
      *
      * @param filePath
@@ -536,11 +545,11 @@ interface MegaApiGateway {
      * Get user avatar
      *
      * @param user
-     * @param dstPath destination path file
+     * @param destinationPath destination path file
      *
      * @return true if success
      */
-    suspend fun getUserAvatar(user: MegaUser, dstPath: String): Boolean
+    suspend fun getUserAvatar(user: MegaUser, destinationPath: String): Boolean
 
     /**
      * Allow to search nodes with the specific options, [order] & [type] & [target]
