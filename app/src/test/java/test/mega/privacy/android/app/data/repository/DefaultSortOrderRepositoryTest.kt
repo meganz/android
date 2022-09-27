@@ -4,15 +4,10 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.data.mapper.MegaExceptionMapper
-import mega.privacy.android.app.data.mapper.MegaShareMapper
 import mega.privacy.android.app.data.mapper.SortOrderMapper
-import mega.privacy.android.app.data.repository.DefaultFilesRepository
+import mega.privacy.android.app.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.domain.entity.SortOrder
-
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -20,27 +15,18 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultFilesRepositoryTest {
-    private lateinit var underTest: DefaultFilesRepository
+class DefaultSortOrderRepositoryTest {
+    private lateinit var underTest: DefaultSortOrderRepository
 
-    private val megaApiGateway = mock<MegaApiGateway>()
-    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
     private val sortOrderMapper = mock<SortOrderMapper>()
-    private val megaShareMapper = mock<MegaShareMapper>()
-    private val megaExceptionMapper = mock<MegaExceptionMapper>()
 
     @Before
     fun setUp() {
-        underTest = DefaultFilesRepository(
-            context = mock(),
-            megaApiGateway = megaApiGateway,
-            megaApiFolderGateway = megaApiFolderGateway,
+        underTest = DefaultSortOrderRepository(
             ioDispatcher = UnconfinedTestDispatcher(),
             megaLocalStorageGateway = megaLocalStorageGateway,
             sortOrderMapper = sortOrderMapper,
-            megaShareMapper = megaShareMapper,
-            megaExceptionMapper = megaExceptionMapper
         )
     }
 

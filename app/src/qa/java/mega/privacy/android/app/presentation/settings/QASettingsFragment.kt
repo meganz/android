@@ -10,8 +10,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.screenshot.navigateToShowkase
+import mega.privacy.android.app.presentation.featureflag.FeatureFlagDialogFragment
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
+import mega.privacy.android.screenshot.navigateToShowkase
 import java.io.File
 
 @AndroidEntryPoint
@@ -22,6 +23,7 @@ class QASettingsFragment : PreferenceFragmentCompat() {
     private val checkForUpdatesPreferenceKey = "settings_qa_check_update"
     private val exportLogsPreferenceKey = "settings_qa_export_logs"
     private val saveLogsPreferenceKey = "settings_qa_save_logs"
+    private val featureFlagsPreferenceKey = "settings_qa_feature_flags"
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_qa, rootKey)
@@ -44,6 +46,11 @@ class QASettingsFragment : PreferenceFragmentCompat() {
             }
             saveLogsPreferenceKey -> {
                 viewModel.exportLogs(::sendSaveLogFileIntent)
+                true
+            }
+            featureFlagsPreferenceKey -> {
+                FeatureFlagDialogFragment.newInstance()
+                    .show(childFragmentManager, featureFlagsPreferenceKey)
                 true
             }
             else -> super.onPreferenceTreeClick(preference)

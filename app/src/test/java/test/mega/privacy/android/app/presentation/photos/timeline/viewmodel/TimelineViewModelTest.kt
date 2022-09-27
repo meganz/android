@@ -64,7 +64,7 @@ class TimelineViewModelTest {
     }
 
     private val jobUtilWrapper =
-        mock<JobUtilWrapper> { on { isOverQuota(any()) }.thenReturn(false) }
+        mock<JobUtilWrapper> { on { isOverQuota() }.thenReturn(false) }
 
     @Before
     fun setUp() {

@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.data.mapper.AccountTypeMapper
 import mega.privacy.android.app.data.mapper.ChatRequestMapper
 import mega.privacy.android.app.data.mapper.ContactDataMapper
 import mega.privacy.android.app.data.mapper.ContactItemMapper
@@ -29,6 +30,7 @@ import mega.privacy.android.app.data.mapper.SortOrderMapper
 import mega.privacy.android.app.data.mapper.StartScreenMapper
 import mega.privacy.android.app.data.mapper.StorageStateMapper
 import mega.privacy.android.app.data.mapper.TransferEventMapper
+import mega.privacy.android.app.data.mapper.UserAccountMapper
 import mega.privacy.android.app.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.mapper.UserLastGreenMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
@@ -37,6 +39,7 @@ import mega.privacy.android.app.data.mapper.getFileTypeInfo
 import mega.privacy.android.app.data.mapper.getMimeType
 import mega.privacy.android.app.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
+import mega.privacy.android.app.data.mapper.toAccountType
 import mega.privacy.android.app.data.mapper.toChatRequest
 import mega.privacy.android.app.data.mapper.toContactData
 import mega.privacy.android.app.data.mapper.toContactItem
@@ -66,6 +69,7 @@ import mega.privacy.android.app.mediaplayer.mapper.toRepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.toRepeatToggleModeMapper
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.presentation.mapper.toFavourite
+import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
 
 /**
@@ -202,4 +206,17 @@ class MapperModule {
      */
     @Provides
     fun provideMegaShareMapper(): MegaShareMapper = ::toShareModel
+
+    /**
+     * Provide account type mapper
+     */
+    @Provides
+    fun provideAccountTypeMapper(): AccountTypeMapper = ::toAccountType
+
+    /**
+     * Provide user account mapper
+     */
+    @Provides
+    fun provideUserAccountMapper(): UserAccountMapper = ::UserAccount
+
 }

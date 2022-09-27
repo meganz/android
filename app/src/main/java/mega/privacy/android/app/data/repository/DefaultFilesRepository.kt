@@ -10,7 +10,6 @@ import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.data.mapper.SortOrderMapper
 import mega.privacy.android.app.data.mapper.MegaExceptionMapper
 import mega.privacy.android.app.data.mapper.MegaShareMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
@@ -21,7 +20,6 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
 import mega.privacy.android.domain.entity.FolderVersionInfo
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
@@ -40,9 +38,11 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @property context
  * @property megaApiGateway
+ * @property megaApiFolderGateway
  * @property ioDispatcher
  * @property megaLocalStorageGateway
- * @property megaLocalStorageGateway
+ * @property megaShareMapper
+ * @property megaExceptionMapper
  */
 class DefaultFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -50,7 +50,6 @@ class DefaultFilesRepository @Inject constructor(
     private val megaApiFolderGateway: MegaApiFolderGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
-    private val sortOrderMapper: SortOrderMapper,
     private val megaShareMapper: MegaShareMapper,
     private val megaExceptionMapper: MegaExceptionMapper,
 ) : FilesRepository, FileRepository {
@@ -170,10 +169,6 @@ class DefaultFilesRepository @Inject constructor(
 
     override suspend fun getCloudSortOrder(): Int = withContext(ioDispatcher) {
         megaLocalStorageGateway.getCloudSortOrder()
-    }
-
-    override suspend fun getCameraSortOrder(): SortOrder = withContext(ioDispatcher) {
-        sortOrderMapper(megaLocalStorageGateway.getCameraSortOrder())
     }
 
     override suspend fun getOthersSortOrder(): Int = withContext(ioDispatcher) {

@@ -13,6 +13,8 @@ import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.app.data.mapper.AccountTypeMapper
+import mega.privacy.android.app.data.mapper.UserAccountMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -52,16 +54,18 @@ class DefaultAccountRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val userUpdateMapper: UserUpdateMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
+    private val userAccountMapper: UserAccountMapper,
+    private val accountTypeMapper: AccountTypeMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
-        UserAccount(
-            userId = user?.let { UserId(it.handle) },
-            email = user?.email ?: "",
-            isBusinessAccount = megaApiGateway.isBusinessAccount,
-            isMasterBusinessAccount = megaApiGateway.isMasterBusinessAccount,
-            accountTypeIdentifier = myAccountInfoFacade.accountTypeId,
-            accountTypeString = myAccountInfoFacade.accountTypeString,
+        userAccountMapper(
+            user?.let { UserId(it.handle) },
+            user?.email ?: "",
+            megaApiGateway.isBusinessAccount,
+            megaApiGateway.isMasterBusinessAccount,
+            accountTypeMapper(myAccountInfoFacade.accountTypeId),
+            myAccountInfoFacade.accountTypeString,
         )
     }
 

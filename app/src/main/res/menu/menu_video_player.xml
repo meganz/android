@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/save_to_device"
+        android:icon="@drawable/ic_download_white"
+        android:orderInCategory="100"
+        android:title="@string/general_save_to_device"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/properties"
+        android:icon="@drawable/info_ic_white"
+        android:orderInCategory="105"
+        android:title="@string/general_file_info"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/chat_import"
+        android:icon="@drawable/ic_import_to_cloud_white"
+        android:orderInCategory="106"
+        android:title="@string/add_to_cloud"
+        android:visible="true"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/share"
+        android:icon="@drawable/ic_social_share_white"
+        android:orderInCategory="110"
+        android:title="@string/general_share"
+        android:visible="true"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/send_to_chat"
+        android:icon="@drawable/ic_send_to_contact"
+        android:orderInCategory="110"
+        android:title="@string/context_send_file_to_chat"
+        app:iconTint="@color/white"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_menu_search"
+        android:orderInCategory="85"
+        android:title="@string/action_search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView"/>
+
+    <item
+        android:id="@+id/get_link"
+        android:icon="@drawable/link_ic_white"
+        android:orderInCategory="115"
+        android:title="@{@plurals/get_links(one)}"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/remove_link"
+        android:icon="@drawable/ic_remove_link"
+        android:orderInCategory="115"
+        android:title="@string/context_remove_link_menu"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/chat_save_for_offline"
+        android:orderInCategory="120"
+        android:icon="@drawable/ic_save_offline"
+        android:title="@string/file_properties_available_offline"
+        android:visible="true"
+        app:iconTint="@color/white"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/remove"
+        android:orderInCategory="145"
+        android:icon="@drawable/ic_remove"
+        android:title="@string/general_remove"
+        android:visible="true"
+        app:iconTint="@color/white"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/rename"
+        android:orderInCategory="120"
+        android:title="@string/context_rename"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/move"
+        android:orderInCategory="125"
+        android:title="@string/context_move"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/copy"
+        android:orderInCategory="130"
+        android:title="@string/context_copy"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/move_to_trash"
+        android:orderInCategory="135"
+        android:title="@string/context_move_to_trash"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/select"
+        android:orderInCategory="140"
+        android:title="@string/general_select"
+        app:showAsAction="never"
+        android:visible="false"/>
+</menu>

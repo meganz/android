@@ -8,4 +8,6 @@
     <string name="settings_qa_export_logs">Send logs</string>
     <string name="settings_qa_logs">Logs</string>
     <string name="settings_qa_save_logs">Open logs</string>
+    <string name="settings_qa_feature_flags_title">Feature flags</string>
+    <string name="settings_qa_feature_flags_summary">Enable or disable features locally</string>
 </resources>
