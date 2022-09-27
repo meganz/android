@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">The subscription has been cancelled</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">We were unable to cancel your subscription. Please contact support&#64;mega.nz for assistance</string>
+    <string name="cancel_subscription_error">We were unable to cancel your subscription. Please contact support&#64;mega.nz for assistance.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Close other sessions</string>
     <!-- Message after kill all opened sessions -->
@@ -209,8 +209,6 @@
     <string name="section_recents">Recents</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Media Uploads</string>
-    <!-- title of the screen that shows the files saved for offline in the device -->
-    <string name="section_saved_for_offline">Saved for Offline</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -317,7 +315,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">View transfers</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Most devices can’t download files greater than 4&#160;GB. Your download will probably fail</string>
+    <string name="error_file_size_greater_than_4gb">Most devices can’t download files greater than 4&#160;GB. Your download will probably fail.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">There isn’t any available app to execute this file on your device</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -976,7 +974,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Mute chat notifications for</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Mute notifications</string>
+    <string name="title_dialog_mute_chatroom_notifications">Mute chat notifications</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">On</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1171,7 +1169,7 @@
     <!-- More button in contact info page -->
     <string name="label_more">More</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">Storage space</string>
+    <string name="storage_space">Storage</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Remove from Offline?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1715,10 +1713,6 @@
     <string name="contacts_mega">On MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Phone contacts</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">Your account has been suspended due to multiple breaches of MEGA’s Terms of Service. Please check your email inbox.</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA’s Terms of Service including, but not limited to, clause 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Loading files</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2673,8 +2667,6 @@
     <string name="text_join_another_call">To join this call you have to end or hold the current call.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">People can join your group by using this link.</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">New chat link</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Enter group name</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -3563,26 +3555,12 @@
     <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Allow the use of mobile data to load high resolution images when previewing. If disabled, the original image will only be loaded when you zoom in.</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">You are changing a default backup folder location. This may affect your ability to find your backup folder in the future. Please remember where it is located so that you can find it in the future.</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Moving this folder changes the destination of one or more configured backups and may have unintended consequences. The backups will be turned off for your safety. Backups can be re-enabled with the MEGA Desktop App. Do you want to proceed?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">Are you sure you want to delete your backup folder and disable the associated backup?</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">Move “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Move “%1s” to Rubbish Bin</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">Move backup folders</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">Move backup folders to Rubbish Bin</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Disable backup</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">Move backup</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">Please type “%1s” to confirm this action</string>
     <!-- when checking the input -->
@@ -3603,11 +3581,6 @@
     <string name="backup_multi_share_permission_text">These folders can only be shared as read-only; as they are backup folders, any changes to their content could disable the backups.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Some folders shared are backup folders and read-only. Do you wish to continue?</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="one">%d device</item>
-        <item quantity="other">%d devices</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Answer call</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3882,8 +3855,6 @@
     <string name="settings_help_report_issue_discard_button">Discard</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">Edit message</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">Gallery</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">Voice</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -3892,8 +3863,6 @@
     <string name="chat_room_toolbar_voice_clip_option">Voice clip</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Invite friends to [/B][A]Chat[/A][B] and enjoy our encrypted platform with privacy and security[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filter</string>
     <!-- Filter option to show all photos -->
@@ -4024,14 +3993,16 @@
     <string name="permissions_notifications_title">Get notified</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA will send you call, chat, and file transfer notifications.</string>
-    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Account suspended due to copyright violations. We sent you an email with more information about this.</string>
-    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Account terminated due to a breach of MEGA’s Terms of Service, such as abuse of others’ rights, sharing and importing illegal data, or system abuse.</string>
     <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
     <string name="home_side_menu_backups_title">Backups</string>
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]No items in [/B][A]backups[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">This is where your backed up files and folders are stored. Your backed up items are “read-only” to protect them from being accidentally modified in your cloud drive.\nYou can back up items from your computer to MEGA using our desktop app.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Account suspended due to copyright violations. We sent you an email with more information about this.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Account terminated due to a breach of MEGA’s Terms of Service, such as abuse of others’ rights, sharing and importing illegal data, or system abuse.</string>
+    <!-- Title of the Meetings tab for the chat section -->
+    <string name="chat_tab_meetings_title">Meetings</string>
 </resources>

@@ -4,16 +4,20 @@
     <androidx.preference.Preference
         android:key="settings_qa_compose_browser"
         android:summary="@string/settings_qa_compose_ui_browser_summary"
-        android:title="@string/settings_qa_compose_ui_browser_title" />
+        android:title="@string/settings_qa_compose_ui_browser_title"
+        app:allowDividerBelow="true" />
 
     <androidx.preference.Preference
-        android:key="settings_qa_check_update"
-        android:title="@string/settings_qa_compose_check_for_updates" />
+        android:key="settings_qa_feature_flags"
+        android:summary="@string/settings_qa_feature_flags_summary"
+        android:title="@string/settings_qa_feature_flags_title"
+        app:allowDividerAbove="true" />
+
     <PreferenceCategory
         android:key="settings_qa_logs"
         android:title="@string/settings_qa_logs"
         app:allowDividerAbove="false"
-        app:allowDividerBelow="false">
+        app:allowDividerBelow="true">
         <androidx.preference.Preference
             android:key="settings_qa_export_logs"
             android:title="@string/settings_qa_export_logs" />
@@ -21,5 +25,10 @@
             android:key="settings_qa_save_logs"
             android:title="@string/settings_qa_save_logs" />
     </PreferenceCategory>
+
+    <androidx.preference.Preference
+        android:key="settings_qa_check_update"
+        android:title="@string/settings_qa_compose_check_for_updates"
+        app:allowDividerAbove="true" />
 
 </PreferenceScreen>

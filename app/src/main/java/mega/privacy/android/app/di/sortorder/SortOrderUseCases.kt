@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.repository.FilesRepository
+import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
@@ -28,8 +29,8 @@ class SortOrderUseCases {
      * Provide the GetCameraSortOrder implementation
      */
     @Provides
-    fun provideGetCameraSortOrder(filesRepository: FilesRepository): GetCameraSortOrder =
-        GetCameraSortOrder(filesRepository::getCameraSortOrder)
+    fun provideGetCameraSortOrder(sortOrderRepository: SortOrderRepository): GetCameraSortOrder =
+        GetCameraSortOrder(sortOrderRepository::getCameraSortOrder)
 
     /**
      * Provide the GetOthersSortOrder implementation

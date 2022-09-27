@@ -467,7 +467,6 @@ object MegaNodeDialogUtil {
                                 }
                                 NO_ERROR -> {
                                     confirmRenameAction(
-                                        context,
                                         node,
                                         typedString,
                                         snackbarShower,
@@ -516,7 +515,6 @@ object MegaNodeDialogUtil {
      * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
      */
     private fun confirmRenameAction(
-        context: Context,
         node: MegaNode,
         typedString: String,
         snackbarShower: SnackbarShower?,
@@ -529,7 +527,6 @@ object MegaNodeDialogUtil {
             typedString,
             RenameListener(
                 snackbarShower,
-                context,
                 showSnackbar = true,
                 isMyChatFilesFolder = false,
                 actionNodeCallback = actionNodeCallback
@@ -579,7 +576,7 @@ object MegaNodeDialogUtil {
             .setMessage(getString(R.string.file_extension_change_warning))
             .setPositiveButton(getString(R.string.general_cancel), null)
             .setNegativeButton(getString(R.string.action_change_anyway)) { _, _ ->
-                confirmRenameAction(context, node, typedString, snackbarShower, actionNodeCallback)
+                confirmRenameAction(node, typedString, snackbarShower, actionNodeCallback)
             }
             .show()
     }

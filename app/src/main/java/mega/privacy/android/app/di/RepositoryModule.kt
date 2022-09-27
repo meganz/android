@@ -25,6 +25,7 @@ import mega.privacy.android.app.data.repository.DefaultPhotosRepository
 import mega.privacy.android.app.data.repository.DefaultPushesRepository
 import mega.privacy.android.app.data.repository.DefaultRecentActionsRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
+import mega.privacy.android.app.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.app.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.app.data.repository.DefaultSupportRepository
 import mega.privacy.android.app.data.repository.DefaultTransfersRepository
@@ -52,6 +53,7 @@ import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
 import javax.inject.Singleton
@@ -155,4 +157,10 @@ abstract class RepositoryModule {
      */
     @Binds
     abstract fun bindRecentActionsRepository(repository: DefaultRecentActionsRepository): RecentActionsRepository
+
+    /**
+     * Bind sort order repository
+     */
+    @Binds
+    abstract fun bindSortOrderRepository(repository: DefaultSortOrderRepository): SortOrderRepository
 }

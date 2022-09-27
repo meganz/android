@@ -26,8 +26,8 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
 import mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE
-import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
@@ -67,7 +67,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val answerCallUseCase: AnswerCallUseCase,
     getLocalAudioChangesUseCase: GetLocalAudioChangesUseCase,
     private val getCallUseCase: GetCallUseCase,
-    private val rtcAudioManagerGateway: RTCAudioManagerGateway
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
@@ -319,23 +319,17 @@ class MeetingActivityViewModel @Inject constructor(
             meetingActivityRepository.loadAvatar()?.also {
                 when {
                     it.first -> _avatarLiveData.value = it.second
-                    retry -> meetingActivityRepository.createAvatar(object :
-                        BaseListener(MegaApplication.getInstance()) {
-                        override fun onRequestFinish(
-                            api: MegaApiJava,
-                            request: MegaRequest,
-                            e: MegaError,
-                        ) {
+                    retry -> meetingActivityRepository.createAvatar(
+                        OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
                             if (request.type == MegaRequest.TYPE_GET_ATTR_USER
                                 && request.paramType == MegaApiJava.USER_ATTR_AVATAR
-                                && e.errorCode == MegaError.API_OK
+                                && error.errorCode == MegaError.API_OK
                             ) {
                                 loadAvatar()
                             } else {
                                 showDefaultAvatar()
                             }
-                        }
-                    })
+                        }))
                     else -> {
                         showDefaultAvatar()
                     }

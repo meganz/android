@@ -55,7 +55,9 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
+import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -74,7 +76,7 @@ public class OfflineUtils {
     private static final String DB_FOLDER = "1";
 
     public static void saveOffline(File destination, MegaNode node, Activity activity) {
-        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (StorageStateExtensionsKt.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }

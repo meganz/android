@@ -47,6 +47,11 @@ class MegaApiFacade @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) : MegaApiGateway {
+
+    override fun getInvalidHandle(): Long {
+        return MegaApiAndroid.INVALID_HANDLE
+    }
+
     override fun multiFactorAuthAvailable(): Boolean {
         return megaApi.multiFactorAuthAvailable()
     }
@@ -188,6 +193,9 @@ class MegaApiFacade @Inject constructor(
 
     override suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode? =
         megaApi.getNodeByHandle(nodeHandle)
+
+    override suspend fun getNodeByPath(path: String?, megaNode: MegaNode?): MegaNode? =
+        megaApi.getNodeByPath(path, megaNode)
 
     override suspend fun getFingerprint(filePath: String): String? =
         megaApi.getFingerprint(filePath)
@@ -336,7 +344,7 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getUserAvatarColor(megaUser: MegaUser): String =
         megaApi.getUserAvatarColor(megaUser)
 
-    override suspend fun getUserAvatar(user: MegaUser, dstPath: String): Boolean {
+    override suspend fun getUserAvatar(user: MegaUser, destinationPath: String): Boolean {
         return suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, e ->
@@ -345,8 +353,9 @@ class MegaApiFacade @Inject constructor(
                 onRequestTemporaryError = { _, e -> continuation.resume(e.errorCode == MegaError.API_OK) })
 
             continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
-            megaApi.getUserAvatar(user,
-                dstPath,
+            megaApi.getUserAvatar(
+                user,
+                destinationPath,
                 listener
             )
         }
@@ -394,6 +403,8 @@ class MegaApiFacade @Inject constructor(
         transfer: MegaTransfer,
         listener: MegaRequestListenerInterface,
     ) = megaApi.moveTransferToFirst(transfer, listener)
+
+    override suspend fun isBusinessAccountActive(): Boolean = megaApi.isBusinessAccountActive
 
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10

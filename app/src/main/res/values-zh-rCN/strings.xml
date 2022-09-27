@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">订阅已取消</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">无法取消您的订阅。请联系支持support&#64;mega.nz获取帮助</string>
+    <string name="cancel_subscription_error">无法取消您的订阅。请联系支持support&#64;mega.nz获取帮助。</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">关闭其他会话</string>
     <!-- Message after kill all opened sessions -->
@@ -206,8 +206,6 @@
     <string name="section_recents">近期</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">媒体上传</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">收件箱</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">离线</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -309,7 +307,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">查看传输</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">大多数设备无法下载大于4&#160;GB的文件。因此您的下载可能会失败</string>
+    <string name="error_file_size_greater_than_4gb">大多数设备无法下载大于4&#160;GB的文件。因此您的下载可能会失败。</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">您的设备上没有可用的应用程序执行此文件</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -371,7 +369,7 @@
     <!-- menu item -->
     <string name="context_share_folder">共享文件夹</string>
     <!-- menu item -->
-    <string name="context_send_file">发送文件至聊天</string>
+    <string name="context_send_file">发送文件到聊天</string>
     <!-- menu item -->
     <string name="context_send_contact">分享联系人至聊天</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
@@ -960,7 +958,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">静音聊天通知</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">静音通知</string>
+    <string name="title_dialog_mute_chatroom_notifications">静音聊天通知</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">开启</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1141,7 +1139,7 @@
     <string name="no_conversation_history">无聊天记录</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="other">%1$s [A]正在输入&#8230;[/A]</item>
+        <item quantity="other">%1$s[A]正在输入...[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]和其他人正在输入&#8230;[/A]</string>
@@ -1351,7 +1349,7 @@
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">删除帐户</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
-    <string name="delete_account_text">如果您删除您的帐户，则您将无法访问您的帐户数据、MEGA联系人或聊天对话。\n您将无法撤消此操作。</string>
+    <string name="delete_account_text">如果您删除您的帐户，您将无法访问您的帐户数据、MEGA联系人或聊天对话。\n您将无法撤消此操作。</string>
     <!-- menu item -->
     <string name="delete_button">删除</string>
     <!--  -->
@@ -1620,8 +1618,6 @@
     <string name="context_share">分享使用</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]回收站[/A][B]为空[/B]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[A]您的收件箱[/A][B]无文件[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[A]您的云盘[/A][B]无文件[/B]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1680,10 +1676,6 @@
     <string name="contacts_mega">在MEGA上</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">手机通讯录</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">由于多次违反MEGA的服务条款，您的帐户已被停用。请检查您的电子邮件收件箱。</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">您的帐户因违反《MEGA服务条款》而被终止，包括但不限于第15条。</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">正在加载文件</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1840,7 +1832,7 @@
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit -->
     <string name="login_API_rate">请求过多。请稍候。</string>
     <!-- Message when previous login is being cancelled -->
-    <string name="login_in_progress">正在取消登录。请稍候&#8230;</string>
+    <string name="login_in_progress">正在取消登录过程。请稍候&#8230;</string>
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">发生错误。文件已损坏或不存在。</string>
     <!-- Menu option to print the recovery key from Offline section -->
@@ -2112,7 +2104,7 @@
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="video_button">视频</string>
     <!-- Title of file explorer to send a link -->
-    <string name="title_file_explorer_send_link">发送链接给&#8230;</string>
+    <string name="title_file_explorer_send_link">发送链接到&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">发送到&#8230;</string>
     <!-- More button in contact info page -->
@@ -2450,7 +2442,7 @@
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">发生错误，无法使用该应用程序打开此文件。</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
-    <string name="outgoing_call_starting">正在通话中&#8230;</string>
+    <string name="outgoing_call_starting">正在通话&#8230;</string>
     <!-- Content of a invalid meta message -->
     <string name="error_meta_message_invalid">消息包含无效元数据</string>
     <!-- Title of the activity that sends a location -->
@@ -2607,8 +2599,6 @@
     <string name="text_join_another_call">您必须先结束或保留当前通话才能加入此通话。</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">参与者可通过此链接加入您的群组。</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">新建聊天链接</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">请输入群组名称</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -2616,7 +2606,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">邀请联系人并在MEGA上开始加密聊天。</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">你好。和我一起在MEGA上加密聊天，并获得20&#160;GB免费存储空间。%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">你好。和我一起在MEGA上加密聊天，并获得20GB免费存储空间。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">无聊天链接可用。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2632,7 +2622,7 @@
     <!-- Title of popup when user click ‘Share’ button on invite contact page -->
     <string name="invite_contact_chooser_title">邀请好友通过</string>
     <!-- Action button label -->
-    <string name="invite_contact_action_button">邀请朋友通过&#8230;</string>
+    <string name="invite_contact_action_button">邀请朋友&#8230;</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
         <item quantity="other">已下载%d个文件。</item>
@@ -3224,7 +3214,7 @@
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">添加您的手机号</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
-    <string name="backup_recovery_key_subtitle">您是否记得您的密码？\n若忘记密码，MEGA则无法为您重置。</string>
+    <string name="backup_recovery_key_subtitle">您是否记得您的密码？\n如果忘记密码，MEGA则无法为您重置。</string>
     <!-- Action to change name -->
     <string name="change_name_action">更改名字</string>
     <!-- Action to add photo -->
@@ -3372,7 +3362,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">加入全球最大的安全云存储和协作平台。</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">获得20&#160;GB免费存储空间</string>
+    <string name="left_meeting_bonus_title">获得20GB免费存储空间</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">立即注册并免费享受全球领先的协作平台。</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -3467,26 +3457,12 @@
     <string name="settings_mobile_data_resoluton_title">使用移动数据预览高分辨率图像</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">允许在预览时使用移动数据加载高分辨率图片。若关闭此选项，则只有在放大时才会加载原始图片。</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">您正在更改默认备份文件夹位置。这可能会影响您将来查找备份文件夹。请牢记此位置以便日后可以找到它。</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">移动此文件夹会更改一个或多个已配置备份的目标位置，并可能导致异常情况。为了安全起见，备份将停止。您可以通过MEGA桌面应用程序重新开启备份。您确定要继续吗？</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">备份文件夹将会被删除。此操作将移除您设置的所有备份。您确定要继续吗？</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">您确定要删除备份文件夹并停用已关联的备份吗？</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">移动“%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">将“%1s”移至回收站</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">移动备份文件夹</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">将备份文件夹移至回收站</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">停用备份</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">移动备份</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">请输入“%1s”确认此操作</string>
     <!-- when checking the input -->
@@ -3507,10 +3483,6 @@
     <string name="backup_multi_share_permission_text">由于这些是备份文件夹，只能以只读方式共享，对其内容的任何更改都可能会禁用备份。</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">某些共享文件夹是备份文件夹和只读文件夹。您确定要继续吗？</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="other">%d个设备</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">接听电话</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3783,8 +3755,6 @@
     <string name="settings_help_report_issue_discard_button">放弃</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">编辑消息</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">图库</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">语音</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -3793,8 +3763,6 @@
     <string name="chat_room_toolbar_voice_clip_option">语音剪辑</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF图片</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]邀请好友加入[/B][A]聊天[/A][B]并享受我们私密和安全的加密服务[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">过滤</string>
     <!-- Filter option to show all photos -->
@@ -3921,4 +3889,14 @@
     <string name="permissions_notifications_title">开启通知</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA将向您发送通话、聊天和文件传输通知。</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">备份</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[A]备份[/A]中[B]无项目[/B]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">这是存储您备份的文件和文件夹的地方。您备份的项目是“只读”以保护它们不会在您的云驱动器中被意外修改。您可以使用我们的桌面应用程序将计算机中的项目备份到MEGA。</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">帐户因侵犯版权而被暂停。我们已向您发送了一封电子邮件，其中包含有关此内容的更多信息。</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">帐户因违反MEGA服务条款而被终止，例如滥用他人权利、共享和导入非法数据，或系统滥用行为。</string>
 </resources>

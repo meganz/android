@@ -4,6 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.repository.FilesRepository
@@ -11,6 +12,8 @@ import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeFromCloud
+import mega.privacy.android.app.domain.usecase.DefaultGetPrimarySyncHandle
+import mega.privacy.android.app.domain.usecase.DefaultGetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
@@ -26,19 +29,26 @@ import mega.privacy.android.app.domain.usecase.GetNodeByFingerprintAndParentNode
 import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
+import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
+import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
+import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
+import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
+import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
 import mega.privacy.android.domain.usecase.DefaultGetSyncRecordByPath
+import mega.privacy.android.domain.usecase.DefaultGetUploadFolderHandle
 import mega.privacy.android.domain.usecase.DefaultIsChargingRequired
 import mega.privacy.android.domain.usecase.DefaultShouldCompressVideo
 import mega.privacy.android.domain.usecase.DefaultUpdateCameraUploadTimeStamp
@@ -51,6 +61,7 @@ import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetRemoveGps
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
+import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.GetVideoQuality
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.HasCredentials
@@ -72,7 +83,7 @@ import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
  * Provides the use case implementation for camera upload
  */
 @Module(includes = [GetNodeModule::class])
-@InstallIn(SingletonComponent::class)
+@InstallIn(SingletonComponent::class, ViewModelComponent::class)
 abstract class CameraUploadUseCases {
 
     companion object {
@@ -124,9 +135,11 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideMediaLocalPathExists(cameraUploadRepository: CameraUploadRepository): MediaLocalPathExists =
             MediaLocalPathExists { filePath, isSecondary ->
-                cameraUploadRepository.doesLocalPathExist(filePath,
+                cameraUploadRepository.doesLocalPathExist(
+                    filePath,
                     isSecondary,
-                    SyncRecordType.TYPE_ANY.value)
+                    SyncRecordType.TYPE_ANY.value
+                )
             }
 
         /**
@@ -184,9 +197,11 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideFileNameExists(cameraUploadRepository: CameraUploadRepository): FileNameExists =
             FileNameExists { fileName, isSecondary ->
-                cameraUploadRepository.doesFileNameExist(fileName,
+                cameraUploadRepository.doesFileNameExist(
+                    fileName,
                     isSecondary,
-                    SyncRecordType.TYPE_ANY.value)
+                    SyncRecordType.TYPE_ANY.value
+                )
             }
 
         /**
@@ -216,9 +231,11 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideSetSyncRecordPendingByPath(cameraUploadRepository: CameraUploadRepository): SetSyncRecordPendingByPath =
             SetSyncRecordPendingByPath { localPath, isSecondary ->
-                cameraUploadRepository.updateSyncRecordStatusByLocalPath(SyncStatus.STATUS_PENDING.value,
+                cameraUploadRepository.updateSyncRecordStatusByLocalPath(
+                    SyncStatus.STATUS_PENDING.value,
                     localPath,
-                    isSecondary)
+                    isSecondary
+                )
             }
 
         /**
@@ -276,13 +293,45 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideGetChildMegaNode(filesRepository: FilesRepository): GetChildMegaNode =
             GetChildMegaNode(filesRepository::getChildNode)
+
+        /**
+         * Provide the SetPrimarySyncHandle implementation
+         */
+        @Provides
+        fun provideSetPrimarySyncHandle(cameraUploadRepository: CameraUploadRepository): SetPrimarySyncHandle =
+            SetPrimarySyncHandle(cameraUploadRepository::setPrimarySyncHandle)
+
+        /**
+         * Provide the SetSecondarySyncHandle implementation
+         */
+        @Provides
+        fun provideSetSecondarySyncHandle(cameraUploadRepository: CameraUploadRepository): SetSecondarySyncHandle =
+            SetSecondarySyncHandle(cameraUploadRepository::setSecondarySyncHandle)
     }
+
+    /**
+     * Provides the [CheckEnableCameraUploadsStatus] implementation
+     */
+    @Binds
+    abstract fun bindCheckEnableCameraUploadsStatus(useCase: DefaultCheckEnableCameraUploadsStatus): CheckEnableCameraUploadsStatus
 
     /**
      * Provide the GetNodeFromCloud implementation
      */
     @Binds
     abstract fun bindGetNodeFromCloud(getNodeFromCloud: DefaultGetNodeFromCloud): GetNodeFromCloud
+
+    /**
+     * Provide the GetPrimarySyncHandle implementation
+     */
+    @Binds
+    abstract fun bindGetPrimarySyncHandle(getPrimarySyncHandle: DefaultGetPrimarySyncHandle): GetPrimarySyncHandle
+
+    /**
+     * Provide the GetSecondarySyncHandle implementation
+     */
+    @Binds
+    abstract fun bindGetSecondarySyncHandle(getSecondarySyncHandle: DefaultGetSecondarySyncHandle): GetSecondarySyncHandle
 
     /**
      * Provide the UpdateTimeStamp implementation
@@ -367,4 +416,10 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindSaveSyncRecordsToDB(saveSyncRecordsToDB: DefaultSaveSyncRecordsToDB): SaveSyncRecordsToDB
+
+    /**
+     * Provide the GetUploadFolderHandle implementation
+     */
+    @Binds
+    abstract fun bindGetUploadFolderHandle(getUploadFolderHandle: DefaultGetUploadFolderHandle): GetUploadFolderHandle
 }
