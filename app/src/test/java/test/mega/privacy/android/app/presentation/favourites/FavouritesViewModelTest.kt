@@ -8,12 +8,14 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.presentation.favourites.FavouritesViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolder
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import nz.mega.sdk.MegaNode
@@ -37,6 +39,7 @@ class FavouritesViewModelTest {
 
     private val fetchNodeWrapper =
         mock<FetchNodeWrapper> { onBlocking { invoke(any()) }.thenReturn(megaNode) }
+    private val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     @Before
     fun setUp() {
@@ -50,7 +53,8 @@ class FavouritesViewModelTest {
             getCloudSortOrder = getCloudSortOrder,
             removeFavourites = mock(),
             favouriteMapper = favouriteMapper,
-            fetchNode = fetchNodeWrapper
+            fetchNode = fetchNodeWrapper,
+            sortOrderIntMapper = sortOrderIntMapper,
         )
     }
 
@@ -63,7 +67,7 @@ class FavouritesViewModelTest {
 
     @Test
     fun `test that start with loading state and there is no favourite item`() = runTest {
-        whenever(getCloudSortOrder()).thenReturn(1)
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getAllFavorites()).thenReturn(
             flowOf(emptyList())
         )
@@ -99,7 +103,7 @@ class FavouritesViewModelTest {
             isTakenDown = false,
         )
         val list = listOf(favourite)
-        whenever(getCloudSortOrder()).thenReturn(1)
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getAllFavorites()).thenReturn(
             flowOf(list)
         )
