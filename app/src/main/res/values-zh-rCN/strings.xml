@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">订阅已取消</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">无法取消您的订阅。请联系支持support&#64;mega.nz获取帮助</string>
+    <string name="cancel_subscription_error">无法取消您的订阅。请联系支持support&#64;mega.nz获取帮助。</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">关闭其他会话</string>
     <!-- Message after kill all opened sessions -->
@@ -307,7 +307,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">查看传输</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">大多数设备无法下载大于4GB的文件。因此您的下载可能会失败</string>
+    <string name="error_file_size_greater_than_4gb">大多数设备无法下载大于4&#160;GB的文件。因此您的下载可能会失败。</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">您的设备上没有可用的应用程序执行此文件</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -2606,7 +2606,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">邀请联系人并在MEGA上开始加密聊天。</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">你好。和我一起在MEGA上加密聊天，并获得20&#160;GB免费存储空间。%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">你好。和我一起在MEGA上加密聊天，并获得20GB免费存储空间。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">无聊天链接可用。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2622,7 +2622,7 @@
     <!-- Title of popup when user click ‘Share’ button on invite contact page -->
     <string name="invite_contact_chooser_title">邀请好友通过</string>
     <!-- Action button label -->
-    <string name="invite_contact_action_button">邀请朋友通过&#8230;</string>
+    <string name="invite_contact_action_button">邀请朋友&#8230;</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
         <item quantity="other">已下载%d个文件。</item>

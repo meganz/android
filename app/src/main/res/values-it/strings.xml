@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">La sottoscrizione è stata annullata</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Non ci è stato possibile annullare il tuo abbonamento. Per favore, contatta support&#64;mega.nz per assistenza</string>
+    <string name="cancel_subscription_error">Non ci è stato possibile annullare il tuo abbonamento. Per favore, contatta support&#64;mega.nz per assistenza.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Chiudi le altre sessioni</string>
     <!-- Message after kill all opened sessions -->
@@ -323,7 +323,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Vedi trasferimenti</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">La maggior parte dei dispositivi non possono scaricare file più grandi di 4&#160;GB. Il tuo download probabilmente fallirà</string>
+    <string name="error_file_size_greater_than_4gb">La maggior parte dei dispositivi non possono scaricare file più grandi di 4&#160;GB. Il tuo download probabilmente fallirà.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Non c’è nessuna applicazione disponibile per eseguire il file sul tuo dispositivo</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1183,8 +1183,9 @@
     <string name="no_conversation_history">Nessuna conversazione</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="one">%1$s [A]is typing&#8230;[/A]</item>
-        <item quantity="other">%1$s [A]are typing&#8230;[/A]</item>
+        <item quantity="one">%1$s [A]sta scrivendo&#8230;[/A]</item>
+        <item quantity="many">%1$s [A]stanno scrivendo&#8230;[/A]</item>
+        <item quantity="other">%1$s [A]stanno scrivendo&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]ed altri stanno scrivendo&#8230;[/A]</string>
@@ -2444,8 +2445,9 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="one">%1$d cartella&#160;·&#160;</item>
+        <item quantity="many">%1$d di cartelle&#160;·&#160;</item>
+        <item quantity="other">%1$d cartelle&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A] [B]ha aggiunto %2$s e %3$s[/B]</string>
@@ -2795,8 +2797,9 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="one">%1$d&#160;immagine&#160;</item>
+        <item quantity="many">%1$d de immagini&#160;</item>
+        <item quantity="other">%1$d&#160;immagini&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]creato da[/A] %s</string>
