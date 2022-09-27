@@ -196,7 +196,7 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                     if (!api.isInRubbish(it)) {
                         val name = context.getString(R.string.my_chat_files_folder)
                         if (it.name != name) {
-                            api.renameNode(it, name, RenameListener(context, true))
+                            api.renameNode(it, name, RenameListener(true))
                         }
                         api.setMyChatFilesFolder(it.handle, SetAttrUserListener(context))
                     }
