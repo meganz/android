@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">La suscripción ha sido cancelada</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">La suscripción no se ha cancelado correctamente. Ponte en contacto con support&#64;mega.nz para obtener ayuda</string>
+    <string name="cancel_subscription_error">La suscripción no se ha cancelado correctamente. Ponte en contacto con support&#64;mega.nz para obtener ayuda.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Cerrar el resto de sesiones</string>
     <!-- Message after kill all opened sessions -->
@@ -323,7 +323,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Ver transferencias</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">La mayoría de los dispositivos no pueden descargar archivos de más de 4&#160;GB. Es probable que la descarga falle</string>
+    <string name="error_file_size_greater_than_4gb">La mayoría de los dispositivos no pueden descargar archivos de más de 4&#160;GB. Es probable que la descarga falle.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">No dispones de una aplicación en tu dispositivo para reproducir este archivo</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1183,8 +1183,9 @@
     <string name="no_conversation_history">No hay historial</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="one">%1$s [A]is typing&#8230;[/A]</item>
-        <item quantity="other">%1$s [A]are typing&#8230;[/A]</item>
+        <item quantity="one">%1$s [A]está escribiendo&#8230;[/A]</item>
+        <item quantity="many">%1$s [A]están escribiendo&#8230;[/A]</item>
+        <item quantity="other">%1$s [A]están escribiendo&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]y otros están escribiendo&#8230;[/A]</string>
@@ -1416,7 +1417,7 @@
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Eliminar cuenta</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
-    <string name="delete_account_text">Si eliminas tu cuenta, no podrás volver a acceder a tus datos, a tus contactos o conversaciones en MEGA.\nEstá acción no se podrá deshacer.</string>
+    <string name="delete_account_text">Si eliminas tu cuenta, no podrás volver a acceder a tus datos, a tus contactos o a tus conversaciones en MEGA.\nEstá acción no se podrá deshacer.</string>
     <!-- menu item -->
     <string name="delete_button">Eliminar</string>
     <!--  -->
@@ -2444,8 +2445,9 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="one">%1$d carpeta&#160;·&#160;</item>
+        <item quantity="many">%1$d de carpetas&#160;·&#160;</item>
+        <item quantity="other">%1$d carpetas&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] ha añadido %2$s y %3$s[/B]</string>
@@ -2795,8 +2797,9 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="one">%1$d&#160;imagen&#160;</item>
+        <item quantity="many">%1$d de imágenes&#160;</item>
+        <item quantity="other">%1$d&#160;imágenes&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]creado por [/A]%s</string>
@@ -4099,7 +4102,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]No hay [/B][A]copias de seguridad[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">Aquí es donde se almacenan las copias de seguridad de tus archivos y carpetas. Estas copias de seguridad son de “solo lectura” para protegerlas de modificaciones accidentales en tu nube.Puedes crear copias de seguridad en MEGA desde tu ordenador usando nuestra aplicación de escritorio.</string>
+    <string name="backups_empty_state_body">Aquí es donde se almacenan las copias de seguridad de tus archivos y carpetas. Estas copias de seguridad son de “solo lectura” para protegerlas de modificaciones accidentales en tu nube.\nPuedes crear copias de seguridad en MEGA desde tu ordenador usando nuestra aplicación de escritorio.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Cuenta suspendida por violar los derechos de autor. Te hemos enviado un correo electrónico con más información al respecto.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
