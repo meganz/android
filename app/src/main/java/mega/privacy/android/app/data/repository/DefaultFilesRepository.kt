@@ -156,7 +156,7 @@ class DefaultFilesRepository @Inject constructor(
 
     override suspend fun checkNodeInRubbish(handle: Long) = withContext(ioDispatcher) {
         val node = megaApiGateway.getMegaNodeByHandle(handle)
-        return@withContext node != null && megaApiGateway.isInRubbish(node)
+        return@withContext (node != null && megaApiGateway.isInRubbish(node))
     }
 
     override suspend fun authorizeNode(handle: Long): MegaNode? = withContext(ioDispatcher) {
