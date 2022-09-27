@@ -3,6 +3,7 @@ package mega.privacy.android.app.domain.usecase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.app.fragments.homepage.NodeItem
@@ -34,6 +35,7 @@ class DefaultGetRecentActionNodes @Inject constructor(
             List(nodes.size()) { nodes[it] }
                 .map { node ->
                     async {
+                        ensureActive()
                         createNodeItem(node)
                     }
                 }.awaitAll()
@@ -47,7 +49,7 @@ class DefaultGetRecentActionNodes @Inject constructor(
      * @return the corresponding [NodeItem], null if an error occured
      */
     private suspend fun createNodeItem(node: MegaNode): NodeItem? =
-        kotlin.runCatching {
+        runCatching {
             NodeItem(
                 node = node,
                 thumbnail = getThumbnail(node.handle),
