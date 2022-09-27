@@ -836,7 +836,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">Parken</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">Dies ist der letzte Schritt: Bitte geben Sie nun das Passwort des neuen Accounts ein. Ihre alten Daten werden mindestens 60 Tage lang aufbewahrt. Sollten Sie sich wieder an Ihr Passwort erinnern, so hilft Ihnen support&#64;mega.nz gerne weiter.</string>
+    <string name="park_account_text_last_step">Dies ist der letzte Schritt zum Parken Ihres Accounts. Bitte geben Sie nun Ihr neues Passwort ein. Ihre Daten werden mindestens 60 Tage lang aufbewahrt. Sollten Sie sich wieder an das Passwort Ihres geparkten Accounts erinnern, so hilft Ihnen support&#64;mega.nz gerne weiter.</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">Neues Passwort</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -903,7 +903,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Ungültige E-Mail und/oder Passwort. Bitte versuchen Sie es noch einmal.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Ihr Account wurde wegen Verletzung unserer Benutzungsbedingungen gesperrt. Bitte setzen Sie sich mit support&#64;mega.nz in Verbindung.</string>
+    <string name="error_account_suspended">Ihr Account wurde wegen Verletzung unserer Nutzungsbedingungen gesperrt. Bitte setzen Sie sich mit support&#64;mega.nz in Verbindung.</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Zuviele Login-Fehlversuche. Bitte warten Sie eine Stunde.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -1161,8 +1161,8 @@
     <string name="no_conversation_history">Keine Nachrichten vorhanden</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="one">%1$s [A]is typing&#8230;[/A]</item>
-        <item quantity="other">%1$s [A]are typing&#8230;[/A]</item>
+        <item quantity="one">%1$s [A]tippt&#8230;[/A]</item>
+        <item quantity="other">%1$s [A]tippen&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]und weitere tippen&#8230;[/A]</string>
@@ -1828,7 +1828,7 @@
     <!-- Title of the dialog ‘Do you remember your password?’ -->
     <string name="remember_pwd_dialog_title">Können Sie sich noch an Ihr Passwort erinnern?</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
-    <string name="remember_pwd_dialog_text_logout">Sie loggen sich aus. Bitte prüfen Sie, ob Sie sich noch an Ihr Passwort erinnern können.\nPasswortverlust bedeutet Datenverlust.</string>
+    <string name="remember_pwd_dialog_text_logout">Sie sind dabei, sich abzumelden. Bitte testen Sie Ihr Passwort, um sicherzustellen, dass Sie es sich korrekt gemerkt haben.\nSollten Sie Ihr Passwort verlieren, verlieren Sie den Zugriff auf die Daten in Ihrem MEGA-Account.</string>
     <!-- Text of the dialog ‘Do you remember your password?’ -->
     <string name="remember_pwd_dialog_text">Bitte testen Sie Ihr Passwort. Passwortverlust bedeutet Datenverlust.</string>
     <!-- Dialog option that permits user do not show it again -->
@@ -2097,7 +2097,7 @@
     <!-- Title of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_title">Dateiversionierung</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
-    <string name="settings_enable_file_versioning_subtitle">Dateiversionierung für den gesamten Account ein- und ausschalten.\nVersionierung in Ordnerfreigaben durch Ihre Kontakte ist davon nicht betroffen.</string>
+    <string name="settings_enable_file_versioning_subtitle">Dateiversionierung für den gesamten Account ein- und ausschalten.\nDas Ausschalten der Dateiversionierung hindert Ihre Kontakte nicht daran, in Ordnerfreigaben neue Versionen zu erstellen.</string>
     <!-- Hint shown to guide user on activity add contacts -->
     <string name="type_mail">Namen oder E-Mail-Adresse eingeben</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
@@ -2392,8 +2392,8 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="one">%1$d Ordner&#160;·&#160;</item>
+        <item quantity="other">%1$d Ordner&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] hat %2$s und %3$s hinzugefügt[/B]</string>
@@ -2674,7 +2674,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Laden Sie Kontakte ein und kommunizieren Sie sicher mit MEGAs Ende-zu-Ende-Verschlüsselung.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hallo! Nutze MEGA für die sichere Kommunikation mit mir und erhalte 20 &#160;GB kostenlosen Cloudspeicher. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hallo! Nutze MEGA für die sichere Kommunikation mit mir und erhalte 20&#160;GB kostenlosen Cloudspeicher. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Kein Chatlink verfügbar.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2725,8 +2725,8 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="one">%1$d Bild&#160;</item>
+        <item quantity="other">%1$d Bilder&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]erstellt von [/A]%s</string>
@@ -3598,21 +3598,21 @@
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
     <string name="successful_upgrade">Vielen Dank, dass Sie %1$s abonniert haben</string>
     <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite monatlich</string>
+    <string name="pro_lite_monthly">Pro&#160;Lite (monatliche Abrechnung)</string>
     <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite jährlich</string>
+    <string name="pro_lite_yearly">Pro&#160;Lite (jährliche Abrechnung)</string>
     <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I monatlich</string>
+    <string name="pro_i_monthly">Pro&#160;I (monatliche Abrechnung)</string>
     <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I jährlich</string>
+    <string name="pro_i_yearly">Pro&#160;I (jährliche Abrechnung)</string>
     <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II monatlich</string>
+    <string name="pro_ii_monthly">Pro&#160;II (monatliche Abrechnung)</string>
     <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II jährlich</string>
+    <string name="pro_ii_yearly">Pro&#160;II (jährliche Abrechnung)</string>
     <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III monatlich</string>
+    <string name="pro_iii_monthly">Pro&#160;III (monatliche Abrechnung)</string>
     <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III jährlich</string>
+    <string name="pro_iii_yearly">Pro&#160;III (jährliche Abrechnung)</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Gastgeberstatus entziehen</string>
     <!-- Title message of existing subscription dialog -->

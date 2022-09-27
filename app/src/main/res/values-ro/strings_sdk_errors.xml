@@ -9,7 +9,7 @@
     <!-- Label to show that a request error occurs during a SDK operation. -->
     <string name="api_eagain">Cerere eșuată, se reîncearcă</string>
     <!-- Label to show that the rate limit has been reached during a SDK operation. -->
-    <string name="api_eratelimit">Limita de rată depășită</string>
+    <string name="api_eratelimit">Limita ratei depășită</string>
     <!-- Label to show that a SDK operation has failed permanently. -->
     <string name="api_efailed">Eșec definitiv</string>
     <!-- Error shown when terms of service are breached during download. -->
@@ -29,13 +29,13 @@
     <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
     <string name="api_eexist">Există deja</string>
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
-    <string name="api_eincomplete">Incomplet</string>
+    <string name="api_eincomplete">Incompletă</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">Cheie nevalidă/eroare de decriptare</string>
+    <string name="api_ekey">Cheie nevalidă sau eroare la decriptare</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">ID-ul sesiunii greșit</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="api_eblocked_ec_import_ec_download">Not accessible as it violated our Terms of Service</string>
+    <string name="api_eblocked_ec_import_ec_download">Indisponibil deoarece a încălcat Termenii de utilizare a serviciului</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Blocat</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
@@ -43,7 +43,7 @@
     <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
     <string name="api_etempunavail">Temporar indisponibil</string>
     <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
-    <string name="api_etoomanyconnections">Conexiune excedentă</string>
+    <string name="api_etoomanyconnections">Depășirea numărului de conexiuni</string>
     <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
     <string name="api_ewrite">Eroare la scriere</string>
     <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
@@ -65,7 +65,7 @@
     <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->
     <string name="payment_ebilling">Facturare eșuată</string>
     <!-- Label to show that an error of Rejected by fraud protection occurs during a SDK operation. -->
-    <string name="payment_efraud">Respins(ă) de protecția împotriva fraudelor</string>
+    <string name="payment_efraud">Respinsă de protecția împotriva fraudelor</string>
     <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
     <string name="payment_etoomay">Prea multe cereri</string>
     <!-- Label to show that an error of Balance occurs during a SDK operation. -->
@@ -75,5 +75,5 @@
     <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
     <string name="api_error_http">Eroare HTTP</string>
     <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->
-    <string name="api_ecircular_ec_upload">Transferul a eșuat din cauza unei structuri recursive a directoarelor</string>
+    <string name="api_ecircular_ec_upload">Transferul a eșuat din cauza unei structuri recursive a directorului</string>
 </resources>
