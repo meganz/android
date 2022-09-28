@@ -222,10 +222,14 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
         }
     }
 
-    override fun updateElevation() =
-        (requireActivity() as ManagerActivity).changeAppBarElevation(
-            binding.transfersListView.canScrollVertically(DEFAULT_SCROLL_DIRECTION) ||
-                    adapter?.isMultipleSelect == true)
+    override fun updateElevation() {
+        if (bindingIsInitialized()) {
+            (requireActivity() as ManagerActivity).changeAppBarElevation(
+                binding.transfersListView.canScrollVertically(DEFAULT_SCROLL_DIRECTION) ||
+                        adapter?.isMultipleSelect == true)
+        }
+    }
+
 
     private fun setupFlow() {
         viewModel.activeState.flowWithLifecycle(
