@@ -281,7 +281,14 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     public void toggleSelection(int pos) {
         Timber.d("Position: %s", pos);
-        startAnimation(pos, putOrDeletePostion(pos));
+        if (selectedItems.get(pos, false)) {
+            Timber.d("Delete pos: %s", pos);
+            selectedItems.delete(pos);
+        } else {
+            Timber.d("PUT pos: %s", pos);
+            selectedItems.put(pos, true);
+        }
+        notifyItemChanged(pos);
     }
 
     boolean putOrDeletePostion(int pos) {
@@ -409,13 +416,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     public void selectAll() {
-        for (int i = 0; i < nodes.size(); i++) {
-            if (!isItemChecked(i)) {
-                //Exclude placeholder.
-                if (nodes.get(i) != null) {
-                    toggleAllSelection(i);
-                }
-            }
+        for (int i = 0; i < nodes.size(); i ++) {
+            selectedItems.put(i, true);
+            notifyItemChanged(i);
         }
     }
 
@@ -424,13 +427,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         if (nodes == null) {
             return;
         }
-        for (int i = 0; i < nodes.size(); i++) {
-            if (isItemChecked(i)) {
-                //Exclude placeholder.
-                if (nodes.get(i) != null) {
-                    toggleAllSelection(i);
-                }
-            }
+
+        for (int i = 0; i < nodes.size(); i ++) {
+            selectedItems.delete(i);
+            notifyItemChanged(i);
         }
     }
 
