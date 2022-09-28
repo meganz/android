@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import mega.privacy.android.app.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.data.mapper.SortOrderIntMapper
@@ -37,4 +38,7 @@ object TestMapperModule {
 
     @Provides
     fun provideSortOrderIntMapper(): SortOrderIntMapper = mock()
+
+    @Provides
+    fun provideBooleanPreferenceMapper(): BooleanPreferenceMapper = mock()
 }
