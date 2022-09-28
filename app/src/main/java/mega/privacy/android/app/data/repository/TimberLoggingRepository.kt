@@ -6,9 +6,6 @@ import android.app.ApplicationExitInfo
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.os.Build
-import android.os.StrictMode
-import android.os.StrictMode.ThreadPolicy
-import android.os.StrictMode.VmPolicy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -24,8 +21,6 @@ import mega.privacy.android.app.data.gateway.LogWriterGateway
 import mega.privacy.android.app.data.gateway.LogbackLogConfigurationGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
-import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.logging.ChatLogger
 import mega.privacy.android.app.logging.SdkLogger
 import mega.privacy.android.app.presentation.logging.tree.LineNumberDebugTree
@@ -33,6 +28,8 @@ import mega.privacy.android.app.presentation.logging.tree.LogFlowTree
 import mega.privacy.android.app.protobuf.TombstoneProtos.Tombstone
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.logging.LogEntry
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.LoggingRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -96,29 +93,6 @@ class TimberLoggingRepository @Inject constructor(
         MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX)
         MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX)
         Timber.plant(LineNumberDebugTree())
-    }
-
-    override fun enableStrictMode() {
-        StrictMode.setThreadPolicy(
-            ThreadPolicy.Builder()
-                .detectAll()
-                .penaltyLog()
-                .build()
-        )
-
-        StrictMode.setVmPolicy(
-            VmPolicy.Builder()
-                .detectAll()
-                .penaltyLog()
-                .build()
-        )
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            StrictMode.setVmPolicy(VmPolicy.Builder() // Other StrictMode checks that you've previously added.
-                .detectUnsafeIntentLaunch()
-                .penaltyLog()
-                .build())
-        }
     }
 
     override fun resetSdkLogging() {
