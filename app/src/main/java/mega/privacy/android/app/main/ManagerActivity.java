@@ -323,10 +323,10 @@ import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface;
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
 import mega.privacy.android.app.logging.LegacyLoggingSettings;
 import mega.privacy.android.app.main.adapters.TransfersPageAdapter;
@@ -10023,8 +10023,16 @@ public class ManagerActivity extends TransfersManagementActivity
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setMessage(getResources().getQuantityString(R.plurals.cancel_selected_transfers, selectedTransfers.size()))
                 .setPositiveButton(R.string.button_continue, (dialog, which) -> {
-                    CancelTransferListener cancelTransferListener = new CancelTransferListener(managerActivity);
-                    cancelTransferListener.cancelTransfers(selectedTransfers);
+                    for (MegaTransfer transfer: selectedTransfers) {
+                        megaApi.cancelTransfer(transfer, new OptionalMegaRequestListenerInterface() {
+                            @Override
+                            public void onRequestFinish(@NonNull MegaApiJava api,
+                                                        @NonNull MegaRequest request,
+                                                        @NonNull MegaError error) {
+                                super.onRequestFinish(api, request, error);
+                            }
+                        });
+                    }
 
                     if (isTransfersInProgressAdded()) {
                         transfersFragment.destroyActionMode();
