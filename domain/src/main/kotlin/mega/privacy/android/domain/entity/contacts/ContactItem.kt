@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.entity.contacts
 
 import mega.privacy.android.domain.entity.user.UserVisibility
-import java.io.Serializable
 
 /**
  * Data class of a MEGA user.
@@ -26,4 +25,4 @@ data class ContactItem(
     val areCredentialsVerified: Boolean,
     val status: UserStatus,
     val lastSeen: Int? = null,
-) : Serializable
+)

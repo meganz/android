@@ -17,13 +17,13 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.mapper.PushMessageMapper
-import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.domain.exception.LoginAlreadyRunningException
 import mega.privacy.android.domain.usecase.FastLogin
 import mega.privacy.android.domain.usecase.FetchNodes
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.InitMegaChat
+import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.RootNodeExists
 import timber.log.Timber
@@ -62,7 +62,7 @@ class PushMessageWorker @AssistedInject constructor(
 
             val pushMessage = pushMessageMapper(inputData)
 
-            if (!rootNodeExists() && !MegaApplication.isLoggingIn()) {
+            if (!rootNodeExists() && !MegaApplication.isLoggingIn) {
                 Timber.d("Needs fast login")
 
                 kotlin.runCatching { initMegaChat(session) }

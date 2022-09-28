@@ -9,6 +9,31 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 interface CameraUploadRepository {
 
     /**
+     * Get Invalid Handle
+     */
+    fun getInvalidHandle(): Long
+
+    /**
+     * Get Camera Uploads Primary handle
+     */
+    suspend fun getPrimarySyncHandle(): Long?
+
+    /**
+     * Get Camera Uploads Secondary handle
+     */
+    suspend fun getSecondarySyncHandle(): Long?
+
+    /**
+     * Set Camera Uploads Primary handle
+     */
+    suspend fun setPrimarySyncHandle(primaryHandle: Long)
+
+    /**
+     * Set Camera Uploads Secondary handle
+     */
+    suspend fun setSecondarySyncHandle(secondaryHandle: Long)
+
+    /**
      * Is camera upload sync by wifi only
      *
      * @return true if sync is by wifi

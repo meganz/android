@@ -145,7 +145,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `test that an error on fetching QR setting returns false instead`() = runTest {
-        whenever(monitorAutoAcceptQRLinks()).thenAnswer { throw SettingNotFoundException() }
+        whenever(monitorAutoAcceptQRLinks()).thenAnswer { throw SettingNotFoundException(-1) }
 
         underTest.uiState
             .map { it.autoAcceptChecked }

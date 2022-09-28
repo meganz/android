@@ -91,6 +91,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -926,15 +928,7 @@ public class ChatUtil {
             return "";
         }
 
-        if (chat.isActive()) {
-            return chat.getTitle();
-        }
-
-        String date = formatDate(chat.getCreationTs(), DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT);
-
-        return isTodayOrYesterday(chat.getCreationTs())
-                ? getString(R.string.inactive_chat_title_2, date.toLowerCase(Locale.getDefault()))
-                : getString(R.string.inactive_chat_title, date);
+        return chat.getTitle();
     }
 
     /**
@@ -949,11 +943,7 @@ public class ChatUtil {
             return "";
         }
 
-        if (chat.isActive()) {
-            return chat.getTitle();
-        }
-
-        return getTitleChat(MegaApplication.getInstance().getMegaChatApi().getChatRoom(chat.getChatId()));
+        return chat.getTitle();
     }
 
     /**
@@ -999,6 +989,21 @@ public class ChatUtil {
             createMuteNotificationsChatAlertDialog(context, chats);
         }
     }
+
+    /**
+     * Method to display a dialog to mute a list of chats.
+     *
+     * @param context Context of Activity.
+     * @param chatIds  Chat IDs.
+     */
+    public static void createMuteNotificationsAlertDialogOfChats(Activity context, List<Long> chatIds) {
+        ArrayList<MegaChatListItem> chats = (ArrayList<MegaChatListItem>) chatIds.stream().map(chatId ->
+                MegaApplication.getInstance().getMegaChatApi().getChatListItem(chatId)).collect(Collectors.toList());
+        if (!chats.isEmpty()) {
+            createMuteNotificationsChatAlertDialog(context, chats);
+        }
+    }
+
 
     /**
      * Method to display a dialog to mute general chat notifications or several specific chats.

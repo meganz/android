@@ -35,7 +35,7 @@ class StartCameraUploadWorker @AssistedInject constructor(
         Timber.d("CameraUploadWork: doWork()")
         val ignoreAttributes = inputData.getBoolean(SHOULD_IGNORE_ATTRIBUTES, false)
         return try {
-            val isOverQuota = jobUtilWrapper.isOverQuota(appContext)
+            val isOverQuota = jobUtilWrapper.isOverQuota()
             val permissions = arrayOf(
                 permissionUtilWrapper.getImagePermissionByVersion(),
                 permissionUtilWrapper.getVideoPermissionByVersion()

@@ -8,8 +8,9 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import nz.mega.sdk.*
-import java.util.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaError
+import java.util.BitSet
 import javax.inject.Inject
 
 /**
@@ -53,7 +54,7 @@ class UpdateCookieSettingsUseCase @Inject constructor(
             ))
         }.doOnComplete {
             val intent = Intent(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED)
-            MegaApplication.getInstance()?.sendBroadcast(intent)
+            MegaApplication.getInstance().sendBroadcast(intent)
         }
 
     /**

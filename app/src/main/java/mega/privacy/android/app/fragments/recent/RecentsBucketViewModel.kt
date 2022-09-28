@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetThumbnail
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
 import timber.log.Timber
 import javax.inject.Inject
@@ -123,6 +124,22 @@ class RecentsBucketViewModel @Inject constructor(
      * @return the selected nodes
      */
     fun getSelectedNodes(): List<NodeItem> = selectedNodes.toList()
+
+    /**
+     * Retrieves the list of non-null [MegaNode] objects from [selectedNodes]
+     *
+     * @return A list of nun-null [MegaNode] objects
+     */
+    fun getSelectedMegaNodes(): List<MegaNode> =
+        selectedNodes.toList().mapNotNull { it.node }
+
+    /**
+     * Checks whether any [MegaNode] in [getSelectedMegaNodes] belongs in Backups
+     *
+     * @return True if at least one [MegaNode] belongs in Backups, and False if otherwise
+     */
+    fun isAnyNodeInBackups(): Boolean =
+        getSelectedMegaNodes().any { node -> megaApi.isInInbox(node) }
 
     /**
      * Get the count of selected nodes

@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
@@ -34,6 +35,7 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.autoCleared
 
 /**
@@ -157,7 +159,17 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         binding.playlist.run {
+            if (!isAudioPlayer) {
+                val params = layoutParams as RelativeLayout.LayoutParams
+                params.topMargin = Util.dp2px(70f)
+                layoutParams = params
+            }
             setHasFixedSize(true)
+            setBackgroundColor(requireActivity().getColor(if (isAudioPlayer) {
+                R.color.grey_020_grey_800
+            } else {
+                R.color.grey_800
+            }))
             // Avoid the item is flash when it is refreshed.
             (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             layoutManager = listLayoutManager
@@ -174,8 +186,17 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
 
             requireContext().run {
                 itemDecoration = PlaylistItemDecoration(
-                    getDrawable(R.drawable.playlist_divider_layer),
-                    getDrawable(R.drawable.playlist_divider_layer_next),
+                    getDrawable(
+                        if (isAudioPlayer) {
+                            R.drawable.playlist_divider_layer
+                        } else {
+                            R.drawable.playlist_divider_layer_video
+                        }),
+                    getDrawable(if (isAudioPlayer) {
+                        R.drawable.playlist_divider_layer_next
+                    } else {
+                        R.drawable.playlist_divider_layer_next_video
+                    }),
                     this@PlaylistFragment.adapter
                 )
             }

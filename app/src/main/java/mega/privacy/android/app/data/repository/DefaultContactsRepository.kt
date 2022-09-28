@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
@@ -24,7 +25,6 @@ import mega.privacy.android.app.data.mapper.UserLastGreenMapper
 import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.model.ChatUpdate
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -78,10 +79,12 @@ class DefaultContactsRepository @Inject constructor(
         megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
             .mapNotNull { it.requests?.map(contactRequestMapper) }
+            .flowOn(ioDispatcher)
 
     override fun monitorChatPresenceLastGreenUpdates() = megaChatApiGateway.chatUpdates
         .filterIsInstance<ChatUpdate.OnChatPresenceLastGreen>()
         .map { userLastGreenMapper(it.userHandle, it.lastGreen) }
+        .flowOn(ioDispatcher)
 
     override suspend fun requestLastGreen(userHandle: Long) {
         megaChatApiGateway.requestLastGreen(userHandle)
@@ -101,7 +104,9 @@ class DefaultContactsRepository @Inject constructor(
                             || user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)
                             || user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS))
                 })
-            }.filter { it.changes.isNotEmpty() }
+            }
+            .filter { it.changes.isNotEmpty() }
+            .flowOn(ioDispatcher)
 
     override suspend fun startConversation(isGroup: Boolean, userHandles: List<Long>): Long =
         withContext(ioDispatcher) {
@@ -131,6 +136,7 @@ class DefaultContactsRepository @Inject constructor(
     override fun monitorChatOnlineStatusUpdates() = megaChatApiGateway.chatUpdates
         .filterIsInstance<ChatUpdate.OnChatOnlineStatusUpdate>()
         .map { onlineStatusMapper(it.userHandle, it.status, it.inProgress) }
+        .flowOn(ioDispatcher)
 
     override suspend fun getVisibleContacts(): List<ContactItem> = withContext(ioDispatcher) {
         megaApiGateway.getContacts()

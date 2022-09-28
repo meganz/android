@@ -2,6 +2,7 @@ package mega.privacy.android.app.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FolderVersionInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -35,11 +36,26 @@ interface FilesRepository {
     suspend fun getRootNode(): MegaNode?
 
     /**
+     * Get the inbox node
+     *
+     * @return A node corresponding to the Inbox node, null if cannot be retrieved
+     */
+    suspend fun getInboxNode(): MegaNode?
+
+    /**
      * Get the rubbish root node
      *
      * @return A node corresponding to the rubbish bin node, null if cannot be retrieved
      */
     suspend fun getRubbishBinNode(): MegaNode?
+
+    /**
+     * Check is megaNode in rubbish bin
+     *
+     * @param node MegaNode
+     * @return if node is in rubbish bin
+     */
+    suspend fun isInRubbish(node: MegaNode): Boolean
 
     /**
      * Get the parent node of a MegaNode
@@ -66,7 +82,7 @@ interface FilesRepository {
      * @param order order for the returned list
      * @return Children nodes of a parent node
      */
-    suspend fun getChildrenNode(parentNode: MegaNode, order: Int? = null): List<MegaNode>
+    suspend fun getChildrenNode(parentNode: MegaNode, order: SortOrder? = null): List<MegaNode>
 
     /**
      * Get the node corresponding to a handle
@@ -74,6 +90,15 @@ interface FilesRepository {
      * @param handle
      */
     suspend fun getNodeByHandle(handle: Long): MegaNode?
+
+    /**
+     * Get the MegaNode by path
+     *
+     * @param path
+     * @param megaNode Base node if the path is relative
+     * @return megaNode in the path or null
+     */
+    suspend fun getNodeByPath(path: String?, megaNode: MegaNode?): MegaNode?
 
     /**
      * Get the fingerprint of a file by path
@@ -120,14 +145,6 @@ interface FilesRepository {
     suspend fun getIncomingSharesNode(order: Int? = null): List<MegaNode>
 
     /**
-     * Get a list of all outgoing shares
-     *
-     * @param order sort order, if null the default order is applied
-     * @return List of MegaNode of all active and pending outbound shared by current user
-     */
-    suspend fun getOutgoingSharesNode(order: Int? = null): List<MegaShare>
-
-    /**
      * Authorize and return a MegaNode can be downloaded with any instance of MegaApi
      *
      * @param handle the handle of the node to authorize
@@ -147,18 +164,6 @@ interface FilesRepository {
      * @return List of MegaNode corresponding of a public link
      */
     suspend fun getPublicLinks(order: Int?): List<MegaNode>?
-
-    /**
-     * Get cloud sort order
-     * @return cloud sort order
-     */
-    suspend fun getCloudSortOrder(): Int
-
-    /**
-     * Get camera sort order
-     * @return camera sort order
-     */
-    suspend fun getCameraSortOrder(): Int
 
     /**
      * Get others sort order
@@ -187,4 +192,20 @@ interface FilesRepository {
      * @return The local path of the downloaded file.
      */
     suspend fun downloadBackgroundFile(node: MegaNode): String
+
+    /**
+     * Check access error extended
+     *
+     * @param node
+     * @param level
+     *
+     * - [MegaShare.ACCESS_UNKNOWN]
+     * - [MegaShare.ACCESS_READ]
+     * - [MegaShare.ACCESS_READWRITE]
+     * - [MegaShare.ACCESS_FULL]
+     * - [MegaShare.ACCESS_OWNER]
+     *
+     * @return success or failed
+     */
+    suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException
 }

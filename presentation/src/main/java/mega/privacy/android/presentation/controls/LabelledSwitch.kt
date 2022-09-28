@@ -23,8 +23,10 @@ import mega.privacy.android.presentation.theme.AndroidTheme
 import mega.privacy.android.presentation.theme.grey_010
 import mega.privacy.android.presentation.theme.grey_200
 import mega.privacy.android.presentation.theme.grey_alpha_038
+import mega.privacy.android.presentation.theme.grey_alpha_087
 import mega.privacy.android.presentation.theme.teal_100
 import mega.privacy.android.presentation.theme.teal_300
+import mega.privacy.android.presentation.theme.white_alpha_087
 
 @Composable
 fun LabelledSwitch(
@@ -43,7 +45,11 @@ fun LabelledSwitch(
                 onValueChange = onCheckChanged
             )
     ) {
-        Text(text = label)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.subtitle1,
+            color = if (!MaterialTheme.colors.isLight) white_alpha_087 else grey_alpha_087
+        )
         Switch(
             checked = checked,
             onCheckedChange = null,

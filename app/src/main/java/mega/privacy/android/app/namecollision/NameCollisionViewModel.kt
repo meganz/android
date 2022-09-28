@@ -167,12 +167,12 @@ class NameCollisionViewModel @Inject constructor(
      * Checks if file versioning is enabled or not depending on if the value has been already set or not.
      */
     private fun getFileVersionsOption() {
-        if (MegaApplication.isDisableFileVersions() == INVALID_VALUE) {
+        if (MegaApplication.isDisableFileVersions == INVALID_VALUE) {
             getFileVersionsOptionUseCase.get()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onComplete = { Timber.d("File versioning: ${MegaApplication.isDisableFileVersions()}") },
+                    onComplete = { Timber.d("File versioning: ${MegaApplication.isDisableFileVersions}") },
                     onError = Timber::w
                 ).addTo(composite)
         }
@@ -210,7 +210,7 @@ class NameCollisionViewModel @Inject constructor(
      * @return True if file versioning is enabled, false otherwise.
      */
     private fun isFileVersioningEnabled(): Boolean =
-        when (MegaApplication.isDisableFileVersions()) {
+        when (MegaApplication.isDisableFileVersions) {
             0 -> true
             else -> false
         }

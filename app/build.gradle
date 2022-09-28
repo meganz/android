@@ -282,6 +282,7 @@ dependencies {
     implementation "androidx.cardview:cardview:$cardViewVersion"
     implementation "com.google.android.material:material:$materialVersion"
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    implementation "androidx.recyclerview:recyclerview-selection:1.1.0"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     implementation "androidx.legacy:legacy-support-$legacySupportVersion"
@@ -483,12 +484,12 @@ dependencies {
     // Live Data testing
     testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
 
-
-
-
     //QA
-
     qaImplementation 'com.google.firebase:firebase-appdistribution:16.0.0-beta03'
+
+    implementation "com.google.auto.value:auto-value-annotations:$autovalueAnnotationVersion"
+    kapt "com.google.auto.value:auto-value:$autovalueVersion"
+
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()

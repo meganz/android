@@ -47,7 +47,7 @@ class MegaChatNotificationHandler @Inject constructor(
 
         updateAppBadge()
 
-        if (MegaApplication.getOpenChatId() == chatId) {
+        if (MegaApplication.openChatId == chatId) {
             Timber.d("Do not update/show notification - opened chat")
             return
         }

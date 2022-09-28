@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">تم إلغاء الاشتراك بشكل صحيح</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">لم نتمكن من إلغاء اشتراكك. الرجاء مراسلتنا عبر البريد الإلكتروني support&#64;mega.nz للمساعدة</string>
+    <string name="cancel_subscription_error">لم نتمكن من إلغاء اشتراكك. الرجاء مراسلتنا عبر البريد الإلكتروني support&#64;mega.nz للمساعدة.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">غلق الجلسات الأخرى</string>
     <!-- Message after kill all opened sessions -->
@@ -221,8 +221,6 @@
     <string name="section_recents">مؤخراً</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">ترفيعات الوسائط</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">صندوق الوارد</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">غير متصل بالانترنت</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -349,7 +347,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">عرض عمليات تراسل المعطيات</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">لا يمكن لمعظم الأجهزة تنزيل ملفات أكبر من 4&#160;غيغابايت. تنزيلك ربما يفشل</string>
+    <string name="error_file_size_greater_than_4gb">لا يمكن لمعظم الأجهزة تنزيل ملفات أكبر من 4&#160;غيغابايت. تنزيلك ربما يفشل.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">ليس هناك أي التطبيق متاح لتنفيذ هذا الملف على جهازك</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -886,7 +884,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">ركن</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">هذه هي الخطوة الأخيرة لحجز حسابك، يرجى إدخال كلمة المرور الجديدة. سيتم الاحتفاظ ببياناتك لمدة 60 يوماً على الأقل. إذا كنت تتذكر كلمة مرور حسابك المتوقف، يرجى التواصل معنا عبر البريد الالكتروني support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">هذه هي الخطوة الأخيرة لركن حسابك، يرجى إدخال كلمة المرور الجديدة. سيتم الاحتفاظ ببياناتك لمدة 60 يوماً على الأقل. إذا كنت تتذكر كلمة مرور حسابك المركون، يرجى التواصل معنا عبر البريد الالكتروني support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">أدخل كلمة مرور جديدة</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -940,7 +938,7 @@
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="hint_confirm_password_protection_dialog">تأكيد كلمة المرور</string>
     <!-- Status text at the beginning of getting a link -->
-    <string name="link_request_status">جاري الإنشاء&#8230;</string>
+    <string name="link_request_status">قيد المعالجة...</string>
     <!-- Option of the sliding panel to edit the link of a node -->
     <string name="edit_link_option">إدارة الرابط</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
@@ -957,7 +955,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">بريد إلكتروني غير صالح و/أو كلمة مرور غير صالحة. حاول مرة اخرى.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">تم تعليق حسابك بسبب انتهاكات شروط الخدمة. يرجى الاتصال support&#64;mega.nz</string>
+    <string name="error_account_suspended">تم تعليق حسابك بسبب انتهاكات شروط الخدمة. يرجى التواصل على support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">هناك الكثير من المحاولات الفاشلة لتسجيل الدخول، يرجى الانتظار لمدة ساعة.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -1040,7 +1038,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">كتم صوت الإشعارات لـ</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">كتم الإشعارات</string>
+    <string name="title_dialog_mute_chatroom_notifications">كتم صوت إشعارات المحادثة</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">تشغيل</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1251,12 +1249,12 @@
     <string name="no_conversation_history">لا توجد سجل للمحادثات</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="zero">%1$s [A]يكتب&#8230;[/A]</item>
-        <item quantity="one">%1$s [A]يكتب&#8230;[/A]</item>
-        <item quantity="two">%1$s [A]يكتبان&#8230;[/A]</item>
-        <item quantity="few">%1$s [A]يكتبون&#8230;[/A]</item>
-        <item quantity="many">%1$s [A]يكتبون&#8230;[/A]</item>
-        <item quantity="other">%1$s [A]يكتبون&#8230;[/A]</item>
+        <item quantity="zero">%1$s [A] يقوم بالكتابة...[/A]</item>
+        <item quantity="one">%1$s [A] يقوم بالكتابة...[/A]</item>
+        <item quantity="two">%1$s [A] يقوما بالكتابة...[/A]</item>
+        <item quantity="few">%1$s [A] يقومون بالكتابة...[/A]</item>
+        <item quantity="many">%1$s [A] يقومون بالكتابة...[/A]</item>
+        <item quantity="other">%1$s [A] يقومون بالكتابة...[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]وأكثر يكتبون&#8230;[/A]</string>
@@ -1805,8 +1803,6 @@
     <string name="context_share">شارك باستخدام</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]إفراغ[/B][A]سلة المحذوفات[/A]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[B]لا توجد ملفات في [/B][A]صندوقك الوارد[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]لا يوجد ملفات في [/B][A]السواقة السحابية الخاصة بك[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1865,10 +1861,6 @@
     <string name="contacts_mega">على ميغا MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">جهات اتصال الهاتف</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">تم تعليق حسابك بسبب الانتهاكات المتعددة لشروط خدمة ميغا MEGA. يرجى التحقق من صندوق البريد الإلكتروني الخاص بك.</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">تم إنهاء حسابك بسبب خرق لشروط الخدمة لدى ميغا MEGA بما في ذلك على سبيل المثال لا الحصر، البند 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">تحميل الملفات</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2054,7 +2046,7 @@
         <item quantity="other">%1$d محادثة غير مقروءة</item>
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
-    <string name="chat_loading_messages">[A]جاري تحميل[/A] [B]الرسائل &#8230; [/B]</string>
+    <string name="chat_loading_messages">[A]جاري تحميل[/A] [B]الرسائل&#8230; [/B]</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">أمن</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -2113,7 +2105,7 @@
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[A]مجلد[/A][B]فارغ[/B]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
-    <string name="type_message_hint_with_customized_title">اكتب رسالة إلى “%s” &#8230;</string>
+    <string name="type_message_hint_with_customized_title">اكتب رسالة إلى “%s”&#8230;</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
     <string name="type_message_hint_with_default_title">اكتب رسالة إلى %s &#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
@@ -2615,7 +2607,7 @@
         <item quantity="zero">%1$d مجلد&#160;.&#160;</item>
         <item quantity="one">%1$d مجلد&#160;.&#160;</item>
         <item quantity="two">%1$d مجلدان&#160;.&#160;</item>
-        <item quantity="few">%1$d المجلدات&#160;.&#160;</item>
+        <item quantity="few">%1$d مجلدات&#160;.&#160;</item>
         <item quantity="many">%1$d مجلداً&#160;.&#160;</item>
         <item quantity="other">%1$d مجلد&#160;.&#160;</item>
     </plurals>
@@ -2947,8 +2939,6 @@
     <string name="text_join_another_call">للانضمام إلى هذه المكالمة، يجب عليك إنهاء المكالمة الحالية أو تعليقها.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">يمكن للأشخاص الانضمام إلى مجموعتك باستخدام هذا الرابط.</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">رابط محادثة جديد</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">ادخل اسم المجموعة</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -3023,12 +3013,12 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="zero">%1$dصورة&#160;</item>
-        <item quantity="one">%1$dصورة&#160;</item>
-        <item quantity="two">%1$dصورتان&#160;</item>
-        <item quantity="few">%1$dصور&#160;</item>
-        <item quantity="many">%1$dصورة&#160;</item>
-        <item quantity="other">%1$dصورة&#160;</item>
+        <item quantity="zero">%1$d صورة&#160;</item>
+        <item quantity="one">%1$d صورة&#160;</item>
+        <item quantity="two">%1$d صورتان&#160;</item>
+        <item quantity="few">%1$d صور&#160;</item>
+        <item quantity="many">%1$d صورة&#160;</item>
+        <item quantity="other">%1$d صورة&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]انشأ من قبل [/A]%s</string>
@@ -3137,7 +3127,7 @@
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
     <string name="reconnecting_message">إعادة الاتصال</string>
     <!-- Text is displayed while a voice clip is being recorded -->
-    <string name="recording_layout">تسجيل&#8230;</string>
+    <string name="recording_layout">جاري التسجيل&#8230;</string>
     <!-- Text shown for the action create new file -->
     <string name="create_new_file_action">إنشاء ملف جديد</string>
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
@@ -3240,9 +3230,9 @@
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
     <string name="already_verifying_credentials">تحديث بيانات الاعتماد. يرجى المحاولة مرة أخرى في وقت لاحق.</string>
     <!-- Info message displayed when the user is joining a chat conversation -->
-    <string name="joining_label">انضمام&#8230;</string>
+    <string name="joining_label">جاري الانضمام&#8230;</string>
     <!-- Info message displayed when the user is leaving a chat conversation -->
-    <string name="leaving_label">مغادرة&#8230;</string>
+    <string name="leaving_label">جاري المغادرة&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">تمت إزالة رقم هاتفك بنجاح.</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
@@ -3957,26 +3947,12 @@
     <string name="settings_mobile_data_resoluton_title">استخدم بيانات الهاتف المحمول لعرض الصور عالية الدقة</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">اسمح باستخدام بيانات الهاتف المحمول لتحميل صور عالية الدقة عند العرض. في حال تعطيله سيتم تحميل الصورة الأصلية فقط عند تقريب الصورة.</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">أنت تقوم بتغيير موقع مجلد النسخ الاحتياطي الافتراضي. قد يؤثر ذلك على قدرتك على العثور على مجلد النسخ الاحتياطي في المستقبل. يرجى تذكر مكانه حتى تتمكن من العثور عليه في المستقبل.</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">يؤدي نقل هذا المجلد إلى تغيير وجهة واحدة أو أكثر من النسخ الاحتياطية وقد يكون له عواقب غير مقصودة. سيتم إيقاف النسخ الاحتياطية حفاظًا على سلامتك. يمكن إعادة تمكين النسخ الاحتياطية باستخدام تطبيق ميغا للحاسوب المكتبي MEGA Desktop App. هل تريد المتابعة؟</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">أنت تقوم بحذف مجلد النسخ الاحتياطي. سيؤدي هذا إلى حذف جميع النسخ الاحتياطية التي قمت بتعيينها. هل انت متأكد من أنك تريد أن تفعل هذا؟</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">هل أنت متأكد أنك تريد حذف مجلد النسخ الاحتياطي وتعطيل النسخة الاحتياطية المرتبطة به؟</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">نقل “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">نقل “%1s” إلى سلة المحذوفات</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">انقل مجلدات النسخ الاحتياطي</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">انقل مجلدات النسخ الاحتياطي إلى سلة المحذوفات</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">تعطيل النسخ الاحتياطي</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">نقل النسخ الاحتياطي</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">الرجاء كتابة “%1s” لتأكيد هذا الإجراء</string>
     <!-- when checking the input -->
@@ -3997,15 +3973,6 @@
     <string name="backup_multi_share_permission_text">يمكن مشاركة هذه المجلدات للقراءة فقط لأنها مجلدات نسخ احتياطي، قد تؤدي أي تغييرات في محتواها إلى تعطيل النسخ الاحتياطية.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">بعض المجلدات المشاركة هي مجلدات نسخ احتياطي وقراءة فقط. هل ترغب في الاستمرار؟</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="zero">%d جهاز</item>
-        <item quantity="one">%d جهاز</item>
-        <item quantity="two">%d جهازان</item>
-        <item quantity="few">%d أجهزة</item>
-        <item quantity="many">%d جهازاً</item>
-        <item quantity="other">%d جهاز</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">أجب الاتصال</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -4288,8 +4255,6 @@
     <string name="settings_help_report_issue_discard_button">تجاهل</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">تعديل الرسالة</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">المعرض</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">صوت</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -4298,8 +4263,6 @@
     <string name="chat_room_toolbar_voice_clip_option">مقطع صوتي</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]ادعي الأصدقاء الى [/B][A]المحادثة[/A][B] و استمتع باستخدام منصتنا المشفرة بخصوصية و أمان [/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">فلتر</string>
     <!-- Filter option to show all photos -->
@@ -4359,7 +4322,7 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">[A]%1$s[/A] مساحة تخزين</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] حجم تراسل معطيات متاح</string>
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] تراسل معطيات</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">مساحة التخزين</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
@@ -4446,4 +4409,14 @@
     <string name="permissions_notifications_title">الحصول على إشعار</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">ستقوم ميغا MEGA بإرسال إشعارات المكالمات والمحادثة و تراسل الملفات.</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">النسخ الاحتياطية</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[B]لايوجد عناصر في[/B][A]النسخ الاحتياطية[/A]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">هذا هو المكان الذي يتم فيه تخزين الملفات والمجلدات التي تم نسخها احتياطيًا. العناصر التي تم نسخها احتياطيًا هي ”للقراءة فقط“ لحمايتها من التعديل العرضي في السواقة السحابية الخاص بك.\nيمكنك نسخ العناصر احتياطيًا من جهاز الكمبيوتر الخاص بك إلى ميغا MEGA باستخدام تطبيق الحاسوب المكتبي الخاص بنا.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">تم تعليق الحساب بسبب انتهاكات حقوق النشر. لقد أرسلنا لك بريدًا إلكترونيًا يحتوي على مزيد من المعلومات حول هذا الموضوع.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">تم إنهاء الحساب بسبب خرق لشروط خدمة ميغا MEGA ، مثل إساءة استخدام حقوق الآخرين أو مشاركة واستيراد البيانات غير القانونية  أو إساءة استخدام النظام.</string>
 </resources>

@@ -115,6 +115,9 @@ class UtilWrapperModule {
     fun provideTimeWrapper() = object : TimeWrapper {
         override val now: Long
             get() = System.currentTimeMillis()
+
+        override val nanoTime: Long
+            get() = System.nanoTime()
     }
 
     /**

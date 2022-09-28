@@ -61,7 +61,6 @@ import static mega.privacy.android.app.utils.Util.showAlert;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingSpaces;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -106,6 +105,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -128,17 +128,19 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.data.model.UserCredentials;
-import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.logging.LegacyLoggingSettings;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.main.megachat.ChatSettings;
+import mega.privacy.android.app.presentation.login.LoginViewModel;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.domain.entity.StorageState;
+import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.domain.repository.LoginRepository;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -164,6 +166,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     LoginRepository loginRepository;
     @Inject
     DatabaseHandler dbH;
+
+    private LoginViewModel viewModel;
 
     private static final long LONG_CLICK_DELAY = 5000;
     private static final int READ_MEDIA_PERMISSION = 109;
@@ -285,6 +289,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Timber.d("onCreateView");
+
+        viewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
         is2FAEnabled = false;
         accountConfirmed = false;
@@ -1724,7 +1730,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                         intent.setAction(ACTION_REFRESH_AFTER_BLOCKED);
                     }
 
-                    if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+                    if (viewModel.getStorageState() == StorageState.PayWall) {
                         showOverDiskQuotaPaywallWarning(true);
                     } else {
                         loginActivity.startActivity(intent);
