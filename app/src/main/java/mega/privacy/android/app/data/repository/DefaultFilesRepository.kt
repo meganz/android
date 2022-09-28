@@ -12,6 +12,7 @@ import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.mapper.MegaExceptionMapper
 import mega.privacy.android.app.data.mapper.MegaShareMapper
+import mega.privacy.android.app.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -21,6 +22,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -52,6 +54,7 @@ class DefaultFilesRepository @Inject constructor(
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val megaShareMapper: MegaShareMapper,
     private val megaExceptionMapper: MegaExceptionMapper,
+    private val sortOrderIntMapper: SortOrderIntMapper,
 ) : FilesRepository, FileRepository {
 
 
@@ -111,9 +114,9 @@ class DefaultFilesRepository @Inject constructor(
             megaApiGateway.getChildNode(parentNode, name)
         }
 
-    override suspend fun getChildrenNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
+    override suspend fun getChildrenNode(parentNode: MegaNode, order: SortOrder?): List<MegaNode> =
         withContext(ioDispatcher) {
-            megaApiGateway.getChildrenByNode(parentNode, order)
+            megaApiGateway.getChildrenByNode(parentNode, sortOrderIntMapper(order))
         }
 
     override suspend fun getNodeByHandle(handle: Long): MegaNode? = withContext(ioDispatcher) {
@@ -161,10 +164,6 @@ class DefaultFilesRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.getPublicLinks(order)
         }
-
-    override suspend fun getCloudSortOrder(): Int = withContext(ioDispatcher) {
-        megaLocalStorageGateway.getCloudSortOrder()
-    }
 
     override suspend fun getOthersSortOrder(): Int = withContext(ioDispatcher) {
         megaLocalStorageGateway.getOthersSortOrder()

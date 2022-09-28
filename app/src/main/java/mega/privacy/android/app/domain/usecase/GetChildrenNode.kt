@@ -1,5 +1,6 @@
 package mega.privacy.android.app.domain.usecase
 
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaNode
 
 /**
@@ -13,5 +14,5 @@ fun interface GetChildrenNode {
      * @param order Order for the returned list
      * @return Children nodes of the parent node
      */
-    suspend operator fun invoke(parent: MegaNode, order: Int?): List<MegaNode>
+    suspend operator fun invoke(parent: MegaNode, order: SortOrder?): List<MegaNode>
 }
