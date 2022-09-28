@@ -10,6 +10,7 @@ import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.GetChildMegaNode
+import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.GetFingerprint
 import mega.privacy.android.app.domain.usecase.GetNodeByFingerprint
 import mega.privacy.android.app.domain.usecase.GetNodeByFingerprintAndParentNode
@@ -188,6 +189,9 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideSaveSyncRecordsToDB() = mock<SaveSyncRecordsToDB>()
+
+    @Provides
+    fun provideGetDefaultNodeHandle() = mock<GetDefaultNodeHandle>()
 
     @Provides
     fun provideSetPrimarySyncHandle() = mock<SetPrimarySyncHandle>()
