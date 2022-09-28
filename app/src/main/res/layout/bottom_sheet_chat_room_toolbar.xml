@@ -317,7 +317,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/location_icon"
                         android:layout_centerHorizontal="true"
-                        android:text="@string/file_properties_info_location"
+                        android:text="@string/chat_room_toolbar_location_option"
                         android:textAppearance="@style/TextAppearance.Mega.Caption.Variant2.Grey54White87" />
                 </RelativeLayout>
 
