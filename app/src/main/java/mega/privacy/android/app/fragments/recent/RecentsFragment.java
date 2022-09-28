@@ -115,20 +115,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     };
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        ((ManagerActivity) requireActivity()).pagerRecentsFragmentOpened(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        ((ManagerActivity) requireActivity()).pagerRecentsFragmentClosed(this);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         if (megaApi == null) {

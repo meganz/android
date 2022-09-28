@@ -783,7 +783,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private int bottomItemBeforeOpenFullscreenOffline = INVALID_VALUE;
     private OfflineFragment fullscreenOfflineFragment;
     private OfflineFragment pagerOfflineFragment;
-    private RecentsFragment pagerRecentsFragment;
 
     AlertDialog statusDialog;
     private AlertDialog processFileDialog;
@@ -4829,16 +4828,6 @@ public class ManagerActivity extends TransfersManagementActivity
     public void pagerOfflineFragmentClosed(OfflineFragment fragment) {
         if (fragment == pagerOfflineFragment) {
             pagerOfflineFragment = null;
-        }
-    }
-
-    public void pagerRecentsFragmentOpened(RecentsFragment fragment) {
-        pagerRecentsFragment = fragment;
-    }
-
-    public void pagerRecentsFragmentClosed(RecentsFragment fragment) {
-        if (fragment == pagerRecentsFragment) {
-            pagerRecentsFragment = null;
         }
     }
 
