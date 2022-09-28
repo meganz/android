@@ -229,6 +229,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.text.HtmlCompat;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -877,7 +878,7 @@ public class ManagerActivity extends TransfersManagementActivity
         @Override
         public void onChanged(Boolean aBoolean) {
             if (drawerLayout != null) {
-                drawerLayout.closeDrawer(Gravity.LEFT);
+                closeDrawer();
             }
             refreshAddPhoneNumberButton();
         }
@@ -2519,7 +2520,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     setRequestNotificationsPermissionFirstLogin(savedInstanceState);
                     askPermissions = intentRec.getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
                     if (upgradeAccount) {
-                        drawerLayout.closeDrawer(Gravity.LEFT);
+                        closeDrawer();
                         int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
                         if (accountType != FREE) {
@@ -2562,7 +2563,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                     }
                 }
-                drawerLayout.closeDrawer(Gravity.LEFT);
+                closeDrawer();
             }
 
             checkCurrentStorageStatus(true);
@@ -2913,7 +2914,7 @@ public class ManagerActivity extends TransfersManagementActivity
         abL.setVisibility(View.GONE);
 
         fragmentContainer.setVisibility(View.VISIBLE);
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         supportInvalidateOptionsMenu();
         hideFabButton();
@@ -3122,7 +3123,7 @@ public class ManagerActivity extends TransfersManagementActivity
         setTabsVisibility();
         abL.setVisibility(View.GONE);
 
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         supportInvalidateOptionsMenu();
         hideFabButton();
@@ -4156,7 +4157,7 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
 
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
 
         switch (item) {
             case CLOUD_DRIVE: {
@@ -4224,7 +4225,7 @@ public class ManagerActivity extends TransfersManagementActivity
         updateSharesTab();
         setToolbarTitle();
 
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
     }
 
     public void selectDrawerItemNotifications() {
@@ -4269,7 +4270,7 @@ public class ManagerActivity extends TransfersManagementActivity
         getTransfersViewModel().checkIfShouldShowCompletedTab();
         setToolbarTitle();
         showFabButton();
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
     }
 
     /**
@@ -4324,7 +4325,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         replaceFragment(chatTabsFragment, FragmentTag.RECENT_CHAT.getTag());
 
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
         PermissionUtils.checkNotificationsPermission(this);
     }
 
@@ -4357,7 +4358,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (turnOnNotifications) {
             fragmentContainer.setVisibility(View.VISIBLE);
-            drawerLayout.closeDrawer(Gravity.LEFT);
+            closeDrawer();
             return;
         }
 
@@ -4397,7 +4398,7 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean.class)
                 .post(drawerItem == DrawerItem.HOMEPAGE);
 
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
     }
 
     /**
@@ -4768,7 +4769,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private void navigateToSettingsActivity(TargetPreference targetPreference) {
         if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
-            drawerLayout.closeDrawer(Gravity.LEFT);
+            drawerLayout.closeDrawer(GravityCompat.START);
         }
         Intent settingsIntent = mega.privacy.android.app.presentation.settings.SettingsActivity.Companion.getIntent(this, targetPreference);
         startActivity(settingsIntent);
@@ -5105,7 +5106,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     private void showMyAccount(String action, Uri data, Pair<String, Integer> extra) {
         if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
-            drawerLayout.closeDrawer(Gravity.LEFT);
+            drawerLayout.closeDrawer(GravityCompat.START);
         }
 
         Intent intent = new Intent(this, MyAccountActivity.class)
@@ -5982,7 +5983,7 @@ public class ManagerActivity extends TransfersManagementActivity
         retryConnectionsAndSignalPresence();
 
         if (drawerLayout.isDrawerOpen(nV)) {
-            drawerLayout.closeDrawer(Gravity.LEFT);
+            drawerLayout.closeDrawer(GravityCompat.START);
             return;
         }
 
@@ -6279,8 +6280,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         checkIfShouldCloseSearchView(oldDrawerItem);
         selectDrawerItem(drawerItem);
-        drawerLayout.closeDrawer(Gravity.LEFT);
-
+        closeDrawer();
         return true;
     }
 
@@ -7824,7 +7824,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void navigateToUpgradeAccount() {
         if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
-            drawerLayout.closeDrawer(Gravity.LEFT);
+            drawerLayout.closeDrawer(GravityCompat.START);
         }
 
         startActivity(new Intent(this, UpgradeAccountActivity.class));
@@ -7838,12 +7838,12 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void navigateToContacts() {
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
         startActivity(ContactsActivity.getListIntent(this));
     }
 
     public void navigateToContactRequests() {
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
         startActivity(ContactsActivity.getReceivedRequestsIntent(this));
     }
 
@@ -11529,5 +11529,11 @@ public class ManagerActivity extends TransfersManagementActivity
         onBackPressedCallback.setEnabled(false);
         getOnBackPressedDispatcher().onBackPressed();
         onBackPressedCallback.setEnabled(true);
+    }
+
+    private void closeDrawer() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
     }
 }
