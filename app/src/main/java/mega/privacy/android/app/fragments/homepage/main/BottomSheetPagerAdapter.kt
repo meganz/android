@@ -3,7 +3,7 @@ package mega.privacy.android.app.fragments.homepage.main
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import mega.privacy.android.app.fragments.offline.OfflineFragment
-import mega.privacy.android.app.fragments.recent.RecentsFragment
+import mega.privacy.android.app.presentation.recents.RecentsFragment
 
 class BottomSheetPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 

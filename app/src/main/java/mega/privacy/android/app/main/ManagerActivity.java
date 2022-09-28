@@ -310,7 +310,6 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;

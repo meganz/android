@@ -1,4 +1,4 @@
-package mega.privacy.android.app;
+package mega.privacy.android.app.presentation.recents.model;
 
 import android.content.Context;
 

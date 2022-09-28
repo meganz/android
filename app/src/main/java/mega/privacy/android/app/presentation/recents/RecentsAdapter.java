@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.adapters;
+package mega.privacy.android.app.presentation.recents;
 
 import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.RECENTS_MODE;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
@@ -31,17 +31,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.RecentsItem;
+import mega.privacy.android.app.presentation.recents.model.RecentsItem;
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
-import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
@@ -60,11 +59,11 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     private DisplayMetrics outMetrics;
 
-    private ArrayList<RecentsItem> recentsItems;
+    private List<RecentsItem> recentsItems;
 
     private int mHeaderColor = -1;
 
-    public RecentsAdapter(Context context, Object fragment, ArrayList<RecentsItem> items) {
+    public RecentsAdapter(Context context, Object fragment, List<RecentsItem> items) {
         Timber.d("new RecentsAdapter");
         this.context = context;
         this.fragment = fragment;
@@ -320,7 +319,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         return mediaTitle;
     }
 
-    public void setItems(ArrayList<RecentsItem> recentsItems) {
+    public void setItems(List<RecentsItem> recentsItems) {
         this.recentsItems = recentsItems;
         notifyDataSetChanged();
     }
