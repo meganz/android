@@ -35,7 +35,6 @@ import static mega.privacy.android.app.utils.Util.getMediaIntent;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -44,14 +43,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -90,9 +86,6 @@ import timber.log.Timber;
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
-    private static final int LANDSCAPE_EMPTY_IMAGE_MARGIN = 60;
-
-    private Context context;
     private DisplayMetrics outMetrics;
 
     private MegaApiAndroid megaApi;
@@ -142,12 +135,12 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        Display display = ((Activity) requireContext()).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+            megaApi = ((MegaApplication) ((Activity) requireContext()).getApplication()).getMegaApi();
         }
         if (megaApi.getRootNode() == null) return null;
 
@@ -174,7 +167,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         listView = v.findViewById(R.id.list_view_recents);
         fastScroller = v.findViewById(R.id.fastscroll);
 
-        stickyLayoutManager = new TopSnappedStickyLayoutManager(context, this);
+        stickyLayoutManager = new TopSnappedStickyLayoutManager(requireContext(), this);
         listView.setLayoutManager(stickyLayoutManager);
         listView.setClipToPadding(false);
         listView.setItemAnimator(new DefaultItemAnimator());
@@ -211,9 +204,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         this.buckets = buckets;
         reloadItems(buckets);
 
-        adapter = new RecentsAdapter(context, this, recentsItems);
+        adapter = new RecentsAdapter(requireContext(), this, recentsItems);
         listView.setAdapter(adapter);
-        listView.addItemDecoration(new HeaderItemDecoration(context));
+        listView.addItemDecoration(new HeaderItemDecoration(requireContext()));
         setVisibleContacts();
     }
 
@@ -223,7 +216,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         String currentDate;
 
         for (int i = 0; i < buckets.size(); i++) {
-            RecentsItem item = new RecentsItem(context, buckets.get(i));
+            RecentsItem item = new RecentsItem(requireContext(), buckets.get(i));
             if (i == 0) {
                 previousDate = currentDate = item.getDate();
                 recentsItems.add(new RecentsItemHeader(currentDate));
@@ -251,7 +244,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 .getBoolean(HIDE_RECENT_ACTIVITY, false);
 
         setRecentsView(hideRecentActivity);
-        ((ManagerActivity) context).setToolbarTitle();
+        ((ManagerActivity) requireContext()).setToolbarTitle();
     }
 
     /**
@@ -338,12 +331,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
-    }
-
     private long[] getBucketNodeHandles(boolean areImages) {
         if (bucketSelected == null || bucketSelected.getNodes() == null || bucketSelected.getNodes().size() == 0)
             return null;
@@ -394,7 +381,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
             putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS, adapter);
             startActivity(intent);
-            ((ManagerActivity) context).overridePendingTransition(0, 0);
+            ((ManagerActivity) requireContext()).overridePendingTransition(0, 0);
             return;
         }
 
@@ -403,7 +390,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
         if (isAudioOrVideo(node)) {
             if (isInternalIntent(node)) {
-                intent = getMediaIntent(context, node.getName());
+                intent = getMediaIntent(requireContext(), node.getName());
             } else {
                 intent = new Intent(Intent.ACTION_VIEW);
             }
@@ -418,10 +405,10 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             }
 
             if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath,
+                paramsSetSuccessfully = setLocalIntentParams(requireContext(), node, intent, localPath,
                         false, (ManagerActivity) requireActivity());
             } else {
-                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
+                paramsSetSuccessfully = setStreamingIntentParams(requireContext(), node, megaApi, intent,
                         (ManagerActivity) requireActivity());
             }
 
@@ -431,17 +418,17 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
             launchIntent(intent, paramsSetSuccessfully, node, index);
         } else if (MimeTypeList.typeForName(node.getName()).isURL()) {
-            manageURLNode(context, megaApi, node);
+            manageURLNode(requireContext(), megaApi, node);
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
-            intent = new Intent(context, PdfViewerActivity.class);
+            intent = new Intent(requireContext(), PdfViewerActivity.class);
             intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true);
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
 
             if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath,
+                paramsSetSuccessfully = setLocalIntentParams(requireContext(), node, intent, localPath,
                         false, (ManagerActivity) requireActivity());
             } else {
-                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
+                paramsSetSuccessfully = setStreamingIntentParams(requireContext(), node, megaApi, intent,
                         (ManagerActivity) requireActivity());
             }
 
@@ -450,7 +437,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             manageTextFileIntent(requireContext(), node, RECENTS_ADAPTER);
         } else {
             Timber.d("itemClick:isFile:otherOption");
-            onNodeTapped(context, node, ((ManagerActivity) requireActivity())::saveNodeByTap, (ManagerActivity) requireActivity(), (ManagerActivity) requireActivity());
+            onNodeTapped(requireContext(), node, ((ManagerActivity) requireActivity())::saveNodeByTap, (ManagerActivity) requireActivity(), (ManagerActivity) requireActivity());
         }
     }
 
@@ -463,17 +450,17 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
      * @param position              Thumbnail's position in the list.
      */
     private void launchIntent(Intent intent, boolean paramsSetSuccessfully, MegaNode node, int position) {
-        if (intent != null && !isIntentAvailable(context, intent)) {
+        if (intent != null && !isIntentAvailable(requireContext(), intent)) {
             paramsSetSuccessfully = false;
-            ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
+            ((ManagerActivity) requireContext()).showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
         }
 
         if (intent != null && paramsSetSuccessfully) {
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
             putThumbnailLocation(intent, listView, position, VIEWER_FROM_RECETS, adapter);
 
-            context.startActivity(intent);
-            ((ManagerActivity) context).overridePendingTransition(0, 0);
+            requireContext().startActivity(intent);
+            ((ManagerActivity) requireContext()).overridePendingTransition(0, 0);
         }
     }
 
