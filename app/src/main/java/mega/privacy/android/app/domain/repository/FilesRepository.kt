@@ -49,6 +49,14 @@ interface FilesRepository {
     suspend fun getRubbishBinNode(): MegaNode?
 
     /**
+     * Check is megaNode in rubbish bin
+     *
+     * @param node MegaNode
+     * @return if node is in rubbish bin
+     */
+    suspend fun isInRubbish(node: MegaNode): Boolean
+
+    /**
      * Get the parent node of a MegaNode
      *
      * @param node
@@ -81,6 +89,15 @@ interface FilesRepository {
      * @param handle
      */
     suspend fun getNodeByHandle(handle: Long): MegaNode?
+
+    /**
+     * Get the MegaNode by path
+     *
+     * @param path
+     * @param megaNode Base node if the path is relative
+     * @return megaNode in the path or null
+     */
+    suspend fun getNodeByPath(path: String?, megaNode: MegaNode?): MegaNode?
 
     /**
      * Get the fingerprint of a file by path
