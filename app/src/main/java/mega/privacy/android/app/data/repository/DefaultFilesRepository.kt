@@ -153,9 +153,8 @@ class DefaultFilesRepository @Inject constructor(
             megaApiGateway.getOutgoingSharesNode(order).map { megaShareMapper(it) }
         }
 
-    override suspend fun checkNodeInRubbish(handle: Long) = withContext(ioDispatcher) {
-        val node = megaApiGateway.getMegaNodeByHandle(handle)
-        return@withContext (node != null && megaApiGateway.isInRubbish(node))
+    override suspend fun isNodeInRubbish(handle: Long) = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInRubbish(it) } ?: false
     }
 
     override suspend fun authorizeNode(handle: Long): MegaNode? = withContext(ioDispatcher) {
