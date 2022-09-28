@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -54,7 +55,8 @@ class RecentsBucketViewModel @Inject constructor(
     /**
      * Current bucket
      */
-    private val bucket: MutableStateFlow<MegaRecentActionBucket?> = MutableStateFlow(null)
+    private val _bucket: MutableStateFlow<MegaRecentActionBucket?> = MutableStateFlow(null)
+    val bucket = _bucket.asStateFlow()
 
     private var cachedActionList: List<MegaRecentActionBucket>? = null
 
@@ -73,7 +75,7 @@ class RecentsBucketViewModel @Inject constructor(
     /**
      *  List of node items in the current bucket
      */
-    val items = bucket
+    val items = _bucket
         .map { it?.let { getRecentActionNodes(it.nodes) } ?: emptyList() }
         .onEach {
             isInShare = it.firstOrNull()?.node?.let { node ->
@@ -98,7 +100,7 @@ class RecentsBucketViewModel @Inject constructor(
      * @param selectedBucket
      */
     fun setBucket(selectedBucket: MegaRecentActionBucket?) = viewModelScope.launch {
-        bucket.emit(selectedBucket)
+        _bucket.emit(selectedBucket)
     }
 
     /**
@@ -221,9 +223,9 @@ class RecentsBucketViewModel @Inject constructor(
      * Update the current bucket
      */
     private suspend fun updateCurrentBucket() {
-        bucket.value
+        _bucket.value
             ?.let { updateRecentAction(it, cachedActionList) }
-            ?.let { bucket.emit(it) }
+            ?.let { _bucket.emit(it) }
             ?: run {
                 // No nodes contained in the bucket or the action bucket is no loner exists.
                 _shouldCloseFragment.postValue(true)
