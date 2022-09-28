@@ -43,6 +43,7 @@ import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
@@ -71,6 +72,7 @@ import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
@@ -309,6 +311,13 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideSetSecondarySyncHandle(cameraUploadRepository: CameraUploadRepository): SetSecondarySyncHandle =
             SetSecondarySyncHandle(cameraUploadRepository::setSecondarySyncHandle)
+
+        /**
+         * Provide the IsNodeInRubbish implementation
+         */
+        @Provides
+        fun provideIsNodeInRubbish(fileRepository: FileRepository): IsNodeInRubbish =
+            IsNodeInRubbish(fileRepository::isNodeInRubbish)
     }
 
     /**

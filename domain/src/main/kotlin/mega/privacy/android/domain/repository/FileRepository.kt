@@ -14,4 +14,12 @@ interface FileRepository {
      * @return List of MegaNode of all active and pending outbound shared by current user
      */
     suspend fun getOutgoingSharesNode(order: Int): List<ShareData>
+
+
+    /**
+     * check whether the node is in rubbish bin or not
+     *
+     * @return Boolean
+     */
+    suspend fun isNodeInRubbish(handle: Long): Boolean
 }
