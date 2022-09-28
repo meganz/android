@@ -33,6 +33,7 @@ import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
+import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
@@ -60,6 +61,7 @@ class ManagerViewModelTest {
     private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
     private val getInboxNode = mock<GetInboxNode>()
     private val getUploadFolderHandle = mock<GetUploadFolderHandle>()
+    private val monitorStorageState = mock<MonitorStorageStateEvent>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -88,7 +90,8 @@ class ManagerViewModelTest {
             monitorMyAvatarFile = monitorMyAvatarFile,
             ioDispatcher = StandardTestDispatcher(),
             getInboxNode = getInboxNode,
-            getUploadFolderHandle = getUploadFolderHandle
+            getUploadFolderHandle = getUploadFolderHandle,
+            monitorStorageStateEvent = monitorStorageState,
         )
     }
 
