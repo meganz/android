@@ -1316,28 +1316,10 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                             Spannable name = new SpannableString(fullNameAction + ": ");
                             name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                            if (chat.getUnreadCount() == 0) {
-                                Timber.d("Message READ");
-                                Spannable myMessage = new SpannableString(lastMessageString);
-                                myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                CharSequence indexedText = TextUtils.concat(name, myMessage);
-                                ((ViewHolderNormalChatList) holder).textViewContent.setText(indexedText);
-                            } else {
-                                Timber.d("Message NOt read");
-                                Spannable myMessage = new SpannableString(lastMessageString);
-                                myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                CharSequence indexedText = TextUtils.concat(name, myMessage);
-                                ((ViewHolderNormalChatList) holder).textViewContent.setText(indexedText);
-                            }
+                            Spannable myMessage = new SpannableString(lastMessageString);
+                            CharSequence indexedText = TextUtils.concat(name, myMessage);
+                            ((ViewHolderNormalChatList) holder).textViewContent.setText(indexedText);
                         } else {
-                            if (chat.getUnreadCount() == 0) {
-                                Timber.d("Message READ");
-                                ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
-                            } else {
-                                Timber.d("Message NOT read");
-                                ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
-                            }
-
                             ((ViewHolderNormalChatList) holder).textViewContent.setText(lastMessageString);
                         }
                     }
@@ -1440,83 +1422,25 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                             Spannable name = new SpannableString(fullNameAction + ": ");
                             name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                            if (chat.getUnreadCount() == 0) {
-                                Timber.d("Message READ");
-                                Spannable myMessage = new SpannableString(invalidMetaMessage);
-                                myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                CharSequence indexedText = TextUtils.concat(name, myMessage);
-                                ((ViewHolderNormalChatList) holder).textViewContent.setText(indexedText);
-                            } else {
-                                Timber.d("Message NOT read");
-                                Spannable myMessage = new SpannableString(invalidMetaMessage);
-                                myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                CharSequence indexedText = TextUtils.concat(name, myMessage);
-                                ((ViewHolderNormalChatList) holder).textViewContent.setText(indexedText);
-                            }
+                            Spannable myMessage = new SpannableString(invalidMetaMessage);
+                            CharSequence indexedText = TextUtils.concat(name, myMessage);
+                            ((ViewHolderNormalChatList) holder).textViewContent.setText(indexedText);
                         } else {
-                            if (chat.getUnreadCount() == 0) {
-                                Timber.d("Message READ");
-                                ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
-                            } else {
-                                Timber.d("Message NOT read");
-                                ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
-                            }
-
                             ((ViewHolderNormalChatList) holder).textViewContent.setText(invalidMetaMessage);
                         }
                     }
                 }
-            } else if (messageType == MegaChatMessage.TYPE_CONTACT_ATTACHMENT && lastMessage != null && lastMessage.getUsersCount() > 1) {
+            } else if (messageType == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
                 long contactsCount = lastMessage.getUsersCount();
                 String contactAttachmentMessage = converterShortCodes(context.getString(R.string.contacts_sent, String.valueOf(contactsCount)));
                 Spannable myMessage = new SpannableString(contactAttachmentMessage);
 
                 if (chat.getLastMessageSender() == megaChatApi.getMyUserHandle()) {
                     Spannable me = new SpannableString(context.getString(R.string.word_me) + " ");
-                    me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                    myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    CharSequence indexedText = TextUtils.concat(me, myMessage);
-                    ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
-                    ((ViewHolderNormalChatList) holder).textViewContent.setText(indexedText);
-                } else if (chat.isGroup()) {
-                    long lastMsgSender = chat.getLastMessageSender();
-
-                    ((ViewHolderNormalChatList) holder).currentPosition = position;
-                    ((ViewHolderNormalChatList) holder).userHandle = lastMsgSender;
-
-                    String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
-
-                    if (isTextEmpty(fullNameAction) && !(((ViewHolderNormalChatList) holder).nameRequestedAction)) {
-                        fullNameAction = context.getString(R.string.unknown_name_label);
-                        ((ViewHolderNormalChatList) holder).nameRequestedAction = true;
-                        ((ViewHolderNormalChatList) holder).userHandle = lastMsgSender;
-
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chat.isPreview());
-
-                        megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-                        megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-                        megaChatApi.getUserEmail(lastMsgSender, listener);
-                    }
-
-                    Spannable name = new SpannableString(fullNameAction + ": ");
-                    name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                    if (chat.getUnreadCount() == 0) {
-                        myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    } else {
-                        myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    }
-
-                    ((ViewHolderNormalChatList) holder).textViewContent.setText(TextUtils.concat(name, myMessage));
+                    ((ViewHolderNormalChatList) holder).textViewContent.setText(TextUtils.concat(me, myMessage));
                 } else {
-                    if (chat.getUnreadCount() == 0) {
-                        ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
-                    } else {
-                        ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
-                    }
-
-                    ((ViewHolderNormalChatList) holder).textViewContent.setText(contactAttachmentMessage);
+                    Spannable me = new SpannableString(megaChatApi.getUserFullnameFromCache(chat.getLastMessageSender()) + ": ");
+                    ((ViewHolderNormalChatList) holder).textViewContent.setText(TextUtils.concat(me, myMessage));
                 }
             } else {
                 //OTHER TYPE OF MESSAGE
@@ -1584,14 +1508,6 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                         Spannable name = new SpannableString(fullNameAction + ": ");
                         name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         Spannable contactMessage = new SpannableString(lastMessageString);
-
-                        if (chat.getUnreadCount() == 0) {
-                            Timber.d("Message READ");
-                            contactMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, contactMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        } else {
-                            Timber.d("Message NOT read");
-                            contactMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, contactMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        }
                         CharSequence indexedText = TextUtils.concat(name, contactMessage);
                         ((ViewHolderNormalChatList) holder).textViewContent.setText(indexedText);
                     } else {
@@ -1600,6 +1516,12 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                 }
 
                 setVoiceClipOrLocationLayout(((ViewHolderNormalChatList) holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList) holder).voiceClipOrLocationText, ((ViewHolderNormalChatList) holder).textViewContent, R.drawable.ic_mic_on_small, chat.getUnreadCount() == 0);
+            }
+
+            if (chat.getUnreadCount() == 0) {
+                ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
+            } else {
+                ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
             }
         } else {
             Timber.w("Holder is NULL: %s", position);
