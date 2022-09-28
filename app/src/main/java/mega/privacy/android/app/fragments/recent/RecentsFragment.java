@@ -10,7 +10,6 @@ import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
-import static mega.privacy.android.app.utils.Constants.NODE_HANDLES;
 import static mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_RECETS;
@@ -76,7 +75,6 @@ import mega.privacy.android.app.main.adapters.RecentsAdapter;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
@@ -88,7 +86,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
     private ArrayList<MegaContactAdapter> visibleContacts = new ArrayList<>();
     private ArrayList<MegaRecentActionBucket> buckets;
-    private MegaRecentActionBucket bucketSelected;
     private ArrayList<RecentsItem> recentsItems;
     private RecentsAdapter adapter;
 
@@ -309,53 +306,15 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         }
     }
 
-    private long[] getBucketNodeHandles(boolean areImages) {
-        if (bucketSelected == null || bucketSelected.getNodes() == null || bucketSelected.getNodes().size() == 0)
-            return null;
-
-        MegaNode node;
-        MegaNodeList list = bucketSelected.getNodes();
-        ArrayList<Long> nodeHandlesList = new ArrayList<>();
-
-        for (int i = 0; i < list.size(); i++) {
-            node = list.get(i);
-            if (node == null) continue;
-
-//          Group handles by type of file
-            if (areImages && MimeTypeList.typeForName(node.getName()).isImage()) {
-//              only images on the one hand
-                nodeHandlesList.add(node.getHandle());
-            } else if (!areImages && isAudioOrVideo(node) && isInternalIntent(node)) {
-//              only videos or audios on the other
-                nodeHandlesList.add(node.getHandle());
-            }
-        }
-
-        long[] nodeHandles = new long[nodeHandlesList.size()];
-        for (int i = 0; i < nodeHandlesList.size(); i++) {
-            nodeHandles[i] = nodeHandlesList.get(i);
-        }
-
-        return nodeHandles;
-    }
-
-    public void openFile(int index, MegaNode node, boolean isMedia) {
+    public void openFile(int index, MegaNode node) {
         Intent intent;
 
         if (MimeTypeList.typeForName(node.getName()).isImage()) {
-            long[] bucket = getBucketNodeHandles(true);
-            if (isMedia && bucket != null && bucket.length > 0) {
-                intent = ImageViewerActivity.getIntentForChildren(
-                        requireContext(),
-                        bucket
-                );
-            } else {
-                intent = ImageViewerActivity.getIntentForSingleNode(
-                        requireContext(),
-                        node.getHandle(),
-                        false
-                );
-            }
+            intent = ImageViewerActivity.getIntentForSingleNode(
+                    requireContext(),
+                    node.getHandle(),
+                    false
+            );
 
             putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS, adapter);
             startActivity(intent);
@@ -375,12 +334,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
             intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
-            if (isMedia) {
-                intent.putExtra(NODE_HANDLES, getBucketNodeHandles(false));
-                intent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true);
-            } else {
-                intent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
-            }
+            intent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 
             if (isLocalFile(node, megaApi, localPath)) {
                 paramsSetSuccessfully = setLocalIntentParams(requireContext(), node, intent, localPath,
@@ -440,10 +394,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             requireContext().startActivity(intent);
             ((ManagerActivity) requireContext()).overridePendingTransition(0, 0);
         }
-    }
-
-    public void setBucketSelected(MegaRecentActionBucket bucketSelected) {
-        this.bucketSelected = bucketSelected;
     }
 
     @Override

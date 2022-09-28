@@ -356,7 +356,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             }
             case R.id.item_bucket_layout: {
                 if (node != null) {
-                    ((RecentsFragment) fragment).openFile(holder.getAdapterPosition(), node, false);
+                    ((RecentsFragment) fragment).openFile(holder.getAdapterPosition(), node);
                     break;
                 }
                 MegaRecentActionBucket bucket = item.getBucket();
