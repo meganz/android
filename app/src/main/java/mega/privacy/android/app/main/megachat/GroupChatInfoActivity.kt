@@ -100,7 +100,15 @@ import javax.inject.Inject
  * @property startCallUseCase   [StartCallUseCase]
  * @property endCallUseCase [EndCallUseCase]
  * @property getCallUseCase [GetCallUseCase]
- */
+ * @property isChatOpen True when the megaChatApi.openChatRoom() method has already been called from ChatActivity. False, otherwise
+ * @property chatLink The chat link
+ * @property chat [MegaChatRoom]
+ * @property chatC [ChatController]
+ * @property chatHandle The chat id
+ * @property selectedHandleParticipant The handle of participant selected
+ * @property participantsCount Number of participants
+ * @property endCallForAllShouldBeVisible True when end call for all should be visible. False, otherwise.
+ * */
 @AndroidEntryPoint
 class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterface,
     MegaRequestListenerInterface, SnackbarShower {
@@ -434,7 +442,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     /**
      * Open add participants screen if has contacts
      */
-    @Suppress("deprecation")
     fun chooseAddParticipantDialog() {
         Timber.d("chooseAddContactDialog")
         if (megaChatApi.isSignalActivityRequired) {
@@ -451,6 +458,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 intent.putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatHandle)
                 intent.putExtra(INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
                     getString(R.string.add_participants_menu_item))
+
+                @Suppress("deprecation")
                 startActivityForResult(intent, Constants.REQUEST_ADD_PARTICIPANTS)
             }
         } else {
@@ -658,7 +667,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     }
 
     @Deprecated("Deprecated in Java")
-    @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         Timber.d("Result Code: %s", resultCode)
         if (intent == null) {
@@ -677,6 +685,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             Timber.e("Error adding participants")
         }
 
+        @Suppress("deprecation")
         super.onActivityResult(requestCode, resultCode, intent)
     }
 
@@ -1289,7 +1298,13 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         megaChatApi.createPublicChat(peers, ChatUtil.getTitleChat(chatRoom), listener)
     }
 
-
+    /**
+     * Shows the new chat created or an error if it was not possible to create it
+     *
+     * @param errorCode Error code of the request.
+     * @param chatHandle The chat Id.
+     * @param publicLink Link of the chat.
+     */
     fun onRequestFinishCreateChat(errorCode: Int, chatHandle: Long, publicLink: Boolean) {
         if (errorCode == MegaChatError.ERROR_OK) {
             val intent = Intent(this, ChatActivity::class.java)
