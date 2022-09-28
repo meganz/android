@@ -30,7 +30,7 @@ class DefaultGetPublicLinksTest {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_NONE)
     }
     private val getLinksSortOrder = mock<GetLinksSortOrder> {
-        onBlocking { invoke() }.thenReturn(1)
+        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
     private val filesRepository = mock<FilesRepository>()
 

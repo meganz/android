@@ -163,19 +163,13 @@ interface FilesRepository {
      * @param order sort order, if null the default order is applied
      * @return List of MegaNode corresponding of a public link
      */
-    suspend fun getPublicLinks(order: Int?): List<MegaNode>?
+    suspend fun getPublicLinks(order: SortOrder?): List<MegaNode>?
 
     /**
      * Get others sort order
      * @return others sort order
      */
     suspend fun getOthersSortOrder(): Int
-
-    /**
-     * Get links cloud sort order
-     * @return links cloud sort order
-     */
-    suspend fun getLinksSortOrder(): Int
 
 
     /**

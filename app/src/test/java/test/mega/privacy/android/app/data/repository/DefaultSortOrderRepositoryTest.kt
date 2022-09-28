@@ -32,22 +32,67 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get camera sort order return type is sort order`() = runTest {
-        whenever(megaLocalStorageGateway.getCameraSortOrder()).thenReturn(1)
-        whenever(sortOrderMapper.invoke(1)).thenReturn(SortOrder.ORDER_NONE)
+        val order = 1
+        whenever(megaLocalStorageGateway.getCameraSortOrder()).thenReturn(order)
+        whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         assertThat(underTest.getCameraSortOrder()).isInstanceOf(SortOrder::class.java)
     }
 
     @Test
-    fun `test that get camera sort order calls get camera sort order of mega local storage gateway`() =
-        runTest {
-            underTest.getCameraSortOrder()
-            verify(megaLocalStorageGateway).getCameraSortOrder()
-        }
+    fun `test that get camera sort order invokes get camera sort order of gateway`() = runTest {
+        underTest.getCameraSortOrder()
+        verify(megaLocalStorageGateway).getCameraSortOrder()
+    }
 
     @Test
     fun `test that get camera sort order invokes sort order mapper`() = runTest {
-        whenever(megaLocalStorageGateway.getCameraSortOrder()).thenReturn(1)
+        val order = 1
+        whenever(megaLocalStorageGateway.getCameraSortOrder()).thenReturn(order)
         underTest.getCameraSortOrder()
-        verify(sortOrderMapper).invoke(1)
+        verify(sortOrderMapper).invoke(order)
+    }
+
+    @Test
+    fun `test that get cloud sort order return type is sort order`() = runTest {
+        val order = 2
+        whenever(megaLocalStorageGateway.getCloudSortOrder()).thenReturn(order)
+        whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_DEFAULT_DESC)
+        assertThat(underTest.getCloudSortOrder()).isInstanceOf(SortOrder::class.java)
+    }
+
+    @Test
+    fun `test that get cloud sort order invokes get cloud sort order of gateway`() = runTest {
+        underTest.getCloudSortOrder()
+        verify(megaLocalStorageGateway).getCloudSortOrder()
+    }
+
+    @Test
+    fun `test that get cloud sort order invokes sort order mapper`() = runTest {
+        val order = 2
+        whenever(megaLocalStorageGateway.getCloudSortOrder()).thenReturn(order)
+        underTest.getCloudSortOrder()
+        verify(sortOrderMapper).invoke(order)
+    }
+
+    @Test
+    fun `test that get links sort order return type is sort order`() = runTest {
+        val order = 3
+        whenever(megaLocalStorageGateway.getLinksSortOrder()).thenReturn(order)
+        whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_SIZE_ASC)
+        assertThat(underTest.getLinksSortOrder()).isInstanceOf(SortOrder::class.java)
+    }
+
+    @Test
+    fun `test that get links sort order invokes get links sort order of gateway`() = runTest {
+        underTest.getLinksSortOrder()
+        verify(megaLocalStorageGateway).getLinksSortOrder()
+    }
+
+    @Test
+    fun `test that get links sort order invokes sort order mapper`() = runTest {
+        val order = 3
+        whenever(megaLocalStorageGateway.getLinksSortOrder()).thenReturn(order)
+        underTest.getLinksSortOrder()
+        verify(sortOrderMapper).invoke(order)
     }
 }
