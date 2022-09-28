@@ -63,10 +63,12 @@ class DefaultFilesRepository @Inject constructor(
         withContext(ioDispatcher) {
             val rootNode = megaApiGateway.getRootNode()
             suspendCoroutine { continuation ->
-                megaApiGateway.getFolderInfo(rootNode,
+                megaApiGateway.getFolderInfo(
+                    rootNode,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = onRequestFolderInfoCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
@@ -105,6 +107,10 @@ class DefaultFilesRepository @Inject constructor(
         megaApiGateway.getRubbishBinNode()
     }
 
+    override suspend fun isInRubbish(node: MegaNode): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.isInRubbish(node)
+    }
+
     override suspend fun getParentNode(node: MegaNode): MegaNode? = withContext(ioDispatcher) {
         megaApiGateway.getParentNode(node)
     }
@@ -117,6 +123,11 @@ class DefaultFilesRepository @Inject constructor(
     override suspend fun getChildrenNode(parentNode: MegaNode, order: SortOrder?): List<MegaNode> =
         withContext(ioDispatcher) {
             megaApiGateway.getChildrenByNode(parentNode, sortOrderIntMapper(order))
+        }
+
+    override suspend fun getNodeByPath(path: String?, megaNode: MegaNode?): MegaNode? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getNodeByPath(path, megaNode)
         }
 
     override suspend fun getNodeByHandle(handle: Long): MegaNode? = withContext(ioDispatcher) {
