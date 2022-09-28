@@ -47,7 +47,7 @@ class DefaultGetThumbnailTest {
     fun `test that if local thumbnail does not exist and an error is thrown when retrieving from server then return null`() =
         runTest {
             whenever(imageRepository.getThumbnailFromLocal(any())).thenReturn(null)
-            whenever(imageRepository.getThumbnailFromServer(any())).thenThrow(MegaException(null,
+            whenever(imageRepository.getThumbnailFromServer(any())).thenThrow(MegaException(0,
                 null))
 
             assertThat(underTest.invoke(any())).isEqualTo(null)
