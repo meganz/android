@@ -7,6 +7,7 @@ import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.RepositoryModule
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.repository.GlobalStatesRepository
+import mega.privacy.android.app.domain.repository.RecentActionsRepository
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
@@ -105,4 +106,7 @@ object TestRepositoryModule {
 
     @Provides
     fun provideDomainFilesRepository(): FileRepository = mock()
+
+    @Provides
+    fun providesRecentActionsRepository(): RecentActionsRepository = mock()
 }
