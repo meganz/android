@@ -194,6 +194,9 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode? =
         megaApi.getNodeByHandle(nodeHandle)
 
+    override suspend fun getNodeByPath(path: String?, megaNode: MegaNode?): MegaNode? =
+        megaApi.getNodeByPath(path, megaNode)
+
     override suspend fun getFingerprint(filePath: String): String? =
         megaApi.getFingerprint(filePath)
 
@@ -341,7 +344,7 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getUserAvatarColor(megaUser: MegaUser): String =
         megaApi.getUserAvatarColor(megaUser)
 
-    override suspend fun getUserAvatar(user: MegaUser, dstPath: String): Boolean {
+    override suspend fun getUserAvatar(user: MegaUser, destinationPath: String): Boolean {
         return suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, e ->
@@ -350,8 +353,9 @@ class MegaApiFacade @Inject constructor(
                 onRequestTemporaryError = { _, e -> continuation.resume(e.errorCode == MegaError.API_OK) })
 
             continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
-            megaApi.getUserAvatar(user,
-                dstPath,
+            megaApi.getUserAvatar(
+                user,
+                destinationPath,
                 listener
             )
         }

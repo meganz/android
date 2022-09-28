@@ -17,7 +17,6 @@ import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -60,6 +59,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.MenuItemCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.appbar.AppBarLayout;
@@ -82,18 +82,20 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.main.providers.CloudDriveProviderFragment;
 import mega.privacy.android.app.main.providers.IncomingSharesProviderFragment;
 import mega.privacy.android.app.main.providers.ProviderPageAdapter;
+import mega.privacy.android.app.presentation.provider.FileProviderViewModel;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -126,6 +128,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
     @Inject
     DatabaseHandler dbH;
+
+    private FileProviderViewModel viewMode;
 
     private String lastEmail;
     private String lastPassword;
@@ -229,6 +233,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         super.onCreate(savedInstanceState);
+
+        viewMode = new ViewModelProvider(this).get(FileProviderViewModel.class);
 
         ColorUtils.setStatusBarTextColor(this);
 
@@ -915,7 +921,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
                     Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
 
-        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewMode.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }

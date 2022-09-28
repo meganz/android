@@ -17,6 +17,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
@@ -31,6 +32,7 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
+import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
 import java.io.File
 import java.util.concurrent.Callable
@@ -46,6 +48,7 @@ class TrackInfoViewModel @Inject constructor(
     private val dbHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
     private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
+    private val monitorStorageStateEvent: MonitorStorageStateEvent,
 ) : BaseRxViewModel() {
     private val _metadata = MutableLiveData<Pair<Metadata, String>>()
     val metadata: LiveData<Pair<Metadata, String>> = _metadata
@@ -246,4 +249,9 @@ class TrackInfoViewModel @Inject constructor(
 
         metadataOnlyPlayer?.release()
     }
+
+    /**
+     * Get latest value of [StorageState]
+     */
+    fun getStorageState() = monitorStorageStateEvent.getState()
 }

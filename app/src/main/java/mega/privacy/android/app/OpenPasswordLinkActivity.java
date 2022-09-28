@@ -15,12 +15,16 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
+
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.listeners.PasswordLinkListener;
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface;
 import mega.privacy.android.app.main.DecryptAlertDialog;
 import mega.privacy.android.app.main.FileLinkActivity;
 import mega.privacy.android.app.main.FolderLinkActivity;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
 import timber.log.Timber;
 
 public class OpenPasswordLinkActivity extends PasscodeActivity
@@ -80,7 +84,15 @@ public class OpenPasswordLinkActivity extends PasscodeActivity
         }
 
         progressBar.setVisibility(View.VISIBLE);
-        megaApi.decryptPasswordProtectedLink(url, key, new PasswordLinkListener(this));
+        megaApi.decryptPasswordProtectedLink(url, key, new OptionalMegaRequestListenerInterface() {
+            @Override
+            public void onRequestFinish(@NonNull MegaApiJava api, @NonNull MegaRequest request, @NonNull MegaError error) {
+                super.onRequestFinish(api, request, error);
+                if (request.getType() == MegaRequest.TYPE_PASSWORD_LINK) {
+                    managePasswordLinkRequest(error, request.getText());
+                }
+            }
+        });
     }
 
     @Override

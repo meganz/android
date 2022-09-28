@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">定期契約は解除されました</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">サブスクリプションを解除できませんでした。サポートについてはsupport&#64;mega.nzにお問い合わせください</string>
+    <string name="cancel_subscription_error">サブスクリプションを解除できませんでした。サポートについてはsupport&#64;mega.nzにお問い合わせください。</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">他のセッションを閉じる</string>
     <!-- Message after kill all opened sessions -->
@@ -307,7 +307,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">転送を表示</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">ほとんどの端末は4&#160;GBを超えるファイルをダウンロードできません。あなたのダウンロードはおそらく失敗するでしょう</string>
+    <string name="error_file_size_greater_than_4gb">ほとんどの端末は4&#160;GBを超えるファイルをダウンロードできません。あなたのダウンロードはおそらく失敗するでしょう。</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">端末上にこのファイルを実行できるアプリがありません</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->

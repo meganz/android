@@ -50,7 +50,6 @@ class DefaultInitialiseLoggingTest {
         underTest(true)
 
         verify(loggingRepository, times(1)).enableLogAllToConsole()
-        verify(loggingRepository, times(1)).enableStrictMode()
         verifyNoMoreInteractions(loggingRepository)
     }
 

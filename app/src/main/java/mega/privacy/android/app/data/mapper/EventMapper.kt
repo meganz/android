@@ -17,16 +17,16 @@ typealias EventMapper = (@JvmSuppressWildcards MegaEvent) -> @JvmSuppressWildcar
 internal fun toEvent(megaEvent: MegaEvent): Event = when (mapType(megaEvent.type)) {
     EventType.Storage -> StorageStateEvent(
         handle = megaEvent.handle,
-        eventString = megaEvent.eventString ?: "",
+        eventString = megaEvent.eventString.orEmpty(),
         number = megaEvent.number,
-        text = megaEvent.text ?: "",
+        text = megaEvent.text.orEmpty(),
         type = EventType.Storage,
         storageState = toStorageState(megaEvent.number.toInt()))
     else -> NormalEvent(
         handle = megaEvent.handle,
-        eventString = megaEvent.eventString ?: "",
+        eventString = megaEvent.eventString.orEmpty(),
         number = megaEvent.number,
-        text = megaEvent.text ?: "",
+        text = megaEvent.text.orEmpty(),
         type = mapType(megaEvent.type))
 }
 

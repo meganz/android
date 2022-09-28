@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Build
+import android.os.StrictMode
 import androidx.core.provider.FontRequest
 import androidx.emoji.text.EmojiCompat
 import androidx.emoji.text.EmojiCompat.InitCallback
@@ -53,6 +54,7 @@ import mega.privacy.android.app.meeting.listeners.MeetingListener
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.logging.InitialiseLoggingUseCaseJavaWrapper
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.NetworkStateReceiver
@@ -65,7 +67,9 @@ import mega.privacy.android.app.utils.ContextUtils.getAvailableMemory
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams.get
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.InitialiseLogging
+import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -187,6 +191,9 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     @Inject
     lateinit var globalChatListener: GlobalChatListener
 
+    @Inject
+    lateinit var monitorStorageStateEvent: MonitorStorageStateEvent
+
     var localIpAddress: String? = ""
 
     var isEsid = false
@@ -215,6 +222,7 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     override fun onCreate() {
         instance = this
         super<MultiDexApplication>.onCreate()
+        enableStrictMode()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         initialiseLogging()
@@ -314,6 +322,31 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         }
     }
 
+    private fun enableStrictMode() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build()
+            )
+
+            StrictMode.setVmPolicy(
+                StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build()
+            )
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder() // Other StrictMode checks that you've previously added.
+                    .detectUnsafeIntentLaunch()
+                    .penaltyLog()
+                    .build())
+            }
+        }
+    }
+
     private fun initialiseLogging() =
         InitialiseLoggingUseCaseJavaWrapper(initialiseLoggingUseCase).invokeUseCase(BuildConfig.DEBUG)
 
@@ -348,7 +381,7 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         Timber.d("askForFullAccountInfo")
         megaApi.run {
             getPaymentMethods(null)
-            if (storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN) {
+            if (monitorStorageStateEvent.getState() == StorageState.Unknown) {
                 getAccountDetails()
             } else {
                 getSpecificAccountDetails(false, true, true)

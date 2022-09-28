@@ -28,6 +28,7 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -40,6 +41,7 @@ import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
+import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -76,6 +78,7 @@ class ManagerViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
+    private val monitorStorageStateEvent: MonitorStorageStateEvent,
 ) : ViewModel() {
 
     /**
@@ -334,4 +337,9 @@ class ManagerViewModel @Inject constructor(
             inboxNode = getInboxNode()
         }
     }
+
+    /**
+     * Get latest [StorageState]
+     */
+    fun getStorageState() = monitorStorageStateEvent.getState()
 }

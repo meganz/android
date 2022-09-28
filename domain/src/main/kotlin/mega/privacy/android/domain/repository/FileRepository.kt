@@ -21,5 +21,5 @@ interface FileRepository {
      *
      * @return Boolean
      */
-    suspend fun checkNodeInRubbish(handle: Long): Boolean
+    suspend fun isNodeInRubbish(handle: Long): Boolean
 }

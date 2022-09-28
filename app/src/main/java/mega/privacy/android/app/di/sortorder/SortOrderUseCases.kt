@@ -22,8 +22,8 @@ class SortOrderUseCases {
      * Provide the GetCloudSortOrder implementation
      */
     @Provides
-    fun provideGetCloudSortOrder(filesRepository: FilesRepository): GetCloudSortOrder =
-        GetCloudSortOrder(filesRepository::getCloudSortOrder)
+    fun provideGetCloudSortOrder(sortOrderRepository: SortOrderRepository): GetCloudSortOrder =
+        GetCloudSortOrder(sortOrderRepository::getCloudSortOrder)
 
     /**
      * Provide the GetCameraSortOrder implementation

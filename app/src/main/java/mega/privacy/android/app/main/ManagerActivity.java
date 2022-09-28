@@ -154,7 +154,6 @@ import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED;
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.ACCESS_READ;
@@ -324,10 +323,10 @@ import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface;
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
 import mega.privacy.android.app.logging.LegacyLoggingSettings;
 import mega.privacy.android.app.main.adapters.TransfersPageAdapter;
@@ -428,6 +427,7 @@ import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
+import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
 import mega.privacy.android.domain.entity.transfer.TransferType;
@@ -1630,7 +1630,7 @@ public class ManagerActivity extends TransfersManagementActivity
         transfersInProgress = new ArrayList<Integer>();
 
         //sync local contacts to see who's on mega.
-        if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+        if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && viewModel.getStorageState() != StorageState.PayWall) {
             Timber.d("sync mega contacts");
             MegaContactGetter getter = new MegaContactGetter(this);
             getter.getMegaContacts(megaApi, TimeUtils.WEEK, this);
@@ -2489,13 +2489,13 @@ public class ManagerActivity extends TransfersManagementActivity
 
                         if (accountType != FREE) {
                             showMyAccount(new Pair<>(EXTRA_ACCOUNT_TYPE, accountType));
-                        } else if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+                        } else if (firstLogin && viewModel.getStorageState() != StorageState.PayWall) {
                             drawerItem = DrawerItem.PHOTOS;
                         } else {
                             showMyAccount();
                         }
                     } else {
-                        if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+                        if (firstLogin && viewModel.getStorageState() != StorageState.PayWall) {
                             Timber.d("First login. Go to Camera Uploads configuration.");
                             drawerItem = DrawerItem.PHOTOS;
                             setIntent(null);
@@ -2522,7 +2522,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                         if (accountType != FREE) {
                             showMyAccount(new Pair<>(EXTRA_ACCOUNT_TYPE, accountType));
-                        } else if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+                        } else if (firstLogin && viewModel.getStorageState() != StorageState.PayWall) {
                             drawerItem = DrawerItem.PHOTOS;
                         } else {
                             showMyAccount();
@@ -2534,7 +2534,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 firstLogin = false;
                             } else {
                                 firstLogin = true;
-                                if (app.getStorageState() != STORAGE_STATE_PAYWALL && isInPhotosPage()) {
+                                if (viewModel.getStorageState() != StorageState.PayWall && isInPhotosPage()) {
                                     drawerItem = DrawerItem.PHOTOS;
                                 }
                             }
@@ -3027,7 +3027,7 @@ public class ManagerActivity extends TransfersManagementActivity
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         supportInvalidateOptionsMenu();
 
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             drawerItem = DrawerItem.CLOUD_DRIVE;
         } else {
             viewModel.setIsFirstLogin(true);
@@ -8104,7 +8104,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         Manifest.permission.WRITE_EXTERNAL_STORAGE);
             }
 
-            if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+            if (viewModel.getStorageState() == StorageState.PayWall) {
                 showOverDiskQuotaPaywallWarning();
                 return;
             }
@@ -9124,7 +9124,7 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
 
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             dismissAlertDialogIfExists(statusDialog);
             dismissAlertDialogIfExists(processFileDialog);
             showOverDiskQuotaPaywallWarning();
@@ -9256,7 +9256,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void createFile(String name, String data, MegaNode parentNode) {
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
@@ -10023,8 +10023,16 @@ public class ManagerActivity extends TransfersManagementActivity
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setMessage(getResources().getQuantityString(R.plurals.cancel_selected_transfers, selectedTransfers.size()))
                 .setPositiveButton(R.string.button_continue, (dialog, which) -> {
-                    CancelTransferListener cancelTransferListener = new CancelTransferListener(managerActivity);
-                    cancelTransferListener.cancelTransfers(selectedTransfers);
+                    for (MegaTransfer transfer: selectedTransfers) {
+                        megaApi.cancelTransfer(transfer, new OptionalMegaRequestListenerInterface() {
+                            @Override
+                            public void onRequestFinish(@NonNull MegaApiJava api,
+                                                        @NonNull MegaRequest request,
+                                                        @NonNull MegaError error) {
+                                super.onRequestFinish(api, request, error);
+                            }
+                        });
+                    }
 
                     if (isTransfersInProgressAdded()) {
                         transfersFragment.destroyActionMode();

@@ -22,6 +22,7 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.presentation.favourites.FavouritesFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.model.Favourite
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaNode
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
@@ -152,7 +153,7 @@ class FavouritesFragmentTest {
         whenever(favourite.isFolder).thenReturn(true)
         val list = listOf(favouriteInfo)
         runBlocking {
-            whenever(TestSortOrderUseCases.getCloudSortOrder()).thenReturn(1)
+            whenever(TestSortOrderUseCases.getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
             whenever(FavouritesTestModule.getAllFavourites()).thenReturn(
                 flowOf(list)
             )

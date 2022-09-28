@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Het abonnement is geannuleerd</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">We konden uw abonnement niet annuleren. Neem a.u.b. contact op met support&#64;mega.nz voor assistentie</string>
+    <string name="cancel_subscription_error">We konden uw abonnement niet annuleren. Neem a.u.b. contact op met support&#64;mega.nz voor assistentie.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Sluit andere sessies</string>
     <!-- Message after kill all opened sessions -->
@@ -315,7 +315,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Overdrachten weergeven</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">De meeste apparaten kunnen geen bestanden downloaden die groter zijn dan 4&#160;GB. Uw download zal waarschijnlijk mislukken</string>
+    <string name="error_file_size_greater_than_4gb">De meeste apparaten kunnen geen bestanden downloaden die groter zijn dan 4&#160;GB. Uw download zal waarschijnlijk mislukken.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Er is geen applicatie beschikbaar om dit bestand te openen op uw apparaat</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->

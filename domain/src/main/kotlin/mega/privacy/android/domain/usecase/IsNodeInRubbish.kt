@@ -4,7 +4,7 @@ package mega.privacy.android.domain.usecase
 /**
  * Use Case that returns Boolean when the node is in rubbish.
  */
-fun interface CheckNodeInRubbish {
+fun interface IsNodeInRubbish {
 
     /**
      * @param handle

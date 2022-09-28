@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">此筆訂閱已經成功取消</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">我們無法取消您的訂閱。請聯繫 support&#64;mega.nz 取得協助</string>
+    <string name="cancel_subscription_error">我們無法取消您的訂閱。請聯繫 support&#64;mega.nz 取得協助。</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">關閉其他登入帳戶</string>
     <!-- Message after kill all opened sessions -->
@@ -307,7 +307,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">查看傳輸</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">大多數的裝置無法下載大於4&#160;GB的檔案。因此您的下載可能會失敗</string>
+    <string name="error_file_size_greater_than_4gb">大多數的裝置無法下載大於4&#160;GB的檔案。因此您的下載可能會失敗。</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">你的裝置上沒有任何應用程式可以執行這個檔案</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -3764,7 +3764,7 @@
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
-    <string name="photos_action_filter">過濾</string>
+    <string name="photos_action_filter">篩選</string>
     <!-- Filter option to show all photos -->
     <string name="photos_filter_all_photos"></string>
     <!-- Filter option to show only photos from Cloud Drive -->

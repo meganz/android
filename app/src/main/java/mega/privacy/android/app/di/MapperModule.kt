@@ -6,6 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.mapper.AccountTypeMapper
+import mega.privacy.android.app.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.app.data.mapper.ChatRequestMapper
 import mega.privacy.android.app.data.mapper.ContactDataMapper
 import mega.privacy.android.app.data.mapper.ContactItemMapper
@@ -37,6 +38,7 @@ import mega.privacy.android.app.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.mapper.VideoMapper
 import mega.privacy.android.app.data.mapper.getFileTypeInfo
 import mega.privacy.android.app.data.mapper.getMimeType
+import mega.privacy.android.app.data.mapper.mapBooleanPreference
 import mega.privacy.android.app.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.app.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.app.data.mapper.toAccountType
@@ -79,30 +81,54 @@ import mega.privacy.android.domain.entity.preference.StartScreen
 @InstallIn(SingletonComponent::class)
 class MapperModule {
 
+    /**
+     * Provide user update mapper
+     */
     @Provides
     fun provideUserUpdateMapper(): UserUpdateMapper = ::mapMegaUserListToUserUpdate
 
+    /**
+     * Provide favourite info mapper
+     */
     @Provides
     fun provideFavouriteInfoMapper(): FavouriteInfoMapper = ::toFavouriteInfo
 
+    /**
+     * Provide favourite mapper
+     */
     @Provides
     fun provideFavouriteMapper(): FavouriteMapper = ::toFavourite
 
+    /**
+     * Provide feature flag mapper
+     */
     @Provides
     fun provideFeatureFlagMapper(): FeatureFlagMapper = ::toFeatureFlag
 
+    /**
+     * Provide data mapper
+     */
     @Provides
     fun provideDataMapper(): DataMapper = ::toData
 
     @Provides
     fun providePushMessageMapper(): PushMessageMapper = ::toPushMessage
 
+    /**
+     * Provide contact request mapper
+     */
     @Provides
     fun provideContactRequestMapper(): ContactRequestMapper = ::toContactRequest
 
+    /**
+     * Provide event mapper
+     */
     @Provides
     fun provideEventMapper(): EventMapper = ::toEvent
 
+    /**
+     * Provide mime type mapper
+     */
     @Provides
     fun provideMimeTypeMapper(): MimeTypeMapper = { extension ->
         getMimeType(extension,
@@ -110,17 +136,31 @@ class MapperModule {
             ::getMimeTypeFromExtension)
     }
 
+    /**
+     * Provide user alert mapper
+     */
     @Provides
     fun provideUserAlertMapper(): UserAlertMapper = ::toUserAlert
 
+    /**
+     * Provide chat request mapper
+     */
     @Provides
     fun provideChatRequestMapper(): ChatRequestMapper = ::toChatRequest
 
+    /**
+     * Provide file type info mapper
+     *
+     * @param mimeTypeMapper
+     */
     @Provides
     fun provideFileTypeInfoMapper(mimeTypeMapper: MimeTypeMapper): FileTypeInfoMapper = { node ->
         getFileTypeInfo(node, mimeTypeMapper)
     }
 
+    /**
+     * Provide favourite folder info mapper
+     */
     @Provides
     fun provideFavouriteFolderInfoMapper(): FavouriteFolderInfoMapper = ::toFavouriteFolderInfo
 
@@ -159,24 +199,45 @@ class MapperModule {
         toTransferEventModel(event, transferMapper, exceptionMapper)
     }
 
+    /**
+     * Provide images mapper
+     */
     @Provides
     fun provideImagesMapper(): ImageMapper = ::toImage
 
+    /**
+     * Provide videos mapper
+     */
     @Provides
     fun provideVideosMapper(): VideoMapper = ::toVideo
 
+    /**
+     * Provide node update mapper
+     */
     @Provides
     fun provideNodeUpdateMapper(): NodeUpdateMapper = ::mapMegaNodeListToNodeUpdate
 
+    /**
+     * Provide start screen mapper
+     */
     @Provides
     fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
 
+    /**
+     * Provide user last green mapper
+     */
     @Provides
     fun provideUserLastGreenMapper(): UserLastGreenMapper = ::toUserUserLastGreen
 
+    /**
+     * Provide mega chat peer list mapper
+     */
     @Provides
     fun provideMegaChatPeerListMapper(): MegaChatPeerListMapper = ::toMegaChatPeerList
 
+    /**
+     * Provide online status mapper
+     */
     @Provides
     fun provideOnlineStatusMapper(): OnlineStatusMapper = ::toOnlineStatus
 
@@ -192,12 +253,21 @@ class MapperModule {
     @Provides
     fun provideSortOrderIntMapper(): SortOrderIntMapper = ::toInt
 
+    /**
+     * Provide contact item mapper
+     */
     @Provides
     fun provideContactItemMapper(): ContactItemMapper = ::toContactItem
 
+    /**
+     * Provide contact data mapper
+     */
     @Provides
     fun provideContactDataMapper(): ContactDataMapper = ::toContactData
-    
+
+    /**
+     * Provide storage state mapper
+     */
     @Provides
     fun provideStorageStateMapper(): StorageStateMapper = ::toStorageState
 
@@ -218,5 +288,12 @@ class MapperModule {
      */
     @Provides
     fun provideUserAccountMapper(): UserAccountMapper = ::UserAccount
+
+
+    /**
+     * Provide boolean preference mapper
+     */
+    @Provides
+    fun provideBooleanPreferenceMapper(): BooleanPreferenceMapper = ::mapBooleanPreference
 
 }

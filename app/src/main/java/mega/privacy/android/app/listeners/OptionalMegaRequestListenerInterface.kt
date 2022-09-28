@@ -13,7 +13,7 @@ import nz.mega.sdk.MegaRequestListenerInterface
  * @property onRequestTemporaryError Action to perform on request temporary error, null if not needed.
  * @property onRequestFinish         Action to perform on request finish, null if not needed.
  */
-class OptionalMegaRequestListenerInterface(
+open class OptionalMegaRequestListenerInterface(
     private val onRequestStart: ((MegaRequest) -> Unit)? = null,
     private val onRequestUpdate: ((MegaRequest) -> Unit)? = null,
     private val onRequestTemporaryError: ((MegaRequest, MegaError) -> Unit)? = null,
