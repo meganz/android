@@ -100,6 +100,7 @@ import javax.inject.Inject
  * @property startCallUseCase   [StartCallUseCase]
  * @property endCallUseCase [EndCallUseCase]
  * @property getCallUseCase [GetCallUseCase]
+ * @property binding [ActivityGroupChatPropertiesBinding]
  * @property isChatOpen True when the megaChatApi.openChatRoom() method has already been called from ChatActivity. False, otherwise
  * @property chatLink The chat link
  * @property chat [MegaChatRoom]
@@ -127,12 +128,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     lateinit var binding: ActivityGroupChatPropertiesBinding
 
-    /**
-     * isChatOpen is:
-     * - True when the megaChatApi.openChatRoom() method has already been called from ChatActivity
-     * and the changes related to history clearing will be listened from there.
-     * - False when it is necessary to call megaChatApi.openChatRoom() method to listen for changes related to history clearing.
-     */
     var isChatOpen = false
     var chatLink: String? = null
     var chat: MegaChatRoom? = null
