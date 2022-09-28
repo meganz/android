@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.recents
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -19,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.brandongogetap.stickyheaders.StickyLayoutManager
 import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler
 import com.jeremyliao.liveeventbus.LiveEventBus
-import mega.privacy.android.app.MegaApplication
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaContactAdapter
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -29,6 +28,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.EventConstants
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.recent.SelectedBucketViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForSingleNode
 import mega.privacy.android.app.main.ManagerActivity
@@ -51,13 +51,17 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Recents page
  */
+@AndroidEntryPoint
 class RecentsFragment : Fragment(), StickyHeaderHandler {
 
-    private var megaApi: MegaApiAndroid? = null
+    @Inject
+    @MegaApi
+    lateinit var megaApi: MegaApiAndroid
 
     private val visibleContacts = ArrayList<MegaContactAdapter>()
     private var buckets: List<MegaRecentActionBucket> = listOf()
@@ -77,7 +81,7 @@ class RecentsFragment : Fragment(), StickyHeaderHandler {
 
     private val nodeChangeObserver = Observer { forceUpdate: Boolean ->
         if (forceUpdate) {
-            buckets = megaApi?.recentActions ?: emptyList()
+            buckets = megaApi.recentActions ?: emptyList()
             reloadItems(buckets)
             refreshRecentsActions()
             setVisibleContacts()
@@ -113,11 +117,7 @@ class RecentsFragment : Fragment(), StickyHeaderHandler {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (megaApi == null) {
-            megaApi = ((requireContext() as Activity).application as MegaApplication).megaApi
-        }
-
-        buckets = megaApi?.recentActions ?: emptyList()
+        buckets = megaApi.recentActions ?: emptyList()
 
         fillRecentItems(buckets)
         setRecentsView()
@@ -188,7 +188,7 @@ class RecentsFragment : Fragment(), StickyHeaderHandler {
                 Context.MODE_PRIVATE)
             .getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
         setRecentsView(hideRecentActivity)
-        (requireContext() as ManagerActivity).setToolbarTitle()
+        (requireActivity() as ManagerActivity).setToolbarTitle()
     }
 
     /**
@@ -261,7 +261,7 @@ class RecentsFragment : Fragment(), StickyHeaderHandler {
 
     private fun setVisibleContacts() {
         visibleContacts.clear()
-        val contacts = megaApi?.contacts ?: return
+        val contacts = megaApi.contacts
         for (i in contacts.indices) {
             if (contacts[i].visibility == MegaUser.VISIBILITY_VISIBLE) {
                 val contactHandle = contacts[i].handle
@@ -312,7 +312,7 @@ class RecentsFragment : Fragment(), StickyHeaderHandler {
             }
             launchIntent(intent, paramsSetSuccessfully, node, index)
         } else if (MimeTypeList.typeForName(node.name).isURL) {
-            manageURLNode(requireContext(), megaApi!!, node)
+            manageURLNode(requireContext(), megaApi, node)
         } else if (MimeTypeList.typeForName(node.name).isPdf) {
             intent = Intent(requireContext(), PdfViewerActivity::class.java)
             intent.putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
