@@ -37,8 +37,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Spanned;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,8 +84,6 @@ import timber.log.Timber;
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
-    private DisplayMetrics outMetrics;
-
     private MegaApiAndroid megaApi;
 
     private ArrayList<MegaContactAdapter> visibleContacts = new ArrayList<>();
@@ -134,10 +130,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        Display display = ((Activity) requireContext()).getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) requireContext()).getApplication()).getMegaApi();
