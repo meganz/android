@@ -1,5 +1,6 @@
 package mega.privacy.android.app.data.gateway.api
 
+import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaContactDB
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.main.megachat.NonContactInfo
@@ -445,4 +446,19 @@ interface MegaLocalStorageGateway {
      * @param enable
      */
     suspend fun setCamSyncEnabled(enable: Boolean)
+
+    /**
+     * Gets attributes from DB
+     */
+    suspend fun getAttributes(): MegaAttributes?
+
+    /**
+     * Gets pricing timestamp.
+     */
+    suspend fun getPricingTimeStamp(): String?
+
+    /**
+     * Gets payment methods timestamp
+     */
+    suspend fun getPaymentMethodsTimeStamp(): String?
 }

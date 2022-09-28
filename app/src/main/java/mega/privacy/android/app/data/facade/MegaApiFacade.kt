@@ -444,4 +444,24 @@ class MegaApiFacade @Inject constructor(
 
     override fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaError =
         megaApi.checkAccessErrorExtended(node, level)
+
+    override fun getPricing(listener: MegaRequestListenerInterface?) {
+        megaApi.getPricing(listener)
+    }
+
+    override fun getPaymentMethods(listener: MegaRequestListenerInterface?) {
+        megaApi.getPaymentMethods(listener)
+    }
+
+    override fun getAccountDetails(listener: MegaRequestListenerInterface?) {
+        megaApi.getAccountDetails(listener)
+    }
+
+    override fun getSpecificAccountDetails(storage: Boolean, transfer: Boolean, pro: Boolean) {
+        megaApi.getSpecificAccountDetails(storage, transfer, pro)
+    }
+
+    override fun creditCardQuerySubscriptions(listener: MegaRequestListenerInterface?) {
+        megaApi.creditCardQuerySubscriptions(listener)
+    }
 }
