@@ -52,11 +52,15 @@ import mega.privacy.android.app.domain.usecase.GetFingerprint
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
+import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
+import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
+import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
+import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.listeners.CreateFolderListener
 import mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction
@@ -435,6 +439,30 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var saveSyncRecordsToDB: SaveSyncRecordsToDB
 
     /**
+     * GetPrimarySyncHandle
+     */
+    @Inject
+    lateinit var getPrimarySyncHandle: GetPrimarySyncHandle
+
+    /**
+     * GetSecondarySyncHandle
+     */
+    @Inject
+    lateinit var getSecondarySyncHandle: GetSecondarySyncHandle
+
+    /**
+     * SetPrimarySyncHandle
+     */
+    @Inject
+    lateinit var setPrimarySyncHandle: SetPrimarySyncHandle
+
+    /**
+     * SetSecondarySyncHandle
+     */
+    @Inject
+    lateinit var setSecondarySyncHandle: SetSecondarySyncHandle
+
+    /**
      * DatabaseHandler
      */
     @Inject
@@ -675,10 +703,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         if (notificationManager == null) {
             notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         }
-        val notification = createNotification(getString(R.string.section_photo_sync),
+        val notification = createNotification(
+            getString(R.string.section_photo_sync),
             getString(R.string.settings_camera_notif_initializing_title),
             null,
-            false)
+            false
+        )
         startForeground(notificationId, notification)
     }
 
@@ -756,10 +786,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     private suspend fun startCameraUploads() {
-        showNotification(getString(R.string.section_photo_sync),
+        showNotification(
+            getString(R.string.section_photo_sync),
             getString(R.string.settings_camera_notif_checking_title),
             pendingIntent,
-            false)
+            false
+        )
         // Start the real uploading process, before is checking settings.
         filesFromMediaStore()
     }
@@ -793,10 +825,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 val modifiedColumn =
                     cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED)
                 while (cursor.moveToNext()) {
-                    getUploadMediaFromCursor(cursor,
+                    getUploadMediaFromCursor(
+                        cursor,
                         dataColumn,
                         addedColumn,
-                        modifiedColumn).takeIf {
+                        modifiedColumn
+                    ).takeIf {
                         isFilePathValid(it, parentPath)
                     }?.let(this::add)
                 }
@@ -1350,8 +1384,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             ChatUtil.initMegaChatApi(tempDbHandler.credentials?.session)
             return LOGIN_IN
         }
-        cameraUploadHandle = CameraUploadUtil.getPrimaryFolderHandle()
-        secondaryUploadHandle = CameraUploadUtil.getSecondaryFolderHandle()
+        cameraUploadHandle = getPrimarySyncHandle()
+        secondaryUploadHandle = getSecondarySyncHandle()
 
         // Prevent checking while app alive because it has been handled by global event
         Timber.d("ignoreAttr: %s", ignoreAttr)
@@ -2232,10 +2266,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         val builder = NotificationCompat.Builder(this, OVER_QUOTA_NOTIFICATION_CHANNEL_ID)
         builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
-            .setContentIntent(PendingIntent.getActivity(this,
-                0,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    this,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            )
             .setAutoCancel(true)
             .setTicker(contentText)
             .setContentTitle(message)
