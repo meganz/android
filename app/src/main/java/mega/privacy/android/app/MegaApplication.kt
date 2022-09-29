@@ -8,10 +8,6 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.StrictMode
-import androidx.core.provider.FontRequest
-import androidx.emoji.text.EmojiCompat
-import androidx.emoji.text.EmojiCompat.InitCallback
-import androidx.emoji.text.FontRequestEmojiCompatConfig
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -30,9 +26,6 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
-import mega.privacy.android.app.components.twemoji.EmojiManager
-import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes
-import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
@@ -55,7 +48,6 @@ import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.app.presentation.logging.InitialiseLoggingUseCaseJavaWrapper
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.NetworkStateReceiver
 import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase
@@ -225,7 +217,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         enableStrictMode()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
-        initialiseLogging()
         themeModeState.initialise()
         callChangesObserver.init()
         LiveEventBus.config().enableLogger(false)
@@ -269,28 +260,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         registerReceiver(NetworkStateReceiver(),
             IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
         registerReceiver(logoutReceiver, IntentFilter(Constants.ACTION_LOG_OUT))
-
-        EmojiManagerShortcodes.initEmojiData(applicationContext)
-        EmojiManager.install(TwitterEmojiProvider())
-        Timber.d("Use downloadable font for EmojiCompat")
-        // Use a downloadable font for EmojiCompat
-        val fontRequest = FontRequest(
-            "com.google.android.gms.fonts",
-            "com.google.android.gms",
-            "Noto Color Emoji Compat",
-            R.array.com_google_android_gms_fonts_certs)
-        val config = FontRequestEmojiCompatConfig(applicationContext, fontRequest)
-            .setReplaceAll(false)
-            .registerInitCallback(object : InitCallback() {
-                override fun onInitialized() {
-                    Timber.d("EmojiCompat initialized")
-                }
-
-                override fun onFailed(throwable: Throwable?) {
-                    Timber.w("EmojiCompat initialization failed")
-                }
-            })
-        EmojiCompat.init(config)
 
         // clear the cache files stored in the external cache folder.
         clearPublicCache(this)
@@ -346,9 +315,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
             }
         }
     }
-
-    private fun initialiseLogging() =
-        InitialiseLoggingUseCaseJavaWrapper(initialiseLoggingUseCase).invokeUseCase(BuildConfig.DEBUG)
 
     /**
      * Get work manager configuration
