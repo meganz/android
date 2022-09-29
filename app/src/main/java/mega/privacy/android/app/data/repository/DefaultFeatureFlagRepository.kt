@@ -1,52 +1,29 @@
 package mega.privacy.android.app.data.repository
 
-import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesGateway
-import mega.privacy.android.app.data.mapper.FeatureFlagMapper
+import mega.privacy.android.app.di.featuretoggle.FeatureFlagPriorityKey
+import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 import javax.inject.Inject
 
+
 /**
- * Implementation of @FeatureFlagRepository
- * @property preferencesGateway
- * @property featureFlagMapper
+ * Default feature flag repository
+ *
  * @property ioDispatcher
+ * @property featureFlagValueProvider
  */
 class DefaultFeatureFlagRepository @Inject constructor(
-    private val preferencesGateway: FeatureFlagPreferencesGateway,
-    private val featureFlagMapper: FeatureFlagMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val featureFlagValueProvider: Map<FeatureFlagPriorityKey, @JvmSuppressWildcards FeatureFlagValueProvider>,
 ) : FeatureFlagRepository {
 
-    /**
-     * Sets value of feature flag
-     *
-     * @param featureName: Name of the feature
-     * @param isEnabled: Boolean value
-     */
-    override suspend fun setFeature(featureName: String, isEnabled: Boolean) =
+    override suspend fun getFeatureValue(feature: Feature) =
         withContext(ioDispatcher) {
-            preferencesGateway.setFeature(featureName, isEnabled)
-        }
-
-
-    /**
-     * Gets a map of Preferences from gateway and returns flow
-     *
-     * @return: Flow of List of @FeatureFlag
-     */
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getAllFeatures() =
-        preferencesGateway.getAllFeatures().mapLatest { map ->
-            map.asMap().mapNotNull { entry: Map.Entry<Preferences.Key<*>, Any> ->
-                entry.takeIf { it.value is Boolean }?.let {
-                    featureFlagMapper(it.key, it.value as Boolean)
-                }
-            }.toMap()
+            featureFlagValueProvider.toSortedMap(compareByDescending { it.priority })
+                .firstNotNullOfOrNull { it.value.isEnabled(feature) }
         }
 }
