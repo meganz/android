@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import mega.privacy.android.app.presentation.featureflag.FeatureFlagMenuViewModel
-import mega.privacy.android.domain.entity.FeatureFlag
+import mega.privacy.android.domain.entity.Feature
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -58,10 +58,10 @@ class FeatureFlagMenuViewModelTest {
 
     @Test
     fun `test that features list is not empty`() {
-        val list = mutableListOf<FeatureFlag>()
-        list.add(FeatureFlag("featureName", false))
+        val map = mutableMapOf<Feature, Boolean>()
+        map[mock { on { name }.thenReturn("featureName") }] = false
         runTest {
-            whenever(getAllFeatureFlags()).thenReturn(flowOf(list))
+            whenever(getAllFeatureFlags()).thenReturn(flowOf(map))
             underTest.state.map {
                 assertEquals(it.featureFlagList[0].featureName, "featureName")
                 assertEquals(it.featureFlagList[0].isEnabled, false)

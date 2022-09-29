@@ -3,13 +3,11 @@ package mega.privacy.android.app.data.repository
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.app.data.mapper.FeatureFlagMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.entity.FeatureFlag
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 import javax.inject.Inject
 
@@ -43,12 +41,12 @@ class DefaultFeatureFlagRepository @Inject constructor(
      * @return: Flow of List of @FeatureFlag
      */
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getAllFeatures(): Flow<List<FeatureFlag>> =
+    override fun getAllFeatures() =
         preferencesGateway.getAllFeatures().mapLatest { map ->
             map.asMap().mapNotNull { entry: Map.Entry<Preferences.Key<*>, Any> ->
                 entry.takeIf { it.value is Boolean }?.let {
                     featureFlagMapper(it.key, it.value as Boolean)
                 }
-            }
+            }.toMap()
         }
 }
