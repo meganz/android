@@ -55,6 +55,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -338,6 +339,8 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     protected void onCreate(Bundle savedInstanceState) {
         Timber.d("onCreate");
         super.onCreate(savedInstanceState);
+
+        viewModel = new ViewModelProvider(this).get(FileContactListViewModel.class);
 
         initFileBackupManager();
 
