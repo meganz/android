@@ -232,14 +232,14 @@ class RecentsBucketFragment : Fragment() {
         (activity as ManagerActivity).changeAppBarElevation(canScroll)
     }
 
-    private fun getNodesHandles(isImageViewerValid: Boolean): LongArray? =
+    private fun getNodesHandles(isImageViewerValid: Boolean): LongArray =
         viewModel.items.value.filter {
             if (isImageViewerValid) {
                 it.node?.isValidForImageViewer() ?: false
             } else {
                 FileUtil.isAudioOrVideo(it.node) && FileUtil.isInternalIntent(it.node)
             }
-        }.map { it.node?.handle ?: 0L }?.toLongArray()
+        }.map { it.node?.handle ?: 0L }.toLongArray()
 
     fun openFile(
         index: Int,
@@ -377,7 +377,7 @@ class RecentsBucketFragment : Fragment() {
         node: MegaNode,
     ) {
         val handles = getNodesHandles(true)
-        val intent = if (handles != null && handles.isNotEmpty()) {
+        val intent = if (handles.isNotEmpty()) {
             ImageViewerActivity.getIntentForChildren(
                 requireContext(),
                 handles,
