@@ -6,5 +6,8 @@ package mega.privacy.android.domain.usecase
  */
 fun interface BackupTimeStampsAndFolderHandle {
 
+    /**
+     * Invoke
+     */
     suspend operator fun invoke()
 }
