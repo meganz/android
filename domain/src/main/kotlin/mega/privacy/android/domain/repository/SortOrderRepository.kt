@@ -24,4 +24,10 @@ interface SortOrderRepository {
      * @return links cloud sort order
      */
     suspend fun getLinksSortOrder(): SortOrder
+
+    /**
+     * Get others sort order
+     * @return others sort order
+     */
+    suspend fun getOthersSortOrder(): SortOrder
 }

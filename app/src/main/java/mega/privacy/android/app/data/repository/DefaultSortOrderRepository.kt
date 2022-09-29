@@ -33,4 +33,9 @@ class DefaultSortOrderRepository @Inject constructor(
     override suspend fun getLinksSortOrder(): SortOrder = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getLinksSortOrder())
     }
+
+    override suspend fun getOthersSortOrder(): SortOrder = withContext(ioDispatcher) {
+        sortOrderMapper(megaLocalStorageGateway.getOthersSortOrder())
+    }
+
 }
