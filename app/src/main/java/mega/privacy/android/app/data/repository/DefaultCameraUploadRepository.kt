@@ -269,4 +269,9 @@ class DefaultCameraUploadRepository @Inject constructor(
             localStorageGateway.getMegaHandleSecondaryFolder() ?: getInvalidHandle()
         localStorageGateway.backupTimestampsAndFolderHandle(primaryHandle, secondaryHandle)
     }
+
+    override suspend fun resetCUTimestamps(clearCamSyncRecords: Boolean) =
+        withContext(ioDispatcher) {
+            localStorageGateway.resetCUTimestamps(clearCamSyncRecords)
+        }
 }

@@ -346,4 +346,12 @@ interface CameraUploadRepository {
      * database records being cleaned
      */
     suspend fun backupTimestampsAndFolderHandle()
+
+
+    /**
+     * This method is to disable the CU and MU settings in database
+     *
+     * @param clearCamSyncRecords the boolean setting whether to clean the cam record
+     */
+    suspend fun resetCUTimestamps(clearCamSyncRecords: Boolean)
 }

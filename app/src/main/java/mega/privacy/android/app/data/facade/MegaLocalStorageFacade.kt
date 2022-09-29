@@ -312,4 +312,12 @@ class MegaLocalStorageFacade @Inject constructor(
             .putLong(SettingsConstants.KEY_SECONDARY_HANDLE, secondaryUploadFolderHandle)
             .apply()
     }
+
+    override suspend fun resetCUTimestamps(clearCamSyncRecords: Boolean) {
+        dbHandler.setCamSyncTimeStamp(0)
+        dbHandler.setCamVideoSyncTimeStamp(0)
+        dbHandler.setSecSyncTimeStamp(0)
+        dbHandler.setSecVideoSyncTimeStamp(0)
+        dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)
+    }
 }
