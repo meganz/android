@@ -20,18 +20,21 @@ import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment
 import mega.privacy.android.app.fragments.managerFragments.actionMode.TransfersActionBarCallBack
 import mega.privacy.android.app.interfaces.MoveTransferInterface
-import mega.privacy.android.app.listeners.MoveTransferListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 
@@ -385,9 +388,21 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
      * @param newPosition The new position on the list.
      */
     private fun startMovementRequest(transfer: MegaTransfer, newPosition: Int) {
-        MoveTransferListener(requireContext(), this).let { moveTransferListener ->
-            viewModel.moveTransfer(transfer, newPosition, moveTransferListener)
-        }
+        viewModel.moveTransfer(transfer,
+            newPosition,
+            OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, megaError ->
+                if (megaRequest.type == MegaRequest.TYPE_MOVE_TRANSFER) {
+                    if (megaError.errorCode != MegaError.API_OK) {
+                        Timber.e("Error changing transfer priority: ${
+                            StringResourcesUtils.getTranslatedErrorString(megaError)
+                        }")
+                        this.movementFailed(megaRequest.transferTag)
+                    } else {
+                        this.movementSuccess(megaRequest.transferTag)
+                    }
+                }
+            }))
+
     }
 
     private fun enableDragAndDrop() {

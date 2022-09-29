@@ -162,7 +162,7 @@ class TimberLoggingRepository @Inject constructor(
 
     override suspend fun startUpLogging() {
         withContext(ioDispatcher) {
-            Util.checkAppUpgrade()
+            checkAppUpgrade()
             checkMegaStandbyBucket()
             getTombstoneInfo()
         }
@@ -218,6 +218,27 @@ class TimberLoggingRepository @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Checks if the app has been upgraded and store the new version code.
+     */
+    private fun checkAppUpgrade() {
+        val appInfoFile = "APP_INFO"
+        val appVersionCodeKey = "APP_VERSION_CODE"
+        val preferences = context.getSharedPreferences(appInfoFile, Context.MODE_PRIVATE)
+        val oldVersionCode = preferences.getInt(appVersionCodeKey, 0)
+        val newVersionCode = Util.getVersion(context)
+        if (oldVersionCode == 0 || oldVersionCode < newVersionCode) {
+            if (oldVersionCode == 0) {
+                Timber.i("App Version: %d", newVersionCode)
+            } else {
+                Timber.i("App upgraded from %d to %d", oldVersionCode, newVersionCode)
+            }
+            preferences.edit().putInt(appVersionCodeKey, newVersionCode).apply()
+        } else {
+            Timber.i("App Version: %s", newVersionCode)
         }
     }
 }

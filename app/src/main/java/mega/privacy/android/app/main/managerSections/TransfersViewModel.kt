@@ -14,11 +14,11 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.listeners.MoveTransferListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
@@ -353,24 +353,24 @@ class TransfersViewModel @Inject constructor(
      *
      * @param transfer    MegaTransfer to change its priority.
      * @param newPosition The new position on the list.
-     * @param moveTransferListener [MoveTransferListener]
+     * @param optionalMegaRequestListenerInterface [OptionalMegaRequestListenerInterface]
      */
     fun moveTransfer(
         transfer: MegaTransfer,
         newPosition: Int,
-        moveTransferListener: MoveTransferListener,
+        optionalMegaRequestListenerInterface: OptionalMegaRequestListenerInterface,
     ) = viewModelScope.launch(ioDispatcher) {
         when (newPosition) {
             0 -> {
-                megaApiGateway.moveTransferToFirst(transfer, moveTransferListener)
+                megaApiGateway.moveTransferToFirst(transfer, optionalMegaRequestListenerInterface)
             }
             activeTransfers.size - 1 -> {
-                megaApiGateway.moveTransferToLast(transfer, moveTransferListener)
+                megaApiGateway.moveTransferToLast(transfer, optionalMegaRequestListenerInterface)
             }
             else -> {
                 megaApiGateway.moveTransferBefore(transfer = transfer,
                     prevTransfer = activeTransfers[newPosition + 1],
-                    listener = moveTransferListener)
+                    listener = optionalMegaRequestListenerInterface)
             }
         }
     }

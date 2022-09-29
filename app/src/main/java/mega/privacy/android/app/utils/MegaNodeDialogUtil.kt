@@ -31,7 +31,7 @@ import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.listeners.MoveListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -57,7 +57,9 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboardDelayed
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import java.util.Locale
 import java.util.Objects
@@ -673,17 +675,29 @@ object MegaNodeDialogUtil {
 
                     megaApi.moveNode(
                         node, rubbishNode,
-                        MoveListener { success, isForeignOverQuota ->
-                            progress.dismiss()
+                        OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, megaError ->
+                            if (megaRequest.type == MegaRequest.TYPE_MOVE) {
 
-                            when {
-                                success -> activity.finish()
-                                isForeignOverQuota -> showForeignStorageOverQuotaWarningDialog(
-                                    activity
-                                )
-                                else -> snackbarShower.showSnackbar(getString(R.string.context_no_moved))
+                                if (megaError.errorCode == MegaError.API_OK) {
+                                    activity.finish()
+                                }
+
+                                val isForeignOverQuota =
+                                    megaError.errorCode == MegaError.API_EOVERQUOTA && megaApi.isForeignNode(
+                                        megaRequest.parentHandle)
+
+                                if (isForeignOverQuota) {
+                                    showForeignStorageOverQuotaWarningDialog(activity)
+                                } else {
+                                    snackbarShower.showSnackbar(
+                                        getString(
+                                            if (megaError.errorCode == MegaError.API_OK) R.string.context_correctly_moved
+                                            else R.string.context_no_moved
+                                        )
+                                    )
+                                }
                             }
-                        })
+                        }))
 
                     progress.show()
                 }
@@ -921,7 +935,9 @@ object MegaNodeDialogUtil {
         val editTextLayout: TextInputLayout = view.findViewById(R.id.confirm_text_layout)
         val editText: TextInputEditText = view.findViewById(R.id.confirm_text)
         editText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) = Unit
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) =
+                Unit
+
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) = Unit
             override fun afterTextChanged(editable: Editable) {
                 editTextLayout.error = null

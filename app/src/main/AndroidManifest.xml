@@ -578,6 +578,14 @@
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup"
                 tools:node="remove" />
+
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.EmojiInitializer"
+                android:value="androidx.startup" />
+
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.LoggerInitializer"
+                android:value="androidx.startup" />
         </provider>
 
         <activity

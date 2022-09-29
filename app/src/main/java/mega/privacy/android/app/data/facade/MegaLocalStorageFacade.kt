@@ -3,6 +3,7 @@ package mega.privacy.android.app.data.facade
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE
@@ -281,6 +282,15 @@ class MegaLocalStorageFacade @Inject constructor(
     override suspend fun setCamSyncEnabled(enable: Boolean) {
         dbHandler.setCamSyncEnabled(enable)
     }
+
+    override suspend fun getAttributes(): MegaAttributes? =
+        dbHandler.attributes
+
+    override suspend fun getPricingTimeStamp(): String? =
+        dbHandler.attributes?.pricingTimeStamp
+
+    override suspend fun getPaymentMethodsTimeStamp(): String? =
+        dbHandler.attributes?.paymentMethodsTimeStamp
 
     override suspend fun backupTimestampsAndFolderHandle(
         primaryUploadFolderHandle: Long,
