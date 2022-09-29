@@ -14,6 +14,8 @@ import mega.privacy.android.app.utils.SharedPreferenceConstants
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_FAV_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_LABEL_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
@@ -63,6 +65,16 @@ class MegaLocalStorageFacade @Inject constructor(
             else -> order
         }
 
+    override suspend fun getOfflineSortOrder(): Int =
+        when (val order = getCloudSortOrder()) {
+            ORDER_LABEL_ASC -> ORDER_DEFAULT_ASC
+            ORDER_FAV_ASC -> ORDER_DEFAULT_ASC
+            else -> order
+        }
+
+    override suspend fun setOfflineSortOrder(order: Int) {
+        dbHandler.preferences?.preferredSortCloud = order.toString()
+    }
 
     override suspend fun getUserCredentials(): UserCredentials? = dbHandler.credentials
 
