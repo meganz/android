@@ -103,7 +103,6 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
@@ -483,20 +482,17 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var areAllUploadTransfersPaused: AreAllUploadTransfersPaused
 
     /**
-     * Coroutine scope for service
-     */
-    @ApplicationScope
-    @Inject
-    lateinit var sharingScope: CoroutineScope
-
-    /**
      * Coroutine dispatcher for camera upload work
      */
     @IoDispatcher
     @Inject
     lateinit var ioDispatcher: CoroutineDispatcher
 
+    /**
+     * Coroutine Scope for camera upload work
+     */
     private var coroutineScope: CoroutineScope? = null
+
     private var app: MegaApplication? = null
     private var megaApi: MegaApiAndroid? = null
     private var megaApiFolder: MegaApiAndroid? = null
@@ -535,7 +531,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private val chargingStopReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            sharingScope.launch {
+            coroutineScope?.launch {
                 if (isChargingRequired((videoCompressor?.totalInputSize ?: 0) / (1024 * 1024))) {
                     Timber.d("Detected device stops charging.")
                     videoCompressor?.stop()
@@ -563,6 +559,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     override fun onCreate() {
         super.onCreate()
+        coroutineScope = CoroutineScope(ioDispatcher)
         startForegroundNotification()
         registerReceiver(chargingStopReceiver, IntentFilter(Intent.ACTION_POWER_DISCONNECTED))
         registerReceiver(batteryInfoReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
@@ -605,7 +602,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     override fun onTypeChanges(type: Int) {
         Timber.d("Network type change to: %s", type)
-        sharingScope.launch {
+        coroutineScope?.launch {
             stopByNetworkStateChange =
                 type == NetworkTypeChangeReceiver.MOBILE && isCameraUploadByWifi()
             if (stopByNetworkStateChange) {
@@ -663,9 +660,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
 
         Timber.d("Start Service - Create Coroutine")
-        coroutineScope = CoroutineScope(ioDispatcher).also {
-            it.launch { startWorker() }
-        }
+        coroutineScope?.launch { startWorker() }
+
         return START_NOT_STICKY
     }
 
@@ -1573,7 +1569,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         intent?.putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
         pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
-        sharingScope.launch {
+        coroutineScope?.launch {
             tempRoot = "${File(cacheDir, CU_CACHE_FOLDER).absolutePath}${File.separator}"
             val root = tempRoot?.let { File(it) }
             if (root?.exists() == false) {
@@ -1637,7 +1633,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish: %s", request.requestString)
         try {
-            sharingScope.launch {
+            coroutineScope?.launch {
                 requestFinished(request, e)
             }
         } catch (th: Throwable) {
@@ -1666,7 +1662,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 Timber.d("fetch nodes ok")
                 MegaApplication.isLoggingIn = false
                 Timber.d("Start service here MegaRequest.TYPE_FETCH_NODES")
-                coroutineScope?.launch { startWorker() }
+                startWorker()
             } else {
                 Timber.d("ERROR: %s", e.errorString)
                 MegaApplication.isLoggingIn = false
@@ -1828,7 +1824,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         try {
             LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java)
                 .post(MegaTransfer.TYPE_UPLOAD)
-            sharingScope.launch {
+            coroutineScope?.launch {
                 transferFinished(transfer, e)
             }
         } catch (th: Throwable) {
@@ -1981,7 +1977,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         )
 
         if (shouldStartVideoCompression(totalPendingSizeInMB)) {
-            sharingScope.launch {
+            coroutineScope?.launch {
                 Timber.d("Starting compressor")
                 videoCompressor?.start()
             }
@@ -2045,7 +2041,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Synchronized
     override fun onCompressSuccessful(record: SyncRecord) {
-        sharingScope.launch {
+        coroutineScope?.launch {
             Timber.d("Compression successfully for file with timestamp: %s", record.timestamp)
             setSyncRecordPendingByPath(record.localPath, record.isSecondary)
         }
@@ -2077,7 +2073,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     Timber.d("Can not compress but got enough disk space, so should be un-supported format issue")
                     val newPath = record.newPath
                     val temp = newPath?.let { File(it) }
-                    sharingScope.launch {
+                    coroutineScope?.launch {
                         setSyncRecordPendingByPath(localPath, isSecondary)
                     }
                     if (newPath != null && tempRoot?.let { newPath.startsWith(it) } == true && temp != null && temp.exists()) {
@@ -2090,7 +2086,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 Timber.e(ex)
             }
         } else {
-            sharingScope.launch {
+            coroutineScope?.launch {
                 Timber.w("Compressed video not exists, remove from DB")
                 localPath?.let {
                     deleteSyncRecordByLocalPath(localPath, isSecondary)
@@ -2103,7 +2099,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * Compression finished
      */
     override fun onCompressFinished(currentIndexString: String) {
-        sharingScope.launch {
+        coroutineScope?.launch {
             if (!canceled) {
                 Timber.d("Preparing to upload compressed video.")
                 val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
