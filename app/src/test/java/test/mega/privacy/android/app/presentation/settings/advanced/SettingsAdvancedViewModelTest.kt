@@ -4,13 +4,14 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.advanced.SettingsAdvancedViewModel
@@ -35,7 +36,7 @@ class SettingsAdvancedViewModelTest {
 
     private val monitorConnectivity = mock<MonitorConnectivity> {
         on { invoke() }.thenReturn(
-            emptyFlow()
+            MutableStateFlow(true)
         )
     }
 
@@ -87,7 +88,7 @@ class SettingsAdvancedViewModelTest {
     @Test
     fun `test that checkbox is enabled if network connected and root node exists`() = runTest {
         whenever(isUseHttpsEnabled()).thenReturn(true)
-        whenever(monitorConnectivity()).thenReturn(flowOf(true))
+        whenever(monitorConnectivity()).thenReturn(MutableStateFlow(true))
         whenever(rootNodeExists()).thenReturn(true)
 
         underTest.state.map { it.useHttpsEnabled }.distinctUntilChanged().test {
@@ -98,13 +99,17 @@ class SettingsAdvancedViewModelTest {
 
     @Test
     fun `test that checkbox becomes not enabled if network is lost`() = runTest {
+        val monitorConnectivityStateFlow = MutableStateFlow(true)
         whenever(isUseHttpsEnabled()).thenReturn(true)
-        whenever(monitorConnectivity()).thenReturn(flowOf(true, false))
+        whenever(monitorConnectivity()).thenReturn(monitorConnectivityStateFlow)
         whenever(rootNodeExists()).thenReturn(true)
-
         underTest.state.map { it.useHttpsEnabled }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
             assertThat(awaitItem()).isTrue()
+        }
+        monitorConnectivityStateFlow.update { false }
+        runCurrent()
+        underTest.state.map { it.useHttpsEnabled }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
         }
     }
