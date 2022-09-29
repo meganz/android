@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.recents
+package mega.privacy.android.app.presentation.recentactions
 
 import android.content.Context
 import android.content.Intent
@@ -33,8 +33,8 @@ import mega.privacy.android.app.fragments.recent.SelectedBucketViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForSingleNode
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
-import mega.privacy.android.app.presentation.recents.model.RecentsItem
-import mega.privacy.android.app.presentation.recents.model.RecentsItemHeader
+import mega.privacy.android.app.presentation.recentactions.model.RecentActionItem
+import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemHeader
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
@@ -54,10 +54,10 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Recents page
+ * Recent actions page
  */
 @AndroidEntryPoint
-class RecentsFragment : Fragment(), StickyHeaderHandler {
+class RecentActionsFragment : Fragment(), StickyHeaderHandler {
 
     @Inject
     @MegaApi
@@ -65,7 +65,7 @@ class RecentsFragment : Fragment(), StickyHeaderHandler {
 
     private val visibleContacts = ArrayList<MegaContactAdapter>()
     private var buckets: List<MegaRecentActionBucket> = listOf()
-    private var recentsItems: List<RecentsItem?> = listOf()
+    private var recentActionsItems: List<RecentActionItem?> = listOf()
 
     private var adapter: RecentsAdapter? = null
     private var emptyLayout: ScrollView? = null
@@ -83,9 +83,9 @@ class RecentsFragment : Fragment(), StickyHeaderHandler {
         if (forceUpdate) {
             buckets = megaApi.recentActions ?: emptyList()
             reloadItems(buckets)
-            refreshRecentsActions()
+            refreshRecentActions()
             setVisibleContacts()
-            setRecentsView()
+            setRecentView()
         }
     }
 
@@ -120,13 +120,13 @@ class RecentsFragment : Fragment(), StickyHeaderHandler {
         buckets = megaApi.recentActions ?: emptyList()
 
         fillRecentItems(buckets)
-        setRecentsView()
+        setRecentView()
 
         LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
             .observeForever(nodeChangeObserver)
         LiveEventBus.get(EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
             .observe(viewLifecycleOwner) { hideRecentActivity: Boolean ->
-                this.setRecentsView(hideRecentActivity)
+                this.setRecentView(hideRecentActivity)
             }
 
         observeDragSupportEvents(viewLifecycleOwner, listView, Constants.VIEWER_FROM_RECETS)
@@ -138,7 +138,7 @@ class RecentsFragment : Fragment(), StickyHeaderHandler {
             .removeObserver(nodeChangeObserver)
     }
 
-    override fun getAdapterData(): List<RecentsItem?> = recentsItems
+    override fun getAdapterData(): List<RecentActionItem?> = recentActionsItems
 
     private fun fillRecentItems(buckets: List<MegaRecentActionBucket>) {
         this.buckets = buckets
@@ -146,48 +146,48 @@ class RecentsFragment : Fragment(), StickyHeaderHandler {
         adapter = RecentsAdapter(
             requireContext(),
             this,
-            recentsItems)
+            recentActionsItems)
         listView?.adapter = adapter
         listView?.addItemDecoration(HeaderItemDecoration(requireContext()))
         setVisibleContacts()
     }
 
     private fun reloadItems(buckets: List<MegaRecentActionBucket>) {
-        val recentItemList = arrayListOf<RecentsItem>()
+        val recentItemList = arrayListOf<RecentActionItem>()
         var previousDate = ""
         var currentDate: String
         for (i in buckets.indices) {
             val item =
-                RecentsItem(
+                RecentActionItem(
                     requireContext(),
                     buckets[i])
             if (i == 0) {
                 currentDate = item.date
                 previousDate = currentDate
-                recentItemList.add(RecentsItemHeader(currentDate))
+                recentItemList.add(RecentActionItemHeader(currentDate))
             } else {
                 currentDate = item.date
                 if (currentDate != previousDate) {
-                    recentItemList.add(RecentsItemHeader(currentDate))
+                    recentItemList.add(RecentActionItemHeader(currentDate))
                     previousDate = currentDate
                 }
             }
             recentItemList.add(item)
         }
-        recentsItems = recentItemList
+        recentActionsItems = recentItemList
     }
 
-    private fun refreshRecentsActions() {
-        adapter?.setItems(recentsItems)
-        setRecentsView()
+    private fun refreshRecentActions() {
+        adapter?.setItems(recentActionsItems)
+        setRecentView()
     }
 
-    private fun setRecentsView() {
+    private fun setRecentView() {
         val hideRecentActivity = requireContext()
             .getSharedPreferences(SharedPreferenceConstants.USER_INTERFACE_PREFERENCES,
                 Context.MODE_PRIVATE)
             .getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
-        setRecentsView(hideRecentActivity)
+        setRecentView(hideRecentActivity)
         (requireActivity() as ManagerActivity).setToolbarTitle()
     }
 
@@ -198,7 +198,7 @@ class RecentsFragment : Fragment(), StickyHeaderHandler {
      * @param hideRecentActivity True if the setting to hide the recent activity is enabled,
      * false otherwise.
      */
-    private fun setRecentsView(hideRecentActivity: Boolean) {
+    private fun setRecentView(hideRecentActivity: Boolean) {
         if (hideRecentActivity) {
             hideRecentActivity()
         } else {

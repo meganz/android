@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.recents;
+package mega.privacy.android.app.presentation.recentactions;
 
 import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.RECENTS_MODE;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
@@ -36,12 +36,12 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.presentation.recents.model.RecentsItem;
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.presentation.recentactions.model.RecentActionItem;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.Util;
@@ -59,11 +59,11 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     private DisplayMetrics outMetrics;
 
-    private List<RecentsItem> recentsItems;
+    private List<RecentActionItem> recentsItems;
 
     private int mHeaderColor = -1;
 
-    public RecentsAdapter(Context context, Object fragment, List<RecentsItem> items) {
+    public RecentsAdapter(Context context, Object fragment, List<RecentActionItem> items) {
         Timber.d("new RecentsAdapter");
         this.context = context;
         this.fragment = fragment;
@@ -167,16 +167,16 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
     @Override
     public void onBindViewHolder(RecentsAdapter.ViewHolderBucket holder, int position) {
         Timber.d("Position: %s", position);
-        RecentsItem item = getItemtAtPosition(position);
+        RecentActionItem item = getItemtAtPosition(position);
         if (item == null) return;
 
-        if (item.getViewType() == RecentsItem.TYPE_HEADER) {
+        if (item.getViewType() == RecentActionItem.TYPE_HEADER) {
             Timber.d("onBindViewHolder: TYPE_HEADER");
             holder.itemBucketLayout.setVisibility(View.GONE);
             holder.headerLayout.setVisibility(View.VISIBLE);
             holder.headerLayout.setBackgroundColor(getHeaderColor());
             holder.headerText.setText(item.getDate());
-        } else if (item.getViewType() == RecentsItem.TYPE_BUCKET) {
+        } else if (item.getViewType() == RecentActionItem.TYPE_BUCKET) {
             Timber.d("onBindViewHolder: TYPE_BUCKET");
             holder.itemBucketLayout.setVisibility(View.VISIBLE);
             holder.itemBucketLayout.setOnClickListener(this);
@@ -206,7 +206,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             if (mail.equals(megaApi.getMyEmail())) {
                 holder.actionBy.setVisibility(View.GONE);
             } else {
-                user = ((RecentsFragment) fragment).findUserName(mail);
+                user = ((RecentActionsFragment) fragment).findUserName(mail);
                 if (bucket.isUpdate()) {
                     userAction = context.getString(R.string.update_action_bucket, user);
                 } else {
@@ -319,7 +319,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         return mediaTitle;
     }
 
-    public void setItems(List<RecentsItem> recentsItems) {
+    public void setItems(List<RecentActionItem> recentsItems) {
         this.recentsItems = recentsItems;
         notifyDataSetChanged();
     }
@@ -337,7 +337,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         ViewHolderBucket holder = (ViewHolderBucket) v.getTag();
         if (holder == null) return;
 
-        RecentsItem item = getItemtAtPosition(holder.getAdapterPosition());
+        RecentActionItem item = getItemtAtPosition(holder.getAdapterPosition());
         if (item == null) return;
 
         MegaNode node = getNodeOfItem(item);
@@ -355,13 +355,13 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             }
             case R.id.item_bucket_layout: {
                 if (node != null) {
-                    ((RecentsFragment) fragment).openFile(holder.getAdapterPosition(), node);
+                    ((RecentActionsFragment) fragment).openFile(holder.getAdapterPosition(), node);
                     break;
                 }
                 MegaRecentActionBucket bucket = item.getBucket();
                 if (bucket == null) break;
 
-                ((RecentsFragment) fragment).getSelectedBucketModel().select(bucket, megaApi.getRecentActions());
+                ((RecentActionsFragment) fragment).getSelectedBucketModel().select(bucket, megaApi.getRecentActions());
                 NavDestination currentDestination = Navigation.findNavController(v).getCurrentDestination();
                 if (currentDestination != null && currentDestination.getId() == R.id.homepageFragment) {
                     Navigation.findNavController(v).navigate(HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(), new NavOptions.Builder().build());
@@ -380,27 +380,27 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         return recentsItems.get(pos).getViewType();
     }
 
-    private RecentsItem getItemtAtPosition(int pos) {
+    private RecentActionItem getItemtAtPosition(int pos) {
         if (recentsItems == null || recentsItems.isEmpty() || pos < 0 || pos >= recentsItems.size())
             return null;
 
         return recentsItems.get(pos);
     }
 
-    private MegaRecentActionBucket getBucketOfItem(RecentsItem item) {
+    private MegaRecentActionBucket getBucketOfItem(RecentActionItem item) {
         if (item == null) return null;
 
         return item.getBucket();
     }
 
-    private MegaNodeList getMegaNodeListOfItem(RecentsItem item) {
+    private MegaNodeList getMegaNodeListOfItem(RecentActionItem item) {
         MegaRecentActionBucket bucket = getBucketOfItem(item);
         if (bucket == null) return null;
 
         return bucket.getNodes();
     }
 
-    private MegaNode getNodeOfItem(RecentsItem item) {
+    private MegaNode getNodeOfItem(RecentActionItem item) {
         MegaNodeList nodeList = getMegaNodeListOfItem(item);
         if (nodeList == null || nodeList.size() > 1) return null;
 
