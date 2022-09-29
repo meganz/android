@@ -41,11 +41,12 @@ class LinksViewModelTest {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
     private val getLinksSortOrder = mock<GetLinksSortOrder> {
-        onBlocking { invoke() }.thenReturn(2)
+        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_DESC)
     }
     private val monitorNodeUpdates = FakeMonitorUpdates()
     private val sortOrderIntMapper = mock<SortOrderIntMapper> {
         onBlocking { invoke(SortOrder.ORDER_DEFAULT_ASC) }.thenReturn(1)
+        onBlocking { invoke(SortOrder.ORDER_DEFAULT_DESC) }.thenReturn(2)
     }
 
     @get:Rule
@@ -376,9 +377,10 @@ class LinksViewModelTest {
     @Test
     fun `test that sort order is set with result of getLinksSortOrder if depth is equals to 0 when call setIncomingTreeDepth`() =
         runTest {
-            val expected = 5
+            val expected = MegaApiJava.ORDER_CREATION_ASC
             whenever(getPublicLinks(any())).thenReturn(mock())
-            whenever(getLinksSortOrder()).thenReturn(expected)
+            whenever(getLinksSortOrder()).thenReturn(SortOrder.ORDER_CREATION_ASC)
+            whenever(sortOrderIntMapper(SortOrder.ORDER_CREATION_ASC)).thenReturn(expected)
 
             underTest.state.map { it.sortOrder }.distinctUntilChanged()
                 .test {
@@ -407,9 +409,10 @@ class LinksViewModelTest {
     @Test
     fun `test that sort order is set with result of getLinksSortOrder when refreshNodes fails`() =
         runTest {
-            val expected = 5
+            val expected = MegaApiJava.ORDER_CREATION_ASC
             whenever(getPublicLinks(any())).thenReturn(null)
-            whenever(getLinksSortOrder()).thenReturn(expected)
+            whenever(getLinksSortOrder()).thenReturn(SortOrder.ORDER_CREATION_ASC)
+            whenever(sortOrderIntMapper(SortOrder.ORDER_CREATION_ASC)).thenReturn(expected)
 
             underTest.state.map { it.sortOrder }.distinctUntilChanged()
                 .test {
