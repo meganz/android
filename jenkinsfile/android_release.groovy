@@ -1,3 +1,4 @@
+import groovy.xml.XmlParser
 /**
  * This script is to build and upload Android AAB to Google Play Store
  */
@@ -493,6 +494,9 @@ pipeline {
                     BUILD_STEP = 'Deploy to Google Play Alpha'
                 }
                 script {
+                    // Release notes
+                    def release_notes = new File('release_notes.xml').text
+
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
                             filesPattern: 'archive/*-gms-release.aab',
@@ -500,7 +504,7 @@ pipeline {
                             rolloutPercentage: '0',
                             additionalVersionCodes: '429',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}",
-                            recentChangeList: getRecentChangeList()
+                            recentChangeList: getRecentChangeList(release_notes)
                 }
             }
         }
@@ -916,42 +920,24 @@ private void printWorkspaceSize(String prompt) {
 }
 
 /**
- * Get the list of recent changes (release note) sorted by language to upload to the Google Play
+ * Get the list of recent changes (release note) xml file input
+ * and return a formatted list following below example
+ *[
+ * [language: 'en-GB', text: "Please test the changes from Jenkins build ${env.BUILD_NUMBER}."],
+ * [language: 'de-DE', text: "Bitte die Änderungen vom Jenkins Build ${env.BUILD_NUMBER} testen."]
+ *]
  *
- * @return the list of recent changes sorted by language
+ * @param input the xml string to parse
+ * @return the list of recent changes formatted
  */
-def getRecentChangeList() {
+static def getRecentChangeList(input) {
     def map = []
-
-    // The input file to load the data
-    //def input = new File('release_notes.xml').text
-    def input =
-            '''
-                <en-US>
-                - Bug fixes and performance improvements
-                </en-US>
-                <ar>
-                - إصلاح أخطاء وتحسينات على الأداء
-                </ar>
-                <de-DE>
-                - Fehlerkorrekturen und Leistungsverbesserungen
-                </de-DE>
-            '''
-
-    def list = new XmlSlurper().parseText(input)
-    list.each { language ->
+    def languages = new XmlParser().parseText(input)
+    languages.each { language ->
         def languageMap = [:]
-        languageMap["language"] = "${language.name}"
-        languageMap["text"] = "${language.text}"
+        languageMap["language"] = "${language.name()}"
+        languageMap["text"] = "${language.value()[0]}"
         map.add(languageMap)
     }
-
-    // output
-//    def output = [
-//            [language: 'en-US', text: "Bug fixes and performance improvements"],
-//            [language: 'fr-FR', text: "Correctifs de bogues et améliorations des performances"],
-//            [language: 'zh-Tw', text: "錯誤修復和性能改進"],
-//    ]
-
     return map
 }
