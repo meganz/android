@@ -5,13 +5,17 @@ import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
-import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.utils.*
-import nz.mega.sdk.*
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import java.io.File
 import java.time.format.DateTimeFormatter.ofPattern
-import java.util.*
-import kotlin.collections.LinkedHashMap
 
 /**
  * Data fetcher for fetching typed files
@@ -21,7 +25,7 @@ open class TypedNodesFetcher(
     private val megaApi: MegaApiAndroid,
     private val type: Int = MegaApiJava.FILE_TYPE_DEFAULT,
     private val order: Int = MegaApiJava.ORDER_DEFAULT_ASC,
-    private val selectedNodesMap: LinkedHashMap<Any, out NodeItem>
+    private val selectedNodesMap: LinkedHashMap<Any, out NodeItem>,
 ) {
     val result = MutableLiveData<List<NodeItem>>()
 
@@ -107,28 +111,21 @@ open class TypedNodesFetcher(
     }
 
     suspend fun getThumbnailsFromServer() {
-        for (item in getThumbnailNodes) {
+        for ((key, value) in getThumbnailNodes) {
             megaApi.getThumbnail(
-                item.key,
-                item.value,
-                object : BaseListener(context) {
-                    override fun onRequestFinish(
-                        api: MegaApiJava,
-                        request: MegaRequest,
-                        e: MegaError
-                    ) {
-                        if (e.errorCode != MegaError.API_OK) return
-
-                        request.let {
+                key,
+                value,
+                OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, megaError ->
+                    if (megaError.errorCode == MegaError.API_OK) {
+                        megaRequest.let {
                             fileNodesMap[it.nodeHandle]?.apply {
-                                thumbnail = getThumbnailFile(item.key)
+                                thumbnail = getThumbnailFile(key)
                                 uiDirty = true
                             }
                         }
-
                         refreshLiveData()
                     }
-                })
+                }))
 
             // Throttle the getThumbnail call, or the UI would be non-responsive
             delay(GET_THUMBNAIL_THROTTLE)
