@@ -15,7 +15,6 @@ import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.data.mapper.EventMapper
 import mega.privacy.android.app.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
-import mega.privacy.android.app.data.mapper.FeatureFlagMapper
 import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.app.data.mapper.ImageMapper
 import mega.privacy.android.app.data.mapper.MegaChatPeerListMapper
@@ -50,7 +49,6 @@ import mega.privacy.android.app.data.mapper.toData
 import mega.privacy.android.app.data.mapper.toEvent
 import mega.privacy.android.app.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.app.data.mapper.toFavouriteInfo
-import mega.privacy.android.app.data.mapper.toFeatureFlag
 import mega.privacy.android.app.data.mapper.toImage
 import mega.privacy.android.app.data.mapper.toInt
 import mega.privacy.android.app.data.mapper.toMegaChatPeerList
@@ -100,17 +98,14 @@ class MapperModule {
     fun provideFavouriteMapper(): FavouriteMapper = ::toFavourite
 
     /**
-     * Provide feature flag mapper
-     */
-    @Provides
-    fun provideFeatureFlagMapper(): FeatureFlagMapper = ::toFeatureFlag
-
-    /**
      * Provide data mapper
      */
     @Provides
     fun provideDataMapper(): DataMapper = ::toData
 
+    /**
+     * Provide push message mapper
+     */
     @Provides
     fun providePushMessageMapper(): PushMessageMapper = ::toPushMessage
 

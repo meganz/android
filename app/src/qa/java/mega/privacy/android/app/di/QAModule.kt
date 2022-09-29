@@ -28,6 +28,7 @@ import mega.privacy.android.app.data.usecase.DefaultDetectShake
 import mega.privacy.android.app.di.featuretoggle.FeatureFlagPriorityKey
 import mega.privacy.android.app.domain.repository.QARepository
 import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
+import mega.privacy.android.app.domain.usecase.DefaultGetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.DetectShake
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
@@ -41,7 +42,6 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.FeatureFlagRepository
 
 /**
  * Provides dependencies used in the QA module
@@ -63,15 +63,15 @@ class QAModule {
      * Provide SetFeatureFlag use case
      */
     @Provides
-    fun provideSetFeatureFlag(repository: FeatureFlagRepository): SetFeatureFlag =
+    fun provideSetFeatureFlag(repository: QARepository): SetFeatureFlag =
         SetFeatureFlag(repository::setFeature)
 
     /**
      * Provide GetAllFeatureFlags use case
      */
     @Provides
-    fun provideGetAllFeatureFlags(featureFlagRepository: FeatureFlagRepository): GetAllFeatureFlags =
-        GetAllFeatureFlags(featureFlagRepository::getAllFeatures)
+    fun provideGetAllFeatureFlags(useCase: DefaultGetAllFeatureFlags): GetAllFeatureFlags =
+        useCase
 
 
     /**
