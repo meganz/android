@@ -461,4 +461,16 @@ interface MegaLocalStorageGateway {
      * Gets payment methods timestamp
      */
     suspend fun getPaymentMethodsTimeStamp(): String?
+
+    /**
+     * The method is to backup time stamps, primary upload folder and secondary folder in share preference after
+     * database records being cleaned
+     * @param primaryUploadFolderHandle
+     * @param secondaryUploadFolderHandle
+     */
+    suspend fun backupTimestampsAndFolderHandle(
+        primaryUploadFolderHandle: Long,
+        secondaryUploadFolderHandle: Long,
+    )
+
 }

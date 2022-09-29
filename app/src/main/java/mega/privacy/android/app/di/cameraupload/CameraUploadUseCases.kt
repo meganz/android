@@ -44,6 +44,7 @@ import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
@@ -318,6 +319,13 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideIsNodeInRubbish(fileRepository: FileRepository): IsNodeInRubbish =
             IsNodeInRubbish(fileRepository::isNodeInRubbish)
+
+        /**
+         * Provide the BackupTimeStampsAndFolderHandle implementation
+         */
+        @Provides
+        fun provideBackupTimeStampsAndFolderHandle(cameraUploadRepository: CameraUploadRepository): BackupTimeStampsAndFolderHandle =
+            BackupTimeStampsAndFolderHandle(cameraUploadRepository::backupTimestampsAndFolderHandle)
     }
 
     /**
