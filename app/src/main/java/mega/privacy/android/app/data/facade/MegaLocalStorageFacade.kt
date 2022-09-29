@@ -10,6 +10,7 @@ import mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_Q
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.main.megachat.NonContactInfo
+import mega.privacy.android.app.utils.SharedPreferenceConstants
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -301,15 +302,17 @@ class MegaLocalStorageFacade @Inject constructor(
             Timber.e("Preference is null, while backup.")
             return
         }
-        context.getSharedPreferences(SettingsConstants.LAST_CAM_SYNC_TIMESTAMP_FILE,
+        context.getSharedPreferences(SharedPreferenceConstants.LAST_CAM_SYNC_TIMESTAMP_FILE,
             Context.MODE_PRIVATE)
             .edit()
-            .putString(SettingsConstants.KEY_CAM_SYNC_TIMESTAMP, prefs.camSyncTimeStamp)
-            .putString(SettingsConstants.KEY_CAM_VIDEO_SYNC_TIMESTAMP, prefs.camVideoSyncTimeStamp)
-            .putString(SettingsConstants.KEY_SEC_SYNC_TIMESTAMP, prefs.secSyncTimeStamp)
-            .putString(SettingsConstants.KEY_SEC_VIDEO_SYNC_TIMESTAMP, prefs.secVideoSyncTimeStamp)
-            .putLong(SettingsConstants.KEY_PRIMARY_HANDLE, primaryUploadFolderHandle)
-            .putLong(SettingsConstants.KEY_SECONDARY_HANDLE, secondaryUploadFolderHandle)
+            .putString(SharedPreferenceConstants.KEY_CAM_SYNC_TIMESTAMP, prefs.camSyncTimeStamp)
+            .putString(SharedPreferenceConstants.KEY_CAM_VIDEO_SYNC_TIMESTAMP,
+                prefs.camVideoSyncTimeStamp)
+            .putString(SharedPreferenceConstants.KEY_SEC_SYNC_TIMESTAMP, prefs.secSyncTimeStamp)
+            .putString(SharedPreferenceConstants.KEY_SEC_VIDEO_SYNC_TIMESTAMP,
+                prefs.secVideoSyncTimeStamp)
+            .putLong(SharedPreferenceConstants.KEY_PRIMARY_HANDLE, primaryUploadFolderHandle)
+            .putLong(SharedPreferenceConstants.KEY_SECONDARY_HANDLE, secondaryUploadFolderHandle)
             .apply()
     }
 }
