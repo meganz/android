@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
@@ -59,7 +60,7 @@ class ReportIssueViewModelTest {
 
 
     private val monitorConnectivity =
-        mock<MonitorConnectivity> { on { invoke() }.thenReturn(flowOf(true)) }
+        mock<MonitorConnectivity> { on { invoke() }.thenReturn(MutableStateFlow(true)) }
 
     private val scheduler = TestCoroutineScheduler()
 
@@ -207,7 +208,7 @@ class ReportIssueViewModelTest {
     @Test
     fun `test that connection error is returned if attempting to submit and no internet available`() =
         runTest {
-            whenever(monitorConnectivity()).thenReturn(flowOf(false))
+            whenever(monitorConnectivity()).thenReturn(MutableStateFlow(false))
 
             underTest.state.map { it.error }.distinctUntilChanged()
                 .test {
