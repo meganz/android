@@ -16,19 +16,15 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.app.presentation.featureflag.model.FeatureFlag
 import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagState
-import mega.privacy.android.domain.entity.FeatureFlag
 
 /**
  * Tag to identify this class in Unit test
@@ -75,7 +71,7 @@ fun FeatureFlagList(
     LazyColumn(modifier = modifier.testTag(FEATURE_FLAG_LIST_TAG),
         state = rememberSaveable(featureFlagList,
             saver = LazyListState.Saver) { LazyListState() }) {
-        items(items = featureFlagList) { (name, isEnabled) ->
+        items(items = featureFlagList) { (name, _, isEnabled) ->
             FeatureFlagRow(name = name,
                 isEnabled = isEnabled,
                 onCheckedChange = onCheckedChange, modifier)

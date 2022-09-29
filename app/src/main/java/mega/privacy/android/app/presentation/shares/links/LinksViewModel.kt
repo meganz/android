@@ -100,7 +100,7 @@ class LinksViewModel @Inject constructor(
                 linksTreeDepth = depth,
                 linksHandle = handle,
                 linksParentHandle = getParentNodeHandle(handle),
-                sortOrder = if (depth == 0) getLinksSortOrder() else sortOrderIntMapper(
+                sortOrder = if (depth == 0) sortOrderIntMapper(getLinksSortOrder()) else sortOrderIntMapper(
                     getCloudSortOrder())
             )
         }
@@ -120,7 +120,7 @@ class LinksViewModel @Inject constructor(
                     isInvalidHandle = true,
                     isLoading = false,
                     linksParentHandle = null,
-                    sortOrder = getLinksSortOrder()
+                    sortOrder = sortOrderIntMapper(getLinksSortOrder())
                 )
             }
         }

@@ -160,22 +160,16 @@ interface FilesRepository {
      * MegaApi::ORDER_DEFAULT_DESC, MegaApi::ORDER_LINK_CREATION_ASC,
      * MegaApi::ORDER_LINK_CREATION_DESC
      *
-     * @param order sort order, if null the default order is applied
+     * @param order sort order
      * @return List of MegaNode corresponding of a public link
      */
-    suspend fun getPublicLinks(order: Int?): List<MegaNode>?
+    suspend fun getPublicLinks(order: SortOrder): List<MegaNode>
 
     /**
      * Get others sort order
      * @return others sort order
      */
     suspend fun getOthersSortOrder(): Int
-
-    /**
-     * Get links cloud sort order
-     * @return links cloud sort order
-     */
-    suspend fun getLinksSortOrder(): Int
 
 
     /**

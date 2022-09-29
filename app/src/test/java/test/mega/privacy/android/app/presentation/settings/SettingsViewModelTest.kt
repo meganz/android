@@ -63,7 +63,7 @@ class SettingsViewModelTest {
             startScreen = mock { on { invoke() }.thenReturn(emptyFlow()) },
             isHideRecentActivityEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
             toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,
-            monitorConnectivity = mock { on { invoke() }.thenReturn(flowOf(true)) },
+            monitorConnectivity = mock { on { invoke() }.thenReturn(MutableStateFlow(true)) },
             requestAccountDeletion = mock(),
             isChatLoggedIn = isChatLoggedIn,
             setSdkLogsEnabled = mock(),

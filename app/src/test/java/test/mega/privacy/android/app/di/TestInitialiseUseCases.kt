@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.InitialiseUseCases
 import mega.privacy.android.domain.usecase.MonitorConnectivity
@@ -19,7 +19,9 @@ import org.mockito.kotlin.mock
 @Module
 object TestInitialiseUseCases {
 
-    val monitorConnectivity = mock<MonitorConnectivity> { on { invoke() }.thenReturn(flowOf(true)) }
+    val monitorConnectivity = mock<MonitorConnectivity> {
+        on { invoke() }.thenReturn(MutableStateFlow(true))
+    }
     val rootNodeExists = mock<RootNodeExists> { on { runBlocking { invoke() } }.thenReturn(true) }
 
     @Provides

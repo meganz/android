@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.domain.usecase
 
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.emptyFlow
@@ -7,7 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
-import mega.privacy.android.domain.entity.FeatureFlag
+import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 import org.junit.Before
 import org.junit.Test
@@ -29,13 +30,13 @@ class DefaultGetAllFeatureFlagsTest {
     @Test
     fun `test that features list is not empty`() {
         runTest {
-            val list = mutableListOf<FeatureFlag>()
-            list.add(FeatureFlag("featureName",
-                false))
-            whenever(featureFlagRepository.getAllFeatures()).thenReturn(flowOf(list))
+            val map = mutableMapOf<Feature, Boolean>()
+            val feature = mock<Feature> { on { name }.thenReturn("featureName") }
+            map[feature] = false
+            whenever(featureFlagRepository.getAllFeatures()).thenReturn(flowOf(map))
             underTest().map {
-                assertEquals(it[0].featureName, "featureName")
-                assertEquals(it[0].isEnabled, false)
+                assertThat(it).containsKey(feature)
+                assertThat(it[feature]).isFalse()
             }
         }
     }

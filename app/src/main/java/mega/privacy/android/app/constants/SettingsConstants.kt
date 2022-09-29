@@ -117,15 +117,4 @@ object SettingsConstants {
     const val KEY_COOKIE_POLICIES = "setting_cookie_policies"
 
     const val REPORT_ISSUE = "settings_help_report_issue"
-
-    /**
-     * Keys for backing up time stamps
-     */
-     const val KEY_CAM_SYNC_TIMESTAMP = "KEY_CAM_SYNC_TIMESTAMP"
-     const val KEY_CAM_VIDEO_SYNC_TIMESTAMP = "KEY_CAM_VIDEO_SYNC_TIMESTAMP"
-     const val KEY_SEC_SYNC_TIMESTAMP = "KEY_SEC_SYNC_TIMESTAMP"
-     const val KEY_SEC_VIDEO_SYNC_TIMESTAMP = "KEY_SEC_VIDEO_SYNC_TIMESTAMP"
-     const val KEY_PRIMARY_HANDLE = "KEY_PRIMARY_HANDLE"
-     const val KEY_SECONDARY_HANDLE = "KEY_SECONDARY_HANDLE"
-     const val LAST_CAM_SYNC_TIMESTAMP_FILE = "LAST_CAM_SYNC_TIMESTAMP_FILE"
 }
