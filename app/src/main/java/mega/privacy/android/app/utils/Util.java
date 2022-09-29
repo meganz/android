@@ -28,7 +28,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -844,37 +843,12 @@ public class Util {
         return difference;
     }
 
-    public static int getVersion() {
+    public static int getVersion(Context context) {
         try {
-            Context context = MegaApplication.getInstance().getApplicationContext();
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             return pInfo.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             return 0;
-        }
-    }
-
-    /**
-     * Checks if the app has been upgraded and store the new version code.
-     */
-    public static void checkAppUpgrade() {
-        final String APP_INFO_FILE = "APP_INFO";
-        final String APP_VERSION_CODE_KEY = "APP_VERSION_CODE";
-
-        Context context = MegaApplication.getInstance().getApplicationContext();
-        SharedPreferences preferences = context.getSharedPreferences(APP_INFO_FILE, Context.MODE_PRIVATE);
-
-        int oldVersionCode = preferences.getInt(APP_VERSION_CODE_KEY, 0);
-        int newVersionCode = getVersion();
-        if (oldVersionCode == 0 || oldVersionCode < newVersionCode) {
-            if (oldVersionCode == 0) {
-                Timber.i("App Version: %d", newVersionCode);
-            } else {
-                Timber.i("App upgraded from %d to %d", oldVersionCode, newVersionCode);
-            }
-            preferences.edit().putInt(APP_VERSION_CODE_KEY, newVersionCode).apply();
-        } else {
-            Timber.i("App Version: %s", newVersionCode);
         }
     }
 

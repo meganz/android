@@ -2039,7 +2039,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         ///Check the MK or RK file
-        Timber.i("App version: %d", getVersion());
         final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
         final File fRKOld = buildExternalStorageFile(OLD_RK_FILE);
         if (isFileAvailable(fMKOld)) {
