@@ -48,6 +48,7 @@ import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
+import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.GetFingerprint
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
@@ -462,6 +463,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var setSecondarySyncHandle: SetSecondarySyncHandle
+
+    /**
+     * GetDefaultNodeHandle
+     */
+    @Inject
+    lateinit var getDefaultNodeHandle: GetDefaultNodeHandle
 
     /**
      * DatabaseHandler
@@ -1442,8 +1449,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         if (needToSetPrimary) {
             // Try to find a folder which name is "Camera Uploads" from root.
-            cameraUploadHandle =
-                CameraUploadUtil.findDefaultFolder(getString(R.string.section_photo_sync))
+            cameraUploadHandle = getDefaultNodeHandle(getString(R.string.section_photo_sync))
             // Cannot find a folder with the name, create one.
             if (cameraUploadHandle == MegaApiJava.INVALID_HANDLE) {
                 // Flag, prevent to create duplicate folder.
@@ -1476,7 +1482,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             if (needToSetSecondary) {
                 // Try to find a folder which name is "Media Uploads" from root.
                 secondaryUploadHandle =
-                    CameraUploadUtil.findDefaultFolder(getString(R.string.section_secondary_media_uploads))
+                    getDefaultNodeHandle(getString(R.string.section_secondary_media_uploads))
                 // Cannot find a folder with the name, create one.
                 if (secondaryUploadHandle == MegaApiJava.INVALID_HANDLE) {
                     // Flag, prevent to create duplicate folder.
