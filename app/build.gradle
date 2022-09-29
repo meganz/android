@@ -486,6 +486,7 @@ dependencies {
 
     //QA
     qaImplementation 'com.google.firebase:firebase-appdistribution:16.0.0-beta03'
+    qaImplementation "androidx.compose.ui:ui-test-manifest:$composeVersion"
 
     implementation "com.google.auto.value:auto-value-annotations:$autovalueAnnotationVersion"
     kapt "com.google.auto.value:auto-value:$autovalueVersion"
