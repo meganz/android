@@ -5,7 +5,7 @@ import nz.mega.sdk.MegaApiJava
 
 
 /**
- * Mapper to convert [, SortOrder] to , SortOrder related Integer values in MegaApiJava
+ * Mapper to convert [SortOrder] to SortOrder related Integer values in MegaApiJava
  */
 typealias SortOrderIntMapper = (@JvmSuppressWildcards SortOrder?) -> @JvmSuppressWildcards Int
 
