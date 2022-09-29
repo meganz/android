@@ -111,8 +111,10 @@ String getLastCommitMessage() {
         return '**N/A**'
     } else {
         return """
-        $lastCommitMessage
-        """.stripIndent().stripMargin()
+\\`\\`\\`
+$lastCommitMessage
+\\`\\`\\`
+""".stripIndent().stripMargin()
     }
 }
 
@@ -228,7 +230,7 @@ pipeline {
 
                         // Create the String to be posted as a comment in Gitlab
                         String mergeRequestMessage = ":white_check_mark: Build Succeeded!\n\n" +
-                                "**Last Commit:** (${env.GIT_COMMIT})\n\n" + getLastCommitMessage() + "\n\n" +
+                                "**Last Commit:** (${env.GIT_COMMIT})\n" + getLastCommitMessage() + "\n" +
                                 "**Build Warnings:**\n" + getBuildWarnings() + "\n\n" +
                                 "**Lint Summary:** (${jsonLintReportLink}):<br/>" + "${LINT_REPORT_SUMMARY}" + "\n\n" +
                                 buildTestResults()
@@ -755,7 +757,6 @@ private void downloadJenkinsConsoleLog(String downloaded) {
 private String uploadFileToGitLab(String fileName) {
     String link = ""
     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        // upload Jenkins console log to GitLab and get download link
         final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
         link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
         return link
