@@ -67,8 +67,8 @@ public class ImportFilesFragment extends Fragment implements ImportFilesAdapter.
     }
 
     private void setupObservers() {
-        viewModel.filesInfo.observe(getViewLifecycleOwner(), this::showFilesInfo);
-        viewModel.textInfo.observe(getViewLifecycleOwner(), this::showImportingTextInfo);
+        viewModel.getFilesInfo().observe(getViewLifecycleOwner(), this::showFilesInfo);
+        viewModel.getTextInfo().observe(getViewLifecycleOwner(), this::showImportingTextInfo);
     }
 
     /**
@@ -177,7 +177,7 @@ public class ImportFilesFragment extends Fragment implements ImportFilesAdapter.
     }
 
     private HashMap<String, String> getNameFiles() {
-        return viewModel.fileNames.getValue();
+        return viewModel.getFileNames().getValue();
     }
 
     @Override

@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 
 /**
@@ -13,5 +13,5 @@ fun interface MonitorConnectivity {
      *
      * @return
      */
-    operator fun invoke(): Flow<Boolean>
+    operator fun invoke(): StateFlow<Boolean>
 }

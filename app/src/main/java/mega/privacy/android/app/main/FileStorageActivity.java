@@ -172,6 +172,12 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_filestorage);
+
+        viewContainer = findViewById(R.id.file_storage_container);
+        contentText = findViewById(R.id.file_storage_content_text);
+        listView = findViewById(R.id.file_storage_list_view);
+
         Intent intent = getIntent();
         prompt = intent.getStringExtra(EXTRA_PROMPT);
         if (prompt != null) {
@@ -205,8 +211,6 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
                     Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
 
-        setContentView(R.layout.activity_filestorage);
-
         //Set toolbar
         tB = findViewById(R.id.toolbar_filestorage);
         setSupportActionBar(tB);
@@ -231,10 +235,6 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
         if (savedInstanceState != null && savedInstanceState.containsKey(PATH)) {
             path = new File(savedInstanceState.getString(PATH));
         }
-
-        viewContainer = findViewById(R.id.file_storage_container);
-        contentText = findViewById(R.id.file_storage_content_text);
-        listView = findViewById(R.id.file_storage_list_view);
 
         emptyImageView = findViewById(R.id.file_storage_empty_image);
         emptyTextView = findViewById(R.id.file_storage_empty_text);

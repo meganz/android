@@ -17,12 +17,6 @@ interface LoggingRepository {
     fun enableLogAllToConsole()
 
     /**
-     * Enable strict mode
-     *
-     */
-    fun enableStrictMode()
-
-    /**
      * Reset sdk logging
      *
      */

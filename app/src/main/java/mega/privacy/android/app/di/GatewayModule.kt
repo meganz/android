@@ -13,8 +13,10 @@ import mega.privacy.android.app.data.facade.MegaApiFolderFacade
 import mega.privacy.android.app.data.facade.MegaChatApiFacade
 import mega.privacy.android.app.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.app.data.gateway.AndroidDeviceGateway
+import mega.privacy.android.app.data.gateway.AppInfoGateway
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.CacheGateway
+import mega.privacy.android.app.data.gateway.DefaultAppInfoGateway
 import mega.privacy.android.app.data.gateway.DeviceGateway
 import mega.privacy.android.app.data.gateway.FileCompressionGateway
 import mega.privacy.android.app.data.gateway.ZipFileCompressionGateway
@@ -22,6 +24,7 @@ import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.app.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
@@ -29,6 +32,7 @@ import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesG
 import mega.privacy.android.app.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.UIPreferencesGateway
+import mega.privacy.android.app.data.preferences.AppInfoPreferencesDatastore
 import mega.privacy.android.app.data.preferences.AppPreferencesDatastore
 import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
@@ -85,6 +89,9 @@ abstract class GatewayModule {
     abstract fun bindAppPreferencesGateway(implementation: AppPreferencesDatastore): AppPreferencesGateway
 
     @Binds
+    abstract fun bindAppInfoPreferencesGateway(implementation: AppInfoPreferencesDatastore): AppInfoPreferencesGateway
+
+    @Binds
     abstract fun bindFeatureFlagPreferencesGateway(implementation: FeatureFlagPreferencesDataStore): FeatureFlagPreferencesGateway
 
     @Binds
@@ -92,6 +99,10 @@ abstract class GatewayModule {
 
     @Binds
     abstract fun bindDeviceGateway(implementation: AndroidDeviceGateway): DeviceGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindAppInfoGateway(implementation: DefaultAppInfoGateway): AppInfoGateway
 
     @Binds
     abstract fun bindFileCompressionGateway(implementation: ZipFileCompressionGateway): FileCompressionGateway

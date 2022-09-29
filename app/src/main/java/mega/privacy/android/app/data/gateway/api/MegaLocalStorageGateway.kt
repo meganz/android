@@ -1,5 +1,6 @@
 package mega.privacy.android.app.data.gateway.api
 
+import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaContactDB
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.main.megachat.NonContactInfo
@@ -13,14 +14,24 @@ import mega.privacy.android.domain.entity.SyncRecord
 interface MegaLocalStorageGateway {
 
     /**
-     * Camera Uploads handle
+     * Get Camera Uploads Primary handle
      */
     suspend fun getCamSyncHandle(): Long?
 
     /**
-     * Media Uploads handle
+     * Get Camera Uploads Secondary handle
      */
     suspend fun getMegaHandleSecondaryFolder(): Long?
+
+    /**
+     * Set Camera Uploads Primary handle
+     */
+    suspend fun setCamSyncHandle(primaryHandle: Long)
+
+    /**
+     * Set Camera Uploads Secondary handle
+     */
+    suspend fun setMegaHandleSecondaryFolder(secondaryHandle: Long)
 
     /**
      * Get cloud sort order
@@ -435,4 +446,31 @@ interface MegaLocalStorageGateway {
      * @param enable
      */
     suspend fun setCamSyncEnabled(enable: Boolean)
+
+    /**
+     * Gets attributes from DB
+     */
+    suspend fun getAttributes(): MegaAttributes?
+
+    /**
+     * Gets pricing timestamp.
+     */
+    suspend fun getPricingTimeStamp(): String?
+
+    /**
+     * Gets payment methods timestamp
+     */
+    suspend fun getPaymentMethodsTimeStamp(): String?
+
+    /**
+     * The method is to backup time stamps, primary upload folder and secondary folder in share preference after
+     * database records being cleaned
+     * @param primaryUploadFolderHandle
+     * @param secondaryUploadFolderHandle
+     */
+    suspend fun backupTimestampsAndFolderHandle(
+        primaryUploadFolderHandle: Long,
+        secondaryUploadFolderHandle: Long,
+    )
+
 }

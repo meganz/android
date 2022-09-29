@@ -9,9 +9,12 @@ import mega.privacy.android.app.presentation.notification.model.mapper.Notificat
 import mega.privacy.android.app.presentation.notification.model.mapper.getNotification
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.AcknowledgeUserAlerts
+import mega.privacy.android.domain.usecase.DefaultMonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.DefaultMonitorUserAlerts
 import mega.privacy.android.domain.usecase.MonitorEvent
+import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.MonitorUserAlerts
+import javax.inject.Singleton
 
 @Module
 @InstallIn(ViewModelComponent::class)

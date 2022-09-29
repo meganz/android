@@ -484,12 +484,13 @@ dependencies {
     // Live Data testing
     testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
 
-
-
-
     //QA
-
     qaImplementation 'com.google.firebase:firebase-appdistribution:16.0.0-beta03'
+    qaImplementation "androidx.compose.ui:ui-test-manifest:$composeVersion"
+
+    implementation "com.google.auto.value:auto-value-annotations:$autovalueAnnotationVersion"
+    kapt "com.google.auto.value:auto-value:$autovalueVersion"
+
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()

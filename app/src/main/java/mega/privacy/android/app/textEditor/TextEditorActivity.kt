@@ -2,6 +2,7 @@ package mega.privacy.android.app.textEditor
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -818,6 +819,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      * @param duration Animation duration.
      */
     private fun animateToolbar(show: Boolean, duration: Long) {
+        @SuppressLint("RestrictedApi")
         animator = binding.appBar
             .animate()
             .translationY(if (show) 0F else -binding.fileEditorToolbar.height.toFloat())
@@ -843,6 +845,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      * @param duration Animation duration.
      */
     private fun animateBottom(show: Boolean, duration: Long) {
+        @SuppressLint("RestrictedApi")
         val animator = binding.nameText
             .animate()
             .translationY(if (show) 0F else binding.nameText.height.toFloat())

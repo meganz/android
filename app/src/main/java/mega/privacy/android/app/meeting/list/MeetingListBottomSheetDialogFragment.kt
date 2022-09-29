@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.list
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -57,7 +58,10 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         itemsLayout = binding.itemsLayout
         binding.header.btnMore.isVisible = false
         binding.header.txtLastMessage.isVisible = false
-        binding.header.root.updateLayoutParams { height = dpToPx(requireContext(), 71).toInt() }
+        binding.header.root.updateLayoutParams {
+            @SuppressLint("RestrictedApi")
+            height = dpToPx(requireContext(), 71).toInt()
+        }
         return binding.root
     }
 

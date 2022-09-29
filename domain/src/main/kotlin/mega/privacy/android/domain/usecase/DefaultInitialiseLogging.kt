@@ -29,7 +29,6 @@ class DefaultInitialiseLogging @Inject constructor(
     override suspend fun invoke(isDebug: Boolean) {
         if (isDebug) {
             loggingRepository.enableLogAllToConsole()
-            loggingRepository.enableStrictMode()
         }
         startupLogging()
 

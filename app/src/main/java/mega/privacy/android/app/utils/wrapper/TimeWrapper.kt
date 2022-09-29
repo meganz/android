@@ -8,4 +8,9 @@ interface TimeWrapper {
      * get current time
      */
     val now: Long
+
+    /**
+     * get nano time
+     */
+    val nanoTime: Long
 }

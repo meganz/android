@@ -9,6 +9,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.ElementsIntoSet
+import dagger.multibindings.IntoMap
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -19,9 +21,11 @@ import mega.privacy.android.app.data.gateway.MotionSensorFacade
 import mega.privacy.android.app.data.gateway.MotionSensorGateway
 import mega.privacy.android.app.data.gateway.VibratorFacade
 import mega.privacy.android.app.data.gateway.VibratorGateway
+import mega.privacy.android.app.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.app.data.repository.DefaultQARepository
 import mega.privacy.android.app.data.repository.DefaultShakeDetectorRepository
 import mega.privacy.android.app.data.usecase.DefaultDetectShake
+import mega.privacy.android.app.di.featuretoggle.FeatureFlagPriorityKey
 import mega.privacy.android.app.domain.repository.QARepository
 import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
 import mega.privacy.android.app.domain.usecase.DetectShake
@@ -29,8 +33,12 @@ import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import mega.privacy.android.app.domain.usecase.UpdateApp
 import mega.privacy.android.app.domain.usecase.VibrateDevice
+import mega.privacy.android.app.featuretoggle.QAFeatures
 import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
+import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FeatureFlagRepository
@@ -64,6 +72,7 @@ class QAModule {
     @Provides
     fun provideGetAllFeatureFlags(featureFlagRepository: FeatureFlagRepository): GetAllFeatureFlags =
         GetAllFeatureFlags(featureFlagRepository::getAllFeatures)
+
 
     /**
      * Provide distribution gateway for QA builds
@@ -174,4 +183,44 @@ class QAModule {
             context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         }
     }
+
+    /**
+     * Provide features
+     *
+     * @return QA module features
+     */
+    @Provides
+    @ElementsIntoSet
+    fun provideFeatures(): Set<@JvmSuppressWildcards Feature> =
+        QAFeatures.values().toSet()
+
+    /**
+     * Provide feature flag default value provider
+     *
+     * @return Default provider
+     */
+    @Provides
+    @IntoMap
+    @FeatureFlagPriorityKey(
+        implementingClass = QAFeatures.Companion::class,
+        priority = FeatureFlagValuePriority.Default
+    )
+    fun provideFeatureFlagDefaultValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+        QAFeatures.Companion
+
+    /**
+     * Provide feature flag runtime value provider
+     *
+     * @param dataStore
+     * @return Runtime value provider
+     */
+    @Provides
+    @IntoMap
+    @FeatureFlagPriorityKey(
+        implementingClass = FeatureFlagPreferencesDataStore::class,
+        priority = FeatureFlagValuePriority.RuntimeOverride
+    )
+    fun provideFeatureFlagRuntimeValueProvider(dataStore: FeatureFlagPreferencesDataStore): @JvmSuppressWildcards FeatureFlagValueProvider =
+        dataStore
+
 }

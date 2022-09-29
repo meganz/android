@@ -44,7 +44,6 @@ import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.showAlert;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.content.Context;
@@ -136,6 +135,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.ShareTextInfo;
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -436,8 +436,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 result -> backToCloud(result != null ? parentHandle : INVALID_HANDLE, 0, result));
 
         viewModel = new ViewModelProvider(this).get(FileExplorerActivityViewModel.class);
-        viewModel.filesInfo.observe(this, this::onProcessAsyncInfo);
-        viewModel.textInfo.observe(this, info -> dismissAlertDialogIfExists(statusDialog));
+        viewModel.getFilesInfo().observe(this, this::onProcessAsyncInfo);
+        viewModel.getTextInfo().observe(this, info -> dismissAlertDialogIfExists(statusDialog));
 
         if (savedInstanceState != null) {
             Timber.d("Bundle is NOT NULL");
@@ -498,7 +498,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
         if (credentials == null) {
             Timber.w("User credentials NULL");
 
-            if (viewModel.isImportingText) {
+            if (viewModel.isImportingText()) {
                 startActivity(new Intent(this, LoginActivity.class)
                         .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
                         .putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(Intent.EXTRA_TEXT))
@@ -1341,15 +1341,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (getIntent() != null && mode == UPLOAD && folderSelected && filePreparedInfos == null) {
-            viewModel.ownFilePrepareTask(this, getIntent());
-            createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
-        }
-    }
-
-    @Override
     public void onBackPressed() {
         Timber.d("tabShown: %s", tabShown);
         if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
@@ -1491,7 +1482,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
             }
         }
 
-        intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, viewModel.fileNames.getValue());
+        intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, viewModel.getFileNames().getValue());
         intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
         intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
         intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
@@ -1596,7 +1587,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 return;
             }
 
-            if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+            if (viewModel.getStorageState() == StorageState.PayWall) {
                 dismissAlertDialogIfExists(statusDialog);
                 showOverDiskQuotaPaywallWarning();
                 return;
@@ -1638,7 +1629,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                             if (!withoutCollisions.isEmpty()) {
                                 PermissionUtils.checkNotificationsPermission(this);
                                 String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
-                                uploadUseCase.uploadInfos(this, infos, viewModel.fileNames.getValue(), finalParentNode.getHandle())
+                                uploadUseCase.uploadInfos(this, infos, viewModel.getFileNames().getValue(), finalParentNode.getHandle())
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(() -> {
@@ -1730,14 +1721,14 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
             Timber.d("mode UPLOAD");
 
-            if (viewModel.isImportingText) {
+            if (viewModel.isImportingText()) {
                 MegaNode parentNode = megaApi.getNodeByHandle(handle);
                 if (parentNode == null) {
                     parentNode = megaApi.getRootNode();
                 }
 
-                ShareTextInfo info = viewModel.textInfo.getValue();
-                HashMap<String, String> names = viewModel.fileNames.getValue();
+                ShareTextInfo info = viewModel.getTextInfoContent();
+                HashMap<String, String> names = viewModel.getFileNames().getValue();
                 if (info != null) {
                     String name = names != null ? names.get(info.getSubject()) : info.getSubject();
                     createFile(name, info.getFileContent(), parentNode, info.isUrl());
@@ -1848,7 +1839,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
     }
 
     public void createFile(String name, String data, MegaNode parentNode, boolean isURL) {
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
@@ -2129,7 +2120,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 Timber.w(e, "IOException deleting childThumbDir.");
             }
         }
-        viewModel.shutdownExecutorService();
 
         dismissAlertDialogIfExists(newFolderDialog);
         super.onDestroy();
@@ -2376,7 +2366,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
         chatListItems.addAll(chats);
 
-        if (viewModel.isImportingText) {
+        if (viewModel.isImportingText()) {
             Timber.d("Handle intent of text plain");
 
             String message = viewModel.getMessageToShare();
@@ -2557,7 +2547,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
     }
 
     public void setNameFiles(HashMap<String, String> nameFiles) {
-        viewModel.fileNames.setValue(nameFiles);
+        viewModel.getFileNames().setValue(nameFiles);
     }
 
     public DrawerItem getCurrentItem() {

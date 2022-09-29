@@ -6,17 +6,38 @@ import android.os.Bundle
 import android.text.TextUtils
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.interfaces.*
+import mega.privacy.android.app.di.notification.getMonitorStorageStateEvent
+import mega.privacy.android.app.interfaces.ActivityLauncher
+import mega.privacy.android.app.interfaces.AttachNodeToChatListener
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.listeners.AttachNodesListener
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.megachat.ChatExplorerActivity
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.AlertsAndWarnings
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.EXTRA_KEY
+import mega.privacy.android.app.utils.Constants.EXTRA_LINK
+import mega.privacy.android.app.utils.Constants.EXTRA_PASSWORD
+import mega.privacy.android.app.utils.Constants.EXTRA_SEVERAL_LINKS
+import mega.privacy.android.app.utils.Constants.NODE_HANDLES
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
+import mega.privacy.android.app.utils.Constants.SELECTED_CHATS
+import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
+import mega.privacy.android.app.utils.Constants.SELECTED_USERS
+import mega.privacy.android.app.utils.Constants.USER_HANDLES
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import nz.mega.sdk.*
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatPeerList
+import nz.mega.sdk.MegaHandleList
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaUser
 
 
 /**
@@ -32,6 +53,8 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
     private val app = MegaApplication.getInstance()
     private val megaApi = app.megaApi
     private val megaChatApi = app.megaChatApi
+
+    val monitorStorageStateEvent: MonitorStorageStateEvent = getMonitorStorageStateEvent()
 
     /**
      * Record if an attach is ongoing.
@@ -68,7 +91,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
             return
         }
 
-        if (app.storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
+        if (monitorStorageStateEvent.getState() == StorageState.PayWall) {
             AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
             return
         }
@@ -405,7 +428,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         forceNonChatSnackbar: Boolean = false,
         attachNodeToChatListener: AttachNodeToChatListener? = null
     ) {
-        if (app.storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
+        if (monitorStorageStateEvent.getState() == StorageState.PayWall) {
             AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
             return
         }

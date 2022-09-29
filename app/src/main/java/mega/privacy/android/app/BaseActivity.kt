@@ -994,7 +994,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 StringResourcesUtils.getString(R.string.error_business_removed),
                 loggingSettings))
             SMS_VERIFICATION_ACCOUNT_BLOCK -> {
-                if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed()) return
+                if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed) return
                 MegaApplication.smsVerifyShowed(true)
                 val gSession = megaApi.dumpSession()
                 //For first login, keep the valid session,
@@ -1017,7 +1017,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 startActivity(intent)
             }
             WEAK_PROTECTION_ACCOUNT_BLOCK -> {
-                if (!MegaApplication.isBlockedDueToWeakAccount() && !MegaApplication.isWebOpenDueToEmailVerification()) {
+                if (!MegaApplication.isBlockedDueToWeakAccount && !MegaApplication.isWebOpenDueToEmailVerification) {
                     startActivity(Intent(this, WeakAccountProtectionAlertActivity::class.java))
                 }
             }
@@ -1597,17 +1597,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 snackbar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
             snackTextView.maxLines = 5
             snackbar.show()
-        }
-    }
-
-    init {
-
-        //Will be checked again and initialized at `onCreate()`
-        if (app != null) {
-            megaApi = app!!.getMegaApi()
-            megaApiFolder = app!!.getMegaApiFolder()
-            megaChatApi = app!!.getMegaChatApi()
-            dbH = app!!.getDbH()
         }
     }
 }

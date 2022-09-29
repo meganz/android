@@ -8,19 +8,22 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.sample
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.TransfersInfo
 import mega.privacy.android.domain.entity.TransfersSizeInfo
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.GetNumPendingUploads
 import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
 import javax.inject.Inject
 
@@ -42,13 +45,18 @@ class TransfersManagementViewModel @Inject constructor(
     private val isCompletedTransfersEmpty: IsCompletedTransfersEmpty,
     private val areAllTransfersPaused: AreAllTransfersPaused,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    monitorConnectivity: MonitorConnectivity,
     monitorTransfersSize: MonitorTransfersSize,
 ) : ViewModel() {
-
     private val transfersInfo: MutableLiveData<TransfersInfo> = MutableLiveData()
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
     private val areTransfersPaused = SingleLiveEvent<Boolean>()
     private val transfersSizeInfoState = MutableStateFlow(TransfersSizeInfo())
+
+    /**
+     * is network connected
+     */
+    val online = monitorConnectivity().stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     init {
         viewModelScope.launch {

@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.Event
 import mega.privacy.android.domain.entity.EventType
+import mega.privacy.android.domain.entity.NormalEvent
 import mega.privacy.android.domain.repository.NotificationsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -188,7 +189,7 @@ class DefaultNotificationsRepositoryTest {
 
     @Test
     fun `test that event is returned if found`() = runTest {
-        val expectedEvent = Event(
+        val expectedEvent = NormalEvent(
             handle = 1L,
             text = "expected text",
             number = 2L,
@@ -214,7 +215,7 @@ class DefaultNotificationsRepositoryTest {
 
     @Test
     fun `test that multiple events are returned if found`() = runTest {
-        val expectedEvent = Event(
+        val expectedEvent = NormalEvent(
             handle = 1L,
             text = "expected text",
             number = 2L,

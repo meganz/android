@@ -7,7 +7,6 @@ import dagger.hilt.testing.TestInstallIn
 import dagger.multibindings.ElementsIntoSet
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import mega.privacy.android.app.di.LoggingModule
 import mega.privacy.android.app.di.settings.SettingsModule
 import mega.privacy.android.app.di.settings.SettingsUseCases
 import mega.privacy.android.app.di.settings.startscreen.TempStartScreenUseCaseStaticModule
@@ -23,7 +22,6 @@ import mega.privacy.android.domain.usecase.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.GetSupportEmail
-import mega.privacy.android.domain.usecase.InitialiseLogging
 import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsHideRecentActivityEnabled
@@ -33,7 +31,6 @@ import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
-import mega.privacy.android.domain.usecase.ResetSdkLogger
 import mega.privacy.android.domain.usecase.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
@@ -50,7 +47,7 @@ import test.mega.privacy.android.app.TEST_USER_ACCOUNT
  * Provides test dependencies for Settings tests
  */
 @TestInstallIn(
-    replaces = [SettingsModule::class, SettingsUseCases::class, LoggingModule::class, TempStartScreenUseCaseStaticModule::class],
+    replaces = [SettingsModule::class, SettingsUseCases::class, TempStartScreenUseCaseStaticModule::class],
     components = [SingletonComponent::class]
 )
 @Module
@@ -136,12 +133,6 @@ object TestSettingsModule {
 
     @Provides
     fun provideSetChatLoggingEnabled(): SetChatLogsEnabled = mock()
-
-    @Provides
-    fun provideInitialiseLogging(): InitialiseLogging = mock()
-
-    @Provides
-    fun provideResetSdkLogger(): ResetSdkLogger = mock()
 
     @Provides
     fun provide(): MonitorAutoAcceptQRLinks = mock {

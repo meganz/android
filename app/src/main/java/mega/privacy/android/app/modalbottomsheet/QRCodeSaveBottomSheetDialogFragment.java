@@ -1,43 +1,44 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
+import static mega.privacy.android.app.utils.Constants.REQUEST_DOWNLOAD_FOLDER;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
+
 import java.io.File;
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.main.FileStorageActivity;
+import mega.privacy.android.app.main.qrcode.QRCodeActivity;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.presentation.bottomsheet.QrCodeSaveBottomSheetDialogViewModel;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.StringResourcesUtils;
-import mega.privacy.android.app.main.FileStorageActivity;
-import mega.privacy.android.app.main.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
-
-import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.Util.showSnackbar;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import javax.inject.Inject;
 
 @AndroidEntryPoint
 public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
@@ -46,6 +47,8 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     UploadUseCase uploadUseCase;
+
+    private QrCodeSaveBottomSheetDialogViewModel viewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -59,6 +62,7 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         contentView.findViewById(R.id.qr_code_saveTo_cloud_layout).setOnClickListener(this);
         contentView.findViewById(R.id.qr_code_saveTo_fileSystem_layout).setOnClickListener(this);
         super.onViewCreated(view, savedInstanceState);
+        viewModel = new ViewModelProvider(this).get(QrCodeSaveBottomSheetDialogViewModel.class);
     }
 
     @Override
@@ -86,7 +90,7 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
             return;
         }
 
-        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
