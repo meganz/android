@@ -8,6 +8,7 @@ import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.mapper.SortOrderMapper
 import mega.privacy.android.app.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.domain.entity.SortOrder
+import nz.mega.sdk.MegaApiJava
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -32,7 +33,7 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get camera sort order return type is sort order`() = runTest {
-        val order = 1
+        val order = MegaApiJava.ORDER_DEFAULT_ASC
         whenever(megaLocalStorageGateway.getCameraSortOrder()).thenReturn(order)
         whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         assertThat(underTest.getCameraSortOrder()).isInstanceOf(SortOrder::class.java)
@@ -46,7 +47,7 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get camera sort order invokes sort order mapper`() = runTest {
-        val order = 1
+        val order = MegaApiJava.ORDER_DEFAULT_ASC
         whenever(megaLocalStorageGateway.getCameraSortOrder()).thenReturn(order)
         underTest.getCameraSortOrder()
         verify(sortOrderMapper).invoke(order)
@@ -54,7 +55,7 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get cloud sort order return type is sort order`() = runTest {
-        val order = 2
+        val order = MegaApiJava.ORDER_DEFAULT_DESC
         whenever(megaLocalStorageGateway.getCloudSortOrder()).thenReturn(order)
         whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_DEFAULT_DESC)
         assertThat(underTest.getCloudSortOrder()).isInstanceOf(SortOrder::class.java)
@@ -68,7 +69,7 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get cloud sort order invokes sort order mapper`() = runTest {
-        val order = 2
+        val order = MegaApiJava.ORDER_DEFAULT_DESC
         whenever(megaLocalStorageGateway.getCloudSortOrder()).thenReturn(order)
         underTest.getCloudSortOrder()
         verify(sortOrderMapper).invoke(order)
@@ -76,7 +77,7 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get links sort order return type is sort order`() = runTest {
-        val order = 3
+        val order = MegaApiJava.ORDER_SIZE_ASC
         whenever(megaLocalStorageGateway.getLinksSortOrder()).thenReturn(order)
         whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_SIZE_ASC)
         assertThat(underTest.getLinksSortOrder()).isInstanceOf(SortOrder::class.java)
@@ -90,7 +91,7 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get links sort order invokes sort order mapper`() = runTest {
-        val order = 3
+        val order = MegaApiJava.ORDER_SIZE_ASC
         whenever(megaLocalStorageGateway.getLinksSortOrder()).thenReturn(order)
         underTest.getLinksSortOrder()
         verify(sortOrderMapper).invoke(order)
@@ -98,7 +99,7 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get others sort order return type is sort order`() = runTest {
-        val order = 4
+        val order = MegaApiJava.ORDER_SIZE_DESC
         whenever(megaLocalStorageGateway.getOthersSortOrder()).thenReturn(order)
         whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_SIZE_DESC)
         assertThat(underTest.getOthersSortOrder()).isInstanceOf(SortOrder::class.java)
@@ -112,7 +113,7 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get others sort order invokes sort order mapper`() = runTest {
-        val order = 4
+        val order = MegaApiJava.ORDER_SIZE_DESC
         whenever(megaLocalStorageGateway.getOthersSortOrder()).thenReturn(order)
         underTest.getOthersSortOrder()
         verify(sortOrderMapper).invoke(order)
