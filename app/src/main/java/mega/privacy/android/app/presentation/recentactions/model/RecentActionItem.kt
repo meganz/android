@@ -9,7 +9,7 @@ import nz.mega.sdk.MegaRecentActionBucket
  * Hold the data for the the adapter recent action bucket item
  */
 open class RecentActionItem {
-    var viewType = 0
+    var viewType = TYPE_HEADER
     var bucket: MegaRecentActionBucket? = null
     var date = ""
     var time = ""
