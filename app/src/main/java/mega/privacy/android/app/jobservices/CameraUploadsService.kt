@@ -586,6 +586,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         getAttrUserListener = null
         setAttrUserListener = null
         createFolderListener = null
+        megaApi?.let {
+            it.removeRequestListener(this)
+            it.removeTransferListener(this)
+        }
         stopActiveHeartbeat()
     }
 
@@ -1671,12 +1675,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         } else if (request.type == MegaRequest.TYPE_CANCEL_TRANSFER) {
             Timber.d("Cancel transfer received")
             if (e.errorCode == MegaError.API_OK) {
-                @Suppress("DEPRECATION")
-                Handler().postDelayed({
-                    if ((megaApi?.numPendingUploads ?: 1) <= 0) {
-                        megaApi?.resetTotalUploads()
+                delay(200)
+                megaApi?.let {
+                    @Suppress("DEPRECATION")
+                    if (it.numPendingUploads <= 0) {
+                        it.resetTotalUploads()
                     }
-                }, 200)
+                }
             } else {
                 finish()
             }
