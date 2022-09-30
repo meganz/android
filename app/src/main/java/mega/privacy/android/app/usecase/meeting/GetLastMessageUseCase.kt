@@ -183,9 +183,9 @@ class GetLastMessageUseCase @Inject constructor(
             if (includeMyName) {
                 megaChatApi.myFullname
                     ?: megaChatApi.myEmail
-                    ?: getString(R.string.bucket_word_me)
+                    ?: getString(R.string.chat_last_message_sender_me)
             } else {
-                getString(R.string.bucket_word_me)
+                getString(R.string.chat_last_message_sender_me)
             }
         } else {
             megaChatApi.getUserFullnameFromCache(lastMessageSender)

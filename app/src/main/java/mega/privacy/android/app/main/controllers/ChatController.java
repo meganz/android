@@ -424,7 +424,7 @@ public class ChatController {
                 if (message.getType() == MegaChatMessage.TYPE_NORMAL) {
                     Timber.d("Message type NORMAL");
 
-                    builder.append(getString(R.string.bucket_word_me)).append(": ");
+                    builder.append(getString(R.string.chat_last_message_sender_me)).append(": ");
                     String messageContent = "";
                     if (message.getContent() != null) {
                         messageContent = message.getContent();
@@ -475,7 +475,7 @@ public class ChatController {
                     return builder.toString();
 
                 } else if (message.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
-                    builder.append(getString(R.string.bucket_word_me)).append(": ");
+                    builder.append(getString(R.string.chat_last_message_sender_me)).append(": ");
                     MegaChatContainsMeta meta = message.getContainsMeta();
                     if (meta != null) {
                         switch (meta.getType()) {
@@ -499,12 +499,12 @@ public class ChatController {
 
                     return "";
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_STARTED) {
-                    builder.append(getString(R.string.bucket_word_me)).append(": ");
+                    builder.append(getString(R.string.chat_last_message_sender_me)).append(": ");
                     String textToShow = MeetingUtil.getAppropriateStringForCallStarted().toString();
                     builder.append(textToShow);
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
-                    builder.append(getString(R.string.bucket_word_me)).append(": ");
+                    builder.append(getString(R.string.chat_last_message_sender_me)).append(": ");
                     String textToShow = "";
                     switch (message.getTermCode()) {
                         case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
