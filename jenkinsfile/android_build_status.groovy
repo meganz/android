@@ -296,9 +296,6 @@ pipeline {
                         sh "git submodule update --init --recursive --remote"
                     }
                 }
-                script {
-                    sh "exit 1"
-                }
             }
         }
 
