@@ -110,7 +110,8 @@ String getLastCommitMessage() {
     if (lastCommitMessage == null) {
         return '**N/A**'
     } else {
-        return "\\`\\`\\`\n$lastCommitMessage\n\\`\\`\\`\n".stripIndent().stripMargin()
+        // use markdown backticks to format commit message into a code block
+        return "\n\\`\\`\\`\n$lastCommitMessage\n\\`\\`\\`\n".stripIndent().stripMargin()
     }
 }
 
