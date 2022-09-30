@@ -255,14 +255,8 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
             .edit().putBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false).apply()
     }
 
-    fun findUserName(mail: String): String {
-        for (contact in visibleContacts) {
-            if (contact.megaUser.email == mail) {
-                return contact.fullName
-            }
-        }
-        return ""
-    }
+    fun findUserName(mail: String): String =
+        visibleContacts.find { mail == it.megaUser.email }?.fullName.orEmpty()
 
     private fun setVisibleContacts() {
         visibleContacts.clear()
