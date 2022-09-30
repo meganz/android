@@ -1,4 +1,3 @@
-import groovy.xml.XmlParser
 /**
  * This script is to build and upload Android AAB to Google Play Store
  */
@@ -932,7 +931,7 @@ private void printWorkspaceSize(String prompt) {
  */
 static def getRecentChangeList(input) {
     def map = []
-    def languages = new XmlParser().parseText(input)
+    def languages = new groovy.xml.XmlParser().parseText(input)
     languages.each { language ->
         def languageMap = [:]
         languageMap["language"] = "${language.name()}"
