@@ -14,7 +14,7 @@ open class RecentActionItem {
     var date = ""
     var time = ""
 
-    constructor(context: Context?, _bucket: MegaRecentActionBucket) {
+    constructor(context: Context, _bucket: MegaRecentActionBucket) {
         viewType = TYPE_BUCKET
         bucket = _bucket
         date = TimeUtils.formatBucketDate(context, _bucket.timestamp)
