@@ -266,19 +266,14 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
 
     private fun setVisibleContacts() {
         visibleContacts.clear()
-        val contacts = megaApi.contacts
-        for (i in contacts.indices) {
-            if (contacts[i].visibility == MegaUser.VISIBILITY_VISIBLE) {
-                val contactHandle = contacts[i].handle
-                val contactDB = ContactUtil.getContactDB(contactHandle) ?: break
-                var fullName = ContactUtil.getContactNameDB(contactDB)
-                if (fullName == null) {
-                    fullName = contacts[i].email
-                }
-                val megaContactAdapter = MegaContactAdapter(contactDB, contacts[i], fullName)
-                visibleContacts.add(megaContactAdapter)
+        megaApi.contacts
+            .asSequence()
+            .filter { it.visibility == MegaUser.VISIBILITY_VISIBLE }
+            .forEach {
+                val contactDB = ContactUtil.getContactDB(it.handle) ?: return@forEach
+                val fullName = ContactUtil.getContactNameDB(contactDB) ?: it.email
+                visibleContacts.add(MegaContactAdapter(contactDB, it, fullName))
             }
-        }
     }
 
     fun openFile(index: Int, node: MegaNode) {
