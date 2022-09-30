@@ -494,7 +494,7 @@ pipeline {
                 }
                 script {
                     // Release notes
-                    def release_notes = new File('release_notes.xml').text
+                    String release_notes = "cat ./release_notes.json".execute().text
 
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
@@ -929,14 +929,27 @@ private void printWorkspaceSize(String prompt) {
  * @param input the xml string to parse
  * @return the list of recent changes formatted
  */
+//static def getRecentChangeList(input) {
+//    def map = []
+//    def languages = new groovy.xml.XmlParser().parseText(input)
+//    languages.each { language ->
+//        def languageMap = [:]
+//        languageMap["language"] = "${language.name()}"
+//        languageMap["text"] = "${language.value()[0]}"
+//        map.add(languageMap)
+//    }
+//    return map
+//}
 static def getRecentChangeList(input) {
     def map = []
-    def languages = new groovy.xml.XmlParser().parseText(input)
-    languages.each { language ->
+    def languages = new groovy.json.JsonSlurperClassic().parseText(input)
+    def keyList = languages.keySet()
+    keyList.each { language ->
         def languageMap = [:]
-        languageMap["language"] = "${language.name()}"
-        languageMap["text"] = "${language.value()[0]}"
+        languageMap["language"] = "${language}"
+        languageMap["text"] = "${languages[language]}"
         map.add(languageMap)
     }
     return map
 }
+
