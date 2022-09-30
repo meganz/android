@@ -65,6 +65,11 @@ class MegaLocalStorageFacade @Inject constructor(
             else -> order
         }
 
+    /**
+     * Since offline nodes cannot be ordered by labels and favorites, the offline order will be same as
+     * cloud order except when cloud order is ORDER_LABEL_ASC or ORDER_FAV_ASC where it defaults to
+     * ORDER_DEFAULT_ASC.
+     */
     override suspend fun getOfflineSortOrder(): Int =
         when (val order = getCloudSortOrder()) {
             ORDER_LABEL_ASC -> ORDER_DEFAULT_ASC
