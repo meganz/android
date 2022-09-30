@@ -265,6 +265,12 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Preparation') {
                     script {
+                        sendToMR("<br/>Last Commit Message: <br/>${getLastCommitMessage()}" +
+                                "<br/>Last Commit ID: ${env.GIT_COMMIT}");
+                        sh("exit 1")
+
+
+
                         getSDKBranch()
                         sh("echo SDK_BRANCH = ${SDK_BRANCH}")
 
@@ -735,7 +741,7 @@ private void sendToMR(String message) {
         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
             env.MARKDOWN_LINK = message
             env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
+            sh "curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}"
         }
     }
 }
