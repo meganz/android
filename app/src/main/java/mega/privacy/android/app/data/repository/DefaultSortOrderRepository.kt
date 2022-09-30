@@ -45,4 +45,15 @@ class DefaultSortOrderRepository @Inject constructor(
         megaLocalStorageGateway.setOfflineSortOrder(sortOrderIntMapper(order))
     }
 
+    override suspend fun setCameraSortOrder(order: SortOrder) = withContext(ioDispatcher) {
+        megaLocalStorageGateway.setCameraSortOrder(sortOrderIntMapper(order))
+    }
+
+    override suspend fun setCloudSortOrder(order: SortOrder) = withContext(ioDispatcher) {
+        megaLocalStorageGateway.setCloudSortOrder(sortOrderIntMapper(order))
+    }
+
+    override suspend fun setOthersSortOrder(order: SortOrder) = withContext(ioDispatcher) {
+        megaLocalStorageGateway.setOthersSortOrder(sortOrderIntMapper(order))
+    }
 }

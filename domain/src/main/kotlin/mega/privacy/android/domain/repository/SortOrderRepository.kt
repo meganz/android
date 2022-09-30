@@ -36,4 +36,22 @@ interface SortOrderRepository {
      * @param order
      */
     suspend fun setOfflineSortOrder(order: SortOrder)
+
+    /**
+     * Set camera sort order
+     * @param order
+     */
+    suspend fun setCameraSortOrder(order: SortOrder)
+
+    /**
+     * Set cloud sort order
+     * @param order
+     */
+    suspend fun setCloudSortOrder(order: SortOrder)
+
+    /**
+     * Set others sort order
+     * @param order
+     */
+    suspend fun setOthersSortOrder(order: SortOrder)
 }

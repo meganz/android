@@ -81,6 +81,18 @@ class MegaLocalStorageFacade @Inject constructor(
         dbHandler.preferences?.preferredSortCloud = order.toString()
     }
 
+    override suspend fun setCloudSortOrder(order: Int) {
+        dbHandler.preferences?.preferredSortCloud = order.toString()
+    }
+
+    override suspend fun setCameraSortOrder(order: Int) {
+        dbHandler.preferences?.preferredSortCameraUpload = order.toString()
+    }
+
+    override suspend fun setOthersSortOrder(order: Int) {
+        dbHandler.preferences?.preferredSortOthers = order.toString()
+    }
+
     override suspend fun getUserCredentials(): UserCredentials? = dbHandler.credentials
 
     override suspend fun isSyncByWifi(): Boolean = dbHandler.preferences?.camSyncWifi.toBoolean()
