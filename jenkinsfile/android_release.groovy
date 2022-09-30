@@ -494,8 +494,8 @@ pipeline {
                 }
                 script {
                     // Release notes
-                    String release_notes = sh(script: "cat release_notes.json", returnStdout: true).trim()
-
+                    String release_notes = releaseNotes()
+                    
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
                             filesPattern: 'archive/*-gms-release.aab',
@@ -952,4 +952,15 @@ def getRecentChangeList(input) {
     }
     return map
 }
+
+private String releaseNotes() {
+    String release_notes = sh(
+            script: """
+                cd ${WORKSPACE}/jenkinsfile/
+                cat release_notes.json
+                """,
+            returnStdout: true).trim()
+    return release_notes
+}
+
 
