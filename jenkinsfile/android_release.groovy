@@ -30,7 +30,7 @@ ARTIFACTORY_BUILD_INFO = "buildinfo.txt"
 /**
  * Default release notes content files
  */
-RELEASE_NOTES = "release_notes.json"
+RELEASE_NOTES = "default_release_notes.json"
 
 pipeline {
     agent { label 'mac-jenkins-slave-android || mac-jenkins-slave' }
