@@ -193,8 +193,8 @@ pipeline {
 
                     def failureMessage = ":x: Build Failed" +
                             "<br/>Failure Stage: ${BUILD_STEP}" +
-                            "<br/>Last Commit Message: <br/>${getLastCommitMessage()}" +
-                            "<br/>Last Commit ID: ${env.GIT_COMMIT}" +
+                            "<br/>Last Commit Message: ${getLastCommitMessage()}" +
+                            "Last Commit ID: ${env.GIT_COMMIT}" +
                             "<br/>Build Log: ${jsonJenkinsLog}" +
                             sdkBuildMessage +
                             unitTestResult
@@ -227,7 +227,7 @@ pipeline {
 
                         // Create the String to be posted as a comment in Gitlab
                         String mergeRequestMessage = ":white_check_mark: Build Succeeded!\n\n" +
-                                "**Last Commit:** (${env.GIT_COMMIT})\n" + getLastCommitMessage() + "\n" +
+                                "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
                                 "**Build Warnings:**\n" + getBuildWarnings() + "\n\n" +
                                 "**Lint Summary:** (${jsonLintReportLink}):<br/>" + "${LINT_REPORT_SUMMARY}" + "\n\n" +
                                 buildTestResults()
@@ -262,12 +262,6 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Preparation') {
                     script {
-                        sendToMR("<br/>Last Commit Message: <br/>${getLastCommitMessage()}" +
-                                "<br/>Last Commit ID: ${env.GIT_COMMIT}");
-                        sh("exit 1")
-
-
-
                         getSDKBranch()
                         sh("echo SDK_BRANCH = ${SDK_BRANCH}")
 
