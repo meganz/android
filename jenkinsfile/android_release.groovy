@@ -27,6 +27,11 @@ NATIVE_SYMBOL_FILE = "symbols.zip"
 ARTIFACTORY_BASE_URL = 'https://artifactory.developers.mega.co.nz/artifactory/android-mega/release'
 ARTIFACTORY_BUILD_INFO = "buildinfo.txt"
 
+/**
+ * Default release notes content files
+ */
+RELEASE_NOTES = "release_notes.json"
+
 pipeline {
     agent { label 'mac-jenkins-slave-android || mac-jenkins-slave' }
     options {
@@ -493,8 +498,8 @@ pipeline {
                     BUILD_STEP = 'Deploy to Google Play Alpha'
                 }
                 script {
-                    // Release notes
-                    String release_notes = releaseNotes()
+                    // Get the formatted release notes
+                    String release_notes = releaseNotes(RELEASE_NOTES)
                     
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
@@ -919,27 +924,16 @@ private void printWorkspaceSize(String prompt) {
 }
 
 /**
- * Get the list of recent changes (release note) xml file input
+ * Get the list of recent changes (release note) json string input
  * and return a formatted list following below example
  *[
  * [language: 'en-GB', text: "Please test the changes from Jenkins build ${env.BUILD_NUMBER}."],
  * [language: 'de-DE', text: "Bitte die Änderungen vom Jenkins Build ${env.BUILD_NUMBER} testen."]
  *]
  *
- * @param input the xml string to parse
+ * @param input the json string to parse
  * @return the list of recent changes formatted
  */
-//static def getRecentChangeList(input) {
-//    def map = []
-//    def languages = new groovy.xml.XmlParser().parseText(input)
-//    languages.each { language ->
-//        def languageMap = [:]
-//        languageMap["language"] = "${language.name()}"
-//        languageMap["text"] = "${language.value()[0]}"
-//        map.add(languageMap)
-//    }
-//    return map
-//}
 def getRecentChangeList(input) {
     def map = []
     def languages = new groovy.json.JsonSlurperClassic().parseText(input)
@@ -953,11 +947,17 @@ def getRecentChangeList(input) {
     return map
 }
 
-private String releaseNotes() {
+/**
+ * Get release notes content from releaseNoteFile
+ * releaseNoteFile should be in json format
+ *
+ * @return a String with the content of releaseNoteFile
+ */
+private String releaseNotes(releaseNoteFile) {
     String release_notes = sh(
             script: """
                 cd ${WORKSPACE}/jenkinsfile/
-                cat release_notes.json
+                cat $fileName
                 """,
             returnStdout: true).trim()
     return release_notes
