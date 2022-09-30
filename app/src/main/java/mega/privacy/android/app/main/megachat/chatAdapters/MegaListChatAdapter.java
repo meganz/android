@@ -1439,8 +1439,8 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                     Spannable me = new SpannableString(context.getString(R.string.word_me) + " ");
                     ((ViewHolderNormalChatList) holder).textViewContent.setText(TextUtils.concat(me, myMessage));
                 } else {
-                    Spannable me = new SpannableString(megaChatApi.getUserFullnameFromCache(chat.getLastMessageSender()) + ": ");
-                    ((ViewHolderNormalChatList) holder).textViewContent.setText(TextUtils.concat(me, myMessage));
+                    Spannable sender = new SpannableString(megaChatApi.getUserFullnameFromCache(chat.getLastMessageSender()) + ": ");
+                    ((ViewHolderNormalChatList) holder).textViewContent.setText(TextUtils.concat(sender, myMessage));
                 }
             } else {
                 //OTHER TYPE OF MESSAGE
