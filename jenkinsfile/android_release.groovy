@@ -957,7 +957,7 @@ private String releaseNotes(releaseNoteFile) {
     String release_notes = sh(
             script: """
                 cd ${WORKSPACE}/jenkinsfile/
-                cat $fileName
+                cat $releaseNoteFile
                 """,
             returnStdout: true).trim()
     return release_notes
