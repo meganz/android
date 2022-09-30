@@ -110,11 +110,7 @@ String getLastCommitMessage() {
     if (lastCommitMessage == null) {
         return '**N/A**'
     } else {
-        return """
-\\`\\`\\`
-$lastCommitMessage
-\\`\\`\\`
-""".stripIndent().stripMargin()
+        return "\\`\\`\\`\n$lastCommitMessage\n\\`\\`\\`\n".stripIndent().stripMargin()
     }
 }
 
