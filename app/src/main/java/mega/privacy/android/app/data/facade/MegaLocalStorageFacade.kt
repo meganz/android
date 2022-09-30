@@ -5,7 +5,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaPreferences
-import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.model.UserCredentials
