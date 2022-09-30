@@ -722,7 +722,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA SDK Version</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGAchat SDK Version</string>
+    <string name="settings_about_karere_version">MEGA chat SDK Version</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">View source code</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -1898,7 +1898,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Enable rich URL previews</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.</string>
+    <string name="text_enable_rich_links">Enhance the MEGA chat experience. URL content will be retrieved without end-to-end encryption.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Please enter a stronger password</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -4007,4 +4007,6 @@
     <string name="chat_tab_meetings_title">Meetings</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_location_option">Location</string>
+    <!-- Used in chat screen to indicate last message sent by me -->
+    <string name="chat_last_message_sender_me">Me</string>
 </resources>
