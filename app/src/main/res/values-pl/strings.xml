@@ -250,7 +250,7 @@
     <!-- message when there are no files in the Cloud drive -->
     <string name="file_browser_empty_cloud_drive">Brak plików na dysku</string>
     <!-- Text that indicates that a folder is currently empty -->
-    <string name="file_browser_empty_folder">Brak plików</string>
+    <string name="file_browser_empty_folder">Katalog jest pusty</string>
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">WYBIERZ KONTO</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->

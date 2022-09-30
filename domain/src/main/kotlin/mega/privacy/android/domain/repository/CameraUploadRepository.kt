@@ -340,4 +340,10 @@ interface CameraUploadRepository {
         localPath: String?,
         isSecondary: Boolean,
     )
+
+    /**
+     * The method is to backup time stamps, primary upload folder and secondary folder in share preference after
+     * database records being cleaned
+     */
+    suspend fun backupTimestampsAndFolderHandle()
 }

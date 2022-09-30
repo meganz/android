@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.app.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.data.mapper.SortOrderMapper
 import mega.privacy.android.app.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.domain.entity.SortOrder
@@ -21,6 +22,7 @@ class DefaultSortOrderRepositoryTest {
 
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
     private val sortOrderMapper = mock<SortOrderMapper>()
+    private val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     @Before
     fun setUp() {
@@ -28,6 +30,7 @@ class DefaultSortOrderRepositoryTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             megaLocalStorageGateway = megaLocalStorageGateway,
             sortOrderMapper = sortOrderMapper,
+            sortOrderIntMapper = sortOrderIntMapper,
         )
     }
 
@@ -117,5 +120,44 @@ class DefaultSortOrderRepositoryTest {
         whenever(megaLocalStorageGateway.getOthersSortOrder()).thenReturn(order)
         underTest.getOthersSortOrder()
         verify(sortOrderMapper).invoke(order)
+    }
+
+    fun `test that get offline sort order return type is sort order`() = runTest {
+        val order = MegaApiJava.ORDER_CREATION_ASC
+        whenever(megaLocalStorageGateway.getOfflineSortOrder()).thenReturn(order)
+        whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_CREATION_ASC)
+        assertThat(underTest.getOfflineSortOrder()).isInstanceOf(SortOrder::class.java)
+    }
+
+    @Test
+    fun `test that get offline sort order invokes get offline sort order of gateway`() = runTest {
+        underTest.getOfflineSortOrder()
+        verify(megaLocalStorageGateway).getOfflineSortOrder()
+    }
+
+    @Test
+    fun `test that get offline sort order invokes sort order mapper`() = runTest {
+        val order = MegaApiJava.ORDER_CREATION_ASC
+        whenever(megaLocalStorageGateway.getOfflineSortOrder()).thenReturn(order)
+        underTest.getOfflineSortOrder()
+        verify(sortOrderMapper).invoke(order)
+    }
+
+    @Test
+    fun `test that set offline sort order invokes set offline sort order of gateway`() = runTest {
+        val order = SortOrder.ORDER_CREATION_DESC
+        val expected = MegaApiJava.ORDER_CREATION_DESC
+        whenever(sortOrderIntMapper.invoke(order)).thenReturn(expected)
+        underTest.setOfflineSortOrder(order)
+        verify(megaLocalStorageGateway).setOfflineSortOrder(expected)
+    }
+
+    @Test
+    fun `test that set offline sort order invokes sort order int mapper`() = runTest {
+        val order = SortOrder.ORDER_CREATION_DESC
+        val expected = MegaApiJava.ORDER_CREATION_DESC
+        whenever(sortOrderIntMapper.invoke(order)).thenReturn(expected)
+        underTest.setOfflineSortOrder(order)
+        verify(sortOrderIntMapper).invoke(order)
     }
 }

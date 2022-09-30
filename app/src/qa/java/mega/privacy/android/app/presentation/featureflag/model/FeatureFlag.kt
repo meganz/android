@@ -1,9 +1,10 @@
 package mega.privacy.android.app.presentation.featureflag.model
 
 /**
- * Data class to hold feature flag information
+ * Feature flag
  *
  * @property featureName
+ * @property description
  * @property isEnabled
  */
 data class FeatureFlag(

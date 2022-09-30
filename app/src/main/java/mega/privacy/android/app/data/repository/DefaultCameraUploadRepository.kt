@@ -261,4 +261,11 @@ class DefaultCameraUploadRepository @Inject constructor(
             localPath,
             isSecondary)
     }
+
+    override suspend fun backupTimestampsAndFolderHandle() = withContext(ioDispatcher) {
+        val primaryHandle = localStorageGateway.getCamSyncHandle() ?: getInvalidHandle()
+        val secondaryHandle =
+            localStorageGateway.getMegaHandleSecondaryFolder() ?: getInvalidHandle()
+        localStorageGateway.backupTimestampsAndFolderHandle(primaryHandle, secondaryHandle)
+    }
 }

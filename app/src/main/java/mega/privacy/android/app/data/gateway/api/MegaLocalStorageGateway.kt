@@ -58,6 +58,18 @@ interface MegaLocalStorageGateway {
     suspend fun getLinksSortOrder(): Int
 
     /**
+     * Get offline sort order
+     * @return offline sort order
+     */
+    suspend fun getOfflineSortOrder(): Int
+
+    /**
+     * Set offline sort order
+     * @param order
+     */
+    suspend fun setOfflineSortOrder(order: Int)
+
+    /**
      * Get user credentials
      *
      * @return user credentials or null
@@ -461,4 +473,16 @@ interface MegaLocalStorageGateway {
      * Gets payment methods timestamp
      */
     suspend fun getPaymentMethodsTimeStamp(): String?
+
+    /**
+     * The method is to backup time stamps, primary upload folder and secondary folder in share preference after
+     * database records being cleaned
+     * @param primaryUploadFolderHandle
+     * @param secondaryUploadFolderHandle
+     */
+    suspend fun backupTimestampsAndFolderHandle(
+        primaryUploadFolderHandle: Long,
+        secondaryUploadFolderHandle: Long,
+    )
+
 }

@@ -30,4 +30,16 @@ interface SortOrderRepository {
      * @return others sort order
      */
     suspend fun getOthersSortOrder(): SortOrder
+
+    /**
+     * Get offline sort order
+     * @return offline sort order
+     */
+    suspend fun getOfflineSortOrder(): SortOrder
+
+    /**
+     * Set offline sort order
+     * @param order
+     */
+    suspend fun setOfflineSortOrder(order: SortOrder)
 }
