@@ -28,6 +28,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.EventConstants
+import mega.privacy.android.app.databinding.FragmentRecentsBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.recent.SelectedBucketViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForSingleNode
@@ -59,6 +60,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RecentActionsFragment : Fragment(), StickyHeaderHandler {
 
+    private var _binding: FragmentRecentsBinding? = null
+    private val binding get() = _binding!!
+
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
@@ -68,14 +72,14 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
     private var recentActionsItems: List<RecentActionItem?> = listOf()
 
     private var adapter: RecentsAdapter? = null
-    private var emptyLayout: ScrollView? = null
-    private var emptyText: TextView? = null
-    private var showActivityButton: Button? = null
-    private var emptySpanned: Spanned? = null
-    private var activityHiddenSpanned: Spanned? = null
-    private var stickyLayoutManager: StickyLayoutManager? = null
-    private var listView: RecyclerView? = null
-    private var fastScroller: FastScroller? = null
+    private lateinit var emptyLayout: ScrollView
+    private lateinit var emptyText: TextView
+    private lateinit var showActivityButton: Button
+    private lateinit var emptySpanned: Spanned
+    private lateinit var activityHiddenSpanned: Spanned
+    private lateinit var stickyLayoutManager: StickyLayoutManager
+    private lateinit var listView: RecyclerView
+    private lateinit var fastScroller: FastScroller
 
     val selectedBucketModel: SelectedBucketViewModel by activityViewModels()
 
@@ -93,25 +97,25 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
-        val v = inflater.inflate(R.layout.fragment_recents, container, false)
+    ): View {
+        _binding = FragmentRecentsBinding.inflate(inflater, container, false)
 
-        emptyLayout = v.findViewById(R.id.empty_state_recents)
-        emptyText = v.findViewById(R.id.empty_text_recents)
-        showActivityButton = v.findViewById(R.id.show_activity_button)
-        showActivityButton?.setOnClickListener { showRecentActivity() }
+        emptyLayout = binding.emptyStateRecents
+        emptyText = binding.emptyTextRecents
+        showActivityButton = binding.showActivityButton
+        showActivityButton.setOnClickListener { showRecentActivity() }
         emptySpanned = TextUtil.formatEmptyScreenText(requireContext(),
             StringResourcesUtils.getString(R.string.context_empty_recents))
         activityHiddenSpanned = TextUtil.formatEmptyScreenText(requireContext(),
             StringResourcesUtils.getString(R.string.recents_activity_hidden))
-        listView = v.findViewById(R.id.list_view_recents)
-        fastScroller = v.findViewById(R.id.fastscroll)
+        listView = binding.listViewRecents
+        fastScroller = binding.fastscroll
         stickyLayoutManager = TopSnappedStickyLayoutManager(requireContext(), this)
-        listView?.layoutManager = stickyLayoutManager
-        listView?.clipToPadding = false
-        listView?.itemAnimator = DefaultItemAnimator()
+        listView.layoutManager = stickyLayoutManager
+        listView.clipToPadding = false
+        listView.itemAnimator = DefaultItemAnimator()
 
-        return v
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -136,6 +140,7 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
         super.onDestroyView()
         LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
             .removeObserver(nodeChangeObserver)
+        _binding = null
     }
 
     override fun getAdapterData(): List<RecentActionItem?> = recentActionsItems
@@ -147,8 +152,8 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
             requireContext(),
             this,
             recentActionsItems)
-        listView?.adapter = adapter
-        listView?.addItemDecoration(HeaderItemDecoration(requireContext()))
+        listView.adapter = adapter
+        listView.addItemDecoration(HeaderItemDecoration(requireContext()))
         setVisibleContacts()
     }
 
@@ -211,19 +216,19 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
      */
     private fun showActivity() {
         if (buckets.isEmpty()) {
-            emptyLayout?.visibility = View.VISIBLE
-            listView?.visibility = View.GONE
-            fastScroller?.visibility = View.GONE
-            showActivityButton?.visibility = View.GONE
-            emptyText?.text = emptySpanned
+            emptyLayout.visibility = View.VISIBLE
+            listView.visibility = View.GONE
+            fastScroller.visibility = View.GONE
+            showActivityButton.visibility = View.GONE
+            emptyText.text = emptySpanned
         } else {
-            emptyLayout?.visibility = View.GONE
-            listView?.visibility = View.VISIBLE
-            fastScroller?.setRecyclerView(listView)
+            emptyLayout.visibility = View.GONE
+            listView.visibility = View.VISIBLE
+            fastScroller.setRecyclerView(listView)
             if (buckets.size < Constants.MIN_ITEMS_SCROLLBAR) {
-                fastScroller?.visibility = View.GONE
+                fastScroller.visibility = View.GONE
             } else {
-                fastScroller?.visibility = View.VISIBLE
+                fastScroller.visibility = View.VISIBLE
             }
         }
     }
@@ -232,11 +237,11 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
      * Hides the recent activity.
      */
     private fun hideRecentActivity() {
-        emptyLayout?.visibility = View.VISIBLE
-        listView?.visibility = View.GONE
-        fastScroller?.visibility = View.GONE
-        showActivityButton?.visibility = View.VISIBLE
-        emptyText?.text = activityHiddenSpanned
+        emptyLayout.visibility = View.VISIBLE
+        listView.visibility = View.GONE
+        fastScroller.visibility = View.GONE
+        showActivityButton.visibility = View.VISIBLE
+        emptyText.text = activityHiddenSpanned
     }
 
     /**
