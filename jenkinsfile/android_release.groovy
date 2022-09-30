@@ -494,7 +494,7 @@ pipeline {
                 }
                 script {
                     // Release notes
-                    String release_notes = "cat ./release_notes.json".execute().text
+                    String release_notes = sh(script: "cat release_notes.json", returnStdout: true).trim()
 
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
@@ -940,7 +940,7 @@ private void printWorkspaceSize(String prompt) {
 //    }
 //    return map
 //}
-static def getRecentChangeList(input) {
+def getRecentChangeList(input) {
     def map = []
     def languages = new groovy.json.JsonSlurperClassic().parseText(input)
     def keyList = languages.keySet()
