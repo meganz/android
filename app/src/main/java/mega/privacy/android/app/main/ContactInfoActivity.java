@@ -126,6 +126,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.palette.graphics.Palette;
 
 import com.google.android.material.appbar.AppBarLayout;
@@ -450,8 +451,9 @@ public class ContactInfoActivity extends PasscodeActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        contactInfoActivity = this;
+        viewModel = new ViewModelProvider(this).get(ContactInfoViewModel.class);
 
+        contactInfoActivity = this;
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }

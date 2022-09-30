@@ -726,4 +726,39 @@ interface MegaApiGateway {
      * false if inactive or if the user is not under a Business Account
      */
     suspend fun isBusinessAccountActive(): Boolean
+
+    /**
+     * Get pricing
+     *
+     * @param listener
+     */
+    fun getPricing(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Get payment methods
+     *
+     * @param listener
+     */
+    fun getPaymentMethods(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Get account details
+     */
+    fun getAccountDetails(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Get specific account details
+     *
+     * @param storage
+     * @param transfer
+     * @param pro
+     */
+    fun getSpecificAccountDetails(storage: Boolean, transfer: Boolean, pro: Boolean)
+
+    /**
+     * Get the credit card subscriptions of the account
+     *
+     * @param listener
+     */
+    fun creditCardQuerySubscriptions(listener: MegaRequestListenerInterface?)
 }

@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ResetSdkLogger
@@ -52,10 +52,10 @@ class LegacyLoggingSettingsFacade @Inject constructor(
             setSdkLogsEnabled(enabled)
         }.invokeOnCompletion {
             if (enabled) {
-                Timber.i("SDK logs are now enabled - App Version: ${Util.getVersion()}")
+                Timber.i("SDK logs are now enabled - App Version: ${Util.getVersion(context)}")
                 Util.showSnackbar(context, context.getString(R.string.settings_enable_logs))
             } else {
-                Timber.i("SDK logs are now disabled - App Version: ${Util.getVersion()}")
+                Timber.i("SDK logs are now disabled - App Version: ${Util.getVersion(context)}")
                 Util.showSnackbar(context, context.getString(R.string.settings_disable_logs))
             }
         }
@@ -66,10 +66,10 @@ class LegacyLoggingSettingsFacade @Inject constructor(
             setChatLogsEnabled(enabled)
         }.invokeOnCompletion {
             if (enabled) {
-                Timber.i("Karere logs are now enabled - App Version: ${Util.getVersion()}")
+                Timber.i("Karere logs are now enabled - App Version: ${Util.getVersion(context)}")
                 Util.showSnackbar(context, context.getString(R.string.settings_enable_logs))
             } else {
-                Timber.i("Karere logs are now disabled - App Version: ${Util.getVersion()}")
+                Timber.i("Karere logs are now disabled - App Version: ${Util.getVersion(context)}")
                 Util.showSnackbar(context, context.getString(R.string.settings_disable_logs))
             }
         }

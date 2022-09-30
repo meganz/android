@@ -4,31 +4,38 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.net.NetworkRequest
 import androidx.core.content.ContextCompat.getSystemService
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.map
-import mega.privacy.android.app.data.gateway.MonitorNetworkConnectivityChange
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.ConnectivityState
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NetworkRepository
+import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Default network repository implementation
  *
  * @property context
- * @property monitorNetworkConnectivityChange
  * @property megaApi
  */
+@Singleton
 class DefaultNetworkRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val monitorNetworkConnectivityChange: MonitorNetworkConnectivityChange,
     private val megaApi: MegaApiGateway,
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : NetworkRepository {
 
     private val connectivityManager = getSystemService(context, ConnectivityManager::class.java)
@@ -49,20 +56,27 @@ class DefaultNetworkRepository @Inject constructor(
             getNetworkCapabilities(it)
         }
 
-    override fun monitorConnectivityChanges(): Flow<ConnectivityState> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            monitorConnectivitySDK26()
-        } else {
-            monitorConnectivity()
-        }
+    override fun monitorConnectivityChanges(): Flow<ConnectivityState> = monitorConnectivity
 
+    // https://developer.android.com/training/basics/network-ops/reading-network-state#listening-events
+    // Note: There is a limit to the number of callbacks that can be registered concurrently, so unregister callbacks once they are no longer needed so that your app can register more.
+    // we can create single callback and share state in our application
+    private val monitorConnectivity = callbackFlow {
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun monitorConnectivitySDK26(): Flow<ConnectivityState> = callbackFlow {
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onLost(network: Network) {
                 super.onLost(network)
+                Timber.d("onLost")
                 trySend(ConnectivityState.Disconnected)
+            }
+
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                Timber.d("onAvailable")
+                trySend(getCurrentConnectivityState())
             }
 
             override fun onCapabilitiesChanged(
@@ -70,6 +84,7 @@ class DefaultNetworkRepository @Inject constructor(
                 networkCapabilities: NetworkCapabilities,
             ) {
                 super.onCapabilitiesChanged(network, networkCapabilities)
+                Timber.d("onCapabilitiesChanged")
                 trySend(
                     ConnectivityState.Connected(
                         meteredConnection = !networkCapabilities.hasCapability(
@@ -79,20 +94,10 @@ class DefaultNetworkRepository @Inject constructor(
                 )
             }
         }
-        connectivityManager?.registerDefaultNetworkCallback(callback)
+        connectivityManager?.registerNetworkCallback(networkRequest, callback)
 
         awaitClose { connectivityManager?.unregisterNetworkCallback(callback) }
-    }
-
-    private fun monitorConnectivity(): Flow<ConnectivityState> =
-        monitorNetworkConnectivityChange.getEvents().map { connected ->
-            val metered = connectivityManager?.isActiveNetworkMetered
-            if (connected && metered != null) {
-                ConnectivityState.Connected(metered)
-            } else {
-                ConnectivityState.Disconnected
-            }
-        }
+    }.flowOn(ioDispatcher).shareIn(applicationScope, SharingStarted.Lazily)
 
     override fun setUseHttps(enabled: Boolean) = megaApi.setUseHttpsOnly(enabled)
 }

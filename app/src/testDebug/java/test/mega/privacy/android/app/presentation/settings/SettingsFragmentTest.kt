@@ -194,7 +194,7 @@ class SettingsFragmentTest {
     @Test
     fun test_that_deactivated_delete_has_50_percent_alpha() {
         whenever(TestSettingsModule.canDeleteAccount(TEST_USER_ACCOUNT)).thenReturn(true)
-        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(flowOf(false))
+        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(MutableStateFlow(false))
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
@@ -233,7 +233,7 @@ class SettingsFragmentTest {
     fun test_that_correct_fields_are_disable_when_offline() {
         whenever(TestSettingsModule.canDeleteAccount(TEST_USER_ACCOUNT)).thenReturn(true)
         whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
-        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(flowOf(false))
+        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(MutableStateFlow(false))
         launchFragmentInHiltContainer<SettingsFragment>()
 
 

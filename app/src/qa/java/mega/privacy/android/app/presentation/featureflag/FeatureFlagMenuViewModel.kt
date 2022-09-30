@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
+import mega.privacy.android.app.presentation.featureflag.model.FeatureFlag
 import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Inject
@@ -35,8 +36,16 @@ class FeatureFlagMenuViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(ioDispatcher) {
-            getAllFeatureFlags().map { list ->
-                { state: FeatureFlagState -> state.copy(featureFlagList = list) }
+            getAllFeatureFlags().map { map ->
+                { state: FeatureFlagState ->
+                    state.copy(featureFlagList = map.map {
+                        FeatureFlag(
+                            featureName = it.key.name,
+                            description = "",
+                            isEnabled = it.value,
+                        )
+                    })
+                }
             }.collect {
                 _state.update(it)
             }

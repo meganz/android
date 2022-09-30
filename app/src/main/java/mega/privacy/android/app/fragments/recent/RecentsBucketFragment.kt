@@ -15,6 +15,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,7 +25,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.BucketSaved
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
@@ -48,7 +52,6 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VIEWER_FROM_RECETS_BUCKET
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
@@ -76,8 +79,6 @@ class RecentsBucketFragment : Fragment() {
 
     private val viewModel by viewModels<RecentsBucketViewModel>()
 
-    var isInShareBucket: Boolean = false
-
     private val selectedBucketModel: SelectedBucketViewModel by activityViewModels()
 
     private lateinit var binding: FragmentRecentBucketBinding
@@ -87,10 +88,6 @@ class RecentsBucketFragment : Fragment() {
     private var adapter: MultipleBucketAdapter? = null
 
     private var actionMode: ActionMode? = null
-
-    private lateinit var actionModeCallback: RecentsBucketActionModeCallback
-
-    private lateinit var bucket: BucketSaved
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -108,35 +105,34 @@ class RecentsBucketFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        val selectedBucket = selectedBucketModel.selected.value
-        bucket = BucketSaved(selectedBucket)
-        viewModel.bucket.value = selectedBucket
-
-        viewModel.cachedActionList.value = selectedBucketModel.currentActionList.value
+        viewModel.setBucket(selectedBucketModel.selected.value)
+        viewModel.setCachedActionList(selectedBucketModel.currentActionList.value?.toMutableList())
 
         viewModel.shouldCloseFragment.observe(viewLifecycleOwner) {
             if (it) Navigation.findNavController(view).popBackStack()
         }
 
-        viewModel.items.observe(viewLifecycleOwner) {
-
-            isInShareBucket =
-                it[0].node?.let { it1 -> megaApi.getRootParentNode(it1).isInShare } == true
-
-            callManager { activity ->
-                actionModeCallback =
-                    RecentsBucketActionModeCallback(activity, viewModel, isInShareBucket)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.items.collectLatest {
+                    setupListView(it)
+                    setupHeaderView()
+                    setupFastScroller(it)
+                    setupToolbar()
+                    checkScroll()
+                }
             }
-            setupListView(it)
-            setupHeaderView()
-            setupFastScroller(it)
-            setupToolbar()
-            checkScroll()
         }
 
         viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
             if (visible && actionMode == null) {
                 callManager { activity ->
+                    val actionModeCallback =
+                        RecentsBucketActionModeCallback(
+                            activity,
+                            viewModel,
+                            viewModel.isInShare
+                        )
                     actionMode = activity.startSupportActionMode(actionModeCallback)
                     activity.setTextSubmitted()
                 }
@@ -163,12 +159,12 @@ class RecentsBucketFragment : Fragment() {
                 activity,
                 this,
                 nodes,
-                bucket.isMedia,
+                viewModel.bucket.value?.isMedia ?: false,
                 RecentsBucketDiffCallback()
             )
             listView.adapter = adapter
 
-            if (bucket.isMedia) {
+            if (viewModel.bucket.value?.isMedia == true) {
                 val numCells: Int = if (Util.isScreenInPortrait(activity)) 4 else 6
                 val gridLayoutManager =
                     GridLayoutManager(activity, numCells, GridLayoutManager.VERTICAL, false)
@@ -206,27 +202,28 @@ class RecentsBucketFragment : Fragment() {
     }
 
     private fun setupHeaderView() {
-        if (!bucket.isMedia) {
-            val folder = megaApi.getNodeByHandle(bucket.parentHandle) ?: return
+        if (viewModel.bucket.value?.isMedia == false) {
+            val folder =
+                megaApi.getNodeByHandle(viewModel.bucket.value?.parentHandle ?: return) ?: return
             binding.folderNameText.text = folder.name
 
             binding.actionImage.setImageDrawable(
                 mutateIconSecondary(
                     context,
-                    if (bucket.isUpdate) R.drawable.ic_versions_small else R.drawable.ic_recents_up,
+                    if (viewModel.bucket.value?.isUpdate == true) R.drawable.ic_versions_small else R.drawable.ic_recents_up,
                     R.color.grey_054_white_054
                 )
             )
 
             binding.dateText.text =
-                TimeUtils.formatBucketDate(activity, bucket.timestamp)
+                TimeUtils.formatBucketDate(activity, viewModel.bucket.value?.timestamp ?: return)
             binding.headerInfoLayout.visibility = View.VISIBLE
         }
     }
 
     private fun setupToolbar() {
         (activity as ManagerActivity).setToolbarTitle(
-            "${viewModel.items.value?.size} ${getString(R.string.general_files)}"
+            "${viewModel.items.value.size} ${getString(R.string.general_files)}"
         )
     }
 
@@ -235,14 +232,14 @@ class RecentsBucketFragment : Fragment() {
         (activity as ManagerActivity).changeAppBarElevation(canScroll)
     }
 
-    private fun getNodesHandles(isImageViewerValid: Boolean): LongArray? =
-        viewModel.items.value?.filter {
+    private fun getNodesHandles(isImageViewerValid: Boolean): LongArray =
+        viewModel.items.value.filter {
             if (isImageViewerValid) {
                 it.node?.isValidForImageViewer() ?: false
             } else {
                 FileUtil.isAudioOrVideo(it.node) && FileUtil.isInternalIntent(it.node)
             }
-        }?.map { it.node?.handle ?: 0L }?.toLongArray()
+        }.map { it.node?.handle ?: 0L }.toLongArray()
 
     fun openFile(
         index: Int,
@@ -296,7 +293,7 @@ class RecentsBucketFragment : Fragment() {
         val intent = Intent(context, PdfViewerActivity::class.java)
         intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
-        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter!!)
+        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter ?: return)
 
         val paramsSetSuccessfully =
             if (FileUtil.isLocalFile(node, megaApi, localPath)) {
@@ -325,7 +322,7 @@ class RecentsBucketFragment : Fragment() {
         }
 
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
-        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter!!)
+        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter ?: return)
         intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
 
         if (isMedia) {
@@ -380,7 +377,7 @@ class RecentsBucketFragment : Fragment() {
         node: MegaNode,
     ) {
         val handles = getNodesHandles(true)
-        val intent = if (handles != null && handles.isNotEmpty()) {
+        val intent = if (handles.isNotEmpty()) {
             ImageViewerActivity.getIntentForChildren(
                 requireContext(),
                 handles,
@@ -392,7 +389,7 @@ class RecentsBucketFragment : Fragment() {
                 node.handle
             )
         }
-        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter!!)
+        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter ?: return)
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)
     }
@@ -426,7 +423,7 @@ class RecentsBucketFragment : Fragment() {
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
-                    viewModel.items.value?.let { newList ->
+                    viewModel.items.value.let { newList ->
                         rvAdapter.submitList(ArrayList(newList))
                     }
                 }
@@ -442,7 +439,7 @@ class RecentsBucketFragment : Fragment() {
                 listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
                     val itemView = viewHolder.itemView
 
-                    val imageView: ImageView = if (!bucket.isMedia) {
+                    val imageView: ImageView = if (viewModel.bucket.value?.isMedia == false) {
                         val thumbnail = itemView.findViewById<ImageView>(R.id.thumbnail_list)
                         val param = thumbnail?.layoutParams as RelativeLayout.LayoutParams
                         param.width = Util.dp2px(

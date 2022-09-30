@@ -6,6 +6,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.app.data.mapper.DataMapper
+import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.data.mapper.SortOrderMapper
@@ -41,4 +42,8 @@ object TestMapperModule {
 
     @Provides
     fun provideBooleanPreferenceMapper(): BooleanPreferenceMapper = mock()
+
+    @Provides
+    fun provideFileTypeInfoMapper(): FileTypeInfoMapper = mock()
+
 }
