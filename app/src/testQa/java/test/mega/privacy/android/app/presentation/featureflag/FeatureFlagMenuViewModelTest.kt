@@ -11,10 +11,10 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import mega.privacy.android.app.presentation.featureflag.FeatureFlagMenuViewModel
+import mega.privacy.android.app.presentation.featureflag.model.toFeatureFlag
 import mega.privacy.android.domain.entity.Feature
 import org.junit.After
 import org.junit.Before
@@ -40,9 +40,11 @@ class FeatureFlagMenuViewModelTest {
     fun setUp() {
         Dispatchers.setMain(standardDispatcher)
         underTest =
-            FeatureFlagMenuViewModel(setFeatureFlag = setFeatureFlag,
+            FeatureFlagMenuViewModel(
+                setFeatureFlag = setFeatureFlag,
                 getAllFeatureFlags = getAllFeatureFlags,
-                ioDispatcher = standardDispatcher)
+                featureFlagMapper = ::toFeatureFlag,
+            )
     }
 
 
@@ -51,20 +53,20 @@ class FeatureFlagMenuViewModelTest {
         runTest {
             underTest.state.test {
                 val initial = awaitItem()
-                assertTrue(initial.featureFlagList.isEmpty())
+                assertTrue(initial.isEmpty())
             }
         }
     }
 
     @Test
     fun `test that features list is not empty`() {
-        val map = mutableMapOf<Feature, Boolean>()
-        map[mock { on { name }.thenReturn("featureName") }] = false
+        val feature = mock<Feature> { on { name }.thenReturn("featureName") }
+        val map = mapOf(feature to false)
         runTest {
             whenever(getAllFeatureFlags()).thenReturn(flowOf(map))
             underTest.state.map {
-                assertEquals(it.featureFlagList[0].featureName, "featureName")
-                assertEquals(it.featureFlagList[0].isEnabled, false)
+                assertEquals(it[0].featureName, "featureName")
+                assertEquals(it[0].isEnabled, false)
             }
         }
     }
