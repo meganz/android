@@ -98,16 +98,21 @@ def getMEGAChatBranch() {
 }
 
 /**
- * Fetch message of last commit from environment variable.
- * @return the commit message text if GitLab plugin has sent a valid commit message,
- *         otherwise return "N/A" normally when CI build is triggered by MR comment "jenkins rebuild".
+ * Fetch the message of the last commit from environment variable.
+ *
+ * @return The commit message text if GitLab plugin has sent a valid commit message, which is
+ * denoted as a Code Block in Gitlab.
+ *
+ * Otherwise, return a Bold "N/A" normally when CI build is triggered by MR comment "jenkins rebuild".
  */
-def getLastCommitMessage() {
+String getLastCommitMessage() {
     def lastCommitMessage = env.GITLAB_OA_LAST_COMMIT_MESSAGE
     if (lastCommitMessage == null) {
-        lastCommitMessage = "N/A"
+        return '**N/A**'
+    } else {
+        // use markdown backticks to format commit message into a code block
+        return "\n\\`\\`\\`\n$lastCommitMessage\n\\`\\`\\`\n".stripIndent().stripMargin()
     }
-    return lastCommitMessage
 }
 
 pipeline {
@@ -188,8 +193,8 @@ pipeline {
 
                     def failureMessage = ":x: Build Failed" +
                             "<br/>Failure Stage: ${BUILD_STEP}" +
-                            "<br/>Last Commit Message: <b>${getLastCommitMessage()}</b>" +
-                            "<br/>Last Commit ID: ${env.GIT_COMMIT}" +
+                            "<br/>Last Commit Message: ${getLastCommitMessage()}" +
+                            "Last Commit ID: ${env.GIT_COMMIT}" +
                             "<br/>Build Log: ${jsonJenkinsLog}" +
                             sdkBuildMessage +
                             unitTestResult
@@ -217,27 +222,24 @@ pipeline {
                                 "<b>WIP:</b> from the beginning of MR title."
                         sendToMR(skipMessage)
                     } else {
-                        def jsonLintReportLink = uploadFileToGitLab(LINT_REPORT_ARCHIVE)
+                        // String containing the Lint Results
+                        String jsonLintReportLink = uploadFileToGitLab(LINT_REPORT_ARCHIVE)
 
-                        def successMessage = ":white_check_mark: Build Succeeded!" +
-                                "<br/><b>Last Commit:</b> ${getLastCommitMessage()} (${env.GIT_COMMIT})" +
-                                "<br/><b>Build Warnings:</b> ${readBuildWarnings()}" +
-                                "<br/><b>App Unit Test:</b>" +
-                                "<br/>${HTML_INDENT}${APP_UNIT_TEST_SUMMARY}" +
-                                "<br/>${HTML_INDENT}Line Coverage: ${APP_COVERAGE}" +
-                                APP_UNIT_TEST_RESULT +
-                                "<br/><b>Domain Unit Test:</b>" +
-                                "<br/>${HTML_INDENT}${DOMAIN_UNIT_TEST_SUMMARY}" +
-                                "<br/>${HTML_INDENT}Line Coverage: ${DOMAIN_COVERAGE}" +
-                                DOMAIN_UNIT_TEST_RESULT +
-                                "<br/><b>Lint Summary</b>(${jsonLintReportLink}):${LINT_REPORT_SUMMARY}"
-                        sendToMR(successMessage)
+                        // Create the String to be posted as a comment in Gitlab
+                        String mergeRequestMessage = ":white_check_mark: Build Succeeded!\n\n" +
+                                "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
+                                "**Build Warnings:**\n" + getBuildWarnings() + "\n\n" +
+                                "**Lint Summary:** (${jsonLintReportLink}):<br/>" + "${LINT_REPORT_SUMMARY}" + "\n\n" +
+                                buildTestResults()
+
+                        // Send mergeRequestMessage to MR
+                        sendToMR(mergeRequestMessage)
 
                         def successSlackMessage = "Android Line Code Coverage:" +
                                 "\nCommit:\t${env.GIT_COMMIT}" +
                                 "\nBranch:\t${env.GIT_BRANCH}" +
-                                "\n- $APP_COVERAGE" +
-                                "\n- $DOMAIN_COVERAGE"
+                                "\n- app coverage: $APP_COVERAGE" +
+                                "\n- domain coverage: $DOMAIN_COVERAGE"
                         slackSend color: "good", message: successSlackMessage
                     }
                 }
@@ -431,7 +433,7 @@ pipeline {
                         // domain coverage
                         sh "./gradlew domain:jacocoTestReport"
                         sh "ls -l $WORKSPACE/domain/build/reports/jacoco/test/"
-                        DOMAIN_COVERAGE = "domain coverage: ${coverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
+                        DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
                         println("DOMAIN_COVERAGE = ${DOMAIN_COVERAGE}")
 
                         // temporarily disable the failed test cases
@@ -442,7 +444,7 @@ pipeline {
 
                         // restore failed test cases
                         sh "git checkout -- app/src/testDebug"
-                        APP_COVERAGE = "app coverage: ${coverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
+                        APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
                         println("APP_COVERAGE = ${APP_COVERAGE}")
                     }
                 }
@@ -463,7 +465,7 @@ pipeline {
 
                     script {
                         MODULE_LIST.eachWithIndex { module, index ->
-                            LINT_REPORT_SUMMARY += "<br/>${HTML_INDENT}<b>${module}</b>: ${lintSummary(module)}"
+                            LINT_REPORT_SUMMARY += "${HTML_INDENT}<b>${module}</b>: ${lintSummary(module)}<br/>"
                         }
                         print("LINT_REPORT_SUMMARY = ${LINT_REPORT_SUMMARY}")
 
@@ -473,6 +475,42 @@ pipeline {
             }
         }
     }
+}
+
+/**
+ * Returns a Markdown table-formatted String that holds all Test Results for both app and domain modules
+ *
+ * @return String that contains all Test Results for both app and domain modules
+ */
+String buildTestResults() {
+    // Break down APP_UNIT_TEST_SUMMARY and DOMAIN_UNIT_TEST_SUMMARY into String arrays.
+    // As dictated in junit_report.py, each value in the String is separated by a comma.
+    // Use "," as the delimiter in order to split all values, then add them in their respective String arrays.
+    def appSummaryArray = APP_UNIT_TEST_SUMMARY.split(',')
+    def domainSummaryArray = DOMAIN_UNIT_TEST_SUMMARY.split(',')
+
+    String appTestResultsRow = "| **app** | " +
+            "${APP_COVERAGE} | " +
+            "${appSummaryArray[0]} | " +
+            "${appSummaryArray[1]} | " +
+            "${appSummaryArray[2]} | " +
+            "${appSummaryArray[3]} | " +
+            "${appSummaryArray[4]} | " +
+            "${APP_UNIT_TEST_RESULT} |"
+
+    String domainTestResultsRow = "| **domain** | " +
+            "${DOMAIN_COVERAGE} | " +
+            "${domainSummaryArray[0]} | " +
+            "${domainSummaryArray[1]} | " +
+            "${domainSummaryArray[2]} | " +
+            "${domainSummaryArray[3]} | " +
+            "${domainSummaryArray[4]} | " +
+            "${DOMAIN_UNIT_TEST_RESULT} |"
+
+    "| Module | Coverage | Total Cases | Skipped | Errors | Failure | Duration (s) | Test Report |\n" +
+            "| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n" +
+            "$appTestResultsRow\n" +
+            "$domainTestResultsRow\n"
 }
 
 def cleanUp() {
@@ -485,7 +523,13 @@ def cleanUp() {
     """
 }
 
-String readBuildWarnings() {
+/**
+ * Combines the GMS, HMS and QA Build Warnings into one String
+ *
+ * @return A String that contains some or all Build Warnings combined together.
+ * If there are no Build Warnings, return "None".
+ */
+String getBuildWarnings() {
     String result = ""
     if (fileExists(GMS_APK_BUILD_LOG)) {
         String gmsBuildWarnings = sh(script: "cat ${GMS_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
@@ -648,19 +692,19 @@ def unitTestArchiveLink(String reportPath, String archiveTargetName) {
     String result
     if (archiveUnitTestReport(reportPath, archiveTargetName)) {
         unitTestFileLink = uploadFileToGitLab(archiveTargetName)
-        result = "<br/>${unitTestFileLink}"
+        result = "${unitTestFileLink}"
     } else {
-        result = "<br>Unit Test report not available, perhaps test code has compilation error. Please check full build log."
+        result = "Unit Test report not available, perhaps test code has compilation error. Please check full build log."
     }
     return result
 }
 
 /**
- * Read and calculate the coverage by a given csv format report
+ * Reads and calculates the Test Coverage by a given csv format report
  * @param csvReportPath path to the csv coverage file, generated by JaCoCo
- * @return a summary of coverage report
+ * @return a String containing the Test Coverage report
  */
-String coverageSummary(String csvReportPath) {
+String getTestCoverageSummary(String csvReportPath) {
     summary = sh(
             script: "python3 ${WORKSPACE}/jenkinsfile/coverage_report.py ${csvReportPath}",
             returnStdout: true).trim()
@@ -688,7 +732,7 @@ private void sendToMR(String message) {
         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
             env.MARKDOWN_LINK = message
             env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
+            sh "curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}"
         }
     }
 }
@@ -710,7 +754,6 @@ private void downloadJenkinsConsoleLog(String downloaded) {
 private String uploadFileToGitLab(String fileName) {
     String link = ""
     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        // upload Jenkins console log to GitLab and get download link
         final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
         link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
         return link
