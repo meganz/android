@@ -34,13 +34,15 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRA
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.main.megachat.ChatUploadService
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava.STORAGE_STATE_RED
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
@@ -62,6 +64,7 @@ class TransfersManagement @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
     private val dbH: DatabaseHandler,
+    private val monitorStorageStateEvent: MonitorStorageStateEvent,
 ) {
 
     companion object {
@@ -303,7 +306,7 @@ class TransfersManagement @Inject constructor(
      * @return True if it is on storage over quota, false otherwise.
      */
     fun isStorageOverQuota(): Boolean =
-        MegaApplication.getInstance().storageState == STORAGE_STATE_RED
+        monitorStorageStateEvent.getState() == StorageState.Red
 
 
     /**
