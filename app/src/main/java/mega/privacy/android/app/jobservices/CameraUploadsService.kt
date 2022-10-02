@@ -497,7 +497,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var megaApi: MegaApiAndroid? = null
     private var megaApiFolder: MegaApiAndroid? = null
     private var receiver: NetworkTypeChangeReceiver? = null
-    private var handler: Handler? = null
     private var wifiLock: WifiLock? = null
     private var wakeLock: PowerManager.WakeLock? = null
     private var videoCompressor: VideoCompressor? = null
@@ -547,7 +546,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     megaApi?.cancelTransfer(transfer)
                 }
                 sendTransfersInterruptedInfoToBackupCenter()
-                finish()
+                endService()
             }
         }
     }
@@ -613,7 +612,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 }
                 coroutineScope?.cancel("Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload")
                 sendTransfersInterruptedInfoToBackupCenter()
-                finish()
+                endService()
             }
         }
     }
@@ -630,7 +629,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         if (megaApi == null) {
             Timber.d("MegaApi is null, return.")
-            finish()
+            endService()
             return START_NOT_STICKY
         }
 
@@ -653,7 +652,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 else -> Unit
             }
             coroutineScope?.cancel("Camera Upload Stop/Cancel Intent Action - Stop Camera Upload")
-            finish()
+            endService()
             return START_NOT_STICKY
         }
 
@@ -731,36 +730,36 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         runCatching {
             if (!hasCredentials()) {
                 Timber.w("There are no user credentials")
-                finish()
+                endService()
                 return
             }
             if (!hasPreferences()) {
                 Timber.w("Preferences not defined, so not enabled")
-                finish()
+                endService()
                 return
             }
             if (!isCameraUploadSyncEnabled()) {
                 Timber.w("Sync enabled not defined or not enabled")
-                finish()
+                endService()
                 return
             }
             if (!Util.isOnline(applicationContext)) {
                 Timber.w("Not online")
-                finish()
+                endService()
                 return
             }
             if (isDeviceLowOnBattery(batteryIntent)) {
-                finish()
+                endService()
                 return
             }
             if (TextUtil.isTextEmpty(localPath())) {
                 Timber.w("LocalPath is not defined, so not enabled")
-                finish()
+                endService()
                 return
             }
             if (isWifiNotSatisfied()) {
                 Timber.w("Cannot start, WiFi required")
-                finish()
+                endService()
                 return
             }
             val result = shouldRun()
@@ -769,11 +768,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 0 -> startCameraUploads()
                 LOGIN_IN, CHECKING_USER_ATTRIBUTE, TARGET_FOLDER_NOT_EXIST, SETTING_USER_ATTRIBUTE ->
                     Timber.d("Wait for login or check user attribute.")
-                else -> finish()
+                else -> endService()
             }
         }.onFailure { exception ->
             Timber.e(exception)
-            handler?.removeCallbacksAndMessages(null)
             releaseLocks()
             if (isOverQuota) {
                 showStorageOverQuotaNotification()
@@ -787,7 +785,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 stopForeground(true)
             }
             cancelNotification()
-            finish()
+            endService()
         }
     }
 
@@ -912,7 +910,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         val primaryUploadNode = getNodeByHandle(getPrimarySyncHandle())
         if (primaryUploadNode == null) {
             Timber.d("ERROR: Primary Parent Folder is NULL")
-            finish()
+            endService()
             return
         }
         val secondaryEnabled = isSecondaryFolderEnabled()
@@ -1079,7 +1077,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 JobUtil.fireSingleHeartbeat(this)
                 // Make sure to re schedule the job
                 JobUtil.scheduleCameraUploadJob(this)
-                finish()
+                endService()
                 FileUtil.purgeDirectory(tempRoot?.let { File(it) })
             }
         } else {
@@ -1130,7 +1128,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                         @Suppress("DEPRECATION")
                         if (megaApi?.numPendingUploads == 0) {
                             Timber.w("Stop service due to out of space issue")
-                            finish()
+                            endService()
                             val title = getString(R.string.title_out_of_space)
                             val message = getString(R.string.error_not_enough_free_space)
                             val intent = Intent(this, ManagerActivity::class.java)
@@ -1242,7 +1240,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         totalToUpload = 0
         reportUploadFinish()
         stopActiveHeartbeat()
-        finish()
+        endService()
     }
 
     private suspend fun getPendingList(
@@ -1519,7 +1517,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         try {
             app = application as MegaApplication
         } catch (ex: Exception) {
-            finish()
+            endService()
         }
 
         val wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF
@@ -1542,14 +1540,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         canceled = false
         isOverQuota = false
         running = true
-        @Suppress("DEPRECATION")
-        handler = Handler()
 
         megaApi = app?.megaApi
         megaApiFolder = app?.megaApiFolder
 
         if (megaApi == null) {
-            finish()
+            endService()
             return
         }
 
@@ -1583,15 +1579,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
-    private fun finish() {
+    private fun endService() {
         Timber.d("Finish Camera upload process.")
-        handler?.removeCallbacksAndMessages(null)
-
-        running = false
-        cancel()
-    }
-
-    private fun cancel() {
         releaseLocks()
         if (isOverQuota) {
             showStorageOverQuotaNotification()
@@ -1659,7 +1648,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             } else {
                 Timber.d("ERROR: %s", e.errorString)
                 MegaApplication.isLoggingIn = false
-                finish()
+                endService()
             }
         } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
             if (e.errorCode == MegaError.API_OK) {
@@ -1670,7 +1659,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             } else {
                 Timber.d("ERROR: %s", e.errorString)
                 MegaApplication.isLoggingIn = false
-                finish()
+                endService()
             }
         } else if (request.type == MegaRequest.TYPE_CANCEL_TRANSFER) {
             Timber.d("Cancel transfer received")
@@ -1683,7 +1672,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     }
                 }
             } else {
-                finish()
+                endService()
             }
         } else if (request.type == MegaRequest.TYPE_CANCEL_TRANSFERS) {
             @Suppress("DEPRECATION")
@@ -1693,7 +1682,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         } else if (request.type == MegaRequest.TYPE_PAUSE_TRANSFERS) {
             Timber.d("PauseTransfer false received")
             if (e.errorCode == MegaError.API_OK) {
-                finish()
+                endService()
             }
         } else if (request.type == MegaRequest.TYPE_COPY) {
             if (e.errorCode == MegaError.API_OK) {
@@ -1728,7 +1717,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
         } else {
             Timber.w("On Get Primary - Failed")
-            finish()
+            endService()
         }
     }
 
@@ -1750,7 +1739,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
         } else {
             Timber.w("On Get Secondary - Failed")
-            finish()
+            endService()
         }
     }
 
@@ -1767,7 +1756,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     fun onCreateFolder(isSuccessful: Boolean) {
         if (!isSuccessful) {
-            finish()
+            endService()
         }
     }
 
@@ -1798,7 +1787,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         if (canceled) {
             Timber.d("Transfer cancel: %s", transfer.nodeHandle)
             megaApi?.cancelTransfer(transfer)
-            cancel()
+            endService()
             return
         }
         if (isOverQuota) {
@@ -1820,7 +1809,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             if (e.value != 0L) Timber.w("TRANSFER OVER QUOTA ERROR: %s", e.errorCode)
             else Timber.w("STORAGE OVER QUOTA ERROR: %s", e.errorCode)
             isOverQuota = true
-            cancel()
+            endService()
         }
     }
 
@@ -1922,13 +1911,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         } else if (e.errorCode == MegaError.API_EOVERQUOTA) {
             Timber.w("Over quota error: %s", e.errorCode)
             isOverQuota = true
-            cancel()
+            endService()
         } else {
             Timber.w("Image Sync FAIL: %d___%s", transfer.nodeHandle, e.errorString)
         }
         if (canceled) {
             Timber.w("Image sync cancelled: %s", transfer.nodeHandle)
-            cancel()
+            endService()
         }
         updateUpload()
     }
@@ -1996,7 +1985,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
         } else {
             Timber.d("Compression queue bigger than setting, show notification to user.")
-            finish()
+            endService()
             val intent = Intent(this, ManagerActivity::class.java)
             intent.action = Constants.ACTION_SHOW_SETTINGS
             val pendingIntent =
@@ -2024,7 +2013,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     override fun onInsufficientSpace() {
         Timber.w("Insufficient space for video compression.")
-        finish()
+        endService()
         val intent = Intent(this, ManagerActivity::class.java)
         val pendingIntent =
             PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
