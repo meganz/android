@@ -320,7 +320,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
     private BottomSheetDialogFragment bottomSheetDialogFragment;
 
-    private FileExplorerActivityViewModel viewModel;
+    private FileExplorerViewModel viewModel;
 
     private long parentHandle;
 
@@ -435,7 +435,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
         nameCollisionActivityContract = registerForActivityResult(new NameCollisionActivityContract(),
                 result -> backToCloud(result != null ? parentHandle : INVALID_HANDLE, 0, result));
 
-        viewModel = new ViewModelProvider(this).get(FileExplorerActivityViewModel.class);
+        viewModel = new ViewModelProvider(this).get(FileExplorerViewModel.class);
         viewModel.getFilesInfo().observe(this, this::onProcessAsyncInfo);
         viewModel.getTextInfo().observe(this, info -> dismissAlertDialogIfExists(statusDialog));
 
@@ -498,7 +498,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
         if (credentials == null) {
             Timber.w("User credentials NULL");
 
-            if (viewModel.isImportingText()) {
+            if (viewModel.isImportingText(getIntent())) {
                 startActivity(new Intent(this, LoginActivity.class)
                         .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
                         .putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(Intent.EXTRA_TEXT))
@@ -1741,7 +1741,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
             Timber.d("mode UPLOAD");
 
-            if (viewModel.isImportingText()) {
+            if (viewModel.isImportingText(getIntent())) {
                 MegaNode parentNode = megaApi.getNodeByHandle(handle);
                 if (parentNode == null) {
                     parentNode = megaApi.getRootNode();
@@ -2386,7 +2386,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
         chatListItems.addAll(chats);
 
-        if (viewModel.isImportingText()) {
+        if (viewModel.isImportingText(getIntent())) {
             Timber.d("Handle intent of text plain");
 
             String message = viewModel.getMessageToShare();
@@ -2567,7 +2567,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
     }
 
     public void setNameFiles(HashMap<String, String> nameFiles) {
-        viewModel.getFileNames().setValue(nameFiles);
+        viewModel.setFileNames(nameFiles);
     }
 
     public DrawerItem getCurrentItem() {
