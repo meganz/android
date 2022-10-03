@@ -8,7 +8,12 @@ import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import nz.mega.sdk.MegaNode
 
 /**
@@ -112,8 +117,16 @@ private fun FileEntity.createFile(
     isExported = isExported,
     isTakenDown = isTakenDown,
     isAvailableOffline = isAvailableOffline,
-    thumbnailPath = thumbnailPath
+    thumbnailPath = thumbnailPath?.takeIf { type.hasThumbnail() }
 )
+
+private fun FileTypeInfo.hasThumbnail(): Boolean = when (this) {
+    is AudioFileTypeInfo -> true
+    is VideoFileTypeInfo -> true
+    is ImageFileTypeInfo -> true
+    PdfFileTypeInfo -> true
+    else -> false
+}
 
 /**
  * Needs to happen on the fragment. preferably using Android formatter:
