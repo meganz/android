@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.data.facade
+package mega.privacy.android.data.facade
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
@@ -6,8 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.facade.CacheFacade
-import mega.privacy.android.app.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import org.junit.After
 import org.junit.Assert.fail
 import org.junit.Before
