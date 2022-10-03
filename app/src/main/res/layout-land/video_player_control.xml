@@ -92,6 +92,7 @@
             android:lines="1"
             android:textColor="@color/white_alpha_087"
             android:textSize="16sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/controls_view"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -143,34 +144,34 @@
             <ImageButton
                 android:id="@+id/playlist"
                 style="@style/VideoPlayerButton"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 android:enabled="false"
                 android:src="@drawable/ic_player_queue"
                 android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.9"
-                app:layout_constraintStart_toStartOf="parent"
                 app:tint="@color/white"
                 tools:visibility="visible" />
 
             <ImageButton
                 android:id="@+id/image_button_lock"
                 style="@style/VideoPlayerButton"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 android:enabled="false"
                 android:src="@drawable/ic_lock"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.6"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/playlist"
                 app:tint="@color/white" />
 
             <ImageButton
                 android:id="@+id/repeat_toggle"
                 style="@style/VideoPlayerButton"
+                android:layout_marginStart="5dp"
+                android:layout_marginBottom="5dp"
                 android:src="@drawable/ic_repeat"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:tint="@color/white" />
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -181,10 +182,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="80dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:visibility="gone">
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
             android:id="@+id/image_button_unlock"
