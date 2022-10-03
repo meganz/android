@@ -47,9 +47,10 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.managerSections.TransfersViewModel;
+import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 import timber.log.Timber;
@@ -273,7 +274,7 @@ public class MegaTransfersAdapter extends RecyclerView.Adapter<MegaTransfersAdap
                 case STATE_RETRYING:
                 case STATE_QUEUED:
                     if ((transferType == TYPE_DOWNLOAD && viewModel.isOnTransferOverQuota())
-                            || (transferType == TYPE_UPLOAD && MegaApplication.getInstance().getStorageState() == MegaApiJava.STORAGE_STATE_RED)) {
+                            || (transferType == TYPE_UPLOAD && StorageStateExtensionsKt.getStorageState() == StorageState.Red)) {
                         holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.orange_400_orange_300));
 
                         if (transferType == TYPE_DOWNLOAD) {

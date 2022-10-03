@@ -33,7 +33,7 @@ class DefaultGetOutgoingSharesChildrenNodeTest {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_NONE)
     }
     private val getOthersSortOrder = mock<GetOthersSortOrder> {
-        onBlocking { invoke() }.thenReturn(1)
+        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
     private val fileRepository = mock<FileRepository>()
 

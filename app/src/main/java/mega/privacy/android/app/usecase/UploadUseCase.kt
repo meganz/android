@@ -4,18 +4,19 @@ import android.content.Context
 import android.content.Intent
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.exception.BreakTransfersProcessingException
 import mega.privacy.android.app.usecase.exception.OverDiskQuotaPaywallMegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import nz.mega.sdk.MegaApiJava
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import java.io.File
 import javax.inject.Inject
 
@@ -25,7 +26,8 @@ import javax.inject.Inject
  * @property transfersManagement    Required for checking transfers status.
  */
 class UploadUseCase @Inject constructor(
-    private val transfersManagement: TransfersManagement
+    private val transfersManagement: TransfersManagement,
+    private val monitorStorageStateEvent: MonitorStorageStateEvent,
 ) {
     /**
      * Uploads a file.
@@ -44,7 +46,7 @@ class UploadUseCase @Inject constructor(
         lastModified: Long,
         parentHandle: Long
     ): Completable = Completable.create { emitter ->
-        if (MegaApplication.getInstance().storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
+        if (monitorStorageStateEvent.getState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning()
             emitter.onError(OverDiskQuotaPaywallMegaException(""))
             return@create

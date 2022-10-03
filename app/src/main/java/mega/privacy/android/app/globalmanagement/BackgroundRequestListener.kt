@@ -12,6 +12,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.main.controllers.AccountController
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CUBackupInitializeChecker
 import mega.privacy.android.app.utils.Constants
@@ -25,6 +26,8 @@ import mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob
 import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
 import mega.privacy.android.app.utils.TimeUtils.formatDateAndTime
 import mega.privacy.android.app.utils.Util.convertToBitSet
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaAccountSession
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -60,6 +63,7 @@ class BackgroundRequestListener @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val transfersManagement: TransfersManagement,
     private val pushNotificationSettingManagement: PushNotificationSettingManagement,
+    private val monitorStorageStateEvent: MonitorStorageStateEvent,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -308,7 +312,7 @@ class BackgroundRequestListener @Inject constructor(
         Timber.d("askForFullAccountInfo")
         megaApi.run {
             getPaymentMethods(null)
-            if ((application as MegaApplication).storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN) {
+            if (monitorStorageStateEvent.getState() == StorageState.Unknown) {
                 getAccountDetails()
             } else {
                 getSpecificAccountDetails(false, true, true)

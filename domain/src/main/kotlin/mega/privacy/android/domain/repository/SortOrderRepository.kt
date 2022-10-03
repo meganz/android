@@ -24,4 +24,40 @@ interface SortOrderRepository {
      * @return links cloud sort order
      */
     suspend fun getLinksSortOrder(): SortOrder
+
+    /**
+     * Get others sort order
+     * @return others sort order
+     */
+    suspend fun getOthersSortOrder(): SortOrder
+
+    /**
+     * Get offline sort order
+     * @return offline sort order
+     */
+    suspend fun getOfflineSortOrder(): SortOrder
+
+    /**
+     * Set offline sort order
+     * @param order
+     */
+    suspend fun setOfflineSortOrder(order: SortOrder)
+
+    /**
+     * Set camera sort order
+     * @param order
+     */
+    suspend fun setCameraSortOrder(order: SortOrder)
+
+    /**
+     * Set cloud sort order
+     * @param order
+     */
+    suspend fun setCloudSortOrder(order: SortOrder)
+
+    /**
+     * Set others sort order
+     * @param order
+     */
+    suspend fun setOthersSortOrder(order: SortOrder)
 }

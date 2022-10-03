@@ -3,6 +3,7 @@ package mega.privacy.android.app.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.app.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.data.mapper.SortOrderMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -15,11 +16,13 @@ import javax.inject.Inject
  * @property ioDispatcher
  * @property megaLocalStorageGateway
  * @property sortOrderMapper
+ * @property sortOrderIntMapper
  */
 class DefaultSortOrderRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val sortOrderMapper: SortOrderMapper,
+    private val sortOrderIntMapper: SortOrderIntMapper,
 ) : SortOrderRepository {
 
     override suspend fun getCameraSortOrder(): SortOrder = withContext(ioDispatcher) {
@@ -32,5 +35,29 @@ class DefaultSortOrderRepository @Inject constructor(
 
     override suspend fun getLinksSortOrder(): SortOrder = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getLinksSortOrder())
+    }
+
+    override suspend fun getOthersSortOrder(): SortOrder = withContext(ioDispatcher) {
+        sortOrderMapper(megaLocalStorageGateway.getOthersSortOrder())
+    }
+
+    override suspend fun getOfflineSortOrder(): SortOrder = withContext(ioDispatcher) {
+        sortOrderMapper(megaLocalStorageGateway.getOfflineSortOrder())
+    }
+
+    override suspend fun setOfflineSortOrder(order: SortOrder) = withContext(ioDispatcher) {
+        megaLocalStorageGateway.setOfflineSortOrder(sortOrderIntMapper(order))
+    }
+
+    override suspend fun setCameraSortOrder(order: SortOrder) = withContext(ioDispatcher) {
+        megaLocalStorageGateway.setCameraSortOrder(sortOrderIntMapper(order))
+    }
+
+    override suspend fun setCloudSortOrder(order: SortOrder) = withContext(ioDispatcher) {
+        megaLocalStorageGateway.setCloudSortOrder(sortOrderIntMapper(order))
+    }
+
+    override suspend fun setOthersSortOrder(order: SortOrder) = withContext(ioDispatcher) {
+        megaLocalStorageGateway.setOthersSortOrder(sortOrderIntMapper(order))
     }
 }

@@ -12,6 +12,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
@@ -30,6 +31,8 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatContainsMeta
+import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
@@ -235,11 +238,20 @@ class GetMeetingListUseCase @Inject constructor(
             onSuccess = { lastMessageFormatted = it },
             onError = Timber::w
         )
+        val lastMessageIcon = when {
+            chatListItem.lastMessageType == MegaChatMessage.TYPE_VOICE_CLIP ->
+                R.drawable.ic_mic_on_small
+            chatListItem.isGeolocationMetaType() ->
+                R.drawable.ic_location_small
+            else ->
+                null
+        }
 
         return MeetingItem(
             chatId = chatId,
             title = title,
             lastMessage = lastMessageFormatted,
+            lastMessageIcon = lastMessageIcon,
             isPublic = isPublic,
             isMuted = isMuted,
             hasPermissions = hasPermissions,
@@ -301,5 +313,10 @@ class GetMeetingListUseCase @Inject constructor(
             avatarColor = userAvatarColor
         )
     }
+
+    private fun MegaChatListItem.isGeolocationMetaType(): Boolean =
+        lastMessageType == MegaChatMessage.TYPE_CONTAINS_META
+                && megaChatApi.getMessage(chatId, lastMessageId)
+            ?.containsMeta?.type == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION
 }
 

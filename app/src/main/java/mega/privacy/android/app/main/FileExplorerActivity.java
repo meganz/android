@@ -74,13 +74,14 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
@@ -105,7 +106,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
-import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.data.model.UserCredentials;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
@@ -282,7 +282,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
     //Tabs in Cloud
     private TabLayout tabLayoutExplorer;
     private FileExplorerPagerAdapter mTabsAdapterExplorer;
-    private CustomViewPager viewPagerExplorer;
+    private ViewPager2 viewPagerExplorer;
 
     private ArrayList<MegaNode> nodes;
 
@@ -320,7 +320,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
     private BottomSheetDialogFragment bottomSheetDialogFragment;
 
-    private FileExplorerActivityViewModel viewModel;
+    private FileExplorerViewModel viewModel;
 
     private long parentHandle;
 
@@ -435,7 +435,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
         nameCollisionActivityContract = registerForActivityResult(new NameCollisionActivityContract(),
                 result -> backToCloud(result != null ? parentHandle : INVALID_HANDLE, 0, result));
 
-        viewModel = new ViewModelProvider(this).get(FileExplorerActivityViewModel.class);
+        viewModel = new ViewModelProvider(this).get(FileExplorerViewModel.class);
         viewModel.getFilesInfo().observe(this, this::onProcessAsyncInfo);
         viewModel.getTextInfo().observe(this, info -> dismissAlertDialogIfExists(statusDialog));
 
@@ -498,7 +498,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
         if (credentials == null) {
             Timber.w("User credentials NULL");
 
-            if (viewModel.isImportingText()) {
+            if (viewModel.isImportingText(getIntent())) {
                 startActivity(new Intent(this, LoginActivity.class)
                         .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
                         .putExtra(Intent.EXTRA_TEXT, getIntent().getStringExtra(Intent.EXTRA_TEXT))
@@ -718,12 +718,29 @@ public class FileExplorerActivity extends TransfersManagementActivity
         viewPagerExplorer.setVisibility(View.VISIBLE);
 
         int position = mTabsAdapterExplorer != null ? viewPagerExplorer.getCurrentItem() : 0;
-        mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager());
+        mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(), this.getLifecycle());
         viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
         viewPagerExplorer.setCurrentItem(position);
-        tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
-        if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2 && removeChatTab) {
+        new TabLayoutMediator(tabLayoutExplorer, viewPagerExplorer, (tab, tabPosition) -> {
+            String tabName;
+
+            switch (tabPosition) {
+                case 1:
+                    tabName = StringResourcesUtils.getString(R.string.tab_incoming_shares);
+                    break;
+                case 2:
+                    tabName = StringResourcesUtils.getString(R.string.section_chat);
+                    break;
+                case 0:
+                default:
+                    tabName = StringResourcesUtils.getString(R.string.section_cloud_drive);
+            }
+
+            tab.setText(tabName);
+        }).attach();
+
+        if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getItemCount() > 2 && removeChatTab) {
             mTabsAdapterExplorer.setTabRemoved(true);
             tabLayoutExplorer.removeTabAt(2);
             mTabsAdapterExplorer.notifyDataSetChanged();
@@ -763,13 +780,13 @@ public class FileExplorerActivity extends TransfersManagementActivity
                     updateAdapterExplorer(removeChatTab);
                 }
 
-                viewPagerExplorer.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                    public void onPageScrollStateChanged(int state) {
-                    }
-
+                viewPagerExplorer.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                    @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                        super.onPageScrolled(position, positionOffset, positionOffsetPixels);
                     }
 
+                    @Override
                     public void onPageSelected(int position) {
                         Timber.d("Position:%s", position);
                         supportInvalidateOptionsMenu();
@@ -796,13 +813,18 @@ public class FileExplorerActivity extends TransfersManagementActivity
                             }
                         }
                     }
+
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
+                        super.onPageScrollStateChanged(state);
+                    }
                 });
             }
         }
     }
 
     private void checkFragmentScroll(int position) {
-        CheckScrollInterface fragment = (CheckScrollInterface) mTabsAdapterExplorer.getItem(position);
+        CheckScrollInterface fragment = (CheckScrollInterface) mTabsAdapterExplorer.createFragment(position);
         fragment.checkScroll();
     }
 
@@ -1217,10 +1239,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
             }
         } else {
             int position = viewPagerExplorer.getCurrentItem();
-            Fragment f = (Fragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, position);
-            if (f == null) {
-                return;
-            }
+            Fragment f = mTabsAdapterExplorer.createFragment(position);
+
             if (position == 0) {
                 if (f instanceof ChatExplorerFragment) {
                     if (tabShown != NO_TABS) {
@@ -1721,7 +1741,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
             Timber.d("mode UPLOAD");
 
-            if (viewModel.isImportingText()) {
+            if (viewModel.isImportingText(getIntent())) {
                 MegaNode parentNode = megaApi.getNodeByHandle(handle);
                 if (parentNode == null) {
                     parentNode = megaApi.getRootNode();
@@ -2366,7 +2386,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
         chatListItems.addAll(chats);
 
-        if (viewModel.isImportingText()) {
+        if (viewModel.isImportingText(getIntent())) {
             Timber.d("Handle intent of text plain");
 
             String message = viewModel.getMessageToShare();
@@ -2431,7 +2451,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
         if (mTabsAdapterExplorer == null) return null;
 
-        ChatExplorerFragment c = (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
+        ChatExplorerFragment c = (ChatExplorerFragment) mTabsAdapterExplorer.createFragment(2);
 
         return c.isAdded() ? c : null;
     }
@@ -2440,7 +2460,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
         if (mTabsAdapterExplorer == null) return null;
 
         IncomingSharesExplorerFragment iS =
-                (IncomingSharesExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
+                (IncomingSharesExplorerFragment) mTabsAdapterExplorer.createFragment(1);
 
         return iS.isAdded() ? iS : null;
     }
@@ -2452,7 +2472,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
         if (mTabsAdapterExplorer == null) return null;
 
-        CloudDriveExplorerFragment cD = (CloudDriveExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
+        CloudDriveExplorerFragment cD = (CloudDriveExplorerFragment) mTabsAdapterExplorer.createFragment(0);
 
         return cD.isAdded() ? cD : null;
     }
@@ -2547,7 +2567,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
     }
 
     public void setNameFiles(HashMap<String, String> nameFiles) {
-        viewModel.getFileNames().setValue(nameFiles);
+        viewModel.setFileNames(nameFiles);
     }
 
     public DrawerItem getCurrentItem() {
@@ -2671,7 +2691,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
                 break;
         }
 
-        viewPagerExplorer.disableSwipe(hide);
+        viewPagerExplorer.setUserInputEnabled(!hide);
 
         // If no tab should be shown, keep hide.
         tabLayoutExplorer.setVisibility(hide || (tabShown == NO_TABS) ? View.GONE : View.VISIBLE);
