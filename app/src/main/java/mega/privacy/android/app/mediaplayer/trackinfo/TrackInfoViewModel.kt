@@ -14,7 +14,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.listeners.MegaRequestFinishListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
 import mega.privacy.android.app.presentation.extensions.getState
@@ -62,9 +62,10 @@ class TrackInfoViewModel @Inject constructor(
     private val _offlineRemoveSnackBarShow = MutableLiveData<Boolean>()
     val offlineRemoveSnackBarShow: LiveData<Boolean> = _offlineRemoveSnackBarShow
 
-    private val createThumbnailRequest = MegaRequestFinishListener({
-        _nodeInfo.notifyObserver()
-    })
+    private val createThumbnailRequest =
+        OptionalMegaRequestListenerInterface(onRequestFinish = { _, _ ->
+            _nodeInfo.notifyObserver()
+        })
 
     fun loadTrackInfo(args: TrackInfoFragmentArgs) {
         trackInfoArgs = args
