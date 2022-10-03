@@ -29,8 +29,6 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.FragmentRecentsBinding
-import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.app.fragments.recent.SelectedBucketViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForSingleNode
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
@@ -46,6 +44,7 @@ import mega.privacy.android.app.utils.SharedPreferenceConstants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
@@ -80,7 +79,7 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
     private lateinit var listView: RecyclerView
     private lateinit var fastScroller: FastScroller
 
-    val selectedBucketModel: SelectedBucketViewModel by activityViewModels()
+    val viewModel: RecentActionsViewModel by activityViewModels()
 
     private val nodeChangeObserver = Observer { forceUpdate: Boolean ->
         if (forceUpdate) {

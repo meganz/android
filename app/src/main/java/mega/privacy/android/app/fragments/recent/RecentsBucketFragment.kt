@@ -39,6 +39,7 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MultipleBucketAdapter
+import mega.privacy.android.app.presentation.recentactions.RecentActionsViewModel
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -79,7 +80,7 @@ class RecentsBucketFragment : Fragment() {
 
     private val viewModel by viewModels<RecentsBucketViewModel>()
 
-    private val selectedBucketModel: SelectedBucketViewModel by activityViewModels()
+    private val recentActionsViewModel: RecentActionsViewModel by activityViewModels()
 
     private lateinit var binding: FragmentRecentBucketBinding
 
@@ -105,8 +106,8 @@ class RecentsBucketFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.setBucket(selectedBucketModel.selected.value)
-        viewModel.setCachedActionList(selectedBucketModel.currentActionList.value?.toMutableList())
+        viewModel.setBucket(recentActionsViewModel.selected)
+        viewModel.setCachedActionList(recentActionsViewModel.currentActionList)
 
         viewModel.shouldCloseFragment.observe(viewLifecycleOwner) {
             if (it) Navigation.findNavController(view).popBackStack()
