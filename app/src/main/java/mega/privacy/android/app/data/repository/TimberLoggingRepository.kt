@@ -1,11 +1,6 @@
 package mega.privacy.android.app.data.repository
 
-import android.app.ActivityManager
-import android.app.Application
-import android.app.ApplicationExitInfo
-import android.app.usage.UsageStatsManager
 import android.content.Context
-import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -25,8 +20,6 @@ import mega.privacy.android.app.logging.ChatLogger
 import mega.privacy.android.app.logging.SdkLogger
 import mega.privacy.android.app.presentation.logging.tree.LineNumberDebugTree
 import mega.privacy.android.app.presentation.logging.tree.LogFlowTree
-import mega.privacy.android.app.protobuf.TombstoneProtos.Tombstone
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.logging.LogEntry
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -37,7 +30,6 @@ import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaLoggerInterface
 import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -75,7 +67,6 @@ class TimberLoggingRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val loggingPreferencesGateway: LoggingPreferencesGateway,
     @ApplicationScope private val appScope: CoroutineScope,
-    private val application: Application,
 ) : LoggingRepository {
 
     init {
@@ -158,87 +149,5 @@ class TimberLoggingRepository @Inject constructor(
 
     override suspend fun setChatLoggingEnabled(enabled: Boolean) {
         loggingPreferencesGateway.setChatLoggingEnabledPreference(enabled)
-    }
-
-    override suspend fun startUpLogging() {
-        withContext(ioDispatcher) {
-            checkAppUpgrade()
-            checkMegaStandbyBucket()
-            getTombstoneInfo()
-        }
-    }
-
-    /**
-     * Get the current standby bucket of the app.
-     * The system determines the standby state of the app based on app usage patterns.
-     *
-     * @return the current standby bucket of the app：
-     * STANDBY_BUCKET_ACTIVE,
-     * STANDBY_BUCKET_WORKING_SET,
-     * STANDBY_BUCKET_FREQUENT,
-     * STANDBY_BUCKET_RARE,
-     * STANDBY_BUCKET_RESTRICTED,
-     * STANDBY_BUCKET_NEVER
-     */
-    private fun checkMegaStandbyBucket() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val usageStatsManager =
-                application.getSystemService(Context.USAGE_STATS_SERVICE) as? UsageStatsManager
-                    ?: return
-            val standbyBucket = usageStatsManager.appStandbyBucket
-            Timber.d("getAppStandbyBucket(): %s", standbyBucket)
-        }
-    }
-
-    /**
-     * Get the tombstone information.
-     */
-    private fun getTombstoneInfo() {
-        Timber.d("getTombstoneInfo")
-        val activityManager =
-            application.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager ?: return
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val exitReasons = activityManager.getHistoricalProcessExitReasons(
-                /* packageName = */null,
-                /* pid = */0,
-                /* maxNum = */3
-            )
-            exitReasons.forEach { exitReason ->
-                if (exitReason.reason == ApplicationExitInfo.REASON_CRASH_NATIVE) {
-                    // Get the tombstone input stream.
-                    try {
-                        exitReason.traceInputStream?.use {
-                            // The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
-                            val tombstone =
-                                Tombstone.parseFrom(it)
-                            Timber.e("Tombstone Info%s", tombstone.toString())
-                        }
-                    } catch (e: IOException) {
-                        Timber.e(e)
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks if the app has been upgraded and store the new version code.
-     */
-    private fun checkAppUpgrade() {
-        val appInfoFile = "APP_INFO"
-        val appVersionCodeKey = "APP_VERSION_CODE"
-        val preferences = context.getSharedPreferences(appInfoFile, Context.MODE_PRIVATE)
-        val oldVersionCode = preferences.getInt(appVersionCodeKey, 0)
-        val newVersionCode = Util.getVersion(context)
-        if (oldVersionCode == 0 || oldVersionCode < newVersionCode) {
-            if (oldVersionCode == 0) {
-                Timber.i("App Version: %d", newVersionCode)
-            } else {
-                Timber.i("App upgraded from %d to %d", oldVersionCode, newVersionCode)
-            }
-            preferences.edit().putInt(appVersionCodeKey, newVersionCode).apply()
-        } else {
-            Timber.i("App Version: %s", newVersionCode)
-        }
     }
 }

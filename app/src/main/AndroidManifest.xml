@@ -586,6 +586,14 @@
             <meta-data
                 android:name="mega.privacy.android.app.initializer.LoggerInitializer"
                 android:value="androidx.startup" />
+
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.CheckMegaStandbyBucketInitializer"
+                android:value="androidx.startup" />
+
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.GetTombstoneInfoInitializer"
+                android:value="androidx.startup" />
         </provider>
 
         <activity

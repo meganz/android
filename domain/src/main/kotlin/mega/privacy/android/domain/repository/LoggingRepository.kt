@@ -82,10 +82,4 @@ interface LoggingRepository {
      * @param enabled
      */
     suspend fun setChatLoggingEnabled(enabled: Boolean)
-
-    /**
-     * Start up logging
-     *
-     */
-    suspend fun startUpLogging()
 }

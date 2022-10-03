@@ -24,11 +24,11 @@ import mega.privacy.android.domain.usecase.CreateSdkLogEntry
 import mega.privacy.android.domain.usecase.CreateTraceString
 import mega.privacy.android.domain.usecase.DefaultCreateTraceString
 import mega.privacy.android.domain.usecase.DefaultInitialiseLogging
+import mega.privacy.android.domain.usecase.EnableLogAllToConsole
 import mega.privacy.android.domain.usecase.GetCurrentTimeString
 import mega.privacy.android.domain.usecase.GetLogFile
 import mega.privacy.android.domain.usecase.InitialiseLogging
 import mega.privacy.android.domain.usecase.ResetSdkLogger
-import mega.privacy.android.domain.usecase.StartupLogging
 import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaLoggerInterface
 import org.slf4j.LoggerFactory
@@ -102,13 +102,11 @@ abstract class LoggingModule {
             loggingRepository: LoggingRepository,
             areSdkLogsEnabled: AreSdkLogsEnabled,
             areChatLogsEnabled: AreChatLogsEnabled,
-            startupLogging: StartupLogging,
             @IoDispatcher coroutineDispatcher: CoroutineDispatcher,
         ): InitialiseLogging = DefaultInitialiseLogging(
             loggingRepository = loggingRepository,
             areSdkLogsEnabled = areSdkLogsEnabled,
             areChatLogsEnabled = areChatLogsEnabled,
-            startupLogging = startupLogging,
             coroutineDispatcher = coroutineDispatcher,
         )
 
@@ -116,12 +114,8 @@ abstract class LoggingModule {
         fun provideGetLogFile(repository: LoggingRepository): GetLogFile =
             GetLogFile(repository::compressLogs)
 
-        /**
-         * Provide startup logging
-         *
-         */
         @Provides
-        fun provideStartupLogging(repository: LoggingRepository): StartupLogging =
-            StartupLogging(repository::startUpLogging)
+        fun provideEnableLogAllToConsole(repository: LoggingRepository): EnableLogAllToConsole =
+            EnableLogAllToConsole(repository::enableLogAllToConsole)
     }
 }
