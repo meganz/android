@@ -6,6 +6,7 @@ import mega.privacy.android.app.data.mapper.getFileTypeInfo
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
@@ -171,6 +172,33 @@ class FileTypeInfoMapperTest {
                 extension = expectedExtension
             )
         )
+    }
+
+    @Test
+    fun `test that a file with raw extension is mapped correctly`() {
+        val expectedMimeType = "expected"
+        val node = mock<MegaNode>()
+        listOf(
+            //Raw
+            "3fr", "arw", "cr2",
+            "crw", "ciff", "cs1",
+            "dcr", "dng", "erf",
+            "iiq", "k25", "kdc",
+            "mef", "mos", "mrw",
+            "nef", "nrw", "orf",
+            "pef", "raf", "raw",
+            "rw2", "rwl", "sr2",
+            "srf", "srw", "x3f",
+        ).forEach {
+            val expectedExtension = it
+            whenever(node.name).thenReturn("withExtension.$expectedExtension")
+            assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+                RawFileTypeInfo(
+                    type = expectedMimeType,
+                    extension = expectedExtension
+                )
+            )
+        }
     }
 
     @Test
