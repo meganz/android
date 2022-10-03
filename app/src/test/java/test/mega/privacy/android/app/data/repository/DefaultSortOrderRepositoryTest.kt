@@ -160,4 +160,58 @@ class DefaultSortOrderRepositoryTest {
         underTest.setOfflineSortOrder(order)
         verify(sortOrderIntMapper).invoke(order)
     }
+
+    @Test
+    fun `test that set camera sort order invokes set camera sort order of gateway`() = runTest {
+        val order = SortOrder.ORDER_MODIFICATION_ASC
+        val expected = MegaApiJava.ORDER_MODIFICATION_ASC
+        whenever(sortOrderIntMapper.invoke(order)).thenReturn(expected)
+        underTest.setCameraSortOrder(order)
+        verify(megaLocalStorageGateway).setCameraSortOrder(expected)
+    }
+
+    @Test
+    fun `test that set camera sort order invokes sort order int mapper`() = runTest {
+        val order = SortOrder.ORDER_MODIFICATION_ASC
+        val expected = MegaApiJava.ORDER_MODIFICATION_ASC
+        whenever(sortOrderIntMapper.invoke(order)).thenReturn(expected)
+        underTest.setCameraSortOrder(order)
+        verify(sortOrderIntMapper).invoke(order)
+    }
+
+    @Test
+    fun `test that set cloud sort order invokes set cloud sort order of gateway`() = runTest {
+        val order = SortOrder.ORDER_MODIFICATION_DESC
+        val expected = MegaApiJava.ORDER_MODIFICATION_DESC
+        whenever(sortOrderIntMapper.invoke(order)).thenReturn(expected)
+        underTest.setCloudSortOrder(order)
+        verify(megaLocalStorageGateway).setCloudSortOrder(expected)
+    }
+
+    @Test
+    fun `test that set cloud sort order invokes sort order int mapper`() = runTest {
+        val order = SortOrder.ORDER_MODIFICATION_DESC
+        val expected = MegaApiJava.ORDER_MODIFICATION_DESC
+        whenever(sortOrderIntMapper.invoke(order)).thenReturn(expected)
+        underTest.setCloudSortOrder(order)
+        verify(sortOrderIntMapper).invoke(order)
+    }
+
+    @Test
+    fun `test that set others sort order invokes set others sort order of gateway`() = runTest {
+        val order = SortOrder.ORDER_ALPHABETICAL_ASC
+        val expected = MegaApiJava.ORDER_ALPHABETICAL_ASC
+        whenever(sortOrderIntMapper.invoke(order)).thenReturn(expected)
+        underTest.setOthersSortOrder(order)
+        verify(megaLocalStorageGateway).setOthersSortOrder(expected)
+    }
+
+    @Test
+    fun `test that set others sort order invokes sort order int mapper`() = runTest {
+        val order = SortOrder.ORDER_ALPHABETICAL_ASC
+        val expected = MegaApiJava.ORDER_ALPHABETICAL_ASC
+        whenever(sortOrderIntMapper.invoke(order)).thenReturn(expected)
+        underTest.setOthersSortOrder(order)
+        verify(sortOrderIntMapper).invoke(order)
+    }
 }

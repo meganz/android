@@ -12,6 +12,9 @@ import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import mega.privacy.android.domain.usecase.GetOfflineSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.SetOfflineSortOrder
+import mega.privacy.android.domain.usecase.SetCameraSortOrder
+import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.SetOthersSortOrder
 
 /**
  * Provides the use case implementation regarding sort order
@@ -61,4 +64,25 @@ class SortOrderUseCases {
     @Provides
     fun provideSetOfflineSortOrder(sortOrderRepository: SortOrderRepository): SetOfflineSortOrder =
         SetOfflineSortOrder(sortOrderRepository::setOfflineSortOrder)
+
+    /**
+     * Provide the SetCloudSortOrder implementation
+     */
+    @Provides
+    fun provideSetCloudSortOrder(sortOrderRepository: SortOrderRepository): SetCloudSortOrder =
+        SetCloudSortOrder(sortOrderRepository::setCloudSortOrder)
+
+    /**
+     * Provide the SetCameraSortOrder implementation
+     */
+    @Provides
+    fun provideSetCameraSortOrder(sortOrderRepository: SortOrderRepository): SetCameraSortOrder =
+        SetCameraSortOrder(sortOrderRepository::setCameraSortOrder)
+
+    /**
+     * Provide the SetOthersSortOrder implementation
+     */
+    @Provides
+    fun provideSetOthersSortOrder(sortOrderRepository: SortOrderRepository): SetOthersSortOrder =
+        SetOthersSortOrder(sortOrderRepository::setOthersSortOrder)
 }

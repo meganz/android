@@ -4,6 +4,7 @@ import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaContactDB
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.main.megachat.NonContactInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SyncRecord
 
 /**
@@ -68,6 +69,24 @@ interface MegaLocalStorageGateway {
      * @param order
      */
     suspend fun setOfflineSortOrder(order: Int)
+
+    /**
+     * Set cloud sort order
+     * @param order
+     */
+    suspend fun setCloudSortOrder(order: Int)
+
+    /**
+     * Set camera sort order
+     * @param order
+     */
+    suspend fun setCameraSortOrder(order: Int)
+
+    /**
+     * Set others sort order
+     * @param order
+     */
+    suspend fun setOthersSortOrder(order: Int)
 
     /**
      * Get user credentials
