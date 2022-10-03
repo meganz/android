@@ -1,13 +1,12 @@
 package mega.privacy.android.domain.usecase
 
 /**
- * Disable Camera Upload Setting Process
- *
+ * Reset Camera Upload Timestamps
  */
-fun interface DisableCameraUploadSettingProcess {
+interface ResetCameraUploadTimeStamps {
 
     /**
-     * Invoke
+     * Invoke.
      *
      * @param clearCamSyncRecords
      */

@@ -332,11 +332,23 @@ class MegaLocalStorageFacade @Inject constructor(
             .apply()
     }
 
-    override suspend fun resetCUTimestamps(clearCamSyncRecords: Boolean) {
+    override suspend fun setCamSyncTimeStamp(value: Int) {
         dbHandler.setCamSyncTimeStamp(0)
+    }
+
+    override suspend fun setCamVideoSyncTimeStamp(value: Int) {
         dbHandler.setCamVideoSyncTimeStamp(0)
+    }
+
+    override suspend fun setSecSyncTimeStamp(value: Int) {
         dbHandler.setSecSyncTimeStamp(0)
+    }
+
+    override suspend fun setSecVideoSyncTimeStamp(value: Int) {
         dbHandler.setSecVideoSyncTimeStamp(0)
+    }
+
+    override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) {
         dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)
     }
 }

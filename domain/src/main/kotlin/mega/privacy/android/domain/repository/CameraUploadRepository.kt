@@ -347,11 +347,38 @@ interface CameraUploadRepository {
      */
     suspend fun backupTimestampsAndFolderHandle()
 
+    /**
+     * This method is to set Camera Sync Timestamp in the Database
+     *
+     * @param value
+     */
+    suspend fun setCamSyncTimeStamp(value: Int)
 
     /**
-     * This method is to disable the CU and MU settings in database
+     * This method is to set Camera Video Sync Timestamp in the Database
+     *
+     * @param value
+     */
+    suspend fun setCamVideoSyncTimeStamp(value: Int)
+
+    /**
+     * This method is to set Secondary Sync Timestamp in the Database
+     *
+     * @param value
+     */
+    suspend fun setSecSyncTimeStamp(value: Int)
+
+    /**
+     * This method is to set Secondary Video Sync Timestamp in the Database
+     *
+     * @param value
+     */
+    suspend fun setSecVideoSyncTimeStamp(value: Int)
+
+    /**
+     * This method is to clear Camera Sync Records from the Database
      *
      * @param clearCamSyncRecords the boolean setting whether to clean the cam record
      */
-    suspend fun resetCUTimestamps(clearCamSyncRecords: Boolean)
+    suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean)
 }
