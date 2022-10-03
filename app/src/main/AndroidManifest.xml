@@ -592,6 +592,10 @@
             <meta-data
                 android:name="mega.privacy.android.app.initializer.GetTombstoneInfoInitializer"
                 android:value="androidx.startup" />
+
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.CheckAppUpgradeInitializer"
+                android:value="androidx.startup" />
         </provider>
 
         <activity
