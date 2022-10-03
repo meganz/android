@@ -33,6 +33,18 @@
         app:roundingBorderWidth="@dimen/image_group_border_size"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
+    <ImageView
+        android:id="@+id/img_select_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/ic_chat_avatar_select"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
     <androidx.constraintlayout.widget.Group
         android:id="@+id/group_thumbnails"
         android:layout_width="wrap_content"

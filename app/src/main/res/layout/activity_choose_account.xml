@@ -1,0 +1,794 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/choose_account_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize" />
+
+    <RelativeLayout
+        android:id="@+id/billing_warning_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/yellow_100_yellow_700_alpha_015"
+        android:layout_below="@+id/toolbar"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/billing_warning_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="16dp"
+            android:layout_toStartOf="@+id/billing_warning_close"
+            android:text="@string/upgrade_billing_warning"
+            android:textAppearance="@style/TextAppearance.Mega.Caption.13sp.Grey87Yellow700" />
+
+        <ImageButton
+            android:id="@+id/billing_warning_close"
+            style="@style/Widget.Mega.Button.Transparent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="1dp"
+            android:src="@drawable/ic_remove_warning"
+            app:tint="@color/grey_alpha_087_yellow_700"
+            tools:ignore="ContentDescription" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/billing_warning_layout">
+
+        <LinearLayout
+            android:id="@+id/linear_layout_upgrade"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/title_my_account_type"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:paddingStart="72dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/text_of_my_account"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="14sp" />
+            </RelativeLayout>
+
+            <!-- FREE -->
+            <RelativeLayout
+                android:id="@+id/choose_account_free_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingTop="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/choose_account_free_layout_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Left side (title) -->
+                    <RelativeLayout
+                        android:id="@+id/choose_account_free_left_side"
+                        android:layout_width="121dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="4dp">
+
+                            <ImageView
+                                android:id="@+id/image_free"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="5dp"
+                                android:background="@null"
+                                android:src="@drawable/ic_free_crest" />
+
+                            <TextView
+                                android:id="@+id/choose_account_free_title_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/image_free"
+                                android:text="@string/free_account"
+                                android:textAllCaps="true"
+                                android:textColor="@color/green_500_green_400"
+                                android:textSize="18sp" />
+
+                        </RelativeLayout>
+
+                    </RelativeLayout>
+
+                    <!-- Right side (price, storage and bandwidth)-->
+                    <RelativeLayout
+                        android:id="@+id/choose_account_free_layout_right_side"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/choose_account_free_left_side"
+                        android:gravity="center_vertical">
+
+                        <TableLayout
+                            android:id="@+id/table_free"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true">
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp">
+
+                                    <TextView
+                                        android:id="@+id/storage_free"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="15sp" />
+
+                                </RelativeLayout>
+
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp">
+
+                                    <TextView
+                                        android:id="@+id/bandwidth_free"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="16dp">
+
+                                    <TextView
+                                        android:id="@+id/achievements_free"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="8dp"
+                                        android:maxWidth="200dp"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="11sp" />
+
+                                </RelativeLayout>
+
+                            </TableRow>
+
+                        </TableLayout>
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/linear_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignBottom="@id/choose_account_free_layout_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@color/grey_012_white_012"
+                    android:orientation="horizontal" />
+
+            </RelativeLayout>
+
+            <!-- Pro Lite -->
+            <RelativeLayout
+                android:id="@+id/upgrade_prolite_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingTop="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/upgrade_prolite_layout_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Left side (image and title) -->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_prolite_left_side"
+                        android:layout_width="121dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="4dp">
+
+                            <ImageView
+                                android:id="@+id/image_lite"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="5dp"
+                                android:background="@null"
+                                android:src="@drawable/ic_lite_crest" />
+
+                            <TextView
+                                android:id="@+id/upgrade_prolite_title_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/image_lite"
+                                android:text="@string/prolite_account"
+                                android:textAllCaps="true"
+                                android:textColor="@color/orange_400_orange_300"
+                                android:textSize="18sp" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!-- Right side (price, storage and bandwidth)-->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_prolite_right_side"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/upgrade_prolite_left_side"
+                        android:gravity="center_vertical">
+
+                        <TableLayout
+                            android:id="@+id/table_lite"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true">
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:background="@drawable/border_lite">
+
+                                    <TextView
+                                        android:id="@+id/month_lite"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorPrimary"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/storage_lite"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="16dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/bandwidth_lite"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+                        </TableLayout>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/linear_divider_pro_lite"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignBottom="@id/upgrade_prolite_layout_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/grey_012_white_012"
+                    android:orientation="horizontal" />
+
+                <RelativeLayout
+                    android:id="@+id/upgrade_prolite_layout_transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="95dp"
+                    android:background="@color/white_054_dark_grey_054"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
+            <!-- Pro I -->
+            <RelativeLayout
+                android:id="@+id/upgrade_pro_i_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingTop="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/upgrade_pro_i_layout_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Left side (image and title) -->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_pro_i_left_side"
+                        android:layout_width="121dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp">
+
+                            <ImageView
+                                android:id="@+id/image_pro_i"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="5dp"
+                                android:src="@drawable/ic_pro_1_crest" />
+
+                            <TextView
+                                android:id="@+id/upgrade_pro_i_title_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/image_pro_i"
+                                android:text="@string/pro1_account"
+                                android:textAllCaps="true"
+                                android:textColor="@color/red_600_red_300"
+                                android:textSize="18sp" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!-- Right side (price, storage and bandwidth)-->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_pro_i_right_side"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/upgrade_pro_i_left_side"
+                        android:gravity="center_vertical">
+
+                        <TableLayout
+                            android:id="@+id/table_pro_i"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true">
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:background="@drawable/border_pro">
+
+                                    <TextView
+                                        android:id="@+id/month_pro_i"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorPrimary"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/storage_pro_i"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="16dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/bandwidth_pro_i"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+                        </TableLayout>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/linear_divider_pro_i"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignBottom="@id/upgrade_pro_i_layout_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/grey_012_white_012"
+                    android:orientation="horizontal" />
+
+                <RelativeLayout
+                    android:id="@+id/upgrade_pro_i_layout_transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="93dp"
+                    android:background="@color/white_054_dark_grey_054"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
+            <!-- Pro II -->
+            <RelativeLayout
+                android:id="@+id/upgrade_pro_ii_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingTop="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/upgrade_pro_ii_layout_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Left side (image and title) -->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_pro_ii_left_side"
+                        android:layout_width="121dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="4dp">
+
+                            <ImageView
+                                android:id="@+id/image_pro_ii"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="5dp"
+                                android:src="@drawable/ic_pro_2_crest" />
+
+                            <TextView
+                                android:id="@+id/upgrade_pro_ii_title_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/image_pro_ii"
+                                android:text="@string/pro2_account"
+                                android:textAllCaps="true"
+                                android:textColor="@color/red_600_red_300"
+                                android:textSize="18sp" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!-- Right side (price, storage and bandwidth)-->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_pro_ii_right_side"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/upgrade_pro_ii_left_side"
+                        android:gravity="center_vertical">
+
+                        <TableLayout
+                            android:id="@+id/table_pro_ii"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerVertical="true">
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:background="@drawable/border_pro">
+
+                                    <TextView
+                                        android:id="@+id/month_pro_ii"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorPrimary"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/storage_pro_ii"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="16dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/bandwidth_pro_ii"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+                        </TableLayout>
+
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/linear_divider_pro_ii"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignBottom="@id/upgrade_pro_ii_layout_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/grey_012_white_012"
+                    android:orientation="horizontal" />
+
+                <RelativeLayout
+                    android:id="@+id/upgrade_pro_ii_layout_transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="93dp"
+                    android:background="@color/white_054_dark_grey_054"
+                    android:visibility="gone" />
+            </RelativeLayout>
+
+            <!-- Pro III -->
+            <RelativeLayout
+                android:id="@+id/upgrade_pro_iii_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingTop="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/upgrade_pro_iii_layout_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Left side (image and title) -->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_pro_iii_left_side"
+                        android:layout_width="121dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="4dp">
+
+                            <ImageView
+                                android:id="@+id/image_pro_iii"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="5dp"
+                                android:src="@drawable/ic_pro_3_crest" />
+
+                            <TextView
+                                android:id="@+id/upgrade_pro_iii_title_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/image_pro_iii"
+                                android:text="@string/pro3_account"
+                                android:textAllCaps="true"
+                                android:textColor="@color/red_600_red_300"
+                                android:textSize="18sp" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <!-- Right side (price, storage and bandwidth)-->
+                    <RelativeLayout
+                        android:id="@+id/upgrade_pro_iii_right_side"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/upgrade_pro_iii_left_side"
+                        android:gravity="center_vertical">
+
+                        <TableLayout
+                            android:id="@+id/table_pro_iii"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true">
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:background="@drawable/border_pro">
+
+                                    <TextView
+                                        android:id="@+id/month_pro_iii"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorPrimary"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/storage_pro_iii"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="16dp"
+                                    android:paddingStart="8dp">
+
+                                    <TextView
+                                        android:id="@+id/bandwidth_pro_iii"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+                            </TableRow>
+                        </TableLayout>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/upgrade_pro_iii_layout_transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="93dp"
+                    android:background="@color/white_054_dark_grey_054"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/lbl_custom_plan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="7dp"
+                android:text="@string/label_custom_plan"
+                android:textSize="13sp" />
+
+            <LinearLayout
+                android:id="@+id/linear_divider_pro_iii"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@color/grey_012_white_012"
+                android:orientation="horizontal" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="30dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:text="@string/upgrade_comment"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

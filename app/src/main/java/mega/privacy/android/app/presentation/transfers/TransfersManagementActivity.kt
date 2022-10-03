@@ -19,10 +19,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.transferWidget.TransfersWidget
-import mega.privacy.android.app.components.transferWidget.TransfersWidget.Companion.NO_TYPE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
-import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB
@@ -32,6 +30,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.transfer.TransferType
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -232,9 +231,9 @@ open class TransfersManagementActivity : PasscodeActivity() {
     /**
      * Updates the state of the transfers widget.
      *
-     * @param transferType  Type of the transfer.
+     * @param transferType Type of the transfer.
      */
-    protected fun updateTransfersWidget(transferType: Int) {
+    protected fun updateTransfersWidget(transferType: TransferType) {
         if (transfersManagement.isProcessingTransfers || transfersManagement.isProcessingFolders) {
             return
         }
@@ -338,7 +337,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Updates the transfers widget.
      */
     fun updateTransfersWidget() {
-        transfersViewModel.checkTransfersInfo(NO_TYPE)
+        transfersViewModel.checkTransfersInfo(TransferType.NONE)
     }
 
     /**

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.settingsFragments;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE;
 import static mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS;
 import static mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS;
 import static mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_FILE_UPLOAD_VIDEOS;
@@ -88,7 +87,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
@@ -1146,8 +1144,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         cameraUploadOnOff.setEnabled(false);
         localCameraUploadFolder.setEnabled(false);
         megaCameraFolder.setEnabled(false);
-
-        MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE));
     }
 
     private void setupConnectionTypeForCameraUpload() {
@@ -1191,8 +1187,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         getPreferenceScreen().removePreference(megaCameraFolder);
         getPreferenceScreen().removePreference(secondaryMediaFolderOn);
         disableMediaUploadUIProcess();
-
-        MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE));
     }
 
     private String getLocalDCIMFolderPath() {

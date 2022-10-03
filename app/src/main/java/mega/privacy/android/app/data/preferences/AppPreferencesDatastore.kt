@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.KEY_APPEARANCE_COLOR_THEME
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.IOException

@@ -1,7 +1,5 @@
 package mega.privacy.android.app.domain.repository
 
-import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.TransfersSizeInfo
 import nz.mega.sdk.MegaTransfer
 
 /**
@@ -81,9 +79,10 @@ interface TransfersRepository {
     suspend fun areAllTransfersPaused(): Boolean
 
     /**
-     * Get size transfer
+     * Checks if the queue of upload transfers is paused or if all in progress upload transfers are individually paused.
      *
-     * @return size transfer info when upload and download
+     * @return True if the queue of upload transfers is paused or if all in progress upload transfers
+     * are individually paused, and False if otherwise.
      */
-    fun getSizeTransfer(): Flow<TransfersSizeInfo>
+    suspend fun areAllUploadTransfersPaused(): Boolean
 }

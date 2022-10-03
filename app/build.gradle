@@ -282,6 +282,7 @@ dependencies {
     implementation "androidx.cardview:cardview:$cardViewVersion"
     implementation "com.google.android.material:material:$materialVersion"
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    implementation "androidx.recyclerview:recyclerview-selection:1.1.0"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     implementation "androidx.legacy:legacy-support-$legacySupportVersion"
@@ -383,7 +384,7 @@ dependencies {
     jacocoAnt 'org.jacoco:org.jacoco.ant:0.8.8:nodeps'
 
     //GMS
-    gmsImplementation 'com.android.billingclient:billing:3.0.2'
+    gmsImplementation 'com.android.billingclient:billing:5.0.0'
     gmsImplementation 'com.google.android.gms:play-services-location:19.0.1'
     gmsImplementation 'com.google.android.gms:play-services-maps:18.0.2'
     gmsImplementation 'com.google.maps.android:android-maps-utils:0.5'
@@ -427,7 +428,8 @@ dependencies {
     implementation "com.google.accompanist:accompanist-flowlayout:$accompanistLayoutVersion"
 
     // Coil Compose
-    implementation "io.coil-kt:coil-compose:$coilComposeVersion"
+    implementation "io.coil-kt:coil-compose:$coilVersion"
+    implementation "io.coil-kt:coil:$coilVersion"
 
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"
@@ -440,6 +442,7 @@ dependencies {
     testImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
+    testImplementation "org.mockito:mockito-inline:3.11.2"
     testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
     testImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion") {

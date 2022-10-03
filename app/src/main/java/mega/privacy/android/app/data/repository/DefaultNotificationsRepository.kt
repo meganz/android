@@ -1,17 +1,19 @@
 package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.data.mapper.ContactRequestMapper
+import mega.privacy.android.app.data.mapper.EventMapper
 import mega.privacy.android.app.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.Event
 import mega.privacy.android.domain.repository.NotificationsRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaUser
@@ -26,15 +28,11 @@ import kotlin.coroutines.suspendCoroutine
  */
 class DefaultNotificationsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
-    private val contactRequestMapper: ContactRequestMapper,
     private val userAlertsMapper: UserAlertMapper,
+    private val eventMapper: EventMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : NotificationsRepository {
-
-    override fun monitorContactRequestUpdates() = megaApiGateway.globalUpdates
-        .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
-        .mapNotNull { it.requests?.map(contactRequestMapper) }
 
     override fun monitorUserAlerts() = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
@@ -48,6 +46,12 @@ class DefaultNotificationsRepository @Inject constructor(
             }
         }
 
+    override fun monitorEvent(): Flow<Event> = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnEvent>()
+        .mapNotNull { (event) ->
+            event?.let { eventMapper(it) }
+        }
+
     override suspend fun getUserAlerts() = withContext(dispatcher) {
         megaApiGateway.getUserAlerts().map {
             userAlertsMapper(it, ::provideContact, megaApiGateway::getMegaNodeByHandle)
@@ -56,7 +60,6 @@ class DefaultNotificationsRepository @Inject constructor(
 
     private suspend fun provideEmail(userId: Long): String? =
         getEmailLocally(userId) ?: fetchAndCacheEmail(userId)
-
 
     private suspend fun fetchAndCacheEmail(userId: Long): String? =
         suspendCoroutine<String?> { continuation ->

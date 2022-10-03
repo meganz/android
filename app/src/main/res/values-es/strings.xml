@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">La suscripción ha sido cancelada</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">La suscripción no se ha cancelado correctamente. Ponte en contacto con support&#64;mega.nz para obtener ayuda</string>
+    <string name="cancel_subscription_error">La suscripción no se ha cancelado correctamente. Ponte en contacto con support&#64;mega.nz para obtener ayuda.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Cerrar el resto de sesiones</string>
     <!-- Message after kill all opened sessions -->
@@ -212,8 +212,6 @@
     <string name="section_recents">Recientes</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Media Uploads</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">Buzón de entrada</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Sin conexión</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -325,7 +323,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Ver transferencias</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">La mayoría de los dispositivos no pueden descargar archivos de más de 4&#160;GB. Es probable que la descarga falle</string>
+    <string name="error_file_size_greater_than_4gb">La mayoría de los dispositivos no pueden descargar archivos de más de 4&#160;GB. Es probable que la descarga falle.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">No dispones de una aplicación en tu dispositivo para reproducir este archivo</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -992,7 +990,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Silenciar las notificaciones del chat durante</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Silenciar notificaciones</string>
+    <string name="title_dialog_mute_chatroom_notifications">Silenciar notificaciones del chat</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Activado</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1419,7 +1417,7 @@
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Eliminar cuenta</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
-    <string name="delete_account_text">Si eliminas tu cuenta, no podrás volver a acceder a tus datos, a tus contactos o conversaciones en MEGA.\nEstá acción no se podrá deshacer.</string>
+    <string name="delete_account_text">Si eliminas tu cuenta, no podrás volver a acceder a tus datos, a tus contactos o a tus conversaciones en MEGA.\nEstá acción no se podrá deshacer.</string>
     <!-- menu item -->
     <string name="delete_button">Eliminar</string>
     <!--  -->
@@ -1694,8 +1692,6 @@
     <string name="context_share">Compartir usando</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]Papelera [/A][B]vacía[/B]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[B]No hay archivos en la [/B][A]bandeja de entrada[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]No hay archivos en tu [/B][A]Nube[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1754,10 +1750,6 @@
     <string name="contacts_mega">En MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Contactos del teléfono</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">Tu cuenta ha sido suspendida debido a múltiples infracciones de los Términos de servicio de MEGA. Por favor revisa la bandeja de entrada de tu correo electrónico.</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Hemos cerrado tu cuenta debido a un incumplimiento de los Términos de servicio de MEGA, incluyendo entre otras la cláusula 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Cargando archivos</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2404,7 +2396,7 @@
     <!-- Option of monthly billing period. Placeholder: purchase price -->
     <string name="billed_monthly_text">[A]Facturado mensualmente[/A] %s/mes</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Facturado anualmente[/A]%s/año</string>
+    <string name="billed_yearly_text">[A]Facturado anualmente[/A] %s/año</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Cancelar</string>
     <!-- dialog option continue in alert dialog -->
@@ -2743,8 +2735,6 @@
     <string name="text_join_another_call">Para unirte a esta llamada, tienes que finalizar o dejar en espera la llamada en curso.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Las personas pueden unirse a tu grupo usando este enlace.</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">Nuevo enlace de chat</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Escribe el nombre del grupo</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -2807,9 +2797,9 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d imagen&#160;</item>
+        <item quantity="one">%1$d&#160;imagen&#160;</item>
         <item quantity="many">%1$d de imágenes&#160;</item>
-        <item quantity="other">%1$d imágenes&#160;</item>
+        <item quantity="other">%1$d&#160;imágenes&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">[A]creado por [/A]%s</string>
@@ -3663,26 +3653,12 @@
     <string name="settings_mobile_data_resoluton_title">Usa los datos móviles para la vista previa de imágenes de alta resolución</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Permite el uso de datos móviles para cargar imágenes de alta resolución al obtener una vista previa. Si está opción está desactivada, la imagen original solo se cargará cuando hagas zoom.</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">Vas a cambiar la ubicación de tu carpeta de backup. Esto puede afectar tu capacidad para encontrar esa carpeta en el futuro. Recuerda la nueva ubicación para que puedas encontrarla en el futuro.</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Al mover esta carpeta se cambiará el destino de una o más copias de seguridad. Se desactivará esta función para evitar consecuencias no deseadas. Puedes volver a activar las copias de seguridad a través de la aplicación de escritorio de MEGA. ¿Quieres continuar?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Vas a eliminar tu carpeta de copias de seguridad. Se borrarán todas las copias de seguridad que hayas configurado. ¿Seguro que quieres hacer esto?</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">¿Estás seguro de que quieres eliminar tu carpeta de backup y desactivar la copia de seguridad asociada?</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">Mover “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Mover “%1s” a la Papelera</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">Mover las carpetas de backup</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">Mover las carpetas de backup a la Papelera</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Desactivar copia de seguridad</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">Mover copia de seguridad</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">Escribe “%1s” para confirmar esta acción</string>
     <!-- when checking the input -->
@@ -3703,12 +3679,6 @@
     <string name="backup_multi_share_permission_text">Estas carpetas se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de carpetas de backup, cualquier cambio en su contenido podría desactivar las copia de seguridad.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Algunas carpetas compartidas son carpetas de respaldo y de solo lectura. ¿Quieres continuar?</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="one">%d dispositivo</item>
-        <item quantity="many">%d dispositivos</item>
-        <item quantity="other">%d dispositivos</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Contestar llamada</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3985,8 +3955,6 @@
     <string name="settings_help_report_issue_discard_button">Descartar</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">Modificar mensaje</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">Galería</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">Llamada</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -3995,8 +3963,6 @@
     <string name="chat_room_toolbar_voice_clip_option">Mensaje de audio</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Invita a tus amigos al [/B][A]Chat[/A][B] y disfruta de nuestra plataforma cifrada de manera privada y segura[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filtro</string>
     <!-- Filter option to show all photos -->
@@ -4050,7 +4016,7 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">[A]%1$s[/A] de almacenamiento</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] de cuota de transferencia</string>
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] de transferencia</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">Almacenamiento</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
@@ -4131,4 +4097,14 @@
     <string name="permissions_notifications_title">Activar notificaciones</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA te enviará notificaciones de llamadas, chats y transferencias de archivos.</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">Copias de seguridad</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[B]No hay [/B][A]copias de seguridad[/A]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">Aquí es donde se almacenan las copias de seguridad de tus archivos y carpetas. Estas copias de seguridad son de “solo lectura” para protegerlas de modificaciones accidentales en tu nube.\nPuedes crear copias de seguridad en MEGA desde tu ordenador usando nuestra aplicación de escritorio.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Cuenta suspendida por violar los derechos de autor. Te hemos enviado un correo electrónico con más información al respecto.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Cuenta cerrada por incumplir los Términos de servicio de MEGA, como el abuso de los derechos de otros, el intercambio e importación de datos ilegales o el abuso del sistema.</string>
 </resources>

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -43,10 +44,20 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
-        if (arguments?.getSerializable(EXTRA_PARTICIPANT) != null) {
-            participantItem = arguments?.getSerializable(EXTRA_PARTICIPANT) as Participant
+        // android.os.Bundle.getSerializable(String key, Class<T> clazz) can only be used for devices
+        // running Android 13 and above. For devices running a lower Android version we have to use
+        // the old getSerializable(String key) method.
+        val serializableParticipant = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable(EXTRA_PARTICIPANT, Participant::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getSerializable(EXTRA_PARTICIPANT)
+        }
+
+        if (serializableParticipant != null) {
+            participantItem = serializableParticipant as Participant
             isMe = participantItem.isMe
             isContact = participantItem.isContact
         }
@@ -156,7 +167,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
                 )
             )
             setPositiveButton(R.string.general_remove) { _, _ ->
-               removeParticipant(chatId)
+                removeParticipant(chatId)
             }
             setNegativeButton(R.string.general_cancel, null)
             show()
@@ -204,7 +215,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
             isGuest: Boolean,
             isModerator: Boolean,
             isSpeakerMode: Boolean,
-            participant: Participant
+            participant: Participant,
         ): MeetingParticipantBottomSheetDialogFragment {
             val args = Bundle()
 

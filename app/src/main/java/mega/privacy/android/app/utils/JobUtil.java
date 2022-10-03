@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.CancelCameraUploadWorker;
 import mega.privacy.android.app.jobservices.StartCameraUploadWorker;
@@ -27,8 +28,8 @@ import timber.log.Timber;
 
 public class JobUtil {
 
-    // when app is inactive, send heartbeat every 30 minutes
-    private static final long INACTIVE_HEARTBEAT_INTERVAL = 30;
+    // when CU has nothing to upload, send up to date heartbeat every 30 minutes
+    private static final long UP_TO_DATE_HEARTBEAT_INTERVAL = 30;
 
     private static final long HEARTBEAT_FLEX_INTERVAL = 20; // 20 minutes
 
@@ -66,7 +67,7 @@ public class JobUtil {
      * @return The result of schedule job
      */
     public static synchronized int scheduleCameraUploadJob(Context context) {
-        if (isCameraUploadDisabled(context)) {
+        if (isCameraUploadDisabled()) {
             Timber.d("Scheduling CameraUpload failed as CameraUpload not enabled");
             return START_JOB_FAILED_NOT_ENABLED;
         }
@@ -96,7 +97,7 @@ public class JobUtil {
         Timber.d("JobUtil: scheduleCameraUploadSyncActiveHeartbeat()");
         // periodic work that runs during the last 10 minutes of every half an hour period
         PeriodicWorkRequest cuSyncActiveHeartbeatWorkRequest =
-                new PeriodicWorkRequest.Builder(SyncHeartbeatCameraUploadWorker.class, INACTIVE_HEARTBEAT_INTERVAL, TimeUnit.MINUTES, HEARTBEAT_FLEX_INTERVAL, TimeUnit.MINUTES)
+                new PeriodicWorkRequest.Builder(SyncHeartbeatCameraUploadWorker.class, UP_TO_DATE_HEARTBEAT_INTERVAL, TimeUnit.MINUTES, HEARTBEAT_FLEX_INTERVAL, TimeUnit.MINUTES)
                         .addTag(HEART_BEAT_TAG)
                         .build();
 
@@ -128,7 +129,7 @@ public class JobUtil {
      * @return The result of the job
      */
     public static synchronized int fireCameraUploadJob(Context context, boolean shouldIgnoreAttributes) {
-        if (isCameraUploadDisabled(context)) {
+        if (isCameraUploadDisabled()) {
             Timber.d("Firing CameraUpload request failed as CameraUpload not enabled");
             return START_JOB_FAILED_NOT_ENABLED;
         }
@@ -152,7 +153,7 @@ public class JobUtil {
      * @param context From which the action is done.
      */
     public static synchronized void fireStopCameraUploadJob(Context context) {
-        if (isCameraUploadDisabled(context)) {
+        if (isCameraUploadDisabled()) {
             Timber.d("Firing StopCameraUpload request failed as CameraUpload not enabled");
             return;
         }
@@ -208,8 +209,8 @@ public class JobUtil {
         }
     }
 
-    private static boolean isCameraUploadDisabled(Context context) {
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+    private static boolean isCameraUploadDisabled() {
+        DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
         MegaPreferences prefs = dbH.getPreferences();
         if (prefs == null) {
             Timber.d("MegaPreferences not defined, so not enabled");

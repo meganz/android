@@ -1,9 +1,6 @@
 package mega.privacy.android.app.main;
 
-import static mega.privacy.android.app.utils.CallUtil.hintShown;
 import static mega.privacy.android.app.utils.CallUtil.isNecessaryDisableLocalCamera;
-import static mega.privacy.android.app.utils.CallUtil.shouldShowMeetingHint;
-import static mega.privacy.android.app.utils.CallUtil.showConfirmationInACall;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationOpenCamera;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH;
@@ -13,7 +10,6 @@ import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
 import static mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_IS_FROM_MEETING;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
-import static mega.privacy.android.app.utils.Constants.KEY_HINT_IS_SHOWING;
 import static mega.privacy.android.app.utils.Constants.MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_CONTACT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE;
@@ -118,10 +114,7 @@ import mega.privacy.android.app.main.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
-import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.HighLightHintHelper;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatRoom;
@@ -225,7 +218,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private MenuItem sendInvitationMenuItem;
     private MenuItem scanQrMenuItem;
-    private MenuItem inviteContactMenuItem;
 
     private boolean comesFromChat;
 
@@ -261,14 +253,9 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     private RelativeLayout typeContactLayout;
     private EditText typeContactEditText;
     private RelativeLayout scanQRButton;
-    private RelativeLayout inviteContactButton;
-    private RelativeLayout newGroupChatButton;
-    private RelativeLayout newChatLinkButton;
-    private RelativeLayout newMeetingButton;
     private boolean isConfirmAddShown = false;
     private String confirmAddMail;
     private boolean createNewGroup = false;
-    private boolean createNewChatLink = false;
     private String title = "";
 
     private boolean queryPermissions = true;
@@ -289,11 +276,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private boolean onlyCreateGroup;
     private boolean waitingForPhoneContacts;
-
-    private static final String SP_KEY_IS_HINT_SHOWN_START_CONVERSATION = "is_hint_shown_start_conversation";
-    private boolean isHintShowing;
-
-    private HighLightHintHelper highLightHintHelper;
 
     private final Observer<Boolean> fabChangeObserver = isShow -> {
         if (isShow) {
@@ -1209,7 +1191,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private void setSendInvitationVisibility() {
         if (fabButton != null) {
-            if (contactType == CONTACT_TYPE_MEGA && !onNewGroup && (createNewGroup || createNewChatLink
+            if (contactType == CONTACT_TYPE_MEGA && !onNewGroup && (createNewGroup
                     || (comesFromChat && adapterMEGAContacts != null && adapterMEGAContacts.getItemCount() > 0))) {
                 fabButton.show();
             } else if (contactType == CONTACT_TYPE_DEVICE && adapterContacts != null && adapterContacts.getItemCount() > 0) {
@@ -1314,14 +1296,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             scanQrMenuItem.setVisible(false);
         }
 
-        inviteContactMenuItem = menu.findItem(R.id.action_invite_contact);
-        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
-                && contactType == CONTACT_TYPE_MEGA && !createNewGroup && !comesFromChat && !onNewGroup) {
-            inviteContactMenuItem.setVisible(true);
-        } else {
-            inviteContactMenuItem.setVisible(false);
-        }
-
         sendInvitationMenuItem = menu.findItem(R.id.action_send_invitation);
         setSendInvitationVisibility();
 
@@ -1395,10 +1369,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 hideKeyboard(addContactActivity, 0);
                 break;
             }
-            case R.id.action_invite_contact: {
-                toInviteContact();
-                break;
-            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -1456,11 +1426,9 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         outState.putString("confirmAddMail", confirmAddMail);
         outState.putBoolean("createNewGroup", createNewGroup);
         outState.putBoolean("queryPermissions", queryPermissions);
-        outState.putBoolean("createNewChatLink", createNewChatLink);
         outState.putBoolean("isEKREnabled", isEKREnabled);
         outState.putBoolean("newGroup", newGroup);
         outState.putBoolean("onlyCreateGroup", onlyCreateGroup);
-        outState.putBoolean(KEY_HINT_IS_SHOWING, isHintShowing);
 
         saveContactsAdded(outState);
     }
@@ -1543,10 +1511,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         super.onDestroy();
         if (megaApi != null) {
             megaApi.removeGlobalListener(this);
-        }
-
-        if (highLightHintHelper != null) {
-            highLightHintHelper.dismissPopupWindow();
         }
     }
 
@@ -1656,18 +1620,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         scanQRButton = (RelativeLayout) findViewById(R.id.layout_scan_qr);
         scanQRButton.setOnClickListener(this);
         scanQRButton.setVisibility(View.GONE);
-        inviteContactButton = (RelativeLayout) findViewById(R.id.layout_invite_contact);
-        inviteContactButton.setOnClickListener(this);
-        inviteContactButton.setVisibility(View.GONE);
-        newGroupChatButton = (RelativeLayout) findViewById(R.id.layout_group_chat);
-        newGroupChatButton.setOnClickListener(this);
-        newGroupChatButton.setVisibility(View.GONE);
-        newChatLinkButton = (RelativeLayout) findViewById(R.id.layout_chat_link);
-        newChatLinkButton.setOnClickListener(this);
-        newChatLinkButton.setVisibility(View.GONE);
-        newMeetingButton = (RelativeLayout) findViewById(R.id.layout_meeting_link);
-        newMeetingButton.setOnClickListener(this);
-        newMeetingButton.setVisibility(View.GONE);
         addContactsLayout = (LinearLayout) findViewById(R.id.add_contacts_container);
         addedContactsRecyclerView = (RecyclerView) findViewById(R.id.contact_adds_recycler_view);
         containerAddedContactsRecyclerView = (RelativeLayout) findViewById(R.id.contacts_adds_container);
@@ -1696,14 +1648,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         fastScroller.setRecyclerView(recyclerViewList);
 
         if (contactType == CONTACT_TYPE_MEGA) {
-            if (!comesFromChat && !newGroup) {
-                if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                    inviteContactButton.setVisibility(View.VISIBLE);
-                }
-                newGroupChatButton.setVisibility(View.VISIBLE);
-                newChatLinkButton.setVisibility(View.VISIBLE);
-                newMeetingButton.setVisibility(View.VISIBLE);
-            }
             recyclerViewList.setLayoutManager(linearLayoutManager);
             showHeader(true);
             textHeader.setText(getString(R.string.section_contacts));
@@ -1789,21 +1733,15 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             confirmAddMail = savedInstanceState.getString("confirmAddMail");
             createNewGroup = savedInstanceState.getBoolean("createNewGroup", false);
             queryPermissions = savedInstanceState.getBoolean("queryPermissions", true);
-            createNewChatLink = savedInstanceState.getBoolean("createNewChatLink", false);
             isEKREnabled = savedInstanceState.getBoolean("isEKREnabled", false);
             ekrSwitch.setChecked(isEKREnabled);
             onlyCreateGroup = savedInstanceState.getBoolean("onlyCreateGroup", false);
-            isHintShowing = savedInstanceState.getBoolean(KEY_HINT_IS_SHOWING, false);
 
             if (contactType == CONTACT_TYPE_MEGA || contactType == CONTACT_TYPE_BOTH) {
                 savedaddedContacts = savedInstanceState.getStringArrayList("savedaddedContacts");
 
                 if (createNewGroup) {
                     setTitleAB();
-                    inviteContactButton.setVisibility(View.GONE);
-                    newGroupChatButton.setVisibility(View.GONE);
-                    newChatLinkButton.setVisibility(View.GONE);
-                    newMeetingButton.setVisibility(View.GONE);
                 }
 
                 if (savedaddedContacts == null && (contactType == CONTACT_TYPE_MEGA || contactType == CONTACT_TYPE_BOTH)) {
@@ -1868,10 +1806,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         if (onlyCreateGroup) {
             createNewGroup = true;
             setTitleAB();
-            inviteContactButton.setVisibility(View.GONE);
-            newGroupChatButton.setVisibility(View.GONE);
-            newChatLinkButton.setVisibility(View.GONE);
-            newMeetingButton.setVisibility(View.GONE);
         }
 
         setGetChatLinkVisibility();
@@ -1880,25 +1814,9 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             if (isAsyncTaskRunning(getContactsTask)) {
                 getContactsTask.cancel(true);
             }
-            createNewChatLink = true;
+
             newGroup();
         }
-
-        highLightHintHelper = new HighLightHintHelper(this);
-
-        // Workaround: wait for R.id.new_meeting_tv initialized.
-        new Handler().postDelayed(() -> {
-            if ((shouldShowMeetingHint(getApplicationContext(), SP_KEY_IS_HINT_SHOWN_START_CONVERSATION) && newMeetingButton.getVisibility() == View.VISIBLE) || isHintShowing) {
-                highLightHintHelper.showHintForMeetingText(R.id.new_meeting_tv, () -> {
-                    hintShown(getApplicationContext(), SP_KEY_IS_HINT_SHOWN_START_CONVERSATION);
-                    highLightHintHelper.dismissPopupWindow();
-                    isHintShowing = false;
-                    return null;
-                });
-
-                isHintShowing = true;
-            }
-        }, 300);
     }
 
     private void setEmptyStateVisibility(boolean visible) {
@@ -1968,9 +1886,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     } else {
                         aB.setSubtitle(null);
                     }
-                } else if (!createNewGroup && !createNewChatLink) {
-                    aB.setTitle(getString(R.string.group_chat_start_conversation_label));
-                } else if ((createNewGroup || createNewChatLink) && !onNewGroup) {
+                } else if (createNewGroup && !onNewGroup) {
                     aB.setTitle(getString(R.string.title_new_group));
                     if (addedContactsMEGA.size() > 0) {
                         aB.setSubtitle(getResources().getString(R.string.selected_items, addedContactsMEGA.size()));
@@ -2715,7 +2631,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         Timber.d("itemClick");
 
         if (contactType == CONTACT_TYPE_MEGA) {
-            if (createNewGroup || createNewChatLink || comesFromChat) {
+            if (createNewGroup || comesFromChat) {
                 if (adapter == MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT) {
                     if (searchExpand) {
                         if (searchAutoComplete != null) {
@@ -2929,18 +2845,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
     }
 
-    private void toStartMeeting() {
-        if (CallUtil.participatingInACall()) {
-            showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
-        } else {
-            Intent intent = new Intent();
-            intent.putExtra(EXTRA_MEETING, true);
-            setResult(RESULT_OK, intent);
-            hideKeyboard(addContactActivity, 0);
-            finish();
-        }
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -2954,29 +2858,14 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 break;
             }
             case R.id.add_contact_list_empty_invite_button:
-            case R.id.layout_invite_contact: {
                 toInviteContact();
                 break;
-            }
-            case R.id.layout_group_chat: {
-                Timber.d("New group chat pressed");
-                createNewGroup = true;
-                setNextLayout();
-                break;
-            }
+
             case R.id.ekr_switch: {
                 isEKREnabled = ekrSwitch.isChecked();
                 setGetChatLinkVisibility();
                 break;
             }
-            case R.id.layout_chat_link: {
-                createNewChatLink = true;
-                newGroup();
-                break;
-            }
-            case R.id.layout_meeting_link:
-                toStartMeeting();
-                break;
             case R.id.fab_button_next: {
                 if (contactType == CONTACT_TYPE_DEVICE) {
                     inviteContacts(addedContactsPhone);
@@ -2993,20 +2882,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 hideKeyboard(this, 0);
                 break;
             }
-        }
-    }
-
-    private void setNextLayout() {
-        inviteContactMenuItem.setVisible(false);
-        if (visibleContactsMEGA != null && !visibleContactsMEGA.isEmpty()) {
-            setSendInvitationVisibility();
-            setTitleAB();
-            inviteContactButton.setVisibility(View.GONE);
-            newGroupChatButton.setVisibility(View.GONE);
-            newChatLinkButton.setVisibility(View.GONE);
-            newMeetingButton.setVisibility(View.GONE);
-        } else {
-            setResultContacts(addedContactsMEGA, true);
         }
     }
 
@@ -3062,8 +2937,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             }
         } else if (createNewGroup && (newGroup || onlyCreateGroup)) {
             finish();
-        } else if ((createNewGroup || createNewChatLink) && (!newGroup || !onlyCreateGroup)) {
-            returnToStartConversation();
         } else {
             super.onBackPressed();
         }
@@ -3113,34 +2986,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         finish();
     }
 
-    private void returnToStartConversation() {
-        createNewGroup = false;
-        createNewChatLink = false;
-        aB.setTitle(getString(R.string.group_chat_start_conversation_label));
-        aB.setSubtitle(null);
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            inviteContactButton.setVisibility(View.VISIBLE);
-        } else {
-            inviteContactMenuItem.setVisible(true);
-        }
-        newGroupChatButton.setVisibility(View.VISIBLE);
-        newChatLinkButton.setVisibility(View.VISIBLE);
-        newMeetingButton.setVisibility(View.VISIBLE);
-        filteredContactMEGA.clear();
-        filteredContactMEGA.addAll(visibleContactsMEGA);
-
-        for (int i = 0; i < filteredContactMEGA.size(); i++) {
-            filteredContactMEGA.get(i).setSelected(false);
-        }
-
-        setMegaAdapterContacts(filteredContactMEGA, MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
-        addedContactsMEGA.clear();
-        setRecyclersVisibility();
-        setSendInvitationVisibility();
-        setSearchVisibility();
-        containerAddedContactsRecyclerView.setVisibility(View.GONE);
-    }
-
     private void returnToAddContacts() {
         onNewGroup = false;
         setTitleAB();
@@ -3151,13 +2996,10 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
         setMegaAdapterContacts(filteredContactMEGA, MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
         newGroupLayout.setVisibility(View.GONE);
-        if (createNewChatLink) {
-            findViewById(R.id.ekr_layout).setVisibility(View.VISIBLE);
-        }
         visibilityFastScroller();
         setSendInvitationVisibility();
         setSearchVisibility();
-        if (createNewChatLink || visibleContactsMEGA == null || visibleContactsMEGA.isEmpty()) {
+        if (visibleContactsMEGA == null || visibleContactsMEGA.isEmpty()) {
             onBackPressed();
         }
     }
@@ -3188,11 +3030,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         onNewGroup = true;
         searchExpand = false;
         if (aB != null) {
-            if (createNewChatLink) {
-                aB.setTitle(getString(R.string.new_chat_link_label));
-            } else {
-                aB.setTitle(getString(R.string.title_new_group));
-            }
+            aB.setTitle(getString(R.string.title_new_group));
             aB.setSubtitle(getString(R.string.subtitle_new_group));
         }
 
@@ -3204,15 +3042,10 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         if (searchMenuItem != null) {
             searchMenuItem.setVisible(false);
         }
-        if (inviteContactMenuItem != null) {
-            inviteContactMenuItem.setVisible(false);
-        }
+
         addContactsLayout.setVisibility(View.GONE);
         newGroupLayout.setVisibility(View.VISIBLE);
-        if (createNewChatLink) {
-            findViewById(R.id.ekr_layout).setVisibility(View.GONE);
-            newMeetingButton.setVisibility(View.GONE);
-        }
+
         setSendInvitationVisibility();
         setMegaAdapterContacts(addedContactsMEGA, MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_GROUP_CHAT);
         visibilityFastScroller();
@@ -3234,7 +3067,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
         intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
 
-        if ((getChatLinkBox.isChecked() || createNewChatLink) && (chatTitle == null || chatTitle.trim().isEmpty())) {
+        if (getChatLinkBox.isChecked() && (chatTitle == null || chatTitle.trim().isEmpty())) {
             new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                     .setTitle(getString(R.string.enter_group_name))
                     .setMessage(getString(R.string.alert_enter_group_name))
@@ -3247,10 +3080,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             intent.putExtra(EXTRA_CHAT_TITLE, chatTitle);
         }
 
-        if (createNewChatLink) {
-            intent.putExtra(EXTRA_GROUP_CHAT, onNewGroup);
-            intent.putExtra(EXTRA_CHAT_LINK, true);
-        } else if (onNewGroup) {
+        if (onNewGroup) {
             intent.putExtra(EXTRA_EKR, isEKREnabled);
             intent.putExtra(EXTRA_GROUP_CHAT, onNewGroup);
             intent.putExtra(EXTRA_CHAT_LINK, getChatLinkBox.isChecked());

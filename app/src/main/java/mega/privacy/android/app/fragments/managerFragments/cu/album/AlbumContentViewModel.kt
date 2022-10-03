@@ -13,7 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
@@ -68,8 +68,6 @@ class AlbumContentViewModel @Inject constructor(
     private val _refreshCards = MutableLiveData(false)
     val refreshCards: LiveData<Boolean> = _refreshCards
 
-    private var cancelToken: FavouriteAlbumRepository.CancelCallback? = null
-
     /**
      * Custom condition in sub class for filter the real photos count
      */
@@ -104,9 +102,7 @@ class AlbumContentViewModel @Inject constructor(
     var items: LiveData<List<GalleryItem>> = liveDataRoot.switchMap {
         liveData(viewModelScope.coroutineContext) {
             if (forceUpdate) {
-                cancelToken = initNewSearch()
                 repository.getFiles(
-                    cancelToken ?: return@liveData,
                     getCameraSortOrder(),
                     mZoom
                 )
@@ -321,14 +317,5 @@ class AlbumContentViewModel @Inject constructor(
                 return it.size
             }
         return 0
-    }
-
-    fun initNewSearch(): FavouriteAlbumRepository.CancelCallback {
-        cancelSearch()
-        return repository.createCancelCallback()
-    }
-
-    fun cancelSearch() {
-        cancelToken?.cancel()
     }
 }

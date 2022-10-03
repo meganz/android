@@ -65,7 +65,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
-import mega.privacy.android.app.di.ApplicationScope;
+import mega.privacy.android.domain.qualifier.ApplicationScope;
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
 import mega.privacy.android.app.main.FileLinkActivity;
@@ -99,6 +100,8 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
     QuerySignupLinkUseCase querySignupLinkUseCase;
     @Inject
     DatabaseHandler dbH;
+    @Inject
+    MegaChatRequestHandler chatRequestHandler;
 
     private String urlConfirmationLink = null;
 
@@ -499,7 +502,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
     }
 
     private void goToMeetingActivity(long chatId, String meetingName) {
-        CallUtil.openMeetingGuestMode(this, meetingName, chatId, url, passcodeManagement);
+        CallUtil.openMeetingGuestMode(this, meetingName, chatId, url, passcodeManagement, chatRequestHandler);
         finish();
     }
 

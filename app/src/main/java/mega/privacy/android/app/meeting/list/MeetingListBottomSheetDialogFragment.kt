@@ -19,9 +19,9 @@ import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.setImageRequestFromUri
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
  * Meeting list bottom sheet dialog fragment that displays meeting options
@@ -41,7 +41,10 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private lateinit var binding: BottomSheetMeetingDetailBinding
-    private val chatId by extraNotNull<Long>(CHAT_ID)
+    private val chatId by lazy {
+        arguments?.getLong(CHAT_ID,
+            MEGACHAT_INVALID_HANDLE) ?: MEGACHAT_INVALID_HANDLE
+    }
     private val viewModel by viewModels<MeetingListViewModel>({ requireParentFragment() })
 
     override fun onCreateView(
@@ -143,7 +146,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 .show()
         }
         binding.btnClearHistory.isVisible = meeting.hasPermissions
-        binding.dividerClear.isVisible = meeting.hasPermissions
+        binding.dividerClear.isVisible = binding.btnClearHistory.isVisible
 
         binding.btnArchive.setOnClickListener {
             viewModel.archiveChat(chatId)

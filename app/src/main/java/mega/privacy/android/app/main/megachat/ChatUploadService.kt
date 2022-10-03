@@ -45,7 +45,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
 import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
-import mega.privacy.android.app.di.ApplicationScope
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
@@ -254,7 +254,12 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
     private fun stopForeground() {
         isForeground = false
-        stopForeground(true)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
         mNotificationManager?.cancel(Constants.NOTIFICATION_CHAT_UPLOAD)
         stopSelf()
     }
@@ -353,14 +358,24 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
         if (intent.hasExtra(EXTRA_NAME_EDITED)) {
             @Suppress("UNCHECKED_CAST")
-            fileNames = intent.getSerializableExtra(EXTRA_NAME_EDITED) as HashMap<String, String>?
+            fileNames = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getSerializableExtra(EXTRA_NAME_EDITED, HashMap::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getSerializableExtra(EXTRA_NAME_EDITED)
+            } as HashMap<String, String>?
         }
 
         if (intent.getBooleanExtra(EXTRA_COMES_FROM_FILE_EXPLORER, false)) {
             fileExplorerUpload = true
             @Suppress("UNCHECKED_CAST")
-            val fileFingerprints =
-                intent.getSerializableExtra(EXTRA_UPLOAD_FILES_FINGERPRINTS) as HashMap<String, String>?
+            val fileFingerprints = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getSerializableExtra(EXTRA_UPLOAD_FILES_FINGERPRINTS, HashMap::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getSerializableExtra(EXTRA_UPLOAD_FILES_FINGERPRINTS)
+            } as HashMap<String, String>?
+
             val idPendMsgs = intent.getLongArrayExtra(EXTRA_PEND_MSG_IDS)
             val attachFiles = intent.getLongArrayExtra(EXTRA_ATTACH_FILES)
             val idChats = intent.getLongArrayExtra(EXTRA_ATTACH_CHAT_IDS)

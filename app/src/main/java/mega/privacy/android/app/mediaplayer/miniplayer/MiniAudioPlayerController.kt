@@ -135,11 +135,6 @@ class MiniAudioPlayerController constructor(
         if (sharingScope == null) {
             sharingScope = owner.lifecycleScope
         }
-        metadataChangedJob?.run {
-            if (isCancelled) {
-                start()
-            }
-        }
         setupPlayerView()
         playerView.onResume()
     }
@@ -148,11 +143,6 @@ class MiniAudioPlayerController constructor(
      * The onPause function is called when Lifecycle event ON_PAUSE
      */
     fun onPause() {
-        metadataChangedJob?.run {
-            if (isActive) {
-                cancel()
-            }
-        }
         playerView.onPause()
     }
 
@@ -161,6 +151,7 @@ class MiniAudioPlayerController constructor(
      */
     fun onDestroy() {
         audioPlayerPlaying.removeObserver(audioPlayerPlayingObserver)
+        metadataChangedJob?.cancel()
         onAudioPlayerServiceStopped()
     }
 

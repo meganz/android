@@ -5,11 +5,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
-import mega.privacy.android.app.data.facade.MegaChatApiFacade.Companion.CHAT_INVALID_HANDLE
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.mapper.ChatRequestMapper
-import mega.privacy.android.app.di.IoDispatcher
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.app.fcm.NewTokenWorker.Companion.NEW_TOKEN
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface

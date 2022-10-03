@@ -5,20 +5,23 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.sample
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
-import mega.privacy.android.domain.entity.TransfersSizeInfo
 import mega.privacy.android.domain.entity.TransfersInfo
+import mega.privacy.android.domain.entity.TransfersSizeInfo
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.GetNumPendingUploads
-import mega.privacy.android.domain.usecase.GetSizeTransferInfo
 import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
+import mega.privacy.android.domain.usecase.MonitorTransfersSize
 import javax.inject.Inject
 
 /**
@@ -38,20 +41,24 @@ class TransfersManagementViewModel @Inject constructor(
     private val getNumPendingTransfers: GetNumPendingTransfers,
     private val isCompletedTransfersEmpty: IsCompletedTransfersEmpty,
     private val areAllTransfersPaused: AreAllTransfersPaused,
-    getSizeTransferInfo: GetSizeTransferInfo,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    monitorTransfersSize: MonitorTransfersSize,
 ) : ViewModel() {
 
     private val transfersInfo: MutableLiveData<TransfersInfo> = MutableLiveData()
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
     private val areTransfersPaused = SingleLiveEvent<Boolean>()
-    private val transfersSizeInfoState = getSizeTransferInfo()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), TransfersSizeInfo())
+    private val transfersSizeInfoState = MutableStateFlow(TransfersSizeInfo())
 
     init {
         viewModelScope.launch {
-            transfersSizeInfoState
+            monitorTransfersSize()
+                .flowOn(ioDispatcher)
                 .sample(500L)
-                .collect(::getPendingDownloadAndUpload)
+                .collect { transfersInfo ->
+                    transfersSizeInfoState.value = transfersInfo
+                    getPendingDownloadAndUpload(transfersInfo)
+                }
         }
     }
 
@@ -73,7 +80,7 @@ class TransfersManagementViewModel @Inject constructor(
     /**
      * Checks transfers info.
      */
-    fun checkTransfersInfo(transferType: Int) {
+    fun checkTransfersInfo(transferType: TransferType) {
         getPendingDownloadAndUpload(transfersSizeInfoState.value.copy(transferType = transferType))
     }
 

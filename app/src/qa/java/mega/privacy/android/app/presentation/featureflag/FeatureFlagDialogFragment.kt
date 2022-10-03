@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.featureflag
 import android.app.Dialog
 import android.os.Bundle
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
@@ -36,7 +36,7 @@ class FeatureFlagDialogFragment : DialogFragment() {
             ComposeView(requireContext()).apply {
                 setContent {
                     val mode by getThemeMode()
-                        .collectAsState(initial = ThemeMode.System)
+                        .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                     AndroidTheme(isDark = mode.isDarkMode()) {
                         FeatureFlagBody()
                     }
@@ -50,7 +50,7 @@ class FeatureFlagDialogFragment : DialogFragment() {
      */
     @Composable
     fun FeatureFlagBody() {
-        val uiState by featureFlagMenuViewModel.state.collectAsState()
+        val uiState by featureFlagMenuViewModel.state.collectAsStateWithLifecycle()
         FeatureFlagListContainer(
             uiState = uiState,
             onCheckedChange = featureFlagMenuViewModel::setFeatureEnabled

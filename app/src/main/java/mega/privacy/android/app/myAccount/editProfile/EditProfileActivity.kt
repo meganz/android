@@ -4,8 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
@@ -16,6 +14,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import coil.load
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -37,22 +39,18 @@ import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.CHECKING_2FA
+import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
 import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError
-import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
-import mega.privacy.android.app.utils.AvatarUtil.getDominantColor
-import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
-import mega.privacy.android.app.utils.Constants.EVENT_AVATAR_CHANGE
 import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_LAND
 import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_PORT
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
 import mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
@@ -70,7 +68,7 @@ import nz.mega.sdk.MegaError.API_EACCESS
 import nz.mega.sdk.MegaError.API_EEXIST
 import nz.mega.sdk.MegaError.API_OK
 import timber.log.Timber
-import java.util.Locale
+import java.io.File
 
 class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.PhotoCallback,
     PhoneNumberBottomSheetDialogFragment.PhoneNumberCallback, SnackbarShower {
@@ -93,6 +91,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     }
 
     private val viewModel by viewModels<MyAccountViewModel>()
+    private val editProfileViewModel by viewModels<EditProfileViewModel>()
 
     private lateinit var binding: ActivityEditProfileBinding
 
@@ -221,7 +220,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
     private fun setupView() {
         setUpActionBar()
-        setUpAvatar()
         setUpHeader()
 
         binding.changeName.setOnClickListener { showChangeNameDialog(null, null) }
@@ -265,9 +263,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     }
 
     private fun setupObservers() {
-        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
-            .observe(this) { setUpAvatar() }
-
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
             .observe(this) { setupPhoneNumber() }
 
@@ -281,6 +276,13 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         viewModel.isProcessingFile().observe(this) { isProcessing ->
             binding.progressBar.isVisible = isProcessing
+        }
+
+        lifecycleScope.launchWhenStarted {
+            editProfileViewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect {
+                    setUpAvatar(it.avatarFile, it.avatarColor)
+                }
         }
     }
 
@@ -422,30 +424,12 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
     }
 
-    private fun setUpAvatar() {
-        val avatar = buildAvatarFile(this, megaApi.myEmail + FileUtil.JPG_EXTENSION)
-        var avatarBitmap: Bitmap? = null
-
-        if (avatar != null) {
-            avatarBitmap = BitmapFactory.decodeFile(avatar.absolutePath, BitmapFactory.Options())
-
-            if (avatarBitmap != null) {
-                binding.headerLayout.toolbarImage.setImageBitmap(avatarBitmap)
-
-                if (!avatarBitmap.isRecycled) {
-                    binding.headerLayout.imageLayout.setBackgroundColor(
-                        getDominantColor(
-                            avatarBitmap
-                        )
-                    )
-                }
-            }
-        }
-
-        if (avatarBitmap == null) {
-            binding.headerLayout.toolbarImage.setImageDrawable(null)
-            binding.headerLayout.imageLayout.setBackgroundColor(getColorAvatar(megaApi.myUser))
-        }
+    /**
+     * load avatar and color
+     */
+    private fun setUpAvatar(avatarFile: File?, color: Int) {
+        binding.headerLayout.toolbarImage.load(avatarFile)
+        binding.headerLayout.imageLayout.setBackgroundColor(color)
     }
 
     private fun setUpHeader() {

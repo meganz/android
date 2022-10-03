@@ -5,12 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.ManagerActivity
@@ -21,9 +21,9 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.applyFilt
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onMediaTypeSelected
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onSourceSelected
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingFilterPage
-import mega.privacy.android.presentation.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.presentation.theme.AndroidTheme
 import javax.inject.Inject
 
 /**
@@ -57,7 +57,7 @@ class PhotosFilterFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val mode by getThemeMode()
-                    .collectAsState(initial = ThemeMode.System)
+                    .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 AndroidTheme(isDark = mode.isDarkMode()) {
                     PhotosFilterBody()
                 }
@@ -67,7 +67,7 @@ class PhotosFilterFragment : Fragment() {
 
     @Composable
     fun PhotosFilterBody() {
-        val timelineViewState by timelineViewModel.state.collectAsState()
+        val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
 
         PhotosFilterView(
             timelineViewState = timelineViewState,

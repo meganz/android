@@ -3,8 +3,12 @@ package mega.privacy.android.app.presentation.photos.timeline.view
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,9 +29,12 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,7 +51,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.DateCard
 import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.presentation.theme.AndroidTheme
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -80,12 +86,21 @@ fun TimelineView(
             when (timelineViewState.selectedTimeBarTab) {
                 TimeBarTab.All -> {
                     Column {
+                        val isBarVisible by remember {
+                            derivedStateOf { lazyGridState.firstVisibleItemIndex == 0 }
+                        }
+
+                        val isScrollingDown = lazyGridState.isScrollingDown()
                         if (timelineViewState.enableCameraUploadButtonShowing && timelineViewState.selectedPhotoCount == 0) {
-                            EnableCameraUploadButton(onClick = onTextButtonClick)
+                            EnableCameraUploadButton(onClick = onTextButtonClick) {
+                                isBarVisible || !isScrollingDown
+                            }
                         }
 
                         if (timelineViewState.progressBarShowing) {
-                            CameraUploadProgressBar(timelineViewState = timelineViewState)
+                            CameraUploadProgressBar(timelineViewState = timelineViewState) {
+                                isBarVisible || !isScrollingDown
+                            }
                         }
 
                         photosGridView()
@@ -192,31 +207,38 @@ fun FilterFAB(
 @Composable
 fun CameraUploadProgressBar(
     timelineViewState: TimelineViewState = TimelineViewState(),
+    isVisible: () -> Boolean = { true },
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
+    AnimatedVisibility(
+        visible = isVisible(),
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = StringResourcesUtils.getQuantityString(
-                    R.plurals.cu_upload_progress,
-                    timelineViewState.pending,
-                    timelineViewState.pending
-                ),
-                color = colorResource(id = R.color.grey_087_white_087),
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(vertical = 14.dp, horizontal = 16.dp),
-            )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Text(
+                    text = StringResourcesUtils.getQuantityString(
+                        R.plurals.cu_upload_progress,
+                        timelineViewState.pending,
+                        timelineViewState.pending
+                    ),
+                    color = colorResource(id = R.color.grey_087_white_087),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(vertical = 14.dp, horizontal = 16.dp),
+                )
 
-            LinearProgressIndicator(
-                progress = timelineViewState.progress,
-                modifier = Modifier.fillMaxWidth(),
-                color = colorResource(id = R.color.teal_300),
-                backgroundColor = colorResource(id = R.color.grey_alpha_012)
-            )
+                LinearProgressIndicator(
+                    progress = timelineViewState.progress,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = colorResource(id = R.color.teal_300),
+                    backgroundColor = colorResource(id = R.color.grey_alpha_012)
+                )
+            }
         }
     }
 }
@@ -225,37 +247,43 @@ fun CameraUploadProgressBar(
  * Enable Camera Upload button for when it is disabled
  */
 @Composable
-private fun EnableCameraUploadButton(onClick: () -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
+private fun EnableCameraUploadButton(onClick: () -> Unit, isVisible: () -> Boolean) {
+    AnimatedVisibility(
+        visible = isVisible(),
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
     ) {
-        Button(
-            onClick = onClick,
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Transparent,
-            ),
-            elevation = ButtonDefaults.elevation(
-                defaultElevation = 0.dp,
-                pressedElevation = 0.dp,
-                disabledElevation = 0.dp,
-                hoveredElevation = 0.dp,
-                focusedElevation = 0.dp
-            ),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(),
-            shape = RectangleShape
+                .height(48.dp)
         ) {
-            Text(
-                text = stringResource(id = R.string.settings_camera_upload_on).uppercase(),
-                color = colorResource(id = R.color.teal_300),
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
-            )
+            Button(
+                onClick = onClick,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.Transparent,
+                ),
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                    focusedElevation = 0.dp
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                shape = RectangleShape
+            ) {
+                Text(
+                    text = stringResource(id = R.string.settings_camera_upload_on).uppercase(),
+                    color = colorResource(id = R.color.teal_300),
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                )
+            }
         }
     }
 }
@@ -279,4 +307,22 @@ fun PreviewProgressBar() {
             )
         )
     }
+}
+
+@Composable
+private fun LazyGridState.isScrollingDown(): Boolean {
+    var nextIndex by remember(this) { mutableStateOf(firstVisibleItemIndex) }
+    var nextScrollOffset by remember(this) { mutableStateOf(firstVisibleItemScrollOffset) }
+    return remember(this) {
+        derivedStateOf {
+            if (nextIndex != firstVisibleItemIndex) {
+                nextIndex < firstVisibleItemIndex
+            } else {
+                nextScrollOffset <= firstVisibleItemScrollOffset
+            }.also {
+                nextIndex = firstVisibleItemIndex
+                nextScrollOffset = firstVisibleItemScrollOffset
+            }
+        }
+    }.value
 }

@@ -9,9 +9,7 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.manager.ManagerUseCases
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
-import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.GetRootFolder
@@ -30,7 +28,7 @@ import org.mockito.kotlin.mock
     replaces = [ManagerUseCases::class],
     components = [ViewModelComponent::class]
 )
-@Module
+@Module(includes = [TestGetNodeModule::class])
 object TestManagerUseCases {
 
     @Provides
@@ -59,16 +57,6 @@ object TestManagerUseCases {
     @Provides
     fun provideGetRubbishBinFolder() = mock<GetRubbishBinFolder> {
         on { runBlocking { invoke() } }.thenReturn(MegaNode())
-    }
-
-    @Provides
-    fun provideGetChildrenNode() = mock<GetChildrenNode> {
-        on { runBlocking { invoke(any(), null) } }.thenReturn(emptyList())
-    }
-
-    @Provides
-    fun provideGetNodeByHandle() = mock<GetNodeByHandle> {
-        on { runBlocking { invoke(any()) } }.thenReturn(MegaNode())
     }
 
     @Provides

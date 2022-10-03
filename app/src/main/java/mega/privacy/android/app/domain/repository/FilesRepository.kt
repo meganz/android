@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaShare
 
 /**
@@ -50,6 +51,15 @@ interface FilesRepository {
     suspend fun getParentNode(node: MegaNode): MegaNode?
 
     /**
+     * Get the child node with the provided name
+     *
+     * @param parentNode
+     * @param name
+     * @return mega node or null if doesn't exist
+     */
+    suspend fun getChildNode(parentNode: MegaNode?, name: String?): MegaNode?
+
+    /**
      * Get children of a parent node
      *
      * @param parentNode parent node
@@ -65,6 +75,41 @@ interface FilesRepository {
      */
     suspend fun getNodeByHandle(handle: Long): MegaNode?
 
+    /**
+     * Get the fingerprint of a file by path
+     *
+     * @param filePath
+     */
+    suspend fun getFingerprint(filePath: String): String?
+
+    /**
+     * Get MegaNode by original fingerprint
+     * @param originalFingerprint
+     * @param parentNode MegaNode
+     * @return MegaNodeList
+     */
+    suspend fun getNodesByOriginalFingerprint(
+        originalFingerprint: String,
+        parentNode: MegaNode?,
+    ): MegaNodeList?
+
+    /**
+     * Get MegaNode by fingerprint and parent node
+     * @param fingerprint
+     * @param parentNode MegaNode
+     * @return MegaNode
+     */
+    suspend fun getNodeByFingerprintAndParentNode(
+        fingerprint: String,
+        parentNode: MegaNode?,
+    ): MegaNode?
+
+    /**
+     * Get MegaNode by fingerprint only
+     * @param fingerprint
+     * @return MegaNode
+     */
+    suspend fun getNodeByFingerprint(fingerprint: String): MegaNode?
 
     /**
      * Get a list of all incoming shares

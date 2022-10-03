@@ -1,24 +1,27 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet
 
 import android.Manifest
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.main.megachat.data.FileGalleryItem
-import mega.privacy.android.app.main.megachat.usecase.GetGalleryFilesUseCase
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.app.utils.FileUtil
-import timber.log.Timber
+import mega.privacy.android.domain.usecase.GetAllGalleryImages
+import mega.privacy.android.domain.usecase.GetAllGalleryVideos
 import javax.inject.Inject
 
 
 @HiltViewModel
 class ChatRoomToolbarViewModel @Inject constructor(
-    private val getGalleryFilesUseCase: GetGalleryFilesUseCase,
+    private val getAllGalleryVideos: GetAllGalleryVideos,
+    private val getAllGalleryImages: GetAllGalleryImages,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
     private val _filesGallery =
@@ -122,18 +125,43 @@ class ChatRoomToolbarViewModel @Inject constructor(
     }
 
     /**
+     * Add new file in gallery
+     *
+     * @param newFile FileGalleryItem
+     */
+    private fun addFile(newFile: FileGalleryItem) {
+        val listToAdd: MutableList<FileGalleryItem> = arrayListOf()
+        listToAdd.addAll(_filesGallery.value)
+        listToAdd.removeAt(0)
+        listToAdd.add(listToAdd.size, newFile)
+        listToAdd.sortByDescending { it.dateAdded }
+
+        addTakePicture(listToAdd)
+    }
+
+    /**
      * Get images and videos from the gallery
      */
     private fun loadGallery() {
-        if (_hasReadStoragePermissionsGranted.value && filesGallery.value.isEmpty()) {
-            getGalleryFilesUseCase.get()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = ::addTakePicture,
-                    onError = Timber::e
-                )
-                .addTo(composite)
+        if (filesGallery.value.isEmpty()) {
+            val emptyFiles = mutableListOf<FileGalleryItem>()
+            addTakePicture(emptyFiles)
+
+            if (_hasReadStoragePermissionsGranted.value) {
+                viewModelScope.launch(ioDispatcher) {
+                    getAllGalleryVideos()
+                        .collectLatest { video ->
+                            addFile(video)
+                        }
+                }
+
+                viewModelScope.launch(ioDispatcher) {
+                    getAllGalleryImages()
+                        .collectLatest { image ->
+                            addFile(image)
+                        }
+                }
+            }
         }
     }
 

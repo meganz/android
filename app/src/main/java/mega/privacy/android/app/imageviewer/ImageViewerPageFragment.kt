@@ -30,8 +30,8 @@ import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
-import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 
 /**
@@ -48,9 +48,10 @@ class ImageViewerPageFragment : Fragment() {
          * Main method to create a ImageViewerPageFragment.
          *
          * @param itemId        Item to show
+         * @param enableZoom    Flag to enable zoom gestures
          * @return              ImageBottomSheetDialogFragment to be shown
          */
-        fun newInstance(itemId: Long, enableZoom: Boolean = true): ImageViewerPageFragment =
+        fun newInstance(itemId: Long, enableZoom: Boolean): ImageViewerPageFragment =
             ImageViewerPageFragment().apply {
                 arguments = Bundle().apply {
                     putLong(INTENT_EXTRA_KEY_HANDLE, itemId)
@@ -64,8 +65,8 @@ class ImageViewerPageFragment : Fragment() {
     private var hasScreenBeenRotated = false
     private var hasZoomBeenTriggered = false
     private val viewModel by activityViewModels<ImageViewerViewModel>()
-    private val itemId: Long by extraNotNull(INTENT_EXTRA_KEY_HANDLE)
-    private val enableZoom: Boolean by extraNotNull(EXTRA_ENABLE_ZOOM, true)
+    private val itemId by lazy { arguments?.getLong(INTENT_EXTRA_KEY_HANDLE) ?: error("Null Item Id") }
+    private val enableZoom by lazy { arguments?.getBoolean(EXTRA_ENABLE_ZOOM, true) ?: true }
     private val controllerListener by lazy { buildImageControllerListener() }
     private val screenSize: Size by lazy { requireContext().getScreenSize() }
 
@@ -102,11 +103,11 @@ class ImageViewerPageFragment : Fragment() {
         super.onPause()
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         if (activity?.isFinishing == true) {
             viewModel.stopImageLoading(itemId)
         }
-        super.onDestroy()
+        super.onDestroyView()
     }
 
     private fun setupView() {
@@ -119,7 +120,9 @@ class ImageViewerPageFragment : Fragment() {
                 setTapListener(
                     MultiTapGestureListener(
                         this,
-                        onSingleTapCallback = viewModel::switchToolbar,
+                        onSingleTapCallback = {
+                            viewModel.showToolbar(!viewModel.isToolbarShown())
+                        },
                         onZoomCallback = {
                             if (!hasZoomBeenTriggered) {
                                 hasZoomBeenTriggered = true
@@ -131,7 +134,7 @@ class ImageViewerPageFragment : Fragment() {
             } else {
                 setTapListener(object : GestureDetector.SimpleOnGestureListener() {
                     override fun onSingleTapUp(e: MotionEvent): Boolean {
-                        viewModel.switchToolbar()
+                        viewModel.showToolbar(!viewModel.isToolbarShown())
                         return true
                     }
 
@@ -146,7 +149,7 @@ class ImageViewerPageFragment : Fragment() {
                     }
                 })
                 setOnClickListener {
-                    viewModel.switchToolbar()
+                    viewModel.showToolbar(!viewModel.isToolbarShown())
                 }
             }
         }
@@ -276,7 +279,7 @@ class ImageViewerPageFragment : Fragment() {
     private fun showVideoButton() {
         if (binding.btnVideo.isVisible && viewModel.isToolbarShown()) return
 
-        viewModel.switchToolbar(true)
+        viewModel.showToolbar(true)
         binding.btnVideo.setOnClickListener { launchVideoScreen() }
         binding.btnVideo.isVisible = true
         binding.image.apply {

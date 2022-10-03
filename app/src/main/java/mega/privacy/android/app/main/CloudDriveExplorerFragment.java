@@ -358,7 +358,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
             setParentHandle(megaApi.getRootNode().getHandle());
         }
 
-        MegaPreferences prefs = getPreferences(context);
+        MegaPreferences prefs = getPreferences();
         order = prefs != null && prefs.getPreferredSortCloud() != null
                 ? Integer.parseInt(prefs.getPreferredSortCloud())
                 : MegaApiJava.ORDER_DEFAULT_ASC;

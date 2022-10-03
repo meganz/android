@@ -1,11 +1,11 @@
 package mega.privacy.android.app.meeting.chats
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,7 +16,7 @@ import mega.privacy.android.app.main.megachat.RecentChatsFragment
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter.Tabs.CHAT
 import mega.privacy.android.app.meeting.list.MeetingListFragment
-import mega.privacy.android.app.utils.AskForDisplayOverDialog
+import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity
 import mega.privacy.android.app.utils.ColorUtils.setElevationWithColor
 import mega.privacy.android.app.utils.StringResourcesUtils
 
@@ -27,6 +27,8 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 class ChatTabsFragment : Fragment() {
 
     companion object {
+        private const val STATE_PAGER_POSITION = "STATE_PAGER_POSITION"
+
         @JvmStatic
         fun newInstance(): ChatTabsFragment =
             ChatTabsFragment()
@@ -34,13 +36,23 @@ class ChatTabsFragment : Fragment() {
 
     private lateinit var binding: FragmentChatTabsBinding
 
-    private val viewModel by activityViewModels<ChatTabsViewModel>()
+    private var skipClearSelection = false
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
-    private val askForDisplayOverDialog by lazy { AskForDisplayOverDialog(requireContext()) }
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 (activity as? ManagerActivity?)?.closeSearchView()
+
+                if (!skipClearSelection) {
+                    childFragmentManager.fragments.forEach { fragment ->
+                        when (fragment) {
+                            is RecentChatsFragment -> fragment.clearSelections()
+                            is MeetingListFragment -> fragment.clearSelections(true)
+                        }
+                    }
+                } else {
+                    skipClearSelection = false
+                }
             }
         }
     }
@@ -55,24 +67,26 @@ class ChatTabsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setupView()
-        view.post { askForDisplayOverDialog.showDialog() }
+        this.setupView()
+        startActivity(Intent(requireContext(), AskForDisplayOverActivity::class.java))
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        val position = viewModel.getCurrentPosition()
-        binding.pager.setCurrentItem(position, false)
+        if (savedInstanceState?.containsKey(STATE_PAGER_POSITION) == true) {
+            skipClearSelection = true
+            val position = savedInstanceState.getInt(STATE_PAGER_POSITION)
+            binding.pager.setCurrentItem(position, false)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        viewModel.setCurrentPosition(binding.pager.currentItem)
+        outState.putInt(STATE_PAGER_POSITION, binding.pager.currentItem)
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroyView() {
         binding.pager.unregisterOnPageChangeCallback(pageChangeCallback)
-        askForDisplayOverDialog.recycle()
         super.onDestroyView()
     }
 

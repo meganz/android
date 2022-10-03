@@ -2,6 +2,8 @@ package mega.privacy.android.presentation.theme
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
 /**
@@ -19,6 +21,14 @@ fun AndroidTheme(
         DarkColorPalette
     } else {
         LightColorPalette
+    }
+
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setSystemBarsColor(
+            color = colors.primary,
+            darkIcons = !isDark
+        )
     }
 
     MaterialTheme(

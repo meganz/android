@@ -93,7 +93,9 @@ class OfflineSaving(
         }
 
         return AutoPlayInfo(
-            nodes[0].name, nodes[0].handle.toLong(), getOfflineFile(context, nodes[0]).absolutePath
+            nodes[0].name,
+            nodes[0].handle.toLong(),
+            getOfflineFile(context, nodes[0]).absolutePath
         )
     }
 

@@ -1,38 +1,39 @@
 package mega.privacy.android.app.usecase.call
 
+import android.util.Pair
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.app.data.extensions.observeOnce
-import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS
+import mega.privacy.android.app.data.extensions.observeOnce
+import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.app.meeting.CallSoundType
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
+import mega.privacy.android.domain.entity.CallsSoundNotifications
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatSession
 import timber.log.Timber
 import javax.inject.Inject
-import android.util.Pair
-import io.reactivex.rxjava3.disposables.Disposable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
-import mega.privacy.android.app.di.ApplicationScope
-import mega.privacy.android.domain.entity.CallsSoundNotifications
 
 /**
  * Main use case to control when a call-related sound should be played.
@@ -46,6 +47,7 @@ class GetCallSoundsUseCase @Inject constructor(
     private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase,
     private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
     private val endCallUseCase: EndCallUseCase,
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) {
 
@@ -208,8 +210,7 @@ class GetCallSoundsUseCase @Inject constructor(
                             Timber.d("Terminating user participation")
                             removeWaitingForOthersCountDownTimer()
                             MegaApplication.getChatManagement().stopCounterToFinishCall()
-                            MegaApplication.getInstance()
-                                .removeRTCAudioManager()
+                            rtcAudioManagerGateway.removeRTCAudioManager()
                             emitter.onNext(CallSoundType.CALL_ENDED)
                         }
                     },

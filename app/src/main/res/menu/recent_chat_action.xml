@@ -46,12 +46,14 @@
         android:id="@+id/cab_menu_select_all"
         android:orderInCategory="120"
         android:title="@string/action_select_all"
+        app:iconTint="?attr/colorSecondary"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_unselect_all"
         android:orderInCategory="120"
         android:title="@string/action_unselect_all"
+        app:iconTint="?attr/colorSecondary"
         app:showAsAction="never" />
 
     <item

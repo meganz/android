@@ -398,6 +398,8 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         viewModelGateway.clear()
         mediaPlayerGateway.clearPlayerForNotification()
         mediaPlayerGateway.playerRelease()
+        // Remove observer when the service is destroyed to avoid the memory leak, causing Service cannot be stopped.
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
     }
 
     override fun mainPlayerUIClosed() {
@@ -412,7 +414,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         if (viewModelGateway.isAudioPlayer()) {
             MiniAudioPlayerController.notifyAudioPlayerPlaying(false)
         }
-
         stopSelf()
     }
 
@@ -522,18 +523,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
          * The minimum size of single playlist
          */
         const val SINGLE_PLAYLIST_SIZE = 2
-
-        /**
-         * Pause the video player when play audio.
-         *
-         * @param context Android context
-         */
-        @JvmStatic
-        fun pauseVideoPlayer(context: Context) {
-            val videoPlayerIntent = Intent(context, VideoPlayerService::class.java)
-            videoPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_PAUSE)
-            context.startService(videoPlayerIntent)
-        }
 
         /**
          * Pause the audio player when play video, play/record audio clip, start/receive call.

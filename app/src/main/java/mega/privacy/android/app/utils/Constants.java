@@ -287,6 +287,7 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_USER_DATA = "BROADCAST_ACTION_INTENT_UPDATE_USER_DATA";
 
+    public static final String INTENT_EXTRA_KEY_PLACEHOLDER = "placeholder";
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
     public static final String INTENT_EXTRA_KEY_OFFLINE_HANDLE = "INTENT_EXTRA_KEY_OFFLINE_HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
@@ -835,8 +836,8 @@ public class Constants {
 
     //Types of blocked accounts
     public static final String ACCOUNT_NOT_BLOCKED = "0";
-    public static final String COPYRIGHT_ACCOUNT_BLOCK = "200";
-    public static final String MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK = "300";
+    public static final String TOS_COPYRIGHT_ACCOUNT_BLOCK = "200";
+    public static final String TOS_NON_COPYRIGHT_ACCOUNT_BLOCK = "300";
     public static final String DISABLED_BUSINESS_ACCOUNT_BLOCK = "400";
     public static final String REMOVED_BUSINESS_ACCOUNT_BLOCK = "401";
     public static final String SMS_VERIFICATION_ACCOUNT_BLOCK = "500";
@@ -885,7 +886,6 @@ public class Constants {
     public static final String EVENT_NODES_CHANGE = "nodes_change";
     public static final String EVENT_ORDER_CHANGE = "order_change";
     public static final String EVENT_LIST_GRID_CHANGE = "list_grid_change";
-    public static final String EVENT_AVATAR_CHANGE = "avatar_change";
     public static final String EVENT_NOTIFICATION_COUNT_CHANGE = "notification_count_change";
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
@@ -899,7 +899,6 @@ public class Constants {
 
     public static final String EVENT_FAB_CHANGE = "fab_change";
 
-    public static final String KEY_HINT_IS_SHOWING = "hint_is_showing";
     public static final String KEY_IS_SHOWED_WARNING_MESSAGE = "is_showed_meeting_warning_message_";
 
     /** In database, invalid value is defined as '-1' */

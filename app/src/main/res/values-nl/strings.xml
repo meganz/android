@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Geen externe opslag gedetecteerd</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Uitloggen</string>
+    <string name="action_logout">Log&#160;uit</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Uploaden</string>
     <!-- Menu item -->
@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Het abonnement is geannuleerd</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">We konden uw abonnement niet annuleren. Neem a.u.b. contact op met support&#64;mega.nz voor assistentie</string>
+    <string name="cancel_subscription_error">We konden uw abonnement niet annuleren. Neem a.u.b. contact op met support&#64;mega.nz voor assistentie.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Sluit andere sessies</string>
     <!-- Message after kill all opened sessions -->
@@ -129,7 +129,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Weet u zeker dat u het huidige aanmeldingsproces wilt annuleren?</string>
     <!-- Login button -->
-    <string name="login_text">Inloggen</string>
+    <string name="login_text">Log&#160;in</string>
     <!-- email label -->
     <string name="email_text">E-mail</string>
     <!-- password label -->
@@ -209,8 +209,6 @@
     <string name="section_recents">Recent</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Media Uploads</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">Postvak In</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -317,7 +315,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Overdrachten weergeven</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">De meeste apparaten kunnen geen bestanden downloaden die groter zijn dan 4&#160;GB. Uw download zal waarschijnlijk mislukken</string>
+    <string name="error_file_size_greater_than_4gb">De meeste apparaten kunnen geen bestanden downloaden die groter zijn dan 4&#160;GB. Uw download zal waarschijnlijk mislukken.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Er is geen applicatie beschikbaar om dit bestand te openen op uw apparaat</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -976,7 +974,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Demp gesprek meldingen voor</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Meldingen dempen</string>
+    <string name="title_dialog_mute_chatroom_notifications">Demp gespreksmeldingen</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Aan</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1163,15 +1161,15 @@
     <string name="no_conversation_history">Geen gespreksgeschiedenis</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
-        <item quantity="one">%1$s [A] is aan het schrijvenl&#8230;[/A]</item>
-        <item quantity="other">%1$s [A]zijn aan het schrijvenl&#8230;[/A]</item>
+        <item quantity="one">%1$s [A]is aan het typen...[/A]</item>
+        <item quantity="other">%1$s [A]zijn aan het typen...[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A] en meer zijn aan het schrijven&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Meer</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">Opslagruimte</string>
+    <string name="storage_space">Opslag</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Verwijderen van Offline?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1657,8 +1655,6 @@
     <string name="context_share">Delen via</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Lege[/B][A]Prullenbak[/A]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[B]Geen bestanden in uw [/B][A]Inbox[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Geen bestanden in uw [/B][A]Cloud Schijf[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1688,7 +1684,7 @@
     <!-- Error message shown when user tries to open a not valid MEGA link -->
     <string name="open_link_not_valid_link">De link die u probeert te openen, is geen geldige MEGA-link.</string>
     <!-- Message shown when a link is being processing -->
-    <string name="processing_link">Link verwerken&#8230;</string>
+    <string name="processing_link">Koppeling verwerken&#8230;</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
     <string name="passwd_weak">Uw wachtwoord is makkelijk te raden. Probeer uw wachtwoord langer te maken. Combineer hoofdletter en kleine letters. Voeg speciale tekens toe. Gebruik geen namen of woordenboek woorden.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
@@ -1717,10 +1713,6 @@
     <string name="contacts_mega">Bij MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Telefoon contacten</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">Uw account is geschorst door meerdere misbruiken van MEGA’s Algemene Voorwaarden. Controleer uw email postvak in.</string>
-    <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Uw account is beëindigd vanwege een schending van de Algemene Voorwaarden van MEGA, inclusief, maar niet beperkt tot, clausule 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Bestanden laden</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -2675,8 +2667,6 @@
     <string name="text_join_another_call">Om toe te treden tot deze oproep moet u de huidige oproep stoppen of in de wacht zetten.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Personen kunnen aansluiten tot uw groep door deze link te gebruiken.</string>
-    <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">Nieuwe gesprekslink</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Voer groep naam in</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -2735,7 +2725,7 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d afbeelding&#160;</item>
+        <item quantity="one">%1$d afbeelding &#160;</item>
         <item quantity="other">%1$d afbeeldingen&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
@@ -3565,26 +3555,12 @@
     <string name="settings_mobile_data_resoluton_title">Mobiele data gebruiken om afbeeldingen met hoge resolutie te bekijken</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Sta het gebruik van mobiele data toe om afbeeldingen met een hoge resolutie te laden bij het bekijken van een voorbeeld. Indien uitgeschakeld, wordt de originele afbeelding alleen geladen wanneer u inzoomt.</string>
-    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">U wijzigt een standaardlocatie voor de back-up map. Dit kan van invloed zijn op uw vermogen om uw back-upmap in de toekomst te vinden. Onthoud waar het zich bevindt, zodat u het in de toekomst kunt vinden.</string>
-    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Het verplaatsen van deze map verandert de bestemming van één of meer geconfigureerde back-ups en kan onbedoelde gevolgen hebben. De back-ups worden voor uw veiligheid uitgeschakeld. Back-ups kunnen opnieuw worden ingeschakeld met de MEGA Desktop Applicatie. Wilt u doorgaan?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">U verwijdert uw back-up map. Hiermee worden alle back-ups verwijderd die u hebt ingesteld. Weet u zeker dat u dit wilt doen?</string>
-    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">Weet u zeker dat u uw back-up map wilt verwijderen en de door u ingestelde back-up wilt uitschakelen?</string>
-    <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">Verplaats “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Verplaats “%1s” naar Prullenbak</string>
-    <!-- The title of warning dialog for multi-folder moving -->
-    <string name="backup_move_multiple_folder_title">Verplaats back-up mappen</string>
-    <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_multiple_folder_title">Verplaats back-up mappen naar Prullenbak</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Back-up uitschakelen</string>
-    <!-- The confirm information of warning dialog for moving "My backup" -->
-    <string name="backup_move_confirm">Verplaats back-up</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">Typ a.u.b. “%1s” om deze actie te bevestigen</string>
     <!-- when checking the input -->
@@ -3605,11 +3581,6 @@
     <string name="backup_multi_share_permission_text">Deze mappen kunnen alleen als alleen-lezen worden gedeeld, aangezien het back-up mappen zijn, kunnen wijzigingen in de inhoud de back-ups uitschakelen.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Sommige gedeelde mappen zijn back-up mappen en alleen-lezen. Wilt u doorgaan?</string>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="one">%d apparaat</item>
-        <item quantity="other">%d apparaten</item>
-    </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Oproep beantwoorden</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3884,8 +3855,6 @@
     <string name="settings_help_report_issue_discard_button">Weggooien</string>
     <!-- Text shown when editing a chatroom message -->
     <string name="edit_chat_message">Bericht wijzigen</string>
-    <!-- Title of the gallery option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_gallery_option">Gallerij</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">Spraak</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -3894,8 +3863,6 @@
     <string name="chat_room_toolbar_voice_clip_option">Spraakclip</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
-    <!-- Text of the empty screen when there are not chat conversations -->
-    <string name="context_empty_chat_recent">[B]Nodig vrienden uit bij [/B][A]Gesprek[/A][B] en geniet van uw gecodeerde platform met privacy en veiligheid[/B]</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filter</string>
     <!-- Filter option to show all photos -->
@@ -3947,7 +3914,7 @@
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
     <string name="account_upgrade_storage_label">[A]%1$s[/A] opslag</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
-    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] overdrachtstegoed</string>
+    <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A]overdracht</string>
     <!-- Label of storage in My account section. -->
     <string name="account_storage_label">Opslag</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
@@ -4026,4 +3993,14 @@
     <string name="permissions_notifications_title">Ontvang een melding</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA stuurt u bel-, gesprek- en bestandsoverdrachtmeldingen.</string>
+    <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
+    <string name="home_side_menu_backups_title">Back-ups</string>
+    <!-- Title of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_title">[B]Geen items in[/B][A]backups[/A]</string>
+    <!-- Description of the Backups feature when no Backup files or folders exist -->
+    <string name="backups_empty_state_body">Dit is waar uw back-upbestanden en mappen worden opgeslagen. Uw back-upitems zijn “alleen-lezen” om te voorkomen dat ze per ongeluk worden gewijzigd in uw clouddrive.\nU kunt een back-up maken van items op uw computer naar MEGA met behulp van onze desktop-applicatie.</string>
+    <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
+    <string name="dialog_account_suspended_ToS_copyright_message">Account is geschorst vanwege copyright overtredingen. We hebben u een email gestuurd met meer informatie hierover.</string>
+    <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Uw account was beëindigd door een schending van MEGA’s Algemene Voorwaarden, zoals misbruik van rechten van anderen; Het delen en/of importen van illegale gegevens; of systeem misbruik.</string>
 </resources>

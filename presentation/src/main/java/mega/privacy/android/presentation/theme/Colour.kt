@@ -8,7 +8,7 @@ import com.airbnb.android.showkase.annotation.ShowkaseColor
  * White
  */
 @ShowkaseColor("white", "white")
-val white = Color(0xFFFFFF)
+val white = Color(0xFFFFFFFF)
 
 /**
  * White_alpha_005

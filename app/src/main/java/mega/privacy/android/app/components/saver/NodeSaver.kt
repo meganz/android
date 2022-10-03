@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.StatFs
 import android.text.TextUtils
@@ -15,10 +16,10 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
+import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -79,7 +80,7 @@ class NodeSaver(
     private val app = MegaApplication.getInstance()
     private val megaApi = app.megaApi
     private val megaApiFolder = app.megaApiFolder
-    private val dbHandler = DatabaseHandler.getDbHandler(app)
+    private val dbHandler = getDbHandler()
 
     private var saving: Saving = Saving.Companion.NOTHING
 
@@ -507,7 +508,15 @@ class NodeSaver(
      * @param savedInstanceState savedInstanceState param of onCreate
      */
     fun restoreState(savedInstanceState: Bundle) {
-        val oldSaving = savedInstanceState.getParcelable<Saving>(STATE_KEY_SAVING) ?: return
+        val oldSaving = with(savedInstanceState) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getParcelable(STATE_KEY_SAVING, Saving::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                getParcelable(STATE_KEY_SAVING)
+            }
+        } ?: return
+
         saving = oldSaving
     }
 

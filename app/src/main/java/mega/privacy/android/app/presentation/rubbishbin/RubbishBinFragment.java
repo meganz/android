@@ -208,7 +208,7 @@ public class RubbishBinFragment extends Fragment {
                 }
 
                 MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
-                if (restoreNode == null || megaApi.isInRubbish(restoreNode)) {
+                if (restoreNode == null || megaApi.isInRubbish(restoreNode) || megaApi.isInInbox(restoreNode)) {
                     isRestoreVisible = false;
                     break;
                 }

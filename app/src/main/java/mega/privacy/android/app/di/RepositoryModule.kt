@@ -10,10 +10,12 @@ import mega.privacy.android.app.data.repository.DefaultAlbumsRepository
 import mega.privacy.android.app.data.repository.DefaultAvatarRepository
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.app.data.repository.DefaultChatRepository
+import mega.privacy.android.app.data.repository.DefaultContactsRepository
 import mega.privacy.android.app.data.repository.DefaultEnvironmentRepository
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.app.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.app.data.repository.DefaultFilesRepository
+import mega.privacy.android.app.data.repository.DefaultGalleryFilesRepository
 import mega.privacy.android.app.data.repository.DefaultGlobalStatesRepository
 import mega.privacy.android.app.data.repository.DefaultImageRepository
 import mega.privacy.android.app.data.repository.DefaultLoginRepository
@@ -34,9 +36,11 @@ import mega.privacy.android.domain.repository.AlbumsRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
+import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.repository.LoginRepository
@@ -107,6 +111,9 @@ abstract class RepositoryModule {
     abstract fun bindNotificationsRepository(repository: DefaultNotificationsRepository): NotificationsRepository
 
     @Binds
+    abstract fun bindContactsRepository(repository: DefaultContactsRepository): ContactsRepository
+
+    @Binds
     abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository
 
     @Binds
@@ -133,4 +140,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPhotosRepository(repository: DefaultPhotosRepository): PhotosRepository
+
+    @Binds
+    abstract fun bindGalleryFilesRepository(repository: DefaultGalleryFilesRepository): GalleryFilesRepository
 }

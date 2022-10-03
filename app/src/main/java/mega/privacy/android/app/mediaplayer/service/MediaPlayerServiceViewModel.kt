@@ -3,6 +3,7 @@ package mega.privacy.android.app.mediaplayer.service
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import com.google.android.exoplayer2.C
@@ -400,7 +401,7 @@ class MediaPlayerServiceViewModel(
                                     getString(
                                         when (type) {
                                             RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
-                                            INBOX_ADAPTER -> R.string.section_inbox
+                                            INBOX_ADAPTER -> R.string.home_side_menu_backups_title
                                             else -> R.string.section_cloud_drive
                                         }
                                     )
@@ -626,8 +627,14 @@ class MediaPlayerServiceViewModel(
     }
 
     private fun buildPlaylistFromOfflineNodes(intent: Intent, firstPlayHandle: Long) {
-        val nodes = intent.getParcelableArrayListExtra<MegaOffline>(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
-            ?: return
+        val nodes = with(intent) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getParcelableArrayListExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE, MegaOffline::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                getParcelableArrayListExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
+            }
+        } ?: return
 
         doBuildPlaylist(
             megaApi, nodes, firstPlayHandle,
@@ -1136,8 +1143,8 @@ class MediaPlayerServiceViewModel(
 
     override fun backgroundPlayEnabled() = backgroundPlayEnabled
 
-    override fun toggleBackgroundPlay(): Boolean {
-        backgroundPlayEnabled = !backgroundPlayEnabled
+    override fun toggleBackgroundPlay(isEnable: Boolean): Boolean {
+        backgroundPlayEnabled = isEnable
         preferences.edit()
             .putBoolean(KEY_AUDIO_BACKGROUND_PLAY_ENABLED, backgroundPlayEnabled)
             .apply()

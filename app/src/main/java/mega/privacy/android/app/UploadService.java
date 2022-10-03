@@ -959,6 +959,15 @@ public class UploadService extends Service {
                         localFile.delete();
                     }
 
+                    if (error.getErrorCode() == MegaError.API_OK) {
+                        // Get the uploaded file from cache root directory.
+                        File uploadedFile = CacheFolderManager.getCacheFile(getApplicationContext(), "", transfer.getFileName());
+                        if (isFileAvailable(uploadedFile)) {
+                            Timber.d("Delete file!: %s", uploadedFile.getAbsolutePath());
+                            uploadedFile.delete();
+                        }
+                    }
+
                     File tempPic = CacheFolderManager.getCacheFolder(getApplicationContext(), CacheFolderManager.TEMPORARY_FOLDER);
                     Timber.d("IN Finish: %spath? %s", transfer.getFileName(), transfer.getPath());
                     if (isFileAvailable(tempPic) && transfer.getPath() != null) {

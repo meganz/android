@@ -37,7 +37,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.presentation.theme.AndroidTheme
 
@@ -78,8 +77,7 @@ fun EnableCU(
 
         Text(
             text = stringResource(id = R.string.settings_camera_upload_on),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.ExtraBold,
+            fontSize = 20.sp,
             color = colorResource(id = R.color.grey_087_white_087),
             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
         )
@@ -207,7 +205,9 @@ fun EnableCU(
 @Composable
 fun PreviewEnableCU() {
     AndroidTheme(isSystemInDarkTheme()) {
-        Scaffold {
+        Scaffold { paddingValues ->
+            Column(modifier = Modifier
+                .padding(paddingValues)) { }
             EnableCU()
         }
     }

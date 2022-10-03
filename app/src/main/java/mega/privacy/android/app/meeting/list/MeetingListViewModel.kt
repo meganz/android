@@ -126,6 +126,15 @@ class MeetingListViewModel @Inject constructor(
     }
 
     /**
+     * Archive chats
+     *
+     * @param chatIds   Chat ids to be archived
+     */
+    fun archiveChats(chatIds: List<Long>) {
+        chatIds.forEach(::archiveChat)
+    }
+
+    /**
      * Leave chat
      *
      * @param chatId    Chat id to leave
@@ -135,6 +144,15 @@ class MeetingListViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onError = Timber::e)
+    }
+
+    /**
+     * Leave chats
+     *
+     * @param chatIds   Chat ids to leave
+     */
+    fun leaveChats(chatIds: List<Long>) {
+        chatIds.forEach(::leaveChat)
     }
 
     /**
