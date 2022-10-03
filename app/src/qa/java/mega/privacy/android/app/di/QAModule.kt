@@ -28,6 +28,7 @@ import mega.privacy.android.app.data.usecase.DefaultDetectShake
 import mega.privacy.android.app.di.featuretoggle.FeatureFlagPriorityKey
 import mega.privacy.android.app.domain.repository.QARepository
 import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
+import mega.privacy.android.app.domain.usecase.DefaultGetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.DetectShake
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
@@ -35,13 +36,14 @@ import mega.privacy.android.app.domain.usecase.UpdateApp
 import mega.privacy.android.app.domain.usecase.VibrateDevice
 import mega.privacy.android.app.featuretoggle.QAFeatures
 import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
+import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagMapper
+import mega.privacy.android.app.presentation.featureflag.model.toFeatureFlag
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.FeatureFlagRepository
 
 /**
  * Provides dependencies used in the QA module
@@ -63,15 +65,15 @@ class QAModule {
      * Provide SetFeatureFlag use case
      */
     @Provides
-    fun provideSetFeatureFlag(repository: FeatureFlagRepository): SetFeatureFlag =
+    fun provideSetFeatureFlag(repository: QARepository): SetFeatureFlag =
         SetFeatureFlag(repository::setFeature)
 
     /**
      * Provide GetAllFeatureFlags use case
      */
     @Provides
-    fun provideGetAllFeatureFlags(featureFlagRepository: FeatureFlagRepository): GetAllFeatureFlags =
-        GetAllFeatureFlags(featureFlagRepository::getAllFeatures)
+    fun provideGetAllFeatureFlags(useCase: DefaultGetAllFeatureFlags): GetAllFeatureFlags =
+        useCase
 
 
     /**
@@ -222,5 +224,8 @@ class QAModule {
     )
     fun provideFeatureFlagRuntimeValueProvider(dataStore: FeatureFlagPreferencesDataStore): @JvmSuppressWildcards FeatureFlagValueProvider =
         dataStore
+
+    @Provides
+    fun provideFeatureFlagMapper(): FeatureFlagMapper = ::toFeatureFlag
 
 }

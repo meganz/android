@@ -12,8 +12,11 @@ class DefaultGetThumbnail @Inject constructor(private val repository: ImageRepos
     GetThumbnail {
 
     override suspend fun invoke(nodeId: Long): File? {
-        return repository.getThumbnailFromLocal(nodeId) ?: repository.getThumbnailFromServer(
-            nodeId
+        runCatching {
+            repository.getThumbnailFromLocal(nodeId) ?: repository.getThumbnailFromServer(nodeId)
+        }.fold(
+            onSuccess = { return it },
+            onFailure = { return null }
         )
     }
 }

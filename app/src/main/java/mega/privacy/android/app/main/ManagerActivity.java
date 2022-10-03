@@ -877,7 +877,7 @@ public class ManagerActivity extends TransfersManagementActivity
         @Override
         public void onChanged(Boolean aBoolean) {
             if (drawerLayout != null) {
-                closeLeftDrawer();
+                closeDrawer();
             }
             refreshAddPhoneNumberButton();
         }
@@ -2516,7 +2516,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     setRequestNotificationsPermissionFirstLogin(savedInstanceState);
                     askPermissions = intentRec.getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
                     if (upgradeAccount) {
-                        closeLeftDrawer();
+                        closeDrawer();
                         int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
                         if (accountType != FREE) {
@@ -2559,7 +2559,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                     }
                 }
-                closeLeftDrawer();
+                closeDrawer();
             }
 
             checkCurrentStorageStatus(true);
@@ -2926,7 +2926,7 @@ public class ManagerActivity extends TransfersManagementActivity
         abL.setVisibility(View.GONE);
 
         fragmentContainer.setVisibility(View.VISIBLE);
-        closeLeftDrawer();
+        closeDrawer();
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         supportInvalidateOptionsMenu();
         hideFabButton();
@@ -3135,7 +3135,8 @@ public class ManagerActivity extends TransfersManagementActivity
         setTabsVisibility();
         abL.setVisibility(View.GONE);
 
-        closeLeftDrawer();
+        closeDrawer();
+
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         supportInvalidateOptionsMenu();
         hideFabButton();
@@ -3948,7 +3949,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
                 } else {
                     setFirstNavigationLevel(true);
-                    aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
+                    aB.setTitle(getString(R.string.sortby_type_photo_first));
                 }
 
                 break;
@@ -4168,7 +4169,7 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
 
-        closeLeftDrawer();
+        closeDrawer();
 
         switch (item) {
             case CLOUD_DRIVE: {
@@ -4236,7 +4237,7 @@ public class ManagerActivity extends TransfersManagementActivity
         updateSharesTab();
         setToolbarTitle();
 
-        closeLeftDrawer();
+        closeDrawer();
     }
 
     public void selectDrawerItemNotifications() {
@@ -4281,7 +4282,7 @@ public class ManagerActivity extends TransfersManagementActivity
         getTransfersViewModel().checkIfShouldShowCompletedTab();
         setToolbarTitle();
         showFabButton();
-        closeLeftDrawer();
+        closeDrawer();
     }
 
     /**
@@ -4336,7 +4337,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         replaceFragment(chatTabsFragment, FragmentTag.RECENT_CHAT.getTag());
 
-        closeLeftDrawer();
+        closeDrawer();
         PermissionUtils.checkNotificationsPermission(this);
     }
 
@@ -4369,7 +4370,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (turnOnNotifications) {
             fragmentContainer.setVisibility(View.VISIBLE);
-            closeLeftDrawer();
+            closeDrawer();
             return;
         }
 
@@ -4409,7 +4410,7 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean.class)
                 .post(drawerItem == DrawerItem.HOMEPAGE);
 
-        closeLeftDrawer();
+        closeDrawer();
     }
 
     /**
@@ -6291,7 +6292,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         checkIfShouldCloseSearchView(oldDrawerItem);
         selectDrawerItem(drawerItem);
-        closeLeftDrawer();
+        closeDrawer();
         return true;
     }
 
@@ -7849,12 +7850,12 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void navigateToContacts() {
-        closeLeftDrawer();
+        closeDrawer();
         startActivity(ContactsActivity.getListIntent(this));
     }
 
     public void navigateToContactRequests() {
-        closeLeftDrawer();
+        closeDrawer();
         startActivity(ContactsActivity.getReceivedRequestsIntent(this));
     }
 
@@ -11536,7 +11537,7 @@ public class ManagerActivity extends TransfersManagementActivity
         onBackPressedCallback.setEnabled(true);
     }
 
-    private void closeLeftDrawer() {
+    private void closeDrawer() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }

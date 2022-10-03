@@ -139,10 +139,10 @@ interface FilesRepository {
     /**
      * Get a list of all incoming shares
      *
-     * @param order sort order, if null the default order is applied
+     * @param order sort order
      * @return List of MegaNode that other users are sharing with this account
      */
-    suspend fun getIncomingSharesNode(order: Int? = null): List<MegaNode>
+    suspend fun getIncomingSharesNode(order: SortOrder): List<MegaNode>
 
     /**
      * Authorize and return a MegaNode can be downloaded with any instance of MegaApi
@@ -164,13 +164,6 @@ interface FilesRepository {
      * @return List of MegaNode corresponding of a public link
      */
     suspend fun getPublicLinks(order: SortOrder): List<MegaNode>
-
-    /**
-     * Get others sort order
-     * @return others sort order
-     */
-    suspend fun getOthersSortOrder(): Int
-
 
     /**
      * Checks if Inbox node has children.

@@ -117,7 +117,8 @@ class IncomingSharesViewModel @Inject constructor(
                 incomingTreeDepth = depth,
                 incomingHandle = handle,
                 incomingParentHandle = getParentNodeHandle(handle),
-                sortOrder = if (depth == 0) getOthersSortOrder() else sortOrderIntMapper(getCloudSortOrder())
+                sortOrder = if (depth == 0) sortOrderIntMapper(getOthersSortOrder()) else sortOrderIntMapper(
+                    getCloudSortOrder())
             )
         }
 
@@ -137,7 +138,7 @@ class IncomingSharesViewModel @Inject constructor(
                     isInvalidHandle = true,
                     isLoading = false,
                     incomingParentHandle = null,
-                    sortOrder = getOthersSortOrder()
+                    sortOrder = sortOrderIntMapper(getOthersSortOrder())
                 )
             }
         }

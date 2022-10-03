@@ -22,7 +22,6 @@ class DefaultInitialiseLoggingTest {
     private lateinit var underTest: InitialiseLogging
     private val areSdkLogsEnabled = mock<AreSdkLogsEnabled>()
     private val areChatLogsEnabled = mock<AreChatLogsEnabled>()
-    private val startupLogging = mock<StartupLogging>()
     private val sdkMessage = LogEntry(message = "sdk", priority = 1)
     private val chatMessage = LogEntry(message = "chat", priority = 1)
 
@@ -37,20 +36,8 @@ class DefaultInitialiseLoggingTest {
             loggingRepository = loggingRepository,
             areSdkLogsEnabled = areSdkLogsEnabled,
             areChatLogsEnabled = areChatLogsEnabled,
-            startupLogging = startupLogging,
             coroutineDispatcher = UnconfinedTestDispatcher()
         )
-    }
-
-    @Test
-    fun `test that debug enables console logs`() = runTest {
-        whenever(areSdkLogsEnabled()).thenReturn(emptyFlow())
-        whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
-        whenever(startupLogging()).thenReturn(Unit)
-        underTest(true)
-
-        verify(loggingRepository, times(1)).enableLogAllToConsole()
-        verifyNoMoreInteractions(loggingRepository)
     }
 
     @Test
@@ -58,7 +45,7 @@ class DefaultInitialiseLoggingTest {
         whenever(areSdkLogsEnabled()).thenReturn(flowOf(true))
         whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
 
-        underTest(false)
+        underTest()
 
         verify(loggingRepository, times(1)).getSdkLoggingFlow()
         verify(loggingRepository, times(1)).logToSdkFile(sdkMessage)
@@ -71,7 +58,7 @@ class DefaultInitialiseLoggingTest {
         whenever(areSdkLogsEnabled()).thenReturn(emptyFlow())
         whenever(areChatLogsEnabled()).thenReturn(flowOf(true))
 
-        underTest(false)
+        underTest()
 
         verify(loggingRepository, times(1)).getChatLoggingFlow()
         verify(loggingRepository, times(1)).logToChatFile(chatMessage)
@@ -84,7 +71,7 @@ class DefaultInitialiseLoggingTest {
         whenever(areSdkLogsEnabled()).thenReturn(flowOf(false))
         whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
 
-        underTest(false)
+        underTest()
 
         verify(loggingRepository, never()).logToSdkFile(any())
 
@@ -96,7 +83,7 @@ class DefaultInitialiseLoggingTest {
         whenever(areSdkLogsEnabled()).thenReturn(emptyFlow())
         whenever(areChatLogsEnabled()).thenReturn(flowOf(false))
 
-        underTest(false)
+        underTest()
 
         verify(loggingRepository, never()).logToChatFile(any())
 
