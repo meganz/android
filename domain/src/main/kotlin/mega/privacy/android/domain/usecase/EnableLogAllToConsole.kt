@@ -1,12 +1,13 @@
 package mega.privacy.android.domain.usecase
 
 /**
- * Startup logging
+ * Enable log all to console
  *
  */
-fun interface StartupLogging {
+fun interface EnableLogAllToConsole {
     /**
      * Invoke
+     *
      */
     suspend operator fun invoke()
 }
