@@ -289,7 +289,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
         if (AchievementsActivity.sFetcher == null) return
         val details = AchievementsActivity.sFetcher.achievementsDetails
         val bonuses = AchievementsActivity.sFetcher.referralBonuses
-        if (details == null || bonuses == null) {
+        if (details == null) {
             return
         }
 
