@@ -21,4 +21,23 @@ interface EnvironmentRepository {
      * @return app info
      */
     suspend fun getAppInfo(): AppInfo
+
+    /**
+     * Get last saved version code
+     *
+     */
+    suspend fun getLastSavedVersionCode(): Int
+
+    /**
+     * Get installed version code
+     *
+     */
+    suspend fun getInstalledVersionCode(): Int
+
+    /**
+     * save version code
+     *
+     * @param newVersionCode
+     */
+    suspend fun saveVersionCode(newVersionCode: Int)
 }

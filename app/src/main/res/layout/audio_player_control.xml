@@ -173,9 +173,10 @@
         android:id="@+id/playlist"
         style="@style/AudioPlayerButton"
         android:enabled="false"
-        android:src="@drawable/media_player_playlist"
+        android:src="@drawable/ic_player_queue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/exo_next"
-        app:layout_constraintStart_toStartOf="@id/exo_next" />
+        app:layout_constraintStart_toStartOf="@id/exo_next"
+        app:tint="@color/dark_grey_white"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

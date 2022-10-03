@@ -31,14 +31,15 @@ import mega.privacy.android.app.main.FileStorageActivity.EXTRA_PROMPT
 import mega.privacy.android.app.main.FileStorageActivity.Mode.PICK_FOLDER
 import mega.privacy.android.app.main.FileStorageActivity.PICK_FOLDER_TYPE
 import mega.privacy.android.app.main.FileStorageActivity.PickFolderType
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE
 import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
-import mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocationForPreviewingFiles
+import mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri
 import mega.privacy.android.app.utils.FileUtil.getTotalSize
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
@@ -50,7 +51,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.storeDownloadLocationIfNeeded
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import nz.mega.sdk.MegaApiJava
+import mega.privacy.android.domain.entity.StorageState
 import nz.mega.sdk.MegaApiJava.nodeListToArray
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -670,7 +671,7 @@ class NodeSaver(
     }
 
     private fun checkParentPathAndDownload(parentPath: String) {
-        if (MegaApplication.getInstance().storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
+        if (getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning()
             return
         }

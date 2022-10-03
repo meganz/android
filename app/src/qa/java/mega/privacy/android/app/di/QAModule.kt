@@ -36,6 +36,8 @@ import mega.privacy.android.app.domain.usecase.UpdateApp
 import mega.privacy.android.app.domain.usecase.VibrateDevice
 import mega.privacy.android.app.featuretoggle.QAFeatures
 import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
+import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagMapper
+import mega.privacy.android.app.presentation.featureflag.model.toFeatureFlag
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
@@ -222,5 +224,8 @@ class QAModule {
     )
     fun provideFeatureFlagRuntimeValueProvider(dataStore: FeatureFlagPreferencesDataStore): @JvmSuppressWildcards FeatureFlagValueProvider =
         dataStore
+
+    @Provides
+    fun provideFeatureFlagMapper(): FeatureFlagMapper = ::toFeatureFlag
 
 }

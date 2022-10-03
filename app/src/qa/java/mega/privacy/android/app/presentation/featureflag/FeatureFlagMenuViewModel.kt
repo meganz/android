@@ -4,17 +4,15 @@ package mega.privacy.android.app.presentation.featureflag
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import mega.privacy.android.app.presentation.featureflag.model.FeatureFlag
-import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagState
-import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagMapper
+import mega.privacy.android.domain.entity.Feature
 import javax.inject.Inject
 
 /**
@@ -24,33 +22,28 @@ import javax.inject.Inject
 class FeatureFlagMenuViewModel @Inject constructor(
     private val setFeatureFlag: SetFeatureFlag,
     private val getAllFeatureFlags: GetAllFeatureFlags,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val featureFlagMapper: FeatureFlagMapper,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(FeatureFlagState())
+    private val _state = MutableStateFlow(emptyList<FeatureFlag>())
 
     /**
      * UI State for feature flag list
      */
-    val state: StateFlow<FeatureFlagState> = _state
+    val state: StateFlow<List<FeatureFlag>> = _state
 
     init {
-        viewModelScope.launch(ioDispatcher) {
-            getAllFeatureFlags().map { map ->
-                { state: FeatureFlagState ->
-                    state.copy(featureFlagList = map.map {
-                        FeatureFlag(
-                            featureName = it.key.name,
-                            description = "",
-                            isEnabled = it.value,
-                        )
-                    })
+        viewModelScope.launch {
+            getAllFeatureFlags().map { map: Map<Feature, Boolean> ->
+                map.map { (key, value) ->
+                    featureFlagMapper(key, value)
                 }
             }.collect {
-                _state.update(it)
+                _state.value = it
             }
         }
     }
+
 
     /**
      * Sets feature flag value
@@ -58,7 +51,7 @@ class FeatureFlagMenuViewModel @Inject constructor(
      * @param isEnabled: Boolean value
      */
     fun setFeatureEnabled(featureName: String, isEnabled: Boolean) {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             setFeatureFlag(featureName, isEnabled)
         }
     }

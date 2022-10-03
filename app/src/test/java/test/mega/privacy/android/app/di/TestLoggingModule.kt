@@ -11,6 +11,7 @@ import mega.privacy.android.app.logging.SdkLogger
 import mega.privacy.android.app.presentation.logging.tree.LogFlowTree
 import mega.privacy.android.domain.usecase.CreateLogEntry
 import mega.privacy.android.domain.usecase.CreateTraceString
+import mega.privacy.android.domain.usecase.EnableLogAllToConsole
 import mega.privacy.android.domain.usecase.GetCurrentTimeString
 import mega.privacy.android.domain.usecase.GetLogFile
 import mega.privacy.android.domain.usecase.InitialiseLogging
@@ -71,4 +72,7 @@ object TestLoggingModule {
 
     @Provides
     fun provideGetLogFile(): GetLogFile = mock()
+
+    @Provides
+    fun provideEnableLogAllToConsole(): EnableLogAllToConsole = mock()
 }

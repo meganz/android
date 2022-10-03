@@ -3949,7 +3949,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
                 } else {
                     setFirstNavigationLevel(true);
-                    aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
+                    aB.setTitle(getString(R.string.sortby_type_photo_first));
                 }
 
                 break;

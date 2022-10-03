@@ -31,7 +31,6 @@ import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.app.Activity;
@@ -66,9 +65,11 @@ import mega.privacy.android.app.main.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.main.megachat.NonContactInfo;
+import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MeetingUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -424,7 +425,7 @@ public class ChatController {
                 if (message.getType() == MegaChatMessage.TYPE_NORMAL) {
                     Timber.d("Message type NORMAL");
 
-                    builder.append(megaChatApi.getMyFullname()).append(": ");
+                    builder.append(getString(R.string.chat_last_message_sender_me)).append(": ");
                     String messageContent = "";
                     if (message.getContent() != null) {
                         messageContent = message.getContent();
@@ -475,7 +476,7 @@ public class ChatController {
                     return builder.toString();
 
                 } else if (message.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
-                    builder.append(megaChatApi.getMyFullname()).append(": ");
+                    builder.append(getString(R.string.chat_last_message_sender_me)).append(": ");
                     MegaChatContainsMeta meta = message.getContainsMeta();
                     if (meta != null) {
                         switch (meta.getType()) {
@@ -499,12 +500,12 @@ public class ChatController {
 
                     return "";
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_STARTED) {
-                    builder.append(megaChatApi.getMyFullname()).append(": ");
+                    builder.append(getString(R.string.chat_last_message_sender_me)).append(": ");
                     String textToShow = MeetingUtil.getAppropriateStringForCallStarted().toString();
                     builder.append(textToShow);
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
-                    builder.append(megaChatApi.getMyFullname()).append(": ");
+                    builder.append(getString(R.string.chat_last_message_sender_me)).append(": ");
                     String textToShow = "";
                     switch (message.getTermCode()) {
                         case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
@@ -769,7 +770,7 @@ public class ChatController {
                                boolean fromMediaViewer, SnackbarShower snackbarShower) {
         File destination = null;
 
-        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (StorageStateExtensionsKt.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }

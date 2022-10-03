@@ -24,7 +24,7 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
 
     private lateinit var binding: FragmentImportFilesBinding
 
-    private val viewModel: FileExplorerActivityViewModel by activityViewModels()
+    private val viewModel: FileExplorerViewModel by activityViewModels()
 
     private var adapter: ImportFilesAdapter? = null
 
@@ -50,10 +50,10 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
 
     private fun setupObservers() {
         with(viewModel) {
-            getFilesInfo().observe(viewLifecycleOwner) { info: List<ShareInfo> ->
+            filesInfo.observe(viewLifecycleOwner) { info: List<ShareInfo> ->
                 showFilesInfo(info)
             }
-            getTextInfo().observe(viewLifecycleOwner) { info: ShareTextInfo ->
+            textInfo.observe(viewLifecycleOwner) { info: ShareTextInfo ->
                 showImportingTextInfo(info)
             }
         }

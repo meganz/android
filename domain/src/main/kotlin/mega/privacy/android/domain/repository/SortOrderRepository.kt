@@ -26,6 +26,12 @@ interface SortOrderRepository {
     suspend fun getLinksSortOrder(): SortOrder
 
     /**
+     * Get others sort order
+     * @return others sort order
+     */
+    suspend fun getOthersSortOrder(): SortOrder
+
+    /**
      * Get offline sort order
      * @return offline sort order
      */
