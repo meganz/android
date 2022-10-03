@@ -84,4 +84,9 @@ interface CacheFolderGateway {
      * Return node preview file path
      */
     fun getPreviewCacheFilePath(megaNode: MegaNode): String?
+
+    /**
+     * clean files from Cache directory
+     */
+    fun purgeCacheDirectory()
 }
