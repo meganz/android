@@ -101,6 +101,27 @@ class DefaultSortOrderRepositoryTest {
     }
 
     @Test
+    fun `test that get others sort order return type is sort order`() = runTest {
+        val order = MegaApiJava.ORDER_SIZE_DESC
+        whenever(megaLocalStorageGateway.getOthersSortOrder()).thenReturn(order)
+        whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_SIZE_DESC)
+        assertThat(underTest.getOthersSortOrder()).isInstanceOf(SortOrder::class.java)
+    }
+
+    @Test
+    fun `test that get others sort order invokes get links sort order of gateway`() = runTest {
+        underTest.getOthersSortOrder()
+        verify(megaLocalStorageGateway).getOthersSortOrder()
+    }
+
+    @Test
+    fun `test that get others sort order invokes sort order mapper`() = runTest {
+        val order = MegaApiJava.ORDER_SIZE_DESC
+        whenever(megaLocalStorageGateway.getOthersSortOrder()).thenReturn(order)
+        underTest.getOthersSortOrder()
+        verify(sortOrderMapper).invoke(order)
+    }
+
     fun `test that get offline sort order return type is sort order`() = runTest {
         val order = MegaApiJava.ORDER_CREATION_ASC
         whenever(megaLocalStorageGateway.getOfflineSortOrder()).thenReturn(order)

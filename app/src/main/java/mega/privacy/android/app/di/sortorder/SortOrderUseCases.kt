@@ -38,8 +38,8 @@ class SortOrderUseCases {
      * Provide the GetOthersSortOrder implementation
      */
     @Provides
-    fun provideGetOthersSortOrder(filesRepository: FilesRepository): GetOthersSortOrder =
-        GetOthersSortOrder(filesRepository::getOthersSortOrder)
+    fun provideGetOthersSortOrder(sortOrderRepository: SortOrderRepository): GetOthersSortOrder =
+        GetOthersSortOrder(sortOrderRepository::getOthersSortOrder)
 
     /**
      * Provide the GetLinksSortOrder implementation

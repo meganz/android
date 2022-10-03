@@ -17,6 +17,7 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
+import mega.privacy.android.app.presentation.photos.timeline.model.Sort
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
@@ -157,14 +158,15 @@ class DefaultFilesRepository @Inject constructor(
             megaApiGateway.getNodeByFingerprint(fingerprint)
         }
 
-    override suspend fun getIncomingSharesNode(order: Int?): List<MegaNode> =
+    override suspend fun getIncomingSharesNode(order: SortOrder): List<MegaNode> =
         withContext(ioDispatcher) {
-            megaApiGateway.getIncomingSharesNode(order)
+            megaApiGateway.getIncomingSharesNode(sortOrderIntMapper(order))
         }
 
-    override suspend fun getOutgoingSharesNode(order: Int): List<ShareData> =
+    override suspend fun getOutgoingSharesNode(order: SortOrder): List<ShareData> =
         withContext(ioDispatcher) {
-            megaApiGateway.getOutgoingSharesNode(order).map { megaShareMapper(it) }
+            megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(order))
+                .map { megaShareMapper(it) }
         }
 
     override suspend fun isNodeInRubbish(handle: Long) = withContext(ioDispatcher) {
@@ -179,10 +181,6 @@ class DefaultFilesRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.getPublicLinks(sortOrderIntMapper(order))
         }
-
-    override suspend fun getOthersSortOrder(): Int = withContext(ioDispatcher) {
-        megaLocalStorageGateway.getOthersSortOrder()
-    }
 
     override suspend fun hasInboxChildren(): Boolean = withContext(ioDispatcher) {
         megaApiGateway.getInboxNode()?.let { megaApiGateway.hasChildren(it) } ?: false

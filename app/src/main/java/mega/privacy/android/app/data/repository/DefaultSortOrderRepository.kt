@@ -37,6 +37,10 @@ class DefaultSortOrderRepository @Inject constructor(
         sortOrderMapper(megaLocalStorageGateway.getLinksSortOrder())
     }
 
+    override suspend fun getOthersSortOrder(): SortOrder = withContext(ioDispatcher) {
+        sortOrderMapper(megaLocalStorageGateway.getOthersSortOrder())
+    }
+
     override suspend fun getOfflineSortOrder(): SortOrder = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getOfflineSortOrder())
     }
@@ -44,5 +48,4 @@ class DefaultSortOrderRepository @Inject constructor(
     override suspend fun setOfflineSortOrder(order: SortOrder) = withContext(ioDispatcher) {
         megaLocalStorageGateway.setOfflineSortOrder(sortOrderIntMapper(order))
     }
-
 }
