@@ -149,7 +149,7 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
         this.buckets = buckets
         reloadItems(buckets)
         adapter = RecentsAdapter(
-            requireContext(),
+            requireActivity(),
             this,
             recentActionsItems)
         listView.adapter = adapter
@@ -280,7 +280,7 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
             )
             putThumbnailLocation(intent, listView, index, Constants.VIEWER_FROM_RECETS, adapter)
             startActivity(intent)
-            (requireContext() as ManagerActivity).overridePendingTransition(0, 0)
+            requireActivity().overridePendingTransition(0, 0)
             return
         }
         val localPath = FileUtil.getLocalFile(node)
@@ -306,7 +306,7 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
             }
             launchIntent(intent, paramsSetSuccessfully, node, index)
         } else if (MimeTypeList.typeForName(node.name).isURL) {
-            manageURLNode(requireContext(), megaApi, node)
+            manageURLNode(requireActivity(), megaApi, node)
         } else if (MimeTypeList.typeForName(node.name).isPdf) {
             intent = Intent(requireContext(), PdfViewerActivity::class.java)
             intent.putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
@@ -346,7 +346,7 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
         position: Int,
     ) {
         if (intent != null && !MegaApiUtils.isIntentAvailable(requireContext(), intent)) {
-            (requireContext() as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
+            (requireActivity() as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
                 getString(R.string.intent_not_available),
                 -1)
             return
@@ -358,8 +358,8 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
                 position,
                 Constants.VIEWER_FROM_RECETS,
                 adapter)
-            requireContext().startActivity(intent)
-            (requireContext() as ManagerActivity).overridePendingTransition(0, 0)
+            requireActivity().startActivity(intent)
+            requireActivity().overridePendingTransition(0, 0)
         }
     }
 }
