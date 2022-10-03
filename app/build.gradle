@@ -274,6 +274,7 @@ dependencies {
     implementation project(':domain')
     implementation project(':sdk')
     implementation project(':presentation')
+    implementation project(':data')
 
     qaImplementation project(':screenshot')
 

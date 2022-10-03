@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
-import mega.privacy.android.app.data.facade.CacheFacade
+import mega.privacy.android.data.facade.CacheFacade
 import mega.privacy.android.app.data.facade.CacheFolderFacade
 import mega.privacy.android.app.data.facade.MegaApiFacade
 import mega.privacy.android.app.data.facade.MegaApiFolderFacade
@@ -15,7 +15,7 @@ import mega.privacy.android.app.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.app.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.app.data.gateway.AppInfoGateway
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
-import mega.privacy.android.app.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.app.data.gateway.DefaultAppInfoGateway
 import mega.privacy.android.app.data.gateway.DeviceGateway
 import mega.privacy.android.app.data.gateway.FileCompressionGateway
