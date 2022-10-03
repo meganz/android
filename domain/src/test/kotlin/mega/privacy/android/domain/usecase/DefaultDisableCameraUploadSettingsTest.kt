@@ -13,7 +13,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultDisableCameraUploadSettingsProcessTest {
+class DefaultDisableCameraUploadSettingsTest {
     private lateinit var underTest: DisableCameraUploadSettings
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
@@ -56,7 +56,7 @@ class DefaultDisableCameraUploadSettingsProcessTest {
             underTest(true)
             verify(cameraUploadRepository,
                 times(1)).deleteAllSyncRecords(SyncRecordType.TYPE_ANY.value)
-            verify(cameraUploadRepository, times(1)).shouldClearSyncRecords(false)
+            verify(cameraUploadRepository, times(1)).saveShouldClearCamSyncRecords(false)
         }
 
     @Test
@@ -66,7 +66,7 @@ class DefaultDisableCameraUploadSettingsProcessTest {
             underTest(true)
             verify(cameraUploadRepository,
                 times(0)).deleteAllSyncRecords(SyncRecordType.TYPE_ANY.value)
-            verify(cameraUploadRepository, times(0)).shouldClearSyncRecords(false)
+            verify(cameraUploadRepository, times(0)).saveShouldClearCamSyncRecords(false)
         }
 
     @Test
@@ -76,7 +76,7 @@ class DefaultDisableCameraUploadSettingsProcessTest {
             underTest(false)
             verify(cameraUploadRepository,
                 times(1)).deleteAllSyncRecords(SyncRecordType.TYPE_ANY.value)
-            verify(cameraUploadRepository, times(1)).shouldClearSyncRecords(false)
+            verify(cameraUploadRepository, times(1)).saveShouldClearCamSyncRecords(false)
         }
 
     @Test
@@ -86,6 +86,6 @@ class DefaultDisableCameraUploadSettingsProcessTest {
             underTest(false)
             verify(cameraUploadRepository,
                 times(0)).deleteAllSyncRecords(SyncRecordType.TYPE_ANY.value)
-            verify(cameraUploadRepository, times(0)).shouldClearSyncRecords(false)
+            verify(cameraUploadRepository, times(0)).saveShouldClearCamSyncRecords(false)
         }
 }

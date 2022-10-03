@@ -150,13 +150,6 @@ interface CameraUploadRepository {
     /**
      * Should clear camera upload sync records
      *
-     * @return
-     */
-    suspend fun shouldClearSyncRecords(clearSyncRecords: Boolean)
-
-    /**
-     * Should clear camera upload sync records
-     *
      * @return true if camera upload sync records should be cleared
      */
     suspend fun shouldClearSyncRecords(): Boolean

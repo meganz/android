@@ -1,12 +1,11 @@
 package mega.privacy.android.domain.usecase
 
-import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import javax.inject.Inject
 
 /**
- * Default Implementation of DisableCameraUploadSettingProcess
+ * Default Implementation of DisableCameraUploadSettings
  *
  */
 class DefaultDisableCameraUploadSettings @Inject constructor(
@@ -17,9 +16,5 @@ class DefaultDisableCameraUploadSettings @Inject constructor(
     override suspend fun invoke(clearCamSyncRecords: Boolean) {
         settingsRepository.setEnableCameraUpload(false)
         cameraUploadRepository.setSecondaryEnabled(false)
-        if (cameraUploadRepository.shouldClearSyncRecords()) {
-            cameraUploadRepository.deleteAllSyncRecords(SyncRecordType.TYPE_ANY.value)
-            cameraUploadRepository.shouldClearSyncRecords(false)
-        }
     }
 }

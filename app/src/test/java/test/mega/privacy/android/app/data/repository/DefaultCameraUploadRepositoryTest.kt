@@ -192,7 +192,7 @@ class DefaultCameraUploadRepositoryTest {
 
     @Test
     fun `test camera upload should clear all sync records`() = runTest {
-        whenever(localStorageGateway.shouldClearSyncRecords()).thenReturn(true)
+        whenever(localStorageGateway.saveShouldClearCamsyncRecords()).thenReturn(true)
         assertThat(underTest.shouldClearSyncRecords()).isEqualTo(true)
     }
 

@@ -138,9 +138,6 @@ class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord? =
         dbHandler.findSyncRecordByLocalPath(path, isSecondary)
 
-    override suspend fun shouldClearSyncRecords(clearSyncRecords: Boolean) =
-        dbHandler.saveShouldClearCamsyncRecords(clearSyncRecords)
-
     override suspend fun doesFileNameExist(
         fileName: String,
         isSecondary: Boolean,
