@@ -821,7 +821,7 @@ private String lastCommitMessage() {
  * @return true if triggered branch is 'release/*', otherwise return false.
  */
 private boolean isOnReleaseBranch() {
-    return  true //env.gitlabSourceBranch != null && env.gitlabSourceBranch.startsWith("release/")
+    return env.gitlabSourceBranch != null && env.gitlabSourceBranch.startsWith("release/")
 }
 
 /**
