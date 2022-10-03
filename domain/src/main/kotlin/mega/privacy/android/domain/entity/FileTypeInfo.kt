@@ -95,6 +95,18 @@ data class GifFileTypeInfo(
     override val extension: String,
 ) : ImageFileTypeInfo
 
+
+/**
+ * Raw file type info
+ *
+ * @property type
+ * @property extension
+ */
+data class RawFileTypeInfo(
+    override val type: String,
+    override val extension: String,
+) : ImageFileTypeInfo
+
 /**
  * Text file type info
  *
