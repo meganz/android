@@ -4007,6 +4007,10 @@
     <string name="chat_tab_meetings_title">Meetings</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_location_option">Location</string>
+    <!-- Hint the screen is locked in video player page -->
+    <string name="video_player_locked_hint">Screen is locked</string>
+    <!-- Hint that tap to unlock in video player page -->
+    <string name="video_player_unlock_hint">Tap to unlock</string>
     <!-- Used in chat screen to indicate last message sent by me -->
     <string name="chat_last_message_sender_me">Me</string>
 </resources>
