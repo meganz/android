@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase
 
+import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import javax.inject.Inject
 
@@ -10,10 +11,10 @@ class DefaultResetCameraUploadTimeStamps @Inject constructor(private val cameraU
     ResetCameraUploadTimeStamps {
     override suspend fun invoke(clearCamSyncRecords: Boolean) {
         cameraUploadRepository.run {
-            setCamSyncTimeStamp(0)
-            setCamVideoSyncTimeStamp(0)
-            setSecSyncTimeStamp(0)
-            setSecVideoSyncTimeStamp(0)
+            setSyncTimeStamp(0, SyncTimeStamp.PRIMARY_PHOTO)
+            setSyncTimeStamp(0, SyncTimeStamp.PRIMARY_VIDEO)
+            setSyncTimeStamp(0, SyncTimeStamp.SECONDARY_PHOTO)
+            setSyncTimeStamp(0, SyncTimeStamp.SECONDARY_VIDEO)
             saveShouldClearCamSyncRecords(clearCamSyncRecords)
         }
     }

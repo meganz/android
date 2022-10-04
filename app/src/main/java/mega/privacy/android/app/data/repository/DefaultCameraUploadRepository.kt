@@ -264,22 +264,6 @@ class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.backupTimestampsAndFolderHandle(primaryHandle, secondaryHandle)
     }
 
-    override suspend fun setCamSyncTimeStamp(value: Int) = withContext(ioDispatcher) {
-        localStorageGateway.setCamSyncTimeStamp(value)
-    }
-
-    override suspend fun setCamVideoSyncTimeStamp(value: Int) = withContext(ioDispatcher) {
-        localStorageGateway.setCamVideoSyncTimeStamp(value)
-    }
-
-    override suspend fun setSecSyncTimeStamp(value: Int) = withContext(ioDispatcher) {
-        localStorageGateway.setSecSyncTimeStamp(value)
-    }
-
-    override suspend fun setSecVideoSyncTimeStamp(value: Int) = withContext(ioDispatcher) {
-        localStorageGateway.setSecVideoSyncTimeStamp(value)
-    }
-
     override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) =
         withContext(ioDispatcher) {
             localStorageGateway.saveShouldClearCamSyncRecords(clearCamSyncRecords)
