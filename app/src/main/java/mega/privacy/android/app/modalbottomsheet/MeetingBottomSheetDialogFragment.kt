@@ -6,13 +6,21 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
 import mega.privacy.android.app.databinding.BottomSheetMeetingSimpleBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClickListener {
 
     companion object {
@@ -28,7 +36,10 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
             }
     }
 
-    private val showSimpleList by lazy { arguments?.getBoolean(SHOW_SIMPLE_LIST, false) ?: false }
+    @Inject
+    lateinit var getFeatureFlag: GetFeatureFlagValue
+
+    private val showSimpleList by lazy { arguments?.getBoolean(SHOW_SIMPLE_LIST) ?: false }
     private var listener: MeetingBottomSheetDialogActionListener? = null
 
     @SuppressLint("RestrictedApi")
@@ -39,6 +50,13 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
             val binding = BottomSheetMeetingSimpleBinding.inflate(LayoutInflater.from(context), null, false)
             binding.btnStartMeeting.setOnClickListener(this)
             binding.btnJoinMeeting.setOnClickListener(this)
+
+            activity?.lifecycleScope?.launch {
+                val scheduleMeetingEnabled = getFeatureFlag(AppFeatures.ScheduleMeeting)
+                binding.dividerSchedule.isVisible = scheduleMeetingEnabled
+                binding.btnScheduleMeeting.isVisible = scheduleMeetingEnabled
+                binding.btnScheduleMeeting.setOnClickListener(this@MeetingBottomSheetDialogFragment)
+            }
             dialog.setContentView(binding.root)
         } else {
             val binding = BottomSheetMeetingBinding.inflate(LayoutInflater.from(context), null, false)
@@ -65,6 +83,10 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
             }
             R.id.iv_join_meeting, R.id.btn_join_meeting -> {
                 listener?.onJoinMeeting()
+                dismiss()
+            }
+            R.id.btn_schedule_meeting -> {
+                // Start schedule meeting screen
                 dismiss()
             }
         }
