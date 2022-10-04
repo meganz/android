@@ -310,7 +310,6 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -783,7 +782,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private int bottomItemBeforeOpenFullscreenOffline = INVALID_VALUE;
     private OfflineFragment fullscreenOfflineFragment;
     private OfflineFragment pagerOfflineFragment;
-    private RecentsFragment pagerRecentsFragment;
 
     AlertDialog statusDialog;
     private AlertDialog processFileDialog;
@@ -4829,16 +4827,6 @@ public class ManagerActivity extends TransfersManagementActivity
     public void pagerOfflineFragmentClosed(OfflineFragment fragment) {
         if (fragment == pagerOfflineFragment) {
             pagerOfflineFragment = null;
-        }
-    }
-
-    public void pagerRecentsFragmentOpened(RecentsFragment fragment) {
-        pagerRecentsFragment = fragment;
-    }
-
-    public void pagerRecentsFragmentClosed(RecentsFragment fragment) {
-        if (fragment == pagerRecentsFragment) {
-            pagerRecentsFragment = null;
         }
     }
 
