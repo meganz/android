@@ -5,7 +5,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaPreferences
-import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.model.UserCredentials
@@ -138,9 +137,6 @@ class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord? =
         dbHandler.findSyncRecordByLocalPath(path, isSecondary)
-
-    override suspend fun shouldClearSyncRecords(clearSyncRecords: Boolean) =
-        dbHandler.saveShouldClearCamsyncRecords(clearSyncRecords)
 
     override suspend fun doesFileNameExist(
         fileName: String,
@@ -343,5 +339,9 @@ class MegaLocalStorageFacade @Inject constructor(
             .putLong(SharedPreferenceConstants.KEY_PRIMARY_HANDLE, primaryUploadFolderHandle)
             .putLong(SharedPreferenceConstants.KEY_SECONDARY_HANDLE, secondaryUploadFolderHandle)
             .apply()
+    }
+
+    override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) {
+        dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)
     }
 }
