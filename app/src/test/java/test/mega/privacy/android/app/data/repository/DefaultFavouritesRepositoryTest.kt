@@ -32,7 +32,6 @@ class DefaultFavouritesRepositoryTest {
     private lateinit var underTest: FavouritesRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
-    private val favouriteInfoMapper = mock<FavouriteInfoMapper>()
     private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
 
     private val node = mock<MegaNode> {
@@ -40,12 +39,6 @@ class DefaultFavouritesRepositoryTest {
         on { name }.thenReturn("testName")
         on { size }.thenReturn(1000L)
         on { label }.thenReturn(MegaNode.NODE_LBL_RED)
-    }
-
-    private val gateway = mock<MegaApiGateway> {
-        on { hasVersion(node) }.thenReturn(false)
-        on { getNumChildFolders(node) }.thenReturn(0)
-        on { getNumChildFiles(node) }.thenReturn(0)
     }
 
     private val favouriteInfo = FavouriteFolder(
@@ -61,6 +54,8 @@ class DefaultFavouritesRepositoryTest {
         isExported = false,
         isTakenDown = false,
     )
+
+    private val favouriteInfoMapper: FavouriteInfoMapper = { _, _, _, _, _, _ -> favouriteInfo }
 
     private val favouriteFolderInfoMapper = ::toFavouriteFolderInfo
 
@@ -79,147 +74,89 @@ class DefaultFavouritesRepositoryTest {
     }
 
     @Test
-    fun `test that get all favourites returns successfully if no error is thrown`() {
-        runTest {
-            val megaHandleListTest = mock<MegaHandleList>()
-            whenever(megaHandleListTest.size()).thenReturn(1)
-            whenever(megaHandleListTest[0]).thenReturn(1L)
+    fun `test that get all favourites returns successfully if no error is thrown`() = runTest {
+        val megaHandleListTest = mock<MegaHandleList>()
+        whenever(megaHandleListTest.size()).thenReturn(1)
+        whenever(megaHandleListTest[0]).thenReturn(1L)
 
-            val gateway = mock<MegaApiGateway> {
-                on { hasVersion(node) }.thenReturn(false)
-                on { getNumChildFolders(node) }.thenReturn(0)
-                on { getNumChildFiles(node) }.thenReturn(0)
-            }
+        whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(node)
 
-            whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(node)
-            whenever(favouriteInfoMapper(
-                node,
-                null,
-                gateway.hasVersion(node),
-                gateway.getNumChildFolders(node),
-                gateway.getNumChildFiles(node),
-                fileTypeInfoMapper,
-            )).thenReturn(
-                favouriteInfo
-            )
-
-            val api = mock<MegaApiJava>()
-            val request = mock<MegaRequest> {
-                on { megaHandleList }.thenReturn(megaHandleListTest)
-            }
-            val error = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_OK)
-            }
-
-            whenever(megaApiGateway.getFavourites(anyOrNull(), any(), any())).thenAnswer {
-                (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
-                    api,
-                    request,
-                    error
-                )
-            }
-
-            val actual = underTest.getAllFavorites()
-            assertThat(actual[0]).isSameInstanceAs(favouriteInfo)
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest> {
+            on { megaHandleList }.thenReturn(megaHandleListTest)
         }
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        whenever(megaApiGateway.getFavourites(anyOrNull(), any(), any())).thenAnswer {
+            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                api,
+                request,
+                error
+            )
+        }
+
+        val actual = underTest.getAllFavorites()
+        assertThat(actual[0]).isSameInstanceAs(favouriteInfo)
     }
+
 
     @Test(expected = MegaException::class)
-    fun `test that get all favourites returns doesn't successfully`() {
-        runTest {
-            val megaHandleListTest = mock<MegaHandleList>()
-            whenever(megaHandleListTest.size()).thenReturn(1)
-            whenever(megaHandleListTest[0]).thenReturn(1L)
+    fun `test that get an exception is thrown if the api does not return successfully`() = runTest {
+        val megaHandleListTest = mock<MegaHandleList>()
+        whenever(megaHandleListTest.size()).thenReturn(1)
+        whenever(megaHandleListTest[0]).thenReturn(1L)
 
-            val gateway = mock<MegaApiGateway> {
-                on { hasVersion(node) }.thenReturn(false)
-                on { getNumChildFolders(node) }.thenReturn(0)
-                on { getNumChildFiles(node) }.thenReturn(0)
-            }
+        whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(node)
 
-            whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(node)
-            whenever(favouriteInfoMapper(
-                node,
-                null,
-                gateway.hasVersion(node),
-                gateway.getNumChildFolders(node),
-                gateway.getNumChildFiles(node),
-                fileTypeInfoMapper,
-            )).thenReturn(
-                favouriteInfo
-            )
-
-            val api = mock<MegaApiJava>()
-            val request = mock<MegaRequest> {
-                on { megaHandleList }.thenReturn(megaHandleListTest)
-            }
-            val error = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_OK + 1)
-            }
-
-            whenever(megaApiGateway.getFavourites(anyOrNull(), any(), any())).thenAnswer {
-                (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
-                    api,
-                    request,
-                    error
-                )
-            }
-
-            underTest.getAllFavorites()
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest> {
+            on { megaHandleList }.thenReturn(megaHandleListTest)
         }
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK + 1)
+        }
+
+        whenever(megaApiGateway.getFavourites(anyOrNull(), any(), any())).thenAnswer {
+            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                api,
+                request,
+                error
+            )
+        }
+
+        underTest.getAllFavorites()
     }
+
 
     @Test
-    fun `test that get children returns successfully if no error is thrown`() {
-        runTest {
-            val expectedParentHandle = 0L
-            val expectedParentName = "parentNodeName"
-            val expectedParentNodeHandle = 1L
-            val parentNode = mock<MegaNode> {
-                on { name }.thenReturn(expectedParentName)
-                on { parentHandle }.thenReturn(expectedParentNodeHandle)
-            }
-            val favouriteInfo = FavouriteFolder(
-                id = 0,
-                name = node.name,
-                label = node.label,
-                parentId = 0,
-                base64Id = "",
-                hasVersion = true,
-                numChildFiles = 0,
-                numChildFolders = 0,
-                isFavourite = true,
-                isExported = false,
-                isTakenDown = false,
-            )
-
-            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(parentNode)
-            whenever(megaApiGateway.getChildrenByNode(parentNode)).thenReturn(arrayListOf(node))
-
-            whenever(favouriteInfoMapper(
-                node,
-                null,
-                gateway.hasVersion(node),
-                gateway.getNumChildFolders(node),
-                gateway.getNumChildFiles(node),
-                fileTypeInfoMapper,
-            )).thenReturn(
-                favouriteInfo
-            )
-
-            val actual = underTest.getChildren(expectedParentHandle)
-
-            val favouriteFolderInfo = FavouriteFolderInfo(
-                children = listOf(favouriteInfo),
-                name = parentNode.name,
-                currentHandle = expectedParentHandle,
-                parentHandle = parentNode.parentHandle
-            )
-
-            assertThat(actual?.children?.get(0)).isSameInstanceAs(favouriteFolderInfo.children[0])
-            assertThat(actual?.currentHandle).isEqualTo(favouriteFolderInfo.currentHandle)
-            assertThat(actual?.parentHandle).isEqualTo(favouriteFolderInfo.parentHandle)
-            assertThat(actual?.name).isEqualTo(favouriteFolderInfo.name)
+    fun `test that get children returns successfully if no error is thrown`() = runTest {
+        val expectedParentHandle = 0L
+        val expectedParentName = "parentNodeName"
+        val expectedParentNodeHandle = 1L
+        val parentNode = mock<MegaNode> {
+            on { name }.thenReturn(expectedParentName)
+            on { parentHandle }.thenReturn(expectedParentNodeHandle)
         }
+
+        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(parentNode)
+        whenever(megaApiGateway.getChildrenByNode(parentNode)).thenReturn(arrayListOf(node))
+
+
+        val actual = underTest.getChildren(expectedParentHandle)
+
+        val favouriteFolderInfo = FavouriteFolderInfo(
+            children = listOf(favouriteInfo),
+            name = parentNode.name,
+            currentHandle = expectedParentHandle,
+            parentHandle = parentNode.parentHandle
+        )
+
+        assertThat(actual?.children?.get(0)).isSameInstanceAs(favouriteFolderInfo.children[0])
+        assertThat(actual?.currentHandle).isEqualTo(favouriteFolderInfo.currentHandle)
+        assertThat(actual?.parentHandle).isEqualTo(favouriteFolderInfo.parentHandle)
+        assertThat(actual?.name).isEqualTo(favouriteFolderInfo.name)
     }
+
 }

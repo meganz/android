@@ -1,6 +1,8 @@
 package test.mega.privacy.android.app.data.mapper
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.mapper.toFavouriteInfo
 import mega.privacy.android.domain.entity.FavouriteFile
@@ -10,6 +12,7 @@ import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.mock
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class FavouriteInfoMapperTest {
     private val expectedName = "testName"
     private val expectedSize = 1000L
@@ -20,38 +23,40 @@ class FavouriteInfoMapperTest {
     private val expectedModificationTime = 123L
 
     @Test
-    fun `test that files are mapped if isFile is true`() {
+    fun `test that files are mapped if isFile is true`() = runTest {
         val megaNode = getMockNode(isFile = true)
-        val actual = toFavouriteInfo(megaNode, null, false, 0, 1) { PdfFileTypeInfo }
+        val actual =
+            toFavouriteInfo(megaNode, { null }, { false }, { 0 }, { 1 }) { PdfFileTypeInfo }
 
         assertThat(actual).isInstanceOf(FavouriteFile::class.java)
     }
 
     @Test
-    fun `test that folders are mapped if isFile is false`() {
+    fun `test that folders are mapped if isFile is false`() = runTest {
         val megaNode = getMockNode(isFile = false)
-        val actual = toFavouriteInfo(megaNode, null, false, 0, 1) { PdfFileTypeInfo }
+        val actual =
+            toFavouriteInfo(megaNode, { null }, { false }, { 0 }, { 1 }) { PdfFileTypeInfo }
 
         assertThat(actual).isInstanceOf(FavouriteFile::class.java)
     }
 
     @Test
-    fun `test that values returned by gateway are used`() {
+    fun `test that values returned by gateway are used`() = runTest {
         val node = getMockNode(isFile = false)
         val expectedHasVersion = true
         val expectedNumChildFolders = 2
         val expectedNumChildFiles = 3
         val gateway = mock<MegaApiGateway> {
-            on { hasVersion(node) }.thenReturn(expectedHasVersion)
-            on { getNumChildFolders(node) }.thenReturn(expectedNumChildFolders)
-            on { getNumChildFiles(node) }.thenReturn(expectedNumChildFiles)
+            onBlocking { hasVersion(node) }.thenReturn(expectedHasVersion)
+            onBlocking { getNumChildFolders(node) }.thenReturn(expectedNumChildFolders)
+            onBlocking { getNumChildFiles(node) }.thenReturn(expectedNumChildFiles)
         }
 
         val actual = toFavouriteInfo(node,
-            null,
-            gateway.hasVersion(node),
-            gateway.getNumChildFolders(node),
-            gateway.getNumChildFiles(node)) { VideoFileTypeInfo("", "") }
+            { null },
+            gateway::hasVersion,
+            gateway::getNumChildFolders,
+            gateway::getNumChildFiles) { VideoFileTypeInfo("", "") }
 
         assertThat(actual.name).isEqualTo(expectedName)
         assertThat(actual.label).isEqualTo(expectedLabel)

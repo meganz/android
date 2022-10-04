@@ -213,7 +213,7 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getNodeByFingerprint(fingerprint: String): MegaNode? =
         megaApi.getNodeByFingerprint(fingerprint)
 
-    override fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
+    override suspend fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
 
     override suspend fun getParentNode(node: MegaNode): MegaNode? = megaApi.getParentNode(node)
 
@@ -245,9 +245,9 @@ class MegaApiFacade @Inject constructor(
             megaApi.getPublicLinks(order)
 
 
-    override fun getNumChildFolders(node: MegaNode): Int = megaApi.getNumChildFolders(node)
+    override suspend fun getNumChildFolders(node: MegaNode): Int = megaApi.getNumChildFolders(node)
 
-    override fun getNumChildFiles(node: MegaNode): Int = megaApi.getNumChildFiles(node)
+    override suspend fun getNumChildFiles(node: MegaNode): Int = megaApi.getNumChildFiles(node)
 
     override fun setAutoAcceptContactsFromLink(
         disableAutoAccept: Boolean,
