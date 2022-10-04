@@ -5,7 +5,6 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
 import mega.privacy.android.app.utils.Util
@@ -148,27 +147,4 @@ class CacheFolderFacade @Inject constructor(
             "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
         }
             ?.takeUnless { megaNode.isFolder }
-
-    override fun purgeCacheDirectory() {
-        Timber.d("Removing cache files")
-        purgeDirectory(File(context.cacheDir.toString() + Constants.SEPARATOR))
-    }
-
-    private fun purgeDirectory(directory: File) {
-        if (!directory.exists()) {
-            return
-        }
-        try {
-            directory.listFiles()?.let {
-                for (file in it) {
-                    if (file.isDirectory) {
-                        purgeDirectory(file)
-                    }
-                }
-            }
-        } catch (exception: Exception) {
-            Timber.e(exception)
-        }
-    }
-
 }

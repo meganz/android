@@ -42,12 +42,10 @@ import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
-import mega.privacy.android.domain.repository.CacheFileRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
-import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
@@ -328,13 +326,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideBackupTimeStampsAndFolderHandle(cameraUploadRepository: CameraUploadRepository): BackupTimeStampsAndFolderHandle =
             BackupTimeStampsAndFolderHandle(cameraUploadRepository::backupTimestampsAndFolderHandle)
-
-        /**
-         * Provide the ClearCacheDirectory implementation
-         */
-        @Provides
-        fun provideClearCacheDirectory(cacheFileRepository: CacheFileRepository): ClearCacheDirectory =
-            ClearCacheDirectory(cacheFileRepository::purgeCacheDirectory)
     }
 
     /**
