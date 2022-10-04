@@ -234,7 +234,7 @@ interface MegaApiGateway {
      * @param node node that is checked
      * @return true is has version
      */
-    fun hasVersion(node: MegaNode): Boolean
+    suspend fun hasVersion(node: MegaNode): Boolean
 
     /**
      * Get children nodes by node
@@ -277,14 +277,14 @@ interface MegaApiGateway {
      * @param node current folder node
      * @return child folder number
      */
-    fun getNumChildFolders(node: MegaNode): Int
+    suspend fun getNumChildFolders(node: MegaNode): Int
 
     /**
      * Get child files number of current folder
      * @param node current folder node
      * @return child files number
      */
-    fun getNumChildFiles(node: MegaNode): Int
+    suspend fun getNumChildFiles(node: MegaNode): Int
 
 
     /**
