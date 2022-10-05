@@ -63,11 +63,10 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     private int mHeaderColor = -1;
 
-    public RecentsAdapter(Context context, Object fragment, List<RecentActionItemType> items) {
+    public RecentsAdapter(Context context, Object fragment) {
         Timber.d("new RecentsAdapter");
         this.context = context;
         this.fragment = fragment;
-        setItems(items);
 
         megaApi = MegaApplication.getInstance().getMegaApi();
 

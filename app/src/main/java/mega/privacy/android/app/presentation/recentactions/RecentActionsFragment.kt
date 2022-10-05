@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.recentactions
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Spanned
@@ -40,7 +39,6 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
-import mega.privacy.android.app.utils.SharedPreferenceConstants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
@@ -84,7 +82,9 @@ class RecentActionsFragment : Fragment() {
         emptyLayout = binding.emptyStateRecents
         emptyText = binding.emptyTextRecents
         showActivityButton = binding.showActivityButton
-        showActivityButton.setOnClickListener { showRecentActivity() }
+        showActivityButton.setOnClickListener {
+            viewModel.disableHideRecentActionsActivitySettings()
+        }
         emptySpanned = TextUtil.formatEmptyScreenText(requireContext(),
             StringResourcesUtils.getString(R.string.context_empty_recents))
         activityHiddenSpanned = TextUtil.formatEmptyScreenText(requireContext(),
@@ -102,7 +102,8 @@ class RecentActionsFragment : Fragment() {
 
         LiveEventBus.get(EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
             .observe(viewLifecycleOwner) { hideRecentActivity: Boolean ->
-                this.setRecentView(hideRecentActivity)
+                this.displayRecentActionsActivity(hideRecentActivity,
+                    viewModel.recentActionsItems.value.size)
             }
 
         observeDragSupportEvents(viewLifecycleOwner, listView, Constants.VIEWER_FROM_RECETS)
@@ -110,8 +111,10 @@ class RecentActionsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.recentActionsItems.collectLatest {
-                    refreshRecentActions(it)
-                    setRecentView()
+                    setRecentActions(it)
+                    displayRecentActionsActivity(viewModel.getHideRecentActionsActivitySettings(),
+                        it.size)
+                    (requireActivity() as ManagerActivity).setToolbarTitle()
                 }
             }
         }
@@ -122,74 +125,79 @@ class RecentActionsFragment : Fragment() {
         _binding = null
     }
 
+    /**
+     * Initialize the adapter
+     */
     private fun initAdapter() {
         adapter = RecentsAdapter(
             requireActivity(),
             this,
-            viewModel.recentActionsItems.value)
+        )
         listView.adapter = adapter
         listView.addItemDecoration(HeaderItemDecoration(requireContext()))
-        listView.layoutManager =
-            TopSnappedStickyLayoutManager(requireContext()) { viewModel.recentActionsItems.value }
         listView.clipToPadding = false
         listView.itemAnimator = DefaultItemAnimator()
     }
 
-    private fun refreshRecentActions(recentActionItems: List<RecentActionItemType>) {
+    /**
+     * Set the recent actions list to the adapter
+     *
+     * @param recentActionItems
+     */
+    private fun setRecentActions(recentActionItems: List<RecentActionItemType>) {
         adapter?.setItems(recentActionItems)
-        setRecentView()
-    }
-
-    private fun setRecentView() {
-        val hideRecentActivity = requireContext()
-            .getSharedPreferences(SharedPreferenceConstants.USER_INTERFACE_PREFERENCES,
-                Context.MODE_PRIVATE)
-            .getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
-        setRecentView(hideRecentActivity)
-        (requireActivity() as ManagerActivity).setToolbarTitle()
+        listView.layoutManager =
+            TopSnappedStickyLayoutManager(requireContext()) { recentActionItems }
     }
 
     /**
-     * Sets the recent view. Hide it if the setting to hide it is enabled, and shows it if the
+     * Display the recent actions activity.
+     * Hide the activity if the setting to hide is enabled, and shows it if the
      * setting is disabled.
      *
      * @param hideRecentActivity True if the setting to hide the recent activity is enabled,
      * false otherwise.
+     * @param listSize
      */
-    private fun setRecentView(hideRecentActivity: Boolean) {
-        if (hideRecentActivity) {
-            hideRecentActivity()
-        } else {
-            showActivity()
+    private fun displayRecentActionsActivity(hideRecentActivity: Boolean, listSize: Int) {
+        when {
+            hideRecentActivity -> hideActivity()
+            listSize == 0 -> showEmptyActivity()
+            else -> showActivity(listSize)
         }
     }
 
     /**
-     * Shows the recent activity.
+     * Show an empty activity
      */
-    private fun showActivity() {
-        if (viewModel.recentActionsItems.value.isEmpty()) {
-            emptyLayout.visibility = View.VISIBLE
-            listView.visibility = View.GONE
-            fastScroller.visibility = View.GONE
-            showActivityButton.visibility = View.GONE
-            emptyText.text = emptySpanned
-        } else {
-            emptyLayout.visibility = View.GONE
-            listView.visibility = View.VISIBLE
-            fastScroller.setRecyclerView(listView)
-            if (viewModel.recentActionsItems.value.size < Constants.MIN_ITEMS_SCROLLBAR) {
-                fastScroller.visibility = View.GONE
-            } else {
-                fastScroller.visibility = View.VISIBLE
-            }
-        }
+    private fun showEmptyActivity() {
+        emptyLayout.visibility = View.VISIBLE
+        listView.visibility = View.GONE
+        fastScroller.visibility = View.GONE
+        showActivityButton.visibility = View.GONE
+        emptyText.text = emptySpanned
     }
 
     /**
-     * Hides the recent activity.
+     * Show the recent activity
+     *
+     * @param listSize
      */
-    private fun hideRecentActivity() {
+    private fun showActivity(listSize: Int) {
+        emptyLayout.visibility = View.GONE
+        listView.visibility = View.VISIBLE
+        fastScroller.setRecyclerView(listView)
+        fastScroller.visibility =
+            if (listSize < Constants.MIN_ITEMS_SCROLLBAR)
+                View.GONE
+            else
+                View.VISIBLE
+    }
+
+    /**
+     * Hide the recent activity
+     */
+    private fun hideActivity() {
         emptyLayout.visibility = View.VISIBLE
         listView.visibility = View.GONE
         fastScroller.visibility = View.GONE
@@ -197,16 +205,6 @@ class RecentActionsFragment : Fragment() {
         emptyText.text = activityHiddenSpanned
     }
 
-    /**
-     * Disables the setting to hide recent activity and updates the UI by showing it.
-     */
-    private fun showRecentActivity() {
-        LiveEventBus.get(EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
-            .post(false)
-        requireContext().getSharedPreferences(SharedPreferenceConstants.USER_INTERFACE_PREFERENCES,
-            Context.MODE_PRIVATE)
-            .edit().putBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false).apply()
-    }
 
     fun openFile(index: Int, node: MegaNode) {
         val intent: Intent
