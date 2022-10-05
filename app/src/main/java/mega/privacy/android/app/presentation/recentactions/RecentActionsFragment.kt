@@ -34,8 +34,7 @@ import mega.privacy.android.app.fragments.recent.SelectedBucketViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForSingleNode
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
-import mega.privacy.android.app.presentation.recentactions.model.RecentActionItem
-import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemHeader
+import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
@@ -69,7 +68,7 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
 
     private val visibleContacts = ArrayList<MegaContactAdapter>()
     private var buckets: List<MegaRecentActionBucket> = listOf()
-    private var recentActionsItems: List<RecentActionItem?> = listOf()
+    private var recentActionsItems: List<RecentActionItemType?> = listOf()
 
     private var adapter: RecentsAdapter? = null
     private lateinit var emptyLayout: ScrollView
@@ -143,7 +142,7 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
         _binding = null
     }
 
-    override fun getAdapterData(): List<RecentActionItem?> = recentActionsItems
+    override fun getAdapterData(): List<RecentActionItemType?> = recentActionsItems
 
     private fun fillRecentItems(buckets: List<MegaRecentActionBucket>) {
         this.buckets = buckets
@@ -158,22 +157,20 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
     }
 
     private fun reloadItems(buckets: List<MegaRecentActionBucket>) {
-        val recentItemList = arrayListOf<RecentActionItem>()
-        var previousDate = ""
-        var currentDate: String
+        val recentItemList = arrayListOf<RecentActionItemType>()
+        var previousDate: Long? = null
+        var currentDate: Long
         for (i in buckets.indices) {
             val item =
-                RecentActionItem(
-                    requireContext(),
-                    buckets[i])
+                RecentActionItemType.Item(buckets[i])
             if (i == 0) {
-                currentDate = item.date
+                currentDate = item.timestamp
                 previousDate = currentDate
-                recentItemList.add(RecentActionItemHeader(currentDate))
+                recentItemList.add(RecentActionItemType.Header(currentDate))
             } else {
-                currentDate = item.date
+                currentDate = item.timestamp
                 if (currentDate != previousDate) {
-                    recentItemList.add(RecentActionItemHeader(currentDate))
+                    recentItemList.add(RecentActionItemType.Header(currentDate))
                     previousDate = currentDate
                 }
             }
