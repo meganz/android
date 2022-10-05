@@ -49,7 +49,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
@@ -68,7 +67,6 @@ class RecentActionsFragment : Fragment() {
     lateinit var megaApi: MegaApiAndroid
 
     private val visibleContacts = ArrayList<MegaContactAdapter>()
-    private var recentActionsItems: List<RecentActionItemType?> = listOf()
 
     private var adapter: RecentsAdapter? = null
     private lateinit var emptyLayout: ScrollView
@@ -116,9 +114,8 @@ class RecentActionsFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.buckets.collectLatest {
-                    reloadItems(it)
-                    refreshRecentActions()
+                viewModel.recentActionsItems.collectLatest {
+                    refreshRecentActions(it)
                     setVisibleContacts()
                     setRecentView()
                 }
@@ -135,40 +132,17 @@ class RecentActionsFragment : Fragment() {
         adapter = RecentsAdapter(
             requireActivity(),
             this,
-            recentActionsItems)
+            viewModel.recentActionsItems.value)
         listView.adapter = adapter
         listView.addItemDecoration(HeaderItemDecoration(requireContext()))
         listView.layoutManager =
-            TopSnappedStickyLayoutManager(requireContext()) { recentActionsItems }
+            TopSnappedStickyLayoutManager(requireContext()) { viewModel.recentActionsItems.value }
         listView.clipToPadding = false
         listView.itemAnimator = DefaultItemAnimator()
     }
 
-    private fun reloadItems(buckets: List<MegaRecentActionBucket>) {
-        val recentItemList = arrayListOf<RecentActionItemType>()
-        var previousDate: Long? = null
-        var currentDate: Long
-        for (i in buckets.indices) {
-            val item =
-                RecentActionItemType.Item(buckets[i])
-            if (i == 0) {
-                currentDate = item.timestamp
-                previousDate = currentDate
-                recentItemList.add(RecentActionItemType.Header(currentDate))
-            } else {
-                currentDate = item.timestamp
-                if (currentDate != previousDate) {
-                    recentItemList.add(RecentActionItemType.Header(currentDate))
-                    previousDate = currentDate
-                }
-            }
-            recentItemList.add(item)
-        }
-        recentActionsItems = recentItemList
-    }
-
-    private fun refreshRecentActions() {
-        adapter?.setItems(recentActionsItems)
+    private fun refreshRecentActions(recentActionItems: List<RecentActionItemType>) {
+        adapter?.setItems(recentActionItems)
         setRecentView()
     }
 
@@ -200,7 +174,7 @@ class RecentActionsFragment : Fragment() {
      * Shows the recent activity.
      */
     private fun showActivity() {
-        if (viewModel.buckets.value.isEmpty()) {
+        if (viewModel.recentActionsItems.value.isEmpty()) {
             emptyLayout.visibility = View.VISIBLE
             listView.visibility = View.GONE
             fastScroller.visibility = View.GONE
@@ -210,7 +184,7 @@ class RecentActionsFragment : Fragment() {
             emptyLayout.visibility = View.GONE
             listView.visibility = View.VISIBLE
             fastScroller.setRecyclerView(listView)
-            if (viewModel.buckets.value.size < Constants.MIN_ITEMS_SCROLLBAR) {
+            if (viewModel.recentActionsItems.value.size < Constants.MIN_ITEMS_SCROLLBAR) {
                 fastScroller.visibility = View.GONE
             } else {
                 fastScroller.visibility = View.VISIBLE
