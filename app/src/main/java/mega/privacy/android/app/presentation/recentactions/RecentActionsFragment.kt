@@ -208,9 +208,6 @@ class RecentActionsFragment : Fragment() {
             .edit().putBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false).apply()
     }
 
-    fun findUserName(mail: String): String =
-        viewModel.getUserName(mail)
-
     fun openFile(index: Int, node: MegaNode) {
         val intent: Intent
         if (MimeTypeList.typeForName(node.name).isImage) {

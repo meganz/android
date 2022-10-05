@@ -3,17 +3,15 @@ package mega.privacy.android.app.presentation.recentactions
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetRecentActions
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import nz.mega.sdk.MegaRecentActionBucket
 import javax.inject.Inject
@@ -22,32 +20,24 @@ import javax.inject.Inject
  * ViewModel associated to [RecentActionsFragment]
  *
  * @param getRecentActions
+ * @param getVisibleContacts
  * @param monitorNodeUpdates
  */
 @HiltViewModel
 class RecentActionsViewModel @Inject constructor(
-    getRecentActions: GetRecentActions,
+    private val getRecentActions: GetRecentActions,
+    private val getVisibleContacts: GetVisibleContacts,
     monitorNodeUpdates: MonitorNodeUpdates,
-    getVisibleContacts: GetVisibleContacts,
 ) : ViewModel() {
 
-    private val _buckets = MutableStateFlow<List<MegaRecentActionBucket>>(emptyList())
+    private var _buckets = listOf<MegaRecentActionBucket>()
+
+    private val _recentActionsItems = MutableStateFlow<List<RecentActionItemType>>(emptyList())
 
     /**
      * List of recent actions to display
      */
-    val recentActionsItems =
-        _buckets
-            .map { reloadItems(it) }
-            .stateIn(viewModelScope,
-                SharingStarted.WhileSubscribed(),
-                emptyList()
-            )
-
-    /**
-     * Hold the list of contacts
-     */
-    private var visibleContacts = emptyList<ContactItem>()
+    val recentActionsItems = _recentActionsItems.asStateFlow()
 
     /**
      * Selected recent actions bucket
@@ -61,13 +51,11 @@ class RecentActionsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _buckets.emit(getRecentActions())
-            visibleContacts =
-                getVisibleContacts().filter { it.visibility == UserVisibility.Visible }
             monitorNodeUpdates().collectLatest {
-                _buckets.emit(getRecentActions())
+                updateRecentActions()
             }
         }
+        updateRecentActions()
     }
 
     /**
@@ -75,17 +63,22 @@ class RecentActionsViewModel @Inject constructor(
      */
     fun select(bucket: MegaRecentActionBucket) {
         selected = bucket
-        snapShotActionList = _buckets.value
+        snapShotActionList = _buckets
     }
 
     /**
-     *  Get the full name of a contact given his mail
-     *
-     *  @param mail
-     *  @return the full name of the contact or empty string if cannot be retrieved
+     * Update the recent actions list
      */
-    fun getUserName(mail: String): String =
-        visibleContacts.find { mail == it.email }?.contactData?.fullName.orEmpty()
+    private fun updateRecentActions() = viewModelScope.launch {
+        val getRecentActions = async {
+            getRecentActions().also { _buckets = it }
+        }
+        val getVisibleContacts = async { getVisibleContacts() }
+
+        val formattedList =
+            formatRecentActions(getRecentActions.await(), getVisibleContacts.await())
+        _recentActionsItems.emit(formattedList)
+    }
 
     /**
      * Format a list of [RecentActionItemType] from a [MegaRecentActionBucket]
@@ -93,26 +86,27 @@ class RecentActionsViewModel @Inject constructor(
      * @param buckets
      * @return a list of [RecentActionItemType]
      */
-    private fun reloadItems(buckets: List<MegaRecentActionBucket>): List<RecentActionItemType> {
+    private fun formatRecentActions(
+        buckets: List<MegaRecentActionBucket>,
+        visibleContacts: List<ContactItem>,
+    ): List<RecentActionItemType> {
+
         val recentItemList = arrayListOf<RecentActionItemType>()
         var previousDate: Long? = null
-        var currentDate: Long
-        for (i in buckets.indices) {
-            val item =
-                RecentActionItemType.Item(buckets[i])
-            if (i == 0) {
-                currentDate = item.timestamp
+
+        buckets.forEach { bucket ->
+            val currentDate = bucket.timestamp
+
+            if (currentDate != previousDate) {
                 previousDate = currentDate
                 recentItemList.add(RecentActionItemType.Header(currentDate))
-            } else {
-                currentDate = item.timestamp
-                if (currentDate != previousDate) {
-                    recentItemList.add(RecentActionItemType.Header(currentDate))
-                    previousDate = currentDate
-                }
             }
-            recentItemList.add(item)
+
+            val userName =
+                visibleContacts.find { bucket.userEmail == it.email }?.contactData?.fullName.orEmpty()
+            recentItemList.add(RecentActionItemType.Item(bucket, userName))
         }
+
         return recentItemList
     }
 }

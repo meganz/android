@@ -209,7 +209,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             if (mail.equals(megaApi.getMyEmail())) {
                 holder.actionBy.setVisibility(View.GONE);
             } else {
-                user = ((RecentActionsFragment) fragment).findUserName(mail);
+                user = ((RecentActionItemType.Item) item).getUserName();
                 if (bucket.isUpdate()) {
                     userAction = context.getString(R.string.update_action_bucket, user);
                 } else {
