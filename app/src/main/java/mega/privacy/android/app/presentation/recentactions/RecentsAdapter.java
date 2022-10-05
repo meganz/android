@@ -367,7 +367,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 }
                 if (bucket == null) break;
 
-                ((RecentActionsFragment) fragment).getViewModel().select(bucket, megaApi.getRecentActions());
+                ((RecentActionsFragment) fragment).getViewModel().select(bucket);
                 NavDestination currentDestination = Navigation.findNavController(v).getCurrentDestination();
                 if (currentDestination != null && currentDestination.getId() == R.id.homepageFragment) {
                     Navigation.findNavController(v).navigate(HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(), new NavOptions.Builder().build());

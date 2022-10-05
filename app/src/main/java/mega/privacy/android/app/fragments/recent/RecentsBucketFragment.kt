@@ -107,7 +107,7 @@ class RecentsBucketFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.setBucket(recentActionsViewModel.selected)
-        viewModel.setCachedActionList(recentActionsViewModel.currentActionList)
+        viewModel.setCachedActionList(recentActionsViewModel.snapShotActionList)
 
         viewModel.shouldCloseFragment.observe(viewLifecycleOwner) {
             if (it) Navigation.findNavController(view).popBackStack()
