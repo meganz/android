@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
@@ -219,6 +220,45 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            retryConnectionsAndSignalPresence()
+            cDriveExplorer = cloudExplorerFragment
+            iSharesExplorer = incomingExplorerFragment
+
+            if (importFileF && importFragmentSelected != CLOUD_FRAGMENT) {
+                when (importFragmentSelected) {
+                    CHAT_FRAGMENT -> {
+                        if (ACTION_UPLOAD_TO_CHAT == action) {
+                            finishAndRemoveTask()
+                        } else {
+                            chatExplorer = chatExplorerFragment
+
+                            if (chatExplorer != null) {
+                                chatExplorer?.clearSelections()
+                                showFabButton(false)
+                                chooseFragment(IMPORT_FRAGMENT)
+                            }
+                        }
+                    }
+                    IMPORT_FRAGMENT -> {
+                        finishAndRemoveTask()
+                    }
+                }
+            } else if (isCloudVisible) {
+                if (cDriveExplorer?.onBackPressed() == 0) {
+                    performImportFileBack()
+                }
+            } else if (isIncomingVisible) {
+                if (iSharesExplorer?.onBackPressed() == 0) {
+                    performImportFileBack()
+                }
+            } else {
+                finish()
+            }
+        }
+    }
+
     override fun onRequestStart(api: MegaChatApiJava, request: MegaChatRequest) {}
 
     override fun onRequestUpdate(api: MegaChatApiJava, request: MegaChatRequest) {}
@@ -322,6 +362,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         Timber.d("onCreate first")
 
         super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         setupObservers()
 
@@ -1202,46 +1243,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         }
     }
 
-    override fun onBackPressed() {
-        Timber.d("tabShown: %s", tabShown)
-        if (psaWebBrowser?.consumeBack() == true) return
-
-        retryConnectionsAndSignalPresence()
-        cDriveExplorer = cloudExplorerFragment
-        iSharesExplorer = incomingExplorerFragment
-
-        if (importFileF && importFragmentSelected != CLOUD_FRAGMENT) {
-            when (importFragmentSelected) {
-                CHAT_FRAGMENT -> {
-                    if (ACTION_UPLOAD_TO_CHAT == action) {
-                        finishAndRemoveTask()
-                    } else {
-                        chatExplorer = chatExplorerFragment
-
-                        if (chatExplorer != null) {
-                            chatExplorer?.clearSelections()
-                            showFabButton(false)
-                            chooseFragment(IMPORT_FRAGMENT)
-                        }
-                    }
-                }
-                IMPORT_FRAGMENT -> {
-                    finishAndRemoveTask()
-                }
-            }
-        } else if (isCloudVisible) {
-            if (cDriveExplorer?.onBackPressed() == 0) {
-                performImportFileBack()
-            }
-        } else if (isIncomingVisible) {
-            if (iSharesExplorer?.onBackPressed() == 0) {
-                performImportFileBack()
-            }
-        } else {
-            super.onBackPressed()
-        }
-    }
-
     private fun performImportFileBack() {
         if (importFileF) {
             chooseFragment(IMPORT_FRAGMENT)
@@ -2005,7 +2006,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         Timber.d("onOptionsItemSelected")
         when (item.itemId) {
             android.R.id.home -> {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
             R.id.cab_menu_create_folder -> {
                 newFolderDialog = showNewFolderDialog(this, this,
