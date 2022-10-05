@@ -22,7 +22,7 @@ import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.app.data.gateway.preferences.UIPreferencesGateway
-import mega.privacy.android.app.data.mapper.StartScreenMapper
+import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface

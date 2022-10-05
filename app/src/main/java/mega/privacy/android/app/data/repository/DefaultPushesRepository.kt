@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.app.data.mapper.ChatRequestMapper
+import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.app.fcm.NewTokenWorker.Companion.NEW_TOKEN
