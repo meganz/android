@@ -901,7 +901,7 @@
         <item quantity="other">The folder is shared with %1$d contacts. Remove all shares?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">Invalid email and/or password. Please try again.</string>
+    <string name="error_incorrect_email_or_password">Invalid email or password. Please try again.</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">Your account has been suspended due to Terms of Service violations. Please contact support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
@@ -4007,10 +4007,12 @@
     <string name="chat_tab_meetings_title">Meetings</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_location_option">Location</string>
+    <!-- Used in chat screen to indicate last message sent by me -->
+    <string name="chat_last_message_sender_me">Me</string>
     <!-- Hint the screen is locked in video player page -->
     <string name="video_player_locked_hint">Screen is locked</string>
     <!-- Hint that tap to unlock in video player page -->
     <string name="video_player_unlock_hint">Tap to unlock</string>
-    <!-- Used in chat screen to indicate last message sent by me -->
-    <string name="chat_last_message_sender_me">Me</string>
+    <!-- Label that schedule a meeting -->
+    <string name="chat_schedule_meeting">Schedule meeting</string>
 </resources>
