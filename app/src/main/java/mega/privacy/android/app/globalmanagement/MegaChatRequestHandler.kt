@@ -8,8 +8,6 @@ import me.leolin.shortcutbadger.ShortcutBadger
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY
-import mega.privacy.android.app.data.mapper.toChatRequest
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
 import mega.privacy.android.app.main.LoginActivity
@@ -18,6 +16,8 @@ import mega.privacy.android.app.main.megachat.BadgeIntentService
 import mega.privacy.android.app.middlelayer.BuildFlavorHelper.isHMS
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.data.mapper.ChatRequestMapper
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -54,6 +54,7 @@ class MegaChatRequestHandler @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     private val passcodeManagement: PasscodeManagement,
     private val transfersManagement: TransfersManagement,
+    private val chatRequestMapper: ChatRequestMapper,
 ) : MegaChatRequestListenerInterface {
     private var isLoggingRunning = false
 
@@ -143,7 +144,7 @@ class MegaChatRequestHandler @Inject constructor(
                     Timber.d("OK:TYPE_PUSH_RECEIVED")
                     if (!megaApi.isEphemeralPlusPlus) {
                         ChatAdvancedNotificationBuilder.newInstance(application)
-                            .generateChatNotification(toChatRequest(request))
+                            .generateChatNotification(chatRequestMapper(request))
                     }
                 } else {
                     Timber.w("Error TYPE_PUSH_RECEIVED: %s", e.errorString)

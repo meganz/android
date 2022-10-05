@@ -1,9 +1,8 @@
-package test.mega.privacy.android.app.data.mapper
+package mega.privacy.android.data.mapper
 
-import mega.privacy.android.app.data.mapper.toAccountType
 import mega.privacy.android.domain.entity.AccountType
 import nz.mega.sdk.MegaAccountDetails
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class AccountTypeMapperTest {
