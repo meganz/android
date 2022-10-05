@@ -96,9 +96,9 @@ class ChatTabsFragment : Fragment() {
 
             TabLayoutMediator(binding.tabs, this) { tab, position ->
                 tab.text = if (position == CHAT.ordinal) {
-                    StringResourcesUtils.getString(R.string.section_chat)
+                    StringResourcesUtils.getString(R.string.chats_label)
                 } else {
-                    StringResourcesUtils.getString(R.string.context_meeting)
+                    StringResourcesUtils.getString(R.string.chat_tab_meetings_title)
                 }
             }.attach()
 

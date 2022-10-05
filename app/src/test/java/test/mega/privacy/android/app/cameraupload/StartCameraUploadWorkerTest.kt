@@ -109,7 +109,7 @@ class StartCameraUploadWorkerTest {
                 *permissions
             )
         ).thenReturn(true)
-        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota(context)).thenReturn(false)
+        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(false)
         whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
             false
         )
@@ -125,7 +125,7 @@ class StartCameraUploadWorkerTest {
                 *permissions
             )
         ).thenReturn(false)
-        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota(context)).thenReturn(false)
+        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(false)
         whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
             false
         )
@@ -141,7 +141,7 @@ class StartCameraUploadWorkerTest {
                 *permissions
             )
         ).thenReturn(true)
-        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota(context)).thenReturn(true)
+        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(true)
         whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
             false
         )
@@ -157,7 +157,7 @@ class StartCameraUploadWorkerTest {
                 *permissions
             )
         ).thenReturn(true)
-        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota(context)).thenReturn(false)
+        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(false)
         whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
             true
         )

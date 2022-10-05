@@ -11,30 +11,74 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorStr
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
 
+/**
+ * RemoveListener
+ * @property snackbarShower: SnackbarShower
+ * @property isIncomingShare: Boolean
+ * @property onFinish: Lambda
+ */
 class RemoveListener(
     private val snackbarShower: SnackbarShower? = null,
     private val isIncomingShare: Boolean = false,
-    private val onFinish: ((Boolean) -> Unit)? = null
-) : BaseListener(MegaApplication.getInstance()) {
+    private val onFinish: ((Boolean) -> Unit)? = null,
+) : MegaRequestListenerInterface {
 
+    /**
+     * Callback function for onRequestStart
+     *
+     * @param api : MegaApiJava
+     * @param request : MegaRequest
+     */
+    override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {
+        // Do nothing
+    }
+
+    /**
+     * Callback function for onRequestUpdate
+     *
+     * @param api : MegaApiJava
+     * @param request : MegaRequest
+     */
+    override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {
+        // Do nothing
+    }
+
+
+    /**
+     * Callback function for onRequestFinish
+     *
+     * @param api : MegaApiJava
+     * @param request : MegaRequest
+     * @param e: MegaError
+     */
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        if (request.type != MegaRequest.TYPE_REMOVE) {
-            return
-        }
+        if (request.type == MegaRequest.TYPE_REMOVE) {
+            if (isIncomingShare) {
+                if (e.errorCode == MegaError.API_OK) {
+                    Intent(BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR).run {
+                        putExtra(BroadcastConstants.SNACKBAR_TEXT, getString(R.string.share_left))
+                        MegaApplication.getInstance().sendBroadcast(this)
+                    }
+                } else {
+                    snackbarShower?.showSnackbar(getTranslatedErrorString(e))
+                }
 
-        if (isIncomingShare) {
-            if (e.errorCode == MegaError.API_OK) {
-                val intent = Intent(BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR)
-                intent.putExtra(BroadcastConstants.SNACKBAR_TEXT, getString(R.string.share_left))
-                context.sendBroadcast(intent)
-            } else {
-                snackbarShower?.showSnackbar(getTranslatedErrorString(e))
+                return
             }
-
-            return
+            onFinish?.invoke(e.errorCode == MegaError.API_OK)
         }
+    }
 
-        onFinish?.invoke(e.errorCode == MegaError.API_OK)
+    /**
+     * Callback function for onRequestTemporaryError
+     *
+     * @param api : MegaApiJava
+     * @param request : MegaRequest
+     * @param e: MegaError
+     */
+    override fun onRequestTemporaryError(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
+        // Do nothing
     }
 }

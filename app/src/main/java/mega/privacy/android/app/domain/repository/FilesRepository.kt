@@ -50,6 +50,14 @@ interface FilesRepository {
     suspend fun getRubbishBinNode(): MegaNode?
 
     /**
+     * Check is megaNode in rubbish bin
+     *
+     * @param node MegaNode
+     * @return if node is in rubbish bin
+     */
+    suspend fun isInRubbish(node: MegaNode): Boolean
+
+    /**
      * Get the parent node of a MegaNode
      *
      * @param node
@@ -74,7 +82,7 @@ interface FilesRepository {
      * @param order order for the returned list
      * @return Children nodes of a parent node
      */
-    suspend fun getChildrenNode(parentNode: MegaNode, order: Int? = null): List<MegaNode>
+    suspend fun getChildrenNode(parentNode: MegaNode, order: SortOrder? = null): List<MegaNode>
 
     /**
      * Get the node corresponding to a handle
@@ -82,6 +90,15 @@ interface FilesRepository {
      * @param handle
      */
     suspend fun getNodeByHandle(handle: Long): MegaNode?
+
+    /**
+     * Get the MegaNode by path
+     *
+     * @param path
+     * @param megaNode Base node if the path is relative
+     * @return megaNode in the path or null
+     */
+    suspend fun getNodeByPath(path: String?, megaNode: MegaNode?): MegaNode?
 
     /**
      * Get the fingerprint of a file by path
@@ -122,10 +139,10 @@ interface FilesRepository {
     /**
      * Get a list of all incoming shares
      *
-     * @param order sort order, if null the default order is applied
+     * @param order sort order
      * @return List of MegaNode that other users are sharing with this account
      */
-    suspend fun getIncomingSharesNode(order: Int? = null): List<MegaNode>
+    suspend fun getIncomingSharesNode(order: SortOrder): List<MegaNode>
 
     /**
      * Authorize and return a MegaNode can be downloaded with any instance of MegaApi
@@ -143,35 +160,10 @@ interface FilesRepository {
      * MegaApi::ORDER_DEFAULT_DESC, MegaApi::ORDER_LINK_CREATION_ASC,
      * MegaApi::ORDER_LINK_CREATION_DESC
      *
-     * @param order sort order, if null the default order is applied
+     * @param order sort order
      * @return List of MegaNode corresponding of a public link
      */
-    suspend fun getPublicLinks(order: Int?): List<MegaNode>?
-
-    /**
-     * Get cloud sort order
-     * @return cloud sort order
-     */
-    suspend fun getCloudSortOrder(): Int
-
-    /**
-     * Get camera sort order
-     * @return camera sort order
-     */
-    suspend fun getCameraSortOrder(): SortOrder
-
-    /**
-     * Get others sort order
-     * @return others sort order
-     */
-    suspend fun getOthersSortOrder(): Int
-
-    /**
-     * Get links cloud sort order
-     * @return links cloud sort order
-     */
-    suspend fun getLinksSortOrder(): Int
-
+    suspend fun getPublicLinks(order: SortOrder): List<MegaNode>
 
     /**
      * Checks if Inbox node has children.

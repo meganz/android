@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">L’abonnement a été annulé</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Il nous a été impossible d’annuler votre abonnement. Veuillez contacter support&#64;mega.nz pour obtenir de l’assistance</string>
+    <string name="cancel_subscription_error">Il nous a été impossible d’annuler votre abonnement. Veuillez contacter support&#64;mega.nz pour obtenir de l’assistance.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Fermer les autres sessions</string>
     <!-- Message after kill all opened sessions -->
@@ -323,7 +323,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Visualiser les transferts</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">La plupart des appareils ne peuvent pas télécharger des fichiers supérieurs à 4&#160;Go. Votre téléchargement échouera probablement</string>
+    <string name="error_file_size_greater_than_4gb">La plupart des appareils ne peuvent pas télécharger des fichiers supérieurs à 4&#160;Go. Votre téléchargement échouera probablement.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Aucune appli installée sur votre appareil ne peut exécuter ce fichier</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->

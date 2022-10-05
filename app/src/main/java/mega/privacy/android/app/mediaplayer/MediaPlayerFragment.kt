@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -46,6 +47,8 @@ import timber.log.Timber
 class MediaPlayerFragment : Fragment() {
     private var audioPlayerVH: AudioPlayerViewHolder? = null
     private var videoPlayerVH: VideoPlayerViewHolder? = null
+
+    private val viewModel: MediaPlayerViewModel by activityViewModels()
 
     private var serviceGateway: MediaPlayerServiceGateway? = null
     private var playerServiceViewModelGateway: PlayerServiceViewModelGateway? = null
@@ -110,7 +113,7 @@ class MediaPlayerFragment : Fragment() {
 
         observeFlow()
 
-        if (!isVideoPlayer()) {
+        if (isAudioPlayer) {
             delayHideToolbar()
         }
     }
@@ -149,7 +152,6 @@ class MediaPlayerFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-
         if (isVideoPlayer() && serviceGateway?.playing() == true) {
             serviceGateway?.setPlayWhenReady(false)
             videoPlayerPausedForPlaylist = true
@@ -158,13 +160,11 @@ class MediaPlayerFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-
         outState.putBoolean(KEY_VIDEO_PAUSED_FOR_PLAYLIST, videoPlayerPausedForPlaylist)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-
         playlistObserved = false
     }
 
@@ -177,70 +177,71 @@ class MediaPlayerFragment : Fragment() {
     }
 
     private fun observeFlow() {
-        serviceGateway?.run {
-            metadataUpdate().flowWithLifecycle(
-                viewLifecycleOwner.lifecycle,
-                Lifecycle.State.RESUMED
-            ).onEach { metadata ->
-                if (isAudioPlayer) {
-                    audioPlayerVH?.displayMetadata(metadata)
-                } else {
-                    videoPlayerVH?.displayMetadata(metadata)
-                }
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
-        }
-        playerServiceViewModelGateway?.run {
-            if (!playlistObserved && view != null) {
-                playlistObserved = true
-
-                playlistUpdate().flowWithLifecycle(
+        if (view != null) {
+            serviceGateway?.run {
+                metadataUpdate().flowWithLifecycle(
                     viewLifecycleOwner.lifecycle,
                     Lifecycle.State.RESUMED
-                ).onEach {
-                    Timber.d("MediaPlayerService observed playlist ${it.first.size} items")
-
-                    audioPlayerVH?.togglePlaylistEnabled(it.first)
-                    videoPlayerVH?.togglePlaylistEnabled(it.first)
+                ).onEach { metadata ->
+                    if (isAudioPlayer) {
+                        audioPlayerVH?.displayMetadata(metadata)
+                    } else {
+                        videoPlayerVH?.displayMetadata(metadata)
+                    }
                 }.launchIn(viewLifecycleOwner.lifecycleScope)
+            }
+            playerServiceViewModelGateway?.run {
+                if (!playlistObserved) {
+                    playlistObserved = true
+                    playlistUpdate().flowWithLifecycle(
+                        viewLifecycleOwner.lifecycle,
+                        Lifecycle.State.RESUMED
+                    ).onEach {
+                        Timber.d("MediaPlayerService observed playlist ${it.first.size} items")
 
-                retryUpdate().flowWithLifecycle(
-                    viewLifecycleOwner.lifecycle,
-                    Lifecycle.State.RESUMED
-                ).onEach { isRetry ->
-                    when {
-                        !isRetry && retryFailedDialog == null -> {
-                            retryFailedDialog = MaterialAlertDialogBuilder(requireContext())
-                                .setCancelable(false)
-                                .setMessage(
-                                    StringResourcesUtils.getString(
-                                        if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
-                                        else R.string.error_fail_to_open_file_no_network
+                        audioPlayerVH?.togglePlaylistEnabled(it.first)
+                        videoPlayerVH?.togglePlaylistEnabled(it.first)
+                    }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+                    retryUpdate().flowWithLifecycle(
+                        viewLifecycleOwner.lifecycle,
+                        Lifecycle.State.RESUMED
+                    ).onEach { isRetry ->
+                        when {
+                            !isRetry && retryFailedDialog == null -> {
+                                retryFailedDialog = MaterialAlertDialogBuilder(requireContext())
+                                    .setCancelable(false)
+                                    .setMessage(
+                                        StringResourcesUtils.getString(
+                                            if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
+                                            else R.string.error_fail_to_open_file_no_network
+                                        )
                                     )
-                                )
-                                .setPositiveButton(
-                                    StringResourcesUtils.getString(R.string.general_ok)
-                                ) { _, _ ->
-                                    serviceGateway?.stopAudioPlayer()
-                                    requireActivity().finish()
-                                }
-                                .show()
+                                    .setPositiveButton(
+                                        StringResourcesUtils.getString(R.string.general_ok)
+                                    ) { _, _ ->
+                                        serviceGateway?.stopAudioPlayer()
+                                        requireActivity().finish()
+                                    }
+                                    .show()
+                            }
+                            isRetry -> {
+                                retryFailedDialog?.dismiss()
+                                retryFailedDialog = null
+                            }
                         }
-                        isRetry -> {
-                            retryFailedDialog?.dismiss()
-                            retryFailedDialog = null
-                        }
-                    }
-                }.launchIn(viewLifecycleOwner.lifecycleScope)
+                    }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-                mediaPlaybackUpdate().flowWithLifecycle(
-                    viewLifecycleOwner.lifecycle,
-                    Lifecycle.State.RESUMED
-                ).onEach { isPaused ->
-                    if (isVideoPlayer()) {
-                        // The keepScreenOn is true when the video is playing, otherwise it's false.
-                        videoPlayerView?.keepScreenOn = !isPaused
-                    }
-                }.launchIn(viewLifecycleOwner.lifecycleScope)
+                    mediaPlaybackUpdate().flowWithLifecycle(
+                        viewLifecycleOwner.lifecycle,
+                        Lifecycle.State.RESUMED
+                    ).onEach { isPaused ->
+                        if (isVideoPlayer()) {
+                            // The keepScreenOn is true when the video is playing, otherwise it's false.
+                            videoPlayerView?.keepScreenOn = !isPaused
+                        }
+                    }.launchIn(viewLifecycleOwner.lifecycleScope)
+                }
             }
         }
     }
@@ -275,7 +276,9 @@ class MediaPlayerFragment : Fragment() {
                 (requireActivity() as MediaPlayerActivity).setDraggable(false)
                 findNavController().navigate(R.id.action_player_to_playlist)
             }
-
+            viewHolder.setupLockUI(viewModel.isLockUpdate.value) { isLock ->
+                viewModel.updateLockStatus(isLock)
+            }
             initRepeatToggleButtonForVideo(viewHolder)
         }
     }
@@ -296,17 +299,18 @@ class MediaPlayerFragment : Fragment() {
                     RepeatToggleMode.REPEAT_ONE
                 }
             )
-            viewHolder.setupRepeatToggleButton(defaultRepeatMode) { repeatToggleButton ->
+            viewHolder.setupRepeatToggleButton(requireContext(),
+                defaultRepeatMode) { repeatToggleButton ->
                 val repeatToggleMode =
                     playerServiceViewModelGateway?.videoRepeatToggleMode()
                         ?: RepeatToggleMode.REPEAT_NONE
 
                 if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
                     setRepeatModeForVideo(RepeatToggleMode.REPEAT_ONE)
-                    repeatToggleButton.setImageResource(R.drawable.exo_controls_repeat_all)
+                    repeatToggleButton.setColorFilter(requireContext().getColor(R.color.teal_300))
                 } else {
                     setRepeatModeForVideo(RepeatToggleMode.REPEAT_NONE)
-                    repeatToggleButton.setImageResource(R.drawable.exo_controls_repeat_off)
+                    repeatToggleButton.setColorFilter(requireContext().getColor(R.color.white))
                 }
             }
         }
@@ -364,7 +368,16 @@ class MediaPlayerFragment : Fragment() {
 
     private fun showToolbar() {
         toolbarVisible = true
-        (requireActivity() as MediaPlayerActivity).showToolbar()
+        val mediaPlayerActivity = requireActivity() as MediaPlayerActivity
+        if (isAudioPlayer) {
+            mediaPlayerActivity.showToolbar()
+        } else {
+            if (viewModel.isLockUpdate.value) {
+                mediaPlayerActivity.showSystemUI()
+            } else {
+                mediaPlayerActivity.showToolbar()
+            }
+        }
     }
 
     /**

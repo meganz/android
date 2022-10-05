@@ -194,6 +194,9 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode? =
         megaApi.getNodeByHandle(nodeHandle)
 
+    override suspend fun getNodeByPath(path: String?, megaNode: MegaNode?): MegaNode? =
+        megaApi.getNodeByPath(path, megaNode)
+
     override suspend fun getFingerprint(filePath: String): String? =
         megaApi.getFingerprint(filePath)
 
@@ -210,7 +213,7 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getNodeByFingerprint(fingerprint: String): MegaNode? =
         megaApi.getNodeByFingerprint(fingerprint)
 
-    override fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
+    override suspend fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
 
     override suspend fun getParentNode(node: MegaNode): MegaNode? = megaApi.getParentNode(node)
 
@@ -242,9 +245,9 @@ class MegaApiFacade @Inject constructor(
             megaApi.getPublicLinks(order)
 
 
-    override fun getNumChildFolders(node: MegaNode): Int = megaApi.getNumChildFolders(node)
+    override suspend fun getNumChildFolders(node: MegaNode): Int = megaApi.getNumChildFolders(node)
 
-    override fun getNumChildFiles(node: MegaNode): Int = megaApi.getNumChildFiles(node)
+    override suspend fun getNumChildFiles(node: MegaNode): Int = megaApi.getNumChildFiles(node)
 
     override fun setAutoAcceptContactsFromLink(
         disableAutoAccept: Boolean,
@@ -341,7 +344,7 @@ class MegaApiFacade @Inject constructor(
     override suspend fun getUserAvatarColor(megaUser: MegaUser): String =
         megaApi.getUserAvatarColor(megaUser)
 
-    override suspend fun getUserAvatar(user: MegaUser, dstPath: String): Boolean {
+    override suspend fun getUserAvatar(user: MegaUser, destinationPath: String): Boolean {
         return suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, e ->
@@ -350,8 +353,9 @@ class MegaApiFacade @Inject constructor(
                 onRequestTemporaryError = { _, e -> continuation.resume(e.errorCode == MegaError.API_OK) })
 
             continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
-            megaApi.getUserAvatar(user,
-                dstPath,
+            megaApi.getUserAvatar(
+                user,
+                destinationPath,
                 listener
             )
         }
@@ -440,4 +444,24 @@ class MegaApiFacade @Inject constructor(
 
     override fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaError =
         megaApi.checkAccessErrorExtended(node, level)
+
+    override fun getPricing(listener: MegaRequestListenerInterface?) {
+        megaApi.getPricing(listener)
+    }
+
+    override fun getPaymentMethods(listener: MegaRequestListenerInterface?) {
+        megaApi.getPaymentMethods(listener)
+    }
+
+    override fun getAccountDetails(listener: MegaRequestListenerInterface?) {
+        megaApi.getAccountDetails(listener)
+    }
+
+    override fun getSpecificAccountDetails(storage: Boolean, transfer: Boolean, pro: Boolean) {
+        megaApi.getSpecificAccountDetails(storage, transfer, pro)
+    }
+
+    override fun creditCardQuerySubscriptions(listener: MegaRequestListenerInterface?) {
+        megaApi.creditCardQuerySubscriptions(listener)
+    }
 }

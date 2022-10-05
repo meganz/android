@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">The subscription has been cancelled</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">We were unable to cancel your subscription. Please contact support&#64;mega.nz for assistance</string>
+    <string name="cancel_subscription_error">We were unable to cancel your subscription. Please contact support&#64;mega.nz for assistance.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Close other sessions</string>
     <!-- Message after kill all opened sessions -->
@@ -315,7 +315,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">View transfers</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Most devices can’t download files greater than 4&#160;GB. Your download will probably fail</string>
+    <string name="error_file_size_greater_than_4gb">Most devices can’t download files greater than 4&#160;GB. Your download will probably fail.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">There isn’t any available app to execute this file on your device</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -722,7 +722,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA SDK Version</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGAchat SDK Version</string>
+    <string name="settings_about_karere_version">MEGA chat SDK Version</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">View source code</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -1898,7 +1898,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Enable rich URL previews</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.</string>
+    <string name="text_enable_rich_links">Enhance the MEGA chat experience. URL content will be retrieved without end-to-end encryption.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Please enter a stronger password</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -4005,4 +4005,14 @@
     <string name="dialog_account_suspended_ToS_non_copyright_message">Account terminated due to a breach of MEGA’s Terms of Service, such as abuse of others’ rights, sharing and importing illegal data, or system abuse.</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Allow non-hosts to add participants</string>
+    <!-- Title of the Meetings tab for the chat section -->
+    <string name="chat_tab_meetings_title">Meetings</string>
+    <!-- Title of the location option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_location_option">Location</string>
+    <!-- Hint the screen is locked in video player page -->
+    <string name="video_player_locked_hint">Screen is locked</string>
+    <!-- Hint that tap to unlock in video player page -->
+    <string name="video_player_unlock_hint">Tap to unlock</string>
+    <!-- Used in chat screen to indicate last message sent by me -->
+    <string name="chat_last_message_sender_me">Me</string>
 </resources>

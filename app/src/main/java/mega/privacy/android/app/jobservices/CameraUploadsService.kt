@@ -47,17 +47,21 @@ import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
-import mega.privacy.android.app.domain.usecase.GetChildMegaNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
+import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.GetFingerprint
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
+import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
+import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
+import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
+import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.listeners.CreateFolderListener
 import mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction
@@ -94,22 +98,20 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback
 import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
-import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetRemoveGps
-import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoQuality
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
@@ -119,9 +121,7 @@ import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
-import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
-import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
@@ -356,24 +356,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var getSyncRecordByPath: GetSyncRecordByPath
 
     /**
-     * SaveSyncRecord
-     */
-    @Inject
-    lateinit var saveSyncRecord: SaveSyncRecord
-
-    /**
-     * FileNameExists
-     */
-    @Inject
-    lateinit var fileNameExists: FileNameExists
-
-    /**
-     * KeepFileNames
-     */
-    @Inject
-    lateinit var keepFileNames: KeepFileNames
-
-    /**
      * GetPendingSyncRecords
      */
     @Inject
@@ -384,12 +366,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var compressedVideoPending: CompressedVideoPending
-
-    /**
-     * GetSyncRecordByFingerprint
-     */
-    @Inject
-    lateinit var getSyncRecordByFingerprint: GetSyncRecordByFingerprint
 
     /**
      * GetVideoSyncRecordsByStatus
@@ -446,12 +422,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var getParentMegaNode: GetParentMegaNode
 
     /**
-     * GetChildMegaNode
-     */
-    @Inject
-    lateinit var getChildMegaNode: GetChildMegaNode
-
-    /**
      * GetChildrenNode
      */
     @Inject
@@ -470,6 +440,36 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var saveSyncRecordsToDB: SaveSyncRecordsToDB
 
     /**
+     * GetPrimarySyncHandle
+     */
+    @Inject
+    lateinit var getPrimarySyncHandle: GetPrimarySyncHandle
+
+    /**
+     * GetSecondarySyncHandle
+     */
+    @Inject
+    lateinit var getSecondarySyncHandle: GetSecondarySyncHandle
+
+    /**
+     * SetPrimarySyncHandle
+     */
+    @Inject
+    lateinit var setPrimarySyncHandle: SetPrimarySyncHandle
+
+    /**
+     * SetSecondarySyncHandle
+     */
+    @Inject
+    lateinit var setSecondarySyncHandle: SetSecondarySyncHandle
+
+    /**
+     * GetDefaultNodeHandle
+     */
+    @Inject
+    lateinit var getDefaultNodeHandle: GetDefaultNodeHandle
+
+    /**
      * DatabaseHandler
      */
     @Inject
@@ -482,25 +482,21 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var areAllUploadTransfersPaused: AreAllUploadTransfersPaused
 
     /**
-     * Coroutine scope for service
-     */
-    @ApplicationScope
-    @Inject
-    lateinit var sharingScope: CoroutineScope
-
-    /**
      * Coroutine dispatcher for camera upload work
      */
     @IoDispatcher
     @Inject
     lateinit var ioDispatcher: CoroutineDispatcher
 
+    /**
+     * Coroutine Scope for camera upload work
+     */
     private var coroutineScope: CoroutineScope? = null
+
     private var app: MegaApplication? = null
     private var megaApi: MegaApiAndroid? = null
     private var megaApiFolder: MegaApiAndroid? = null
     private var receiver: NetworkTypeChangeReceiver? = null
-    private var handler: Handler? = null
     private var wifiLock: WifiLock? = null
     private var wakeLock: PowerManager.WakeLock? = null
     private var videoCompressor: VideoCompressor? = null
@@ -518,8 +514,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var totalUploaded = 0
     private var totalToUpload = 0
     private var lastUpdated: Long = 0
-    private var cameraUploadHandle = MegaApiJava.INVALID_HANDLE
-    private var secondaryUploadHandle = MegaApiJava.INVALID_HANDLE
     private var getAttrUserListener: GetCameraUploadAttributeListener? = null
     private var setAttrUserListener: SetAttrUserListener? = null
     private var createFolderListener: CreateFolderListener? = null
@@ -534,7 +528,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private val chargingStopReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            sharingScope.launch {
+            coroutineScope?.launch {
                 if (isChargingRequired((videoCompressor?.totalInputSize ?: 0) / (1024 * 1024))) {
                     Timber.d("Detected device stops charging.")
                     videoCompressor?.stop()
@@ -552,7 +546,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     megaApi?.cancelTransfer(transfer)
                 }
                 sendTransfersInterruptedInfoToBackupCenter()
-                finish()
+                endService()
             }
         }
     }
@@ -562,11 +556,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     override fun onCreate() {
         super.onCreate()
+        coroutineScope = CoroutineScope(ioDispatcher)
         startForegroundNotification()
         registerReceiver(chargingStopReceiver, IntentFilter(Intent.ACTION_POWER_DISCONNECTED))
         registerReceiver(batteryInfoReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        registerReceiver(pauseReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION))
+        registerReceiver(
+            pauseReceiver,
+            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION)
+        )
         getAttrUserListener = GetCameraUploadAttributeListener(this)
         setAttrUserListener = SetAttrUserListener(this)
         createFolderListener = CreateFolderListener(this, ExtraAction.INIT_CAMERA_UPLOAD)
@@ -586,6 +583,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         getAttrUserListener = null
         setAttrUserListener = null
         createFolderListener = null
+        megaApi?.let {
+            it.removeRequestListener(this)
+            it.removeTransferListener(this)
+        }
         stopActiveHeartbeat()
     }
 
@@ -602,7 +603,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     override fun onTypeChanges(type: Int) {
         Timber.d("Network type change to: %s", type)
-        sharingScope.launch {
+        coroutineScope?.launch {
             stopByNetworkStateChange =
                 type == NetworkTypeChangeReceiver.MOBILE && isCameraUploadByWifi()
             if (stopByNetworkStateChange) {
@@ -611,7 +612,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 }
                 coroutineScope?.cancel("Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload")
                 sendTransfersInterruptedInfoToBackupCenter()
-                finish()
+                endService()
             }
         }
     }
@@ -628,7 +629,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         if (megaApi == null) {
             Timber.d("MegaApi is null, return.")
-            finish()
+            endService()
             return START_NOT_STICKY
         }
 
@@ -651,7 +652,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 else -> Unit
             }
             coroutineScope?.cancel("Camera Upload Stop/Cancel Intent Action - Stop Camera Upload")
-            finish()
+            endService()
             return START_NOT_STICKY
         }
 
@@ -660,9 +661,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
 
         Timber.d("Start Service - Create Coroutine")
-        coroutineScope = CoroutineScope(ioDispatcher).also {
-            it.launch { startWorker() }
-        }
+        coroutineScope?.launch { startWorker() }
+
         return START_NOT_STICKY
     }
 
@@ -708,10 +708,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         if (notificationManager == null) {
             notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         }
-        val notification = createNotification(getString(R.string.section_photo_sync),
+        val notification = createNotification(
+            getString(R.string.section_photo_sync),
             getString(R.string.settings_camera_notif_initializing_title),
             null,
-            false)
+            false
+        )
         startForeground(notificationId, notification)
     }
 
@@ -728,36 +730,36 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         runCatching {
             if (!hasCredentials()) {
                 Timber.w("There are no user credentials")
-                finish()
+                endService()
                 return
             }
             if (!hasPreferences()) {
                 Timber.w("Preferences not defined, so not enabled")
-                finish()
+                endService()
                 return
             }
             if (!isCameraUploadSyncEnabled()) {
                 Timber.w("Sync enabled not defined or not enabled")
-                finish()
+                endService()
                 return
             }
             if (!Util.isOnline(applicationContext)) {
                 Timber.w("Not online")
-                finish()
+                endService()
                 return
             }
             if (isDeviceLowOnBattery(batteryIntent)) {
-                finish()
+                endService()
                 return
             }
             if (TextUtil.isTextEmpty(localPath())) {
                 Timber.w("LocalPath is not defined, so not enabled")
-                finish()
+                endService()
                 return
             }
             if (isWifiNotSatisfied()) {
                 Timber.w("Cannot start, WiFi required")
-                finish()
+                endService()
                 return
             }
             val result = shouldRun()
@@ -766,11 +768,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 0 -> startCameraUploads()
                 LOGIN_IN, CHECKING_USER_ATTRIBUTE, TARGET_FOLDER_NOT_EXIST, SETTING_USER_ATTRIBUTE ->
                     Timber.d("Wait for login or check user attribute.")
-                else -> finish()
+                else -> endService()
             }
         }.onFailure { exception ->
             Timber.e(exception)
-            handler?.removeCallbacksAndMessages(null)
             releaseLocks()
             if (isOverQuota) {
                 showStorageOverQuotaNotification()
@@ -784,15 +785,17 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 stopForeground(true)
             }
             cancelNotification()
-            finish()
+            endService()
         }
     }
 
     private suspend fun startCameraUploads() {
-        showNotification(getString(R.string.section_photo_sync),
+        showNotification(
+            getString(R.string.section_photo_sync),
             getString(R.string.settings_camera_notif_checking_title),
             pendingIntent,
-            false)
+            false
+        )
         // Start the real uploading process, before is checking settings.
         filesFromMediaStore()
     }
@@ -826,10 +829,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 val modifiedColumn =
                     cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED)
                 while (cursor.moveToNext()) {
-                    getUploadMediaFromCursor(cursor,
+                    getUploadMediaFromCursor(
+                        cursor,
                         dataColumn,
                         addedColumn,
-                        modifiedColumn).takeIf {
+                        modifiedColumn
+                    ).takeIf {
                         isFilePathValid(it, parentPath)
                     }?.let(this::add)
                 }
@@ -902,16 +907,16 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private suspend fun filesFromMediaStore() {
         Timber.d("Get Pending Files from Media Store Database")
-        val primaryUploadNode = getNodeByHandle(cameraUploadHandle)
+        val primaryUploadNode = getNodeByHandle(getPrimarySyncHandle())
         if (primaryUploadNode == null) {
             Timber.d("ERROR: Primary Parent Folder is NULL")
-            finish()
+            endService()
             return
         }
         val secondaryEnabled = isSecondaryFolderEnabled()
         val secondaryUploadNode = if (secondaryEnabled) {
             Timber.d("Secondary Upload is ENABLED")
-            getNodeByHandle(secondaryUploadHandle)
+            getNodeByHandle(getSecondarySyncHandle())
         } else {
             null
         }
@@ -931,17 +936,21 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             ) {
                 // Photos
                 primaryPhotos.addAll(
-                    buildMediaQueue(uri,
+                    buildMediaQueue(
+                        uri,
                         localPath(),
                         pageSize,
-                        selectionQuery(SyncTimeStamp.PRIMARY_PHOTO))
+                        selectionQuery(SyncTimeStamp.PRIMARY_PHOTO)
+                    )
                 )
                 if (secondaryEnabled) {
                     secondaryPhotos.addAll(
-                        buildMediaQueue(uri,
+                        buildMediaQueue(
+                            uri,
                             localPathSecondary(),
                             pageSize,
-                            selectionQuery(SyncTimeStamp.SECONDARY_PHOTO))
+                            selectionQuery(SyncTimeStamp.SECONDARY_PHOTO)
+                        )
                     )
                 }
             } else if (uri == MediaStore.Video.Media.EXTERNAL_CONTENT_URI
@@ -949,30 +958,36 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             ) {
                 // Videos
                 primaryVideos.addAll(
-                    buildMediaQueue(uri,
+                    buildMediaQueue(
+                        uri,
                         localPath(),
                         pageSizeVideo,
-                        selectionQuery(SyncTimeStamp.PRIMARY_VIDEO))
+                        selectionQuery(SyncTimeStamp.PRIMARY_VIDEO)
+                    )
                 )
                 if (secondaryEnabled) {
                     secondaryVideos.addAll(
-                        buildMediaQueue(uri,
+                        buildMediaQueue(
+                            uri,
                             localPathSecondary(),
                             pageSizeVideo,
-                            selectionQuery(SyncTimeStamp.SECONDARY_VIDEO))
+                            selectionQuery(SyncTimeStamp.SECONDARY_VIDEO)
+                        )
                     )
                 }
             }
         }
 
         totalUploaded = 0
-        prepareUpload(primaryPhotos,
+        prepareUpload(
+            primaryPhotos,
             primaryVideos,
             secondaryPhotos,
             secondaryVideos,
             secondaryEnabled,
             primaryUploadNode,
-            secondaryUploadNode)
+            secondaryUploadNode
+        )
     }
 
     private suspend fun prepareUpload(
@@ -984,44 +999,60 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         primaryUploadNode: MegaNode?,
         secondaryUploadNode: MegaNode?,
     ) {
-        Timber.d("\nPrimary photo count from media store database: %d\nSecondary photo count from media store database: %d\nPrimary video count from media store database: %d\nSecondary video count from media store database: %d",
+        Timber.d(
+            "\nPrimary photo count from media store database: %d\nSecondary photo count from media store database: %d\nPrimary video count from media store database: %d\nSecondary video count from media store database: %d",
             primaryPhotos.size,
             secondaryPhotos.size,
             primaryVideos.size,
-            secondaryVideos.size)
+            secondaryVideos.size
+        )
 
         val pendingUploadsList =
             getPendingList(primaryPhotos, isSecondary = false, isVideo = false)
         Timber.d("Primary photo pending list size: %s", pendingUploadsList.size)
         saveSyncRecordsToDB(pendingUploadsList, primaryUploadNode, secondaryUploadNode, tempRoot)
 
-        val pendingVideoUploadsList = getPendingList(primaryVideos,
+        val pendingVideoUploadsList = getPendingList(
+            primaryVideos,
             isSecondary = false,
-            isVideo = true)
+            isVideo = true
+        )
         Timber.d("Primary video pending list size: %s", pendingVideoUploadsList.size)
-        saveSyncRecordsToDB(pendingVideoUploadsList,
+        saveSyncRecordsToDB(
+            pendingVideoUploadsList,
             primaryUploadNode,
             secondaryUploadNode,
-            tempRoot)
+            tempRoot
+        )
 
         if (secondaryEnabled) {
-            val pendingUploadsListSecondary = getPendingList(secondaryPhotos,
+            val pendingUploadsListSecondary = getPendingList(
+                secondaryPhotos,
                 isSecondary = true,
-                isVideo = false)
+                isVideo = false
+            )
             Timber.d("Secondary photo pending list size: %s", pendingUploadsListSecondary.size)
-            saveSyncRecordsToDB(pendingUploadsListSecondary,
+            saveSyncRecordsToDB(
+                pendingUploadsListSecondary,
                 primaryUploadNode,
                 secondaryUploadNode,
-                tempRoot)
+                tempRoot
+            )
 
-            val pendingVideoUploadsListSecondary = getPendingList(secondaryVideos,
+            val pendingVideoUploadsListSecondary = getPendingList(
+                secondaryVideos,
                 isSecondary = true,
-                isVideo = true)
-            Timber.d("Secondary video pending list size: %s",
-                pendingVideoUploadsListSecondary.size)
-            saveSyncRecordsToDB(pendingVideoUploadsListSecondary,
+                isVideo = true
+            )
+            Timber.d(
+                "Secondary video pending list size: %s",
+                pendingVideoUploadsListSecondary.size
+            )
+            saveSyncRecordsToDB(
+                pendingVideoUploadsListSecondary,
                 primaryUploadNode,
-                secondaryUploadNode, tempRoot)
+                secondaryUploadNode, tempRoot
+            )
         }
         yield()
 
@@ -1046,7 +1077,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 JobUtil.fireSingleHeartbeat(this)
                 // Make sure to re schedule the job
                 JobUtil.scheduleCameraUploadJob(this)
-                finish()
+                endService()
                 FileUtil.purgeDirectory(tempRoot?.let { File(it) })
             }
         } else {
@@ -1067,8 +1098,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             updatePrimaryFolderBackupState(BackupState.PAUSE_UPLOADS)
             updateSecondaryFolderBackupState(BackupState.PAUSE_UPLOADS)
         }
-        val primaryUploadNode = getNodeByHandle(cameraUploadHandle)
-        val secondaryUploadNode = getNodeByHandle(secondaryUploadHandle)
+        val primaryUploadNode = getNodeByHandle(getPrimarySyncHandle())
+        val secondaryUploadNode = getNodeByHandle(getSecondarySyncHandle())
 
         startActiveHeartbeat(finalList)
         for (file in finalList) {
@@ -1097,14 +1128,16 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                         @Suppress("DEPRECATION")
                         if (megaApi?.numPendingUploads == 0) {
                             Timber.w("Stop service due to out of space issue")
-                            finish()
+                            endService()
                             val title = getString(R.string.title_out_of_space)
                             val message = getString(R.string.error_not_enough_free_space)
                             val intent = Intent(this, ManagerActivity::class.java)
-                            val pendingIntent = PendingIntent.getActivity(this,
+                            val pendingIntent = PendingIntent.getActivity(
+                                this,
                                 0,
                                 intent,
-                                PendingIntent.FLAG_IMMUTABLE)
+                                PendingIntent.FLAG_IMMUTABLE
+                            )
                             showNotification(title, message, pendingIntent, true)
                             return
                         }
@@ -1134,10 +1167,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 Timber.d("Copy from node, file timestamp is: %s", file.timestamp)
                 totalToUpload++
                 file.nodeHandle?.let {
-                    megaApi?.copyNode(getNodeByHandle(it),
+                    megaApi?.copyNode(
+                        getNodeByHandle(it),
                         parent,
                         file.fileName,
-                        this)
+                        this
+                    )
                 }
             } else {
                 val toUpload = path?.let { File(it) }
@@ -1145,16 +1180,20 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     // compare size
                     val node = checkExistBySize(parent, toUpload.length())
                     if (node != null && node.originalFingerprint == null) {
-                        Timber.d("Node with handle: %d already exists, delete record from database.",
-                            node.handle)
+                        Timber.d(
+                            "Node with handle: %d already exists, delete record from database.",
+                            node.handle
+                        )
                         path?.let {
                             deleteSyncRecord(it, isSecondary)
                         }
                     } else {
                         totalToUpload++
                         val lastModified = getLastModifiedTime(file)
-                        megaApi?.startUpload(path, parent, file.fileName, lastModified / 1000,
-                            Constants.APP_DATA_CU, false, false, null, this)
+                        megaApi?.startUpload(
+                            path, parent, file.fileName, lastModified / 1000,
+                            Constants.APP_DATA_CU, false, false, null, this
+                        )
                     }
                 } else {
                     Timber.d("Local file is unavailable, delete record from database.")
@@ -1177,7 +1216,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     private suspend fun checkExistBySize(parent: MegaNode, size: Long): MegaNode? {
-        val nodeList = getChildrenNode(parent, MegaApiJava.ORDER_ALPHABETICAL_ASC)
+        val nodeList = getChildrenNode(parent, SortOrder.ORDER_ALPHABETICAL_ASC)
         for (node in nodeList) {
             if (node.size == size) {
                 return node
@@ -1201,7 +1240,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         totalToUpload = 0
         reportUploadFinish()
         stopActiveHeartbeat()
-        finish()
+        endService()
     }
 
     private suspend fun getPendingList(
@@ -1209,11 +1248,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         isSecondary: Boolean,
         isVideo: Boolean,
     ): List<SyncRecord> {
-        Timber.d("Get pending list, is secondary upload: %s, is video: %s",
+        Timber.d(
+            "Get pending list, is secondary upload: %s, is video: %s",
             isSecondary,
-            isVideo)
+            isVideo
+        )
         val pendingList = mutableListOf<SyncRecord>()
-        val parentNodeHandle = if (isSecondary) secondaryUploadHandle else cameraUploadHandle
+        val parentNodeHandle = if (isSecondary) getSecondarySyncHandle() else getPrimarySyncHandle()
         val parentNode = getNodeByHandle(parentNodeHandle)
         Timber.d("Upload to parent node which handle is: %s", parentNodeHandle)
         val type =
@@ -1245,7 +1286,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             if (nodeExists == null) {
                 Timber.d("Possible node with same fingerprint is null.")
                 val gpsData = sourceFile?.let { getGPSCoordinates(it.absolutePath, isVideo) }
-                val record = SyncRecord(0,
+                val record = SyncRecord(
+                    0,
                     sourceFile?.absolutePath,
                     null,
                     localFingerPrint,
@@ -1258,15 +1300,21 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     type,
                     null,
                     false,
-                    isSecondary)
-                Timber.d("Add local file with timestamp: %d to pending list, for upload.",
-                    record.timestamp)
+                    isSecondary
+                )
+                Timber.d(
+                    "Add local file with timestamp: %d to pending list, for upload.",
+                    record.timestamp
+                )
                 pendingList.add(record)
             } else {
-                Timber.d("Possible node with same fingerprint which handle is: %s",
-                    nodeExists.handle)
+                Timber.d(
+                    "Possible node with same fingerprint which handle is: %s",
+                    nodeExists.handle
+                )
                 if (getParentMegaNode(nodeExists)?.handle != parentNodeHandle) {
-                    val record = SyncRecord(0,
+                    val record = SyncRecord(
+                        0,
                         media.filePath,
                         null,
                         nodeExists.originalFingerprint,
@@ -1279,9 +1327,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                         type,
                         nodeExists.handle,
                         true,
-                        isSecondary)
-                    Timber.d("Add local file with handle: %d to pending list, for copy.",
-                        record.nodeHandle)
+                        isSecondary
+                    )
+                    Timber.d(
+                        "Add local file with handle: %d to pending list, for copy.",
+                        record.nodeHandle
+                    )
                     pendingList.add(record)
                 } else {
                     if (isVideo) {
@@ -1299,8 +1350,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private suspend fun shouldRun(): Int {
         if (!isLocalPrimaryFolderSet()) {
-            localFolderUnavailableNotification(R.string.camera_notif_primary_local_unavailable,
-                LOCAL_FOLDER_REMINDER_PRIMARY)
+            localFolderUnavailableNotification(
+                R.string.camera_notif_primary_local_unavailable,
+                LOCAL_FOLDER_REMINDER_PRIMARY
+            )
             CameraUploadUtil.disableCameraUploadSettingProcess()
             setSyncLocalPath(Constants.INVALID_NON_NULL_VALUE)
             setSecondaryFolderPath(Constants.INVALID_NON_NULL_VALUE)
@@ -1312,8 +1365,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
 
         if (!isLocalSecondaryFolderSet()) {
-            localFolderUnavailableNotification(R.string.camera_notif_secondary_local_unavailable,
-                LOCAL_FOLDER_REMINDER_SECONDARY)
+            localFolderUnavailableNotification(
+                R.string.camera_notif_secondary_local_unavailable,
+                LOCAL_FOLDER_REMINDER_SECONDARY
+            )
             // disable media upload only
             CameraUploadUtil.disableMediaUploadProcess()
             setSecondaryFolderPath(SettingsConstants.INVALID_PATH)
@@ -1333,15 +1388,15 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             ChatUtil.initMegaChatApi(tempDbHandler.credentials?.session)
             return LOGIN_IN
         }
-        cameraUploadHandle = CameraUploadUtil.getPrimaryFolderHandle()
-        secondaryUploadHandle = CameraUploadUtil.getSecondaryFolderHandle()
 
         // Prevent checking while app alive because it has been handled by global event
         Timber.d("ignoreAttr: %s", ignoreAttr)
         if (!ignoreAttr && !isPrimaryHandleSynced) {
             Timber.d("Try to get Camera Uploads primary target folder from CU attribute.")
-            megaApi?.getUserAttribute(MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER,
-                getAttrUserListener)
+            megaApi?.getUserAttribute(
+                MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER,
+                getAttrUserListener
+            )
             return CHECKING_USER_ATTRIBUTE
         }
         return checkTargetFolders()
@@ -1363,10 +1418,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
         }
         if (!isShowing) {
-            notification = createNotification(getString(R.string.section_photo_sync),
+            notification = createNotification(
+                getString(R.string.section_photo_sync),
                 getString(resId),
                 null,
-                false)
+                false
+            )
             notificationManager?.notify(notificationId, notification)
         }
     }
@@ -1381,30 +1438,33 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private suspend fun checkTargetFolders(): Int {
         var primaryToSet = MegaApiJava.INVALID_HANDLE
         // If CU folder in local setting is deleted, then need to reset.
-        val needToSetPrimary = isNodeInRubbishOrDeleted(cameraUploadHandle)
+        val needToSetPrimary = isNodeInRubbishOrDeleted(getPrimarySyncHandle())
         val secondaryEnabled = isSecondaryFolderEnabled()
 
         if (needToSetPrimary) {
             // Try to find a folder which name is "Camera Uploads" from root.
-            cameraUploadHandle =
-                CameraUploadUtil.findDefaultFolder(getString(R.string.section_photo_sync))
+            val primaryHandle = getDefaultNodeHandle(getString(R.string.section_photo_sync)).also {
+                setPrimarySyncHandle(it)
+            }
             // Cannot find a folder with the name, create one.
-            if (cameraUploadHandle == MegaApiJava.INVALID_HANDLE) {
+            if (primaryHandle == MegaApiJava.INVALID_HANDLE) {
                 // Flag, prevent to create duplicate folder.
                 if (!isCreatingPrimary) {
                     Timber.d("Must create CU folder.")
                     isCreatingPrimary = true
                     // Create a folder with name "Camera Uploads" at root.
-                    megaApi?.createFolder(getString(R.string.section_photo_sync),
+                    megaApi?.createFolder(
+                        getString(R.string.section_photo_sync),
                         megaApi?.rootNode,
-                        createFolderListener)
+                        createFolderListener
+                    )
                 }
                 if (!secondaryEnabled) {
                     return TARGET_FOLDER_NOT_EXIST
                 }
             } else {
                 // Found, prepare to set the folder as CU folder.
-                primaryToSet = cameraUploadHandle
+                primaryToSet = primaryHandle
             }
         }
 
@@ -1414,26 +1474,30 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         if (secondaryEnabled) {
             Timber.d("Secondary uploads are enabled.")
             // If MU folder in local setting is deleted, then need to reset.
-            needToSetSecondary = isNodeInRubbishOrDeleted(secondaryUploadHandle)
+            needToSetSecondary = isNodeInRubbishOrDeleted(getSecondarySyncHandle())
             if (needToSetSecondary) {
                 // Try to find a folder which name is "Media Uploads" from root.
-                secondaryUploadHandle =
-                    CameraUploadUtil.findDefaultFolder(getString(R.string.section_secondary_media_uploads))
+                val secondaryHandle =
+                    getDefaultNodeHandle(getString(R.string.section_secondary_media_uploads)).also {
+                        setSecondarySyncHandle(it)
+                    }
                 // Cannot find a folder with the name, create one.
-                if (secondaryUploadHandle == MegaApiJava.INVALID_HANDLE) {
+                if (secondaryHandle == MegaApiJava.INVALID_HANDLE) {
                     // Flag, prevent to create duplicate folder.
                     if (!isCreatingSecondary) {
                         Timber.d("Must create MU folder.")
                         isCreatingSecondary = true
                         // Create a folder with name "Media Uploads" at root.
-                        megaApi?.createFolder(getString(R.string.section_secondary_media_uploads),
+                        megaApi?.createFolder(
+                            getString(R.string.section_secondary_media_uploads),
                             megaApi?.rootNode,
-                            createFolderListener)
+                            createFolderListener
+                        )
                     }
                     return TARGET_FOLDER_NOT_EXIST
                 } else {
                     // Found, prepare to set the folder as MU folder.
-                    secondaryToSet = secondaryUploadHandle
+                    secondaryToSet = secondaryHandle
                 }
             }
         } else {
@@ -1453,7 +1517,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         try {
             app = application as MegaApplication
         } catch (ex: Exception) {
-            finish()
+            endService()
         }
 
         val wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF
@@ -1476,14 +1540,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         canceled = false
         isOverQuota = false
         running = true
-        @Suppress("DEPRECATION")
-        handler = Handler()
 
         megaApi = app?.megaApi
         megaApiFolder = app?.megaApiFolder
 
         if (megaApi == null) {
-            finish()
+            endService()
             return
         }
 
@@ -1507,7 +1569,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         intent?.putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
         pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
-        sharingScope.launch {
+        coroutineScope?.launch {
             tempRoot = "${File(cacheDir, CU_CACHE_FOLDER).absolutePath}${File.separator}"
             val root = tempRoot?.let { File(it) }
             if (root?.exists() == false) {
@@ -1517,15 +1579,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
-    private fun finish() {
+    private fun endService() {
         Timber.d("Finish Camera upload process.")
-        handler?.removeCallbacksAndMessages(null)
-
-        running = false
-        cancel()
-    }
-
-    private fun cancel() {
         releaseLocks()
         if (isOverQuota) {
             showStorageOverQuotaNotification()
@@ -1571,7 +1626,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish: %s", request.requestString)
         try {
-            sharingScope.launch {
+            coroutineScope?.launch {
                 requestFinished(request, e)
             }
         } catch (th: Throwable) {
@@ -1593,30 +1648,31 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             } else {
                 Timber.d("ERROR: %s", e.errorString)
                 MegaApplication.isLoggingIn = false
-                finish()
+                endService()
             }
         } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
             if (e.errorCode == MegaError.API_OK) {
                 Timber.d("fetch nodes ok")
                 MegaApplication.isLoggingIn = false
                 Timber.d("Start service here MegaRequest.TYPE_FETCH_NODES")
-                coroutineScope?.launch { startWorker() }
+                startWorker()
             } else {
                 Timber.d("ERROR: %s", e.errorString)
                 MegaApplication.isLoggingIn = false
-                finish()
+                endService()
             }
         } else if (request.type == MegaRequest.TYPE_CANCEL_TRANSFER) {
             Timber.d("Cancel transfer received")
             if (e.errorCode == MegaError.API_OK) {
-                @Suppress("DEPRECATION")
-                Handler().postDelayed({
-                    if ((megaApi?.numPendingUploads ?: 1) <= 0) {
-                        megaApi?.resetTotalUploads()
+                delay(200)
+                megaApi?.let {
+                    @Suppress("DEPRECATION")
+                    if (it.numPendingUploads <= 0) {
+                        it.resetTotalUploads()
                     }
-                }, 200)
+                }
             } else {
-                finish()
+                endService()
             }
         } else if (request.type == MegaRequest.TYPE_CANCEL_TRANSFERS) {
             @Suppress("DEPRECATION")
@@ -1626,13 +1682,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         } else if (request.type == MegaRequest.TYPE_PAUSE_TRANSFERS) {
             Timber.d("PauseTransfer false received")
             if (e.errorCode == MegaError.API_OK) {
-                finish()
+                endService()
             }
         } else if (request.type == MegaRequest.TYPE_COPY) {
             if (e.errorCode == MegaError.API_OK) {
                 val node = getNodeByHandle(request.nodeHandle)
                 val fingerPrint = node?.fingerprint
-                val isSecondary = node?.parentHandle == secondaryUploadHandle
+                val isSecondary = node?.parentHandle == getSecondarySyncHandle()
                 fingerPrint?.let { deleteSyncRecordByFingerprint(it, fingerPrint, isSecondary) }
                 node?.let { onUploadSuccess(it, isSecondary) }
             }
@@ -1650,14 +1706,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     fun onGetPrimaryFolderAttribute(handle: Long, errorCode: Int, shouldStart: Boolean) {
         if (errorCode == MegaError.API_OK || errorCode == MegaError.API_ENOENT) {
             isPrimaryHandleSynced = true
-            if (cameraUploadHandle != handle) cameraUploadHandle = handle
-            if (shouldStart) {
-                Timber.d("On Get Primary - Start Coroutine")
-                coroutineScope?.launch { startWorker() }
+            coroutineScope?.launch {
+                if (getPrimarySyncHandle() != handle) {
+                    setPrimarySyncHandle(handle)
+                }
+                if (shouldStart) {
+                    Timber.d("On Get Primary - Start Coroutine")
+                    startWorker()
+                }
             }
         } else {
             Timber.w("On Get Primary - Failed")
-            finish()
+            endService()
         }
     }
 
@@ -1669,13 +1729,17 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     fun onGetSecondaryFolderAttribute(handle: Long, errorCode: Int) {
         if (errorCode == MegaError.API_OK || errorCode == MegaError.API_ENOENT) {
-            if (handle != secondaryUploadHandle) secondaryUploadHandle = handle
-            // Start to upload. Unlike onGetPrimaryFolderAttribute needs to wait for getting MU folder handle completes.
-            Timber.d("On Get Secondary - Start Coroutine")
-            coroutineScope?.launch { startWorker() }
+            coroutineScope?.launch {
+                if (getSecondarySyncHandle() != handle) {
+                    setSecondarySyncHandle(handle)
+                }
+                // Start upload now - unlike in onGetPrimaryFolderAttribute where it needs to wait for getting Media Uploads folder handle to complete
+                Timber.d("On Get Secondary - Start Coroutine")
+                startWorker()
+            }
         } else {
             Timber.w("On Get Secondary - Failed")
-            finish()
+            endService()
         }
     }
 
@@ -1692,7 +1756,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     fun onCreateFolder(isSuccessful: Boolean) {
         if (!isSuccessful) {
-            finish()
+            endService()
         }
     }
 
@@ -1723,7 +1787,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         if (canceled) {
             Timber.d("Transfer cancel: %s", transfer.nodeHandle)
             megaApi?.cancelTransfer(transfer)
-            cancel()
+            endService()
             return
         }
         if (isOverQuota) {
@@ -1745,7 +1809,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             if (e.value != 0L) Timber.w("TRANSFER OVER QUOTA ERROR: %s", e.errorCode)
             else Timber.w("STORAGE OVER QUOTA ERROR: %s", e.errorCode)
             isOverQuota = true
-            cancel()
+            endService()
         }
     }
 
@@ -1753,14 +1817,16 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * Finish transfer
      */
     override fun onTransferFinish(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
-        Timber.d("Image sync finished, error code: %d, handle: %d, size: %d",
+        Timber.d(
+            "Image sync finished, error code: %d, handle: %d, size: %d",
             e.errorCode,
             transfer.nodeHandle,
-            transfer.transferredBytes)
+            transfer.transferredBytes
+        )
         try {
             LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java)
                 .post(MegaTransfer.TYPE_UPLOAD)
-            sharingScope.launch {
+            coroutineScope?.launch {
                 transferFinished(transfer, e)
             }
         } catch (th: Throwable) {
@@ -1777,14 +1843,16 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         if (transfer.state == MegaTransfer.STATE_COMPLETED) {
             // TODO Remove in MegaApi refactoring (remove MegaTransferListenerInterface)
-            addCompletedTransfer(AndroidCompletedTransfer(transfer, e),
-                tempDbHandler)
+            addCompletedTransfer(
+                AndroidCompletedTransfer(transfer, e),
+                tempDbHandler
+            )
         }
 
         if (e.errorCode == MegaError.API_OK) {
             Timber.d("Image Sync API_OK")
             val node = getNodeByHandle(transfer.nodeHandle)
-            val isSecondary = node?.parentHandle == secondaryUploadHandle
+            val isSecondary = node?.parentHandle == getSecondarySyncHandle()
             val record = getSyncRecordByPath(path, isSecondary)
             if (record != null) {
                 node?.let { onUploadSuccess(it, record.isSecondary) }
@@ -1792,27 +1860,35 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 megaApi?.setOriginalFingerprint(node, originalFingerprint, this)
                 record.latitude?.let { latitude ->
                     record.longitude?.let { longitude ->
-                        megaApi?.setNodeCoordinates(node,
+                        megaApi?.setNodeCoordinates(
+                            node,
                             latitude.toDouble(),
                             longitude.toDouble(),
-                            null)
+                            null
+                        )
                     }
                 }
                 val src = record.localPath?.let { File(it) }
                 if (src != null && src.exists()) {
                     Timber.d("Creating preview")
                     val previewDir = PreviewUtils.getPreviewFolder(this)
-                    val preview = File(previewDir,
-                        MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION)
+                    val preview = File(
+                        previewDir,
+                        MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION
+                    )
                     val thumbDir = ThumbnailUtils.getThumbFolder(this)
-                    val thumb = File(thumbDir,
-                        MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION)
+                    val thumb = File(
+                        thumbDir,
+                        MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION
+                    )
                     if (FileUtil.isVideoFile(transfer.path)) {
                         val img = record.localPath?.let { File(it) }
                         if (!preview.exists()) {
-                            ImageProcessor.createVideoPreview(this@CameraUploadsService,
+                            ImageProcessor.createVideoPreview(
+                                this@CameraUploadsService,
                                 img,
-                                preview)
+                                preview
+                            )
                         }
                         ImageProcessor.createThumbnail(img, thumb)
                     } else if (MimeTypeList.typeForName(transfer.path).isImage) {
@@ -1835,13 +1911,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         } else if (e.errorCode == MegaError.API_EOVERQUOTA) {
             Timber.w("Over quota error: %s", e.errorCode)
             isOverQuota = true
-            cancel()
+            endService()
         } else {
             Timber.w("Image Sync FAIL: %d___%s", transfer.nodeHandle, e.errorString)
         }
         if (canceled) {
             Timber.w("Image sync cancelled: %s", transfer.nodeHandle)
-            cancel()
+            endService()
         }
         updateUpload()
     }
@@ -1852,10 +1928,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
         totalUploaded++
         @Suppress("DEPRECATION")
-        Timber.d("Total to upload: %d Total uploaded: %d Pending uploads: %d",
+        Timber.d(
+            "Total to upload: %d Total uploaded: %d Pending uploads: %d",
             totalToUpload,
             totalUploaded,
-            megaApi?.numPendingUploads)
+            megaApi?.numPendingUploads
+        )
         if (totalToUpload == totalUploaded) {
             Timber.d("Photo upload finished, now checking videos")
             if (compressedVideoPending() && !canceled && isCompressorAvailable()) {
@@ -1864,9 +1942,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             } else {
                 Timber.d("No pending videos, finish")
                 onQueueComplete()
-                sendBroadcast(Intent(BroadcastConstants.ACTION_UPDATE_CU)
-                    .putExtra(BroadcastConstants.PROGRESS, 100)
-                    .putExtra(BroadcastConstants.PENDING_TRANSFERS, 0))
+                sendBroadcast(
+                    Intent(BroadcastConstants.ACTION_UPDATE_CU)
+                        .putExtra(BroadcastConstants.PROGRESS, 100)
+                        .putExtra(BroadcastConstants.PENDING_TRANSFERS, 0)
+                )
             }
         }
     }
@@ -1892,26 +1972,30 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         videoCompressor?.setPendingList(fullList)
         videoCompressor?.setOutputRoot(tempRoot)
         val totalPendingSizeInMB = (videoCompressor?.totalInputSize ?: 0) / (1024 * 1024)
-        Timber.d("Total videos count are %d, %d mb to Conversion",
+        Timber.d(
+            "Total videos count are %d, %d mb to Conversion",
             fullList.size,
-            totalPendingSizeInMB)
+            totalPendingSizeInMB
+        )
 
         if (shouldStartVideoCompression(totalPendingSizeInMB)) {
-            sharingScope.launch {
+            coroutineScope?.launch {
                 Timber.d("Starting compressor")
                 videoCompressor?.start()
             }
         } else {
             Timber.d("Compression queue bigger than setting, show notification to user.")
-            finish()
+            endService()
             val intent = Intent(this, ManagerActivity::class.java)
             intent.action = Constants.ACTION_SHOW_SETTINGS
             val pendingIntent =
                 PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
             val title = getString(R.string.title_compression_size_over_limit)
             val size = getChargingOnSizeString()
-            val message = getString(R.string.message_compression_size_over_limit,
-                getString(R.string.label_file_size_mega_byte, size))
+            val message = getString(
+                R.string.message_compression_size_over_limit,
+                getString(R.string.label_file_size_mega_byte, size)
+            )
             showNotification(title, message, pendingIntent, true)
         }
     }
@@ -1929,7 +2013,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     override fun onInsufficientSpace() {
         Timber.w("Insufficient space for video compression.")
-        finish()
+        endService()
         val intent = Intent(this, ManagerActivity::class.java)
         val pendingIntent =
             PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
@@ -1945,9 +2029,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     override fun onCompressUpdateProgress(progress: Int) {
         if (!canceled) {
             val message = getString(R.string.message_compress_video, "$progress%")
-            val subText = getString(R.string.title_compress_video,
+            val subText = getString(
+                R.string.title_compress_video,
                 videoCompressor?.currentFileIndex,
-                videoCompressor?.totalCount)
+                videoCompressor?.totalCount
+            )
             showProgressNotification(progress, pendingIntent, message, subText, "")
         }
     }
@@ -1957,7 +2043,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Synchronized
     override fun onCompressSuccessful(record: SyncRecord) {
-        sharingScope.launch {
+        coroutineScope?.launch {
             Timber.d("Compression successfully for file with timestamp: %s", record.timestamp)
             setSyncRecordPendingByPath(record.localPath, record.isSecondary)
         }
@@ -1989,7 +2075,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     Timber.d("Can not compress but got enough disk space, so should be un-supported format issue")
                     val newPath = record.newPath
                     val temp = newPath?.let { File(it) }
-                    sharingScope.launch {
+                    coroutineScope?.launch {
                         setSyncRecordPendingByPath(localPath, isSecondary)
                     }
                     if (newPath != null && tempRoot?.let { newPath.startsWith(it) } == true && temp != null && temp.exists()) {
@@ -2002,7 +2088,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 Timber.e(ex)
             }
         } else {
-            sharingScope.launch {
+            coroutineScope?.launch {
                 Timber.w("Compressed video not exists, remove from DB")
                 localPath?.let {
                     deleteSyncRecordByLocalPath(localPath, isSecondary)
@@ -2015,7 +2101,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * Compression finished
      */
     override fun onCompressFinished(currentIndexString: String) {
-        sharingScope.launch {
+        coroutineScope?.launch {
             if (!canceled) {
                 Timber.d("Preparing to upload compressed video.")
                 val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
@@ -2062,18 +2148,24 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     totalTransfers - pendingTransfers + 1
                 }
 
-                sendBroadcast(Intent(BroadcastConstants.ACTION_UPDATE_CU)
-                    .putExtra(BroadcastConstants.PROGRESS, progressPercent)
-                    .putExtra(BroadcastConstants.PENDING_TRANSFERS, pendingTransfers))
+                sendBroadcast(
+                    Intent(BroadcastConstants.ACTION_UPDATE_CU)
+                        .putExtra(BroadcastConstants.PROGRESS, progressPercent)
+                        .putExtra(BroadcastConstants.PENDING_TRANSFERS, pendingTransfers)
+                )
 
                 message = if (megaApi?.areTransfersPaused(MegaTransfer.TYPE_UPLOAD) == true) {
-                    StringResourcesUtils.getString(R.string.upload_service_notification_paused,
+                    StringResourcesUtils.getString(
+                        R.string.upload_service_notification_paused,
                         inProgress,
-                        totalTransfers)
+                        totalTransfers
+                    )
                 } else {
-                    StringResourcesUtils.getString(R.string.upload_service_notification,
+                    StringResourcesUtils.getString(
+                        R.string.upload_service_notification,
                         inProgress,
-                        totalTransfers)
+                        totalTransfers
+                    )
                 }
             }
 
@@ -2081,11 +2173,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 Util.getProgressSize(this, totalSizeTransferred, totalSizePendingTransfer)
             val pendingIntent =
                 PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-            showProgressNotification(progressPercent,
+            showProgressNotification(
+                progressPercent,
                 pendingIntent,
                 message,
                 info,
-                getString(R.string.settings_camera_notif_title))
+                getString(R.string.settings_camera_notif_title)
+            )
         }
     }
 
@@ -2096,9 +2190,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         isAutoCancel: Boolean,
     ): Notification? {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(notificationChannelId,
+            val channel = NotificationChannel(
+                notificationChannelId,
                 notificationChannelName,
-                NotificationManager.IMPORTANCE_DEFAULT)
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
             channel.setShowBadge(false)
             channel.setSound(null, null)
             notificationManager?.createNotificationChannel(channel)
@@ -2147,9 +2243,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             ?.setOnlyAlertOnce(true)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(notificationChannelId,
+            val channel = NotificationChannel(
+                notificationChannelId,
                 notificationChannelName,
-                NotificationManager.IMPORTANCE_DEFAULT)
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
             channel.setShowBadge(true)
             channel.setSound(null, null)
             notificationManager?.createNotificationChannel(channel)
@@ -2173,18 +2271,24 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         val builder = NotificationCompat.Builder(this, OVER_QUOTA_NOTIFICATION_CHANNEL_ID)
         builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
-            .setContentIntent(PendingIntent.getActivity(this,
-                0,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    this,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            )
             .setAutoCancel(true)
             .setTicker(contentText)
             .setContentTitle(message)
             .setOngoing(false)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(OVER_QUOTA_NOTIFICATION_CHANNEL_ID,
+            val channel = NotificationChannel(
+                OVER_QUOTA_NOTIFICATION_CHANNEL_ID,
                 notificationChannelName,
-                NotificationManager.IMPORTANCE_DEFAULT)
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
             channel.setShowBadge(true)
             channel.setSound(null, null)
             notificationManager?.createNotificationChannel(channel)

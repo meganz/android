@@ -103,7 +103,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">구독이 취소되었습니다</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">당신의 구독을 취소할 수 없었습니다. 도움을 받으려면 support&#64;mega.nz로 연락주세요</string>
+    <string name="cancel_subscription_error">당신의 구독을 취소할 수 없었습니다. 도움을 받으려면 support&#64;mega.nz로 연락주세요.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">다른 세션 닫기</string>
     <!-- Message after kill all opened sessions -->
@@ -307,7 +307,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">전송 보기</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">대부분의 장치는 4GB를 초과하는 파일을 다운로드할 수 없습니다. 다운로드가 실패할 수 있습니다</string>
+    <string name="error_file_size_greater_than_4gb">대부분의 장치는 4GB를 초과하는 파일을 다운로드할 수 없습니다. 다운로드가 실패할 수 있습니다.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">장치에 이 파일을 실행할 앱이 없습니다</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1679,25 +1679,25 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">파일 불러오는 중</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%sB</string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%sKB</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%sMB</string>
+    <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%sGB</string>
+    <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s&#160;TB</string>
+    <string name="label_file_size_tera_byte">%sTB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%sB/s</string>
+    <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%sKB/s</string>
+    <string name="label_file_speed_kilo_byte">%s&#160;KB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%sMB/s</string>
+    <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%sGB/s</string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
+    <string name="label_file_speed_tera_byte">%sTB/s</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">MB</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -2606,7 +2606,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">지인을 초대하고 MEGA의 암호화된 대화로 안전하게 대화를 시작하세요.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">안녕하세요. 저와 MEGA에서 안전하게 대화하고 20GB의 무료 저장소를 받으세요. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">안녕하세요. 저와 MEGA에서 안전하게 대화하고 20&#160;GB의 무료 저장소를 받으세요. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">사용 가능한 대화 링크 없음.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3362,7 +3362,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">세계에서 가장 큰 안전한 클라우드 저장소와 협업 플랫폼에 가입하세요.</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">20GB를 무료로 받으세요</string>
+    <string name="left_meeting_bonus_title">20&#160;GB를 무료로 받으세요</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">지금 가입하고 고급 협업 기능을 무료로 즐기세요.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -3706,19 +3706,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">다시 연결할 수 없습니다</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]B</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]KB</string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]MB</string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]GB</string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">%s 내에 통화 종료</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -3894,7 +3894,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[A]백업[/A][B]에 항목이 존재하지 않습니다[/B]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">이곳은 백업된 파일과 폴더가 보관되는 곳입니다. 백업된 항목은 실수로 클라우드 드라이브에서 수정되는 것을 방지하지 위해 “읽기 전용”이 됩니다.데스크톱 앱을 이용하여 컴퓨터에서 MEGA로 항목들을 백업할 수 있습니다.</string>
+    <string name="backups_empty_state_body">이곳은 백업된 파일과 폴더가 보관되는 곳입니다. 백업된 항목은 실수로 클라우드 드라이브에서 수정되는 것을 방지하지 위해 “읽기 전용”이 됩니다.\n데스크톱 앱을 이용하여 컴퓨터에서 MEGA로 항목들을 백업할 수 있습니다.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">저작권 침해로 계정이 정지되었습니다. 이것에 대한 자세한 정보를 이메일로 보내드렸습니다.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->

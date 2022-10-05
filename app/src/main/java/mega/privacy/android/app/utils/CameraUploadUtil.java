@@ -303,7 +303,7 @@ public class CameraUploadUtil {
             // if current device language is not English, rename this folder as "Camera Uploads" in other language
             if (!context.getString(R.string.section_photo_sync).equals(CAMERA_UPLOADS_ENGLISH)) {
                 api.renameNode(api.getNodeByHandle(primaryHandle),
-                        getString(R.string.section_photo_sync), new RenameListener(context));
+                        getString(R.string.section_photo_sync), new RenameListener());
             }
         }
     }
@@ -319,7 +319,7 @@ public class CameraUploadUtil {
             if (!context.getString(R.string.section_secondary_media_uploads).equals(SECONDARY_UPLOADS_ENGLISH)) {
                 api.renameNode(api.getNodeByHandle(secondaryHandle),
                         getString(R.string.section_secondary_media_uploads),
-                        new RenameListener(context));
+                        new RenameListener());
             }
         }
     }

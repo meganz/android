@@ -1,6 +1,5 @@
 package mega.privacy.android.app.listeners
 
-import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -17,22 +16,20 @@ import timber.log.Timber
  * RenameListener
  *
  * @property snackbarShower : SnackbarShower
- * @property context: Context
  * @property showSnackbar: Boolean
  * @property isMyChatFilesFolder: Boolean
  * @property actionNodeCallback: ActionNodeCallback
  */
 class RenameListener(
     private val snackbarShower: SnackbarShower?,
-    context: Context,
     private val showSnackbar: Boolean = true,
     private val isMyChatFilesFolder: Boolean = false,
     private val actionNodeCallback: ActionNodeCallback?,
 ) : MegaRequestListenerInterface {
-    constructor(context: Context) : this(null, context, false, false, null)
+    constructor() : this(null, false, false, null)
 
-    constructor(context: Context, isMyChatFilesFolder: Boolean) : this(
-        null, context, false, isMyChatFilesFolder, null
+    constructor(isMyChatFilesFolder: Boolean) : this(
+        null, false, isMyChatFilesFolder, null
     )
 
     /**

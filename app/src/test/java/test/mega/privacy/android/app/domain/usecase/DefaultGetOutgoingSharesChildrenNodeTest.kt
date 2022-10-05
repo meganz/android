@@ -7,6 +7,7 @@ import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
@@ -29,10 +30,10 @@ class DefaultGetOutgoingSharesChildrenNodeTest {
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getChildrenNode = mock<GetChildrenNode>()
     private val getCloudSortOrder = mock<GetCloudSortOrder> {
-        onBlocking { invoke() }.thenReturn(0)
+        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_NONE)
     }
     private val getOthersSortOrder = mock<GetOthersSortOrder> {
-        onBlocking { invoke() }.thenReturn(1)
+        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
     private val fileRepository = mock<FileRepository>()
 

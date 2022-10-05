@@ -331,7 +331,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Просмотр передач</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">Большинство устройств не может скачивать файлы больше 4&#160;ГБ. Возможно, скачивание не удастся</string>
+    <string name="error_file_size_greater_than_4gb">Большинство устройств не может скачивать файлы больше 4&#160;ГБ. Возможно, скачивание не удастся.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">На вашем устройстве нет приложений для открытия этого файла</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->

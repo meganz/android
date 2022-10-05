@@ -165,7 +165,6 @@ import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED;
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.ACCESS_READ;
@@ -240,6 +239,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.text.HtmlCompat;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -321,7 +321,6 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -334,10 +333,10 @@ import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface;
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
 import mega.privacy.android.app.logging.LegacyLoggingSettings;
 import mega.privacy.android.app.main.adapters.TransfersPageAdapter;
@@ -438,6 +437,7 @@ import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
+import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
 import mega.privacy.android.domain.entity.transfer.TransferType;
@@ -793,7 +793,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private int bottomItemBeforeOpenFullscreenOffline = INVALID_VALUE;
     private OfflineFragment fullscreenOfflineFragment;
     private OfflineFragment pagerOfflineFragment;
-    private RecentsFragment pagerRecentsFragment;
 
     AlertDialog statusDialog;
     private AlertDialog processFileDialog;
@@ -887,7 +886,7 @@ public class ManagerActivity extends TransfersManagementActivity
         @Override
         public void onChanged(Boolean aBoolean) {
             if (drawerLayout != null) {
-                drawerLayout.closeDrawer(Gravity.LEFT);
+                closeDrawer();
             }
             refreshAddPhoneNumberButton();
         }
@@ -1640,7 +1639,7 @@ public class ManagerActivity extends TransfersManagementActivity
         transfersInProgress = new ArrayList<Integer>();
 
         //sync local contacts to see who's on mega.
-        if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+        if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && viewModel.getStorageState() != StorageState.PayWall) {
             Timber.d("sync mega contacts");
             MegaContactGetter getter = new MegaContactGetter(this);
             getter.getMegaContacts(megaApi, TimeUtils.WEEK, this);
@@ -2049,7 +2048,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         ///Check the MK or RK file
-        Timber.i("App version: %d", getVersion());
         final File fMKOld = buildExternalStorageFile(OLD_MK_FILE);
         final File fRKOld = buildExternalStorageFile(OLD_RK_FILE);
         if (isFileAvailable(fMKOld)) {
@@ -2499,13 +2497,13 @@ public class ManagerActivity extends TransfersManagementActivity
 
                         if (accountType != FREE) {
                             showMyAccount(new Pair<>(EXTRA_ACCOUNT_TYPE, accountType));
-                        } else if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+                        } else if (firstLogin && viewModel.getStorageState() != StorageState.PayWall) {
                             drawerItem = DrawerItem.PHOTOS;
                         } else {
                             showMyAccount();
                         }
                     } else {
-                        if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+                        if (firstLogin && viewModel.getStorageState() != StorageState.PayWall) {
                             Timber.d("First login. Go to Camera Uploads configuration.");
                             drawerItem = DrawerItem.PHOTOS;
                             setIntent(null);
@@ -2527,12 +2525,12 @@ public class ManagerActivity extends TransfersManagementActivity
                     setRequestNotificationsPermissionFirstLogin(savedInstanceState);
                     askPermissions = intentRec.getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
                     if (upgradeAccount) {
-                        drawerLayout.closeDrawer(Gravity.LEFT);
+                        closeDrawer();
                         int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
                         if (accountType != FREE) {
                             showMyAccount(new Pair<>(EXTRA_ACCOUNT_TYPE, accountType));
-                        } else if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+                        } else if (firstLogin && viewModel.getStorageState() != StorageState.PayWall) {
                             drawerItem = DrawerItem.PHOTOS;
                         } else {
                             showMyAccount();
@@ -2544,7 +2542,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 firstLogin = false;
                             } else {
                                 firstLogin = true;
-                                if (app.getStorageState() != STORAGE_STATE_PAYWALL && isInPhotosPage()) {
+                                if (viewModel.getStorageState() != StorageState.PayWall && isInPhotosPage()) {
                                     drawerItem = DrawerItem.PHOTOS;
                                 }
                             }
@@ -2570,7 +2568,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                     }
                 }
-                drawerLayout.closeDrawer(Gravity.LEFT);
+                closeDrawer();
             }
 
             checkCurrentStorageStatus(true);
@@ -2937,7 +2935,7 @@ public class ManagerActivity extends TransfersManagementActivity
         abL.setVisibility(View.GONE);
 
         fragmentContainer.setVisibility(View.VISIBLE);
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         supportInvalidateOptionsMenu();
         hideFabButton();
@@ -3037,7 +3035,7 @@ public class ManagerActivity extends TransfersManagementActivity
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         supportInvalidateOptionsMenu();
 
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             drawerItem = DrawerItem.CLOUD_DRIVE;
         } else {
             viewModel.setIsFirstLogin(true);
@@ -3146,7 +3144,8 @@ public class ManagerActivity extends TransfersManagementActivity
         setTabsVisibility();
         abL.setVisibility(View.GONE);
 
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
+
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         supportInvalidateOptionsMenu();
         hideFabButton();
@@ -3959,7 +3958,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
                 } else {
                     setFirstNavigationLevel(true);
-                    aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
+                    aB.setTitle(getString(R.string.sortby_type_photo_first));
                 }
 
                 break;
@@ -4179,7 +4178,7 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
 
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
 
         switch (item) {
             case CLOUD_DRIVE: {
@@ -4247,7 +4246,7 @@ public class ManagerActivity extends TransfersManagementActivity
         updateSharesTab();
         setToolbarTitle();
 
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
     }
 
     public void selectDrawerItemNotifications() {
@@ -4292,7 +4291,7 @@ public class ManagerActivity extends TransfersManagementActivity
         getTransfersViewModel().checkIfShouldShowCompletedTab();
         setToolbarTitle();
         showFabButton();
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
     }
 
     /**
@@ -4347,7 +4346,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         replaceFragment(chatTabsFragment, FragmentTag.RECENT_CHAT.getTag());
 
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
         PermissionUtils.checkNotificationsPermission(this);
     }
 
@@ -4380,7 +4379,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (turnOnNotifications) {
             fragmentContainer.setVisibility(View.VISIBLE);
-            drawerLayout.closeDrawer(Gravity.LEFT);
+            closeDrawer();
             return;
         }
 
@@ -4420,7 +4419,7 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean.class)
                 .post(drawerItem == DrawerItem.HOMEPAGE);
 
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
     }
 
     /**
@@ -4791,7 +4790,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private void navigateToSettingsActivity(TargetPreference targetPreference) {
         if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
-            drawerLayout.closeDrawer(Gravity.LEFT);
+            drawerLayout.closeDrawer(GravityCompat.START);
         }
         Intent settingsIntent = mega.privacy.android.app.presentation.settings.SettingsActivity.Companion.getIntent(this, targetPreference);
         startActivity(settingsIntent);
@@ -4839,16 +4838,6 @@ public class ManagerActivity extends TransfersManagementActivity
     public void pagerOfflineFragmentClosed(OfflineFragment fragment) {
         if (fragment == pagerOfflineFragment) {
             pagerOfflineFragment = null;
-        }
-    }
-
-    public void pagerRecentsFragmentOpened(RecentsFragment fragment) {
-        pagerRecentsFragment = fragment;
-    }
-
-    public void pagerRecentsFragmentClosed(RecentsFragment fragment) {
-        if (fragment == pagerRecentsFragment) {
-            pagerRecentsFragment = null;
         }
     }
 
@@ -5128,7 +5117,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     private void showMyAccount(String action, Uri data, Pair<String, Integer> extra) {
         if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
-            drawerLayout.closeDrawer(Gravity.LEFT);
+            drawerLayout.closeDrawer(GravityCompat.START);
         }
 
         Intent intent = new Intent(this, MyAccountActivity.class)
@@ -6005,7 +5994,7 @@ public class ManagerActivity extends TransfersManagementActivity
         retryConnectionsAndSignalPresence();
 
         if (drawerLayout.isDrawerOpen(nV)) {
-            drawerLayout.closeDrawer(Gravity.LEFT);
+            drawerLayout.closeDrawer(GravityCompat.START);
             return;
         }
 
@@ -6302,8 +6291,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         checkIfShouldCloseSearchView(oldDrawerItem);
         selectDrawerItem(drawerItem);
-        drawerLayout.closeDrawer(Gravity.LEFT);
-
+        closeDrawer();
         return true;
     }
 
@@ -7847,7 +7835,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void navigateToUpgradeAccount() {
         if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
-            drawerLayout.closeDrawer(Gravity.LEFT);
+            drawerLayout.closeDrawer(GravityCompat.START);
         }
 
         startActivity(new Intent(this, UpgradeAccountActivity.class));
@@ -7861,12 +7849,12 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void navigateToContacts() {
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
         startActivity(ContactsActivity.getListIntent(this));
     }
 
     public void navigateToContactRequests() {
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        closeDrawer();
         startActivity(ContactsActivity.getReceivedRequestsIntent(this));
     }
 
@@ -8115,7 +8103,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         Manifest.permission.WRITE_EXTERNAL_STORAGE);
             }
 
-            if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+            if (viewModel.getStorageState() == StorageState.PayWall) {
                 showOverDiskQuotaPaywallWarning();
                 return;
             }
@@ -9137,7 +9125,7 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
 
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             dismissAlertDialogIfExists(statusDialog);
             dismissAlertDialogIfExists(processFileDialog);
             showOverDiskQuotaPaywallWarning();
@@ -9269,7 +9257,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void createFile(String name, String data, MegaNode parentNode) {
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
@@ -10036,8 +10024,16 @@ public class ManagerActivity extends TransfersManagementActivity
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setMessage(getResources().getQuantityString(R.plurals.cancel_selected_transfers, selectedTransfers.size()))
                 .setPositiveButton(R.string.button_continue, (dialog, which) -> {
-                    CancelTransferListener cancelTransferListener = new CancelTransferListener(managerActivity);
-                    cancelTransferListener.cancelTransfers(selectedTransfers);
+                    for (MegaTransfer transfer: selectedTransfers) {
+                        megaApi.cancelTransfer(transfer, new OptionalMegaRequestListenerInterface() {
+                            @Override
+                            public void onRequestFinish(@NonNull MegaApiJava api,
+                                                        @NonNull MegaRequest request,
+                                                        @NonNull MegaError error) {
+                                super.onRequestFinish(api, request, error);
+                            }
+                        });
+                    }
 
                     if (isTransfersInProgressAdded()) {
                         transfersFragment.destroyActionMode();
@@ -11540,5 +11536,11 @@ public class ManagerActivity extends TransfersManagementActivity
         onBackPressedCallback.setEnabled(false);
         getOnBackPressedDispatcher().onBackPressed();
         onBackPressedCallback.setEnabled(true);
+    }
+
+    private void closeDrawer() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
     }
 }

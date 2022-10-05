@@ -16,6 +16,12 @@ import java.util.concurrent.Callable
 import java.util.concurrent.ThreadPoolExecutor
 import javax.inject.Inject
 
+/**
+ * Default implementation of [CacheFolderGateway]
+ *
+ * @property context ApplicationContext
+ * @property megaThreadPoolExecutor ThreadPoolExecutor
+ */
 class CacheFolderFacade @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaThreadPoolExecutor: ThreadPoolExecutor,
@@ -141,5 +147,4 @@ class CacheFolderFacade @Inject constructor(
             "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
         }
             ?.takeUnless { megaNode.isFolder }
-
 }

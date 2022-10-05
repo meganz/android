@@ -12,12 +12,9 @@ import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.transferWidget.TransfersWidget
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
@@ -25,14 +22,12 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.usecase.GetNetworkConnectionUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.transfer.TransferType
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Activity for showing concrete UI items related to transfers management.
@@ -45,9 +40,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
         private const val SHOW_SCANNING_DIALOG_TIMER = 800L
         private const val HIDE_SCANNING_DIALOG_TIMER = 1200L
     }
-
-    @Inject
-    lateinit var getNetworkConnectionUseCase: GetNetworkConnectionUseCase
 
     private var transfersWidget: TransfersWidget? = null
 
@@ -88,20 +80,13 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Registers the transfers BroadcastReceivers and observers.
      */
     private fun setupObservers() {
-        getNetworkConnectionUseCase.getConnectionUpdates()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { online ->
-                    if (online) {
-                        transfersManagement.resetNetworkTimer()
-                    } else {
-                        transfersManagement.startNetworkTimer()
-                    }
-                },
-                onError = { error -> Timber.e(error, "Network update error") }
-            )
-            .addTo(composite)
+        collectFlow(transfersViewModel.online) { online ->
+            if (online) {
+                transfersManagement.resetNetworkTimer()
+            } else {
+                transfersManagement.startNetworkTimer()
+            }
+        }
 
         transfersViewModel.onTransfersInfoUpdate().observe(this) { transfersInfo ->
             transfersWidget?.update(transfersInfo = transfersInfo)

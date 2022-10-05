@@ -7,10 +7,10 @@ import android.content.ServiceConnection
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.database.ContentObserver
 import android.graphics.Color
 import android.graphics.PixelFormat
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -21,14 +21,13 @@ import android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
 import android.provider.Settings.System.getUriFor
 import android.view.Menu
 import android.view.MenuItem
-import android.view.WindowInsets
-import android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -54,6 +53,7 @@ import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityMediaPlayerBinding
+import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -132,15 +132,14 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.getFragmentFromNavHost
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaShare
 import org.jetbrains.anko.configuration
 import timber.log.Timber
+import java.lang.Integer.max
 
 /**
  * Media player Activity
@@ -198,7 +197,13 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 refreshMenuOptionsVisibility()
 
                 service.serviceGateway.metadataUpdate()
-                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).onEach {
+                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).onEach { metadata ->
+                        binding.toolbar.title =
+                            if (configuration.orientation == ORIENTATION_LANDSCAPE) {
+                                metadata.title ?: metadata.nodeName
+                            } else {
+                                ""
+                            }
                         dragToExit.nodeChanged(service.playerServiceViewModelGateway.getCurrentPlayingHandle())
                     }.launchIn(lifecycleScope)
 
@@ -218,7 +223,6 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                                 SCREEN_ORIENTATION_SENSOR
                             } else {
                                 currentOrientation
-
                             }
                     }.launchIn(lifecycleScope)
 
@@ -281,6 +285,14 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         } else {
             setContentView(dragToExit.wrapContentView(binding.root))
             dragToExit.observeThumbnailLocation(this, intent)
+            binding.toolbar.run {
+                collapseIcon = AppCompatResources.getDrawable(this@MediaPlayerActivity,
+                    androidx.appcompat.R.drawable.abc_ic_ab_back_material)
+                collapseIcon?.setTint(Color.WHITE)
+            }
+            binding.toolbar.post {
+                updateToolbar(viewModel.isLockUpdate.value)
+            }
         }
 
         val navHostFragment =
@@ -309,19 +321,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
         serviceBound = true
 
-        viewModel.getCollision().observe(this) { collision ->
-            nameCollisionActivityContract?.launch(arrayListOf(collision))
-        }
-
-        viewModel.onSnackbarMessage().observe(this) { message ->
-            showSnackbar(message)
-        }
-
-        viewModel.onExceptionThrown().observe(this, ::manageException)
-
-        viewModel.itemToRemove.observe(this) { handle ->
-            playerServiceViewModelGateway?.removeItem(handle)
-        }
+        setupObserver()
 
         if (savedInstanceState == null && !isAudioPlayer) {
             // post to next UI cycle so that MediaPlayerFragment's onCreateView is called
@@ -343,6 +343,40 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         if (savedInstanceState == null && isAudioPlayer) {
             PermissionUtils.checkNotificationsPermission(this)
         }
+    }
+
+    private fun setupObserver() {
+        viewModel.getCollision().observe(this) { collision ->
+            nameCollisionActivityContract?.launch(arrayListOf(collision))
+        }
+
+        viewModel.onSnackbarMessage().observe(this) { message ->
+            showSnackbar(message)
+        }
+
+        viewModel.onExceptionThrown().observe(this, ::manageException)
+
+        viewModel.itemToRemove.observe(this) { handle ->
+            playerServiceViewModelGateway?.removeItem(handle)
+        }
+
+        viewModel.renameUpdate.observe(this) { node ->
+            node?.let {
+                showRenameNodeDialog(this, it, this, object : ActionNodeCallback {
+                    override fun finishRenameActionWithSuccess(newName: String) {
+                        playerServiceViewModelGateway?.updateItemName(it.handle, newName)
+                        updateTrackInfoNodeNameIfNeeded(it.handle, newName)
+                        //Avoid the dialog is shown repeatedly when screen is rotated.
+                        viewModel.renameUpdate(null)
+                    }
+                })
+            }
+        }
+
+        viewModel.isLockUpdate.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .onEach { isLock ->
+                updateToolbar(isLock)
+            }.launchIn(lifecycleScope)
     }
 
     private fun observeRotationSettingsChange() {
@@ -463,7 +497,12 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         optionsMenu = menu
 
-        menuInflater.inflate(R.menu.media_player, menu)
+        menuInflater.inflate(
+            if (isAudioPlayer()) {
+                R.menu.media_player
+            } else {
+                R.menu.menu_video_player
+            }, menu)
 
         menu.findItem(R.id.get_link).title =
             StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
@@ -892,13 +931,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 return true
             }
             R.id.rename -> {
-                val node = megaApi.getNodeByHandle(playingHandle) ?: return true
-                showRenameNodeDialog(this, node, this, object : ActionNodeCallback {
-                    override fun finishRenameActionWithSuccess(newName: String) {
-                        playerServiceViewModelGateway?.updateItemName(node.handle, newName)
-                        updateTrackInfoNodeNameIfNeeded(node.handle, newName)
-                    }
-                })
+                viewModel.renameUpdate(megaApi.getNodeByHandle(playingHandle))
                 return true
             }
             R.id.move -> {
@@ -1069,12 +1102,12 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     fun showToolbar(animate: Boolean = true) {
         if (animate) {
             binding.toolbar.animate()
-                .translationY(0F)
+                .translationY(TRANSLATION_Y_ZERO)
                 .setDuration(MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
                 .start()
         } else {
             binding.toolbar.animate().cancel()
-            binding.toolbar.translationY = 0F
+            binding.toolbar.translationY = TRANSLATION_Y_ZERO
         }
         if (!isAudioPlayer()) {
             showSystemUI()
@@ -1082,13 +1115,6 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     private fun hideSystemUI() {
-        @Suppress("DEPRECATION")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.hide(WindowInsets.Type.statusBars())
-        } else {
-            window.setFlags(FLAG_FULLSCREEN, FLAG_FULLSCREEN)
-        }
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, binding.root).let { controller ->
             controller.hide(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior =
@@ -1096,16 +1122,26 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
     }
 
-    private fun showSystemUI() {
-        @Suppress("DEPRECATION")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.show(WindowInsets.Type.statusBars())
-        } else {
-            window.clearFlags(FLAG_FULLSCREEN)
-        }
-        WindowCompat.setDecorFitsSystemWindows(window, true)
+    /**
+     * Show system UI
+     */
+    fun showSystemUI() {
         WindowInsetsControllerCompat(window,
             binding.root).show(WindowInsetsCompat.Type.systemBars())
+    }
+
+    /**
+     * Update toolbar
+     *
+     * @param isHide true is hidden, otherwise is shown
+     */
+    fun updateToolbar(isHide: Boolean) {
+        binding.toolbar.animate().cancel()
+        binding.toolbar.translationY = if (isHide) {
+            -binding.toolbar.measuredHeight.toFloat()
+        } else {
+            TRANSLATION_Y_ZERO
+        }
     }
 
     /**
@@ -1116,42 +1152,54 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     fun setupToolbarColors(showElevation: Boolean = false) {
         val isDarkMode = Util.isDarkMode(this)
         val isMainPlayer = navController.currentDestination?.id == R.id.main_player
+        val isPlaylist = navController.currentDestination?.id == R.id.playlist
         @ColorRes val toolbarBackgroundColor: Int
         @ColorInt val statusBarColor: Int
         val toolbarElevation: Float
         val isVideoPlayerMainView = !isAudioPlayer() && isMainPlayer
+        val isVideoPlaylist = !isAudioPlayer() && isPlaylist
 
+        WindowCompat.setDecorFitsSystemWindows(window,
+            !isVideoPlayerMainView || !isVideoPlaylist)
 
-        WindowCompat.setDecorFitsSystemWindows(window, !isVideoPlayerMainView)
+        updatePaddingForSystemUI(isVideoPlayerMainView, isVideoPlaylist)
 
-        binding.rootLayout.post {
-            // Apply system bars top and bottom insets
-            ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { _, windowInsets ->
-                val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-                binding.toolbar.updatePadding(0, if (isVideoPlayerMainView) insets.top else 0, 0, 0)
-                binding.rootLayout.updatePadding(
-                    if (isVideoPlayerMainView) insets.left else 0,
-                    0,
-                    if (isVideoPlayerMainView) insets.right else 0,
-                    if (isVideoPlayerMainView) insets.bottom else 0
-                )
-                WindowInsetsCompat.CONSUMED
+        binding.rootLayout.setBackgroundColor(getColor(
+            if (isAudioPlayer()) {
+                R.color.white_dark_grey
+            } else {
+                R.color.dark_grey
             }
-        }
+        ))
 
         when {
             isAudioPlayer() && isMainPlayer -> {
-                toolbarElevation = 0F
+                toolbarElevation = TOOLBAR_ELEVATION_ZERO
                 toolbarBackgroundColor = android.R.color.transparent
                 statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
             }
-            isVideoPlayerMainView -> {
-                toolbarElevation = 0F
-                toolbarBackgroundColor = R.color.white_alpha_070_grey_alpha_070
-                statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+            (isVideoPlayerMainView || isVideoPlaylist) && !isDarkMode -> {
+                moveToDarkModeUI()
+                toolbarElevation = TOOLBAR_ELEVATION_ZERO
+                if (isVideoPlayerMainView) {
+                    toolbarBackgroundColor = R.color.grey_alpha_070
+                    statusBarColor = ContextCompat.getColor(this, R.color.dark_grey)
+                } else {
+                    toolbarBackgroundColor = if (showElevation) {
+                        R.color.action_mode_background
+                    } else {
+                        R.color.dark_grey
+                    }
+                    statusBarColor = if (showElevation) {
+                        val elevation = resources.getDimension(R.dimen.toolbar_elevation)
+                        ColorUtils.getColorForElevation(this, elevation)
+                    } else {
+                        ContextCompat.getColor(this, android.R.color.transparent)
+                    }
+                }
             }
             isDarkMode -> {
-                toolbarElevation = 0F
+                toolbarElevation = TOOLBAR_ELEVATION_ZERO
                 toolbarBackgroundColor = if (showElevation) {
                     R.color.action_mode_background
                 } else {
@@ -1168,7 +1216,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 toolbarElevation = if (showElevation) {
                     resources.getDimension(R.dimen.toolbar_elevation)
                 } else {
-                    0F
+                    TOOLBAR_ELEVATION_ZERO
                 }
                 toolbarBackgroundColor = if (showElevation) {
                     R.color.white
@@ -1182,6 +1230,51 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         window.statusBarColor = statusBarColor
         binding.toolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarBackgroundColor))
         binding.toolbar.elevation = toolbarElevation
+    }
+
+    private fun moveToDarkModeUI() {
+        binding.toolbar.context.setTheme(R.style.videoPlayerToolbarThemeDark)
+        binding.toolbar.navigationIcon?.setTint(Color.WHITE)
+        binding.toolbar.setTitleTextColor(Color.WHITE)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            isAppearanceLightNavigationBars = false
+            isAppearanceLightStatusBars = false
+        }
+        window.navigationBarColor = getColor(R.color.dark_grey)
+    }
+
+    private fun updatePaddingForSystemUI(
+        isVideoPlayerMainView: Boolean,
+        isVideoPlaylist: Boolean,
+    ) {
+        binding.rootLayout.post {
+            ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { _, windowInsets ->
+                if (isVideoPlayerMainView || isVideoPlaylist) {
+                    windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()).let { insets ->
+                        val horizontalInsets: Pair<Int, Int> =
+                            if (resources.configuration.orientation == ORIENTATION_LANDSCAPE) {
+                                // If the navigation bar at left side, add the padding that the
+                                // width is equals height of status bar for right side.
+                                if (insets.left > insets.right) {
+                                    Pair(insets.left, max(insets.top, insets.bottom))
+                                } else {
+                                    Pair(max(insets.top, insets.bottom), insets.right)
+                                }
+                            } else {
+                                Pair(0, 0)
+                            }
+                        binding.toolbar.updatePadding(0, insets.top, 0, 0)
+                        binding.rootLayout.updatePadding(
+                            horizontalInsets.first,
+                            0,
+                            horizontalInsets.second,
+                            insets.bottom
+                        )
+                    }
+                }
+                WindowInsetsCompat.CONSUMED
+            }
+        }
     }
 
     /**
@@ -1238,6 +1331,17 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     companion object {
+
+        /**
+         * The zero value for toolbar elevation
+         */
+        const val TOOLBAR_ELEVATION_ZERO = 0F
+
+        /**
+         * The zero value for translation Y
+         */
+        const val TRANSLATION_Y_ZERO = 0F
+
         /**
          * Judge the player whether is audio player
          *

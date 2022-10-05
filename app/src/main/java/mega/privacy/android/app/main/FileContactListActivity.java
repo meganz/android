@@ -26,7 +26,6 @@ import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
 import android.annotation.SuppressLint;
@@ -56,6 +55,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -64,7 +64,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Stack;
 
 import javax.inject.Inject;
@@ -83,11 +82,13 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.presentation.contact.FileContactListViewModel;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaEvent;
@@ -105,6 +106,8 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     UploadUseCase uploadUseCase;
+
+    private FileContactListViewModel viewModel;
 
     private ContactController contactController;
     private NodeController nodeController;
@@ -336,6 +339,8 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     protected void onCreate(Bundle savedInstanceState) {
         Timber.d("onCreate");
         super.onCreate(savedInstanceState);
+
+        viewModel = new ViewModelProvider(this).get(FileContactListViewModel.class);
 
         initFileBackupManager();
 
@@ -785,7 +790,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             return;
         }
 
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
             showOverDiskQuotaPaywallWarning();
             return;

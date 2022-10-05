@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
@@ -50,6 +51,12 @@ private fun getFileTypeInfoForExtension(
     }
     extension.isGifExtension() -> {
         GifFileTypeInfo(
+            type = mimeType,
+            extension = extension,
+        )
+    }
+    extension.isRawExtension() -> {
+        RawFileTypeInfo(
             type = mimeType,
             extension = extension,
         )
@@ -104,44 +111,32 @@ private fun String.isVideoMimeType(extension: String) =
 
 private fun String.isGifExtension() = (this == "gif") || (this == "webp")
 
-private val textExtensions = listOf( //Text
-    "txt",
-    "ans",
-    "ascii",
-    "log",
-    "wpd",
-    "json",
-    "md",
-    "html",
-    "xml",
-    "shtml",
-    "dhtml",
-    "js",
-    "css",
-    "jar",
-    "java",
-    "class",
-    "php",
-    "php3",
-    "php4",
-    "php5",
-    "phtml",
-    "inc",
-    "asp",
-    "pl",
-    "cgi",
-    "py",
-    "sql",
-    "accdb",
-    "db",
-    "dbf",
-    "mdb",
-    "pdb",
-    "c",
-    "cpp",
-    "h",
-    "cs",
-    "sh",
-    "vb",
-    "swift"
+private fun String.isRawExtension() = this in rawExtensions
+
+private val rawExtensions = listOf(
+    "3fr", "arw", "cr2",
+    "crw", "ciff", "cs1",
+    "dcr", "dng", "erf",
+    "iiq", "k25", "kdc",
+    "mef", "mos", "mrw",
+    "nef", "nrw", "orf",
+    "pef", "raf", "raw",
+    "rw2", "rwl", "sr2",
+    "srf", "srw", "x3f",
+)
+
+private val textExtensions = listOf(
+    "txt", "css", "cgi",
+    "ans", "jar", "py",
+    "ascii", "java", "sql",
+    "log", "class", "accdb",
+    "wpd", "php", "db",
+    "json", "php3", "dbf",
+    "md", "php4", "mdb",
+    "html", "php5", "pdb",
+    "xml", "phtml", "c",
+    "shtml", "inc", "cpp",
+    "dhtml", "asp", "h",
+    "js", "pl", "cs",
+    "sh", "vb", "swift",
 )

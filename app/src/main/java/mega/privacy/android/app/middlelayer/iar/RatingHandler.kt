@@ -5,6 +5,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.preference.PreferenceManager
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.domain.entity.StorageState
 import nz.mega.sdk.MegaApiJava
 
 /**
@@ -118,7 +120,7 @@ abstract class RatingHandler(val context: Context) {
 
         // Exclude ODQ & OBQ accounts
         if (megaApi.bandwidthOverquotaDelay > 0
-            && app.storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
+            && getStorageState() == StorageState.PayWall) {
             return false
         }
 

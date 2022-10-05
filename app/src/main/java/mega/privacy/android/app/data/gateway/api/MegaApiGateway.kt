@@ -185,6 +185,15 @@ interface MegaApiGateway {
     suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode?
 
     /**
+     * Get the MegaNode by path
+     *
+     * @param path
+     * @param megaNode Base node if the path is relative
+     * @return megaNode in the path or null
+     */
+    suspend fun getNodeByPath(path: String?, megaNode: MegaNode?): MegaNode?
+
+    /**
      * Get the fingerprint of a file by path
      *
      * @param filePath
@@ -225,7 +234,7 @@ interface MegaApiGateway {
      * @param node node that is checked
      * @return true is has version
      */
-    fun hasVersion(node: MegaNode): Boolean
+    suspend fun hasVersion(node: MegaNode): Boolean
 
     /**
      * Get children nodes by node
@@ -268,14 +277,14 @@ interface MegaApiGateway {
      * @param node current folder node
      * @return child folder number
      */
-    fun getNumChildFolders(node: MegaNode): Int
+    suspend fun getNumChildFolders(node: MegaNode): Int
 
     /**
      * Get child files number of current folder
      * @param node current folder node
      * @return child files number
      */
-    fun getNumChildFiles(node: MegaNode): Int
+    suspend fun getNumChildFiles(node: MegaNode): Int
 
 
     /**
@@ -536,11 +545,11 @@ interface MegaApiGateway {
      * Get user avatar
      *
      * @param user
-     * @param dstPath destination path file
+     * @param destinationPath destination path file
      *
      * @return true if success
      */
-    suspend fun getUserAvatar(user: MegaUser, dstPath: String): Boolean
+    suspend fun getUserAvatar(user: MegaUser, destinationPath: String): Boolean
 
     /**
      * Allow to search nodes with the specific options, [order] & [type] & [target]
@@ -717,4 +726,39 @@ interface MegaApiGateway {
      * false if inactive or if the user is not under a Business Account
      */
     suspend fun isBusinessAccountActive(): Boolean
+
+    /**
+     * Get pricing
+     *
+     * @param listener
+     */
+    fun getPricing(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Get payment methods
+     *
+     * @param listener
+     */
+    fun getPaymentMethods(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Get account details
+     */
+    fun getAccountDetails(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Get specific account details
+     *
+     * @param storage
+     * @param transfer
+     * @param pro
+     */
+    fun getSpecificAccountDetails(storage: Boolean, transfer: Boolean, pro: Boolean)
+
+    /**
+     * Get the credit card subscriptions of the account
+     *
+     * @param listener
+     */
+    fun creditCardQuerySubscriptions(listener: MegaRequestListenerInterface?)
 }

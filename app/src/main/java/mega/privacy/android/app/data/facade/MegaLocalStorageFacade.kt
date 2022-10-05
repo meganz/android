@@ -1,18 +1,25 @@
 package mega.privacy.android.app.data.facade
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.main.megachat.NonContactInfo
+import mega.privacy.android.app.utils.SharedPreferenceConstants
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_FAV_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_LABEL_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -23,7 +30,8 @@ import javax.inject.Inject
  * @property dbHandler
  */
 class MegaLocalStorageFacade @Inject constructor(
-    val dbHandler: DatabaseHandler,
+    private val dbHandler: DatabaseHandler,
+    @ApplicationContext private val context: Context,
 ) : MegaLocalStorageGateway {
 
     override suspend fun getCamSyncHandle(): Long? =
@@ -56,6 +64,33 @@ class MegaLocalStorageFacade @Inject constructor(
             else -> order
         }
 
+    /**
+     * Since offline nodes cannot be ordered by labels and favorites, the offline order will be same as
+     * cloud order except when cloud order is ORDER_LABEL_ASC or ORDER_FAV_ASC where it defaults to
+     * ORDER_DEFAULT_ASC.
+     */
+    override suspend fun getOfflineSortOrder(): Int =
+        when (val order = getCloudSortOrder()) {
+            ORDER_LABEL_ASC -> ORDER_DEFAULT_ASC
+            ORDER_FAV_ASC -> ORDER_DEFAULT_ASC
+            else -> order
+        }
+
+    override suspend fun setOfflineSortOrder(order: Int) {
+        dbHandler.preferences?.preferredSortCloud = order.toString()
+    }
+
+    override suspend fun setCloudSortOrder(order: Int) {
+        dbHandler.preferences?.preferredSortCloud = order.toString()
+    }
+
+    override suspend fun setCameraSortOrder(order: Int) {
+        dbHandler.preferences?.preferredSortCameraUpload = order.toString()
+    }
+
+    override suspend fun setOthersSortOrder(order: Int) {
+        dbHandler.preferences?.preferredSortOthers = order.toString()
+    }
 
     override suspend fun getUserCredentials(): UserCredentials? = dbHandler.credentials
 
@@ -102,9 +137,6 @@ class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord? =
         dbHandler.findSyncRecordByLocalPath(path, isSecondary)
-
-    override suspend fun shouldClearSyncRecords(clearSyncRecords: Boolean) =
-        dbHandler.saveShouldClearCamsyncRecords(clearSyncRecords)
 
     override suspend fun doesFileNameExist(
         fileName: String,
@@ -275,5 +307,41 @@ class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun setCamSyncEnabled(enable: Boolean) {
         dbHandler.setCamSyncEnabled(enable)
+    }
+
+    override suspend fun getAttributes(): MegaAttributes? =
+        dbHandler.attributes
+
+    override suspend fun getPricingTimeStamp(): String? =
+        dbHandler.attributes?.pricingTimeStamp
+
+    override suspend fun getPaymentMethodsTimeStamp(): String? =
+        dbHandler.attributes?.paymentMethodsTimeStamp
+
+    override suspend fun backupTimestampsAndFolderHandle(
+        primaryUploadFolderHandle: Long,
+        secondaryUploadFolderHandle: Long,
+    ) {
+        val prefs = dbHandler.preferences
+        if (prefs == null) {
+            Timber.e("Preference is null, while backup.")
+            return
+        }
+        context.getSharedPreferences(SharedPreferenceConstants.LAST_CAM_SYNC_TIMESTAMP_FILE,
+            Context.MODE_PRIVATE)
+            .edit()
+            .putString(SharedPreferenceConstants.KEY_CAM_SYNC_TIMESTAMP, prefs.camSyncTimeStamp)
+            .putString(SharedPreferenceConstants.KEY_CAM_VIDEO_SYNC_TIMESTAMP,
+                prefs.camVideoSyncTimeStamp)
+            .putString(SharedPreferenceConstants.KEY_SEC_SYNC_TIMESTAMP, prefs.secSyncTimeStamp)
+            .putString(SharedPreferenceConstants.KEY_SEC_VIDEO_SYNC_TIMESTAMP,
+                prefs.secVideoSyncTimeStamp)
+            .putLong(SharedPreferenceConstants.KEY_PRIMARY_HANDLE, primaryUploadFolderHandle)
+            .putLong(SharedPreferenceConstants.KEY_SECONDARY_HANDLE, secondaryUploadFolderHandle)
+            .apply()
+    }
+
+    override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) {
+        dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)
     }
 }

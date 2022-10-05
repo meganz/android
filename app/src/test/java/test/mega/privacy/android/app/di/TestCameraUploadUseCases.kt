@@ -10,17 +10,22 @@ import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.GetChildMegaNode
+import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.GetFingerprint
 import mega.privacy.android.app.domain.usecase.GetNodeByFingerprint
 import mega.privacy.android.app.domain.usecase.GetNodeByFingerprintAndParentNode
 import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
+import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
+import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
+import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
+import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
@@ -184,6 +189,21 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideSaveSyncRecordsToDB() = mock<SaveSyncRecordsToDB>()
+
+    @Provides
+    fun provideGetDefaultNodeHandle() = mock<GetDefaultNodeHandle>()
+
+    @Provides
+    fun provideSetPrimarySyncHandle() = mock<SetPrimarySyncHandle>()
+
+    @Provides
+    fun provideSetSecondarySyncHandle() = mock<SetSecondarySyncHandle>()
+
+    @Provides
+    fun provideGetPrimarySyncHandle() = mock<GetPrimarySyncHandle>()
+
+    @Provides
+    fun provideGetSecondarySyncHandle() = mock<GetSecondarySyncHandle>()
 
     @Provides
     fun provideCheckEnableCameraUploadsStatus() = mock<CheckEnableCameraUploadsStatus>()

@@ -27,6 +27,11 @@ NATIVE_SYMBOL_FILE = "symbols.zip"
 ARTIFACTORY_BASE_URL = 'https://artifactory.developers.mega.co.nz/artifactory/android-mega/release'
 ARTIFACTORY_BUILD_INFO = "buildinfo.txt"
 
+/**
+ * Default release notes content files
+ */
+RELEASE_NOTES = "default_release_notes.json"
+
 pipeline {
     agent { label 'mac-jenkins-slave-android || mac-jenkins-slave' }
     options {
@@ -493,13 +498,17 @@ pipeline {
                     BUILD_STEP = 'Deploy to Google Play Alpha'
                 }
                 script {
+                    // Get the formatted release notes
+                    String release_notes = releaseNotes(RELEASE_NOTES)
+                    
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
                             filesPattern: 'archive/*-gms-release.aab',
                             trackName: 'alpha',
                             rolloutPercentage: '0',
                             additionalVersionCodes: '429',
-                            nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}"
+                            nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}",
+                            recentChangeList: getRecentChangeList(release_notes)
                 }
             }
         }
@@ -913,3 +922,45 @@ private void printWorkspaceSize(String prompt) {
         du -sh
     """
 }
+
+/**
+ * Get the list of recent changes (release note) json string input
+ * and return a formatted list following below example
+ *[
+ * [language: 'en-GB', text: "Please test the changes from Jenkins build ${env.BUILD_NUMBER}."],
+ * [language: 'de-DE', text: "Bitte die Änderungen vom Jenkins Build ${env.BUILD_NUMBER} testen."]
+ *]
+ *
+ * @param input the json string to parse
+ * @return the list of recent changes formatted
+ */
+def getRecentChangeList(input) {
+    def map = []
+    def languages = new groovy.json.JsonSlurperClassic().parseText(input)
+    def keyList = languages.keySet()
+    keyList.each { language ->
+        def languageMap = [:]
+        languageMap["language"] = "${language}"
+        languageMap["text"] = "${languages[language]}"
+        map.add(languageMap)
+    }
+    return map
+}
+
+/**
+ * Get release notes content from releaseNoteFile
+ * releaseNoteFile should be in json format
+ *
+ * @return a String with the content of releaseNoteFile
+ */
+private String releaseNotes(releaseNoteFile) {
+    String release_notes = sh(
+            script: """
+                cd ${WORKSPACE}/jenkinsfile/
+                cat $releaseNoteFile
+                """,
+            returnStdout: true).trim()
+    return release_notes
+}
+
+

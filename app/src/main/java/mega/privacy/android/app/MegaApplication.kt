@@ -7,10 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Build
-import androidx.core.provider.FontRequest
-import androidx.emoji.text.EmojiCompat
-import androidx.emoji.text.EmojiCompat.InitCallback
-import androidx.emoji.text.FontRequestEmojiCompatConfig
+import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -29,22 +26,17 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
-import mega.privacy.android.app.components.twemoji.EmojiManager
-import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes
-import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
-import mega.privacy.android.app.globalmanagement.BackgroundRequestListener
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.listeners.GlobalChatListener
-import mega.privacy.android.app.listeners.GlobalListener
 import mega.privacy.android.app.meeting.CallService
 import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.CallSoundsController
@@ -53,7 +45,7 @@ import mega.privacy.android.app.meeting.listeners.MeetingListener
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.logging.InitialiseLoggingUseCaseJavaWrapper
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.NetworkStateReceiver
 import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase
@@ -64,8 +56,9 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContextUtils.getAvailableMemory
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams.get
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.InitialiseLogging
+import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -74,7 +67,6 @@ import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaHandleList
 import org.webrtc.ContextUtils
 import timber.log.Timber
-import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -95,11 +87,9 @@ import javax.inject.Inject
  * @property themeModeState
  * @property transfersManagement
  * @property activityLifecycleHandler
- * @property globalListener
  * @property megaChatNotificationHandler
  * @property pushNotificationSettingManagement
  * @property chatManagement
- * @property requestListener
  * @property chatRequestHandler
  * @property rtcAudioManagerGateway
  * @property callChangesObserver
@@ -107,6 +97,7 @@ import javax.inject.Inject
  * @property localIpAddress
  * @property isEsid
  * @property storageState
+ * @property monitorStorageStateEvent
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLifecycleObserver {
@@ -159,9 +150,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     lateinit var activityLifecycleHandler: ActivityLifecycleHandler
 
     @Inject
-    lateinit var globalListener: GlobalListener
-
-    @Inject
     lateinit var megaChatNotificationHandler: MegaChatNotificationHandler
 
     @Inject
@@ -171,9 +159,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     @Inject
     @get:JvmName("chatManagement")
     lateinit var chatManagement: ChatManagement
-
-    @Inject
-    lateinit var requestListener: BackgroundRequestListener
 
     @Inject
     lateinit var chatRequestHandler: MegaChatRequestHandler
@@ -186,6 +171,9 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
 
     @Inject
     lateinit var globalChatListener: GlobalChatListener
+
+    @Inject
+    lateinit var monitorStorageStateEvent: MonitorStorageStateEvent
 
     var localIpAddress: String? = ""
 
@@ -215,9 +203,9 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     override fun onCreate() {
         instance = this
         super<MultiDexApplication>.onCreate()
+        enableStrictMode()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
-        initialiseLogging()
         themeModeState.initialise()
         callChangesObserver.init()
         LiveEventBus.config().enableLogger(false)
@@ -231,7 +219,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         registerActivityLifecycleCallbacks(activityLifecycleHandler)
         isVerifySMSShowed = false
 
-        setupMegaApi()
         setupMegaApiFolder()
         setupMegaChatApi()
 
@@ -261,28 +248,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         registerReceiver(NetworkStateReceiver(),
             IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
         registerReceiver(logoutReceiver, IntentFilter(Constants.ACTION_LOG_OUT))
-
-        EmojiManagerShortcodes.initEmojiData(applicationContext)
-        EmojiManager.install(TwitterEmojiProvider())
-        Timber.d("Use downloadable font for EmojiCompat")
-        // Use a downloadable font for EmojiCompat
-        val fontRequest = FontRequest(
-            "com.google.android.gms.fonts",
-            "com.google.android.gms",
-            "Noto Color Emoji Compat",
-            R.array.com_google_android_gms_fonts_certs)
-        val config = FontRequestEmojiCompatConfig(applicationContext, fontRequest)
-            .setReplaceAll(false)
-            .registerInitCallback(object : InitCallback() {
-                override fun onInitialized() {
-                    Timber.d("EmojiCompat initialized")
-                }
-
-                override fun onFailed(throwable: Throwable?) {
-                    Timber.w("EmojiCompat initialization failed")
-                }
-            })
-        EmojiCompat.init(config)
 
         // clear the cache files stored in the external cache folder.
         clearPublicCache(this)
@@ -314,8 +279,30 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         }
     }
 
-    private fun initialiseLogging() =
-        InitialiseLoggingUseCaseJavaWrapper(initialiseLoggingUseCase).invokeUseCase(BuildConfig.DEBUG)
+    private fun enableStrictMode() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build()
+            )
+
+            StrictMode.setVmPolicy(
+                StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build()
+            )
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder() // Other StrictMode checks that you've previously added.
+                    .detectUnsafeIntentLaunch()
+                    .penaltyLog()
+                    .build())
+            }
+        }
+    }
 
     /**
      * Get work manager configuration
@@ -348,7 +335,7 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         Timber.d("askForFullAccountInfo")
         megaApi.run {
             getPaymentMethods(null)
-            if (storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN) {
+            if (monitorStorageStateEvent.getState() == StorageState.Unknown) {
                 getAccountDetails()
             } else {
                 getSpecificAccountDetails(false, true, true)
@@ -435,56 +422,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         } catch (e: Exception) {
             Timber.e(e)
         }
-    }
-
-    private fun setupMegaApi() {
-        megaApi.apply {
-            Timber.d("ADD REQUEST LISTENER")
-            retrySSLerrors(true)
-            downloadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
-            uploadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
-            addRequestListener(requestListener)
-            addGlobalListener(globalListener)
-        }
-        setSDKLanguage()
-
-        // Set the proper resource limit to try avoid issues when the number of parallel transfers is very big.
-        val desirableRLimit = 20000 // SDK team recommended value
-        val currentLimit = megaApi.platformGetRLimitNumFile()
-        Timber.d("Current resource limit is set to %s", currentLimit)
-        if (currentLimit < desirableRLimit) {
-            Timber.d("Resource limit is under desirable value. Trying to increase the resource limit...")
-            if (!megaApi.platformSetRLimitNumFile(desirableRLimit)) {
-                Timber.w("Error setting resource limit.")
-            }
-
-            // Check new resource limit after set it in order to see if had been set successfully to the
-            // desired value or maybe to a lower value limited by the system.
-            Timber.d("Resource limit is set to %s", megaApi.platformGetRLimitNumFile())
-        }
-    }
-
-    /**
-     * Set the language code used by the app.
-     * Language code is from current system setting.
-     * Need to distinguish simplified and traditional Chinese.
-     */
-    private fun setSDKLanguage() {
-        val locale = Locale.getDefault()
-        var langCode: String?
-
-        // If it's Chinese
-        langCode = if (Locale.CHINESE.toLanguageTag() == locale.language) {
-            if (Util.isSimplifiedChinese()) Locale.SIMPLIFIED_CHINESE.toLanguageTag() else Locale.TRADITIONAL_CHINESE.toLanguageTag()
-        } else {
-            locale.toString()
-        }
-        var result = megaApi.setLanguage(langCode)
-        if (!result) {
-            langCode = locale.language
-            result = megaApi.setLanguage(langCode)
-        }
-        Timber.d("Result: $result Language: $langCode")
     }
 
     /**
