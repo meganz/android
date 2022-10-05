@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -734,7 +734,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">Versión del SDK de MEGA</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">Versión del SDK de MEGAchat</string>
+    <string name="settings_about_karere_version">Versión del SDK de MEGA chat</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Ver código fuente</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -914,7 +914,7 @@
         <item quantity="other">La carpeta está compartida con %1$d contactos. ¿Eliminar la compartición?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">Correo electrónico y/o contraseña incorrectos. Vuelve a intentarlo.</string>
+    <string name="error_incorrect_email_or_password">Correo electrónico o contraseña no válidos Vuelve a intentarlo.</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">Tu cuenta ha sido suspendida por infringir nuestros Términos de servicio. Por favor, ponte en contacto con support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
@@ -1944,7 +1944,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Activar la vista previa de los enlaces</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Mejora tu experiencia con MEGAchat. El contenido del enlace se recuperará sin cifrado punto a punto.</string>
+    <string name="text_enable_rich_links">Mejora tu experiencia con MEGA chat. El contenido del enlace se recuperará sin cifrado punto a punto.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Por favor ingresa una contraseña más segura</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2935,10 +2935,6 @@
     <string name="browse_files_label">Examinar archivos</string>
     <!-- Title of the File Provider activity -->
     <string name="file_provider_title">Adjuntar desde&#8230;</string>
-    <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
-    <string name="inactive_chat_title_2">Chat creado %s</string>
-    <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
-    <string name="inactive_chat_title">Chat creado el %s</string>
     <!-- Title of the chat when multi-selection is activated -->
     <string name="select_message_title">Seleccionar mensajes</string>
     <!-- The label that describes that a transfer failed. -->
@@ -3293,8 +3289,6 @@
     <string name="settings_media_audio_files">Archivos de audio</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Reproducción en segundo plano</string>
-    <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]No[/B] [B]hay[/B] [A]fotos[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Realiza una copia de seguridad automática de tus fotos y videos en tu Nube.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3595,8 +3589,6 @@
     <string name="show_activity_action">Mostrar actividad</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]Actividad reciente[/B] oculta</string>
-    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
-    <string name="video_quality_info">Ahorra espacio disminuyendo la calidad de vídeo en los ajustes de las Subidas de la cámara.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Calidad original</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
@@ -3965,14 +3957,8 @@
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filtro</string>
-    <!-- Filter option to show all photos -->
-    <string name="photos_filter_all_photos"></string>
-    <!-- Filter option to show only photos from Cloud Drive -->
-    <string name="photos_filter_cloud_drive">Desde la Nube</string>
     <!-- Filter option to show only photos and videos from Camera Uploads folder -->
     <string name="photos_filter_camera_uploads"></string>
-    <!-- Filter option to show only videos from Camera Uploads -->
-    <string name="photos_filter_videos_only">Solo vídeos</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
     <string name="dialog_cannot_open_file_title">El archivo no se puede abrir</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
@@ -4107,4 +4093,14 @@
     <string name="dialog_account_suspended_ToS_copyright_message">Cuenta suspendida por violar los derechos de autor. Te hemos enviado un correo electrónico con más información al respecto.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Cuenta cerrada por incumplir los Términos de servicio de MEGA, como el abuso de los derechos de otros, el intercambio e importación de datos ilegales o el abuso del sistema.</string>
+    <!-- Title of the Meetings tab for the chat section -->
+    <string name="chat_tab_meetings_title">Reuniones</string>
+    <!-- Title of the location option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_location_option">Ubicación</string>
+    <!-- Used in chat screen to indicate last message sent by me -->
+    <string name="chat_last_message_sender_me">Yo</string>
+    <!-- Hint the screen is locked in video player page -->
+    <string name="video_player_locked_hint">Screen is locked</string>
+    <!-- Hint that tap to unlock in video player page -->
+    <string name="video_player_unlock_hint">Tap to unlock</string>
 </resources>
