@@ -11,6 +11,8 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
@@ -39,6 +41,12 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.listeners.CreateFolderListener
 import mega.privacy.android.app.listeners.GetAttrUserListener
+import mega.privacy.android.app.main.AddContactActivity.EXTRA_CHAT_LINK
+import mega.privacy.android.app.main.AddContactActivity.EXTRA_CHAT_TITLE
+import mega.privacy.android.app.main.AddContactActivity.EXTRA_CONTACTS
+import mega.privacy.android.app.main.AddContactActivity.EXTRA_CONTACT_TYPE
+import mega.privacy.android.app.main.AddContactActivity.EXTRA_EKR
+import mega.privacy.android.app.main.AddContactActivity.EXTRA_ONLY_CREATE_GROUP
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.CAMERA
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.COPY
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.IMPORT
@@ -72,6 +80,7 @@ import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevatio
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT
@@ -220,6 +229,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
 
+    private lateinit var createChatLauncher: ActivityResultLauncher<Intent?>
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             retryConnectionsAndSignalPresence()
@@ -363,6 +374,62 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+
+        createChatLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode != RESULT_OK) {
+                    Timber.d("Result is not OK")
+                    return@registerForActivityResult
+                }
+
+                result.data?.let { intent ->
+                    intent.getStringArrayListExtra(EXTRA_CONTACTS)
+                        ?.let { contactsData ->
+                            if (contactsData.size == 1) {
+                                val user = megaApi.getContact(contactsData[0])
+
+                                if (user != null) {
+                                    Timber.d("Chat with contact: %s", contactsData.size)
+                                    startOneToOneChat(user)
+                                }
+                            } else {
+                                Timber.d("Create GROUP chat")
+                                val peers = MegaChatPeerList.createInstance()
+
+                                for (i in contactsData.indices) {
+                                    val user = megaApi.getContact(contactsData[i])
+                                    if (user != null) {
+                                        peers.addPeer(user.handle, MegaChatPeerList.PRIV_STANDARD)
+                                    }
+                                }
+
+                                Timber.d("create group chat with participants: %s", peers.size())
+                                val chatTitle = intent.getStringExtra(EXTRA_CHAT_TITLE)
+                                val isEKR = intent.getBooleanExtra(EXTRA_EKR, false)
+
+                                if (isEKR) {
+                                    megaChatApi.createChat(true, peers, chatTitle, this)
+                                } else {
+                                    val chatLink = intent.getBooleanExtra(EXTRA_CHAT_LINK, false)
+
+                                    if (chatLink) {
+                                        if (chatTitle != null && chatTitle.isNotEmpty()) {
+                                            megaChatApi.createPublicChat(peers,
+                                                chatTitle,
+                                                CreateGroupChatWithPublicLink(this, chatTitle))
+                                        } else {
+                                            Util.showAlert(this,
+                                                getString(R.string.message_error_set_title_get_link),
+                                                null)
+                                        }
+                                    } else {
+                                        megaChatApi.createPublicChat(peers, chatTitle, this)
+                                    }
+                                }
+                            }
+                        }
+                }
+            }
 
         setupObservers()
 
@@ -2021,9 +2088,9 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         if (contacts.isEmpty()) {
                             showSnackbar(getString(R.string.no_contacts_invite))
                         } else {
-                            val `in` = Intent(this, AddContactActivity::class.java)
-                            `in`.putExtra("contactType", Constants.CONTACT_TYPE_MEGA)
-                            startActivityForResult(`in`, Constants.REQUEST_CREATE_CHAT)
+                            createChatLauncher.launch(
+                                Intent(this, AddContactActivity::class.java)
+                                    .putExtra(EXTRA_CONTACT_TYPE, CONTACT_TYPE_MEGA))
                         }
                     }
                 } else {
@@ -2036,65 +2103,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         }
 
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
-        Timber.d("Request code: %d, Result code: %d", requestCode, resultCode)
-        if (requestCode == Constants.REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
-            Timber.d("REQUEST_CREATE_CHAT OK")
-            if (intent == null) {
-                Timber.w("Return.....")
-                return
-            }
-
-            val contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
-
-            if (contactsData != null) {
-                if (contactsData.size == 1) {
-                    val user = megaApi.getContact(contactsData[0])
-
-                    if (user != null) {
-                        Timber.d("Chat with contact: %s", contactsData.size)
-                        startOneToOneChat(user)
-                    }
-                } else {
-                    Timber.d("Create GROUP chat")
-                    val peers = MegaChatPeerList.createInstance()
-
-                    for (i in contactsData.indices) {
-                        val user = megaApi.getContact(contactsData[i])
-                        if (user != null) {
-                            peers.addPeer(user.handle, MegaChatPeerList.PRIV_STANDARD)
-                        }
-                    }
-
-                    Timber.d("create group chat with participants: %s", peers.size())
-                    val chatTitle = intent.getStringExtra(AddContactActivity.EXTRA_CHAT_TITLE)
-                    val isEKR = intent.getBooleanExtra(AddContactActivity.EXTRA_EKR, false)
-
-                    if (isEKR) {
-                        megaChatApi.createChat(true, peers, chatTitle, this)
-                    } else {
-                        val chatLink =
-                            intent.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false)
-
-                        if (chatLink) {
-                            if (chatTitle != null && chatTitle.isNotEmpty()) {
-                                val listener = CreateGroupChatWithPublicLink(this, chatTitle)
-                                megaChatApi.createPublicChat(peers, chatTitle, listener)
-                            } else {
-                                Util.showAlert(this,
-                                    getString(R.string.message_error_set_title_get_link),
-                                    null)
-                            }
-                        } else {
-                            megaChatApi.createPublicChat(peers, chatTitle, this)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -2180,10 +2188,9 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         if (contacts.isEmpty()) {
                             showSnackbar(getString(R.string.no_contacts_invite))
                         } else {
-                            val intent = Intent(this, AddContactActivity::class.java)
-                            intent.putExtra("contactType", Constants.CONTACT_TYPE_MEGA)
-                            intent.putExtra("onlyCreateGroup", true)
-                            startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT)
+                            createChatLauncher.launch(Intent(this, AddContactActivity::class.java)
+                                .putExtra(EXTRA_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                                .putExtra(EXTRA_ONLY_CREATE_GROUP, true))
                         }
                     }
                 } else {
