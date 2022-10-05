@@ -21,7 +21,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaContactAdapter
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.HeaderItemDecoration
@@ -36,7 +35,6 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
@@ -49,7 +47,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -65,8 +62,6 @@ class RecentActionsFragment : Fragment() {
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
-
-    private val visibleContacts = ArrayList<MegaContactAdapter>()
 
     private var adapter: RecentsAdapter? = null
     private lateinit var emptyLayout: ScrollView
@@ -116,7 +111,6 @@ class RecentActionsFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.recentActionsItems.collectLatest {
                     refreshRecentActions(it)
-                    setVisibleContacts()
                     setRecentView()
                 }
             }
@@ -215,19 +209,7 @@ class RecentActionsFragment : Fragment() {
     }
 
     fun findUserName(mail: String): String =
-        visibleContacts.find { mail == it.megaUser.email }?.fullName.orEmpty()
-
-    private fun setVisibleContacts() {
-        visibleContacts.clear()
-        megaApi.contacts
-            .asSequence()
-            .filter { it.visibility == MegaUser.VISIBILITY_VISIBLE }
-            .forEach {
-                val contactDB = ContactUtil.getContactDB(it.handle) ?: return@forEach
-                val fullName = ContactUtil.getContactNameDB(contactDB) ?: it.email
-                visibleContacts.add(MegaContactAdapter(contactDB, it, fullName))
-            }
-    }
+        viewModel.getUserName(mail)
 
     fun openFile(index: Int, node: MegaNode) {
         val intent: Intent

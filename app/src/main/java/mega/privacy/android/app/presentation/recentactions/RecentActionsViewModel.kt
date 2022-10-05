@@ -12,6 +12,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetRecentActions
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
+import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.domain.usecase.GetVisibleContacts
 import nz.mega.sdk.MegaRecentActionBucket
 import javax.inject.Inject
 
@@ -25,6 +28,7 @@ import javax.inject.Inject
 class RecentActionsViewModel @Inject constructor(
     getRecentActions: GetRecentActions,
     monitorNodeUpdates: MonitorNodeUpdates,
+    getVisibleContacts: GetVisibleContacts,
 ) : ViewModel() {
 
     private val _buckets = MutableStateFlow<List<MegaRecentActionBucket>>(emptyList())
@@ -41,6 +45,11 @@ class RecentActionsViewModel @Inject constructor(
             )
 
     /**
+     * Hold the list of contacts
+     */
+    private var visibleContacts = emptyList<ContactItem>()
+
+    /**
      * Selected recent actions bucket
      */
     var selected: MegaRecentActionBucket? = null
@@ -53,6 +62,8 @@ class RecentActionsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _buckets.emit(getRecentActions())
+            visibleContacts =
+                getVisibleContacts().filter { it.visibility == UserVisibility.Visible }
             monitorNodeUpdates().collectLatest {
                 _buckets.emit(getRecentActions())
             }
@@ -66,6 +77,15 @@ class RecentActionsViewModel @Inject constructor(
         selected = bucket
         snapShotActionList = _buckets.value
     }
+
+    /**
+     *  Get the full name of a contact given his mail
+     *
+     *  @param mail
+     *  @return the full name of the contact or empty string if cannot be retrieved
+     */
+    fun getUserName(mail: String): String =
+        visibleContacts.find { mail == it.email }?.contactData?.fullName.orEmpty()
 
     /**
      * Format a list of [RecentActionItemType] from a [MegaRecentActionBucket]
