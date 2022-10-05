@@ -35,12 +35,16 @@ import mega.privacy.android.app.listeners.SetAttrUserListener
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import nz.mega.sdk.MegaApiJava
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.CameraUploadUtil
@@ -76,17 +80,18 @@ import mega.privacy.android.app.constants.SettingsConstants.REQUEST_LOCAL_SECOND
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_CAMERA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_SECONDARY_MEDIA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER
+import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.VideoQuality
 import java.io.File
-import java.lang.Exception
 
 /**
  * [SettingsBaseFragment] that enables or disables Camera Uploads in Settings
  */
+@AndroidEntryPoint
 class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var cameraUploadOnOff: SwitchPreferenceCompat? = null
     private var cameraUploadHow: ListPreference? = null
@@ -119,7 +124,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var queueSizeInput: EditText? = null
 
     // Secondary Folder
-    private var localSecondaryFolderPath = ""
+    private var localSecondaryFolderPath: String? = ""
     private var handleSecondaryMediaFolder: Long? = null
     private var megaNodeSecondaryMediaFolder: MegaNode? = null
     private var megaPathSecMediaFolder = ""
@@ -128,6 +133,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
 
     private val localDCIMFolderPath: String
         get() = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
+    private val viewModel by viewModels<SettingsCameraUploadsViewModel>()
 
     /**
      * Register the permissions callback, used when the user attempts to enable Camera Uploads
@@ -145,7 +151,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 // Otherwise if all necessary permissions have been granted, check the user
                 // Business Account status
                 Timber.d("All permissions in enableCameraUploadsPermissionLauncher granted")
-                checkIfShouldShowBusinessCUAlert()
+                viewModel.handleEnableCameraUploads()
             }
         }
 
@@ -184,6 +190,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         return v
     }
 
+
     /**
      * onSaveInstanceState Behavior
      */
@@ -194,6 +201,35 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         ) {
             outState.putBoolean(KEY_SET_QUEUE_DIALOG, true)
             outState.putString(KEY_SET_QUEUE_SIZE, queueSizeInput?.text.toString())
+        }
+    }
+
+    /**
+     * onViewCreated Behavior
+     */
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.state.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .collect {
+                    // Display a Dialog explaining that the Business Account Administrator can access the user's Camera Uploads
+                    if (it.shouldShowBusinessAccountPrompt) {
+                        showBusinessCameraUploadsAlert()
+                    }
+                    // Send a broadcast to BaseActivity to display the Dialog informing that the current Business Account has expired
+                    // Afterwards, reset the Business Account suspended prompt state
+                    if (it.shouldShowBusinessAccountSuspendedPrompt) {
+                        requireContext().sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
+                        viewModel.resetBusinessAccountSuspendedPromptState()
+                    }
+                    // Enable Camera Uploads
+                    // Afterwards, reset the Trigger Camera Uploads state
+                    if (it.shouldTriggerCameraUploads) {
+                        enableCameraUploads()
+                        viewModel.setTriggerCameraUploadsState(false)
+                    }
+                }
         }
     }
 
@@ -465,7 +501,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         }
 
         val chargingHelper = getString(R.string.settings_camera_upload_charging_helper_label,
-            resources.getString(R.string.label_file_size_mega_byte, size))
+            getString(R.string.label_file_size_mega_byte, size))
         cameraUploadCharging?.summary = chargingHelper
         if (savedInstanceState != null) {
             val isShowingQueueDialog = savedInstanceState.getBoolean(KEY_SET_QUEUE_DIALOG, false)
@@ -764,10 +800,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     secondaryPath) && !FileUtil.isBasedOnFileStorage()
                 dbH.mediaFolderExternalSdCard = isExternalSDCardMU
                 localSecondaryFolderPath =
-                    if (isExternalSDCardMU) SDCardUtils.getSDCardDirName(Uri.parse(dbH.uriMediaExternalSdCard)) else secondaryPath.orEmpty()
-                dbH.setSecondaryFolderPath(localSecondaryFolderPath)
-                prefs.localPathSecondaryFolder = localSecondaryFolderPath
-                localSecondaryFolder?.summary = localSecondaryFolderPath
+                    if (isExternalSDCardMU) SDCardUtils.getSDCardDirName(Uri.parse(dbH.uriMediaExternalSdCard)) else secondaryPath
+                dbH.setSecondaryFolderPath(localSecondaryFolderPath.orEmpty())
+                prefs.localPathSecondaryFolder = localSecondaryFolderPath.orEmpty()
+                localSecondaryFolder?.summary = localSecondaryFolderPath.orEmpty()
                 dbH.setSecSyncTimeStamp(0)
                 dbH.setSecVideoSyncTimeStamp(0)
                 JobUtil.rescheduleCameraUpload(context)
@@ -826,7 +862,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 preferenceScreen.addPreference(it)
             }
             localSecondaryFolder?.let {
-                it.summary = localSecondaryFolderPath
+                it.summary = localSecondaryFolderPath.orEmpty()
                 preferenceScreen.addPreference(it)
             }
         } else {
@@ -886,7 +922,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         var cuEnabled = false
         prefs = dbH.preferences
         if (prefs != null) {
-            cuEnabled = java.lang.Boolean.parseBoolean(prefs.camSyncEnabled)
+            cuEnabled = prefs.camSyncEnabled.toBoolean()
         }
         if (cuEnabled) {
             Timber.d("Disable CU.")
@@ -902,7 +938,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             )
             if (hasPermissions(context, *permissionsList)) {
                 Timber.d("All necessary permissions have been granted")
-                checkIfShouldShowBusinessCUAlert()
+                viewModel.handleEnableCameraUploads()
             } else {
                 Timber.d("At least one permission was denied. Launching permission window")
                 enableCameraUploadsPermissionLauncher.launch(permissionsList)
@@ -911,20 +947,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     }
 
     /**
-     * Method to check if Business alert needs to be displayed before enabling Camera Uploads.
+     * Displays an [AlertDialog] informing the user that the Business Account administrator can
+     * access your Camera Uploads
      */
-    private fun checkIfShouldShowBusinessCUAlert() {
-        if (megaApi.isBusinessAccount && !megaApi.isMasterBusinessAccount) {
-            showBusinessCUAlert()
-        } else {
-            enableCameraUpload()
-        }
-    }
-
-    /**
-     * Method for displaying the Business alert dialog
-     */
-    private fun showBusinessCUAlert() {
+    private fun showBusinessCameraUploadsAlert() {
         if (businessCameraUploadsAlertDialog != null && (businessCameraUploadsAlertDialog
                 ?: return).isShowing
         ) {
@@ -935,8 +961,13 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         builder.setTitle(R.string.section_photo_sync)
             .setMessage(R.string.camera_uploads_business_alert)
             .setNegativeButton(R.string.general_cancel) { _, _ -> }
-            .setPositiveButton(R.string.general_enable) { _, _ -> enableCameraUpload() }
+            // Clicking this Button will enable Camera Uploads
+            .setPositiveButton(R.string.general_enable) { _, _ ->
+                viewModel.setTriggerCameraUploadsState(true)
+            }
             .setCancelable(false)
+            // Reset the Business Account Prompt State when the Dialog is dismissed
+            .setOnDismissListener { viewModel.resetBusinessAccountPromptState() }
         businessCameraUploadsAlertDialog = builder.create()
         businessCameraUploadsAlertDialog?.show()
     }
@@ -957,16 +988,16 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     private fun checkMediaUploadsPath() {
         localSecondaryFolderPath = prefs.localPathSecondaryFolder
-        if (TextUtil.isTextEmpty(localSecondaryFolderPath)
+        if (localSecondaryFolderPath.isNullOrBlank()
             || localSecondaryFolderPath == Constants.INVALID_NON_NULL_VALUE
-            || !isExternalSDCardMU && !FileUtil.isFileAvailable(File(localSecondaryFolderPath))
+            || (!isExternalSDCardMU && !FileUtil.isFileAvailable(File(localSecondaryFolderPath.orEmpty())))
         ) {
             Timber.w("Secondary ON: invalid localSecondaryFolderPath")
             localSecondaryFolderPath = getString(R.string.settings_empty_folder)
             Toast.makeText(context,
                 getString(R.string.secondary_media_service_error_local_folder),
                 Toast.LENGTH_SHORT).show()
-            if (!FileUtil.isFileAvailable(File(localSecondaryFolderPath))) {
+            if (!FileUtil.isFileAvailable(File(localSecondaryFolderPath.orEmpty()))) {
                 dbH.setSecondaryFolderPath(Constants.INVALID_NON_NULL_VALUE)
             }
         } else if (isExternalSDCardMU) {
@@ -1049,9 +1080,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      *
      * @param size The Queue size
      */
-    private fun isQueueSizeValid(size: Int): Boolean {
-        return size in COMPRESSION_QUEUE_SIZE_MIN..COMPRESSION_QUEUE_SIZE_MAX
-    }
+    private fun isQueueSizeValid(size: Int): Boolean =
+        size in COMPRESSION_QUEUE_SIZE_MIN..COMPRESSION_QUEUE_SIZE_MAX
 
     /**
      * Reset Size Input
@@ -1110,14 +1140,14 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             Util.dp2px(0f, outMetrics),
             Util.dp2px(margin.toFloat(), outMetrics),
             0)
-        val text = TextView(context)
-        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
-        text.text = getString(R.string.settings_compression_queue_subtitle,
+        val textView = TextView(context)
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+        textView.text = getString(R.string.settings_compression_queue_subtitle,
             getString(R.string.label_file_size_mega_byte,
-                java.lang.String.valueOf(COMPRESSION_QUEUE_SIZE_MIN)),
+                COMPRESSION_QUEUE_SIZE_MIN.toString()),
             getString(R.string.label_file_size_mega_byte,
-                java.lang.String.valueOf(COMPRESSION_QUEUE_SIZE_MAX)))
-        layout.addView(text, params)
+                COMPRESSION_QUEUE_SIZE_MAX.toString()))
+        layout.addView(textView, params)
 
         val builder = AlertDialog.Builder(context)
         with(builder) {
@@ -1311,7 +1341,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     /**
      * Enables the Camera Uploads functionality with location data embedded in each upload
      */
-    fun enableCameraUploadsWithLocation() {
+    private fun enableCameraUploadsWithLocation() {
         includeGPS = true
         dbH.setRemoveGPS(false)
         cameraUploadIncludeGPS?.isChecked = includeGPS
@@ -1321,7 +1351,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     /**
      * Enables the Camera Uploads functionality
      */
-    fun enableCameraUpload() {
+    private fun enableCameraUploads() {
         cameraUpload = true
         prefs = dbH.preferences
 
