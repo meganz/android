@@ -1,7 +1,6 @@
-package test.mega.privacy.android.app.data.mapper
+package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.data.mapper.StartScreenMapper
 import mega.privacy.android.domain.entity.preference.StartScreen
 import org.junit.Test
 

@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.mapper.EventMapper
-import mega.privacy.android.app.data.mapper.UserAlertMapper
+import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface

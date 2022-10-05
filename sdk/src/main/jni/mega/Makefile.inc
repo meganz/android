@@ -63,7 +63,8 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/raid.cpp \
     sdk/src/testhooks.cpp \
     sdk/src/heartbeats.cpp \
-    sdk/src/textchat.cpp
+    sdk/src/textchat.cpp \
+    sdk/src/setandelement.cpp
     
 C_SOURCES = sdk/src/mega_glob.c
 
@@ -121,7 +122,8 @@ HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/raid.h \
 		sdk/include/mega/testhooks.h \
 		sdk/include/mega/heartbeats.h \
-		sdk/include/mega/textchat.h
+		sdk/include/mega/textchat.h \
+		sdk/include/mega/setandelement.h
 
 OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
 C_WRAPPER_SOURCES = sdk/src/megaapi.cpp sdk/src/megaapi_impl.cpp

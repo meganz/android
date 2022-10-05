@@ -12,4 +12,8 @@ interface JobUtilWrapper {
 
     fun fireCameraUploadJob(context: Context, shouldIgnoreAttributes: Boolean): Int =
         JobUtil.fireCameraUploadJob(context, shouldIgnoreAttributes)
+
+    fun fireStopCameraUploadJob(context: Context) =
+        JobUtil.fireStopCameraUploadJob(context)
+
 }

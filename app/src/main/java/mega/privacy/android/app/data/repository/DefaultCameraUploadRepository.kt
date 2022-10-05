@@ -111,11 +111,6 @@ class DefaultCameraUploadRepository @Inject constructor(
             localStorageGateway.getSyncRecordByLocalPath(path, isSecondary)
         }
 
-    override suspend fun shouldClearSyncRecords(clearSyncRecords: Boolean) =
-        withContext(ioDispatcher) {
-            localStorageGateway.shouldClearSyncRecords(clearSyncRecords)
-        }
-
     override suspend fun doesFileNameExist(
         fileName: String,
         isSecondary: Boolean,
@@ -268,4 +263,9 @@ class DefaultCameraUploadRepository @Inject constructor(
             localStorageGateway.getMegaHandleSecondaryFolder() ?: getInvalidHandle()
         localStorageGateway.backupTimestampsAndFolderHandle(primaryHandle, secondaryHandle)
     }
+
+    override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) =
+        withContext(ioDispatcher) {
+            localStorageGateway.saveShouldClearCamSyncRecords(clearCamSyncRecords)
+        }
 }
