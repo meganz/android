@@ -1,6 +1,12 @@
 BUILD_STEP = ""
+
+// Below values will be read from MR description and are used to decide SDK versions
 SDK_BRANCH = "develop"
 MEGACHAT_BRANCH = "develop"
+SDK_COMMIT = ""
+MEGACHAT_COMMIT = ""
+SDK_TAG = ""
+MEGACHAT_TAG = ""
 
 GMS_APK_BUILD_LOG = "gms_build.log"
 HMS_APK_BUILD_LOG = "hms_build.log"
@@ -259,6 +265,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Preparation"
+                    checkSDKVersion()
                 }
                 gitlabCommitStatus(name: 'Preparation') {
                     script {
@@ -287,13 +294,51 @@ pipeline {
 
                 gitlabCommitStatus(name: 'Fetch SDK Submodules') {
                     withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                        sh 'git checkout -- .'
-                        sh 'git config --file=.gitmodules submodule."sdk/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
-                        sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch ${SDK_BRANCH}"
-                        sh 'git config --file=.gitmodules submodule."sdk/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-                        sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch ${MEGACHAT_BRANCH}"
-                        sh "git submodule sync"
-                        sh "git submodule update --init --recursive --remote"
+                        script {
+                            sh '''
+                            cd ${WORKSPACE}
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
+                            git submodule sync
+                            git submodule update --init --recursive --remote 
+                            cd sdk/src/main/jni/mega/sdk
+                            git fetch
+                            cd ../../megachat/sdk
+                            git fetch
+                            cd ${WORKSPACE}
+                        '''
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Select SDK Version') {
+            steps {
+                script {
+                    BUILD_STEP = 'Select SDK Version'
+                }
+                gitlabCommitStatus(name: 'Select SDK Version') {
+                    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
+                        script {
+                            if (isDefined(SDK_COMMIT)) {
+                                checkoutSdkByCommit(SDK_COMMIT)
+                            } else if (isDefined(SDK_TAG)) {
+                                checkoutSdkByTag(SDK_TAG)
+                            } else {
+                                checkoutSdkByBranch(SDK_BRANCH)
+                            }
+
+                            if (isDefined(MEGACHAT_COMMIT)) {
+                                checkoutMegaChatSdkByCommit(MEGACHAT_COMMIT)
+                            } else if (isDefined(MEGACHAT_TAG)) {
+                                checkoutMegaChatSdkByTag(MEGACHAT_TAG)
+                            } else {
+                                checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
+                            }
+                        }
                     }
                 }
             }
@@ -759,4 +804,137 @@ private String uploadFileToGitLab(String fileName) {
         return link
     }
     return link
+}
+
+/**
+ * Get the value from GitLab MR description by key
+ * @param key the key to check and read
+ * @return actual value of key if key is specified. null otherwise.
+ */
+String getValueInMRDescriptionBy(String key) {
+    if (key == null || key.isEmpty()) return null
+    String description = env.GITLAB_OA_DESCRIPTION
+    if (description == null) return null
+    String[] lines = description.split('\n')
+    for (String line : lines) {
+        line = line.trim()
+        if (line.startsWith(key)) {
+            String value = line.substring(key.length() + 1)
+            print("getValueInMRDescriptionBy(): " + key + " ==> " + value)
+            return value
+        }
+    }
+    return null
+}
+
+/**
+ * Read SDK versions from MR description and assign the values into environment.
+ */
+private void checkSDKVersion() {
+    SDK_COMMIT = getValueInMRDescriptionBy("SDK_COMMIT")
+    MEGACHAT_COMMIT = getValueInMRDescriptionBy("MEGACHAT_COMMIT")
+
+    SDK_TAG = getValueInMRDescriptionBy("SDK_TAG")
+    MEGACHAT_TAG = getValueInMRDescriptionBy("MEGACHAT_TAG")
+
+    SDK_BRANCH = getValueInMRDescriptionBy("SDK_BRANCH")
+    if (!isDefined(SDK_BRANCH)) {
+        SDK_BRANCH = "develop"
+    }
+
+    MEGACHAT_BRANCH = getValueInMRDescriptionBy("MEGACHAT_BRANCH")
+    if (!isDefined(MEGACHAT_BRANCH)) {
+        MEGACHAT_BRANCH = "develop"
+    }
+}
+
+/**
+ * check if a certain value is defined by checking the tag value
+ * @param value value of tag
+ * @return true if tag has a value. false if tag is null or zero length
+ */
+static boolean isDefined(String value) {
+    return value != null && !value.isEmpty()
+}
+
+/**
+ * checkout SDK by commit ID
+ * @param sdkCommitId the commit ID to checkout
+ */
+private void checkoutSdkByCommit(String sdkCommitId) {
+    sh """
+    echo checkoutSdkByCommit
+    cd $WORKSPACE
+    cd sdk/src/main/jni/mega/sdk
+    git checkout $sdkCommitId
+    cd $WORKSPACE
+    """
+}
+
+/**
+ * checkout SDK by git tag
+ * @param sdkTag the tag to checkout
+ */
+private void checkoutSdkByTag(String sdkTag) {
+    sh """
+    echo checkoutSdkByTag
+    cd $WORKSPACE
+    cd sdk/src/main/jni/mega/sdk
+    git checkout tags/$sdkTag
+    cd $WORKSPACE
+    """
+}
+
+/**
+ * checkout SDK by branch
+ * @param sdkBranch the branch to checkout
+ */
+private void checkoutSdkByBranch(String sdkBranch) {
+    sh "echo checkoutSdkByBranch"
+    sh "cd \"$WORKSPACE\""
+    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
+    sh 'git submodule sync'
+    sh 'git submodule update --init --recursive --remote'
+}
+
+/**
+ * checkout MEGAchat SDK by commit ID
+ * @param megaChatCommitId the commit ID to checkout
+ */
+private void checkoutMegaChatSdkByCommit(String megaChatCommitId) {
+    sh """
+    echo checkoutMegaChatSdkByCommit
+    cd $WORKSPACE
+    cd sdk/src/main/jni/megachat/sdk
+    git checkout $megaChatCommitId
+    cd $WORKSPACE
+    """
+}
+
+/**
+ * checkout MEGAchat SDK by git tag
+ * @param megaChatTag the tag to checkout
+ */
+private void checkoutMegaChatSdkByTag(String megaChatTag) {
+    sh """
+    echo checkoutMegaChatSdkByTag
+    cd $WORKSPACE
+    cd sdk/src/main/jni/megachat/sdk
+    git checkout tags/$megaChatTag
+    cd $WORKSPACE
+    """
+}
+
+/**
+ * checkout MEGAchat SDK by branch
+ * @param megaChatBranch the branch to checkout
+ */
+private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
+    sh "echo checkoutMegaChatSdkByBranch"
+    sh "cd \"$WORKSPACE\""
+    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
+    sh 'git submodule sync'
+    sh 'git submodule update --init --recursive --remote'
 }
