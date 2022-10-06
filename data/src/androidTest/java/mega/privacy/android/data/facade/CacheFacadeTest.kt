@@ -168,7 +168,8 @@ class CacheFacadeTest {
             }
         }
         underTest.clearCacheDirectory()
+        val actual = 0
         val expected = context.cacheDir.listFiles()?.size
-        assertThat(expected).isEqualTo(0)
+        assertThat(actual).isEqualTo(expected)
     }
 }

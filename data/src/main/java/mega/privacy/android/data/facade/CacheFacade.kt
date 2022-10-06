@@ -41,17 +41,23 @@ class CacheFacade @Inject constructor(
             }
         }
 
-    override suspend fun clearCacheDirectory(): Unit = withContext(ioDispatcher) {
-        try {
-            val dir = context.cacheDir
-            dir.list()?.forEach {
-                deleteDir(File(dir, it))
+    override suspend fun clearCacheDirectory() {
+        withContext(ioDispatcher) {
+            try {
+                val dir = context.cacheDir
+                dir.list()?.forEach {
+                    deleteDir(File(dir, it))
+                }
+            } catch (e: Exception) {
+                Timber.e(e)
             }
-        } catch (e: Exception) {
-            Timber.e(e)
         }
     }
 
+    /**
+     * @param dir [File] indicates current directory or file
+     * @return Boolean true if the delete operation is successful otherwise false
+     */
     private fun deleteDir(dir: File): Boolean {
         return if (dir.isDirectory) {
             dir.deleteRecursively()
