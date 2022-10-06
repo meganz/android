@@ -37,7 +37,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:placeholderImage="@drawable/ic_image_thumbnail"
             app:selected="@{item.selected}"
             app:thumbnail="@{item.thumbnail}"
             tools:src="@drawable/ic_image_thumbnail" />
