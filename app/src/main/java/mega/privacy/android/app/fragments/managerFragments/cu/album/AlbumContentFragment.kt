@@ -29,7 +29,6 @@ import mega.privacy.android.app.components.GestureScaleListener
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.databinding.FragmentAlbumContentBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
@@ -54,6 +53,7 @@ import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
