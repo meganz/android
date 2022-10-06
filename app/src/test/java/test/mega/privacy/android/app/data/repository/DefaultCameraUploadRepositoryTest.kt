@@ -29,6 +29,7 @@ class DefaultCameraUploadRepositoryTest {
         underTest = DefaultCameraUploadRepository(
             localStorageGateway = localStorageGateway,
             megaApiGateway = mock(),
+            cacheGateway = mock(),
             ioDispatcher = UnconfinedTestDispatcher()
         )
     }

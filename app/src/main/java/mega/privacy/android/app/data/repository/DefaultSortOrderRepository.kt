@@ -3,8 +3,8 @@ package mega.privacy.android.app.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.data.mapper.SortOrderIntMapper
-import mega.privacy.android.app.data.mapper.SortOrderMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SortOrderRepository

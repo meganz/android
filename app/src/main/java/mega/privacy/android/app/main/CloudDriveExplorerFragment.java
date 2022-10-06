@@ -417,7 +417,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
         fastScroller.setRecyclerView(recyclerView);
         setNodes(nodes);
 
-        if (((FileExplorerActivity) context).shouldRestartSearch()) {
+        if (((FileExplorerActivity) context).getShouldRestartSearch()) {
             setWaitingForSearchedNodes(true);
             search(((FileExplorerActivity) context).getQuerySearch());
         }
@@ -516,7 +516,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
 
             }
             case R.id.cancel_text: {
-                ((FileExplorerActivity) context).finishActivity();
+                ((FileExplorerActivity) context).finishAndRemoveTask();
             }
             break;
         }

@@ -20,7 +20,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * App Test toggle
      */
-    AppTest("This is a test toggle. It does nothing", false);
+    AppTest("This is a test toggle. It does nothing", false),
+
+    /**
+     * Schedule Meeting toggle
+     */
+    ScheduleMeeting("Enable schedule meetings feature", false);
 
 
     companion object : FeatureFlagValueProvider {
@@ -28,11 +33,3 @@ enum class AppFeatures(override val description: String, private val defaultValu
             values().firstOrNull { it == feature }?.defaultValue
     }
 }
-
-
-
-
-
-
-
-
