@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava

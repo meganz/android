@@ -1,6 +1,6 @@
-package mega.privacy.android.app.data.mapper
+package mega.privacy.android.data.mapper
 
-import mega.privacy.android.app.data.model.GlobalTransfer
+import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 
 /**
