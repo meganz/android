@@ -42,10 +42,6 @@ pipeline {
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
 
-        GOOGLE_MAP_API_URL = 'https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k'
-        GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
-        GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
-
         APK_VERSION_NAME_FOR_CD = "_${new Date().format('MMddHHmm')}"
 
         // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
@@ -162,39 +158,29 @@ pipeline {
                     BUILD_STEP = 'Download Dependency Lib for SDK'
                 }
                 gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
-                    sh """
+                    script {
+                        sh """
+                            cd "${WORKSPACE}/jenkinsfile/"
+                            bash download_webrtc.sh
+    
+                            mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
+                            cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
+                            pwd
+                            ls -lh
+                        """
+                    }
 
-                        cd "${WORKSPACE}/jenkinsfile/"
-                        bash download_webrtc.sh
-
-                        mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                        cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                        pwd
-                        ls -lh
-
-                        ## check default Google API
-                        if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_FILE}"; then
-                            echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
-                        else
-                            echo "downloading google map api"
-                            mega-get ${GOOGLE_MAP_API_URL}
-
-                            echo "unzipping google map api"
-                            rm -fr ${GOOGLE_MAP_API_UNZIPPED}
-                            unzip ${GOOGLE_MAP_API_FILE} -d ${GOOGLE_MAP_API_UNZIPPED}
-                        fi
-
-                        ls -lh
-
-                        cd ${WORKSPACE}
-                        pwd
-
-                        echo "Applying Google Map API patches"
-                        rm -fr app/src/debug/res/values/google_maps_api.xml
-                        rm -fr app/src/release/res/values/google_maps_api.xml
-                        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
-
-                    """
+                    withCredentials([
+                            file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_QA', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_QA')
+                    ]) {
+                        script {
+                            println("applying production google map api config... ")
+                            sh 'mkdir -p app/src/debug/res/values'
+                            sh 'mkdir -p app/src/release/res/values'
+                            sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_QA} app/src/debug/res/values/google_maps_api.xml"
+                            sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_QA} app/src/release/res/values/google_maps_api.xml"
+                        }
+                    }
                 }
             }
         }
