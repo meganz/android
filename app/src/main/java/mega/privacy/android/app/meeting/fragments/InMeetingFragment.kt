@@ -901,7 +901,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun initViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                inMeetingViewModel.state.collect { (error, enabled) ->
+                inMeetingViewModel.state.collect { (_, enabled) ->
                    if (enabled != null) {
                         bottomFloatingPanelViewHolder.updateShareAndInviteButton()
                         bottomFloatingPanelViewHolder.updateAllowAddParticipantsOption(enabled)
