@@ -2112,7 +2112,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun isLinkVisible(): Boolean {
         getCall()?.let {
-            return isChatRoomPublic() && it.status == CALL_STATUS_IN_PROGRESS && (getOwnPrivileges() == PRIV_MODERATOR || isOpenInvite())
+            return isChatRoomPublic() && it.status == CALL_STATUS_IN_PROGRESS && (getOwnPrivileges() == PRIV_MODERATOR || (isOpenInvite() && !amIAGuest()))
         }
 
         return false
