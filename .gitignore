@@ -14,6 +14,7 @@
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/dictionaries
+.idea/androidTestResultsUserPreferences.xml
 
 # Sensitive or high-churn files:
 .idea/dataSources.ids
