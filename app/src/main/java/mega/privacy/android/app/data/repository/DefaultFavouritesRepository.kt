@@ -7,9 +7,9 @@ import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.mapper.FavouriteFolderInfoMapper
-import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
-import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
+import mega.privacy.android.data.mapper.FavouriteInfoMapper
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.mapper
+package mega.privacy.android.data.mapper
 
 import nz.mega.sdk.MegaChatPeerList
 

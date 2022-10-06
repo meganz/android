@@ -1,16 +1,15 @@
-package test.mega.privacy.android.app.data.mapper
+package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.data.mapper.toContactRequest
 import nz.mega.sdk.MegaContactRequest
 import org.junit.Test
 import org.mockito.kotlin.mock
 
-class ContactRequestMapperTest{
+class ContactRequestMapperTest {
 
     @Test
     fun `test that request with a null target email can be mapped successfully`() {
-        val megaRequest = mock<MegaContactRequest>{
+        val megaRequest = mock<MegaContactRequest> {
             on { targetEmail }.thenReturn(null)
             on { handle }.thenReturn(12L)
             on { sourceEmail }.thenReturn(" ")

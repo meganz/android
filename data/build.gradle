@@ -49,6 +49,7 @@ dependencies {
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     implementation 'androidx.exifinterface:exifinterface:1.3.0'
+    implementation "androidx.datastore:datastore-preferences:$datastoreVersion"
 
     // Testing dependencies
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"

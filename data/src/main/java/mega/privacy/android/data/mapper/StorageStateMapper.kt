@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.mapper
+package mega.privacy.android.data.mapper
 
 import mega.privacy.android.domain.entity.StorageState
 import nz.mega.sdk.MegaApiJava.STORAGE_STATE_CHANGE
