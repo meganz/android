@@ -50,7 +50,7 @@ class AlbumContentViewModel @Inject constructor(
     /**
      * Get current sort rule from SortOrderManagement
      */
-    fun getOrder() = runBlocking { sortOrderIntMapper(getCameraSortOrder()) }
+    fun getOrder() = runBlocking { getCameraSortOrder() }
 
     var currentHandle: Long? = null
 
