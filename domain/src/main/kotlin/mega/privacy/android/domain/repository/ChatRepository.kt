@@ -17,8 +17,7 @@ interface ChatRepository {
      * Starts a chat conversation with the provided contacts.
      *
      * @param chatId   The Chat id.
-     * @param enabled True if is should create a group chat, false otherwise.
-     * @return The chat conversation handle.
+     * @return True if is enabled, false if not.
      */
-    suspend fun setOpenInvite(chatId: Long, enabled: Boolean): Long
+    suspend fun setOpenInvite(chatId: Long): Boolean
 }

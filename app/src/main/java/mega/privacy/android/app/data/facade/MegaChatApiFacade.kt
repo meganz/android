@@ -153,7 +153,9 @@ class MegaChatApiFacade @Inject constructor(
         }
 
         chatApi.openChatRoom(chatId, listener)
-        awaitClose { chatApi.closeChatRoom(chatId, listener) }
+        awaitClose {
+            chatApi.closeChatRoom(chatId, listener)
+        }
     }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
     override suspend fun requestLastGreen(userHandle: Long) =
@@ -182,6 +184,9 @@ class MegaChatApiFacade @Inject constructor(
 
     override fun getUserOnlineStatus(userHandle: Long): Int =
         chatApi.getUserOnlineStatus(userHandle)
+
+    override fun getChatRoom(chatId: Long): MegaChatRoom? =
+        chatApi.getChatRoom(chatId)
 
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE

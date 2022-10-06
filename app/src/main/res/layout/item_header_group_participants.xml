@@ -172,7 +172,6 @@
             android:id="@+id/chat_group_allow_participants_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_gravity="start|center_vertical"
             android:layout_marginStart="16dp"
             android:src="@drawable/add_participants"/>
@@ -181,8 +180,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
-            android:layout_marginStart="32dp"
-            android:layout_toEndOf="@id/chat_group_allow_participants_icon">
+            android:layout_marginStart="32dp">
 
             <TextView
                 android:layout_width="wrap_content"

@@ -72,7 +72,10 @@ class ContactGroupsFragment : Fragment() {
                 val chatTitle =
                     intent.getStringExtra(AddContactActivity.EXTRA_CHAT_TITLE)
 
-                viewModel.getGroupChatRoom(contactsData, chatTitle)
+                val allowAddParticipants =
+                    intent.getBooleanExtra(AddContactActivity.ALLOW_ADD_PARTICIPANTS, false)
+
+                viewModel.getGroupChatRoom(contactsData, chatTitle, allowAddParticipants)
                     .observe(viewLifecycleOwner) { chatId ->
                         if (chatId == MEGACHAT_INVALID_HANDLE) {
                             (requireActivity() as SnackbarShower).showSnackbar(

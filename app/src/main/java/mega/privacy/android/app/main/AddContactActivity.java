@@ -224,6 +224,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private boolean comesFromRecent;
     public static final String FROM_RECENT = "comesFromRecent";
+    public static final String IS_ALLOWED_ADD_PARTICIPANTS = "isAllowAddParticipants";
 
     private RelativeLayout headerContacts;
     private TextView textHeader;
@@ -1364,7 +1365,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 break;
             }
             case R.id.action_send_invitation: {
-                //viewmodel mio
                 if (contactType == CONTACT_TYPE_MEGA) {
                     setResultContacts(addedContactsMEGA, true);
                 } else {
@@ -1431,7 +1431,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         outState.putBoolean("createNewGroup", createNewGroup);
         outState.putBoolean("queryPermissions", queryPermissions);
         outState.putBoolean("isEKREnabled", isEKREnabled);
-        outState.putBoolean("isAllowAddParticipants", isAllowAddParticipantsEnabled);
+        outState.putBoolean(IS_ALLOWED_ADD_PARTICIPANTS, isAllowAddParticipantsEnabled);
         outState.putBoolean("newGroup", newGroup);
         outState.putBoolean("onlyCreateGroup", onlyCreateGroup);
 
@@ -1742,7 +1742,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             queryPermissions = savedInstanceState.getBoolean("queryPermissions", true);
             isEKREnabled = savedInstanceState.getBoolean("isEKREnabled", false);
             ekrSwitch.setChecked(isEKREnabled);
-            isAllowAddParticipantsEnabled = savedInstanceState.getBoolean("isAllowAddParticipants", false);
+            isAllowAddParticipantsEnabled = savedInstanceState.getBoolean(IS_ALLOWED_ADD_PARTICIPANTS, false);
             allowAddParticipantsSwitch.setChecked(isAllowAddParticipantsEnabled);
             onlyCreateGroup = savedInstanceState.getBoolean("onlyCreateGroup", false);
 
@@ -1802,7 +1802,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             isEKREnabled = false;
             ekrSwitch.setChecked(isEKREnabled);
             isAllowAddParticipantsEnabled = false;
-            allowAddParticipantsSwitch.setChecked(isAllowAddParticipantsEnabled);
+            allowAddParticipantsSwitch.setChecked(false);
             setAddedAdapterContacts();
 
             if (contactType == CONTACT_TYPE_MEGA) {
@@ -3093,7 +3093,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         if (onNewGroup) {
             intent.putExtra(EXTRA_EKR, isEKREnabled);
             intent.putExtra(ALLOW_ADD_PARTICIPANTS, isAllowAddParticipantsEnabled);
-
             intent.putExtra(EXTRA_GROUP_CHAT, onNewGroup);
             intent.putExtra(EXTRA_CHAT_LINK, getChatLinkBox.isChecked());
         }

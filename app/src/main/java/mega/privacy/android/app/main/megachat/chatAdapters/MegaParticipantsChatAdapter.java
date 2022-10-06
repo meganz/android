@@ -144,7 +144,6 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         private TextView notificationsSubTitle;
         private View dividerNotifications;
         private LinearLayout allowParticipantsLayout;
-        private RelativeLayout allowParticipantsSwitchLayout;
         private SwitchCompat allowParticipantsSwitch;
         private View dividerAllowParticipants;
         private LinearLayout chatLinkLayout;
@@ -201,9 +200,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
 
                 //Notifications Layout
                 holderHeader.allowParticipantsLayout = v.findViewById(R.id.chat_group_allow_participants_layout);
-                holderHeader.allowParticipantsLayout.setVisibility(View.VISIBLE);
-                holderHeader.allowParticipantsSwitchLayout = v.findViewById(R.id.chat_group_allow_participants_properties_layout);
-                holderHeader.allowParticipantsSwitchLayout.setOnClickListener(this);
+                holderHeader.allowParticipantsLayout.setOnClickListener(this);
                 holderHeader.allowParticipantsSwitch = v.findViewById(R.id.chat_group_allow_participants_properties_switch);
                 holderHeader.allowParticipantsSwitch.setClickable(false);
                 holderHeader.allowParticipantsSwitch.setChecked(getChat().isOpenInvite());
@@ -323,8 +320,8 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 }
 
                 long participantsCount = getChat().getPeerCount();
-                holderHeader.participantsLayout.setVisibility(isNecessaryToHideParticipants() ? View.GONE : View.VISIBLE);
-
+                int visible = isNecessaryToHideParticipants() ? View.GONE : View.VISIBLE;
+                holderHeader.participantsLayout.setVisibility(visible);
                 holderHeader.allowParticipantsLayout.setVisibility(View.GONE);
                 holderHeader.dividerAllowParticipants.setVisibility(View.GONE);
 
@@ -357,7 +354,6 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                         holderHeader.privateSeparator.setVisibility(View.VISIBLE);
                         holderHeader.allowParticipantsLayout.setVisibility(View.VISIBLE);
                         holderHeader.dividerAllowParticipants.setVisibility(View.VISIBLE);
-
                         holderHeader.allowParticipantsSwitch.setChecked(getChat().isOpenInvite());
 
                         if (!getChat().isPublic()) {
@@ -499,12 +495,12 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
      *
      * @return True if the current chat is not a preview and if the user is moderator, false otherwise.
      */
-    private boolean isNotPreviewAndFirstParticipantModerator() {
+    private boolean isNotPreviewAndFirstParticipantModerator(MegaChatRoom chatRoom) {
         if (participants.isEmpty()) {
             return false;
         }
 
-        return !isPreview && participants.get(0).getPrivilege() == MegaChatRoom.PRIV_MODERATOR;
+        return !isPreview && (participants.get(0).getPrivilege() == MegaChatRoom.PRIV_MODERATOR || chatRoom.isOpenInvite());
     }
 
     /**
@@ -521,7 +517,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
      */
     @Override
     public int getItemCount() {
-        if (isNotPreviewAndFirstParticipantModerator()) {
+        if (isNotPreviewAndFirstParticipantModerator(getChat())) {
             return participants.size() + COUNT_HEADER_AND_ADD_PARTICIPANTS_POSITIONS;
         } else {
             return participants.size() + COUNT_HEADER_POSITION;
@@ -532,7 +528,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     public int getItemViewType(int position) {
         if (position == HEADER_POSITION) {
             return ITEM_VIEW_TYPE_HEADER;
-        } else if (isNotPreviewAndFirstParticipantModerator() && position == ADD_PARTICIPANTS_POSITION) {
+        } else if (isNotPreviewAndFirstParticipantModerator(getChat()) && position == ADD_PARTICIPANTS_POSITION) {
             return ITEM_VIEW_TYPE_ADD_PARTICIPANT;
         } else {
             return ITEM_VIEW_TYPE_NORMAL;
@@ -553,7 +549,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
      * @return The position of the participant in the array.
      */
     public int getParticipantPositionInArray(int adapterPosition) {
-        if (isNotPreviewAndFirstParticipantModerator()) {
+        if (isNotPreviewAndFirstParticipantModerator(getChat())) {
             return adapterPosition - COUNT_HEADER_AND_ADD_PARTICIPANTS_POSITIONS;
         } else {
             return adapterPosition - COUNT_HEADER_POSITION;
@@ -574,7 +570,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
      * @return The position of the participant in the adapter.
      */
     private int getParticipantPositionInAdapter(int arrayPosition) {
-        if (isNotPreviewAndFirstParticipantModerator()) {
+        if (isNotPreviewAndFirstParticipantModerator(getChat())) {
             return arrayPosition + COUNT_HEADER_AND_ADD_PARTICIPANTS_POSITIONS;
         } else {
             return arrayPosition + COUNT_HEADER_POSITION;
@@ -603,6 +599,8 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
             groupChatInfoActivity.showSnackbar(groupChatInfoActivity.getString(R.string.error_server_connection_problem));
             return;
         }
+
+        ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
 
         switch (v.getId()) {
             case R.id.participant_list_three_dots:
@@ -641,7 +639,6 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 break;
 
             case R.id.chat_group_contact_properties_layout:
-                ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
                 if (holderHeader != null) {
                     if (holderHeader.notificationsSwitch.isChecked()) {
                         createMuteNotificationsAlertDialogOfAChat(groupChatInfoActivity, chatId);
@@ -651,10 +648,9 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 }
                 break;
 
-            case R.id.chat_group_allow_participants_properties_layout:
-                ViewHolderParticipantsHeader holderHeader2 = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
-                if (holderHeader2 != null) {
-
+            case R.id.chat_group_allow_participants_layout:
+                if (holderHeader != null) {
+                    groupChatInfoActivity.setOpenInvite();
                 }
                 break;
 
@@ -715,9 +711,14 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         }
     }
 
-    public void updateAllowAddParticipants(boolean enabled){
+    /**
+     * Update allowParticipantsSwitch status
+     *
+     * @param enabled True, if it is to be checked. False, otherwise.
+     */
+    public void updateAllowAddParticipants(boolean enabled) {
         ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
-        if (holderHeader != null) {
+        if (holderHeader != null && holderHeader.allowParticipantsSwitch.isChecked() != enabled) {
             holderHeader.allowParticipantsSwitch.setChecked(enabled);
         }
     }
