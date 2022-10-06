@@ -50,6 +50,9 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     implementation 'androidx.exifinterface:exifinterface:1.3.0'
 
+    // Logger
+    implementation "com.jakewharton.timber:timber:$timberVersion"
+
     // Testing dependencies
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"

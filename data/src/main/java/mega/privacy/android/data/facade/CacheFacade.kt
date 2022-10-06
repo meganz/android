@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -39,4 +40,25 @@ class CacheFacade @Inject constructor(
                 File(it, fileName)
             }
         }
+
+    override suspend fun clearCacheDirectory(): Unit = withContext(ioDispatcher) {
+        try {
+            val dir = context.cacheDir
+            dir.list()?.forEach {
+                deleteDir(File(dir, it))
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
+
+    private fun deleteDir(dir: File): Boolean {
+        return if (dir.isDirectory) {
+            dir.deleteRecursively()
+        } else if (dir.isFile) {
+            dir.delete()
+        } else {
+            false
+        }
+    }
 }

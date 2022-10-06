@@ -346,4 +346,10 @@ interface CameraUploadRepository {
      * @param clearCamSyncRecords the boolean setting whether to clean the cam record
      */
     suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean)
+
+    /**
+     * This method is to clear all the contents of Internal cache directory
+     *
+     */
+    suspend fun clearCacheDirectory()
 }

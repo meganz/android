@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
+    private val cacheGateway: CacheGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CameraUploadRepository {
 
@@ -268,4 +270,8 @@ class DefaultCameraUploadRepository @Inject constructor(
         withContext(ioDispatcher) {
             localStorageGateway.saveShouldClearCamSyncRecords(clearCamSyncRecords)
         }
+
+    override suspend fun clearCacheDirectory() = withContext(ioDispatcher) {
+        cacheGateway.clearCacheDirectory()
+    }
 }
