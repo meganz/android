@@ -46,21 +46,23 @@ class DefaultChatRepository @Inject constructor(
         }
     }
 
-    override suspend fun setOpenInvite(chatId: Long, enabled: Boolean): Long =
+    override suspend fun setOpenInvite(chatId: Long): Boolean =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                chatGateway.setOpenInvite(chatId,
-                    enabled,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestCreateChatCompleted(continuation)
-                    ))
+                chatGateway.getChatRoom(chatId)?.let { chat ->
+                    chatGateway.setOpenInvite(chatId,
+                        !chat.isOpenInvite,
+                        OptionalMegaChatRequestListenerInterface(
+                            onRequestFinish = onRequestSetOpenInviteCompleted(continuation)
+                        ))
+                }
             }
         }
 
-    private fun onRequestCreateChatCompleted(continuation: Continuation<Long>) =
+    private fun onRequestSetOpenInviteCompleted(continuation: Continuation<Boolean>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {
-                continuation.resumeWith(Result.success(request.chatHandle))
+                continuation.resumeWith(Result.success(request.flag))
             } else {
                 continuation.failWithError(error)
             }

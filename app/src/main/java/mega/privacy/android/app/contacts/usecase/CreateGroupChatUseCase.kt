@@ -5,7 +5,6 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import nz.mega.sdk.*
-import nz.mega.sdk.MegaContactRequest.*
 import nz.mega.sdk.MegaError.API_OK
 import timber.log.Timber
 import javax.inject.Inject
@@ -18,7 +17,7 @@ import javax.inject.Inject
  */
 class CreateGroupChatUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val megaChatApi: MegaChatApiAndroid
+    private val megaChatApi: MegaChatApiAndroid,
 ) {
 
     /**
@@ -28,7 +27,11 @@ class CreateGroupChatUseCase @Inject constructor(
      * @param chatTitle     Title of new chat room
      * @return              Chat ID of the new chat room
      */
-    fun getGroupChatRoomCreated(contactsData: ArrayList<String>, chatTitle: String?): Single<Long> =
+    fun getGroupChatRoomCreated(
+        contactsData: ArrayList<String>,
+        chatTitle: String?,
+        allowAddParticipants: Boolean,
+    ): Single<Long> =
         Single.create { emitter ->
             val peerList = MegaChatPeerList.createInstance()
             contactsData.forEach { email ->
@@ -45,6 +48,9 @@ class CreateGroupChatUseCase @Inject constructor(
 
             megaChatApi.createPublicChat(peerList,
                 chatTitle,
+                false,
+                false,
+                allowAddParticipants,
                 OptionalMegaChatRequestListenerInterface(
                     onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
                         if (emitter.isDisposed) return@OptionalMegaChatRequestListenerInterface

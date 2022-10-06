@@ -41,6 +41,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.listeners.CreateFolderListener
 import mega.privacy.android.app.listeners.GetAttrUserListener
+import mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS
 import mega.privacy.android.app.main.AddContactActivity.EXTRA_CHAT_LINK
 import mega.privacy.android.app.main.AddContactActivity.EXTRA_CHAT_TITLE
 import mega.privacy.android.app.main.AddContactActivity.EXTRA_CONTACTS
@@ -119,6 +120,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
+
 
 /**
  * Activity used for several purposes like import content to the cloud, copies or movements.
@@ -406,9 +408,16 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                                 Timber.d("create group chat with participants: %s", peers.size())
                                 val chatTitle = intent.getStringExtra(EXTRA_CHAT_TITLE)
                                 val isEKR = intent.getBooleanExtra(EXTRA_EKR, false)
+                                val allowAddParticipants =
+                                    intent.getBooleanExtra(ALLOW_ADD_PARTICIPANTS, false)
 
                                 if (isEKR) {
-                                    megaChatApi.createChat(true, peers, chatTitle, this)
+                                    megaChatApi.createGroupChat(peers,
+                                        chatTitle,
+                                        false,
+                                        false,
+                                        allowAddParticipants,
+                                        this)
                                 } else {
                                     val chatLink = intent.getBooleanExtra(EXTRA_CHAT_LINK, false)
 
@@ -416,6 +425,9 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                                         if (chatTitle != null && chatTitle.isNotEmpty()) {
                                             megaChatApi.createPublicChat(peers,
                                                 chatTitle,
+                                                false,
+                                                false,
+                                                allowAddParticipants,
                                                 CreateGroupChatWithPublicLink(this, chatTitle))
                                         } else {
                                             Util.showAlert(this,
@@ -423,7 +435,12 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                                                 null)
                                         }
                                     } else {
-                                        megaChatApi.createPublicChat(peers, chatTitle, this)
+                                        megaChatApi.createPublicChat(peers,
+                                            chatTitle,
+                                            false,
+                                            false,
+                                            allowAddParticipants,
+                                            this)
                                     }
                                 }
                             }

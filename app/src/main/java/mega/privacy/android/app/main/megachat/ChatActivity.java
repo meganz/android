@@ -26,6 +26,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TI
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_OPEN_INVITE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.isServiceRunning;
@@ -1500,6 +1501,7 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
@@ -2304,7 +2306,8 @@ public class ChatActivity extends PasscodeActivity
      *                     If not, a simple Snackbar has to be shown with this text.
      */
     private void initAndShowChat(String textSnackbar) {
-        if (!initChat()) {
+        boolean resultInit = initChat();
+        if (!resultInit) {
             return;
         }
 
@@ -2986,10 +2989,11 @@ public class ChatActivity extends PasscodeActivity
                 videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.grey_054_white_054));
             }
 
+            inviteMenuItem.setVisible(false);
+
             if (chatRoom.isPreview() || !isStatusConnected(this, idChat)) {
                 leaveMenuItem.setVisible(false);
                 clearHistoryMenuItem.setVisible(false);
-                inviteMenuItem.setVisible(false);
                 contactInfoMenuItem.setVisible(false);
                 archiveMenuItem.setVisible(false);
             } else {
@@ -3015,8 +3019,9 @@ public class ChatActivity extends PasscodeActivity
                 int permission = chatRoom.getOwnPrivilege();
                 Timber.d("Permission in the chat: %s", permission);
                 if (chatRoom.isGroup()) {
-                    if (permission == MegaChatRoom.PRIV_MODERATOR) {
+                    leaveMenuItem.setVisible(false);
 
+                    if (permission == MegaChatRoom.PRIV_MODERATOR) {
                         inviteMenuItem.setVisible(true);
 
                         int lastMessageIndex = messages.size() - 1;
@@ -3037,37 +3042,27 @@ public class ChatActivity extends PasscodeActivity
                         } else {
                             clearHistoryMenuItem.setVisible(false);
                         }
-                        leaveMenuItem.setVisible(true);
-                    } else if (permission == MegaChatRoom.PRIV_RM) {
-                        Timber.d("Group chat PRIV_RM");
-                        leaveMenuItem.setVisible(false);
-                        clearHistoryMenuItem.setVisible(false);
-                        inviteMenuItem.setVisible(false);
-                        callMenuItem.setVisible(false);
-                        videoMenuItem.setVisible(false);
-                    } else if (permission == MegaChatRoom.PRIV_RO) {
-                        Timber.d("Group chat PRIV_RO");
-                        leaveMenuItem.setVisible(true);
-                        clearHistoryMenuItem.setVisible(false);
-                        inviteMenuItem.setVisible(false);
-                        callMenuItem.setVisible(false);
-                        videoMenuItem.setVisible(false);
-                    } else if (permission == MegaChatRoom.PRIV_STANDARD) {
-                        Timber.d("Group chat PRIV_STANDARD");
-                        leaveMenuItem.setVisible(true);
-                        clearHistoryMenuItem.setVisible(false);
-                        inviteMenuItem.setVisible(false);
                     } else {
-                        Timber.d("Permission: %s", permission);
-                        leaveMenuItem.setVisible(true);
+                        inviteMenuItem.setVisible(chatRoom.isOpenInvite());
                         clearHistoryMenuItem.setVisible(false);
-                        inviteMenuItem.setVisible(false);
+                        if (permission == MegaChatRoom.PRIV_RM) {
+                            Timber.d("Group chat PRIV_RM");
+                            callMenuItem.setVisible(false);
+                            videoMenuItem.setVisible(false);
+                        } else if (permission == MegaChatRoom.PRIV_RO) {
+                            Timber.d("Group chat PRIV_RO");
+                            callMenuItem.setVisible(false);
+                            videoMenuItem.setVisible(false);
+                        } else if (permission == MegaChatRoom.PRIV_STANDARD) {
+                            Timber.d("Group chat PRIV_STANDARD");
+                        } else {
+                            Timber.d("Permission: %s", permission);
+                        }
                     }
 
                     contactInfoMenuItem.setTitle(getString(R.string.general_info));
                     contactInfoMenuItem.setVisible(true);
                 } else {
-                    inviteMenuItem.setVisible(false);
                     if (permission == MegaChatRoom.PRIV_RO) {
                         clearHistoryMenuItem.setVisible(false);
                         contactInfoMenuItem.setVisible(false);
@@ -6001,7 +5996,6 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
-        Timber.d("onChatRoomUpdate!");
         this.chatRoom = chat;
         if (adapter != null) {
             adapter.updateChatRoom(chatRoom);
@@ -6188,11 +6182,19 @@ public class ChatActivity extends PasscodeActivity
             Intent intentRetentionTime = new Intent(ACTION_UPDATE_RETENTION_TIME);
             intentRetentionTime.putExtra(RETENTION_TIME, chat.getRetentionTime());
             MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
+        } else if (chat.hasChanged(MegaChatRoom.CHANGE_TYPE_OPEN_INVITE)) {
+            if (chat.isGroup()) {
+                int permission = chat.getOwnPrivilege();
+                boolean visibility = permission == MegaChatRoom.PRIV_MODERATOR || chat.isOpenInvite();
+                inviteMenuItem.setVisible(visibility);
+            }
+
+            LiveEventBus.get(EVENT_CHAT_OPEN_INVITE, MegaChatRoom.class).post(chat);
         }
     }
 
     void setPreviewersView() {
-        if (chatRoom.getNumPreviewers() > 0) {
+        if (chatRoom != null && chatRoom.getNumPreviewers() > 0) {
             observersNumberText.setText(chatRoom.getNumPreviewers() + "");
             observersLayout.setVisibility(View.VISIBLE);
         } else {
