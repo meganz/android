@@ -43,6 +43,7 @@ dependencies {
     implementation project(':sdk')
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+    implementation "com.google.code.gson:gson:$gsonVersion"
 
     kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"

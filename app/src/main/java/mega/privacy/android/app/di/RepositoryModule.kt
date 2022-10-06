@@ -128,6 +128,7 @@ abstract class RepositoryModule {
     abstract fun bindLoginRepository(repository: DefaultLoginRepository): LoginRepository
 
     @Binds
+    @Singleton
     abstract fun bindFeatureFlagRepository(repository: DefaultFeatureFlagRepository): FeatureFlagRepository
 
     @Binds
