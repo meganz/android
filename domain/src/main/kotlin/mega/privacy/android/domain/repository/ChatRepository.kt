@@ -17,7 +17,7 @@ interface ChatRepository {
      * Starts a chat conversation with the provided contacts.
      *
      * @param chatId   The Chat id.
-     * @return True if is enabled, false if not.
+     * @return True if non-hosts are allowed to add participants, false otherwise.
      */
     suspend fun setOpenInvite(chatId: Long): Boolean
 }

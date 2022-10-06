@@ -163,47 +163,46 @@
     <LinearLayout
         android:id="@+id/chat_group_allow_participants_layout"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginTop="4dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="26dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="26dp"
+        android:weightSum="3">
 
         <ImageView
             android:id="@+id/chat_group_allow_participants_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|center_vertical"
-            android:layout_marginStart="16dp"
-            android:src="@drawable/add_participants"/>
+            android:src="@drawable/add_participants"
+            app:tint="?android:attr/textColorSecondary" />
 
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|center_vertical"
-            android:layout_marginStart="32dp">
+            android:layout_marginStart="32dp"
+            android:layout_weight="3"
+            android:paddingStart="0dp"
+            android:paddingEnd="30dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start|center_vertical"
                 android:text="@string/chat_group_chat_info_allow_non_host_participants_option"
                 android:textAppearance="?attr/textAppearanceSubtitle1" />
-
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/chat_group_allow_participants_properties_layout"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:gravity="end|center_vertical">
+            android:layout_height="wrap_content">
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/chat_group_allow_participants_properties_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 android:clickable="false" />
         </RelativeLayout>
     </LinearLayout>

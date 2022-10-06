@@ -228,7 +228,7 @@ class BottomFloatingPanelViewHolder(
         floatingPanelView.shareLink.isVisible = inMeetingViewModel.isLinkVisible()
         floatingPanelView.invite.isVisible = inMeetingViewModel.isLinkVisible()
         floatingPanelView.dividerParticipants.isVisible = inMeetingViewModel.isModerator()
-        floatingPanelView.dividerAllowAddParticipants.isVisible = inMeetingViewModel.isModerator()
+        floatingPanelView.allowAddParticipantsLayout.isVisible = inMeetingViewModel.isModerator()
         floatingPanelView.allowAddParticipantsSwitch.isClickable = false
         updateAllowAddParticipantsOption(inMeetingViewModel.isOpenInvite())
 
