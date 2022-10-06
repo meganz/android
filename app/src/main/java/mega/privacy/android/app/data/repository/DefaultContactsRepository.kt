@@ -17,10 +17,10 @@ import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.mapper.ContactDataMapper
-import mega.privacy.android.app.data.mapper.ContactItemMapper
-import mega.privacy.android.app.data.mapper.ContactRequestMapper
-import mega.privacy.android.app.data.mapper.MegaChatPeerListMapper
-import mega.privacy.android.app.data.mapper.OnlineStatusMapper
+import mega.privacy.android.data.mapper.ContactItemMapper
+import mega.privacy.android.data.mapper.ContactRequestMapper
+import mega.privacy.android.data.mapper.MegaChatPeerListMapper
+import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.app.data.model.ChatUpdate

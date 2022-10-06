@@ -1,13 +1,10 @@
-package test.mega.privacy.android.app.data.mapper
+package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.mapper.toFavouriteInfo
 import mega.privacy.android.domain.entity.FavouriteFile
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -40,34 +37,35 @@ class FavouriteInfoMapperTest {
         assertThat(actual).isInstanceOf(FavouriteFile::class.java)
     }
 
-    @Test
-    fun `test that values returned by gateway are used`() = runTest {
-        val node = getMockNode(isFile = false)
-        val expectedHasVersion = true
-        val expectedNumChildFolders = 2
-        val expectedNumChildFiles = 3
-        val gateway = mock<MegaApiGateway> {
-            onBlocking { hasVersion(node) }.thenReturn(expectedHasVersion)
-            onBlocking { getNumChildFolders(node) }.thenReturn(expectedNumChildFolders)
-            onBlocking { getNumChildFiles(node) }.thenReturn(expectedNumChildFiles)
-        }
-
-        val actual = toFavouriteInfo(node,
-            { null },
-            gateway::hasVersion,
-            gateway::getNumChildFolders,
-            gateway::getNumChildFiles) { VideoFileTypeInfo("", "") }
-
-        assertThat(actual.name).isEqualTo(expectedName)
-        assertThat(actual.label).isEqualTo(expectedLabel)
-        assertThat(actual.hasVersion).isEqualTo(expectedHasVersion)
-        assertThat(actual.id).isEqualTo(expectedId)
-        assertThat(actual.parentId).isEqualTo(expectedParentId)
-        assertThat(actual.base64Id).isEqualTo(expectedBase64Id)
-        assertThat(actual.isFavourite).isEqualTo(node.isFavourite)
-        assertThat(actual.isExported).isEqualTo(node.isExported)
-        assertThat(actual.isTakenDown).isEqualTo(node.isTakenDown)
-    }
+    // TODO: Uncomment when move MegaApiGateway to data layer
+//    @Test
+//    fun `test that values returned by gateway are used`() = runTest {
+//        val node = getMockNode(isFile = false)
+//        val expectedHasVersion = true
+//        val expectedNumChildFolders = 2
+//        val expectedNumChildFiles = 3
+//        val gateway = mock<MegaApiGateway> {
+//            onBlocking { hasVersion(node) }.thenReturn(expectedHasVersion)
+//            onBlocking { getNumChildFolders(node) }.thenReturn(expectedNumChildFolders)
+//            onBlocking { getNumChildFiles(node) }.thenReturn(expectedNumChildFiles)
+//        }
+//
+//        val actual = toFavouriteInfo(node,
+//            { null },
+//            gateway::hasVersion,
+//            gateway::getNumChildFolders,
+//            gateway::getNumChildFiles) { VideoFileTypeInfo("", "") }
+//
+//        assertThat(actual.name).isEqualTo(expectedName)
+//        assertThat(actual.label).isEqualTo(expectedLabel)
+//        assertThat(actual.hasVersion).isEqualTo(expectedHasVersion)
+//        assertThat(actual.id).isEqualTo(expectedId)
+//        assertThat(actual.parentId).isEqualTo(expectedParentId)
+//        assertThat(actual.base64Id).isEqualTo(expectedBase64Id)
+//        assertThat(actual.isFavourite).isEqualTo(node.isFavourite)
+//        assertThat(actual.isExported).isEqualTo(node.isExported)
+//        assertThat(actual.isTakenDown).isEqualTo(node.isTakenDown)
+//    }
 
     private fun getMockNode(
         name: String = expectedName,

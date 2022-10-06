@@ -1,7 +1,6 @@
-package test.mega.privacy.android.app.data.mapper
+package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.data.mapper.toSortOrder
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiJava
 import org.junit.Test

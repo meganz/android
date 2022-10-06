@@ -1,7 +1,6 @@
-package test.mega.privacy.android.app.data.mapper
+package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.data.mapper.toStorageState
 import mega.privacy.android.domain.entity.StorageState
 import nz.mega.sdk.MegaApiJava.STORAGE_STATE_CHANGE
 import nz.mega.sdk.MegaApiJava.STORAGE_STATE_GREEN
@@ -29,7 +28,6 @@ class StorageStateMapperTest {
         expectedResults.forEach { (key, value) ->
             val actual = toStorageState(key)
             assertThat(actual).isEqualTo(value)
-
         }
     }
 }

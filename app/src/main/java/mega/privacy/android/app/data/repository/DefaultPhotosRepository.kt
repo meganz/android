@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.data.mapper.NodeUpdateMapper
+import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.presentation.favourites.facade.DateUtilWrapper
 import mega.privacy.android.app.utils.CacheFolderManager

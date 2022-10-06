@@ -1,12 +1,11 @@
-package test.mega.privacy.android.app.data.mapper
+package mega.privacy.android.data.mapper
 
-import mega.privacy.android.app.data.mapper.toPaymentMethodType
 import mega.privacy.android.domain.entity.PaymentMethodType
 import nz.mega.sdk.MegaApiJava
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class PaymentMethodTypeMapperTest{
+class PaymentMethodTypeMapperTest {
     @Test
     fun `test that payment method type can be mapped correctly`() {
         val unknownPaymentMethodType = 21

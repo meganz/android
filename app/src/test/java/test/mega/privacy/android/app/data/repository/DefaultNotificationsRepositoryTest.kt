@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.MegaContactDB
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.data.mapper.EventMapper
+import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.app.main.megachat.NonContactInfo

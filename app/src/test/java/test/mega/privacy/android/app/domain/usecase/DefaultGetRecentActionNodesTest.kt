@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.app.domain.usecase.DefaultGetRecentActionNodes
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
 import mega.privacy.android.domain.entity.VideoFileTypeInfo

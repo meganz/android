@@ -1,32 +1,65 @@
 package mega.privacy.android.data.di
 
+import android.webkit.MimeTypeMap
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.mapper.AccountTypeMapper
+import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
+import mega.privacy.android.data.mapper.ContactItemMapper
+import mega.privacy.android.data.mapper.ContactRequestMapper
+import mega.privacy.android.data.mapper.EventMapper
+import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
+import mega.privacy.android.data.mapper.FavouriteInfoMapper
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
+import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
+import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.MegaTransferMapper
+import mega.privacy.android.data.mapper.MimeTypeMapper
+import mega.privacy.android.data.mapper.NodeUpdateMapper
+import mega.privacy.android.data.mapper.OnlineStatusMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.TransferEventMapper
+import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.VideoMapper
+import mega.privacy.android.data.mapper.getFileTypeInfo
+import mega.privacy.android.data.mapper.getMimeType
+import mega.privacy.android.data.mapper.mapBooleanPreference
+import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toChatRequest
 import mega.privacy.android.data.mapper.toContactData
+import mega.privacy.android.data.mapper.toContactItem
+import mega.privacy.android.data.mapper.toContactRequest
+import mega.privacy.android.data.mapper.toEvent
+import mega.privacy.android.data.mapper.toFavouriteFolderInfo
+import mega.privacy.android.data.mapper.toFavouriteInfo
 import mega.privacy.android.data.mapper.toImage
+import mega.privacy.android.data.mapper.toInt
+import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
+import mega.privacy.android.data.mapper.toOnlineStatus
+import mega.privacy.android.data.mapper.toShareModel
+import mega.privacy.android.data.mapper.toSortOrder
+import mega.privacy.android.data.mapper.toStorageState
 import mega.privacy.android.data.mapper.toTransferEventModel
 import mega.privacy.android.data.mapper.toTransferModel
 import mega.privacy.android.data.mapper.toUserAlert
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
+import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
 
 /**
@@ -112,4 +145,111 @@ internal class MapperModule {
      */
     @Provides
     fun provideVideosMapper(): VideoMapper = ::toVideo
+
+    /**
+     * Provide event mapper
+     */
+    @Provides
+    fun provideEventMapper(): EventMapper = ::toEvent
+
+    /**
+     * Provide sort order mapper
+     */
+    @Provides
+    fun provideSortOrderMapper(): SortOrderMapper = ::toSortOrder
+
+    /**
+     * Provide sort order int mapper
+     */
+    @Provides
+    fun provideSortOrderIntMapper(): SortOrderIntMapper = ::toInt
+
+    /**
+     * Provide storage state mapper
+     */
+    @Provides
+    fun provideStorageStateMapper(): StorageStateMapper = ::toStorageState
+
+    /**
+     * Provide node update mapper
+     */
+    @Provides
+    fun provideNodeUpdateMapper(): NodeUpdateMapper = ::mapMegaNodeListToNodeUpdate
+
+    /**
+     * Provide mega chat peer list mapper
+     */
+    @Provides
+    fun provideMegaChatPeerListMapper(): MegaChatPeerListMapper = ::toMegaChatPeerList
+
+    /**
+     * Provide online status mapper
+     */
+    @Provides
+    fun provideOnlineStatusMapper(): OnlineStatusMapper = ::toOnlineStatus
+
+    /**
+     * Provide contact item mapper
+     */
+    @Provides
+    fun provideContactItemMapper(): ContactItemMapper = ::toContactItem
+
+    /**
+     * Provide mega share mapper
+     */
+    @Provides
+    fun provideMegaShareMapper(): MegaShareMapper = ::toShareModel
+
+    /**
+     * Provide boolean preference mapper
+     */
+    @Provides
+    fun provideBooleanPreferenceMapper(): BooleanPreferenceMapper = ::mapBooleanPreference
+
+    /**
+     * Provide file type info mapper
+     *
+     * @param mimeTypeMapper
+     */
+    @Provides
+    fun provideFileTypeInfoMapper(mimeTypeMapper: MimeTypeMapper): FileTypeInfoMapper = { node ->
+        getFileTypeInfo(node, mimeTypeMapper)
+    }
+
+    /**
+     * Provide favourite folder info mapper
+     */
+    @Provides
+    fun provideFavouriteFolderInfoMapper(): FavouriteFolderInfoMapper = ::toFavouriteFolderInfo
+
+    /**
+     * Provide contact request mapper
+     */
+    @Provides
+    fun provideContactRequestMapper(): ContactRequestMapper = ::toContactRequest
+
+    /**
+     * Provide mime type mapper
+     */
+    @Provides
+    fun provideMimeTypeMapper(): MimeTypeMapper = { extension ->
+        getMimeType(extension,
+            MimeTypeMap.getSingleton()
+            ::getMimeTypeFromExtension)
+    }
+
+
+    /**
+     * Provide favourite info mapper
+     */
+    @Provides
+    fun provideFavouriteInfoMapper(): FavouriteInfoMapper = ::toFavouriteInfo
+
+
+    /**
+     * Provide user account mapper
+     */
+    @Provides
+    fun provideUserAccountMapper(): UserAccountMapper =
+        ::UserAccount
 }

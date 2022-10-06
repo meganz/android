@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.gateway.DistributionGateway
 import mega.privacy.android.app.data.gateway.preferences.FeatureFlagPreferencesGateway
-import mega.privacy.android.app.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.app.domain.repository.QARepository
+import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.qualifier.IoDispatcher

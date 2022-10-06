@@ -1,8 +1,6 @@
-package test.mega.privacy.android.app.data.mapper
+package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.app.data.mapper.getFileTypeInfo
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
