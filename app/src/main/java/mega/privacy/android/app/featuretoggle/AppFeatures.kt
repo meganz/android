@@ -33,11 +33,3 @@ enum class AppFeatures(override val description: String, private val defaultValu
             values().firstOrNull { it == feature }?.defaultValue
     }
 }
-
-
-
-
-
-
-
-
