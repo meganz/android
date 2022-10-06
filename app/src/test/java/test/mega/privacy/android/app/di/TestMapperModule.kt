@@ -22,6 +22,8 @@ import org.mockito.kotlin.mock
 @Module
 object TestMapperModule {
 
+    val sortOrderIntMapper = mock<SortOrderIntMapper>()
+
     @Provides
     fun provideDataMapper(): DataMapper = mock()
 
@@ -38,7 +40,7 @@ object TestMapperModule {
     fun provideSortOrderMapper(): SortOrderMapper = mock()
 
     @Provides
-    fun provideSortOrderIntMapper(): SortOrderIntMapper = mock()
+    fun provideSortOrderIntMapper(): SortOrderIntMapper = sortOrderIntMapper
 
     @Provides
     fun provideBooleanPreferenceMapper(): BooleanPreferenceMapper = mock()
