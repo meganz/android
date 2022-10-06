@@ -36,4 +36,11 @@ interface CacheGateway {
      *         Return null if the folder cannot be created
      */
     suspend fun getCacheFile(folderName: String, fileName: String): File?
+
+
+    /**
+     * Remove the contents of the internal cache directory
+     */
+    suspend fun clearCacheDirectory()
+
 }
