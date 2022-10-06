@@ -8,10 +8,10 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.mapper.TransferEventMapper
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.domain.repository.TransfersRepository
+import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaTransfer
 import javax.inject.Inject
 

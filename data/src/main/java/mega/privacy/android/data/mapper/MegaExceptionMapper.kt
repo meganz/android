@@ -1,6 +1,5 @@
-package mega.privacy.android.app.data.mapper
+package mega.privacy.android.data.mapper
 
-import mega.privacy.android.app.data.extensions.toException
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaError
 
@@ -9,4 +8,5 @@ import nz.mega.sdk.MegaError
  */
 typealias MegaExceptionMapper = (@JvmSuppressWildcards MegaError) -> @JvmSuppressWildcards MegaException
 
-internal fun toMegaExceptionModel(error: MegaError) = error.toException()
+internal fun toMegaExceptionModel(error: MegaError) =
+    MegaException(error.errorCode, error.errorString)
