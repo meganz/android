@@ -3944,7 +3944,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     aB.setTitle(getString(R.string.photos_action_filter));
                 } else if (getPhotosFragment() != null && photosFragment.shouldUpdateTitle()) {
                     setFirstNavigationLevel(false);
-                    aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
+                    aB.setTitle(getString(R.string.settings_camera_upload_on));
                 } else {
                     setFirstNavigationLevel(true);
                     aB.setTitle(getString(R.string.sortby_type_photo_first));
