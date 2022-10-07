@@ -30,7 +30,7 @@ import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.FavouritePlaceholderItem
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
-import mega.privacy.android.app.presentation.mapper.FavouriteMapper
+import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteInfo

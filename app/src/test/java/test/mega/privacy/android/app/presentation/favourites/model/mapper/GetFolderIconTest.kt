@@ -1,8 +1,8 @@
-package test.mega.privacy.android.app.presentation.mapper
+package test.mega.privacy.android.app.presentation.favourites.model.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.mapper.getFolderIcon
+import mega.privacy.android.app.presentation.favourites.model.mapper.getFolderIcon
 import mega.privacy.android.domain.entity.BackupType
 import mega.privacy.android.domain.entity.DeviceType
 import mega.privacy.android.domain.entity.FolderNode

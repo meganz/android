@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.favourites.FavouriteFolderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
-import mega.privacy.android.app.presentation.mapper.FavouriteMapper
+import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolder
 import mega.privacy.android.domain.entity.FavouriteFolderInfo

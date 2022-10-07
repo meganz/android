@@ -1,10 +1,10 @@
-package test.mega.privacy.android.app.data.mapper
+package test.mega.privacy.android.app.presentation.favourites.model.mapper
 
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
-import mega.privacy.android.app.presentation.mapper.toFavourite
+import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.domain.entity.FavouriteFile
