@@ -2,6 +2,7 @@ package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
@@ -39,9 +40,10 @@ class DefaultLoginRepository @Inject constructor(
     override var allowBackgroundLogin: Boolean = true
 
     override suspend fun fastLogin(session: String) =
-        withContext<Unit>(ioDispatcher) {
+        withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                if (allowBackgroundLogin) {
+                if (allowBackgroundLogin && !MegaApplication.isLoggingIn()) {
+                    MegaApplication.setLoggingIn(true)
                     allowBackgroundLogin = false
                     megaApiGateway.fastLogin(
                         session,
@@ -67,7 +69,7 @@ class DefaultLoginRepository @Inject constructor(
         }
 
     override suspend fun fetchNodes() =
-        withContext<Unit>(ioDispatcher) {
+        withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 megaApiGateway.fetchNodes(
                     OptionalMegaRequestListenerInterface(
@@ -87,7 +89,7 @@ class DefaultLoginRepository @Inject constructor(
         }
 
     override suspend fun initMegaChat(session: String) =
-        withContext<Unit>(ioDispatcher) {
+        withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 var state = megaChatApiGateway.initState
 
@@ -96,7 +98,9 @@ class DefaultLoginRepository @Inject constructor(
 
                     when (state) {
                         MegaChatApi.INIT_NO_CACHE -> Timber.d("INIT_NO_CACHE")
-                        MegaChatApi.INIT_ERROR -> megaChatApiGateway.logout()
+                        MegaChatApi.INIT_ERROR -> if (!MegaApplication.isLoggingIn()) {
+                            megaChatApiGateway.logout()
+                        }
                         else -> Timber.d("Chat correctly initialized")
                     }
                 }
