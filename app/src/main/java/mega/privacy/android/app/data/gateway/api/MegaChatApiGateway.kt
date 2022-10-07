@@ -1,6 +1,7 @@
 package mega.privacy.android.app.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.data.model.ChatRoomUpdate
 import mega.privacy.android.app.data.model.ChatUpdate
 import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaChatPeerList
@@ -102,6 +103,19 @@ interface MegaChatApiGateway {
     )
 
     /**
+     * Set open invite setting for a chat room, allowing participants to add more participants to the chat.
+     *
+     * @param chatId  The chat id.
+     * @param enabled  True if allow add participants, false otherwise.
+     * @param listener Listener.
+     */
+    fun setOpenInvite(
+        chatId: Long,
+        enabled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
      * Gets a 1to1 chat conversation if exists.
      *
      * @param userHandle The user handle.
@@ -134,4 +148,17 @@ interface MegaChatApiGateway {
      * @return Online status of the user.
      */
     fun getUserOnlineStatus(userHandle: Long): Int
+
+    /**
+     * Gets chat Room updates.
+     */
+    fun getChatRoomUpdates(chatId: Long): Flow<ChatRoomUpdate>
+
+    /**
+     * Gets a chat conversation if exists.
+     *
+     * @param chatId The chat id.
+     * @return The chat conversation.
+     */
+    fun getChatRoom(chatId: Long): MegaChatRoom?
 }

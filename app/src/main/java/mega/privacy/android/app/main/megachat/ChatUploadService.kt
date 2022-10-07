@@ -1601,7 +1601,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
             val pendMsg = pendingMessages!![i]
 
             if (pendMsg.getId() == id) {
-                val openChatId = MegaApplication.getOpenChatId()
+                val openChatId = MegaApplication.openChatId
 
                 if (pendMsg.getChatId() == openChatId) {
                     Timber.w("Error update activity")

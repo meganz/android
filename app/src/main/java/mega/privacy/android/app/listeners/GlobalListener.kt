@@ -59,8 +59,6 @@ class GlobalListener @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
 ) : MegaGlobalListenerInterface {
 
-    private var megaApplication: MegaApplication = MegaApplication.getInstance()
-
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser?>?) {
 
         users?.filterNotNull()?.forEach { user ->
@@ -199,11 +197,11 @@ class GlobalListener @Inject constructor(
                         api.getAccountDetails(null)
                     }
                     MegaApiJava.STORAGE_STATE_PAYWALL -> {
-                        megaApplication.storageState = state
+                        MegaApplication.getInstance().storageState = state
                         showOverDiskQuotaPaywallWarning()
                     }
                     else -> {
-                        megaApplication.storageState = state
+                        MegaApplication.getInstance().storageState = state
                         val intent =
                             Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS).apply {
                                 action = Constants.ACTION_STORAGE_STATE_CHANGED

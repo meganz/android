@@ -9,6 +9,9 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -46,7 +49,41 @@ class MediaPlayerViewModel @Inject constructor(
     fun onExceptionThrown(): LiveData<Throwable> = throwable
 
     private val _itemToRemove = MutableLiveData<Long>()
+
+    /**
+     * Removed item update
+     */
     val itemToRemove: LiveData<Long> = _itemToRemove
+
+    private val _renameUpdate = MutableLiveData<MegaNode?>()
+
+    /**
+     * Rename update
+     */
+    val renameUpdate: LiveData<MegaNode?> = _renameUpdate
+
+    private val _isLockUpdate = MutableStateFlow(false)
+
+    /**
+     * Lock status update
+     */
+    val isLockUpdate: StateFlow<Boolean> = _isLockUpdate
+
+    /**
+     * Update the lock status
+     *
+     * @param isLock true is screen is locked, otherwise is screen is not locked
+     */
+    fun updateLockStatus(isLock: Boolean) = _isLockUpdate.update { isLock }
+
+    /**
+     * Rename update
+     *
+     * @param node the renamed node
+     */
+    fun renameUpdate(node: MegaNode?) {
+        _renameUpdate.value = node
+    }
 
     /**
      * Copies a node if there is no name collision.
@@ -66,8 +103,10 @@ class MediaPlayerViewModel @Inject constructor(
                 copyNodeUseCase.copy(node = node, parentHandle = newParentHandle)
                     .subscribeAndCompleteCopy()
             } else {
-                copyNodeUseCase.copy(handle = nodeHandle!!, parentHandle = newParentHandle)
-                    .subscribeAndCompleteCopy()
+                nodeHandle?.let {
+                    copyNodeUseCase.copy(handle = it, parentHandle = newParentHandle)
+                        .subscribeAndCompleteCopy()
+                }
             }
         }
     }
@@ -141,11 +180,13 @@ class MediaPlayerViewModel @Inject constructor(
                 type = type
             ).subscribeAndShowCollisionResult(completeAction)
         } else {
-            checkNameCollisionUseCase.check(
-                handle = nodeHandle!!,
-                parentHandle = newParentHandle,
-                type = type
-            ).subscribeAndShowCollisionResult(completeAction)
+            nodeHandle?.let {
+                checkNameCollisionUseCase.check(
+                    handle = it,
+                    parentHandle = newParentHandle,
+                    type = type
+                ).subscribeAndShowCollisionResult(completeAction)
+            }
         }
     }
 

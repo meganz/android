@@ -36,12 +36,6 @@ sealed interface FavouriteInfo {
      */
     val hasVersion: Boolean
 
-
-    /**
-     * Thumbnail path
-     */
-    val thumbnailPath: String?
-
     /**
      * Is favourite
      */
@@ -85,7 +79,7 @@ data class FavouriteFile(
     val modificationTime: Long,
     override val hasVersion: Boolean,
     val type: FileTypeInfo,
-    override val thumbnailPath: String? = null,
+    val thumbnailPath: String? = null,
     override val isFavourite: Boolean,
     override val isExported: Boolean,
     override val isTakenDown: Boolean,
@@ -102,7 +96,6 @@ data class FavouriteFile(
  * @property hasVersion
  * @property numChildFolders
  * @property numChildFiles
- * @property thumbnailPath
  * @property isFavourite
  * @property isExported
  * @property isTakenDown
@@ -117,7 +110,6 @@ data class FavouriteFolder(
     override val hasVersion: Boolean,
     val numChildFolders: Int,
     val numChildFiles: Int,
-    override val thumbnailPath: String? = null,
     override val isFavourite: Boolean,
     override val isExported: Boolean,
     override val isTakenDown: Boolean,

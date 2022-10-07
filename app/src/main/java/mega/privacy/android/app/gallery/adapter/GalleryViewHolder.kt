@@ -61,8 +61,6 @@ class GalleryViewHolder(
             thumbnail.hierarchy.roundingParams = RoundingParams.fromCornersRadius(
                 (if (item.selected) itemSizeConfig.roundCornerRadius else 0).toFloat()
             )
-            val imagePadding = if (item.selected) itemSizeConfig.imageSelectedPadding else 0
-            thumbnail.setPadding(imagePadding, imagePadding, imagePadding, imagePadding)
             if (item.selected) {
                 thumbnail.background = ContextCompat.getDrawable(
                     thumbnail.context,

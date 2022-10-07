@@ -7,6 +7,7 @@ import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.RepositoryModule
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.repository.GlobalStatesRepository
+import mega.privacy.android.app.domain.repository.RecentActionsRepository
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
+import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.repository.LoginRepository
@@ -101,4 +103,10 @@ object TestRepositoryModule {
 
     @Provides
     fun provideGalleryFilesRepository(): GalleryFilesRepository = mock()
+
+    @Provides
+    fun provideDomainFilesRepository(): FileRepository = mock()
+
+    @Provides
+    fun providesRecentActionsRepository(): RecentActionsRepository = mock()
 }

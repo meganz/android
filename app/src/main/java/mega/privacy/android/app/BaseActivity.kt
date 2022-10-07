@@ -994,7 +994,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 StringResourcesUtils.getString(R.string.error_business_removed),
                 loggingSettings))
             SMS_VERIFICATION_ACCOUNT_BLOCK -> {
-                if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed()) return
+                if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed) return
                 MegaApplication.smsVerifyShowed(true)
                 val gSession = megaApi.dumpSession()
                 //For first login, keep the valid session,
@@ -1017,7 +1017,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 startActivity(intent)
             }
             WEAK_PROTECTION_ACCOUNT_BLOCK -> {
-                if (!MegaApplication.isBlockedDueToWeakAccount() && !MegaApplication.isWebOpenDueToEmailVerification()) {
+                if (!MegaApplication.isBlockedDueToWeakAccount && !MegaApplication.isWebOpenDueToEmailVerification) {
                     startActivity(Intent(this, WeakAccountProtectionAlertActivity::class.java))
                 }
             }
@@ -1399,7 +1399,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                         val account: Int
                         var color = R.color.red_600_red_300
                         val image: Int
-                        val purchaseText: Int
                         val activeSubscriptionSku =
                             if (myAccountInfo.activeSubscription != null) myAccountInfo.activeSubscription?.sku
                             else ""
@@ -1408,106 +1407,46 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                             PRO_I -> {
                                 account = R.string.pro1_account
                                 image = R.drawable.ic_pro_i_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_I_YEAR == activeSubscriptionSku) R.string.pro_i_yearly else R.string.pro_i_monthly
+                                purchaseMessage.text = StringResourcesUtils.getString(
+                                    if (BillingManagerImpl.SKU_PRO_I_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_1_yearly
+                                    else R.string.upgrade_account_successful_pro_1_monthly)
                             }
                             PRO_II -> {
                                 account = R.string.pro2_account
                                 image = R.drawable.ic_pro_ii_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_II_YEAR == activeSubscriptionSku) R.string.pro_ii_yearly else R.string.pro_ii_monthly
+                                purchaseMessage.text = StringResourcesUtils.getString(
+                                    if (BillingManagerImpl.SKU_PRO_II_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_2_yearly
+                                    else R.string.upgrade_account_successful_pro_2_monthly)
                             }
                             PRO_III -> {
                                 account = R.string.pro3_account
                                 image = R.drawable.ic_pro_iii_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_III_YEAR == activeSubscriptionSku) R.string.pro_iii_yearly else R.string.pro_iii_monthly
+                                purchaseMessage.text = StringResourcesUtils.getString(
+                                    if (BillingManagerImpl.SKU_PRO_III_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_3_yearly
+                                    else R.string.upgrade_account_successful_pro_3_monthly)
                             }
                             PRO_LITE -> {
                                 account = R.string.prolite_account
                                 color = R.color.orange_400_orange_300
                                 image = R.drawable.ic_lite_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.pro_lite_yearly else R.string.pro_lite_monthly
+                                purchaseMessage.text = StringResourcesUtils.getString(
+                                    if (BillingManagerImpl.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_lite_yearly
+                                    else R.string.upgrade_account_successful_pro_lite_monthly)
                             }
                             else -> {
-                                account = R.string.prolite_account
-                                color = R.color.orange_400_orange_300
-                                image = R.drawable.ic_lite_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.pro_lite_yearly else R.string.pro_lite_monthly
+                                Timber.w("Unexpected account subscription level")
+                                return@setOnShowListener
                             }
                         }
                         purchaseType.text = StringResourcesUtils.getString(account)
                         purchaseType.setTextColor(ContextCompat.getColor(this@BaseActivity, color))
                         purchaseImage.setImageResource(image)
-                        purchaseMessage.text =
-                            StringResourcesUtils.getString(R.string.successful_upgrade,
-                                StringResourcesUtils.getString(purchaseText))
                     }
                 }
             }
             else -> {
-                upgradeAlert = builder.setView(R.layout.dialog_purchase_success).create().apply {
-                    setOnShowListener {
-                        val purchaseType = findViewById<TextView>(R.id.purchase_type)
-                        val purchaseImage = findViewById<ImageView>(R.id.purchase_image)
-                        val purchaseMessage =
-                            findViewById<TextView>(R.id.purchase_message)
-                        if (purchaseType == null || purchaseImage == null || purchaseMessage == null) {
-                            return@setOnShowListener
-                        }
-
-                        val account: Int
-                        var color = R.color.red_600_red_300
-                        val image: Int
-                        val purchaseText: Int
-                        val activeSubscriptionSku =
-                            if (myAccountInfo.activeSubscription != null) myAccountInfo.activeSubscription?.sku
-                            else ""
-
-                        when (myAccountInfo.levelInventory) {
-                            PRO_I -> {
-                                account = R.string.pro1_account
-                                image = R.drawable.ic_pro_i_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_I_YEAR == activeSubscriptionSku) R.string.pro_i_yearly else R.string.pro_i_monthly
-                            }
-                            PRO_II -> {
-                                account = R.string.pro2_account
-                                image = R.drawable.ic_pro_ii_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_II_YEAR == activeSubscriptionSku) R.string.pro_ii_yearly else R.string.pro_ii_monthly
-                            }
-                            PRO_III -> {
-                                account = R.string.pro3_account
-                                image = R.drawable.ic_pro_iii_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_III_YEAR == activeSubscriptionSku) R.string.pro_iii_yearly else R.string.pro_iii_monthly
-                            }
-                            PRO_LITE -> {
-                                account = R.string.prolite_account
-                                color = R.color.orange_400_orange_300
-                                image = R.drawable.ic_lite_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.pro_lite_yearly else R.string.pro_lite_monthly
-                            }
-                            else -> {
-                                account = R.string.prolite_account
-                                color = R.color.orange_400_orange_300
-                                image = R.drawable.ic_lite_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.pro_lite_yearly else R.string.pro_lite_monthly
-                            }
-                        }
-                        purchaseType.text = StringResourcesUtils.getString(account)
-                        purchaseType.setTextColor(ContextCompat.getColor(this@BaseActivity, color))
-                        purchaseImage.setImageResource(image)
-                        purchaseMessage.text =
-                            StringResourcesUtils.getString(R.string.successful_upgrade,
-                                StringResourcesUtils.getString(purchaseText))
-                    }
-                }
+                Timber.w("Unexpected PurchaseType")
+                return
             }
         }
 
@@ -1597,17 +1536,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 snackbar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
             snackTextView.maxLines = 5
             snackbar.show()
-        }
-    }
-
-    init {
-
-        //Will be checked again and initialized at `onCreate()`
-        if (app != null) {
-            megaApi = app!!.getMegaApi()
-            megaApiFolder = app!!.getMegaApiFolder()
-            megaChatApi = app!!.getMegaChatApi()
-            dbH = app!!.getDbH()
         }
     }
 }

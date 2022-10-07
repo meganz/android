@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.user.UserId
 import org.junit.Before
@@ -54,7 +55,7 @@ class DefaultCanDeleteAccountTest {
             email = "",
             isBusinessAccount = isBusinessAccount,
             isMasterBusinessAccount = isMasterBusinessAccount,
-            accountTypeIdentifier = 0,
+            accountTypeIdentifier = AccountType.FREE,
             accountTypeString = "",
         )
 }

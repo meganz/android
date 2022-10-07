@@ -29,4 +29,5 @@ object TestMapperModule {
 
     @Provides
     fun provideRepeatToggleModeMapper(): RepeatToggleModeMapper = mock()
+
 }

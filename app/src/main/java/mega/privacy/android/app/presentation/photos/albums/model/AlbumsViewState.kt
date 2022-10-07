@@ -4,4 +4,5 @@ import mega.privacy.android.domain.entity.photos.Album
 
 data class AlbumsViewState(
     val albums: List<Album> = emptyList(),
+    val currentAlbum: Album? = null
 )

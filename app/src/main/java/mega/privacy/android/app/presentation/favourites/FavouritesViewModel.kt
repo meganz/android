@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
@@ -29,7 +30,7 @@ import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.FavouritePlaceholderItem
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
-import mega.privacy.android.app.presentation.mapper.FavouriteMapper
+import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteInfo
@@ -49,6 +50,8 @@ import javax.inject.Inject
  * @param removeFavourites RemoveFavourites
  * @param getCloudSortOrder GetCloudSortOrder
  * @param megaUtilWrapper MegaUtilWrapper
+ * @param fetchNode FetchNodeWrapper
+ * @param sortOrderIntMapper SortOrderIntMapper
  */
 @HiltViewModel
 class FavouritesViewModel @Inject constructor(
@@ -61,6 +64,7 @@ class FavouritesViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val megaUtilWrapper: MegaUtilWrapper,
     private val fetchNode: FetchNodeWrapper,
+    private val sortOrderIntMapper: SortOrderIntMapper,
 ) :
     ViewModel() {
     private val _favouritesState =
@@ -122,7 +126,7 @@ class FavouritesViewModel @Inject constructor(
                                     FavouriteLoadState.Success(
                                         favouriteListToFavouriteItemList(
                                             favouriteList = reorganizeFavouritesByConditions(
-                                                getCloudSortOrder(),
+                                                sortOrderIntMapper(getCloudSortOrder()),
                                                 if (searchMode) {
                                                     searchQuery
                                                 } else {
@@ -386,7 +390,7 @@ class FavouritesViewModel @Inject constructor(
                 FavouriteLoadState.Success(
                     favouriteListToFavouriteItemList(
                         favouriteList = reorganizeFavouritesByConditions(
-                            order ?: getCloudSortOrder(),
+                            order ?: sortOrderIntMapper(getCloudSortOrder()),
                             query ?: if (searchMode) {
                                 searchQuery
                             } else {

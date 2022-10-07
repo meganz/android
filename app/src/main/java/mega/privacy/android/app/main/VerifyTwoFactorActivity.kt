@@ -19,7 +19,7 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED
 import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
-import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.utils.Constants.ACTION_PASS_CHANGED
 import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_2FA
@@ -32,7 +32,6 @@ import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_EACCESS
 import nz.mega.sdk.MegaError.API_EEXIST
@@ -515,19 +514,16 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         }
     }
 
-    private val listener = object : BaseListener(this) {
+    private val listener = OptionalMegaRequestListenerInterface(onRequestStart = { request ->
+        Timber.d("Start ${request.type}: ${request.requestString} request.")
 
-        override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-            Timber.d("Start ${request.type}: ${request.requestString} request.")
-
-            // If there's an in-progress request (except checking 2fa status request, TYPE_MULTI_FACTOR_AUTH_CHECK),
-            // quitting the activity is not allowed.
-            if (request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
-                onBackPressedCallback.isEnabled = true
-            }
+        // If there's an in-progress request (except checking 2fa status request, TYPE_MULTI_FACTOR_AUTH_CHECK),
+        // quitting the activity is not allowed.
+        if (request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
+            onBackPressedCallback.isEnabled = true
         }
-
-        override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+    },
+        onRequestFinish = { request, error ->
             Timber.d("${request.type}: ${request.requestString} finished.")
 
             // Reset to false in order to allow quitting the activity.
@@ -540,22 +536,21 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
             binding.progressbarVerify2fa.isVisible = false
 
             // PIN code verification error.
-            if (e.errorCode == API_EFAILED or API_EEXPIRED) {
+            if (error.errorCode == API_EFAILED or API_EEXPIRED) {
                 Timber.w("Pin not correct")
                 if (is2FAEnabled) {
                     verifyShowError()
                 }
 
-                return
+                return@OptionalMegaRequestListenerInterface
             }
 
             when (request.type) {
-                TYPE_MULTI_FACTOR_AUTH_CHECK -> check2faFinish(request, e)
-                TYPE_GET_CHANGE_EMAIL_LINK -> changeEmailFinish(e)
-                TYPE_GET_CANCEL_LINK -> cancelAccountFinish(e)
-                TYPE_MULTI_FACTOR_AUTH_SET -> disable2faFinish(request, e)
-                TYPE_CHANGE_PW -> changePasswordFinish(e)
+                TYPE_MULTI_FACTOR_AUTH_CHECK -> check2faFinish(request, error)
+                TYPE_GET_CHANGE_EMAIL_LINK -> changeEmailFinish(error)
+                TYPE_GET_CANCEL_LINK -> cancelAccountFinish(error)
+                TYPE_MULTI_FACTOR_AUTH_SET -> disable2faFinish(request, error)
+                TYPE_CHANGE_PW -> changePasswordFinish(error)
             }
-        }
-    }
+        })
 }

@@ -11,6 +11,8 @@ import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.data.repository.DefaultAccountRepository
+import mega.privacy.android.data.mapper.AccountTypeMapper
+import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.repository.AccountRepository
@@ -26,8 +28,10 @@ import kotlin.contracts.ExperimentalContracts
 class DefaultAccountRepositoryTest {
     private lateinit var underTest: AccountRepository
 
-    private val accountInfoWrapper = mock<AccountInfoWrapper>()
+    private val accountInfoWrapper = mock<AccountInfoWrapper> {on { accountTypeString }.thenReturn("") }
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val userAccountMapper = ::UserAccount
+    private val accountTypeMapper = mock<AccountTypeMapper>()
 
     @Before
     fun setUp() {
@@ -39,6 +43,8 @@ class DefaultAccountRepositoryTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             userUpdateMapper = { UserUpdate(emptyMap()) },
             localStorageGateway = mock(),
+            userAccountMapper = userAccountMapper,
+            accountTypeMapper = accountTypeMapper,
         )
     }
 
@@ -80,5 +86,18 @@ class DefaultAccountRepositoryTest {
                 awaitComplete()
             }
         }
+
+    @Test
+    fun `test that is business account active returns true if api returns true`() =
+        runTest {
+            whenever(megaApiGateway.isBusinessAccountActive()).thenReturn(true)
+            assertThat(underTest.isBusinessAccountActive()).isTrue()
+        }
+
+    @Test
+    fun `test that is business account active returns false if api returns false`() = runTest {
+        whenever(megaApiGateway.isBusinessAccountActive()).thenReturn(false)
+        assertThat(underTest.isBusinessAccountActive()).isFalse()
+    }
 
 }

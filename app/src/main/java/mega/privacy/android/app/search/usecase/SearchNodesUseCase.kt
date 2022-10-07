@@ -4,6 +4,7 @@ import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
@@ -26,12 +27,14 @@ import javax.inject.Inject
  * @property megaApi                MegaApiAndroid object.
  * @property sortOrderManagement    SortOrderManagement object to check order.
  * @property getLinksSortOrder
+ * @property sortOrderIntMapper
  * @property ioDispatcher
  */
 class SearchNodesUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val sortOrderManagement: SortOrderManagement,
     private val getLinksSortOrder: GetLinksSortOrder,
+    private val sortOrderIntMapper: SortOrderIntMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -250,7 +253,7 @@ class SearchNodesUseCase @Inject constructor(
         megaCancelToken: MegaCancelToken,
     ): ArrayList<MegaNode> = withContext(ioDispatcher) {
         if (query.isEmpty()) {
-            megaApi.getPublicLinks(if (isFirstNavigationLevel) getLinksSortOrder() else sortOrderManagement.getOrderCloud())
+            megaApi.getPublicLinks(if (isFirstNavigationLevel) sortOrderIntMapper(getLinksSortOrder()) else sortOrderManagement.getOrderCloud())
         } else {
             megaApi.searchOnPublicLinks(query, megaCancelToken, sortOrderManagement.getOrderCloud())
         }

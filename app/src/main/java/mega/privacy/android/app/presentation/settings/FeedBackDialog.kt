@@ -23,8 +23,8 @@ class FeedBackDialog : DialogFragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setView(
                 createFeedbackDialogView(
-                    email = arguments?.getString(emailKey)!!,
-                    accountType = arguments?.getInt(accountTypeKey)!!
+                    email = arguments?.getString(emailKey).orEmpty(),
+                    accountType = arguments?.getString(accountTypeKey).orEmpty()
                 )
             )
             .setTitle(R.string.title_evaluate_the_app_panel)
@@ -33,7 +33,7 @@ class FeedBackDialog : DialogFragment() {
 
     private fun createFeedbackDialogView(
         email: String,
-        accountType: Int,
+        accountType: String,
     ): View? {
         val dialogLayout = View.inflate(context, R.layout.evaluate_the_app_dialog, null)
         val displayMetrics = getDisplayMetrics()
@@ -82,7 +82,7 @@ class FeedBackDialog : DialogFragment() {
         )
     }
 
-    private fun generateBody(email: String, accountType: Int): String {
+    private fun generateBody(email: String, accountType: String): String {
         return StringBuilder()
             .append(getString(R.string.setting_feedback_body))
             .append("\n\n\n\n\n\n\n\n\n\n\n")
@@ -93,18 +93,8 @@ class FeedBackDialog : DialogFragment() {
             .append(" ").append(Build.DISPLAY).append("\n")
             .append(getString(R.string.user_account_feedback)).append("  ")
             .append(email)
-            .append(" (${getAccountTypeLabel(accountType)})")
+            .append(" ($accountType)")
             .toString()
-    }
-
-    private fun getAccountTypeLabel(accountType: Int) = when (accountType) {
-        Constants.FREE -> getString(R.string.my_account_free)
-        Constants.PRO_I -> getString(R.string.my_account_pro1)
-        Constants.PRO_II -> getString(R.string.my_account_pro2)
-        Constants.PRO_III -> getString(R.string.my_account_pro3)
-        Constants.PRO_LITE -> getString(R.string.my_account_prolite_feedback_email)
-        Constants.BUSINESS -> getString(R.string.business_label)
-        else -> getString(R.string.my_account_free)
     }
 
     private fun sendEmail(subject: String, body: String) {
@@ -121,10 +111,10 @@ class FeedBackDialog : DialogFragment() {
         private const val emailKey = "emailKey"
         private const val accountTypeKey = "accountTypeKey"
 
-        fun newInstance(email: String, accountType: Int): FeedBackDialog {
+        fun newInstance(email: String, accountType: String): FeedBackDialog {
             val args = Bundle().apply {
                 putString(emailKey, email)
-                putInt(accountTypeKey, accountType)
+                putString(accountTypeKey, accountType)
             }
 
             return FeedBackDialog().apply {

@@ -326,15 +326,15 @@ class DragToExitSupport(
         @JvmStatic
         fun putThumbnailLocation(
             launchIntent: Intent,
-            rv: RecyclerView,
+            rv: RecyclerView?,
             position: Int,
             viewerFrom: Int,
-            thumbnailGetter: DragThumbnailGetter,
+            thumbnailGetter: DragThumbnailGetter?,
         ) {
             launchIntent.putExtra(INTENT_EXTRA_KEY_VIEWER_FROM, viewerFrom)
 
-            val viewHolder = rv.findViewHolderForLayoutPosition(position) ?: return
-            val thumbnail = thumbnailGetter.getThumbnail(viewHolder) ?: return
+            val viewHolder = rv?.findViewHolderForLayoutPosition(position) ?: return
+            val thumbnail = thumbnailGetter?.getThumbnail(viewHolder) ?: return
 
             launchIntent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, getThumbnailLocation(thumbnail))
         }
@@ -370,7 +370,7 @@ class DragToExitSupport(
         @JvmStatic
         fun observeDragSupportEvents(
             lifecycleOwner: LifecycleOwner,
-            rv: RecyclerView,
+            rv: RecyclerView?,
             viewerFrom: Int,
         ) {
             LiveEventBus.get(
@@ -382,7 +382,7 @@ class DragToExitSupport(
                     return@observe
                 }
 
-                val thumbnailGetter = rv.adapter as? DragThumbnailGetter ?: return@observe
+                val thumbnailGetter = rv?.adapter as? DragThumbnailGetter ?: return@observe
 
                 if (it.previousHiddenHandle != INVALID_HANDLE) {
                     val thumbnail = getThumbnail(rv, thumbnailGetter, it.previousHiddenHandle)
@@ -425,7 +425,7 @@ class DragToExitSupport(
                     return@observe
                 }
 
-                val thumbnailGetter = rv.adapter as? DragThumbnailGetter ?: return@observe
+                val thumbnailGetter = rv?.adapter as? DragThumbnailGetter ?: return@observe
 
                 val position = thumbnailGetter.getNodePosition(it.handle)
                 Timber.d("EVENT_DRAG_TO_EXIT_SCROLL handle $it, position $position")

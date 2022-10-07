@@ -80,7 +80,6 @@ import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.annotation.SuppressLint;
@@ -127,6 +126,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.palette.graphics.Palette;
 
 import com.google.android.material.appbar.AppBarLayout;
@@ -152,7 +152,6 @@ import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity;
 import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.AppBarStateChangeListener;
@@ -178,6 +177,8 @@ import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity;
+import mega.privacy.android.app.presentation.contact.ContactInfoViewModel;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
@@ -186,6 +187,7 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -224,6 +226,8 @@ public class ContactInfoActivity extends PasscodeActivity
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+
+    private ContactInfoViewModel viewModel;
 
     private ChatController chatC;
     private ContactController cC;
@@ -447,8 +451,9 @@ public class ContactInfoActivity extends PasscodeActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        contactInfoActivity = this;
+        viewModel = new ViewModelProvider(this).get(ContactInfoViewModel.class);
 
+        contactInfoActivity = this;
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
@@ -970,7 +975,7 @@ public class ContactInfoActivity extends PasscodeActivity
     public void sendFileToChat() {
         Timber.d("sendFileToChat");
 
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
@@ -989,7 +994,7 @@ public class ContactInfoActivity extends PasscodeActivity
     public void sendMessageToChat() {
         Timber.d("sendMessageToChat");
 
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
@@ -1184,7 +1189,7 @@ public class ContactInfoActivity extends PasscodeActivity
             case R.id.chat_contact_properties_share_contact_layout: {
                 Timber.d("Share contact option");
 
-                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                if (viewModel.getStorageState() == StorageState.PayWall) {
                     showOverDiskQuotaPaywallWarning();
                     return;
                 }

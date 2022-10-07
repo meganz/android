@@ -63,7 +63,7 @@ class SettingsViewModelTest {
             startScreen = mock { on { invoke() }.thenReturn(emptyFlow()) },
             isHideRecentActivityEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
             toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,
-            monitorConnectivity = mock { on { invoke() }.thenReturn(flowOf(true)) },
+            monitorConnectivity = mock { on { invoke() }.thenReturn(MutableStateFlow(true)) },
             requestAccountDeletion = mock(),
             isChatLoggedIn = isChatLoggedIn,
             setSdkLogsEnabled = mock(),
@@ -145,7 +145,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `test that an error on fetching QR setting returns false instead`() = runTest {
-        whenever(monitorAutoAcceptQRLinks()).thenAnswer { throw SettingNotFoundException() }
+        whenever(monitorAutoAcceptQRLinks()).thenAnswer { throw SettingNotFoundException(-1) }
 
         underTest.uiState
             .map { it.autoAcceptChecked }

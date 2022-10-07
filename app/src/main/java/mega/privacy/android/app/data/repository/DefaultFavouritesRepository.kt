@@ -4,18 +4,18 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
-import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.mapper.FavouriteFolderInfoMapper
-import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
-import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
+import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
+import mega.privacy.android.data.mapper.FavouriteInfoMapper
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FavouritesRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaHandleList
@@ -96,14 +96,14 @@ class DefaultFavouritesRepository @Inject constructor(
      * @param nodes List<MegaNode>
      * @return FavouriteInfo list
      */
-    private fun mapNodesToFavouriteInfo(nodes: List<MegaNode>) =
+    private suspend fun mapNodesToFavouriteInfo(nodes: List<MegaNode>) =
         nodes.map { megaNode ->
             favouriteInfoMapper(
                 megaNode,
-                getThumbnailCacheFilePath(megaNode),
-                megaApiGateway.hasVersion(megaNode),
-                megaApiGateway.getNumChildFolders(megaNode),
-                megaApiGateway.getNumChildFiles(megaNode),
+                ::getThumbnailCacheFilePath,
+                megaApiGateway::hasVersion,
+                megaApiGateway::getNumChildFolders,
+                megaApiGateway::getNumChildFiles,
                 fileTypeInfoMapper,
             )
         }
@@ -116,5 +116,5 @@ class DefaultFavouritesRepository @Inject constructor(
     private fun getThumbnailCacheFilePath(megaNode: MegaNode) =
         cacheFolder.getCacheFolder(CacheFolderManager.THUMBNAIL_FOLDER)?.let { thumbnail ->
             "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
-        }?.takeUnless { megaNode.isFolder }
+        }
 }

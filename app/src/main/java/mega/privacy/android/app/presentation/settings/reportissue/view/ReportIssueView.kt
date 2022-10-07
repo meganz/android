@@ -19,8 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,6 +27,10 @@ import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIs
 import mega.privacy.android.presentation.controls.LabelledSwitch
 import mega.privacy.android.presentation.controls.ProgressDialog
 import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.presentation.theme.grey_alpha_012
+import mega.privacy.android.presentation.theme.grey_alpha_087
+import mega.privacy.android.presentation.theme.white_alpha_012
+import mega.privacy.android.presentation.theme.white_alpha_087
 
 @Composable
 fun ReportIssueView(
@@ -68,11 +70,13 @@ private fun body(
         Text(
             modifier = Modifier.padding(16.dp),
             text = stringResource(R.string.settings_help_report_issue_instructions),
-            color = if (!MaterialTheme.colors.isLight) Color.White else Color.Black
+            color = if (!MaterialTheme.colors.isLight) white_alpha_087 else grey_alpha_087
         )
-        Divider(modifier = Modifier.padding(horizontal = 16.dp),
-            color = colorResource(id = R.color.grey_alpha_012),
-            thickness = 1.dp)
+        Divider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = if (!MaterialTheme.colors.isLight) white_alpha_012 else grey_alpha_012,
+            thickness = 1.dp
+        )
         DescriptionTextField(
             description = state.description,
             onDescriptionChanged = onDescriptionChanged,

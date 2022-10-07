@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.photos.albums.model.AlbumsLoadState
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.usecase.exception.MegaException
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.usecase.GetAlbums
 import timber.log.Timber
 import javax.inject.Inject
@@ -24,9 +24,6 @@ class AlbumsViewModel @Inject constructor(
     private val getAlbums: GetAlbums,
 ) : ViewModel() {
 
-    private val _loadState =
-        MutableStateFlow<AlbumsLoadState>(AlbumsLoadState.Empty)
-    val loadState = _loadState.asStateFlow()
     private val _state = MutableStateFlow(AlbumsViewState())
     val state = _state.asStateFlow()
     private var currentNodeJob: Job? = null
@@ -39,25 +36,24 @@ class AlbumsViewModel @Inject constructor(
      * Get all favourites
      */
     private fun getAlbumCover() {
-        _loadState.update {
-            AlbumsLoadState.Loading
-        }
         currentNodeJob = viewModelScope.launch {
             runCatching {
                 getAlbums().collectLatest { albums ->
-                    _state.value = AlbumsViewState(albums = albums)
-                    _loadState.update {
-                        AlbumsLoadState.Success(albums)
+                    _state.update {
+                        it.copy(albums = albums)
                     }
                 }
             }.onFailure { exception ->
                 if (exception is MegaException) {
                     Timber.e(exception)
                 }
-                _loadState.update {
-                    AlbumsLoadState.Empty
-                }
             }
+        }
+    }
+
+    fun setCurrentAlbum(album: Album?) {
+        _state.update {
+            it.copy(currentAlbum = album)
         }
     }
 }

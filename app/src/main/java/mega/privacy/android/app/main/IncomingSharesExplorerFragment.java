@@ -64,7 +64,6 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
-import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.main.adapters.MegaExplorerAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
@@ -83,8 +82,6 @@ import timber.log.Timber;
 public class IncomingSharesExplorerFragment extends RotatableFragment
         implements OnClickListener, CheckScrollInterface, SearchCallback.View, SearchCallback.Data {
 
-    @Inject
-    SortOrderManagement sortOrderManagement;
     @Inject
     SearchNodesUseCase searchNodesUseCase;
 
@@ -406,7 +403,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
         Timber.d("deepBrowserTree value: %s", ((FileExplorerActivity) context).getDeepBrowserTree());
         setOptionsBarVisibility();
 
-        if (((FileExplorerActivity) context).shouldRestartSearch()) {
+        if (((FileExplorerActivity) context).getShouldRestartSearch()) {
             setWaitingForSearchedNodes(true);
             search(((FileExplorerActivity) context).getQuerySearch());
         }
@@ -556,7 +553,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
                 break;
             }
             case R.id.cancel_text: {
-                ((FileExplorerActivity) context).finishActivity();
+                ((FileExplorerActivity) context).finishAndRemoveTask();
                 break;
             }
         }

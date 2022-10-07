@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -18,7 +19,11 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
@@ -37,6 +42,7 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
+import mega.privacy.android.app.presentation.meeting.model.InMeetingState
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
@@ -47,6 +53,8 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.SetOpenInvite
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
 import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
@@ -62,6 +70,20 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+/**
+ * InMeetingFragment view model.
+ *
+ * @property inMeetingRepository            [InMeetingRepository]
+ * @property getCallUseCase                 [GetCallUseCase]
+ * @property startCallUseCase               [StartCallUseCase]
+ * @property getNetworkChangesUseCase       [GetNetworkChangesUseCase]
+ * @property getCallStatusChangesUseCase    [GetCallStatusChangesUseCase]
+ * @property endCallUseCase                 [EndCallUseCase]
+ * @property getParticipantsChangesUseCase  [GetParticipantsChangesUseCase]
+ * @property rtcAudioManagerGateway         [RTCAudioManagerGateway]
+ * @property setOpenInvite                  [SetOpenInvite]
+ * @property state                       Current view state as [InMeetingState]
+ */
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository,
@@ -72,8 +94,20 @@ class InMeetingViewModel @Inject constructor(
     private val endCallUseCase: EndCallUseCase,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
+    private val setOpenInvite: SetOpenInvite,
+    monitorConnectivity: MonitorConnectivity,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
+
+    /**
+     * private UI state
+     */
+    private val _state = MutableStateFlow(InMeetingState())
+
+    /**
+     * public UI State
+     */
+    val state: StateFlow<InMeetingState> = _state
 
     /**
      * Enum defining the type of call subtitle.
@@ -126,6 +160,9 @@ class InMeetingViewModel @Inject constructor(
 
     private val _showAssignModeratorBottomPanel = MutableLiveData<Boolean>()
     val showAssignModeratorBottomPanel: LiveData<Boolean> = _showAssignModeratorBottomPanel
+
+    private val isConnected =
+        monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     /**
      * Participant in carousel clicked
@@ -186,6 +223,13 @@ class InMeetingViewModel @Inject constructor(
     // Num of participants
     private val _updateNumParticipants = MutableStateFlow(1)
     val updateNumParticipants: StateFlow<Int> get() = _updateNumParticipants
+
+    private val openInviteChangeObserver =
+        Observer<MegaChatRoom> { chat ->
+            _state.update {
+                it.copy(resultSetOpenInvite = chat.isOpenInvite)
+            }
+        }
 
     private val updateCallObserver =
         Observer<MegaChatCall> {
@@ -287,6 +331,9 @@ class InMeetingViewModel @Inject constructor(
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
             .observeForever(waitingForOthersBannerObserver as Observer<Any>)
+
+        LiveEventBus.get(EventConstants.EVENT_CHAT_OPEN_INVITE, MegaChatRoom::class.java)
+            .observeForever(openInviteChangeObserver)
 
     }
 
@@ -507,6 +554,14 @@ class InMeetingViewModel @Inject constructor(
      */
     fun isChatRoomPublic(): Boolean =
         inMeetingRepository.getChatRoom(currentChatId)?.let { return it.isPublic } ?: false
+
+    /**
+     * Method to know if it's open invite enabled
+     *
+     * @return True, if it's enabled. False, otherwise
+     */
+    fun isOpenInvite(): Boolean =
+        inMeetingRepository.getChatRoom(currentChatId)?.let { return it.isOpenInvite } ?: false
 
     /**
      * Method to know if it is the same chat
@@ -1933,6 +1988,9 @@ class InMeetingViewModel @Inject constructor(
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
             .removeObserver(waitingForOthersBannerObserver as Observer<Any>)
+
+        LiveEventBus.get(EventConstants.EVENT_CHAT_OPEN_INVITE, MegaChatRoom::class.java)
+            .removeObserver(openInviteChangeObserver)
     }
 
     override fun onEditedChatRoomName(chatId: Long, name: String) {
@@ -2047,7 +2105,6 @@ class InMeetingViewModel @Inject constructor(
         return participant
     }
 
-
     /**
      * Determine if should hide or show the share link and invite button
      *
@@ -2055,7 +2112,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun isLinkVisible(): Boolean {
         getCall()?.let {
-            return isChatRoomPublic() && getOwnPrivileges() == PRIV_MODERATOR && it.status == CALL_STATUS_IN_PROGRESS
+            return isChatRoomPublic() && it.status == CALL_STATUS_IN_PROGRESS && (getOwnPrivileges() == PRIV_MODERATOR || (isOpenInvite() && !amIAGuest()))
         }
 
         return false
@@ -2519,5 +2576,27 @@ class InMeetingViewModel @Inject constructor(
     fun hideBottomPanels() {
         _showEndMeetingAsModeratorBottomPanel.value = false
         _showAssignModeratorBottomPanel.value = false
+    }
+
+    /**
+     * Allow add participants
+     */
+    fun onAllowAddParticipantsTap() {
+        if (isConnected.value) {
+            viewModelScope.launch {
+                runCatching {
+                    setOpenInvite(currentChatId)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                    _state.update { it.copy(error = R.string.general_text_error) }
+                }.onSuccess { result ->
+                    _state.update {
+                        it.copy(resultSetOpenInvite = result)
+                    }
+                }
+            }
+        } else {
+            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+        }
     }
 }

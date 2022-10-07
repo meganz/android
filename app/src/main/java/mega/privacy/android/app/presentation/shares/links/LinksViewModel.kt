@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
@@ -30,6 +31,7 @@ class LinksViewModel @Inject constructor(
     private val getPublicLinks: GetPublicLinks,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getLinksSortOrder: GetLinksSortOrder,
+    private val sortOrderIntMapper: SortOrderIntMapper,
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
@@ -98,7 +100,8 @@ class LinksViewModel @Inject constructor(
                 linksTreeDepth = depth,
                 linksHandle = handle,
                 linksParentHandle = getParentNodeHandle(handle),
-                sortOrder = if (depth == 0) getLinksSortOrder() else getCloudSortOrder()
+                sortOrder = if (depth == 0) sortOrderIntMapper(getLinksSortOrder()) else sortOrderIntMapper(
+                    getCloudSortOrder())
             )
         }
 
@@ -117,7 +120,7 @@ class LinksViewModel @Inject constructor(
                     isInvalidHandle = true,
                     isLoading = false,
                     linksParentHandle = null,
-                    sortOrder = getLinksSortOrder()
+                    sortOrder = sortOrderIntMapper(getLinksSortOrder())
                 )
             }
         }

@@ -1,7 +1,7 @@
 package mega.privacy.android.app.data.facade
 
-import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.app.di.MegaApiFolder
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject

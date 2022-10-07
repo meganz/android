@@ -224,8 +224,14 @@ class BottomFloatingPanelViewHolder(
      * Init the visibility of `ShareLink` & `Invite` Button
      */
     fun updateShareAndInviteButton() {
+        floatingPanelView.dividerAllowAddParticipants.isVisible = inMeetingViewModel.isLinkVisible()
         floatingPanelView.shareLink.isVisible = inMeetingViewModel.isLinkVisible()
         floatingPanelView.invite.isVisible = inMeetingViewModel.isLinkVisible()
+        floatingPanelView.dividerParticipants.isVisible = inMeetingViewModel.isModerator()
+        floatingPanelView.allowAddParticipantsLayout.isVisible = inMeetingViewModel.isModerator()
+        floatingPanelView.allowAddParticipantsSwitch.isClickable = false
+        updateAllowAddParticipantsOption(inMeetingViewModel.isOpenInvite())
+
         floatingPanelView.guestShareLink.apply {
             isVisible = inMeetingViewModel.isGuestLinkVisible()
             text = inMeetingViewModel.getGuestLinkTitle()
@@ -236,6 +242,13 @@ class BottomFloatingPanelViewHolder(
                 0
             )
         }
+    }
+
+    /**
+     * Update allow add participant option
+     */
+    fun updateAllowAddParticipantsOption(enabled: Boolean) {
+        floatingPanelView.allowAddParticipantsSwitch.isChecked = enabled
     }
 
     /**
@@ -400,6 +413,10 @@ class BottomFloatingPanelViewHolder(
 
             invite.setOnClickListener {
                 listener.onInviteParticipants()
+            }
+
+            allowAddParticipantsLayout.setOnClickListener {
+                listener.onAllowAddParticipants()
             }
         }
     }

@@ -120,27 +120,30 @@ class GetLastMessageUseCase @Inject constructor(
                     if (timeFormatted.isTextEmpty()) {
                         String.format(
                             getString(R.string.retention_history_disabled),
-                            chatListItem.getSenderName()
+                            chatListItem.getSenderName(true)
                         ).cleanHtmlText()
                     } else {
                         String.format(
                             getString(R.string.retention_history_changed_by),
-                            chatListItem.getSenderName(),
+                            chatListItem.getSenderName(true),
                             timeFormatted
                         ).cleanHtmlText()
                     }
                 }
                 TYPE_PUBLIC_HANDLE_CREATE ->
                     String.format(
-                        getString(R.string.message_created_chat_link), chatListItem.getSenderName()
+                        getString(R.string.message_created_chat_link),
+                        chatListItem.getSenderName(true)
                     ).cleanHtmlText()
                 TYPE_PUBLIC_HANDLE_DELETE ->
                     String.format(
-                        getString(R.string.message_deleted_chat_link), chatListItem.getSenderName()
+                        getString(R.string.message_deleted_chat_link),
+                        chatListItem.getSenderName(true)
                     ).cleanHtmlText()
                 TYPE_SET_PRIVATE_MODE ->
                     String.format(
-                        getString(R.string.message_set_chat_private), chatListItem.getSenderName()
+                        getString(R.string.message_set_chat_private),
+                        chatListItem.getSenderName(true)
                     ).cleanHtmlText()
                 TYPE_NODE_ATTACHMENT -> {
                     val nodeList = chatMessage.megaNodeList
@@ -149,61 +152,46 @@ class GetLastMessageUseCase @Inject constructor(
                     } else {
                         converterShortCodes(chatListItem.lastMessage)
                     }
-                    if (chatListItem.isMine()) {
-                        "${getString(R.string.word_me)} $message"
-                    } else {
-                        "${chatListItem.getSenderName()}: $message"
-                    }
+                    "${chatListItem.getSenderName()}: $message"
                 }
                 TYPE_CONTACT_ATTACHMENT -> {
-                    val message = converterShortCodes(getString(R.string.contacts_sent, chatMessage.usersCount.toString()))
-                    if (chatListItem.isMine()) {
-                        "${getString(R.string.word_me)} $message"
-                    } else {
-                        "${chatListItem.getSenderName()}: $message"
-                    }
+                    val message = getString(R.string.contacts_sent, chatMessage.usersCount.toString())
+                    "${chatListItem.getSenderName()}: ${converterShortCodes(message)}"
                 }
                 TYPE_VOICE_CLIP -> {
                     val nodeList = chatMessage.megaNodeList
-                    val message = if ((nodeList?.size() ?: 0) > 0&& ChatUtil.isVoiceClip(nodeList.get(0).name)) {
+                    val message = if ((nodeList?.size() ?: 0) > 0 && ChatUtil.isVoiceClip(nodeList.get(0).name)) {
                         val duration = ChatUtil.getVoiceClipDuration(nodeList.get(0))
                         CallUtil.milliSecondsToTimer(duration)
                     } else {
                         "--:--"
                     }
-
-                    if (chatListItem.isMine()) {
-                        "${getString(R.string.word_me)} $message"
-                    } else {
-                        "${chatListItem.getSenderName()}: $message"
-                    }
+                    "${chatListItem.getSenderName()}: $message"
                 }
-
                 else -> {
-                    when {
-                        chatListItem.lastMessage.isNullOrBlank() ->
-                            getString(R.string.error_message_unrecognizable)
-                        chatListItem.isMine() ->
-                            "${getString(R.string.word_me)} ${converterShortCodes(chatListItem.lastMessage)}"
-                        else ->
-                            "${chatListItem.getSenderName()}: ${converterShortCodes(chatListItem.lastMessage)}"
+                    if (chatListItem.lastMessage.isNullOrBlank()) {
+                        getString(R.string.error_message_unrecognizable)
+                    } else {
+                        "${chatListItem.getSenderName()}: ${converterShortCodes(chatListItem.lastMessage)}"
                     }
                 }
             }
         }
 
-    private fun MegaChatListItem.getSenderName(): String {
-        val senderName = if (isMine()) {
-            megaChatApi.myFullname
-                ?: megaChatApi.myEmail
-                ?: getString(R.string.unknown_name_label)
+    private fun MegaChatListItem.getSenderName(includeMyName: Boolean = false): String =
+        if (isMine()) {
+            if (includeMyName) {
+                megaChatApi.myFullname
+                    ?: megaChatApi.myEmail
+                    ?: getString(R.string.chat_last_message_sender_me)
+            } else {
+                getString(R.string.chat_last_message_sender_me)
+            }
         } else {
             megaChatApi.getUserFullnameFromCache(lastMessageSender)
                 ?: megaChatApi.getUserEmailFromCache(lastMessageSender)
                 ?: getString(R.string.unknown_name_label)
         }
-        return senderName
-    }
 
     private fun MegaChatListItem.isMine(): Boolean =
         lastMessageSender == megaChatApi.myUserHandle

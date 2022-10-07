@@ -5,7 +5,7 @@ Example output:
 
 Usage:
 This command must have 1 parameter of XML format lint report
-    python3 junit_repor.py ${WORKSPACE}/${MODULE}build/report/lint-results.xml
+    python3 lint_report.py ${WORKSPACE}/${MODULE}build/report/lint-results.xml
 '''
 
 import sys

@@ -6,9 +6,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.data.gateway.DeviceGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.repository.DefaultEnvironmentRepository
+import mega.privacy.android.data.gateway.AppInfoGateway
+import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import org.junit.Before
 import org.junit.Test
@@ -25,6 +27,8 @@ class DefaultEnvironmentRepositoryTest {
     private val context = mock<Context>()
 
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val appInfoGateway = mock<AppInfoGateway>()
+    private val appInfoPreferencesGateway = mock<AppInfoPreferencesGateway>()
 
     @Before
     fun setUp() {
@@ -32,7 +36,9 @@ class DefaultEnvironmentRepositoryTest {
             deviceGateway = deviceGateway,
             context = context,
             megaApiGateway = megaApiGateway,
-            ioDispatcher = UnconfinedTestDispatcher()
+            ioDispatcher = UnconfinedTestDispatcher(),
+            appInfoGateway = appInfoGateway,
+            appInfoPreferencesGateway = appInfoPreferencesGateway,
         )
     }
 

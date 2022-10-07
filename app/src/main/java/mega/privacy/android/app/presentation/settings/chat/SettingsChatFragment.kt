@@ -126,7 +126,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         richLinksSwitch =
             findPreference<SwitchPreferenceCompat?>(SettingsConstants.KEY_CHAT_RICH_LINK)?.apply {
                 onPreferenceClickListener = this@SettingsChatFragment
-                isChecked = MegaApplication.isEnabledRichLinks()
+                isChecked = MegaApplication.isEnabledRichLinks
             }
 
         if (megaChatApi.isSignalActivityRequired) {
@@ -288,11 +288,11 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
      * Method for updating the rich link previews option.
      */
     fun updateEnabledRichLinks() {
-        if (MegaApplication.isEnabledRichLinks() == richLinksSwitch?.isChecked) return
+        if (MegaApplication.isEnabledRichLinks == richLinksSwitch?.isChecked) return
 
         richLinksSwitch?.apply {
             onPreferenceClickListener = null
-            isChecked = MegaApplication.isEnabledRichLinks()
+            isChecked = MegaApplication.isEnabledRichLinks
             onPreferenceClickListener = this@SettingsChatFragment
         }
     }

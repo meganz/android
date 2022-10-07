@@ -25,13 +25,16 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.list.ContactListViewModel
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.BottomSheetContactDetailBinding
-import mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.EXTRA_SELECTED_FOLDER
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES
+import mega.privacy.android.app.utils.Constants.CHAT_ID
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
+import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.setImageRequestFromUri
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -191,7 +194,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionCall.setOnClickListener {
-            MegaApplication.setUserWaitingForCall(megaUser.handle)
+            MegaApplication.userWaitingForCall = megaUser.handle
             if (CallUtil.canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
                 viewModel.startCall()
             }

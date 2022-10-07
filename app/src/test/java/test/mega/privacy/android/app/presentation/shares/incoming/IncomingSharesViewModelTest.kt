@@ -10,13 +10,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
@@ -37,13 +40,16 @@ class IncomingSharesViewModelTest {
     private val authorizeNode = mock<AuthorizeNode>()
     private val getIncomingSharesChildrenNode = mock<GetIncomingSharesChildrenNode>()
     private val getCloudSortOrder = mock<GetCloudSortOrder> {
-        onBlocking { invoke() }.thenReturn(1)
+        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
     private val getOtherSortOrder = mock<GetOthersSortOrder> {
-        onBlocking { invoke() }.thenReturn(2)
+        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_DESC)
     }
     private val monitorNodeUpdates = FakeMonitorUpdates()
-
+    private val sortOrderIntMapper = mock<SortOrderIntMapper> {
+        onBlocking { invoke(SortOrder.ORDER_DEFAULT_ASC) }.thenReturn(1)
+        onBlocking { invoke(SortOrder.ORDER_DEFAULT_DESC) }.thenReturn(2)
+    }
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -58,6 +64,7 @@ class IncomingSharesViewModelTest {
             getIncomingSharesChildrenNode,
             getCloudSortOrder,
             getOtherSortOrder,
+            sortOrderIntMapper,
             monitorNodeUpdates,
         )
     }
@@ -394,9 +401,10 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that sort order is set with result of getOthersSortOrder if depth is equals to 0 when call setIncomingTreeDepth`() =
         runTest {
-            val expected = 5
+            val expected = MegaApiJava.ORDER_CREATION_ASC
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
-            whenever(getOtherSortOrder()).thenReturn(expected)
+            whenever(getOtherSortOrder()).thenReturn(SortOrder.ORDER_CREATION_ASC)
+            whenever(sortOrderIntMapper(SortOrder.ORDER_CREATION_ASC)).thenReturn(expected)
 
             underTest.state.map { it.sortOrder }.distinctUntilChanged()
                 .test {
@@ -409,9 +417,10 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that sort order is set with result of getCloudSortOrder if depth is different than 0 when call setIncomingTreeDepth`() =
         runTest {
-            val expected = 5
+            val expected = MegaApiJava.ORDER_CREATION_ASC
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
-            whenever(getCloudSortOrder()).thenReturn(expected)
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_CREATION_ASC)
+            whenever(sortOrderIntMapper(SortOrder.ORDER_CREATION_ASC)).thenReturn(expected)
 
             underTest.state.map { it.sortOrder }.distinctUntilChanged()
                 .test {
@@ -424,9 +433,10 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that sort order is set with result of getOtherSortOrder when refreshNodes fails`() =
         runTest {
-            val expected = 5
+            val expected = MegaApiJava.ORDER_CREATION_ASC
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(null)
-            whenever(getOtherSortOrder()).thenReturn(expected)
+            whenever(getOtherSortOrder()).thenReturn(SortOrder.ORDER_CREATION_ASC)
+            whenever(sortOrderIntMapper(SortOrder.ORDER_CREATION_ASC)).thenReturn(expected)
 
             underTest.state.map { it.sortOrder }.distinctUntilChanged()
                 .test {

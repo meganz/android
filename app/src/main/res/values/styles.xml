@@ -469,6 +469,15 @@
         <item name="android:layout_height">52dp</item>
     </style>
 
+    <style name="VideoPlayerButton">
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:layout_width">52dp</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:layout_marginBottom">15dp</item>
+    </style>
+
     <style name="messageForwardIconStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -740,4 +749,8 @@
         <item name="android:letterSpacing">0.0004</item>
     </style>
 
+    <style name="videoPlayerToolbarThemeDark" parent="ThemeOverlay.MaterialComponents.Dark">
+        <item name="android:popupBackground">@color/grey_800</item>
+        <item name="actionModeBackground">@color/grey_800</item>
+    </style>
 </resources>

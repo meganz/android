@@ -1,5 +1,6 @@
 package mega.privacy.android.app.data.gateway.api
 
+import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaContactDB
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.main.megachat.NonContactInfo
@@ -13,14 +14,24 @@ import mega.privacy.android.domain.entity.SyncRecord
 interface MegaLocalStorageGateway {
 
     /**
-     * Camera Uploads handle
+     * Get Camera Uploads Primary handle
      */
     suspend fun getCamSyncHandle(): Long?
 
     /**
-     * Media Uploads handle
+     * Get Camera Uploads Secondary handle
      */
     suspend fun getMegaHandleSecondaryFolder(): Long?
+
+    /**
+     * Set Camera Uploads Primary handle
+     */
+    suspend fun setCamSyncHandle(primaryHandle: Long)
+
+    /**
+     * Set Camera Uploads Secondary handle
+     */
+    suspend fun setMegaHandleSecondaryFolder(secondaryHandle: Long)
 
     /**
      * Get cloud sort order
@@ -45,6 +56,36 @@ interface MegaLocalStorageGateway {
      * @return links sort order
      */
     suspend fun getLinksSortOrder(): Int
+
+    /**
+     * Get offline sort order
+     * @return offline sort order
+     */
+    suspend fun getOfflineSortOrder(): Int
+
+    /**
+     * Set offline sort order
+     * @param order
+     */
+    suspend fun setOfflineSortOrder(order: Int)
+
+    /**
+     * Set cloud sort order
+     * @param order
+     */
+    suspend fun setCloudSortOrder(order: Int)
+
+    /**
+     * Set camera sort order
+     * @param order
+     */
+    suspend fun setCameraSortOrder(order: Int)
+
+    /**
+     * Set others sort order
+     * @param order
+     */
+    suspend fun setOthersSortOrder(order: Int)
 
     /**
      * Get user credentials
@@ -131,11 +172,6 @@ interface MegaLocalStorageGateway {
      * @return sync record
      */
     suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord?
-
-    /**
-     * Should clear sync records
-     */
-    suspend fun shouldClearSyncRecords(clearSyncRecords: Boolean)
 
     /**
      * Does file name exist
@@ -435,4 +471,37 @@ interface MegaLocalStorageGateway {
      * @param enable
      */
     suspend fun setCamSyncEnabled(enable: Boolean)
+
+    /**
+     * Gets attributes from DB
+     */
+    suspend fun getAttributes(): MegaAttributes?
+
+    /**
+     * Gets pricing timestamp.
+     */
+    suspend fun getPricingTimeStamp(): String?
+
+    /**
+     * Gets payment methods timestamp
+     */
+    suspend fun getPaymentMethodsTimeStamp(): String?
+
+    /**
+     * The method is to backup time stamps, primary upload folder and secondary folder in share preference after
+     * database records being cleaned
+     * @param primaryUploadFolderHandle
+     * @param secondaryUploadFolderHandle
+     */
+    suspend fun backupTimestampsAndFolderHandle(
+        primaryUploadFolderHandle: Long,
+        secondaryUploadFolderHandle: Long,
+    )
+
+    /**
+     * This method is to clear Camera Sync Records from the Database
+     *
+     * @param clearCamSyncRecords the boolean setting whether to clean the cam record
+     */
+    suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean)
 }

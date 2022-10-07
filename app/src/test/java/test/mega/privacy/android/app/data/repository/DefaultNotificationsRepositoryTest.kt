@@ -9,17 +9,17 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.MegaContactDB
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.data.mapper.EventMapper
-import mega.privacy.android.app.data.mapper.NodeProvider
-import mega.privacy.android.app.data.mapper.UserAlertContactProvider
-import mega.privacy.android.app.data.mapper.UserAlertMapper
+import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.app.main.megachat.NonContactInfo
+import mega.privacy.android.data.mapper.NodeProvider
+import mega.privacy.android.data.mapper.UserAlertContactProvider
+import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
-import mega.privacy.android.domain.entity.Event
 import mega.privacy.android.domain.entity.EventType
+import mega.privacy.android.domain.entity.NormalEvent
 import mega.privacy.android.domain.repository.NotificationsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -188,7 +188,7 @@ class DefaultNotificationsRepositoryTest {
 
     @Test
     fun `test that event is returned if found`() = runTest {
-        val expectedEvent = Event(
+        val expectedEvent = NormalEvent(
             handle = 1L,
             text = "expected text",
             number = 2L,
@@ -214,7 +214,7 @@ class DefaultNotificationsRepositoryTest {
 
     @Test
     fun `test that multiple events are returned if found`() = runTest {
-        val expectedEvent = Event(
+        val expectedEvent = NormalEvent(
             handle = 1L,
             text = "expected text",
             number = 2L,

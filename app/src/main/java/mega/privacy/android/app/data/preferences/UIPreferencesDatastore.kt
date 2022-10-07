@@ -12,7 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.app.data.gateway.preferences.UIPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import java.io.IOException

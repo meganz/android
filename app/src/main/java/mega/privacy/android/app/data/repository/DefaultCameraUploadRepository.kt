@@ -2,10 +2,12 @@ package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import javax.inject.Inject
 
@@ -17,8 +19,31 @@ import javax.inject.Inject
  */
 class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
+    private val megaApiGateway: MegaApiGateway,
+    private val cacheGateway: CacheGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CameraUploadRepository {
+
+    override fun getInvalidHandle(): Long {
+        return megaApiGateway.getInvalidHandle()
+    }
+
+
+    override suspend fun getPrimarySyncHandle(): Long? = withContext(ioDispatcher) {
+        localStorageGateway.getCamSyncHandle()
+    }
+
+    override suspend fun getSecondarySyncHandle(): Long? = withContext(ioDispatcher) {
+        localStorageGateway.getMegaHandleSecondaryFolder()
+    }
+
+    override suspend fun setPrimarySyncHandle(primaryHandle: Long) = withContext(ioDispatcher) {
+        localStorageGateway.setCamSyncHandle(primaryHandle)
+    }
+
+    override suspend fun setSecondarySyncHandle(secondaryHandle: Long) = withContext(ioDispatcher) {
+        localStorageGateway.setMegaHandleSecondaryFolder(secondaryHandle)
+    }
 
     override suspend fun isSyncByWifi() = withContext(ioDispatcher) {
         localStorageGateway.isSyncByWifi()
@@ -86,11 +111,6 @@ class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord? =
         withContext(ioDispatcher) {
             localStorageGateway.getSyncRecordByLocalPath(path, isSecondary)
-        }
-
-    override suspend fun shouldClearSyncRecords(clearSyncRecords: Boolean) =
-        withContext(ioDispatcher) {
-            localStorageGateway.shouldClearSyncRecords(clearSyncRecords)
         }
 
     override suspend fun doesFileNameExist(
@@ -237,5 +257,21 @@ class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.updateSyncRecordStatusByLocalPath(syncStatusType,
             localPath,
             isSecondary)
+    }
+
+    override suspend fun backupTimestampsAndFolderHandle() = withContext(ioDispatcher) {
+        val primaryHandle = localStorageGateway.getCamSyncHandle() ?: getInvalidHandle()
+        val secondaryHandle =
+            localStorageGateway.getMegaHandleSecondaryFolder() ?: getInvalidHandle()
+        localStorageGateway.backupTimestampsAndFolderHandle(primaryHandle, secondaryHandle)
+    }
+
+    override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) =
+        withContext(ioDispatcher) {
+            localStorageGateway.saveShouldClearCamSyncRecords(clearCamSyncRecords)
+        }
+
+    override suspend fun clearCacheDirectory() = withContext(ioDispatcher) {
+        cacheGateway.clearCacheDirectory()
     }
 }

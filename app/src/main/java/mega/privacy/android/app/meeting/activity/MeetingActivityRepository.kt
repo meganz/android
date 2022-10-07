@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -25,6 +24,7 @@ import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -63,7 +63,7 @@ class MeetingActivityRepository @Inject constructor(
     /**
      * Get the actual avatar from the server and save it to the cache folder
      */
-    suspend fun createAvatar(listener: BaseListener) = withContext(Dispatchers.IO) {
+    suspend fun createAvatar(listener: MegaRequestListenerInterface) = withContext(Dispatchers.IO) {
         megaApi.getUserAvatar(
             megaApi.myUser,
             CacheFolderManager.buildAvatarFile(context,

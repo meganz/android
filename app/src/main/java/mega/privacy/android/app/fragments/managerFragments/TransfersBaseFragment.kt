@@ -116,8 +116,17 @@ open class TransfersBaseFragment : RotatableFragment() {
     /**
      * Update elevation when scrolling if needed.
      */
-    open fun updateElevation() = (requireActivity() as ManagerActivity).changeAppBarElevation(
-        binding.transfersListView.canScrollVertically(DEFAULT_SCROLL_DIRECTION))
+    open fun updateElevation() {
+        if (bindingIsInitialized()) {
+            (requireActivity() as ManagerActivity).changeAppBarElevation(
+                binding.transfersListView.canScrollVertically(DEFAULT_SCROLL_DIRECTION))
+        }
+    }
+
+    /**
+     * Check the binding whether is initialized
+     */
+    open fun bindingIsInitialized() = ::binding.isInitialized
 
     /**
      * Shows an empty view if there are not transfers

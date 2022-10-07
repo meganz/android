@@ -278,7 +278,7 @@ private fun EnableCameraUploadButton(onClick: () -> Unit, isVisible: () -> Boole
                 shape = RectangleShape
             ) {
                 Text(
-                    text = stringResource(id = R.string.settings_camera_upload_on).uppercase(),
+                    text = stringResource(id = R.string.settings_camera_upload_on),
                     color = colorResource(id = R.color.teal_300),
                     fontWeight = FontWeight.Medium,
                     fontSize = 14.sp,

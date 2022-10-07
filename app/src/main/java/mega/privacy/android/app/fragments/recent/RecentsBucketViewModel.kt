@@ -2,122 +2,122 @@ package mega.privacy.android.app.fragments.recent
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.domain.usecase.GetParentMegaNode
+import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.domain.usecase.UpdateRecentAction
 import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
+import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * ViewModel associated to [RecentsBucketFragment]
+ */
 @HiltViewModel
 class RecentsBucketViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val recentsBucketRepository: RecentsBucketRepository,
+    private val getParentMegaNode: GetParentMegaNode,
+    private val updateRecentAction: UpdateRecentAction,
+    private val getRecentActionNodes: GetRecentActionNodes,
+    monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
+
+    /**
+     * True if the actionMode should to be visible
+     */
+    val actionMode: LiveData<Boolean> = _actionMode
+
     private val _nodesToAnimate = MutableLiveData<Set<Int>>()
 
-    val actionMode: LiveData<Boolean> = _actionMode
+    /**
+     * Set of node positions to animate
+     */
     val nodesToAnimate: LiveData<Set<Int>> = _nodesToAnimate
 
     private val selectedNodes: MutableSet<NodeItem> = mutableSetOf()
 
-    var bucket: MutableLiveData<MegaRecentActionBucket> = MutableLiveData()
+    /**
+     * Current bucket
+     */
+    private val _bucket: MutableStateFlow<MegaRecentActionBucket?> = MutableStateFlow(null)
+    val bucket = _bucket.asStateFlow()
 
-    var cachedActionList = MutableLiveData<List<MegaRecentActionBucket>>()
+    private var cachedActionList: List<MegaRecentActionBucket>? = null
 
-    var shouldCloseFragment: MutableLiveData<Boolean> = MutableLiveData(false)
+    private val _shouldCloseFragment: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    var items: LiveData<List<NodeItem>> = bucket.switchMap {
-        viewModelScope.launch {
-            recentsBucketRepository.getNodes(it)
+    /**
+     * True if the fragment needs to be closed
+     */
+    val shouldCloseFragment: LiveData<Boolean> = _shouldCloseFragment
+
+    /**
+     * True if the parent of the bucket is an incoming shares
+     */
+    var isInShare = false
+
+    /**
+     *  List of node items in the current bucket
+     */
+    val items = _bucket
+        .map { it?.let { getRecentActionNodes(it.nodes) } ?: emptyList() }
+        .onEach {
+            isInShare = it.firstOrNull()?.node?.let { node ->
+                getParentMegaNode(node)?.isInShare
+            } ?: false
         }
-
-        recentsBucketRepository.nodes
-    }
-
-    var loadNodesJob: Job? = null
-
-    fun getItemPositionByHandle(handle: Long): Int {
-        var index = INVALID_POSITION
-
-        items.value?.forEachIndexed { i, nodeItem ->
-            if (nodeItem.node?.handle == handle) {
-                index = i
-                return@forEachIndexed
-            }
-        }
-
-        return index
-    }
-
-    private fun isSameBucket(
-        selected: MegaRecentActionBucket,
-        other: MegaRecentActionBucket,
-    ): Boolean {
-        return selected.isMedia == other.isMedia &&
-                selected.isUpdate == other.isUpdate &&
-                selected.timestamp == other.timestamp &&
-                selected.parentHandle == other.parentHandle &&
-                selected.userEmail == other.userEmail
-    }
-
-    private val nodesChangeObserver = Observer<Boolean> {
-        if (it) {
-            if (bucket.value == null) {
-                return@Observer
-            }
-
-            val recentActions = megaApi.recentActions
-
-            recentActions.forEach { b ->
-                bucket.value?.let { current ->
-                    if (isSameBucket(current, b)) {
-                        bucket.value = b
-                        return@Observer
-                    }
-                }
-            }
-
-            cachedActionList.value?.forEach { b ->
-                val iterator = recentActions.iterator()
-                while (iterator.hasNext()) {
-                    if (isSameBucket(iterator.next(), b)) {
-                        iterator.remove()
-                    }
-                }
-            }
-
-            // The last one is the changed one.
-            if (recentActions.size == 1) {
-                bucket.value = recentActions[0]
-                return@Observer
-            }
-
-            // No nodes contained in the bucket or the action bucket is no loner exists.
-            shouldCloseFragment.value = true
-        }
-    }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     init {
-        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-            .observeForever(nodesChangeObserver)
+        viewModelScope.launch {
+            monitorNodeUpdates().collectLatest {
+                Timber.d("Received node update")
+                updateCurrentBucket()
+                clearSelection()
+            }
+        }
     }
 
-    override fun onCleared() {
-        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-            .removeObserver(nodesChangeObserver)
+    /**
+     * Set bucket value
+     *
+     * @param selectedBucket
+     */
+    fun setBucket(selectedBucket: MegaRecentActionBucket?) = viewModelScope.launch {
+        _bucket.emit(selectedBucket)
     }
+
+    /**
+     * Set cached action list
+     *
+     * @param cachedActions
+     */
+    fun setCachedActionList(cachedActions: List<MegaRecentActionBucket>?) {
+        cachedActionList = cachedActions
+    }
+
+    /**
+     * Get the selected nodes
+     *
+     * @return the selected nodes
+     */
+    fun getSelectedNodes(): List<NodeItem> = selectedNodes.toList()
 
     /**
      * Retrieves the list of non-null [MegaNode] objects from [selectedNodes]
@@ -135,16 +135,29 @@ class RecentsBucketViewModel @Inject constructor(
     fun isAnyNodeInBackups(): Boolean =
         getSelectedMegaNodes().any { node -> megaApi.isInInbox(node) }
 
+    /**
+     * Get the count of selected nodes
+     *
+     * @return the count of selected nodes
+     */
     fun getSelectedNodesCount(): Int = selectedNodes.size
 
-    fun getNodesCount(): Int = items.value?.size ?: 0
+    /**
+     * Get the count of nodes
+     *
+     * @return the count of nodes
+     */
+    fun getNodesCount(): Int = items.value.size
 
+    /**
+     * Clear selected nodes
+     */
     fun clearSelection() {
         _actionMode.value = false
         selectedNodes.clear()
 
         val animNodeIndices = mutableSetOf<Int>()
-        val nodeList = items.value ?: return
+        val nodeList = items.value
 
         for ((position, node) in nodeList.withIndex()) {
             if (node in selectedNodes) {
@@ -157,11 +170,16 @@ class RecentsBucketViewModel @Inject constructor(
         _nodesToAnimate.value = animNodeIndices
     }
 
+    /**
+     * Receive on node long click
+     *
+     * @param position the position of the item in the adapter
+     * @param node the node item
+     */
     fun onNodeLongClicked(position: Int, node: NodeItem) {
         val nodeList = items.value
 
-        if (nodeList == null || position < 0 || position >= nodeList.size
-            || nodeList[position].hashCode() != node.hashCode()
+        if (position < 0 || position >= nodeList.size || nodeList[position].hashCode() != node.hashCode()
         ) {
             return
         }
@@ -180,9 +198,11 @@ class RecentsBucketViewModel @Inject constructor(
         _nodesToAnimate.value = hashSetOf(position)
     }
 
-
+    /**
+     * Select all nodes
+     */
     fun selectAll() {
-        val nodeList = items.value ?: return
+        val nodeList = items.value
 
         val animNodeIndices = mutableSetOf<Int>()
 
@@ -197,6 +217,19 @@ class RecentsBucketViewModel @Inject constructor(
 
         _nodesToAnimate.value = animNodeIndices
         _actionMode.value = true
+    }
+
+    /**
+     * Update the current bucket
+     */
+    private suspend fun updateCurrentBucket() {
+        _bucket.value
+            ?.let { updateRecentAction(it, cachedActionList) }
+            ?.let { _bucket.emit(it) }
+            ?: run {
+                // No nodes contained in the bucket or the action bucket is no loner exists.
+                _shouldCloseFragment.postValue(true)
+            }
     }
 }
 

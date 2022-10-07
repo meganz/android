@@ -4667,13 +4667,13 @@ open class SqliteDatabaseHandler(
 
         @JvmStatic
         @Synchronized
-        fun getDbHandler(context: Context?): DatabaseHandler {
+        fun getDbHandler(context: Context): DatabaseHandler {
             Timber.d("getDbHandler")
 
             if (instance == null) {
                 Timber.d("INSTANCE IS NULL")
                 val legacyLoggingSettings = fromApplication(
-                    MegaApplication.getInstance(),
+                    context,
                     LegacyLoggingEntryPoint::class.java
                 ).legacyLoggingSettings
 
