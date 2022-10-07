@@ -20,13 +20,11 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import java.util.Locale;
-
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.di.MegaApi;
+import mega.privacy.android.data.qualifier.MegaApi;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.main.InviteContactActivity;
 import mega.privacy.android.app.utils.ColorUtils;

@@ -7,7 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.di.AppModule
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaApiAndroid
