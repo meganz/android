@@ -13,6 +13,7 @@ import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -62,6 +63,7 @@ class DefaultChatRepository @Inject constructor(
     private fun onRequestSetOpenInviteCompleted(continuation: Continuation<Boolean>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {
+                Timber.d("******************** set open invite OK -> state? ${request.flag}")
                 continuation.resumeWith(Result.success(request.flag))
             } else {
                 continuation.failWithError(error)

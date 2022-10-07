@@ -269,7 +269,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     private RelativeLayout getChatLinkLayout;
     private CheckBox getChatLinkBox;
     private SwitchCompat allowAddParticipantsSwitch;
-    private boolean isAllowAddParticipantsEnabled = false;
+    private boolean isAllowAddParticipantsEnabled = true;
     private LinearLayoutManager newGrouplinearLayoutManager;
     private RecyclerView newGroupRecyclerView;
     private TextView newGroupHeaderList;
@@ -1742,7 +1742,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             queryPermissions = savedInstanceState.getBoolean("queryPermissions", true);
             isEKREnabled = savedInstanceState.getBoolean("isEKREnabled", false);
             ekrSwitch.setChecked(isEKREnabled);
-            isAllowAddParticipantsEnabled = savedInstanceState.getBoolean(IS_ALLOWED_ADD_PARTICIPANTS, false);
+            isAllowAddParticipantsEnabled = savedInstanceState.getBoolean(IS_ALLOWED_ADD_PARTICIPANTS, true);
             allowAddParticipantsSwitch.setChecked(isAllowAddParticipantsEnabled);
             onlyCreateGroup = savedInstanceState.getBoolean("onlyCreateGroup", false);
 
@@ -1801,8 +1801,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         } else {
             isEKREnabled = false;
             ekrSwitch.setChecked(isEKREnabled);
-            isAllowAddParticipantsEnabled = false;
-            allowAddParticipantsSwitch.setChecked(false);
+            allowAddParticipantsSwitch.setChecked(isAllowAddParticipantsEnabled);
             setAddedAdapterContacts();
 
             if (contactType == CONTACT_TYPE_MEGA) {

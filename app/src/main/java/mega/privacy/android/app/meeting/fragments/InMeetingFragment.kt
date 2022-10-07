@@ -901,10 +901,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun initViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                inMeetingViewModel.state.collect { (_, enabled) ->
-                   if (enabled != null) {
+                inMeetingViewModel.state.collect { (error, enabled) ->
+                    if (error != null) {
+                        sharedModel.showSnackBar(StringResourcesUtils.getString(error))
+                        bottomFloatingPanelViewHolder.checkErrorAllowAddParticipants()
+                    } else if (enabled != null) {
                         bottomFloatingPanelViewHolder.updateShareAndInviteButton()
-                        bottomFloatingPanelViewHolder.updateAllowAddParticipantsOption(enabled)
+                        bottomFloatingPanelViewHolder.updateAllowAddParticipantsSwitch(enabled)
                     }
                 }
             }

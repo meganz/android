@@ -2123,11 +2123,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return True, if the link should be visible. False, if not.
      */
-    fun isGuestLinkVisible(): Boolean = if (isChatRoomPublic()) {
-        getOwnPrivileges() != PRIV_MODERATOR
-    } else {
-        getOwnPrivileges() == PRIV_MODERATOR
-    }
+    fun isGuestLinkVisible(): Boolean = (isChatRoomPublic() && !isModerator() && !isOpenInvite())
 
     /**
      * Method to update the link button depending on the participant's permissions
@@ -2590,6 +2586,8 @@ class InMeetingViewModel @Inject constructor(
                     Timber.e(exception)
                     _state.update { it.copy(error = R.string.general_text_error) }
                 }.onSuccess { result ->
+                    Timber.d("*******************+ RECIBO EL CAMBIO DE MISMO CLIENTE A $result")
+
                     _state.update {
                         it.copy(resultSetOpenInvite = result)
                     }
