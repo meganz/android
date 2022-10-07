@@ -6,10 +6,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
-import mega.privacy.android.app.data.gateway.FileLogWriter
-import mega.privacy.android.app.data.gateway.LogWriterGateway
-import mega.privacy.android.app.data.gateway.TimberChatLogger
-import mega.privacy.android.app.data.gateway.TimberMegaLogger
+import mega.privacy.android.data.gateway.FileLogWriter
+import mega.privacy.android.data.gateway.LogWriterGateway
+import mega.privacy.android.data.gateway.TimberChatLogger
+import mega.privacy.android.data.gateway.TimberMegaLogger
 import mega.privacy.android.app.domain.usecase.GetCurrentTimeStringFromCalendar
 import mega.privacy.android.app.logging.ChatLogger
 import mega.privacy.android.app.logging.SdkLogger

@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheFolderGateway
 
 @Module
 @InstallIn(SingletonComponent::class)

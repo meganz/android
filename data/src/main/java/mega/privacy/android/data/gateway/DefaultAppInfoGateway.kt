@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.gateway
+package mega.privacy.android.data.gateway
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -12,7 +12,7 @@ import javax.inject.Inject
  * Default implementation of [AppInfoGateway]
  *
  */
-class DefaultAppInfoGateway @Inject constructor(
+internal class DefaultAppInfoGateway @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : AppInfoGateway {
     // getPackageInfo is expensive we don't need to query every call we should cache it

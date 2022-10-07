@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.gateway
+package mega.privacy.android.data.gateway
 
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatLoggerInterface

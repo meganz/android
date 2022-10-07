@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.gateway
+package mega.privacy.android.data.gateway
 
 import android.content.Context
 import android.util.Xml

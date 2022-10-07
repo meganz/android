@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.gateway
+package mega.privacy.android.data.gateway
 
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
@@ -13,7 +13,7 @@ import javax.inject.Inject
  * File compression gateway implements [FileCompressionGateway]
  *
  */
-class ZipFileCompressionGateway @Inject constructor() : FileCompressionGateway {
+internal class ZipFileCompressionGateway @Inject constructor() : FileCompressionGateway {
 
     @Throws(AssertionError::class)
     override suspend fun zipFolder(sourceFolder: File, zipFile: File) {
