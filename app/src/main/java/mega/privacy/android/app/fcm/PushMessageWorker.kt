@@ -14,7 +14,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.domain.usecase.PushReceived
@@ -62,14 +61,14 @@ class PushMessageWorker @AssistedInject constructor(
 
             val pushMessage = pushMessageMapper(inputData)
 
-            if (!rootNodeExists() && !MegaApplication.isLoggingIn()) {
+            if (!rootNodeExists()) {
                 Timber.d("Needs fast login")
 
                 kotlin.runCatching { initMegaChat(session) }
                     .fold(
                         { Timber.d("Init chat success.") },
                         { error ->
-                            Timber.e("Init chat error.", error)
+                            Timber.e("Init chat error: $error")
                             return@withContext Result.failure()
                         }
                     )
@@ -82,7 +81,7 @@ class PushMessageWorker @AssistedInject constructor(
                                 Timber.d(error, "No more actions required.")
                                 return@withContext Result.success()
                             } else {
-                                Timber.e("Fast login error.", error)
+                                Timber.e("Fast login error: $error")
                                 return@withContext Result.failure()
                             }
                         }
@@ -92,7 +91,7 @@ class PushMessageWorker @AssistedInject constructor(
                     .fold(
                         { Timber.d("Fetch nodes success.") },
                         { error ->
-                            Timber.e("Fetch nodes error.", error)
+                            Timber.e("Fetch nodes error: $error")
                             return@withContext Result.failure()
                         }
                     )
