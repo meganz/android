@@ -250,8 +250,10 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.RESUMED) {
                     viewModel.state.collect { (_, error, enabled) ->
-                        if (error == null && enabled != null) {
-                            chat = megaChatApi.getChatRoom(chatHandle)
+                        if (error != null) {
+                            showSnackbar(StringResourcesUtils.getString(error))
+                            adapter?.updateAllowAddParticipants(getChatRoom().isOpenInvite)
+                        } else if (enabled != null) {
                             adapter?.updateAllowAddParticipants(enabled)
                             updateAdapterHeader()
                             updateParticipants()
@@ -1646,6 +1648,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     }
 
+    fun getChatRoom() = megaChatApi.getChatRoom(chatHandle)
+
     public override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         chat?.let {
@@ -1661,4 +1665,5 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         private const val MAX_LENGTH_CHAT_TITLE = 60
         private const val END_CALL_FOR_ALL_DIALOG = "isEndCallForAllDialogShown"
     }
+
 }

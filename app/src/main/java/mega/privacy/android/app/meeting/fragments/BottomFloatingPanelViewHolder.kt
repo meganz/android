@@ -25,6 +25,7 @@ import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
+import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatAdapter.ViewHolderParticipantsHeader
 import mega.privacy.android.app.meeting.LockableBottomSheetBehavior
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
@@ -230,7 +231,7 @@ class BottomFloatingPanelViewHolder(
         floatingPanelView.dividerParticipants.isVisible = inMeetingViewModel.isModerator()
         floatingPanelView.allowAddParticipantsLayout.isVisible = inMeetingViewModel.isModerator()
         floatingPanelView.allowAddParticipantsSwitch.isClickable = false
-        updateAllowAddParticipantsOption(inMeetingViewModel.isOpenInvite())
+        updateAllowAddParticipantsSwitch(inMeetingViewModel.isOpenInvite())
 
         floatingPanelView.guestShareLink.apply {
             isVisible = inMeetingViewModel.isGuestLinkVisible()
@@ -247,8 +248,15 @@ class BottomFloatingPanelViewHolder(
     /**
      * Update allow add participant option
      */
-    fun updateAllowAddParticipantsOption(enabled: Boolean) {
+    fun updateAllowAddParticipantsSwitch(enabled: Boolean) {
         floatingPanelView.allowAddParticipantsSwitch.isChecked = enabled
+    }
+
+    /**
+     * Revert the switch status when set open invite update could not be completed.
+     */
+    fun checkErrorAllowAddParticipants() {
+        floatingPanelView.allowAddParticipantsSwitch.isChecked = inMeetingViewModel.isOpenInvite()
     }
 
     /**
@@ -416,6 +424,7 @@ class BottomFloatingPanelViewHolder(
             }
 
             allowAddParticipantsLayout.setOnClickListener {
+                updateAllowAddParticipantsSwitch(!floatingPanelView.allowAddParticipantsSwitch.isChecked)
                 listener.onAllowAddParticipants()
             }
         }

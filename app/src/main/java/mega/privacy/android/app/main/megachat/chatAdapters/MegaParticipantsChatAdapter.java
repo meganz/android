@@ -202,8 +202,8 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 holderHeader.allowParticipantsLayout = v.findViewById(R.id.chat_group_allow_participants_layout);
                 holderHeader.allowParticipantsLayout.setOnClickListener(this);
                 holderHeader.allowParticipantsSwitch = v.findViewById(R.id.chat_group_allow_participants_properties_switch);
+                holderHeader.allowParticipantsSwitch.setOnClickListener(this);
                 holderHeader.allowParticipantsSwitch.setClickable(false);
-                holderHeader.allowParticipantsSwitch.setChecked(getChat().isOpenInvite());
                 holderHeader.dividerAllowParticipants = v.findViewById(R.id.divider_allow_participants_layout);
 
                 holderHeader.infoNumParticipantsText = v.findViewById(R.id.chat_group_contact_properties_info_participants);
@@ -649,9 +649,9 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 break;
 
             case R.id.chat_group_allow_participants_layout:
-                if (holderHeader != null) {
-                    groupChatInfoActivity.setOpenInvite();
-                }
+            case R.id.chat_group_allow_participants_properties_switch:
+                updateAllowAddParticipants(!getChat().isOpenInvite());
+                groupChatInfoActivity.setOpenInvite();
                 break;
 
             case R.id.chat_group_contact_properties_chat_link_layout: {
@@ -718,7 +718,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
      */
     public void updateAllowAddParticipants(boolean enabled) {
         ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
-        if (holderHeader != null && holderHeader.allowParticipantsSwitch.isChecked() != enabled) {
+        if (holderHeader != null) {
             holderHeader.allowParticipantsSwitch.setChecked(enabled);
         }
     }
@@ -828,6 +828,6 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     }
 
     private MegaChatRoom getChat() {
-        return groupChatInfoActivity.getChat();
+        return groupChatInfoActivity.getChatRoom();
     }
 }
