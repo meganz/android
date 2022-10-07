@@ -2586,8 +2586,6 @@ class InMeetingViewModel @Inject constructor(
                     Timber.e(exception)
                     _state.update { it.copy(error = R.string.general_text_error) }
                 }.onSuccess { result ->
-                    Timber.d("*******************+ RECIBO EL CAMBIO DE MISMO CLIENTE A $result")
-
                     _state.update {
                         it.copy(resultSetOpenInvite = result)
                     }
