@@ -1,12 +1,14 @@
 '''
 This script analyses the JUnit test report(XML format) and prints a
 test summary.
-Example output: 
-Unit Test Result: Success Rate(100.00%), Total(154), Skipped(1), Failure(0), Errors(0), Duration(10.4s)
+
+The entire output only prints the values separated with a comma, in order to easily parse each value in a table.
+The String is outputted as:
+"[Total Cases],[Skipped],[Errors],[Failure],[Duration]"
 
 Usage:
 This command must have 1 parameter of root folder of test report, for example '${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest'
-    python3 junit_repor.py ${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest
+    python3 junit_report.py ${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest
 '''
 
 from bs4 import BeautifulSoup
@@ -61,8 +63,8 @@ if total_cases == 0:
 else:
     rate = "{0:.2%}".format((total_cases - total_failures - total_errors)/total_cases)
 
-# print final results
-print("Success Rate(%s), Total(%s), Skipped(%s), Failure(%s), Errors(%s), Duration(%ss)" %
-    (rate, str(total_cases), str(total_skipped), str(total_failures), str(total_errors), '{0:.3g}'.format(total_duration)))
-
+# In order to easily parse the results in a table format, print them without any label and separate each result with a comma
+# The final results can be visualized as a String:
+# "[Total Cases],[Skipped],[Errors],[Failure],[Duration]"
+print("%s,%s,%s,%s,%s" % (str(total_cases), str(total_skipped), str(total_errors), str(total_failures), '{0:.3g}'.format(total_duration)))
 

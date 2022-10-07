@@ -34,7 +34,7 @@
 
             </com.google.android.material.appbar.AppBarLayout>
 
-            <mega.privacy.android.app.components.CustomViewPager
+            <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/explorer_tabs_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

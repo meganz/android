@@ -9,9 +9,8 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.advanced.SettingsAdvancedFragment
@@ -61,7 +60,7 @@ class SettingsAdvancedFragmentTest {
 
     @Test
     fun test_that_checkbox_is_enabled_if_online_and_root_node_exists() {
-        setInitialState(isOnline = flowOf(true), rootNodeExists = true)
+        setInitialState(isOnline = MutableStateFlow(true), rootNodeExists = true)
 
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
@@ -70,7 +69,7 @@ class SettingsAdvancedFragmentTest {
 
     @Test
     fun test_that_checkbox_is_not_enabled_if_offline() {
-        setInitialState(flowOf(value = false), true)
+        setInitialState(MutableStateFlow(value = false), true)
 
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
@@ -152,7 +151,7 @@ class SettingsAdvancedFragmentTest {
     }
 
     private fun setInitialState(
-        isOnline: Flow<Boolean> = flowOf(true),
+        isOnline: StateFlow<Boolean> = MutableStateFlow(true),
         rootNodeExists: Boolean = true
     ) {
         whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(isOnline)

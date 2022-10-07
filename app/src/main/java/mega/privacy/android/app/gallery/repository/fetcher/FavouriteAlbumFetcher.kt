@@ -15,7 +15,6 @@ import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.MediaCardType
 import mega.privacy.android.app.gallery.extension.formatDateTitle
-import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
@@ -27,7 +26,6 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -340,16 +338,15 @@ class FavouriteAlbumFetcher(
                 value,
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = { request, error ->
-                        if (error.errorCode != MegaError.API_OK) return@OptionalMegaRequestListenerInterface
-
-                        request.let {
-                            fileNodesMap[it.nodeHandle]?.apply {
-                                thumbnail = getPreviewFile(key).absoluteFile
-                                uiDirty = true
+                        if (error.errorCode == MegaError.API_OK) {
+                            request.let {
+                                fileNodesMap[it.nodeHandle]?.apply {
+                                    thumbnail = getPreviewFile(key).absoluteFile
+                                    uiDirty = true
+                                }
                             }
+                            refreshCallback.invoke()
                         }
-
-                        refreshCallback.invoke()
                     }
                 ))
 
@@ -401,28 +398,21 @@ class FavouriteAlbumFetcher(
     }
 
     suspend fun getThumbnailsFromServer() {
-        for (item in getThumbnailNodes) {
+        for ((key, value) in getThumbnailNodes) {
             megaApi.getThumbnail(
-                item.key,
-                item.value,
-                object : BaseListener(context) {
-                    override fun onRequestFinish(
-                        api: MegaApiJava,
-                        request: MegaRequest,
-                        e: MegaError,
-                    ) {
-                        if (e.errorCode != MegaError.API_OK) return
-
-                        request.let {
+                key,
+                value,
+                OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, megaError ->
+                    if (megaError.errorCode == MegaError.API_OK) {
+                        megaRequest.let {
                             fileNodesMap[it.nodeHandle]?.apply {
-                                thumbnail = getThumbnailFile(item.key)
+                                thumbnail = getThumbnailFile(key)
                                 uiDirty = true
                             }
                         }
-
                         refreshLiveData()
                     }
-                })
+                }))
 
             // Throttle the getThumbnail call, or the UI would be non-responsive
             delay(GET_THUMBNAIL_THROTTLE)

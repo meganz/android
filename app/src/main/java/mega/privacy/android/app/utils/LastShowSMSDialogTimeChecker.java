@@ -4,9 +4,8 @@ package mega.privacy.android.app.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import mega.privacy.android.app.MegaApplication;
-
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
+import mega.privacy.android.domain.entity.StorageState;
 
 public class LastShowSMSDialogTimeChecker {
 
@@ -80,7 +79,7 @@ public class LastShowSMSDialogTimeChecker {
 
     public boolean shouldShow() {
         // If account is in ODQ Paywall state avoid ask for SMS verification because request will fail.
-        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (StorageStateExtensionsKt.getStorageState() == StorageState.PayWall) {
             return false;
         }
 

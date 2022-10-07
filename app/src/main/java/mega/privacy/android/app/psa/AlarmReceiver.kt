@@ -7,41 +7,27 @@ import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.TimeUtils.SECOND
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
 
 class AlarmReceiver : BroadcastReceiver() {
     private val megaApi by lazy { MegaApplication.getInstance().megaApi }
 
     override fun onReceive(context: Context, intent: Intent) {
         wakeLock.acquire(30 * SECOND)  // The wakelock will be held for at most 30 Secs
-
-        megaApi.getPSAWithUrl(object : BaseListener(context) {
-
-            override fun onRequestFinish(
-                api: MegaApiJava,
-                request: MegaRequest,
-                e: MegaError
-            ) {
-                super.onRequestFinish(api, request, e)
-
-                // API response may arrive after stopChecking, in this case we shouldn't
-                // emit PSA anymore.
-                if (e.errorCode == MegaError.API_OK) {
-                    callback?.invoke(
-                        Psa(
-                            request.number.toInt(), request.name, request.text, request.file,
-                            request.password, request.link, request.email
-                        )
+        megaApi.getPSAWithUrl(OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
+            if (error.errorCode == MegaError.API_OK) {
+                callback?.invoke(
+                    Psa(
+                        request.number.toInt(), request.name, request.text, request.file,
+                        request.password, request.link, request.email
                     )
-                }
-
-                setAlarm(context, PsaManager.GET_PSA_INTERVAL_MS, callback)
+                )
             }
-        })
+
+            setAlarm(context, PsaManager.GET_PSA_INTERVAL_MS, callback)
+        }))
     }
 
     companion object {

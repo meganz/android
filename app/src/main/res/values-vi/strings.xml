@@ -271,7 +271,7 @@
     <!-- option to decline a contact invitation -->
     <string name="contact_decline">Từ chối</string>
     <!-- option to accept a contact invitation -->
-    <string name="contact_accept">Nhận</string>
+    <string name="contact_accept">Chấp nhận</string>
     <!-- Label for the option of the sliding panel to show the contact info -->
     <string name="contact_properties_activity">Thông tin liên lạc</string>
     <!-- Adding new relationships (contacts) using the actions. -->
@@ -710,7 +710,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">Phiên bản MEGA SDK</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">Phiên bản SDK MEGAchat</string>
+    <string name="settings_about_karere_version">Phiên bản SDK MEGA chat</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Xem mã nguồn</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -888,7 +888,7 @@
         <item quantity="other">Thư mục này đang được chia sẻ cho %1$d tên liên lạc. Có chắc muốn xóa không?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">Sai email hay/và mật khẩu. Xin thử lại.</string>
+    <string name="error_incorrect_email_or_password">Email hoặc mật khẩu không hợp lệ. Xin thử lại</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">Tài khoản bị đình chỉ do vi phạm Điều Khoản Dịch Vụ. Xin liên hệ support&#64;mega.nz để được giải quyết.</string>
     <!-- Error message when to many attempts to login. -->
@@ -920,13 +920,13 @@
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Chát</string>
     <!-- Confirmation button of the dialog to archive a chat -->
-    <string name="tab_archive_chat">Chuyển Vào Bảo Lưu</string>
+    <string name="tab_archive_chat">Bảo lưu</string>
     <!-- Initial of the word hour to show the duration of a video or audio call -->
     <string name="initial_hour">g̀</string>
     <!-- Initial of the word minute to show the duration of a video or audio call -->
-    <string name="initial_minute">ṕ</string>
+    <string name="initial_minute">ph</string>
     <!-- Initial of the word second to show the duration of a video or audio call -->
-    <string name="initial_second">ĝ</string>
+    <string name="initial_second">giây</string>
     <!-- Title shown when multiselection is enable in chat tabs -->
     <string name="selected_items">%d mục được chọn</string>
     <!-- Message to confirm if the user wants to delete a contact from a shared folder -->
@@ -1205,7 +1205,7 @@
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
     <string name="transfer_paused">Đã tạm dừng</string>
     <!-- Possible state of a transfer -->
-    <string name="transfer_queued">Đang chờ</string>
+    <string name="transfer_queued">Chờ tới lượt</string>
     <!-- Possible state of a transfer. When the transfer is finishing -->
     <string name="transfer_completing">Đang hoàn tất</string>
     <!-- Possible state of a transfer. When the transfer is retrying -->
@@ -1433,7 +1433,7 @@
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Phần thưởng lời mời</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">Tải và cài đặt MEGA cho điện thoại</string>
+    <string name="title_install_app">Cài đặt App MEGA cho Di Động</string>
     <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
     <string name="title_add_phone">Thêm số điện thoại</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
@@ -1852,7 +1852,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Bật hiển thị xem trước nội dung tóm tắt của URL</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Tăng cường trải nghiệm MEGAchat. Nội dung được gửi dưới dạng URL sẽ được hiện thị không thông qua mã hóa.</string>
+    <string name="text_enable_rich_links">Tăng cường trải nghiệm MEGA chat. Nội dung được gửi dưới dạng URL sẽ được hiện thị không thông qua mã hóa.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Xin đặt một mật khẩu mạnh hơn</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2232,7 +2232,7 @@
     <!-- Subtitle of the historic notification when an user deletes you as contact -->
     <string name="subtitle_contact_notification_deleted">[A]%s [/A][B]đã xóa tên của bạn khỏi sổ liên lạc.[/B]</string>
     <!-- Title of the historic notification when an user blocks you as contact -->
-    <string name="title_contact_notification_blocked">Tên liên lạc đã chặn</string>
+    <string name="title_contact_notification_blocked">Tên liên lạc đã bị chặn</string>
     <!-- Subtitle of the historic notification when an user blocks you as contact -->
     <string name="subtitle_contact_notification_blocked">[A]%s [/A][B]đã chặn tên bạn khỏi sổ liên lạc.[/B]</string>
     <!-- Item of the navigation title for the notification section when there is any unread -->
@@ -2787,10 +2787,6 @@
     <string name="browse_files_label">Duyệt tệp tin</string>
     <!-- Title of the File Provider activity -->
     <string name="file_provider_title">Đính kèm từ&#8230;</string>
-    <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
-    <string name="inactive_chat_title_2">Cuộc chát được tạo %s</string>
-    <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
-    <string name="inactive_chat_title">Chát tạo vào ngày %s</string>
     <!-- Title of the chat when multi-selection is activated -->
     <string name="select_message_title">Chọn tin nhắn</string>
     <!-- The label that describes that a transfer failed. -->
@@ -2810,7 +2806,7 @@
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Hết Không Gian Lưu Trữ</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
-    <string name="over_disk_quota_paywall_title">Dữ liệu của bạn đang gặp rủi ro!</string>
+    <string name="over_disk_quota_paywall_title">Dữ liệu của bạn có nguy cơ bị xóa!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
         <item quantity="other">Chúng tôi đã gửi thông báo vào địa chỉ email %1$s của quý khách vào ngày %2$s và ngày %3$s, nhưng quý khách vẫn còn %4$s tệp tin chiếm tới %5$s trong tài khoản MEGA, quý khách cần phải nâng câp lên %6$s để đáp ứng dung lượng.</item>
@@ -2924,7 +2920,7 @@
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Xóa lịch sử nội dung chát</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
-    <string name="retention_history_disabled">[A]%1$s[/A][B] đã vô hiệu tính năng tự động xóa tin nhắn đã có lâu.[/B]</string>
+    <string name="retention_history_disabled">[A]%1$s[/A][B] đã vô hiệu tính năng tự động dọn dẹp tin nhắn cũ.[/B]</string>
     <!-- Subtitle of the section to clear the chat content in the Manage chat history screen -->
     <string name="subtitle_properties_chat_clear">Xóa tất cả tin nhắn và tệp tin đã chia sẻ trong cuộc trò chuyện này. Việc này sẽ không thể hoàn tác.</string>
     <!-- Title of the history retention option -->
@@ -3127,8 +3123,6 @@
     <string name="settings_media_audio_files">Tệp tin âm thanh</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Cho phép phát trong nền</string>
-    <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Không có[/B] [A]ảnh[/A] [B]nào[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Tự động sao lưu dự phòng hình ảnh và videos của bạn lên Ổ Mây.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3399,8 +3393,6 @@
     <string name="show_activity_action">Hiện hoạt động</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">Hoạt động [B]gần đây[/B] bị ẩn</string>
-    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
-    <string name="video_quality_info">Bạn có thể giảm bớt không gian bằng cách chỉnh chất lượng video thấp hơn trong thiết đặt Đăng Tải Camêra.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Chất lượng nguyên gốc</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
@@ -3765,14 +3757,8 @@
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Lọc</string>
-    <!-- Filter option to show all photos -->
-    <string name="photos_filter_all_photos"></string>
-    <!-- Filter option to show only photos from Cloud Drive -->
-    <string name="photos_filter_cloud_drive">Lấy từ Ổ Mây</string>
     <!-- Filter option to show only photos and videos from Camera Uploads folder -->
     <string name="photos_filter_camera_uploads">Đăng tải camêra</string>
-    <!-- Filter option to show only videos from Camera Uploads -->
-    <string name="photos_filter_videos_only">Chỉ video</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
     <string name="dialog_cannot_open_file_title">Không thể mở được tệp</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
@@ -3899,4 +3885,14 @@
     <string name="dialog_account_suspended_ToS_copyright_message">Tài khoản bị đình chỉ do vi phạm bản quyền. Chúng tôi đã gửi cho bạn một email với nhiều thông tin hơn về việc này.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Tài khoản đã bị chấm dứt hoạt động do vi phạm lỗi có nêu trong Điều Khoản Dịch Vụ của MEGA; chẳng hạn như lạm dụng hệ thống, quyền hạn sử dụng của người khác hoặc chia sẻ nội dung cấm.</string>
+    <!-- Title of the Meetings tab for the chat section -->
+    <string name="chat_tab_meetings_title">Họp</string>
+    <!-- Title of the location option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_location_option">Định Vị</string>
+    <!-- Used in chat screen to indicate last message sent by me -->
+    <string name="chat_last_message_sender_me">Tôi</string>
+    <!-- Hint the screen is locked in video player page -->
+    <string name="video_player_locked_hint">Màn hình đã khóa</string>
+    <!-- Hint that tap to unlock in video player page -->
+    <string name="video_player_unlock_hint">Chạm để mở</string>
 </resources>

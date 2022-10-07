@@ -55,8 +55,8 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "6.18.1"
-    versionCode = 470
+    appVersion = "6.19"
+    versionCode = 469
 
     // Sdk and tools
     compileSdkVersion = 33
@@ -65,20 +65,22 @@ ext {
     buildToolsVerion = '31.0.0'
 
     // App dependencies
-    activityComposeVersion = '1.4.0'
-    accompanistVersion ='0.24.13-rc'
     accompanistLayoutVersion = '0.24.13-rc'
+    accompanistVersion ='0.24.13-rc'
+    activityComposeVersion = '1.4.0'
     androidxArchCoreVersion = '2.1.0'
     androidxTestExtVersion = '1.1.3'
     androidxTestVersion = '1.4.0'
     ankoVersion = '0.10.8'
-    appCompatVersion = '1.4.1'
+    appCompatVersion = '1.5.1'
+    autovalueAnnotationVersion = '1.9'
+    autovalueVersion = '1.9'
     bannerViewPagerVersion = '3.4.0'
     biometricVersion = '1.1.0'
     cardViewVersion = '1.0.0'
-    composeVersion = '1.2.0-rc03'
-    composeCompilerVersion = '1.2.0'
     coilVersion = '2.1.0'
+    composeCompilerVersion = '1.2.0'
+    composeVersion = '1.2.0-rc03'
     constraintLayoutVersion = '2.1.1'
     coroutinesVersion = "1.6.0"
     coroutineTestVersion = '1.6.0'
@@ -97,7 +99,7 @@ ext {
     junitVersion = '4.13.2'
     ktxVersion = '1.7.0'
     legacySupportVersion = 'v4:1.0.0'
-    lifecycleVersion = '2.4.1'
+    lifecycleVersion = '2.5.1'
     liveEventBus = '1.7.3'
     logbackVersion = '2.0.0'
     materialVersion = '1.3.0'

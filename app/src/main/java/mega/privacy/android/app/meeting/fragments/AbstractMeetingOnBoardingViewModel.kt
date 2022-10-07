@@ -7,8 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -19,7 +18,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AbstractMeetingOnBoardingViewModel @Inject constructor(
-    private val abstractMeetingOnBoardingRepository: AbstractMeetingOnBoardingRepository
+    private val abstractMeetingOnBoardingRepository: AbstractMeetingOnBoardingRepository,
 ) : ViewModel() {
 
     // Avatar
@@ -50,23 +49,17 @@ class AbstractMeetingOnBoardingViewModel @Inject constructor(
             abstractMeetingOnBoardingRepository.loadAvatar()?.also {
                 when {
                     it.first -> _avatarLiveData.value = it.second
-                    retry -> abstractMeetingOnBoardingRepository.createAvatar(object :
-                        BaseListener(MegaApplication.getInstance()) {
-                        override fun onRequestFinish(
-                            api: MegaApiJava,
-                            request: MegaRequest,
-                            e: MegaError
-                        ) {
+                    retry -> abstractMeetingOnBoardingRepository.createAvatar(
+                        OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
                             if (request.type == MegaRequest.TYPE_GET_ATTR_USER
                                 && request.paramType == MegaApiJava.USER_ATTR_AVATAR
-                                && e.errorCode == MegaError.API_OK
+                                && error.errorCode == MegaError.API_OK
                             ) {
                                 loadAvatar()
                             } else {
                                 showDefaultAvatar()
                             }
-                        }
-                    })
+                        }))
                     else -> {
                         showDefaultAvatar()
                     }

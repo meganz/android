@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFavouriteBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
@@ -23,7 +22,6 @@ import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteHeaderItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteItem
-import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
 import mega.privacy.android.app.utils.Constants.ITEM_VIEW_TYPE
 import java.io.File
 
@@ -40,7 +38,7 @@ class FavouritesAdapter(
     private val onItemClicked: (info: Favourite, icon: ImageView, position: Int) -> Unit,
     private val onLongClicked: (info: Favourite, icon: ImageView, position: Int) -> Boolean = { _, _, _ -> false },
     private val onThreeDotsClicked: (info: Favourite) -> Unit,
-    private val getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit
+    private val getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit,
 ) : ListAdapter<FavouriteItem, FavouritesViewHolder>(FavouritesDiffCallback) {
 
     override fun getItemViewType(position: Int): Int = getItem(position).type
@@ -54,7 +52,7 @@ class FavouritesAdapter(
                     parent,
                     false
                 )
-            }else {
+            } else {
                 SortByHeaderBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -105,7 +103,7 @@ class FavouritesAdapter(
  */
 class FavouritesViewHolder(
     private val context: Context,
-    private val binding: ViewBinding
+    private val binding: ViewBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     /**
@@ -124,44 +122,40 @@ class FavouritesViewHolder(
         onItemClicked: (info: Favourite, icon: ImageView, position: Int) -> Unit,
         onThreeDotsClicked: (info: Favourite) -> Unit,
         onLongClicked: (info: Favourite, icon: ImageView, position: Int) -> Boolean,
-        getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit
+        getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit,
     ) {
         with(binding) {
             when (this) {
                 is ItemFavouriteBinding -> {
-                    item.favourite?.let { info ->
+                    item.favourite?.let { info: Favourite ->
                         info.thumbnailPath?.let { thumbnailPath ->
-                            if (item is FavouriteListItem && isThumbnailAvailable(info)) {
-                                File(thumbnailPath).let { file ->
-                                    if (file.exists()) {
-                                        itemThumbnail.setImageURI(Uri.fromFile(file))
-                                    } else {
-                                        getThumbnail(info.handle) { thumbnail ->
-                                            thumbnail?.let { fileByGetThumbnail ->
-                                                itemThumbnail.setImageURI(
-                                                    Uri.fromFile(
-                                                        fileByGetThumbnail
-                                                    )
+                            File(thumbnailPath).let { file ->
+                                if (file.exists()) {
+                                    itemThumbnail.setImageURI(Uri.fromFile(file))
+                                } else {
+                                    getThumbnail(info.handle) { thumbnail ->
+                                        thumbnail?.let { fileByGetThumbnail ->
+                                            itemThumbnail.setImageURI(
+                                                Uri.fromFile(
+                                                    fileByGetThumbnail
                                                 )
-                                            }
+                                            )
                                         }
-                                        itemThumbnail.setImageResource(info.icon)
                                     }
+                                    itemThumbnail.setImageResource(info.icon)
                                 }
-                            } else {
-                                itemThumbnail.setImageResource(info.icon)
                             }
                         } ?: itemThumbnail.setImageResource(info.icon)
                         itemFilename.text = info.name
                         itemImgLabel.setImageDrawable(
-                                ResourcesCompat.getDrawable(
-                                        context.resources,
-                                        R.drawable.ic_circle_label,
-                                        null
-                                )
-                                        ?.apply {
-                                            setTint(
-                                                    ResourcesCompat.getColor(
+                            ResourcesCompat.getDrawable(
+                                context.resources,
+                                R.drawable.ic_circle_label,
+                                null
+                            )
+                                ?.apply {
+                                    setTint(
+                                        ResourcesCompat.getColor(
                                             context.resources,
                                             info.labelColour,
                                             null
@@ -200,20 +194,11 @@ class FavouritesViewHolder(
                     enterMediaDiscovery.isVisible = false
                     this.sortByHeaderViewModel = sortByHeaderViewModel
                 }
-                else -> { }
+                else -> {}
             }
         }
     }
 
-    /**
-     * Check whether needs to get thumbnail
-     * @param favourite favourite item
-     * @return true needs to get thumbnail
-     */
-    private fun isThumbnailAvailable(favourite: Favourite) =
-        !favourite.isFolder && MimeTypeList.typeForName(favourite.name).run {
-            isAudio || isVideo || isImage || isPdf || isMp4Video || isGIF
-        }
 }
 
 /**

@@ -1,8 +1,10 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.content.Context
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.google.android.exoplayer2.Player
 import mega.privacy.android.app.R
@@ -22,6 +24,10 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
     private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
     private val trackName = binding.root.findViewById<TextView>(R.id.track_name)
     private val repeatToggleButton = binding.root.findViewById<ImageButton>(R.id.repeat_toggle)
+    private val lockButton = binding.root.findViewById<ImageButton>(R.id.image_button_lock)
+    private val unlockButton = binding.root.findViewById<ImageButton>(R.id.image_button_unlock)
+    private val playerLayout = binding.root.findViewById<ConstraintLayout>(R.id.layout_player)
+    private val unlockLayout = binding.root.findViewById<ConstraintLayout>(R.id.layout_unlock)
 
     /**
      * Setup playlist button.
@@ -46,22 +52,44 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
      * @param clickedCallback the callback of repeat toggle button clicked
      */
     fun setupRepeatToggleButton(
+        context: Context,
         defaultRepeatToggleMode: RepeatToggleMode,
         clickedCallback: (repeatToggleButton: ImageButton) -> Unit
     ) {
         with(repeatToggleButton) {
             isVisible = true
-            setImageResource(
-                if (defaultRepeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
-                    R.drawable.exo_controls_repeat_off
-                } else {
-                    R.drawable.exo_controls_repeat_all
-                }
-            )
+            setColorFilter(if (defaultRepeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
+                context.getColor(R.color.white)
+            } else {
+                context.getColor(R.color.teal_300)
+            })
             setOnClickListener {
                 clickedCallback(this)
             }
         }
+    }
+
+    /**
+     * Setup the UI based on the lock feature
+     *
+     * @param defaultLockStatus the default lock status
+     * @param lockCallback the callback regarding lock feature
+     */
+    fun setupLockUI(defaultLockStatus: Boolean, lockCallback: (isLock: Boolean) -> Unit) {
+        playerLayout.isVisible = !defaultLockStatus
+        unlockLayout.isVisible = defaultLockStatus
+        lockButton.setOnClickListener {
+            updateUI(true, lockCallback)
+        }
+        unlockButton.setOnClickListener {
+            updateUI(false, lockCallback)
+        }
+    }
+
+    private fun updateUI(isLock: Boolean, lockCallback: (isLock: Boolean) -> Unit) {
+        playerLayout.isVisible = !isLock
+        unlockLayout.isVisible = isLock
+        lockCallback(isLock)
     }
 
     /**

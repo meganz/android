@@ -299,7 +299,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
 
                 holderHeader.infoTitleChatText.setText(getTitleChat(getChat()));
 
-                holderHeader.endCallForAllLayout.setVisibility(groupChatInfoActivity.endCallForAllShouldBeVisible()? View.VISIBLE : View.GONE);
+                holderHeader.endCallForAllLayout.setVisibility(groupChatInfoActivity.getEndCallForAllShouldBeVisible()? View.VISIBLE : View.GONE);
 
                 if (getChat().isArchived()) {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
@@ -335,7 +335,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                         holderHeader.editImageView.setVisibility(View.VISIBLE);
                         holderHeader.dividerClearLayout.setVisibility(View.VISIBLE);
                         holderHeader.manageChatLayout.setVisibility(View.VISIBLE);
-                        holderHeader.dividerLeaveLayout.setVisibility(groupChatInfoActivity.endCallForAllShouldBeVisible()? View.VISIBLE : View.GONE);
+                        holderHeader.dividerLeaveLayout.setVisibility(groupChatInfoActivity.getEndCallForAllShouldBeVisible()? View.VISIBLE : View.GONE);
                         holderHeader.privateLayout.setVisibility(View.VISIBLE);
                         holderHeader.dividerEndCallForAllLayout.setVisibility(View.VISIBLE);
                         holderHeader.privateSeparator.setVisibility(View.VISIBLE);

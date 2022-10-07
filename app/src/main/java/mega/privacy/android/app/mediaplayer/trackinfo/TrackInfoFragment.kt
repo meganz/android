@@ -2,7 +2,6 @@ package mega.privacy.android.app.mediaplayer.trackinfo
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,15 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.databinding.FragmentAudioTrackInfoBinding
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.autoCleared
-import nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL
+import mega.privacy.android.domain.entity.StorageState
 
 @AndroidEntryPoint
 class TrackInfoFragment : Fragment() {
@@ -30,7 +28,7 @@ class TrackInfoFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentAudioTrackInfoBinding.inflate(inflater, container, false)
         return binding.root
@@ -90,7 +88,7 @@ class TrackInfoFragment : Fragment() {
         binding.availableOfflineSwitch.setOnClickListener {
             val isChecked = binding.availableOfflineSwitch.isChecked
 
-            if (MegaApplication.getInstance().storageState == STORAGE_STATE_PAYWALL) {
+            if (viewModel.getStorageState() == StorageState.PayWall) {
                 showOverDiskQuotaPaywallWarning()
                 binding.availableOfflineSwitch.isChecked = !isChecked
                 return@setOnClickListener

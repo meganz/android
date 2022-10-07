@@ -107,7 +107,7 @@ class StartCallUseCase @Inject constructor(
                 return@create
             }
 
-            MegaApplication.setIsWaitingForCall(false)
+            MegaApplication.isWaitingForCall = false
 
             var audio = enableAudio
             if (audio) {

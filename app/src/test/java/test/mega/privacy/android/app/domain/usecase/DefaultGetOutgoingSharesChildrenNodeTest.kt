@@ -2,16 +2,17 @@ package test.mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
+import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaShare
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -29,12 +30,12 @@ class DefaultGetOutgoingSharesChildrenNodeTest {
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getChildrenNode = mock<GetChildrenNode>()
     private val getCloudSortOrder = mock<GetCloudSortOrder> {
-        onBlocking { invoke() }.thenReturn(0)
+        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_NONE)
     }
     private val getOthersSortOrder = mock<GetOthersSortOrder> {
-        onBlocking { invoke() }.thenReturn(1)
+        onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
-    private val filesRepository = mock<FilesRepository>()
+    private val fileRepository = mock<FileRepository>()
 
     @Before
     fun setUp() {
@@ -43,49 +44,49 @@ class DefaultGetOutgoingSharesChildrenNodeTest {
             getChildrenNode,
             getCloudSortOrder,
             getOthersSortOrder,
-            filesRepository,
+            fileRepository,
         )
     }
 
     @Test
     fun `test that invoke with -1L execute filesRepository getOutgoingSharesNode function with others sort order`() =
         runTest {
-            whenever(filesRepository.getOutgoingSharesNode(any())).thenReturn(emptyList())
+            whenever(fileRepository.getOutgoingSharesNode(any())).thenReturn(emptyList())
             underTest(-1L)
 
-            verify(filesRepository).getOutgoingSharesNode(getOthersSortOrder())
+            verify(fileRepository).getOutgoingSharesNode(getOthersSortOrder())
         }
 
     @Test
     fun `test that invoke with INVALID_HANDLE executes filesRepository getOutgoingSharesNode function with others sort order`() =
         runTest {
-            whenever(filesRepository.getOutgoingSharesNode(any())).thenReturn(emptyList())
+            whenever(fileRepository.getOutgoingSharesNode(any())).thenReturn(emptyList())
 
             underTest(MegaApiJava.INVALID_HANDLE)
 
-            verify(filesRepository).getOutgoingSharesNode(getOthersSortOrder())
+            verify(fileRepository).getOutgoingSharesNode(getOthersSortOrder())
         }
 
     @Test
     fun `test that share nodes retrieved from file repository getOutgoingShareNode without user is filtered out from the list`() =
         runTest {
             val nodeHandle1 = 123456789L
-            val megaShare1 = mock<MegaShare> {
+            val megaShare1 = mock<ShareData> {
                 on { nodeHandle }.thenReturn(nodeHandle1)
                 on { user }.thenReturn("user1")
             }
             val nodeHandle2 = 987654321L
-            val megaShare2 = mock<MegaShare> {
+            val megaShare2 = mock<ShareData> {
                 on { nodeHandle }.thenReturn(nodeHandle2)
                 on { user }.thenReturn(null)
             }
             val nodeHandle3 = 111111111L
-            val megaShare3 = mock<MegaShare> {
+            val megaShare3 = mock<ShareData> {
                 on { nodeHandle }.thenReturn(nodeHandle3)
                 on { user }.thenReturn("user3")
             }
             val list = listOf(megaShare1, megaShare2, megaShare3)
-            whenever(filesRepository.getOutgoingSharesNode(any())).thenReturn(list)
+            whenever(fileRepository.getOutgoingSharesNode(any())).thenReturn(list)
 
             underTest(-1L)
 
@@ -98,22 +99,22 @@ class DefaultGetOutgoingSharesChildrenNodeTest {
     fun `test that share nodes retrieved from file repository getOutgoingShareNode all have distinct handle`() =
         runTest {
             val nodeHandle1 = 123456789L
-            val megaShare1 = mock<MegaShare> {
+            val megaShare1 = mock<ShareData> {
                 on { nodeHandle }.thenReturn(nodeHandle1)
                 on { user }.thenReturn("user1")
             }
             val nodeHandle2 = 123456789L
-            val megaShare2 = mock<MegaShare> {
+            val megaShare2 = mock<ShareData> {
                 on { nodeHandle }.thenReturn(nodeHandle2)
                 on { user }.thenReturn("user1")
             }
             val nodeHandle3 = 111111111L
-            val megaShare3 = mock<MegaShare> {
+            val megaShare3 = mock<ShareData> {
                 on { nodeHandle }.thenReturn(nodeHandle3)
                 on { user }.thenReturn("user3")
             }
             val list = listOf(megaShare1, megaShare2, megaShare3)
-            whenever(filesRepository.getOutgoingSharesNode(any())).thenReturn(list)
+            whenever(fileRepository.getOutgoingSharesNode(any())).thenReturn(list)
 
             underTest(-1L)
 

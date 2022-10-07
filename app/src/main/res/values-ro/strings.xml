@@ -105,7 +105,7 @@
     <!-- error message when the subscription has not been canceled successfully -->
     <string name="cancel_subscription_error">Nu am putut să îți anulăm abonamentul. Te rugăm să contactezi support&#64;mega.nz pentru asistență.</string>
     <!-- Menu item to kill all opened sessions -->
-    <string name="action_kill_all_sessions">Închide alte sesiuni</string>
+    <string name="action_kill_all_sessions">Închide celelalte sesiuni</string>
     <!-- Message after kill all opened sessions -->
     <string name="success_kill_all_sessions">Sesiunile rămase au fost închise</string>
     <!-- Message after kill all opened sessions -->
@@ -659,7 +659,7 @@
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
     <string name="settings_secondary_upload_off">Dezactivează încărcări media secundare</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
-    <string name="settings_empty_folder">Alege folderul</string>
+    <string name="settings_empty_folder">Alege un folder</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string-array name="settings_camera_upload_how_to_entries">
         <item>Wi-Fi sau plan de date</item>
@@ -734,7 +734,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">Versiunea MEGA SDK</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">Versiunea SDK MEGAchat</string>
+    <string name="settings_about_karere_version">Versiunea SDK MEGA chat</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Vezi codul sursă</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -842,7 +842,7 @@
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Te rugăm să introduci cheia ta de recuperare mai jos</string>
     <!-- Text of the alert when the pass has been correctly changed -->
-    <string name="pass_changed_alert">Parola ta a fost modificată.</string>
+    <string name="pass_changed_alert">Parola ți-a fost modificată.</string>
     <!-- Title of the dialog to park an account -->
     <string name="park_account_dialog_title">Parchează contul</string>
     <!-- Button to park an account -->
@@ -914,7 +914,7 @@
         <item quantity="other">Folderul este partajat cu %1$d de contacte. Elimini toate partajările?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">E-mail și/sau parolă nevalide. Te rugăm să încerci din nou.</string>
+    <string name="error_incorrect_email_or_password">E-mail sau parolă nevalide. Te rugăm să încerci din nou.</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">Contul tău a fost suspendat din cauza încălcărilor Termenilor de utilizare a serviciului. Te rugăm să contactezi support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
@@ -1944,7 +1944,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Activează previzualizările îmbogățite ale URL-urilor</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Îmbunătățește experiența MEGAchat. Conținutul URL-urilor va fi preluat fără criptare capăt-la-capăt.</string>
+    <string name="text_enable_rich_links">Îmbunătățește experiența MEGA chat. Conținutul URL-urilor va fi preluat fără criptare capăt-la-capăt.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Te rugăm să introduci o parolă mai puternică</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2216,7 +2216,7 @@
     <!-- Title of confirmation dialog of sending invitation to a contact -->
     <string name="title_confirm_send_invitation">Inviți pe %1$s?</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
-    <string name="title_share_folder_explorer">Alege folderul</string>
+    <string name="title_share_folder_explorer">Alege un folder</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
     <string name="login_warning_abort_transfers">Toate transferurile vor fi anulate, vrei să te autentifici?</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -2838,7 +2838,7 @@
     <!-- Alert shown to an admin user of a business account in My Account section -->
     <string name="business_management_alert">Gestionarea utilizatorilor este disponibilă doar de pe un browser web de desktop.</string>
     <!-- Title of usage storage details section in My Account -->
-    <string name="usage_storage_details_label">Detalierea utilizării spațiului de stocare</string>
+    <string name="usage_storage_details_label">Defalcarea utilizării spațiului de stocare</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">Transfer</string>
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
@@ -2935,10 +2935,6 @@
     <string name="browse_files_label">Răsfoiește fișiere</string>
     <!-- Title of the File Provider activity -->
     <string name="file_provider_title">Atașează de pe&#8230;</string>
-    <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
-    <string name="inactive_chat_title_2">Chat creat %s</string>
-    <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
-    <string name="inactive_chat_title">Chat creat în %s</string>
     <!-- Title of the chat when multi-selection is activated -->
     <string name="select_message_title">Selectează mesajele</string>
     <!-- The label that describes that a transfer failed. -->
@@ -3293,8 +3289,6 @@
     <string name="settings_media_audio_files">Fișiere audio</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Redare în fundal</string>
-    <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Nicio[/B] [A]fotografie[/A] [B]găsită[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Fă backup automat fotografiilor și videoclipurilor în unitatea cloud.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3595,8 +3589,6 @@
     <string name="show_activity_action">Afișează activitatea</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">Activitatea pentru [B]Recente[/B] este ascunsă</string>
-    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
-    <string name="video_quality_info">You can save space by decreasing the video quality in Camera Uploads settings.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Calitate originală</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
@@ -3965,14 +3957,8 @@
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filtrează</string>
-    <!-- Filter option to show all photos -->
-    <string name="photos_filter_all_photos"></string>
-    <!-- Filter option to show only photos from Cloud Drive -->
-    <string name="photos_filter_cloud_drive">Din unitatea cloud</string>
     <!-- Filter option to show only photos and videos from Camera Uploads folder -->
     <string name="photos_filter_camera_uploads"></string>
-    <!-- Filter option to show only videos from Camera Uploads -->
-    <string name="photos_filter_videos_only">Numai videoclipuri</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
     <string name="dialog_cannot_open_file_title">Nu se poate deschide fișierul</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
@@ -4107,4 +4093,14 @@
     <string name="dialog_account_suspended_ToS_copyright_message">Account suspended due to copyright violations. We sent you an email with more information about this.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Account terminated due to a breach of MEGA’s Terms of Service, such as abuse of others’ rights, sharing and importing illegal data, or system abuse.</string>
+    <!-- Title of the Meetings tab for the chat section -->
+    <string name="chat_tab_meetings_title">Întâlniri</string>
+    <!-- Title of the location option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_location_option">Locație</string>
+    <!-- Used in chat screen to indicate last message sent by me -->
+    <string name="chat_last_message_sender_me">Eu</string>
+    <!-- Hint the screen is locked in video player page -->
+    <string name="video_player_locked_hint">Screen is locked</string>
+    <!-- Hint that tap to unlock in video player page -->
+    <string name="video_player_unlock_hint">Tap to unlock</string>
 </resources>

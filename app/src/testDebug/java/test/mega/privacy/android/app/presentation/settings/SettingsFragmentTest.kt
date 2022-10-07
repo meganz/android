@@ -35,6 +35,7 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.presentation.settings.SettingsFragment
 import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueFragment
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.user.UserId
 import org.hamcrest.Matchers
@@ -115,7 +116,7 @@ class SettingsFragmentTest {
             email = "refreshEmail",
             isBusinessAccount = false,
             isMasterBusinessAccount = false,
-            accountTypeIdentifier = Constants.FREE,
+            accountTypeIdentifier = AccountType.FREE,
             accountTypeString = "free",
         )
 
@@ -193,7 +194,7 @@ class SettingsFragmentTest {
     @Test
     fun test_that_deactivated_delete_has_50_percent_alpha() {
         whenever(TestSettingsModule.canDeleteAccount(TEST_USER_ACCOUNT)).thenReturn(true)
-        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(flowOf(false))
+        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(MutableStateFlow(false))
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
@@ -232,7 +233,7 @@ class SettingsFragmentTest {
     fun test_that_correct_fields_are_disable_when_offline() {
         whenever(TestSettingsModule.canDeleteAccount(TEST_USER_ACCOUNT)).thenReturn(true)
         whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
-        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(flowOf(false))
+        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(MutableStateFlow(false))
         launchFragmentInHiltContainer<SettingsFragment>()
 
 

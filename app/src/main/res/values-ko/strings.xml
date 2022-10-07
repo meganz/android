@@ -710,7 +710,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA SDK 버전</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGAchat SDK 버전</string>
+    <string name="settings_about_karere_version">MEGA chat SDK 버전</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">소스 코드 보기</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -888,7 +888,7 @@
         <item quantity="other">폴더가 %1$d개의 연락처와 공유되어 있습니다. 모든 공유를 제거할까요?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">잘못된 이메일 또는 암호. 다시 시도하세요.</string>
+    <string name="error_incorrect_email_or_password">잘못된 이메일 또는 암호입니다. 다시 시도하세요.</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">당신의 계정은 이용 약관 위반으로 인해 정지되어 있습니다. support&#64;mega.nz로 연락주세요.</string>
     <!-- Error message when to many attempts to login. -->
@@ -1852,7 +1852,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">고급 URL 미리 보기 활성화</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">MEGAchat 경험을 향상하세요. URL 컨텐츠가 종단간 암호화 없이 수신됩니다.</string>
+    <string name="text_enable_rich_links">MEGA chat 경험을 향상하세요. URL 컨텐츠가 종단간 암호화 없이 수신됩니다.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">더 강력한 암호를 입력하세요</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2787,10 +2787,6 @@
     <string name="browse_files_label">파일 탐색</string>
     <!-- Title of the File Provider activity -->
     <string name="file_provider_title">다음에서 첨부&#8230;</string>
-    <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
-    <string name="inactive_chat_title_2">%s 생성된 대화</string>
-    <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
-    <string name="inactive_chat_title">%s에 생성된 대화</string>
     <!-- Title of the chat when multi-selection is activated -->
     <string name="select_message_title">메시지 선택</string>
     <!-- The label that describes that a transfer failed. -->
@@ -3127,8 +3123,6 @@
     <string name="settings_media_audio_files">오디오 파일</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">백그라운드에서 재생 중</string>
-    <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]발견된[/B] [A]사진[/A] [B]없음[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">클라우드 드라이브에 자동으로 사진과 동영상을 백업하세요.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3399,8 +3393,6 @@
     <string name="show_activity_action">활동 보기</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]최근[/B] 활동 숨겨짐</string>
-    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
-    <string name="video_quality_info">카메라 업로드 설정에서 동영상 품질을 낮춰서 공간을 절약할 수 있습니다.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">원본 품질</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
@@ -3765,14 +3757,8 @@
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">필터</string>
-    <!-- Filter option to show all photos -->
-    <string name="photos_filter_all_photos">All photos</string>
-    <!-- Filter option to show only photos from Cloud Drive -->
-    <string name="photos_filter_cloud_drive">From Cloud Drive</string>
     <!-- Filter option to show only photos and videos from Camera Uploads folder -->
     <string name="photos_filter_camera_uploads">Camera uploads</string>
-    <!-- Filter option to show only videos from Camera Uploads -->
-    <string name="photos_filter_videos_only">Videos only</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
     <string name="dialog_cannot_open_file_title">파일을 열 수 없습니다</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
@@ -3899,4 +3885,14 @@
     <string name="dialog_account_suspended_ToS_copyright_message">저작권 침해로 계정이 정지되었습니다. 이것에 대한 자세한 정보를 이메일로 보내드렸습니다.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">타인의 권리 침해, 불법 데이터의 공유 및 내보내기, 시스템 오용 등의 MEGA 이용 약관 위반으로 계정이 제거되었습니다.</string>
+    <!-- Title of the Meetings tab for the chat section -->
+    <string name="chat_tab_meetings_title">회의</string>
+    <!-- Title of the location option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_location_option">위치</string>
+    <!-- Used in chat screen to indicate last message sent by me -->
+    <string name="chat_last_message_sender_me">나</string>
+    <!-- Hint the screen is locked in video player page -->
+    <string name="video_player_locked_hint">화면이 잠겼습니다</string>
+    <!-- Hint that tap to unlock in video player page -->
+    <string name="video_player_unlock_hint">잠금 해제하려면 탭하세요</string>
 </resources>

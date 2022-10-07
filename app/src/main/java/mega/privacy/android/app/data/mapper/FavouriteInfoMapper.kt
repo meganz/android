@@ -8,21 +8,28 @@ import nz.mega.sdk.MegaNode
 /**
  * The mapper class for converting the data entity to FavouriteInfo
  */
-typealias FavouriteInfoMapper = (
+typealias FavouriteInfoMapper = @JvmSuppressWildcards suspend (
     @JvmSuppressWildcards MegaNode,
-    @JvmSuppressWildcards String?,
-    @JvmSuppressWildcards Boolean,
-    @JvmSuppressWildcards Int,
-    @JvmSuppressWildcards Int,
+    @JvmSuppressWildcards MapThumbnail,
+    @JvmSuppressWildcards MapHasVersion,
+    @JvmSuppressWildcards MapNumberOfChildFolders,
+    @JvmSuppressWildcards MapNumberOfChildFiles,
     @JvmSuppressWildcards FileTypeInfoMapper,
 ) -> @JvmSuppressWildcards FavouriteInfo
 
-internal fun toFavouriteInfo(
+internal typealias MapThumbnail = suspend (MegaNode) -> String?
+internal typealias MapHasVersion = suspend (MegaNode) -> Boolean
+internal typealias MapNumberOfChildFolders = suspend (MegaNode) -> Int
+internal typealias MapNumberOfChildFiles = suspend (MegaNode) -> Int
+internal typealias MapPendingShare = suspend (MegaNode) -> Boolean
+internal typealias MapInRubbish = suspend (MegaNode) -> Boolean
+
+internal suspend fun toFavouriteInfo(
     megaNode: MegaNode,
-    thumbnailPath: String?,
-    hasVersion: Boolean,
-    numberOfChildFolders: Int,
-    numberOfChildFiles: Int,
+    thumbnailPath: MapThumbnail,
+    hasVersion: MapHasVersion,
+    numberOfChildFolders: MapNumberOfChildFolders,
+    numberOfChildFiles: MapNumberOfChildFiles,
     fileTypeInfoMapper: FileTypeInfoMapper,
 ) = if (megaNode.isFolder) {
     FavouriteFolder(
@@ -31,10 +38,9 @@ internal fun toFavouriteInfo(
         label = megaNode.label,
         parentId = megaNode.parentHandle,
         base64Id = megaNode.base64Handle,
-        hasVersion = hasVersion,
-        numChildFolders = numberOfChildFolders,
-        numChildFiles = numberOfChildFiles,
-        thumbnailPath = thumbnailPath,
+        hasVersion = hasVersion(megaNode),
+        numChildFolders = numberOfChildFolders(megaNode),
+        numChildFiles = numberOfChildFiles(megaNode),
         isFavourite = megaNode.isFavourite,
         isExported = megaNode.isExported,
         isTakenDown = megaNode.isTakenDown,
@@ -48,8 +54,8 @@ internal fun toFavouriteInfo(
         parentId = megaNode.parentHandle,
         base64Id = megaNode.base64Handle,
         modificationTime = megaNode.modificationTime,
-        hasVersion = hasVersion,
-        thumbnailPath = thumbnailPath,
+        hasVersion = hasVersion(megaNode),
+        thumbnailPath = thumbnailPath(megaNode),
         type = fileTypeInfoMapper(megaNode),
         isFavourite = megaNode.isFavourite,
         isExported = megaNode.isExported,

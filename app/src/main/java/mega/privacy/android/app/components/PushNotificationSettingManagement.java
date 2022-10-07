@@ -1,33 +1,49 @@
 package mega.privacy.android.app.components;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
+import static mega.privacy.android.app.utils.ChatUtil.muteChat;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_1_HOUR;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_24_HOURS;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_30_MINUTES;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_6_HOURS;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
+import static mega.privacy.android.app.utils.TimeUtils.getCalendarSpecificTime;
+
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaPushNotificationSettings;
-import mega.privacy.android.app.MegaApplication;
-import nz.mega.sdk.MegaPushNotificationSettingsAndroid;
-
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.TimeUtils.*;
-
-import com.jeremyliao.liveeventbus.LiveEventBus;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import mega.privacy.android.app.di.MegaApi;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaPushNotificationSettings;
+import nz.mega.sdk.MegaPushNotificationSettingsAndroid;
 
 @Singleton
 public class PushNotificationSettingManagement {
 
     private MegaPushNotificationSettings push;
+    private final MegaApiAndroid megaApi;
+    private final Application application;
+    private final MegaChatApiAndroid megaChatApi;
 
     @Inject
-    public PushNotificationSettingManagement() {
+    public PushNotificationSettingManagement(@MegaApi MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi, Application application) {
+        this.megaApi = megaApi;
+        this.application = application;
+        this.megaChatApi = megaChatApi;
         push = getPushNotificationSetting();
     }
 
@@ -47,10 +63,8 @@ public class PushNotificationSettingManagement {
     /**
      * Method for getting MegaPushNotificationSettings from megaApi.
      */
-    public void updateMegaPushNotificationSetting(){
-        if (MegaApplication.getInstance().getMegaApi() != null) {
-            MegaApplication.getInstance().getMegaApi().getPushNotificationSettings(null);
-        }
+    public void updateMegaPushNotificationSetting() {
+        megaApi.getPushNotificationSettings(null);
     }
 
     /**
@@ -60,7 +74,7 @@ public class PushNotificationSettingManagement {
      */
     public void sendPushNotificationSettings(MegaPushNotificationSettings receivedPush) {
         push = receivedPush != null ? MegaPushNotificationSettingsAndroid.copy(receivedPush) : MegaPushNotificationSettings.createInstance();
-        MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
+        application.sendBroadcast(new Intent(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
         LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).post(null);
     }
 
@@ -73,7 +87,7 @@ public class PushNotificationSettingManagement {
      */
     public void controlMuteNotificationsOfAChat(Context context, String option, long chatId) {
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
-        MegaChatListItem chat = MegaApplication.getInstance().getMegaChatApi().getChatListItem(chatId);
+        MegaChatListItem chat = megaChatApi.getChatListItem(chatId);
         if (chat != null) {
             chats.add(chat);
             controlMuteNotifications(context, option, chats);
@@ -85,7 +99,7 @@ public class PushNotificationSettingManagement {
      *
      * @param context Context of Activity.
      * @param option  Muting option selected
-     * @param chats  List of Chats.
+     * @param chats   List of Chats.
      */
     public void controlMuteNotifications(Context context, String option, ArrayList<MegaChatListItem> chats) {
         switch (option) {
@@ -115,7 +129,7 @@ public class PushNotificationSettingManagement {
 
             case NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING:
             case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING:
-                long timestamp = getCalendarSpecificTime(option).getTimeInMillis()/1000;
+                long timestamp = getCalendarSpecificTime(option).getTimeInMillis() / 1000;
                 if (chats == null) {
                     push.setGlobalChatsDnd(timestamp);
                 } else {
@@ -145,7 +159,7 @@ public class PushNotificationSettingManagement {
                         break;
                 }
 
-                long time = newCalendar.getTimeInMillis()/1000;
+                long time = newCalendar.getTimeInMillis() / 1000;
                 if (chats == null) {
                     push.setGlobalChatsDnd(time);
                 } else {
@@ -157,7 +171,7 @@ public class PushNotificationSettingManagement {
                 }
         }
 
-        MegaApplication.getInstance().getMegaApi().setPushNotificationSettings(push, null);
+        megaApi.setPushNotificationSettings(push, null);
         muteChat(context, option);
     }
 }

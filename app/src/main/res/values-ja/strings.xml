@@ -710,7 +710,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA SDKバージョン</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGAchat SDKバージョン</string>
+    <string name="settings_about_karere_version">MEGA chat SDKバージョン</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">ソースコードを表示</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -888,7 +888,7 @@
         <item quantity="other">そのフォルダは%1$d件の連絡先と共有されています。共有をすべて削除しますか？</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">メールアドレスおよび/またはパスワードが無効です。もう一度やり直してください。</string>
+    <string name="error_incorrect_email_or_password">メールアドレスかパスワードが無効です。もう一度お試しください。</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">あなたのアカウントはご利用規約の違反により凍結されました。support&#64;mega.co.nzにお問い合わせください</string>
     <!-- Error message when to many attempts to login. -->
@@ -1852,7 +1852,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">リッチURLプレビューを有効にする</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">MEGAchat体験を強化します。URLコンテンツがエンドツーエンドの暗号化なしで取得されます。</string>
+    <string name="text_enable_rich_links">MEGA chat体験を強化します。URLコンテンツがエンドツーエンドの暗号化なしで取得されます。</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">より強力なパスワードを入力してください</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2787,10 +2787,6 @@
     <string name="browse_files_label">ファイルを閲覧</string>
     <!-- Title of the File Provider activity -->
     <string name="file_provider_title">以下から添付&#8230;</string>
-    <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
-    <string name="inactive_chat_title_2">チャットが作成されたのは%s</string>
-    <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
-    <string name="inactive_chat_title">%sに作成されたチャット</string>
     <!-- Title of the chat when multi-selection is activated -->
     <string name="select_message_title">メッセージを選択</string>
     <!-- The label that describes that a transfer failed. -->
@@ -3127,8 +3123,6 @@
     <string name="settings_media_audio_files">音声ファイル</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">バックグラウンドで再生</string>
-    <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B][/B][A]写真[/A][B]が見つかりません[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">あなたの写真や動画をあなたのクラウドドライブに自動的にバックアップします。</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3399,8 +3393,6 @@
     <string name="show_activity_action">アクティビティを表示</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]最近[/B]のアクティビティは非表示です</string>
-    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
-    <string name="video_quality_info">カメラアップロードの設定で動画の品質を下げることで、容量を節約することができます。</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">元の品質</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
@@ -3765,14 +3757,8 @@
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">絞り込み</string>
-    <!-- Filter option to show all photos -->
-    <string name="photos_filter_all_photos"></string>
-    <!-- Filter option to show only photos from Cloud Drive -->
-    <string name="photos_filter_cloud_drive">クラウドドライブから</string>
     <!-- Filter option to show only photos and videos from Camera Uploads folder -->
     <string name="photos_filter_camera_uploads">カメラアップロード</string>
-    <!-- Filter option to show only videos from Camera Uploads -->
-    <string name="photos_filter_videos_only">動画のみ</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
     <string name="dialog_cannot_open_file_title">ファイルを開けません</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
@@ -3899,4 +3885,14 @@
     <string name="dialog_account_suspended_ToS_copyright_message">著作権侵害によりアカウントが停止されました。これに関する詳細情報を記載したメールをお送りしました。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">アカウントは、他人の権利の乱用、違法データの共有やインポート、システムの乱用など、MEGAのご利用規約に違反したために終了しました。</string>
+    <!-- Title of the Meetings tab for the chat section -->
+    <string name="chat_tab_meetings_title">ミーティング</string>
+    <!-- Title of the location option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_location_option">場所</string>
+    <!-- Used in chat screen to indicate last message sent by me -->
+    <string name="chat_last_message_sender_me">私</string>
+    <!-- Hint the screen is locked in video player page -->
+    <string name="video_player_locked_hint">画面がロックされています</string>
+    <!-- Hint that tap to unlock in video player page -->
+    <string name="video_player_unlock_hint">タップするとロックが解除されます</string>
 </resources>

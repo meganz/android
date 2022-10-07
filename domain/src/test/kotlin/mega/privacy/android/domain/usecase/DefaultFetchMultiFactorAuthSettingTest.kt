@@ -51,7 +51,7 @@ class DefaultFetchMultiFactorAuthSettingTest {
     @Test
     fun `test that subsequent changes are returned when an exception from the api is thrown`() =
         runTest {
-            whenever(accountRepository.isMultiFactorAuthEnabled()).thenThrow(MegaException(null,
+            whenever(accountRepository.isMultiFactorAuthEnabled()).thenThrow(MegaException(-1,
                 null))
             whenever(accountRepository.monitorMultiFactorAuthChanges()).thenReturn(flowOf(true))
 
