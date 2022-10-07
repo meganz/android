@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.FavouriteFolder
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -104,6 +105,7 @@ class FavouritesViewModelTest {
         )
         val list = listOf(favourite)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(sortOrderIntMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(MegaApiJava.ORDER_DEFAULT_ASC)
         whenever(getAllFavorites()).thenReturn(
             flowOf(list)
         )
