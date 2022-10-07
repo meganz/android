@@ -5,9 +5,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.app.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderMapper
-import mega.privacy.android.app.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiJava
 import org.junit.Before

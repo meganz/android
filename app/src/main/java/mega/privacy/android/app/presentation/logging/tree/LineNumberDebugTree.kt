@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.logging.tree
 
 import android.util.Log
-import mega.privacy.android.app.data.gateway.TimberChatLogger
-import mega.privacy.android.app.data.gateway.TimberMegaLogger
+import mega.privacy.android.data.gateway.TimberChatLogger
+import mega.privacy.android.data.gateway.TimberMegaLogger
 import timber.log.Timber
 
 /**

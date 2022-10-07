@@ -3,11 +3,11 @@ package mega.privacy.android.app.data.facade
 import android.content.Context
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File

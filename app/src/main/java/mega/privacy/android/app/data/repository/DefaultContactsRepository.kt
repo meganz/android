@@ -13,7 +13,6 @@ import mega.privacy.android.app.data.extensions.findItemByHandle
 import mega.privacy.android.app.data.extensions.getDecodedAliases
 import mega.privacy.android.app.data.extensions.replaceIfExists
 import mega.privacy.android.app.data.extensions.sortList
-import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.mapper.ContactDataMapper
@@ -28,6 +27,7 @@ import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest

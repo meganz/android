@@ -6,10 +6,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.data.gateway.AppInfoGateway
-import mega.privacy.android.app.data.gateway.DeviceGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.gateway.preferences.AppInfoPreferencesGateway
+import mega.privacy.android.data.gateway.AppInfoGateway
+import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.domain.entity.AppInfo
 import mega.privacy.android.domain.entity.DeviceInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher

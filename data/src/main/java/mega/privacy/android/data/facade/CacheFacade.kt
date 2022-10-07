@@ -16,7 +16,7 @@ import javax.inject.Inject
  * @property context
  * @property ioDispatcher
  */
-class CacheFacade @Inject constructor(
+internal class CacheFacade @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CacheGateway {

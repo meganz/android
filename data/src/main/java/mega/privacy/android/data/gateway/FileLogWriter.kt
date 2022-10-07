@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.gateway
+package mega.privacy.android.data.gateway
 
 import android.util.Log
 import mega.privacy.android.domain.entity.logging.LogEntry

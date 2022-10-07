@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.gateway.api
+package mega.privacy.android.data.gateway.api
 
 import nz.mega.sdk.MegaNode
 
