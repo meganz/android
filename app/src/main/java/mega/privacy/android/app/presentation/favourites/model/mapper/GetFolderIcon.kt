@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.mapper
+package mega.privacy.android.app.presentation.favourites.model.mapper
 
 import androidx.annotation.DrawableRes
 import mega.privacy.android.app.R

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.mapper
+package mega.privacy.android.app.presentation.favourites.model.mapper
 
 import mega.privacy.android.domain.entity.FavouriteFile as FileEntity
 import mega.privacy.android.domain.entity.FavouriteFolder as FolderEntity

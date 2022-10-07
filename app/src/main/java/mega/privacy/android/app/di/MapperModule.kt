@@ -12,8 +12,8 @@ import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.toRepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.toRepeatToggleModeMapper
-import mega.privacy.android.app.presentation.mapper.FavouriteMapper
-import mega.privacy.android.app.presentation.mapper.toFavourite
+import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
+import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
 
 /**
  * Module for providing mapper dependencies
