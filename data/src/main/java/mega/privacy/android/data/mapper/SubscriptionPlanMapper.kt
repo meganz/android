@@ -15,5 +15,5 @@ typealias SubscriptionPlanMapper = (
     @JvmSuppressWildcards Int,
     @JvmSuppressWildcards Int,
     @JvmSuppressWildcards Currency?,
-    @JvmSuppressWildcards String,
+    @JvmSuppressWildcards String?,
 ) -> @JvmSuppressWildcards SubscriptionPlan

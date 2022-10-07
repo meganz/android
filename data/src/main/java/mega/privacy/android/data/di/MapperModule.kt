@@ -15,6 +15,7 @@ import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
@@ -23,10 +24,14 @@ import mega.privacy.android.data.mapper.MegaTransferMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
+import mega.privacy.android.data.mapper.PaymentMethodMapper
+import mega.privacy.android.data.mapper.SkuMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
+import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
+import mega.privacy.android.data.mapper.SubscriptionPlanMapper
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
@@ -51,16 +56,21 @@ import mega.privacy.android.data.mapper.toInt
 import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toOnlineStatus
+import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toSortOrder
 import mega.privacy.android.data.mapper.toStorageState
+import mega.privacy.android.data.mapper.toSubscriptionPlanList
 import mega.privacy.android.data.mapper.toTransferEventModel
 import mega.privacy.android.data.mapper.toTransferModel
 import mega.privacy.android.data.mapper.toUserAlert
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
+import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
+import nz.mega.sdk.MegaRequest
 
 /**
  * Module for providing mapper dependencies
@@ -252,4 +262,29 @@ internal class MapperModule {
     @Provides
     fun provideUserAccountMapper(): UserAccountMapper =
         ::UserAccount
+
+    /**
+     * Provide subscription plan mapper
+     */
+    @Provides
+    fun provideSubscriptionPlanMapper(): SubscriptionPlanMapper = ::SubscriptionPlan
+
+    /**
+     * Provide currency mapper
+     */
+    @Provides
+    fun provideCurrencyMapper(): CurrencyMapper = ::Currency
+
+    /**
+     * Provide paymentMethod type mapper
+     */
+    @Provides
+    fun providePaymentMethodTypeMapper(): PaymentMethodMapper = ::toPaymentMethodType
+
+    /**
+     * Provide subscription plan list mapper
+     */
+    @Provides
+    fun provideSubscriptionPlanListMapper(): SubscriptionPlanListMapper =
+        ::toSubscriptionPlanList
 }
