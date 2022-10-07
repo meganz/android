@@ -10,17 +10,15 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.usecase.GetAlbums
-import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
-import mega.privacy.android.app.presentation.photos.albums.model.AlbumsLoadState
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @ExperimentalCoroutinesApi
 class AlbumsViewModelTest {
@@ -42,22 +40,10 @@ class AlbumsViewModelTest {
     }
 
     @Test
-    fun `test default state`() = runTest {
-        underTest.loadState.test {
-            assertTrue(awaitItem() is AlbumsLoadState.Loading)
-        }
-    }
-
-    @Test
-    fun `test that start with loading state and load albums success`() = runTest {
-        whenever(getAlbums()).thenReturn(
-            flowOf(
-                createAlbums()
-            )
-        )
-        underTest.loadState.test {
-            assertTrue(awaitItem() is AlbumsLoadState.Loading)
-            assertTrue(awaitItem() is AlbumsLoadState.Success)
+    fun `test that initial state is returned`() = runTest {
+        underTest.state.test {
+            val initial = awaitItem()
+            assertThat(initial.albums).isEmpty()
         }
     }
 
@@ -72,16 +58,6 @@ class AlbumsViewModelTest {
         underTest.state.test {
             assertEquals(0, awaitItem().albums.size)
             assertEquals(1, awaitItem().albums.size)
-        }
-    }
-
-    @Test
-    fun `test that an error in the flow returns an empty state`() = runTest {
-        whenever(getAlbums()).thenReturn(flow { throw Exception("Error") })
-
-        underTest.loadState.test {
-            assertThat(awaitItem()).isSameInstanceAs(AlbumsLoadState.Loading)
-            assertThat(awaitItem()).isSameInstanceAs(AlbumsLoadState.Empty)
         }
     }
 
@@ -103,6 +79,4 @@ class AlbumsViewModelTest {
             favouriteAlbum
         )
     }
-
-
 }

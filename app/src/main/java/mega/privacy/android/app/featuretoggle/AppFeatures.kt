@@ -25,7 +25,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * Schedule Meeting toggle
      */
-    ScheduleMeeting("Enable schedule meetings feature", false);
+    ScheduleMeeting("Enable schedule meetings feature", false),
+
+    /**
+     * Dynamic album layout toggle
+     */
+    DynamicAlbum("Enable dynamic album feature", false);
 
 
     companion object : FeatureFlagValueProvider {
