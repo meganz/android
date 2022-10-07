@@ -14,7 +14,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.viewmodel.compose.viewModel
 import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -48,19 +47,16 @@ class AlbumDynamicContentFragment : Fragment() {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 AndroidTheme(isDark = mode.isDarkMode()) {
-                    AlbumContentBody(viewModel)
+                    AlbumContentBody()
                 }
             }
         }
     }
 
     @Composable
-    fun AlbumContentBody(
-        viewModel: AlbumsViewModel = viewModel(),
-    ) {
-        val uiState by viewModel.state.collectAsStateWithLifecycle()
+    fun AlbumContentBody() {
         val configuration = LocalConfiguration.current
-        val smallWidth = remember(configuration) {
+        remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3
         }
         Text("AlbumDynamicContentFragment", color = Color.Red)
