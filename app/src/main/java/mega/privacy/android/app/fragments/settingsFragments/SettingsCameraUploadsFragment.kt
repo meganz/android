@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
-import android.text.TextUtils
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -40,7 +39,6 @@ import androidx.preference.Preference
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import timber.log.Timber
 import nz.mega.sdk.MegaApiJava
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.CameraUploadUtil
@@ -82,7 +80,6 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.VideoQuality
 import java.io.File
-import java.lang.Exception
 
 /**
  * [SettingsBaseFragment] that enables or disables Camera Uploads in Settings
@@ -119,7 +116,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var queueSizeInput: EditText? = null
 
     // Secondary Folder
-    private var localSecondaryFolderPath = ""
+    private var localSecondaryFolderPath: String? = ""
     private var handleSecondaryMediaFolder: Long? = null
     private var megaNodeSecondaryMediaFolder: MegaNode? = null
     private var megaPathSecMediaFolder = ""
@@ -465,7 +462,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         }
 
         val chargingHelper = getString(R.string.settings_camera_upload_charging_helper_label,
-            resources.getString(R.string.label_file_size_mega_byte, size))
+            getString(R.string.label_file_size_mega_byte, size))
         cameraUploadCharging?.summary = chargingHelper
         if (savedInstanceState != null) {
             val isShowingQueueDialog = savedInstanceState.getBoolean(KEY_SET_QUEUE_DIALOG, false)
@@ -495,30 +492,31 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 if (!includeGPS) {
                     dbH.setRemoveGPS(true)
                     JobUtil.rescheduleCameraUpload(context)
-                }
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                    // Devices whose Android OS is below Android 10 do not need to request for the
-                    // ACCESS_MEDIA_LOCATION permission. Enable Camera Uploads with Location Tags immediately
-                    Timber.d("Device OS is below Android 10. Enable Camera Uploads with Location Tags")
-                    dbH.setRemoveGPS(false)
-                    JobUtil.rescheduleCameraUpload(context)
                 } else {
-                    // Otherwise if the device is running on Android 10 above, check whether the
-                    // ACCESS_MEDIA_LOCATION permission is granted or not
-                    Timber.d("Device OS is Android 10 above. Checking if ACCESS_MEDIA_LOCATION is granted")
-                    if (hasPermissions(context, Manifest.permission.ACCESS_MEDIA_LOCATION)) {
-                        // ACCESS_MEDIA_LOCATION permission is granted. Enable Camera Uploads with Location Tags
-                        Timber.d("ACCESS_MEDIA_LOCATION permission granted. Enable Camera Uploads with Location Tags")
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                        // Devices whose Android OS is below Android 10 do not need to request for the
+                        // ACCESS_MEDIA_LOCATION permission. Enable Camera Uploads with Location Tags immediately
+                        Timber.d("Device OS is below Android 10. Enable Camera Uploads with Location Tags")
                         dbH.setRemoveGPS(false)
                         JobUtil.rescheduleCameraUpload(context)
                     } else {
-                        // ACCESS_MEDIA_LOCATION permission is denied. Request to enable the
-                        // ACCESS_MEDIA_LOCATION permission
-                        Timber.d("ACCESS_MEDIA_LOCATION permission denied. Launching permission window")
-                        includeGPS = false
-                        dbH.setRemoveGPS(true)
-                        cameraUploadIncludeGPS?.isChecked = includeGPS
-                        enableCameraUploadsWithLocationPermissionLauncher.launch(Manifest.permission.ACCESS_MEDIA_LOCATION)
+                        // Otherwise if the device is running on Android 10 above, check whether the
+                        // ACCESS_MEDIA_LOCATION permission is granted or not
+                        Timber.d("Device OS is Android 10 above. Checking if ACCESS_MEDIA_LOCATION is granted")
+                        if (hasPermissions(context, Manifest.permission.ACCESS_MEDIA_LOCATION)) {
+                            // ACCESS_MEDIA_LOCATION permission is granted. Enable Camera Uploads with Location Tags
+                            Timber.d("ACCESS_MEDIA_LOCATION permission granted. Enable Camera Uploads with Location Tags")
+                            dbH.setRemoveGPS(false)
+                            JobUtil.rescheduleCameraUpload(context)
+                        } else {
+                            // ACCESS_MEDIA_LOCATION permission is denied. Request to enable the
+                            // ACCESS_MEDIA_LOCATION permission
+                            Timber.d("ACCESS_MEDIA_LOCATION permission denied. Launching permission window")
+                            includeGPS = false
+                            dbH.setRemoveGPS(true)
+                            cameraUploadIncludeGPS?.isChecked = includeGPS
+                            enableCameraUploadsWithLocationPermissionLauncher.launch(Manifest.permission.ACCESS_MEDIA_LOCATION)
+                        }
                     }
                 }
             }
@@ -764,10 +762,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     secondaryPath) && !FileUtil.isBasedOnFileStorage()
                 dbH.mediaFolderExternalSdCard = isExternalSDCardMU
                 localSecondaryFolderPath =
-                    if (isExternalSDCardMU) SDCardUtils.getSDCardDirName(Uri.parse(dbH.uriMediaExternalSdCard)) else secondaryPath.orEmpty()
-                dbH.setSecondaryFolderPath(localSecondaryFolderPath)
-                prefs.localPathSecondaryFolder = localSecondaryFolderPath
-                localSecondaryFolder?.summary = localSecondaryFolderPath
+                    if (isExternalSDCardMU) SDCardUtils.getSDCardDirName(Uri.parse(dbH.uriMediaExternalSdCard)) else secondaryPath
+                dbH.setSecondaryFolderPath(localSecondaryFolderPath.orEmpty())
+                prefs.localPathSecondaryFolder = localSecondaryFolderPath.orEmpty()
+                localSecondaryFolder?.summary = localSecondaryFolderPath.orEmpty()
                 dbH.setSecSyncTimeStamp(0)
                 dbH.setSecVideoSyncTimeStamp(0)
                 JobUtil.rescheduleCameraUpload(context)
@@ -826,7 +824,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 preferenceScreen.addPreference(it)
             }
             localSecondaryFolder?.let {
-                it.summary = localSecondaryFolderPath
+                it.summary = localSecondaryFolderPath.orEmpty()
                 preferenceScreen.addPreference(it)
             }
         } else {
@@ -886,7 +884,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         var cuEnabled = false
         prefs = dbH.preferences
         if (prefs != null) {
-            cuEnabled = java.lang.Boolean.parseBoolean(prefs.camSyncEnabled)
+            cuEnabled = prefs.camSyncEnabled.toBoolean()
         }
         if (cuEnabled) {
             Timber.d("Disable CU.")
@@ -917,7 +915,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         if (megaApi.isBusinessAccount && !megaApi.isMasterBusinessAccount) {
             showBusinessCUAlert()
         } else {
-            enableCameraUpload()
+            enableCameraUploads()
         }
     }
 
@@ -935,7 +933,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         builder.setTitle(R.string.section_photo_sync)
             .setMessage(R.string.camera_uploads_business_alert)
             .setNegativeButton(R.string.general_cancel) { _, _ -> }
-            .setPositiveButton(R.string.general_enable) { _, _ -> enableCameraUpload() }
+            .setPositiveButton(R.string.general_enable) { _, _ -> enableCameraUploads() }
             .setCancelable(false)
         businessCameraUploadsAlertDialog = builder.create()
         businessCameraUploadsAlertDialog?.show()
@@ -957,16 +955,16 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     private fun checkMediaUploadsPath() {
         localSecondaryFolderPath = prefs.localPathSecondaryFolder
-        if (TextUtil.isTextEmpty(localSecondaryFolderPath)
+        if (localSecondaryFolderPath.isNullOrBlank()
             || localSecondaryFolderPath == Constants.INVALID_NON_NULL_VALUE
-            || !isExternalSDCardMU && !FileUtil.isFileAvailable(File(localSecondaryFolderPath))
+            || (!isExternalSDCardMU && !FileUtil.isFileAvailable(File(localSecondaryFolderPath.orEmpty())))
         ) {
             Timber.w("Secondary ON: invalid localSecondaryFolderPath")
             localSecondaryFolderPath = getString(R.string.settings_empty_folder)
             Toast.makeText(context,
                 getString(R.string.secondary_media_service_error_local_folder),
                 Toast.LENGTH_SHORT).show()
-            if (!FileUtil.isFileAvailable(File(localSecondaryFolderPath))) {
+            if (!FileUtil.isFileAvailable(File(localSecondaryFolderPath.orEmpty()))) {
                 dbH.setSecondaryFolderPath(Constants.INVALID_NON_NULL_VALUE)
             }
         } else if (isExternalSDCardMU) {
@@ -991,7 +989,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             includeGPS = false
             dbH.setRemoveGPS(true)
         } else {
-            includeGPS = removeGPSString.toBoolean()
+            Timber.d("Remove GPS is $removeGPSString")
+            includeGPS = !removeGPSString.toBoolean()
         }
 
         cameraUploadIncludeGPS?.let {
@@ -1049,9 +1048,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      *
      * @param size The Queue size
      */
-    private fun isQueueSizeValid(size: Int): Boolean {
-        return size in COMPRESSION_QUEUE_SIZE_MIN..COMPRESSION_QUEUE_SIZE_MAX
-    }
+    private fun isQueueSizeValid(size: Int): Boolean =
+        size in COMPRESSION_QUEUE_SIZE_MIN..COMPRESSION_QUEUE_SIZE_MAX
 
     /**
      * Reset Size Input
@@ -1110,14 +1108,14 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             Util.dp2px(0f, outMetrics),
             Util.dp2px(margin.toFloat(), outMetrics),
             0)
-        val text = TextView(context)
-        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
-        text.text = getString(R.string.settings_compression_queue_subtitle,
+        val textView = TextView(context)
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+        textView.text = getString(R.string.settings_compression_queue_subtitle,
             getString(R.string.label_file_size_mega_byte,
-                java.lang.String.valueOf(COMPRESSION_QUEUE_SIZE_MIN)),
+                COMPRESSION_QUEUE_SIZE_MIN.toString()),
             getString(R.string.label_file_size_mega_byte,
-                java.lang.String.valueOf(COMPRESSION_QUEUE_SIZE_MAX)))
-        layout.addView(text, params)
+                COMPRESSION_QUEUE_SIZE_MAX.toString()))
+        layout.addView(textView, params)
 
         val builder = AlertDialog.Builder(context)
         with(builder) {
@@ -1239,7 +1237,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         prefs = dbH.preferences
         videoQuality?.let { preferenceScreen.addPreference(it) }
         val uploadQuality = prefs.uploadVideoQuality
-        if (TextUtils.isEmpty(uploadQuality)) {
+        if (uploadQuality.isNullOrBlank()) {
             prefs.uploadVideoQuality =
                 VideoQuality.ORIGINAL.value.toString()
             dbH.setCameraUploadVideoQuality(VideoQuality.ORIGINAL.value)
@@ -1311,7 +1309,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     /**
      * Enables the Camera Uploads functionality with location data embedded in each upload
      */
-    fun enableCameraUploadsWithLocation() {
+    private fun enableCameraUploadsWithLocation() {
         includeGPS = true
         dbH.setRemoveGPS(false)
         cameraUploadIncludeGPS?.isChecked = includeGPS
@@ -1321,7 +1319,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     /**
      * Enables the Camera Uploads functionality
      */
-    fun enableCameraUpload() {
+    private fun enableCameraUploads() {
         cameraUpload = true
         prefs = dbH.preferences
 
