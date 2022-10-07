@@ -5,6 +5,9 @@ package mega.privacy.android.domain.repository
  */
 interface LoginRepository {
 
+    /**
+     * True if there is no login already in progress, false otherwise.
+     */
     var allowBackgroundLogin: Boolean
 
     /**
