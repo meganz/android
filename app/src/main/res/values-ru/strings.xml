@@ -850,17 +850,17 @@
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Пожалуйста, проверьте свой электронный почтовый ящик и попробуйте заново.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
-    <string name="title_dialog_insert_MK">Восстановление пароля</string>
+    <string name="title_dialog_insert_MK">Сброс пароля</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Введите ключ восстановления ниже</string>
     <!-- Text of the alert when the pass has been correctly changed -->
-    <string name="pass_changed_alert">Ваш пароль был изменен.</string>
+    <string name="pass_changed_alert">Ваш пароль был изменён.</string>
     <!-- Title of the dialog to park an account -->
-    <string name="park_account_dialog_title">Сбросить учётную запись</string>
+    <string name="park_account_dialog_title">Заморозка аккаунта</string>
     <!-- Button to park an account -->
     <string name="park_account_button">Заморозить</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">Это последний шаг перед заморозкой учётной записи, пожалуйста, введите новый пароль. Ваши данные будут храниться ещё как минимум 60 дней. Если вы вспомнили пароль замороженной учётной записи, пожалуйста, свяжитесь с support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">Это последний шаг перед заморозкой аккаунта. Пожалуйста, введите новый пароль. Ваши данные будут храниться ещё как минимум 60 дней. Если вы вспомнили пароль замороженного аккаунта, пожалуйста, свяжитесь с support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">Введите новый пароль</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -4207,4 +4207,24 @@
     <string name="video_player_locked_hint">Экран заблокирован</string>
     <!-- Hint that tap to unlock in video player page -->
     <string name="video_player_unlock_hint">Коснитесь, чтобы разблокировать</string>
+    <!-- Label that schedule a meeting -->
+    <string name="chat_schedule_meeting">Запланировать встречу</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
+    <string name="upgrade_account_successful_pro_lite_monthly">Спасибо за вашу месячную подписку Pro&#160;Lite</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
+    <string name="upgrade_account_successful_pro_lite_yearly">Спасибо за вашу годовую подписку Pro&#160;Lite</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
+    <string name="upgrade_account_successful_pro_1_monthly">Спасибо за вашу месячную подписку Pro&#160;I</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
+    <string name="upgrade_account_successful_pro_1_yearly">Спасибо за вашу годовую подписку Pro&#160;I</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
+    <string name="upgrade_account_successful_pro_2_monthly">Спасибо за вашу месячную подписку Pro&#160;II</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
+    <string name="upgrade_account_successful_pro_2_yearly">Спасибо за вашу годовую подписку Pro&#160;II</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
+    <string name="upgrade_account_successful_pro_3_monthly">Спасибо за вашу месячную подписку Pro&#160;III</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
+    <string name="upgrade_account_successful_pro_3_yearly">Спасибо за вашу годовую подписку Pro&#160;III</string>
+    <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
+    <string name="chat_group_chat_info_allow_non_host_participants_option">Разрешить не организаторам добавлять участников</string>
 </resources>

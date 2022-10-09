@@ -3895,4 +3895,24 @@
     <string name="video_player_locked_hint">画面がロックされています</string>
     <!-- Hint that tap to unlock in video player page -->
     <string name="video_player_unlock_hint">タップするとロックが解除されます</string>
+    <!-- Label that schedule a meeting -->
+    <string name="chat_schedule_meeting">ミーティングをスケジュール</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
+    <string name="upgrade_account_successful_pro_lite_monthly">Pro&#160;Liteの月間サブスクリプションをご利用いただきありがとうございます</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
+    <string name="upgrade_account_successful_pro_lite_yearly">Pro&#160;Liteの年間サブスクリプションをご利用いただきありがとうございます</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
+    <string name="upgrade_account_successful_pro_1_monthly">Pro&#160;Iの月間サブスクリプションをご利用いただきありがとうございます</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
+    <string name="upgrade_account_successful_pro_1_yearly">Pro&#160;Iの年間サブスクリプションをご利用いただきありがとうございます</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
+    <string name="upgrade_account_successful_pro_2_monthly">Pro&#160;IIの月間サブスクリプションをご利用いただきありがとうございます</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
+    <string name="upgrade_account_successful_pro_2_yearly">Pro&#160;IIの年間サブスクリプションをご利用いただきありがとうございます</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
+    <string name="upgrade_account_successful_pro_3_monthly">Pro&#160;IIIの月間サブスクリプションをご利用いただきありがとうございます</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
+    <string name="upgrade_account_successful_pro_3_yearly">Pro&#160;IIIの年間サブスクリプションをご利用いただきありがとうございます</string>
+    <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
+    <string name="chat_group_chat_info_allow_non_host_participants_option">主催者以外が参加者を追加できるようにします</string>
 </resources>

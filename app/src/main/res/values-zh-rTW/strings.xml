@@ -3895,4 +3895,24 @@
     <string name="video_player_locked_hint">螢幕被鎖定</string>
     <!-- Hint that tap to unlock in video player page -->
     <string name="video_player_unlock_hint">點按即可解鎖</string>
+    <!-- Label that schedule a meeting -->
+    <string name="chat_schedule_meeting">安排會議</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
+    <string name="upgrade_account_successful_pro_lite_monthly">感謝您訂閱Pro&#160;Lite月方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
+    <string name="upgrade_account_successful_pro_lite_yearly">感謝您訂閱Pro&#160;Lite年方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
+    <string name="upgrade_account_successful_pro_1_monthly">感謝您訂閱Pro&#160;I月方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
+    <string name="upgrade_account_successful_pro_1_yearly">感謝您訂閱Pro&#160;I年方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
+    <string name="upgrade_account_successful_pro_2_monthly">感謝您訂閱Pro&#160;II月方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
+    <string name="upgrade_account_successful_pro_2_yearly">感謝您訂閱Pro&#160;II年方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
+    <string name="upgrade_account_successful_pro_3_monthly">感謝您訂閱Pro&#160;III月方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
+    <string name="upgrade_account_successful_pro_3_yearly">感謝您訂閱Pro&#160;III年方案</string>
+    <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
+    <string name="chat_group_chat_info_allow_non_host_participants_option">允許非主持人新增參與者</string>
 </resources>

@@ -4100,7 +4100,27 @@
     <!-- Used in chat screen to indicate last message sent by me -->
     <string name="chat_last_message_sender_me">Eu</string>
     <!-- Hint the screen is locked in video player page -->
-    <string name="video_player_locked_hint">Screen is locked</string>
+    <string name="video_player_locked_hint">A tela está bloqueada</string>
     <!-- Hint that tap to unlock in video player page -->
-    <string name="video_player_unlock_hint">Tap to unlock</string>
+    <string name="video_player_unlock_hint">Toque para desbloquear</string>
+    <!-- Label that schedule a meeting -->
+    <string name="chat_schedule_meeting">Programar reunião</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
+    <string name="upgrade_account_successful_pro_lite_monthly">Obrigado pela assinatura mensal do Pro&#160;Lite</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
+    <string name="upgrade_account_successful_pro_lite_yearly">Obrigado pela assinatura anual do Pro&#160;Lite</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
+    <string name="upgrade_account_successful_pro_1_monthly">Obrigado pela assinatura mensal do Pro&#160;I</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
+    <string name="upgrade_account_successful_pro_1_yearly">Obrigado pela assinatura anual do Pro&#160;I</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
+    <string name="upgrade_account_successful_pro_2_monthly">Obrigado pela assinatura mensal do Pro&#160;II</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
+    <string name="upgrade_account_successful_pro_2_yearly">Obrigado pela assinatura anual do Pro&#160;II</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
+    <string name="upgrade_account_successful_pro_3_monthly">Obrigado pela assinatura mensal do Pro&#160;III</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
+    <string name="upgrade_account_successful_pro_3_yearly">Obrigado pela assinatura anual do Pro&#160;III</string>
+    <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
+    <string name="chat_group_chat_info_allow_non_host_participants_option">Permitir adicionar participantes a usuários que não forem anfitriões</string>
 </resources>
