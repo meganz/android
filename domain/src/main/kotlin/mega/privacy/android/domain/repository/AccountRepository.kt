@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
@@ -99,4 +100,11 @@ interface AccountRepository {
      * false if inactive or if the user is not under a Business Account
      */
     suspend fun isBusinessAccountActive(): Boolean
+
+    /**
+     * Get the List of SubscriptionPlans
+     *
+     * @return List of SubscriptionPlans
+     */
+    suspend fun getSubscriptionPlans(): List<SubscriptionPlan>
 }
