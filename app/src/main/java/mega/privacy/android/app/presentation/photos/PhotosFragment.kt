@@ -266,7 +266,13 @@ class PhotosFragment : Fragment() {
         val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
         val albumsViewState by albumsViewModel.state.collectAsStateWithLifecycle()
 
-        pagerState = rememberPagerState()
+        if (!this::pagerState.isInitialized) {
+            pagerState =
+                if (managerActivity.fromAlbumContent)
+                    rememberPagerState(initialPage = PhotosTab.Albums.ordinal)
+                else
+                    rememberPagerState()
+        }
         lazyGridState =
             rememberSaveable(
                 timelineViewState.scrollStartIndex,
@@ -279,12 +285,12 @@ class PhotosFragment : Fragment() {
                 )
             }
 
+        if (managerActivity.fromAlbumContent) {
+            managerActivity.fromAlbumContent = false
+            photosViewModel.onTabSelected(PhotosTab.Albums)
+        }
+
         LaunchedEffect(pagerState) {
-            if (managerActivity.fromAlbumContent) {
-                managerActivity.fromAlbumContent = false
-                photosViewModel.onTabSelected(PhotosTab.Albums)
-                pagerState.scrollToPage(PhotosTab.Albums.ordinal)
-            }
             snapshotFlow { pagerState.currentPage }.collect { page ->
                 photosViewModel.onTabSelected(selectedTab = photosViewState.tabs[page])
                 pagerState.scrollToPage(PhotosTab.values()[page].ordinal)
@@ -292,8 +298,7 @@ class PhotosFragment : Fragment() {
         }
 
         PhotosBodyView(
-            tabs = photosViewState.tabs,
-            selectedTab = photosViewState.selectedTab,
+            photosViewState = photosViewState,
             pagerState = pagerState,
             onTabSelected = this::onTabSelected,
             timelineView = { timelineView(timelineViewState = timelineViewState) },
