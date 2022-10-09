@@ -9,10 +9,7 @@ import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.di.MapperModule
 import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
-import mega.privacy.android.data.mapper.BooleanPreferenceMapper
-import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
-import mega.privacy.android.data.mapper.SortOrderMapper
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -36,16 +33,5 @@ object TestMapperModule {
     @Provides
     fun provideRepeatToggleModeMapper(): RepeatToggleModeMapper = mock()
 
-    @Provides
-    fun provideSortOrderMapper(): SortOrderMapper = mock()
-
-    @Provides
-    fun provideSortOrderIntMapper(): SortOrderIntMapper = sortOrderIntMapper
-
-    @Provides
-    fun provideBooleanPreferenceMapper(): BooleanPreferenceMapper = mock()
-
-    @Provides
-    fun provideFileTypeInfoMapper(): FileTypeInfoMapper = mock()
 
 }
