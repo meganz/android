@@ -403,7 +403,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
         Timber.d("deepBrowserTree value: %s", ((FileExplorerActivity) context).getDeepBrowserTree());
         setOptionsBarVisibility();
 
-        if (((FileExplorerActivity) context).shouldRestartSearch()) {
+        if (((FileExplorerActivity) context).getShouldRestartSearch()) {
             setWaitingForSearchedNodes(true);
             search(((FileExplorerActivity) context).getQuerySearch());
         }
@@ -553,7 +553,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
                 break;
             }
             case R.id.cancel_text: {
-                ((FileExplorerActivity) context).finishActivity();
+                ((FileExplorerActivity) context).finishAndRemoveTask();
                 break;
             }
         }

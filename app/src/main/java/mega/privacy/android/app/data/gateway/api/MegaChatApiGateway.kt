@@ -153,4 +153,12 @@ interface MegaChatApiGateway {
      * Gets chat Room updates.
      */
     fun getChatRoomUpdates(chatId: Long): Flow<ChatRoomUpdate>
+
+    /**
+     * Gets a chat conversation if exists.
+     *
+     * @param chatId The chat id.
+     * @return The chat conversation.
+     */
+    fun getChatRoom(chatId: Long): MegaChatRoom?
 }

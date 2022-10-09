@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
-import mega.privacy.android.app.data.gateway.LogWriterGateway
+import mega.privacy.android.data.gateway.LogWriterGateway
 import mega.privacy.android.app.di.LoggingModule
 import mega.privacy.android.app.logging.ChatLogger
 import mega.privacy.android.app.logging.SdkLogger

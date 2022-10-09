@@ -1,8 +1,8 @@
 package mega.privacy.android.app.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.app.data.model.GlobalTransfer
 import mega.privacy.android.app.data.model.GlobalUpdate
+import mega.privacy.android.data.model.GlobalTransfer
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError

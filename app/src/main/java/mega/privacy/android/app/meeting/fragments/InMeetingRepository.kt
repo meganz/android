@@ -156,7 +156,7 @@ class InMeetingRepository @Inject constructor(
      * @param listener MegaChatRequestListenerInterface
      */
     fun createMeeting(meetingName: String, listener: MegaChatRequestListenerInterface) =
-        megaChatApi.createMeeting(meetingName, listener)
+        megaChatApi.createMeeting(meetingName, false, false, true, listener)
 
     /**
      * Method to switch a call on hold

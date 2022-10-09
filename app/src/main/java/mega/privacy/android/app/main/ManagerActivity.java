@@ -35,16 +35,7 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOG
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
 import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
-import static mega.privacy.android.app.main.FileInfoActivity.NODE_HANDLE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
-import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
-import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
-import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.incomingSharesState;
-import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.linksState;
-import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.outgoingSharesState;
-import static mega.privacy.android.app.presentation.permissions.PermissionsFragment.PERMISSIONS_FRAGMENT;
+import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
 import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CHAT_BNV;
 import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
 import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.HOME_BNV;
@@ -55,6 +46,16 @@ import static mega.privacy.android.app.presentation.settings.startscreen.util.St
 import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartDrawerItem;
 import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp;
 import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldCloseApp;
+import static mega.privacy.android.app.main.FileInfoActivity.NODE_HANDLE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
+import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
+import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.incomingSharesState;
+import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.linksState;
+import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.outgoingSharesState;
+import static mega.privacy.android.app.presentation.permissions.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
@@ -134,7 +135,6 @@ import static mega.privacy.android.app.utils.Util.checkTakePicture;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.getSizeStringGBBased;
-import static mega.privacy.android.app.utils.Util.getVersion;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
 import static mega.privacy.android.app.utils.Util.hideKeyboardView;
 import static mega.privacy.android.app.utils.Util.isOnline;
@@ -8410,8 +8410,9 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (!isEKR) {
                         chatLink = intent.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false);
                     }
+                    boolean allowAddParticipants = intent.getBooleanExtra(ALLOW_ADD_PARTICIPANTS, false);
 
-                    createGroupChat(peers, chatTitle, chatLink, isEKR);
+                    createGroupChat(peers, chatTitle, chatLink, isEKR, allowAddParticipants);
                 }
             }
         } else if (requestCode == REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
@@ -8529,22 +8530,23 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    public void createGroupChat(MegaChatPeerList peers, String chatTitle, boolean chatLink, boolean isEKR) {
+    public void createGroupChat(MegaChatPeerList peers, String chatTitle, boolean chatLink, boolean isEKR, boolean allowAddParticipants) {
 
         Timber.d("Create group chat with participants: %s", peers.size());
 
         if (isEKR) {
-            megaChatApi.createChat(true, peers, chatTitle, this);
+            megaChatApi.createGroupChat(peers, chatTitle,  false, false, allowAddParticipants, this);
         } else {
             if (chatLink) {
                 if (chatTitle != null && !chatTitle.isEmpty()) {
                     CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
-                    megaChatApi.createPublicChat(peers, chatTitle, listener);
+                    megaChatApi.createPublicChat(peers, chatTitle,  false, false, allowAddParticipants, listener);
+
                 } else {
                     showAlert(this, getString(R.string.message_error_set_title_get_link), null);
                 }
             } else {
-                megaChatApi.createPublicChat(peers, chatTitle, this);
+                megaChatApi.createPublicChat(peers, chatTitle,  false, false, allowAddParticipants, this);
             }
         }
     }

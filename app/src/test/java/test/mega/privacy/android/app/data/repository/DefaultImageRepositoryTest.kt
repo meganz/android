@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.app.data.repository.DefaultImageRepository
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.domain.exception.MegaException

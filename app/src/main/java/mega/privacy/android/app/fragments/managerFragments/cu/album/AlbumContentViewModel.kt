@@ -13,7 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
@@ -50,7 +50,7 @@ class AlbumContentViewModel @Inject constructor(
     /**
      * Get current sort rule from SortOrderManagement
      */
-    fun getOrder() = runBlocking { sortOrderIntMapper(getCameraSortOrder()) }
+    fun getOrder() = runBlocking { getCameraSortOrder() }
 
     var currentHandle: Long? = null
 

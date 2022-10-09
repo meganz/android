@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
-import mega.privacy.android.app.data.gateway.preferences.StatisticsPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import java.io.IOException
 import javax.inject.Inject

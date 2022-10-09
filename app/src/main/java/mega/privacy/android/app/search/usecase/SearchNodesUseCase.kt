@@ -4,7 +4,7 @@ import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.SortOrderManagement

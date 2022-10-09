@@ -147,4 +147,29 @@ class CacheFacadeTest {
 
         assertThat(underTest.getCacheFile(folderName, fileName)).isEqualTo(expected)
     }
+
+    /**
+     * Test that clearCacheDirectory remove all of its contents
+     */
+    @Test
+    fun test_that_clearCacheDirectory_remove_all_contents_inside_cache_directory() = runTest {
+        (0..10).map {
+            val random = (0..5).random()
+            val file = File(context.cacheDir, it.toString())
+            if (random % 2 == 0) {
+                val folder = createDirectory(file)
+                (0..5).map { i ->
+                    val fileInFolder = File(folder, i.toString())
+                    createFile(fileInFolder)
+
+                }
+            } else {
+                createFile(file)
+            }
+        }
+        underTest.clearCacheDirectory()
+        val actual = 0
+        val expected = context.cacheDir.listFiles()?.size
+        assertThat(actual).isEqualTo(expected)
+    }
 }

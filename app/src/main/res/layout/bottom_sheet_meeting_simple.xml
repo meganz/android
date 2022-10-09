@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/items_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,7 +16,7 @@
         app:drawableStartCompat="@drawable/ic_video_plus" />
 
     <View
-        android:id="@+id/divider"
+        android:id="@+id/divider_join"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="72dp"
@@ -28,4 +29,23 @@
         android:layout_height="56dp"
         android:text="@string/join_meeting"
         app:drawableStartCompat="@drawable/ic_video_join" />
+
+    <View
+        android:id="@+id/divider_schedule"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="72dp"
+        android:background="@color/grey_012_white_012"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/btn_schedule_meeting"
+        style="@style/BottomSheetOption"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/chat_schedule_meeting"
+        android:visibility="gone"
+        app:drawableStartCompat="@drawable/ic_calendar"
+        tools:visibility="visible" />
 </LinearLayout>
