@@ -179,7 +179,7 @@ class DefaultSettingsRepository @Inject constructor(
 
     override fun monitorStartScreen(): Flow<Int> = monitorStartScreenFacade.getEvents()
 
-    override fun monitorHideRecentActivity(): Flow<Boolean> =
+    override fun monitorHideRecentActivityEvent(): Flow<Boolean> =
         monitorHideRecentActivityFacade.getEvents()
 
     override suspend fun setHideRecentActivity(value: Boolean) =
