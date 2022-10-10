@@ -16,6 +16,7 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.MegaNodeUtil.getPreviewFileName
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.VideoMapper
@@ -49,6 +50,7 @@ class DefaultPhotosRepository @Inject constructor(
     private val imageMapper: ImageMapper,
     private val videoMapper: VideoMapper,
     private val nodeUpdateMapper: NodeUpdateMapper,
+    private val fileTypeInfoMapper: FileTypeInfoMapper,
 ) : PhotosRepository {
 
     private var thumbnailFolderPath: String? = null
@@ -160,7 +162,8 @@ class DefaultPhotosRepository @Inject constructor(
             dateUtilFacade.fromEpoch(megaNode.creationTime),
             dateUtilFacade.fromEpoch(megaNode.modificationTime),
             getThumbnailCacheFilePath(megaNode),
-            getPreviewCacheFilePath(megaNode)
+            getPreviewCacheFilePath(megaNode),
+            fileTypeInfoMapper(megaNode),
         )
 
     /**
@@ -178,7 +181,8 @@ class DefaultPhotosRepository @Inject constructor(
             dateUtilFacade.fromEpoch(megaNode.modificationTime),
             getThumbnailCacheFilePath(megaNode),
             getPreviewCacheFilePath(megaNode),
-            megaNode.duration
+            megaNode.duration,
+            fileTypeInfoMapper(megaNode),
         )
 
     private fun getThumbnailCacheFilePath(megaNode: MegaNode): String? {

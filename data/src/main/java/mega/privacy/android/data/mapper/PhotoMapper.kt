@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper
 
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.photos.Photo
 import java.time.LocalDateTime
 
@@ -15,6 +16,7 @@ typealias ImageMapper = (
     @JvmSuppressWildcards LocalDateTime,
     @JvmSuppressWildcards String?,
     @JvmSuppressWildcards String?,
+    @JvmSuppressWildcards FileTypeInfo,
 ) -> @JvmSuppressWildcards Photo
 
 internal fun toImage(
@@ -26,6 +28,7 @@ internal fun toImage(
     modificationTime: LocalDateTime,
     thumbnailFilePath: String?,
     previewFilePath: String?,
+    fileTypeInfo: FileTypeInfo,
 ) = Photo.Image(
     id = id,
     parentId = parentId,
@@ -34,7 +37,8 @@ internal fun toImage(
     creationTime = creationTime,
     modificationTime = modificationTime,
     thumbnailFilePath = thumbnailFilePath,
-    previewFilePath = previewFilePath
+    previewFilePath = previewFilePath,
+    fileTypeInfo = fileTypeInfo
 )
 
 /**
@@ -50,6 +54,7 @@ typealias VideoMapper = (
     @JvmSuppressWildcards String?,
     @JvmSuppressWildcards String?,
     @JvmSuppressWildcards Int,
+    @JvmSuppressWildcards FileTypeInfo,
 ) -> @JvmSuppressWildcards Photo
 
 internal fun toVideo(
@@ -62,6 +67,7 @@ internal fun toVideo(
     thumbnailFilePath: String?,
     previewFilePath: String?,
     duration: Int,
+    fileTypeInfo: FileTypeInfo,
 ) = Photo.Video(
     id = id,
     parentId = parentId,
@@ -71,6 +77,7 @@ internal fun toVideo(
     modificationTime = modificationTime,
     thumbnailFilePath = thumbnailFilePath,
     previewFilePath = previewFilePath,
-    duration = duration
+    duration = duration,
+    fileTypeInfo = fileTypeInfo
 )
 
