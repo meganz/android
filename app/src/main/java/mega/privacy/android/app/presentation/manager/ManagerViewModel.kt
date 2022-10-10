@@ -357,5 +357,8 @@ class ManagerViewModel @Inject constructor(
      */
     fun getStorageState() = monitorStorageStateEvent.getState()
 
+    /**
+     * Get Cloud Sort Order
+     */
     fun getOrder() = runBlocking { sortOrderIntMapper(getCloudSortOrder()) }
 }
