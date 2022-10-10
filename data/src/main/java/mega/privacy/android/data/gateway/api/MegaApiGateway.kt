@@ -761,4 +761,9 @@ interface MegaApiGateway {
      * @param listener
      */
     fun creditCardQuerySubscriptions(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Get the selected user attribute for the logged in user
+     */
+    fun getUserAttribute(attributeIdentifier: Int, listener: MegaRequestListenerInterface)
 }

@@ -463,4 +463,11 @@ internal class MegaApiFacade @Inject constructor(
     override fun creditCardQuerySubscriptions(listener: MegaRequestListenerInterface?) {
         megaApi.creditCardQuerySubscriptions(listener)
     }
+
+    override fun getUserAttribute(
+        attributeIdentifier: Int,
+        listener: MegaRequestListenerInterface
+    ) {
+        megaApi.getUserAttribute(attributeIdentifier, listener)
+    }
 }
