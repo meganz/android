@@ -182,6 +182,9 @@ class DefaultSettingsRepository @Inject constructor(
     override fun monitorHideRecentActivity(): Flow<Boolean> =
         monitorHideRecentActivityFacade.getEvents()
 
+    override suspend fun setHideRecentActivity(value: Boolean) =
+        uiPreferencesGateway.setHideRecentActivity(value)
+
     override fun isCameraSyncPreferenceEnabled(): Boolean =
         databaseHandler.preferences?.camSyncEnabled.toBoolean()
 

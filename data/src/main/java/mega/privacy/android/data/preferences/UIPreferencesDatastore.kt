@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -18,6 +19,7 @@ import javax.inject.Inject
 
 private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
 private const val PREFERRED_START_SCREEN = "PREFERRED_START_SCREEN"
+private const val HIDE_RECENT_ACTIVITY = "HIDE_RECENT_ACTIVITY"
 private const val uiPreferenceFileName = USER_INTERFACE_PREFERENCES
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = uiPreferenceFileName,
@@ -28,6 +30,7 @@ private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferences
                 sharedPreferencesName = uiPreferenceFileName,
                 keysToMigrate = setOf(
                     PREFERRED_START_SCREEN,
+                    HIDE_RECENT_ACTIVITY,
                 )
             ),
         )
@@ -37,6 +40,7 @@ internal class UIPreferencesDatastore @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : UIPreferencesGateway {
     private val preferredStartScreenKey = intPreferencesKey(PREFERRED_START_SCREEN)
+    private val hideRecentActivityKey = booleanPreferencesKey(HIDE_RECENT_ACTIVITY)
 
     override fun monitorPreferredStartScreen() = context.uiPreferenceDataStore.data
         .catch { exception ->
@@ -76,6 +80,8 @@ internal class UIPreferencesDatastore @Inject constructor(
     }
 
     override suspend fun setHideRecentActivity(value: Boolean) {
-        TODO("Not yet implemented")
+        context.uiPreferenceDataStore.edit {
+            it[hideRecentActivityKey] = value
+        }
     }
 }
