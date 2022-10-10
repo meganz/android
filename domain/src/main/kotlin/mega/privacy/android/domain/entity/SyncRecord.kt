@@ -1,18 +1,63 @@
 package mega.privacy.android.domain.entity
 
+/**
+ * These records are saved into the database and used for camera upload
+ */
 data class SyncRecord(
+    /**
+     * record ID
+     */
     val id: Int = 0,
-    val localPath: String? = null,
-    var newPath: String? = null,
-    val originFingerprint: String? = null,
-    val newFingerprint: String? = null,
-    val timestamp: Long? = null,
-    var fileName: String? = null,
-    val longitude: Float? = null,
-    val latitude: Float? = null,
-    val status: Int = SyncStatus.STATUS_PENDING.value,
-    val type: Int = 0,
-    val nodeHandle: Long? = null,
-    val isCopyOnly: Boolean = false,
-    val isSecondary: Boolean = false,
+    /**
+     * record path locally
+     */
+    val localPath: String?,
+    /**
+     * new record path
+     */
+    var newPath: String?,
+    /**
+     * fingerprint locally
+     */
+    val originFingerprint: String?,
+    /**
+     * new record fingerprint
+     */
+    val newFingerprint: String?,
+    /**
+     * timestamp of media
+     */
+    val timestamp: Long?,
+    /**
+     * name of record
+     */
+    var fileName: String?,
+    /**
+     * GPS longitude coordinate
+     */
+    val longitude: Float?,
+    /**
+     * GPS latitude coordinate
+     */
+    val latitude: Float?,
+    /**
+     * record status (ready for upload or compression)
+     */
+    val status: Int,
+    /**
+     * record type (photo or video or anything)
+     */
+    val type: Int,
+    /**
+     * node handle of record
+     */
+    val nodeHandle: Long?,
+    /**
+     * if node exists or not
+     */
+    val isCopyOnly: Boolean,
+    /**
+     * secondary media or not
+     */
+    val isSecondary: Boolean,
 )
