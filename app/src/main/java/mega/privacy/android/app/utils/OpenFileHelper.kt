@@ -3,7 +3,7 @@ package mega.privacy.android.app.utils
 import android.content.Context
 import android.content.Intent
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.PdfViewerActivity

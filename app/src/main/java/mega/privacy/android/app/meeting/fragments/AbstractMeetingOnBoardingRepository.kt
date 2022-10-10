@@ -6,7 +6,7 @@ import android.util.Pair
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar

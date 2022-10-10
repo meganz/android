@@ -24,7 +24,7 @@ import java.util.Calendar;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import mega.privacy.android.app.di.MegaApi;
+import mega.privacy.android.data.qualifier.MegaApi;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;

@@ -12,7 +12,7 @@ import dagger.hilt.android.components.FragmentComponent
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.AvatarUtil

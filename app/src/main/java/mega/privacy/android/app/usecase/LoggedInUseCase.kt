@@ -1,7 +1,7 @@
 package mega.privacy.android.app.usecase
 
 import io.reactivex.rxjava3.core.Single
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.utils.MegaApiUtil.isUserLoggedIn
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject

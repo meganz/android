@@ -7,12 +7,11 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.failWithError
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
@@ -201,7 +200,7 @@ class DefaultFilesRepository @Inject constructor(
                     appData = Constants.APP_DATA_BACKGROUND_TRANSFER,
                     startFirst = true,
                     cancelToken = null,
-                    listener = OptionalMegaTransferListenerInterface(
+                    listener = mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface(
                         onTransferTemporaryError = { _, error ->
                             continuation.failWithError(error)
                         },

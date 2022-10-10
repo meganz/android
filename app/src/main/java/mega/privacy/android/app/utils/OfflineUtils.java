@@ -52,7 +52,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway;
+import mega.privacy.android.data.gateway.api.MegaApiGateway;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
