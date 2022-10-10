@@ -335,6 +335,24 @@ interface CameraUploadRepository {
     )
 
     /**
+     * Get GPS coordinates from video file
+     *
+     * @param filePath
+     *
+     * @return a pair with latitude and longitude coordinates
+     */
+    suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float>
+
+    /**
+     * Get GPS coordinates from photo file
+     *
+     * @param filePath
+     *
+     * @return a pair with latitude and longitude coordinates
+     */
+    suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Float, Float>
+
+    /**
      * The method is to backup time stamps, primary upload folder and secondary folder in share preference after
      * database records being cleaned
      */
