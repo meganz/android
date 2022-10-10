@@ -68,6 +68,7 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     implementation 'androidx.exifinterface:exifinterface:1.3.0'
     implementation "androidx.datastore:datastore-preferences:$datastoreVersion"
+    implementation "androidx.preference:preference-ktx:$preferenceVersion"
 
     // Logging
     implementation "org.slf4j:slf4j-api:$slf4jVersion"
