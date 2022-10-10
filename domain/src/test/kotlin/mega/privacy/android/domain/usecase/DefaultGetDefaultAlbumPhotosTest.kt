@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
@@ -139,7 +140,8 @@ class DefaultGetDefaultAlbumPhotosTest {
             modificationTime = modificationTime,
             thumbnailFilePath = "thumbnailFilePath",
             previewFilePath = "previewFilePath",
-            duration = 123
+            duration = 123,
+            fileTypeInfo = VideoFileTypeInfo("", "")
         )
     }
 }
