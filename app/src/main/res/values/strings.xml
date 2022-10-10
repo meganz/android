@@ -4020,7 +4020,7 @@
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Allow non-hosts to add participants</string>
     <!-- Title of gif album. -->
-    <string name="title_gif_album">GIF</string>
+    <string name="photos_album_title_gif">GIF</string>
     <!-- Title of raw album. -->
-    <string name="title_raw_album">RAW</string>
+    <string name="photos_album_title_raw">RAW</string>
 </resources>
