@@ -1,6 +1,7 @@
 package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
@@ -14,7 +15,6 @@ import mega.privacy.android.app.presentation.favourites.facade.DateUtilWrapper
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.MegaNodeUtil.getPreviewFileName
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
-import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
@@ -83,12 +83,12 @@ class DefaultPhotosRepository @Inject constructor(
             }
 
     override suspend fun searchMegaPhotos(): List<Photo> = withContext(ioDispatcher) {
-        val photosNodes =
-            (awaitSearchImages() + awaitSearchVideos()).sortedByDescending { it.modificationTime }
-        mapMegaNodesToPhotos(photosNodes)
+        val images = async { mapMegaNodesToImages(searchImages()) }
+        val videos = async { mapMegaNodesToVideos(searchVideos()) }
+        images.await() + videos.await()
     }
 
-    private suspend fun awaitSearchImages(): List<MegaNode> = withContext(ioDispatcher) {
+    private suspend fun searchImages(): List<MegaNode> = withContext(ioDispatcher) {
         val token = MegaCancelToken.createInstance()
         val imageNodes = megaApiFacade.searchByType(
             token,
@@ -104,7 +104,7 @@ class DefaultPhotosRepository @Inject constructor(
         }
     }
 
-    private suspend fun awaitSearchVideos(): List<MegaNode> = withContext(ioDispatcher) {
+    private suspend fun searchVideos(): List<MegaNode> = withContext(ioDispatcher) {
         val token = MegaCancelToken.createInstance()
         val videosNodes = megaApiFacade.searchByType(
             token,
@@ -122,23 +122,29 @@ class DefaultPhotosRepository @Inject constructor(
 
     /**
      * Convert the MegaNode list to Image list
-     * @param nodes List<MegaNode>
+     * @param megaNodes List<MegaNode>
      * @return List<Photo> / Images
      */
-    private fun mapMegaNodesToImages(nodes: List<MegaNode>) =
-        nodes.map { megaNode ->
+    private suspend fun mapMegaNodesToImages(megaNodes: List<MegaNode>): List<Photo> {
+        return megaNodes.filter {
+            !megaApiFacade.isInRubbish(it)
+        }.map { megaNode ->
             mapMegaNodeToImage(megaNode)
         }
+    }
 
     /**
      * Convert the MegaNode list to Video list
-     * @param nodes List<MegaNode>
+     * @param megaNodes List<MegaNode>
      * @return List<Photo> / Videos
      */
-    private fun mapMegaNodesToVideos(nodes: List<MegaNode>) =
-        nodes.map { megaNode ->
+    private suspend fun mapMegaNodesToVideos(megaNodes: List<MegaNode>): List<Photo> {
+        return megaNodes.filter {
+            !megaApiFacade.isInRubbish(it)
+        }.map { megaNode ->
             mapMegaNodeToVideo(megaNode)
         }
+    }
 
     /**
      * Convert the MegaNode to Image
@@ -175,19 +181,6 @@ class DefaultPhotosRepository @Inject constructor(
             megaNode.duration
         )
 
-    private suspend fun mapMegaNodesToPhotos(megaNodes: List<MegaNode>): List<Photo> =
-        withContext(ioDispatcher) {
-            megaNodes.filter {
-                !megaApiFacade.isInRubbish(it)
-            }.map { megaNode ->
-                if (megaNode.isVideo()) {
-                    mapMegaNodeToVideo(megaNode)
-                } else {
-                    mapMegaNodeToImage(megaNode)
-                }
-            }
-        }
-
     private fun getThumbnailCacheFilePath(megaNode: MegaNode): String? {
         if (thumbnailFolderPath == null) {
             thumbnailFolderPath =
@@ -197,7 +190,6 @@ class DefaultPhotosRepository @Inject constructor(
             "$it${File.separator}${megaNode.getThumbnailFileName()}"
         }
     }
-
 
     private fun getPreviewCacheFilePath(megaNode: MegaNode): String? {
         if (previewFolderPath == null) {
