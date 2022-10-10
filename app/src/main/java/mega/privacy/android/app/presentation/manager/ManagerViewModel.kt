@@ -20,11 +20,12 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetInboxNode
+import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
+import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
@@ -34,10 +35,12 @@ import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
-import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
@@ -68,8 +71,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorGlobalUpdates: MonitorGlobalUpdates,
     private val getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
     private val getBrowserChildrenNode: GetBrowserChildrenNode,
-    private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
-    private val getUploadFolderHandle: GetUploadFolderHandle,
+    monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val getInboxNode: GetInboxNode,
     private val getRootFolder: GetRootFolder,
     private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
@@ -79,6 +81,9 @@ class ManagerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val getPrimarySyncHandle: GetPrimarySyncHandle,
+    private val getSecondarySyncHandle: GetSecondarySyncHandle,
+    private val checkCameraUpload: CheckCameraUpload,
 ) : ViewModel() {
 
     /**
@@ -342,4 +347,34 @@ class ManagerViewModel @Inject constructor(
      * Get latest [StorageState]
      */
     fun getStorageState() = monitorStorageStateEvent.getState()
+
+
+    /**
+     * After nodes on Cloud Drive changed or some nodes are moved to rubbish bin,
+     * need to check CU and MU folders' status.
+     *
+     * @param shouldDisable If CU or MU folder is deleted by current client, then CU should be disabled. Otherwise not.
+     * @param updatedNodes  Nodes which have changed.
+     */
+    fun checkCameraUploadFolder(shouldDisable: Boolean, updatedNodes: List<MegaNode>?) {
+        viewModelScope.launch {
+            val primaryHandle = getPrimarySyncHandle()
+            val secondaryHandle = getSecondarySyncHandle()
+            updatedNodes?.let {
+                val nodeMap = it.associateBy { node -> node.handle }
+                // If CU and MU folder don't change then return.
+                if (!nodeMap.containsKey(primaryHandle) && !nodeMap.containsKey(secondaryHandle)) {
+                    Timber.d("Updated nodes don't include CU/MU, return.")
+                    return@launch
+                }
+            }
+            val result = checkCameraUpload(shouldDisable, primaryHandle, secondaryHandle)
+            _state.update {
+                it.copy(
+                    shouldStopCameraUpload = result.shouldStopProcess,
+                    shouldSendCameraBroadCastEvent = result.shouldSendEvent,
+                )
+            }
+        }
+    }
 }

@@ -137,27 +137,6 @@ public class CameraUploadUtil {
     }
 
     /**
-     * The method is to backup time stamps, primary upload folder and secondary folder in share preference after
-     * database records being cleaned
-     */
-    public static void backupTimestampsAndFolderHandle() {
-        MegaPreferences prefs = dbH.getPreferences();
-        if (prefs == null) {
-            Timber.e("Preference is null, while backup.");
-            return;
-        }
-        app.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE)
-                .edit()
-                .putString(KEY_CAM_SYNC_TIMESTAMP, prefs.getCamSyncTimeStamp())
-                .putString(KEY_CAM_VIDEO_SYNC_TIMESTAMP, prefs.getCamVideoSyncTimeStamp())
-                .putString(KEY_SEC_SYNC_TIMESTAMP, prefs.getSecSyncTimeStamp())
-                .putString(KEY_SEC_VIDEO_SYNC_TIMESTAMP, prefs.getSecVideoSyncTimeStamp())
-                .putLong(KEY_PRIMARY_HANDLE, getUploadFolderHandle(true))
-                .putLong(KEY_SECONDARY_HANDLE, getUploadFolderHandle(false))
-                .apply();
-    }
-
-    /**
      * set all the time stamps to 0 for uploading, clean the cache directory for gps process
      * and clean the sync record by default
      */
@@ -224,12 +203,6 @@ public class CameraUploadUtil {
         String handle = isPrimary ? prefs.getCamSyncHandle() : prefs.getMegaHandleSecondaryFolder();
 
         return isTextEmpty(handle) ? INVALID_HANDLE : Long.parseLong(handle);
-    }
-
-    public static void disableMediaUploadProcess() {
-        resetMUTimestampsAndCache();
-        dbH.setSecondaryUploadEnabled(false);
-        fireStopCameraUploadJob(app);
     }
 
     /**
