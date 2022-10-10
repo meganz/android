@@ -36,16 +36,6 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOU
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
 import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
 import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CHAT_BNV;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.HOME_BNV;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.NO_BNV;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.PHOTOS_BNV;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.SHARED_ITEMS_BNV;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartBottomNavigationItem;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartDrawerItem;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp;
-import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldCloseApp;
 import static mega.privacy.android.app.main.FileInfoActivity.NODE_HANDLE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
@@ -56,6 +46,16 @@ import static mega.privacy.android.app.presentation.manager.ManagerActivityExten
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.linksState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.outgoingSharesState;
 import static mega.privacy.android.app.presentation.permissions.PermissionsFragment.PERMISSIONS_FRAGMENT;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CHAT_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.HOME_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.NO_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.PHOTOS_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.SHARED_ITEMS_BNV;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartBottomNavigationItem;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartDrawerItem;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldCloseApp;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
@@ -620,8 +620,8 @@ public class ManagerActivity extends TransfersManagementActivity
     boolean newAccount = false;
     public boolean newCreationAccount;
 
-    private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
-    private int storageStateFromBroadcast = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
+    private StorageState storageState = StorageState.Unknown; //Default value
+    private StorageState storageStateFromBroadcast = StorageState.Unknown; //Default value
     private boolean showStorageAlertWithDelay;
 
     private boolean isStorageStatusDialogShown = false;
@@ -976,10 +976,15 @@ public class ManagerActivity extends TransfersManagementActivity
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
                 if (ACTION_STORAGE_STATE_CHANGED.equals(intent.getAction())) {
-                    storageStateFromBroadcast = intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
+                    Bundle extras = intent.getExtras();
+                    if (extras != null && extras.containsKey(EXTRA_STORAGE_STATE)) {
+                        storageStateFromBroadcast = (StorageState) extras.getSerializable(EXTRA_STORAGE_STATE);
+                    } else {
+                        storageStateFromBroadcast = StorageState.Unknown;
+                    }
                     if (!showStorageAlertWithDelay) {
-                        checkStorageStatus(storageStateFromBroadcast != MegaApiJava.STORAGE_STATE_UNKNOWN ?
-                                storageStateFromBroadcast : app.getStorageState(), false);
+                        checkStorageStatus(storageStateFromBroadcast != StorageState.Unknown ?
+                                storageStateFromBroadcast : viewModel.getStorageState(), false);
                     }
                     updateAccountDetailsVisibleInfo();
                     return;
@@ -1335,7 +1340,7 @@ public class ManagerActivity extends TransfersManagementActivity
             getSupportFragmentManager().putFragment(outState, FragmentTag.SMS_VERIFICATION.getTag(), smsVerificationFragment);
         }
         outState.putInt("elevation", mElevationCause);
-        outState.putInt("storageState", storageState);
+        outState.putSerializable("storageState", storageState);
         outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
         outState.putInt("comesFromNotificationDeepBrowserTreeIncoming", comesFromNotificationDeepBrowserTreeIncoming);
 
@@ -1512,7 +1517,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 smsVerificationFragment = (SMSVerificationFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.SMS_VERIFICATION.getTag());
             }
             mElevationCause = savedInstanceState.getInt("elevation", 0);
-            storageState = savedInstanceState.getInt("storageState", MegaApiJava.STORAGE_STATE_UNKNOWN);
+            storageState = (StorageState)savedInstanceState.getSerializable("storageState");
             isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
             comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", INVALID_VALUE);
             openLinkDialogIsShown = savedInstanceState.getBoolean(OPEN_LINK_DIALOG_SHOWN, false);
@@ -1637,7 +1642,6 @@ public class ManagerActivity extends TransfersManagementActivity
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        float density = getResources().getDisplayMetrics().density;
 
         initFileBackupManager();
 
@@ -1742,7 +1746,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
             @Override
             public void onDrawerOpened(@NonNull View drawerView) {
-                refreshDrawerInfo(storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN);
+                refreshDrawerInfo(storageState == StorageState.Unknown);
 
                 // Sync the account info after changing account information settings to keep the data the same
                 updateAccountDetailsVisibleInfo();
@@ -3689,8 +3693,8 @@ public class ManagerActivity extends TransfersManagementActivity
     private void showGlobalAlertDialogsIfNeeded() {
         if (showStorageAlertWithDelay) {
             showStorageAlertWithDelay = false;
-            checkStorageStatus(storageStateFromBroadcast != MegaApiJava.STORAGE_STATE_UNKNOWN ?
-                    storageStateFromBroadcast : app.getStorageState(), false);
+            checkStorageStatus(storageStateFromBroadcast != StorageState.Unknown ?
+                    storageStateFromBroadcast : viewModel.getStorageState(), false);
         }
 
         if (!firstTimeAfterInstallation) {
@@ -7633,14 +7637,14 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 String textToShow = String.format(getResources().getString(R.string.used_space), myAccountInfo.getUsedFormatted(), myAccountInfo.getTotalFormatted());
                 String colorString = ColorUtils.getThemeColorHexString(this, R.attr.colorSecondary);
-                switch (storageState) {
-                    case MegaApiJava.STORAGE_STATE_GREEN:
+                switch (viewModel.getStorageState()) {
+                    case Green:
                         break;
-                    case MegaApiJava.STORAGE_STATE_ORANGE:
+                    case Orange:
                         colorString = ColorUtils.getColorHexString(this, R.color.amber_600_amber_300);
                         break;
-                    case MegaApiJava.STORAGE_STATE_RED:
-                    case MegaApiJava.STORAGE_STATE_PAYWALL:
+                    case Red:
+                    case PayWall:
                         colorString = ColorUtils.getColorHexString(this, R.color.red_600_red_300);
                         break;
                 }
@@ -7676,13 +7680,13 @@ public class ManagerActivity extends TransfersManagementActivity
 
         int resId = R.drawable.custom_progress_bar_horizontal_ok;
         switch (storageState) {
-            case MegaApiJava.STORAGE_STATE_GREEN:
+            case Green:
                 break;
-            case MegaApiJava.STORAGE_STATE_ORANGE:
+            case Orange:
                 resId = R.drawable.custom_progress_bar_horizontal_warning;
                 break;
-            case MegaApiJava.STORAGE_STATE_RED:
-            case MegaApiJava.STORAGE_STATE_PAYWALL:
+            case Red:
+            case PayWall:
                 resId = R.drawable.custom_progress_bar_horizontal_exceed;
                 break;
         }
@@ -8749,8 +8753,8 @@ public class ManagerActivity extends TransfersManagementActivity
         // If the current storage state is not initialized is because the app received the
         // event informing about the storage state  during login, the ManagerActivity
         // wasn't active and for this reason the value is stored in the MegaApplication object.
-        int storageStateToCheck = (storageState != MegaApiJava.STORAGE_STATE_UNKNOWN) ?
-                storageState : app.getStorageState();
+        StorageState storageStateToCheck = (storageState != StorageState.Unknown) ?
+                storageState :  viewModel.getStorageState();
 
         checkStorageStatus(storageStateToCheck, onCreate);
     }
@@ -8761,10 +8765,10 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param newStorageState Storage state to check.
      * @param onCreate        Flag to indicate if the method was called from "onCreate" or not.
      */
-    private void checkStorageStatus(int newStorageState, boolean onCreate) {
+    private void checkStorageStatus(StorageState newStorageState, boolean onCreate) {
         Intent intent = new Intent(this, UploadService.class);
         switch (newStorageState) {
-            case MegaApiJava.STORAGE_STATE_GREEN:
+            case Green:
                 Timber.d("STORAGE STATE GREEN");
 
                 intent.setAction(ACTION_STORAGE_STATE_CHANGED);
@@ -8787,7 +8791,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 fireCameraUploadJob(ManagerActivity.this, false);
                 break;
 
-            case MegaApiJava.STORAGE_STATE_ORANGE:
+            case Orange:
                 Timber.w("STORAGE STATE ORANGE");
 
                 intent.setAction(ACTION_STORAGE_STATE_CHANGED);
@@ -8803,7 +8807,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (onCreate && isStorageStatusDialogShown) {
                     isStorageStatusDialogShown = false;
                     showStorageAlmostFullDialog();
-                } else if (newStorageState > storageState) {
+                } else if (newStorageState.ordinal() > storageState.ordinal()) {
                     showStorageAlmostFullDialog();
                 }
                 storageState = newStorageState;
@@ -8811,17 +8815,17 @@ public class ManagerActivity extends TransfersManagementActivity
                 fireCameraUploadJob(ManagerActivity.this, false);
                 break;
 
-            case MegaApiJava.STORAGE_STATE_RED:
+            case Red:
                 Timber.w("STORAGE STATE RED");
                 if (onCreate && isStorageStatusDialogShown) {
                     isStorageStatusDialogShown = false;
                     showStorageFullDialog();
-                } else if (newStorageState > storageState) {
+                } else if (newStorageState.ordinal() > storageState.ordinal()) {
                     showStorageFullDialog();
                 }
                 break;
 
-            case MegaApiJava.STORAGE_STATE_PAYWALL:
+            case PayWall:
                 Timber.w("STORAGE STATE PAYWALL");
                 break;
 
@@ -8838,7 +8842,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void showStorageAlmostFullDialog() {
         Timber.d("showStorageAlmostFullDialog");
-        showStorageStatusDialog(MegaApiJava.STORAGE_STATE_ORANGE, false, false);
+        showStorageStatusDialog(StorageState.Orange, false, false);
     }
 
     /**
@@ -8846,7 +8850,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void showStorageFullDialog() {
         Timber.d("showStorageFullDialog");
-        showStorageStatusDialog(MegaApiJava.STORAGE_STATE_RED, false, false);
+        showStorageStatusDialog(StorageState.Red, false, false);
     }
 
     /**
@@ -8857,7 +8861,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public void showOverquotaAlert(boolean preWarning) {
         Timber.d("preWarning: %s", preWarning);
         showStorageStatusDialog(
-                preWarning ? MegaApiJava.STORAGE_STATE_ORANGE : MegaApiJava.STORAGE_STATE_RED,
+                preWarning ? StorageState.Orange : StorageState.Red,
                 true, preWarning);
     }
 
@@ -8902,7 +8906,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param overquotaAlert Flag to indicate that is an overquota alert or not.
      * @param preWarning     Flag to indicate if is a pre-overquota alert or not.
      */
-    private void showStorageStatusDialog(int storageState, boolean overquotaAlert, boolean preWarning) {
+    private void showStorageStatusDialog(StorageState storageState, boolean overquotaAlert, boolean preWarning) {
         Timber.d("showStorageStatusDialog");
 
         if (myAccountInfo.getAccountType() == -1) {
@@ -8936,16 +8940,16 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         switch (storageState) {
-            case MegaApiJava.STORAGE_STATE_GREEN:
+            case Green:
                 Timber.d("STORAGE STATE GREEN");
                 return;
 
-            case MegaApiJava.STORAGE_STATE_ORANGE:
+            case Orange:
                 image.setImageResource(R.drawable.ic_storage_almost_full);
                 text.setText(String.format(getString(R.string.text_almost_full_warning), storageString, transferString));
                 break;
 
-            case MegaApiJava.STORAGE_STATE_RED:
+            case Red:
                 image.setImageResource(R.drawable.ic_storage_full);
                 text.setText(String.format(getString(R.string.text_storage_full_warning), storageString, transferString));
                 break;
@@ -9011,9 +9015,9 @@ public class ManagerActivity extends TransfersManagementActivity
             case MegaAccountDetails.ACCOUNT_TYPE_PROIII:
                 Timber.d("Show storage status dialog for USER PRO III");
                 if (!overquotaAlert) {
-                    if (storageState == MegaApiJava.STORAGE_STATE_ORANGE) {
+                    if (storageState == StorageState.Orange) {
                         text.setText(getString(R.string.text_almost_full_warning_pro3_account));
-                    } else if (storageState == MegaApiJava.STORAGE_STATE_RED) {
+                    } else if (storageState == StorageState.Red) {
                         text.setText(getString(R.string.text_storage_full_warning_pro3_account));
                     }
                 }
@@ -9028,9 +9032,9 @@ public class ManagerActivity extends TransfersManagementActivity
             case MegaAccountDetails.ACCOUNT_TYPE_PROII:
                 Timber.d("Show storage status dialog for USER PRO");
                 if (!overquotaAlert) {
-                    if (storageState == MegaApiJava.STORAGE_STATE_ORANGE) {
+                    if (storageState == StorageState.Orange) {
                         text.setText(String.format(getString(R.string.text_almost_full_warning_pro_account), storageString, transferString));
-                    } else if (storageState == MegaApiJava.STORAGE_STATE_RED) {
+                    } else if (storageState == StorageState.Red) {
                         text.setText(String.format(getString(R.string.text_storage_full_warning_pro_account), storageString, transferString));
                     }
                 }
@@ -11072,10 +11076,6 @@ public class ManagerActivity extends TransfersManagementActivity
             refreshFragment(FragmentTag.INBOX.getTag());
             selectDrawerItem(DrawerItem.INBOX);
         }
-    }
-
-    public int getStorageState() {
-        return storageState;
     }
 
     /**

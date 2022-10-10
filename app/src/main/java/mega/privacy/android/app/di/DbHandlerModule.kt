@@ -11,6 +11,8 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.SqliteDatabaseHandler
+import mega.privacy.android.data.mapper.StorageStateIntMapper
+import mega.privacy.android.data.mapper.StorageStateMapper
 import javax.inject.Singleton
 
 
@@ -19,8 +21,16 @@ import javax.inject.Singleton
 class DatabaseHandlerModule {
     @Singleton
     @Provides
-    fun provideDbHandler(@ApplicationContext context: Context): DatabaseHandler {
-        return SqliteDatabaseHandler.getDbHandler(context)
+    fun provideDbHandler(
+        @ApplicationContext context: Context,
+        storageStateMapper: StorageStateMapper,
+        storageStateIntMapper: StorageStateIntMapper,
+    ): DatabaseHandler {
+        return SqliteDatabaseHandler.getDbHandler(
+            context = context,
+            storageStateMapper = storageStateMapper,
+            storageStateIntMapper = storageStateIntMapper
+        )
     }
 }
 

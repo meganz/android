@@ -58,9 +58,17 @@ import javax.inject.Inject
  * @param monitorGlobalUpdates Monitor global updates
  * @param getRubbishBinChildrenNode Fetch the rubbish bin nodes
  * @param getBrowserChildrenNode Fetch the browser nodes
+ * @param monitorContactRequestUpdates
+ * @param getUploadFolderHandle
+ * @param getInboxNode
  * @param getRootFolder Fetch the root node
  * @param getNumUnreadUserAlerts
  * @param hasInboxChildren
+ * @param sendStatisticsMediaDiscovery
+ * @param savedStateHandle
+ * @param ioDispatcher
+ * @param monitorMyAvatarFile
+ * @param monitorStorageStateEvent monitor global storage state changes
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(

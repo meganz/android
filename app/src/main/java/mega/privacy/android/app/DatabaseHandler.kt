@@ -10,6 +10,7 @@ import mega.privacy.android.app.main.megachat.PendingMessageSingle
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.Backup
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 
 interface DatabaseHandler {
@@ -125,7 +126,7 @@ interface DatabaseHandler {
      *
      * @param storageState Storage state value.
      */
-    var storageState: Int
+    var storageState: StorageState
 
     /**
      * Set the handle of "My chat files" folder into the database.
