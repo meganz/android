@@ -1,8 +1,8 @@
 package mega.privacy.android.app.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.app.data.model.ChatRoomUpdate
-import mega.privacy.android.app.data.model.ChatUpdate
+import mega.privacy.android.data.model.ChatRoomUpdate
+import mega.privacy.android.data.model.ChatUpdate
 import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequestListenerInterface

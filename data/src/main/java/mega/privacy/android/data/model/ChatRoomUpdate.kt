@@ -1,8 +1,8 @@
-package mega.privacy.android.app.data.model
+package mega.privacy.android.data.model
 
 import nz.mega.sdk.MegaChatMessage
-import nz.mega.sdk.MegaChatRoomListenerInterface
 import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaChatRoomListenerInterface
 
 /**
  * Chat Room update events corresponding to [MegaChatRoomListenerInterface] callbacks.
