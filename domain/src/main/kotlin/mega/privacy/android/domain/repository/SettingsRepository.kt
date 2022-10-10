@@ -74,6 +74,13 @@ interface SettingsRepository {
     fun monitorHideRecentActivityEvent(): Flow<Boolean>
 
     /**
+     * Monitor hide recent activity setting
+     *
+     * @return hide recent activity option enabled status as a flow
+     */
+    fun monitorHideRecentActivity(): Flow<Boolean?>
+
+    /**
      * Set hide recent activity
      *
      * @param value

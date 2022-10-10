@@ -75,9 +75,16 @@ internal class UIPreferencesDatastore @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override fun monitorHideRecentActivity(): Flow<Boolean?> {
-        TODO("Not yet implemented")
-    }
+    override fun monitorHideRecentActivity(): Flow<Boolean?> = context.uiPreferenceDataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map {
+            it[hideRecentActivityKey]
+        }
 
     override suspend fun setHideRecentActivity(value: Boolean) {
         context.uiPreferenceDataStore.edit {

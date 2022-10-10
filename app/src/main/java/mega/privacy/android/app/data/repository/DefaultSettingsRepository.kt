@@ -182,6 +182,9 @@ class DefaultSettingsRepository @Inject constructor(
     override fun monitorHideRecentActivityEvent(): Flow<Boolean> =
         monitorHideRecentActivityFacade.getEvents()
 
+    override fun monitorHideRecentActivity(): Flow<Boolean?> =
+        uiPreferencesGateway.monitorHideRecentActivity()
+
     override suspend fun setHideRecentActivity(value: Boolean) =
         uiPreferencesGateway.setHideRecentActivity(value)
 
@@ -337,7 +340,7 @@ class DefaultSettingsRepository @Inject constructor(
 
     override fun monitorPreferredStartScreen() =
         uiPreferencesGateway.monitorPreferredStartScreen()
-            .map{ startScreenMapper(it) }
+            .map { startScreenMapper(it) }
 
     override suspend fun setPreferredStartScreen(screen: StartScreen) {
         uiPreferencesGateway.setPreferredStartScreen(screen.id)
