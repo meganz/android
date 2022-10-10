@@ -8955,7 +8955,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
 
             default:
-                Timber.w("STORAGE STATE INVALID VALUE: %d", storageState);
+                Timber.w("STORAGE STATE INVALID VALUE: %d", storageState.ordinal());
                 return;
         }
 
