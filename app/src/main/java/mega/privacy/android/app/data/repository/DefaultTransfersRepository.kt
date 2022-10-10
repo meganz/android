@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.domain.entity.transfer.TransferEvent

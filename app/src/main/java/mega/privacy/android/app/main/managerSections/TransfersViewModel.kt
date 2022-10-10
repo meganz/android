@@ -13,7 +13,7 @@ import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION

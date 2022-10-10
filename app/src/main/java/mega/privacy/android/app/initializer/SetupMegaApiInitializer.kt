@@ -8,7 +8,7 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.globalmanagement.BackgroundRequestListener
 import mega.privacy.android.app.listeners.GlobalListener
 import mega.privacy.android.app.utils.Util

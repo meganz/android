@@ -7,12 +7,8 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.facade.CacheFolderFacade
-import mega.privacy.android.app.data.facade.MegaApiFacade
 import mega.privacy.android.app.data.facade.MegaApiFolderFacade
-import mega.privacy.android.app.data.facade.MegaChatApiFacade
 import mega.privacy.android.app.data.facade.MegaLocalStorageFacade
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
@@ -41,13 +37,7 @@ abstract class GatewayModule {
     abstract fun bindAccountInfoWrapper(implementation: AccountInfoFacade): AccountInfoWrapper
 
     @Binds
-    abstract fun bindMegaApiWrapper(implementation: MegaApiFacade): MegaApiGateway
-
-    @Binds
     abstract fun bindMegaApiFolderGateway(implementation: MegaApiFolderFacade): MegaApiFolderGateway
-
-    @Binds
-    abstract fun bindMegaChatApiGateway(implementation: MegaChatApiFacade): MegaChatApiGateway
 
     @Binds
     abstract fun bindMegaDBHandlerWrapper(implementation: MegaLocalStorageFacade): MegaLocalStorageGateway

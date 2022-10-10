@@ -26,7 +26,7 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
@@ -179,12 +179,12 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
 
     var isEsid = false
 
-    var storageState = MegaApiJava.STORAGE_STATE_UNKNOWN //Default value
+    var storageState = StorageState.Unknown //Default value
 
     private val logoutReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == Constants.ACTION_LOG_OUT) {
-                storageState = MegaApiJava.STORAGE_STATE_UNKNOWN //Default value
+                storageState = StorageState.Unknown //Default value
             }
         }
     }

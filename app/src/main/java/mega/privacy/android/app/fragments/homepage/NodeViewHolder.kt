@@ -1,13 +1,12 @@
 package mega.privacy.android.app.fragments.homepage
 
-import android.view.View
 import androidx.core.view.isVisible
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemNodeGridBinding
 import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 

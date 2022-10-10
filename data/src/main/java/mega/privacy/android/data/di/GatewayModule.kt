@@ -7,6 +7,8 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.facade.AssetsFacade
 import mega.privacy.android.data.facade.CacheFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
+import mega.privacy.android.data.facade.MegaApiFacade
+import mega.privacy.android.data.facade.MegaChatApiFacade
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.AssetsGateway
@@ -16,6 +18,8 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.ZipFileCompressionGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
@@ -85,4 +89,10 @@ internal abstract class GatewayModule {
      */
     @Binds
     abstract fun bindUIPreferencesGateway(implementation: UIPreferencesDatastore): UIPreferencesGateway
+
+    @Binds
+    abstract fun bindMegaApiWrapper(implementation: MegaApiFacade): MegaApiGateway
+
+    @Binds
+    abstract fun bindMegaChatApiGateway(implementation: MegaChatApiFacade): MegaChatApiGateway
 }

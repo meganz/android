@@ -3,7 +3,7 @@ package mega.privacy.android.app.smsVerification.usecase
 import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.Completable
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import nz.mega.sdk.MegaApiAndroid
