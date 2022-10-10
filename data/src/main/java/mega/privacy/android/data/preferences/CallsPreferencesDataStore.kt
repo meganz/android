@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.preferences
+package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import java.io.IOException
 import javax.inject.Inject
 
@@ -30,7 +30,7 @@ private val Context.callsDataStore: DataStore<Preferences> by preferencesDataSto
  * @property ioDispatcher
  * @constructor Create empty calls preferences data store.
  **/
-class CallsPreferencesDataStore @Inject constructor(
+internal class CallsPreferencesDataStore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CallsPreferencesGateway {

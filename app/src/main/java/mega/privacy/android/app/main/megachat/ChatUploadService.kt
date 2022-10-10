@@ -31,7 +31,6 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -44,8 +43,6 @@ import mega.privacy.android.app.VideoDownsampling
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
-import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
@@ -69,8 +66,10 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -115,6 +114,8 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
     @Inject
     lateinit var getGlobalTransferUseCase: GetGlobalTransferUseCase
 
+    @Inject
+    lateinit var chatPreferencesGateway: ChatPreferencesGateway
 
     private var isForeground = false
     private var canceled = false
@@ -483,7 +484,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         val file = File(pendingMsg.getFilePath())
 
         sharingScope.launch {
-            ChatPreferencesDataStore(this@ChatUploadService, Dispatchers.IO)
+            chatPreferencesGateway
                 .getChatImageQualityPreference().collectLatest { imageQuality ->
                     val shouldCompressImage = MimeTypeList.typeForName(file.name).isImage
                             && !MimeTypeList.typeForName(file.name).isGIF

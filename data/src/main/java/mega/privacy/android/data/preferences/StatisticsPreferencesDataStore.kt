@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.preferences
+package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -37,7 +37,7 @@ private val Context.mediaDiscoveryStatisticsDataStore: DataStore<Preferences> by
  * @property ioDispatcher
  * @constructor Create empty chat preferences data store.
  **/
-class StatisticsPreferencesDataStore @Inject constructor(
+internal class StatisticsPreferencesDataStore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : StatisticsPreferencesGateway {

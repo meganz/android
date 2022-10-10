@@ -19,6 +19,10 @@ import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.print.PrintHelper
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,8 +32,6 @@ import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
-import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.app.data.repository.DefaultPushesRepository.Companion.PUSH_TOKEN
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.fragments.offline.OfflineFragment
@@ -67,6 +69,8 @@ import mega.privacy.android.app.utils.ZoomUtil.resetZoomLevel
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.domain.entity.SyncRecordType
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -77,6 +81,26 @@ import java.io.File
 import java.io.IOException
 
 class AccountController(private val context: Context) {
+
+    /**
+     * Account controller entry point
+     *
+     */
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface AccountControllerEntryPoint {
+        /**
+         * Chat preferences gateway
+         *
+         */
+        fun chatPreferencesGateway(): ChatPreferencesGateway
+
+        /**
+         * Calls preferences gateway
+         *
+         */
+        fun callsPreferencesGateway(): CallsPreferencesGateway
+    }
 
     fun existsAvatar(): Boolean {
         val avatar = buildAvatarFile(
@@ -364,9 +388,12 @@ class AccountController(private val context: Context) {
                 .edit().clear().apply()
 
             //clear chat and calls preferences
+            val entryPoint =
+                EntryPointAccessors.fromApplication(context,
+                    AccountControllerEntryPoint::class.java)
             sharingScope.launch(Dispatchers.IO) {
-                ChatPreferencesDataStore(context, Dispatchers.IO).clearPreferences()
-                CallsPreferencesDataStore(context, Dispatchers.IO).clearPreferences()
+                entryPoint.callsPreferencesGateway().clearPreferences()
+                entryPoint.chatPreferencesGateway().clearPreferences()
             }
 
             // Clear text editor preference
