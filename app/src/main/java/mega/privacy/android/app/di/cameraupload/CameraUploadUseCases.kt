@@ -13,6 +13,7 @@ import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSe
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.DefaultGetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeFromCloud
+import mega.privacy.android.app.domain.usecase.DefaultGetPendingUploadList
 import mega.privacy.android.app.domain.usecase.DefaultGetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetSyncFileUploadUris
@@ -31,6 +32,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByFingerprintAndParentNode
 import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
+import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
@@ -52,6 +54,7 @@ import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
+import mega.privacy.android.domain.usecase.DefaultGetGPSCoordinates
 import mega.privacy.android.domain.usecase.DefaultGetSyncRecordByPath
 import mega.privacy.android.domain.usecase.DefaultGetUploadFolderHandle
 import mega.privacy.android.domain.usecase.DefaultIsChargingRequired
@@ -62,6 +65,7 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
+import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetRemoveGps
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
@@ -439,6 +443,12 @@ abstract class CameraUploadUseCases {
     abstract fun bindCompressedVideoPending(compressedVideoPending: DefaultCompressedVideoPending): CompressedVideoPending
 
     /**
+     * Provide the GetGPSCoordinates implementation
+     */
+    @Binds
+    abstract fun bindGetGPSCoordinates(getGPSCoordinates: DefaultGetGPSCoordinates): GetGPSCoordinates
+
+    /**
      * Provide the IsChargingRequired implementation
      */
     @Binds
@@ -449,6 +459,12 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindSaveSyncRecordsToDB(saveSyncRecordsToDB: DefaultSaveSyncRecordsToDB): SaveSyncRecordsToDB
+
+    /**
+     * Provide the GetPendingUploadList implementation
+     */
+    @Binds
+    abstract fun bindGetPendingUploadList(getPendingUploadList: DefaultGetPendingUploadList): GetPendingUploadList
 
     /**
      * Provide the GetUploadFolderHandle implementation

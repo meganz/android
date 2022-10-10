@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.model
+package mega.privacy.android.data.model
 
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaEvent

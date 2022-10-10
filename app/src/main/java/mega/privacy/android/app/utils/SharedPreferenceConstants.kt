@@ -11,9 +11,6 @@ object SharedPreferenceConstants {
     const val START_SCREEN_LOGIN_TIMESTAMP = "START_SCREEN_LOGIN_TIMESTAMP"
     const val DO_NOT_ALERT_ABOUT_START_SCREEN = "DO_NOT_ALERT_ABOUT_START_SCREEN"
     const val HIDE_RECENT_ACTIVITY = "HIDE_RECENT_ACTIVITY"
-    const val APP_INFO_FILE = "APP_INFO"
-    const val APP_VERSION_CODE_KEY = "APP_VERSION_CODE"
-
 
     /**
      * Keys for backing up time stamps

@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
+import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -23,6 +24,24 @@ class DefaultCameraUploadRepositoryTest {
     private lateinit var underTest: CameraUploadRepository
 
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
+    private val fileAttributeGateway = mock<FileAttributeGateway>()
+
+    private val fakeRecord = SyncRecord(
+        id = 0,
+        localPath = null,
+        newPath = null,
+        originFingerprint = null,
+        newFingerprint = null,
+        timestamp = null,
+        fileName = null,
+        longitude = null,
+        latitude = null,
+        status = SyncStatus.STATUS_PENDING.value,
+        type = SyncRecordType.TYPE_ANY.value,
+        nodeHandle = null,
+        isCopyOnly = false,
+        isSecondary = false
+    )
 
     @Before
     fun setUp() {
@@ -30,7 +49,8 @@ class DefaultCameraUploadRepositoryTest {
             localStorageGateway = localStorageGateway,
             megaApiGateway = mock(),
             cacheGateway = mock(),
-            ioDispatcher = UnconfinedTestDispatcher()
+            fileAttributeGateway = fileAttributeGateway,
+            ioDispatcher = UnconfinedTestDispatcher(),
         )
     }
 
@@ -48,8 +68,8 @@ class DefaultCameraUploadRepositoryTest {
 
     @Test
     fun `test camera upload retrieves sync records`() = runTest {
-        whenever(localStorageGateway.getPendingSyncRecords()).thenReturn(listOf(SyncRecord()))
-        assertThat(underTest.getPendingSyncRecords()).isEqualTo(listOf(SyncRecord()))
+        whenever(localStorageGateway.getPendingSyncRecords()).thenReturn(listOf(fakeRecord))
+        assertThat(underTest.getPendingSyncRecords()).isEqualTo(listOf(fakeRecord))
     }
 
     @Test
@@ -66,12 +86,20 @@ class DefaultCameraUploadRepositoryTest {
 
     @Test
     fun `test camera upload gets sync record by fingerprint`() = runTest {
-        whenever(localStorageGateway.getSyncRecordByFingerprint(fingerprint = null,
-            isSecondary = false,
-            isCopy = false)).thenReturn(null)
-        assertThat(underTest.getSyncRecordByFingerprint(fingerprint = null,
-            isSecondary = false,
-            isCopy = false)).isEqualTo(null)
+        whenever(
+            localStorageGateway.getSyncRecordByFingerprint(
+                fingerprint = null,
+                isSecondary = false,
+                isCopy = false
+            )
+        ).thenReturn(null)
+        assertThat(
+            underTest.getSyncRecordByFingerprint(
+                fingerprint = null,
+                isSecondary = false,
+                isCopy = false
+            )
+        ).isEqualTo(null)
     }
 
     @Test
@@ -88,29 +116,44 @@ class DefaultCameraUploadRepositoryTest {
 
     @Test
     fun `test camera upload retrieves file name exists`() = runTest {
-        whenever(localStorageGateway.doesFileNameExist("",
-            false,
-            SyncRecordType.TYPE_ANY.value)).thenReturn(true)
+        whenever(
+            localStorageGateway.doesFileNameExist(
+                "",
+                false,
+                SyncRecordType.TYPE_ANY.value
+            )
+        ).thenReturn(true)
         assertThat(underTest.doesFileNameExist("", false, SyncRecordType.TYPE_ANY.value)).isEqualTo(
-            true)
+            true
+        )
     }
 
     @Test
     fun `test camera upload retrieves local path exists`() = runTest {
-        whenever(localStorageGateway.doesLocalPathExist("",
-            false,
-            SyncRecordType.TYPE_ANY.value)).thenReturn(true)
-        assertThat(underTest.doesLocalPathExist("",
-            false,
-            SyncRecordType.TYPE_ANY.value)).isEqualTo(
-            true)
+        whenever(
+            localStorageGateway.doesLocalPathExist(
+                "",
+                false,
+                SyncRecordType.TYPE_ANY.value
+            )
+        ).thenReturn(true)
+        assertThat(
+            underTest.doesLocalPathExist(
+                "",
+                false,
+                SyncRecordType.TYPE_ANY.value
+            )
+        ).isEqualTo(
+            true
+        )
     }
 
     @Test
     fun `test camera upload retrieves the correct sync time stamp`() = runTest {
         whenever(localStorageGateway.getPhotoTimeStamp()).thenReturn(150L)
         assertThat(underTest.getSyncTimeStamp(SyncTimeStamp.PRIMARY_PHOTO)).isEqualTo(
-            150L)
+            150L
+        )
     }
 
     @Test
@@ -199,17 +242,23 @@ class DefaultCameraUploadRepositoryTest {
 
     @Test
     fun `test camera upload retrieves maximal time stamp`() = runTest {
-        whenever(localStorageGateway.getMaxTimestamp(false,
-            SyncRecordType.TYPE_ANY.value)).thenReturn(1000L)
+        whenever(
+            localStorageGateway.getMaxTimestamp(
+                false,
+                SyncRecordType.TYPE_ANY.value
+            )
+        ).thenReturn(1000L)
         assertThat(underTest.getMaxTimestamp(false, SyncRecordType.TYPE_ANY.value)).isEqualTo(1000L)
     }
 
     @Test
     fun `test camera upload retrieves video sync records by status`() = runTest {
         whenever(localStorageGateway.getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING.value)).thenReturn(
-            listOf(SyncRecord(id = 111)))
+            listOf(fakeRecord)
+        )
         assertThat(underTest.getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING.value)).isEqualTo(
-            listOf(SyncRecord(id = 111)))
+            listOf(fakeRecord)
+        )
     }
 
     @Test
@@ -240,6 +289,26 @@ class DefaultCameraUploadRepositoryTest {
             val result = 2L
             whenever(localStorageGateway.getMegaHandleSecondaryFolder()).thenReturn(result)
             val actual = underTest.getSecondarySyncHandle()
+            assertThat(actual).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `test that correct GPS coordinates are retrieved by file type video`() {
+        val result = Pair(6F, 9F)
+        runTest {
+            whenever(fileAttributeGateway.getVideoGPSCoordinates("")).thenReturn(result)
+            val actual = underTest.getVideoGPSCoordinates("")
+            assertThat(actual).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `test that correct GPS coordinates are retrieved by file type photo`() {
+        val result = Pair(6F, 9F)
+        runTest {
+            whenever(fileAttributeGateway.getPhotoGPSCoordinates("")).thenReturn(result)
+            val actual = underTest.getPhotoGPSCoordinates("")
             assertThat(actual).isEqualTo(result)
         }
     }

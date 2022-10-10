@@ -25,7 +25,6 @@ import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodMapper
-import mega.privacy.android.data.mapper.SkuMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
@@ -70,7 +69,6 @@ import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
-import nz.mega.sdk.MegaRequest
 
 /**
  * Module for providing mapper dependencies

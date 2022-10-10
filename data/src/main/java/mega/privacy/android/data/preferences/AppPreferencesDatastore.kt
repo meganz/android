@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.preferences
+package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -13,6 +13,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.catch
@@ -21,7 +22,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.KEY_APPEARANCE_COLOR_THEME
-import org.jetbrains.anko.defaultSharedPreferences
 import java.io.IOException
 import javax.inject.Inject
 
@@ -31,7 +31,7 @@ private val Context.appPreferencesDatastore: DataStore<Preferences> by preferenc
     produceMigrations = {
         listOf(
             SharedPreferencesMigration(
-                produceSharedPreferences = it::defaultSharedPreferences,
+                produceSharedPreferences = { PreferenceManager.getDefaultSharedPreferences(it) },
                 keysToMigrate = setOf(KEY_APPEARANCE_COLOR_THEME)
             )
         )
@@ -43,7 +43,7 @@ private val Context.appPreferencesDatastore: DataStore<Preferences> by preferenc
  * @property context
  * @property ioDispatcher
  */
-class AppPreferencesDatastore @Inject constructor(
+internal class AppPreferencesDatastore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AppPreferencesGateway {

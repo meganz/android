@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.preferences
+package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -13,11 +13,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
-import mega.privacy.android.app.utils.SharedPreferenceConstants
 import java.io.IOException
 import javax.inject.Inject
 
-private const val appInfoPreferenceFileName = SharedPreferenceConstants.APP_INFO_FILE
+private const val APP_INFO_FILE = "APP_INFO"
+private const val APP_VERSION_CODE_KEY = "APP_VERSION_CODE"
+private const val appInfoPreferenceFileName = APP_INFO_FILE
 private val Context.appInfoPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = appInfoPreferenceFileName,
     produceMigrations = {
@@ -26,7 +27,7 @@ private val Context.appInfoPreferenceDataStore: DataStore<Preferences> by prefer
                 context = it,
                 sharedPreferencesName = appInfoPreferenceFileName,
                 keysToMigrate = setOf(
-                    SharedPreferenceConstants.APP_VERSION_CODE_KEY,
+                    APP_VERSION_CODE_KEY,
                 )
             ),
         )
@@ -36,11 +37,11 @@ private val Context.appInfoPreferenceDataStore: DataStore<Preferences> by prefer
  * App info preferences datastore
  *
  */
-class AppInfoPreferencesDatastore @Inject constructor(
+internal class AppInfoPreferencesDatastore @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : AppInfoPreferencesGateway {
     private val preferredAppVersionCodeKey =
-        intPreferencesKey(SharedPreferenceConstants.APP_VERSION_CODE_KEY)
+        intPreferencesKey(APP_VERSION_CODE_KEY)
 
     override suspend fun setLastVersionCode(versionCode: Int) {
         context.appInfoPreferenceDataStore.edit {

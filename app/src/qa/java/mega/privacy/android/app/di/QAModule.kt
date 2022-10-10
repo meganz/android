@@ -21,7 +21,6 @@ import mega.privacy.android.app.data.gateway.MotionSensorFacade
 import mega.privacy.android.app.data.gateway.MotionSensorGateway
 import mega.privacy.android.app.data.gateway.VibratorFacade
 import mega.privacy.android.app.data.gateway.VibratorGateway
-import mega.privacy.android.app.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.app.data.repository.DefaultQARepository
 import mega.privacy.android.app.data.repository.DefaultShakeDetectorRepository
 import mega.privacy.android.app.data.usecase.DefaultDetectShake
@@ -39,6 +38,7 @@ import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
 import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagMapper
 import mega.privacy.android.app.presentation.featureflag.model.toFeatureFlag
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
+import mega.privacy.android.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
