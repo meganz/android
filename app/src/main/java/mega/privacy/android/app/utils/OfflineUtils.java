@@ -25,7 +25,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.shareNodes;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.isOnline;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import android.app.Activity;
 import android.content.Context;

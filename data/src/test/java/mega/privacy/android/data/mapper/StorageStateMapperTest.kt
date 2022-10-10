@@ -15,15 +15,15 @@ class StorageStateMapperTest {
     @Test
     fun `test that storage type can be mapped correctly`() {
         val unknownState = 100
-        val expectedResults = HashMap<Int, StorageState>().apply {
-            put(STORAGE_STATE_UNKNOWN, StorageState.Unknown)
-            put(STORAGE_STATE_GREEN, StorageState.Green)
-            put(STORAGE_STATE_ORANGE, StorageState.Orange)
-            put(STORAGE_STATE_RED, StorageState.Red)
-            put(STORAGE_STATE_CHANGE, StorageState.Change)
-            put(STORAGE_STATE_PAYWALL, StorageState.PayWall)
-            put(unknownState, StorageState.Unknown)
-        }
+        val expectedResults = mapOf(
+            STORAGE_STATE_UNKNOWN to StorageState.Unknown,
+            STORAGE_STATE_GREEN to StorageState.Green,
+            STORAGE_STATE_ORANGE to StorageState.Orange,
+            STORAGE_STATE_RED to StorageState.Red,
+            STORAGE_STATE_CHANGE to StorageState.Change,
+            STORAGE_STATE_PAYWALL to StorageState.PayWall,
+            unknownState to StorageState.Unknown,
+        )
 
         expectedResults.forEach { (key, value) ->
             val actual = toStorageState(key)

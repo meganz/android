@@ -12,6 +12,7 @@ import android.text.TextUtils
 import android.util.Base64
 import dagger.hilt.android.EntryPointAccessors.fromApplication
 import mega.privacy.android.app.DatabaseHandler.Companion.MAX_TRANSFERS
+import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.di.LegacyLoggingEntryPoint
 import mega.privacy.android.app.logging.LegacyLoggingSettings
@@ -34,6 +35,8 @@ import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.contacts.MegaContactGetter.MegaContact
+import mega.privacy.android.data.mapper.StorageStateMapper
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -43,9 +46,14 @@ import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.util.Collections
 
+/**
+ * Sqlite implementation of database handler
+ */
 open class SqliteDatabaseHandler(
     context: Context?,
     private val legacyLoggingSettings: LegacyLoggingSettings,
+    private val storageStateMapper: StorageStateMapper,
+    private val storageStateIntMapper: StorageStateIntMapper,
 ) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), DatabaseHandler {
     private var db: SQLiteDatabase
@@ -137,7 +145,7 @@ open class SqliteDatabaseHandler(
                 "$KEY_SHOW_NOTIF_OFF TEXT, " +                                  //12
                 "$KEY_LAST_PUBLIC_HANDLE TEXT, " +                              //13
                 "$KEY_LAST_PUBLIC_HANDLE_TIMESTAMP TEXT, " +                    //14
-                "$KEY_STORAGE_STATE INTEGER DEFAULT '${encrypt(MegaApiJava.STORAGE_STATE_UNKNOWN.toString())}'," +              //15
+                "$KEY_STORAGE_STATE INTEGER DEFAULT '${encrypt(storageStateIntMapper(StorageState.Unknown).toString())}'," +              //15
                 "$KEY_LAST_PUBLIC_HANDLE_TYPE INTEGER DEFAULT '${encrypt(MegaApiJava.AFFILIATE_TYPE_INVALID.toString())}', " +  //16
                 "$KEY_MY_CHAT_FILES_FOLDER_HANDLE TEXT DEFAULT '${encrypt(MegaApiJava.INVALID_HANDLE.toString())}', " +         //17
                 "$KEY_TRANSFER_QUEUE_STATUS BOOLEAN DEFAULT '${encrypt("false")}')"  //18 - True if the queue is paused, false otherwise
@@ -519,7 +527,7 @@ open class SqliteDatabaseHandler(
         }
         if (oldVersion <= 46) {
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_STORAGE_STATE INTEGER;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_STORAGE_STATE = '${encrypt(MegaApiJava.STORAGE_STATE_UNKNOWN.toString())}';")
+            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_STORAGE_STATE = '${encrypt(storageStateIntMapper(StorageState.Unknown).toString())}';")
         }
         if (oldVersion <= 47) {
             db.execSQL(CREATE_MEGA_CONTACTS_TABLE)
@@ -2022,7 +2030,8 @@ open class SqliteDatabaseHandler(
         values.put(KEY_LAST_PUBLIC_HANDLE, encrypt(attr.lastPublicHandle.toString()))
         values.put(KEY_LAST_PUBLIC_HANDLE_TIMESTAMP,
             encrypt(attr.lastPublicHandleTimeStamp.toString()))
-        values.put(KEY_STORAGE_STATE, encrypt(Integer.toString(attr.storageState)))
+        values.put(KEY_STORAGE_STATE,
+            encrypt(storageStateIntMapper(attr.storageState).toString()))
         values.put(KEY_LAST_PUBLIC_HANDLE_TYPE,
             encrypt(attr.lastPublicHandleType.toString()))
         values.put(KEY_MY_CHAT_FILES_FOLDER_HANDLE,
@@ -2111,7 +2120,8 @@ open class SqliteDatabaseHandler(
                         lastPublicHandle,
                         lastPublicHandleTimeStamp,
                         lastPublicHandleType?.toIntOrNull() ?: MegaApiJava.AFFILIATE_TYPE_INVALID,
-                        storageState?.toIntOrNull() ?: MegaApiJava.STORAGE_STATE_UNKNOWN,
+                        storageState?.toIntOrNull()?.let { storageStateMapper(it) }
+                            ?: StorageState.Unknown,
                         myChatFilesFolderHandle,
                         transferQueueStatus
                     )
@@ -3725,16 +3735,21 @@ open class SqliteDatabaseHandler(
      *
      * @param storageState Storage state value.
      */
-    override var storageState: Int
+    override var storageState: StorageState
         get() {
             Timber.i("Getting the storage state from DB")
-            return getIntValue(TABLE_ATTRIBUTES,
-                KEY_STORAGE_STATE,
-                MegaApiJava.STORAGE_STATE_UNKNOWN)
+            return storageStateMapper(
+                getIntValue(
+                    tableName = TABLE_ATTRIBUTES,
+                    columnName = KEY_STORAGE_STATE,
+                    defaultValue = storageStateIntMapper(StorageState.Unknown),
+                )
+            )
+
         }
         set(storageState) {
             Timber.i("Setting the storage state in the DB")
-            setIntValue(TABLE_ATTRIBUTES, KEY_STORAGE_STATE, storageState)
+            setIntValue(TABLE_ATTRIBUTES, KEY_STORAGE_STATE, storageStateIntMapper(storageState))
         }
     /**
      * Get the handle of "My chat files" folder from the database.
@@ -4667,7 +4682,11 @@ open class SqliteDatabaseHandler(
 
         @JvmStatic
         @Synchronized
-        fun getDbHandler(context: Context): DatabaseHandler {
+        fun getDbHandler(
+            context: Context,
+            storageStateMapper: StorageStateMapper,
+            storageStateIntMapper: StorageStateIntMapper,
+        ): DatabaseHandler {
             Timber.d("getDbHandler")
 
             if (instance == null) {
@@ -4677,7 +4696,12 @@ open class SqliteDatabaseHandler(
                     LegacyLoggingEntryPoint::class.java
                 ).legacyLoggingSettings
 
-                instance = SqliteDatabaseHandler(context, legacyLoggingSettings)
+                instance = SqliteDatabaseHandler(
+                    context = context,
+                    legacyLoggingSettings = legacyLoggingSettings,
+                    storageStateMapper = storageStateMapper,
+                    storageStateIntMapper = storageStateIntMapper
+                )
             }
             return instance as DatabaseHandler
         }

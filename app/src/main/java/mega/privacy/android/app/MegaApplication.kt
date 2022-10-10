@@ -179,12 +179,12 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
 
     var isEsid = false
 
-    var storageState = MegaApiJava.STORAGE_STATE_UNKNOWN //Default value
+    var storageState = StorageState.Unknown //Default value
 
     private val logoutReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == Constants.ACTION_LOG_OUT) {
-                storageState = MegaApiJava.STORAGE_STATE_UNKNOWN //Default value
+                storageState = StorageState.Unknown //Default value
             }
         }
     }
