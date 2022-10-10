@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.data.model.GlobalUpdate
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder

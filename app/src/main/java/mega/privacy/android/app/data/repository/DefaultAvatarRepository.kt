@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.model.GlobalUpdate
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.wrapper.AvatarWrapper

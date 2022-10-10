@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.model.GlobalUpdate
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.app.data.repository.DefaultAccountRepository
 import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.data.mapper.AccountTypeMapper
