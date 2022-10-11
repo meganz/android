@@ -6,6 +6,8 @@ import javax.inject.Inject
 
 /**
  * Filter Favourite photos
+ *
+ * @param photosRepository
  */
 class DefaultFilterFavourite @Inject constructor(
     val photosRepository: PhotosRepository,
