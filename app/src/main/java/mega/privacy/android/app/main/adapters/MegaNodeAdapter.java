@@ -288,6 +288,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             Timber.d("PUT pos: %s", pos);
             selectedItems.put(pos, true);
         }
+
+        hideMultipleSelect();
         notifyItemChanged(pos);
     }
 
