@@ -72,8 +72,6 @@ import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.inject.Inject;
-
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
 import mega.privacy.android.app.MegaApplication;
@@ -85,7 +83,6 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
-import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
@@ -117,9 +114,6 @@ public class SearchFragment extends RotatableFragment {
     private OutgoingSharesViewModel outgoingSharesViewModel;
     private LinksViewModel linksViewModel;
     private SearchViewModel viewModel;
-
-    @Inject
-    SortOrderManagement sortOrderManagement;
 
     private Context context;
     private RecyclerView recyclerView;
@@ -787,7 +781,7 @@ public class SearchFragment extends RotatableFragment {
                         mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
                     }
 
-                    mediaIntent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
+                    mediaIntent.putExtra("orderGetChildren", viewModel.getOrder());
                     putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_SEARCH, adapter);
                     manageNodes(mediaIntent);
 
