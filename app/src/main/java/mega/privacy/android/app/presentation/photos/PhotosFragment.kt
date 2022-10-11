@@ -298,7 +298,8 @@ class PhotosFragment : Fragment() {
         }
 
         PhotosBodyView(
-            photosViewState = photosViewState,
+            tabs = photosViewState.tabs,
+            selectedTab = photosViewState.selectedTab,
             pagerState = pagerState,
             onTabSelected = this::onTabSelected,
             timelineView = { timelineView(timelineViewState = timelineViewState) },

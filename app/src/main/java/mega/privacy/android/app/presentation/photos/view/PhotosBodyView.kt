@@ -24,12 +24,12 @@ import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
-import mega.privacy.android.app.presentation.photos.model.PhotosViewState
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 
 @Composable
 fun PhotosBodyView(
-    photosViewState: PhotosViewState = PhotosViewState(),
+    tabs: List<PhotosTab> = listOf(),
+    selectedTab: PhotosTab = PhotosTab.Timeline,
     pagerState: PagerState = rememberPagerState(),
     onTabSelected: (PhotosTab) -> Unit = {},
     timelineView: @Composable () -> Unit = {},
@@ -39,13 +39,13 @@ fun PhotosBodyView(
     Column {
         if (timelineViewState.selectedPhotoCount == 0) {
             PhotosTabs(
-                tabs = photosViewState.tabs,
-                onTabSelected = onTabSelected,
-                pagerState = pagerState,
+                tabs = tabs,
+                selectedTab = selectedTab,
+                onTabSelected = onTabSelected
             )
         }
         PagerView(
-            tabs = photosViewState.tabs,
+            tabs = tabs,
             pagerState = pagerState,
             timelineView = timelineView,
             albumsView = albumsView,
@@ -57,11 +57,11 @@ fun PhotosBodyView(
 @Composable
 fun PhotosTabs(
     tabs: List<PhotosTab>,
+    selectedTab: PhotosTab,
     onTabSelected: (PhotosTab) -> Unit,
-    pagerState: PagerState = rememberPagerState(),
     modifier: Modifier = Modifier,
 ) {
-    val selectedTabIndex = pagerState.currentPage
+    val selectedTabIndex = selectedTab.ordinal
     TabRow(
         selectedTabIndex = selectedTabIndex,
         indicator = { tabPositions: List<TabPosition> ->
