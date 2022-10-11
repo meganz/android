@@ -12,6 +12,7 @@ package mega.privacy.android.app.presentation.manager.model
  * @param isFirstLogin is first login
  * @param hasInboxChildren whether any nodes for Inbox
  * @param shouldStopCameraUpload camera upload should be stopped or not
+ * @param shouldSendCameraBroadcastEvent broadcast event should be sent or not
  */
 data class ManagerState(
     val browserParentHandle: Long = -1L,
