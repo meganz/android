@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
@@ -22,6 +23,8 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase.Companion.TYPE_GENERAL
+import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.RootNodeExists
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
@@ -35,6 +38,8 @@ import javax.inject.Inject
  * @param monitorNodeUpdates Monitor global node updates
  * @param rootNodeExists Check if the root node exists
  * @param searchNodesUseCase Perform a search request
+ * @param getCloudSortOrder Get the Cloud Sort Order
+ * @param sortOrderIntMapper Sort Order Int Mapper
  */
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -42,6 +47,8 @@ class SearchViewModel @Inject constructor(
     private val rootNodeExists: RootNodeExists,
     private val getRootFolder: GetRootFolder,
     private val searchNodesUseCase: SearchNodesUseCase,
+    private val getCloudSortOrder: GetCloudSortOrder,
+    private val sortOrderIntMapper: SortOrderIntMapper,
 ) : ViewModel() {
 
     /**
@@ -316,4 +323,8 @@ class SearchViewModel @Inject constructor(
             isInProgress = false
         )
 
+    /**
+     * Get Cloud Sort Order
+     */
+    fun getOrder() = runBlocking { sortOrderIntMapper(getCloudSortOrder()) }
 }

@@ -75,12 +75,6 @@ import kotlin.collections.ArrayList
 class InboxFragment : RotatableFragment() {
 
     /**
-     * Inject [SortOrderManagement] to the Fragment
-     */
-    @Inject
-    lateinit var sortOrderManagement: SortOrderManagement
-
-    /**
      * Inject [MegaApiAndroid] to the Fragment
      */
     @MegaApi
@@ -181,14 +175,14 @@ class InboxFragment : RotatableFragment() {
             if (megaApi.inboxNode != null) {
                 Timber.d("InboxNode != null")
                 inboxNode = megaApi.inboxNode
-                nodes = megaApi.getChildren(inboxNode, sortOrderManagement.getOrderCloud())
+                nodes = megaApi.getChildren(inboxNode, viewModel.getOrder())
             }
         } else {
             Timber.d("Parent Handle: %d", parentHandleInbox)
             val parentNode = megaApi.getNodeByHandle(parentHandleInbox)
             if (parentNode != null) {
                 logParentNodeHandle(parentNode)
-                nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
+                nodes = megaApi.getChildren(parentNode, viewModel.getOrder())
             }
         }
         (requireActivity() as ManagerActivity).invalidateOptionsMenu()
@@ -498,12 +492,12 @@ class InboxFragment : RotatableFragment() {
 
         inboxNode?.let {
             if (parentHandleInbox == -1L || parentHandleInbox == it.handle) {
-                nodes = megaApi.getChildren(it, sortOrderManagement.getOrderCloud())
+                nodes = megaApi.getChildren(it, viewModel.getOrder())
             } else {
                 val parentNode = megaApi.getNodeByHandle(parentHandleInbox)
                 if (parentNode != null) {
                     logParentNodeHandle(parentNode)
-                    nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
+                    nodes = megaApi.getChildren(parentNode, viewModel.getOrder())
                 }
             }
         }
@@ -521,7 +515,7 @@ class InboxFragment : RotatableFragment() {
             val intent = getIntentForParentNode(
                 context = requireContext(),
                 parentNodeHandle = megaApi.getParentNode(node).handle,
-                childOrder = sortOrderManagement.getOrderCloud(),
+                childOrder = viewModel.getOrder(),
                 currentNodeHandle = node.handle,
             )
             putThumbnailLocation(
@@ -563,7 +557,7 @@ class InboxFragment : RotatableFragment() {
                     megaApi.getParentNode(node).handle)
             }
             mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                sortOrderManagement.getOrderCloud())
+                viewModel.getOrder())
             putThumbnailLocation(
                 launchIntent = mediaIntent,
                 rv = recyclerView,
@@ -743,7 +737,7 @@ class InboxFragment : RotatableFragment() {
                     (requireActivity() as ManagerActivity).parentHandleInbox = it[position].handle
                 }
                 nodes = megaApi.getChildren((nodes ?: return)[position],
-                    sortOrderManagement.getOrderCloud())
+                    viewModel.getOrder())
                 adapter?.setNodes(nodes)
                 setContent()
                 recyclerView?.scrollToPosition(0)
@@ -795,7 +789,7 @@ class InboxFragment : RotatableFragment() {
                 (requireActivity() as ManagerActivity).invalidateOptionsMenu()
                 (requireActivity() as ManagerActivity).parentHandleInbox = parentNode.handle
                 (requireActivity() as ManagerActivity).setToolbarTitle()
-                nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud())
+                nodes = megaApi.getChildren(parentNode, viewModel.getOrder())
                 setNodes(nodes)
 
                 var lastVisiblePosition = 0
