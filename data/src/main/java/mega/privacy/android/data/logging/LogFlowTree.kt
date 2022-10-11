@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.logging.tree
+package mega.privacy.android.data.logging
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -22,7 +22,7 @@ import timber.log.Timber
  *
  * @property logFlow a flow where all sdk log messages are emitted
  */
-class LogFlowTree(
+internal class LogFlowTree(
     dispatcher: CoroutineDispatcher,
     private val createLogEntry: CreateLogEntry,
 ) : Timber.Tree() {

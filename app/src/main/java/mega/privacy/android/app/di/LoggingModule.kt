@@ -6,14 +6,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
+import mega.privacy.android.app.domain.usecase.GetCurrentTimeStringFromCalendar
 import mega.privacy.android.data.gateway.FileLogWriter
 import mega.privacy.android.data.gateway.LogWriterGateway
 import mega.privacy.android.data.gateway.TimberChatLogger
 import mega.privacy.android.data.gateway.TimberMegaLogger
-import mega.privacy.android.app.domain.usecase.GetCurrentTimeStringFromCalendar
-import mega.privacy.android.app.logging.ChatLogger
-import mega.privacy.android.app.logging.SdkLogger
-import mega.privacy.android.app.presentation.logging.tree.LogFlowTree
+import mega.privacy.android.data.qualifier.ChatLogger
+import mega.privacy.android.data.qualifier.SdkLogger
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
@@ -82,20 +81,6 @@ abstract class LoggingModule {
         @Provides
         fun provideResetSdkLogger(loggingRepository: LoggingRepository): ResetSdkLogger =
             ResetSdkLogger(loggingRepository::resetSdkLogging)
-
-        @SdkLogger
-        @Provides
-        fun provideSdkLogFlowTree(
-            @SdkLogger useCase: CreateLogEntry,
-            @IoDispatcher dispatcher: CoroutineDispatcher,
-        ): LogFlowTree = LogFlowTree(dispatcher, useCase)
-
-        @ChatLogger
-        @Provides
-        fun provideChatLogFlowTree(
-            @ChatLogger useCase: CreateLogEntry,
-            @IoDispatcher dispatcher: CoroutineDispatcher,
-        ): LogFlowTree = LogFlowTree(dispatcher, useCase)
 
         @Provides
         fun provideInitialiseLogging(

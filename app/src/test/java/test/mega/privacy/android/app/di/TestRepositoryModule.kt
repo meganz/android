@@ -20,7 +20,6 @@ import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
-import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
@@ -58,9 +57,6 @@ object TestRepositoryModule {
 
     @Provides
     fun bindFavouritesRepository(): FavouritesRepository = mock()
-
-    @Provides
-    fun bindLoggingRepository(): LoggingRepository = mock()
 
     @Provides
     fun bindAlbumsRepository(): AlbumsRepository = mock()
