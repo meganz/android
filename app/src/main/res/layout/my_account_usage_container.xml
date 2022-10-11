@@ -44,14 +44,13 @@
                 tools:text="30%" />
 
             <ImageView
-                android:id="@+id/business_storage_image"
+                android:id="@+id/no_percentage_storage_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:layout_marginStart="2dp"
-                android:layout_marginTop="22dp"
                 android:layout_marginEnd="12dp"
-                android:layout_marginBottom="22dp"
-                android:src="@drawable/ic_business_storage"
+                android:src="@drawable/ic_storage"
                 tools:ignore="ContentDescription" />
 
         </RelativeLayout>
@@ -107,14 +106,13 @@
                 tools:text="30%" />
 
             <ImageView
-                android:id="@+id/business_transfer_image"
+                android:id="@+id/no_percentage_transfer_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:layout_marginStart="2dp"
-                android:layout_marginTop="22dp"
                 android:layout_marginEnd="12dp"
-                android:layout_marginBottom="22dp"
-                android:src="@drawable/ic_business_transfers"
+                android:src="@drawable/ic_transfer"
                 tools:ignore="ContentDescription" />
 
         </RelativeLayout>

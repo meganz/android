@@ -409,6 +409,7 @@ import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
@@ -704,6 +705,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private EmojiTextView nVDisplayName;
     TextView nVEmail;
     TextView businessLabel;
+    private TextView proFlexiLabel;
     RoundedImageView nVPictureProfile;
     TextView spaceTV;
     ProgressBar usedSpacePB;
@@ -1870,6 +1872,8 @@ public class ManagerActivity extends TransfersManagementActivity
 
         businessLabel = findViewById(R.id.business_label);
         businessLabel.setVisibility(View.GONE);
+
+        proFlexiLabel = findViewById(R.id.pro_flexi_label);
 
         fragmentContainer = findViewById(R.id.fragment_container);
         spaceTV = (TextView) findViewById(R.id.navigation_drawer_space);
@@ -7574,7 +7578,14 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             } else {
                 businessLabel.setVisibility(View.GONE);
-                upgradeAccount.setVisibility(View.VISIBLE);
+                if (myAccountInfo.getAccountType() == PRO_FLEXI) {
+                    upgradeAccount.setVisibility(View.GONE);
+                    proFlexiLabel.setVisibility(View.VISIBLE);
+                } else {
+                    upgradeAccount.setVisibility(View.VISIBLE);
+                    proFlexiLabel.setVisibility(View.GONE);
+                }
+
                 if (settingsSeparator != null) {
                     settingsSeparator.setVisibility(View.GONE);
                 }
@@ -7610,7 +7621,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 long usedSpace = myAccountInfo.getUsedStorage();
                 Timber.d("Progress: %d, Used space: %d", progress, usedSpace);
                 usedSpacePB.setProgress(progress);
-                if (progress >= 0 && usedSpace >= 0) {
+                if (myAccountInfo.getAccountType() != PRO_FLEXI && progress >= 0 && usedSpace >= 0) {
                     usedSpaceLayout.setVisibility(View.VISIBLE);
                 } else {
                     usedSpaceLayout.setVisibility(View.GONE);
