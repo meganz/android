@@ -18,6 +18,7 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
@@ -97,4 +98,7 @@ object TestManagerUseCases {
     fun provideGetInboxNode() = mock<GetInboxNode> {
         onBlocking { invoke() }.thenReturn(MegaNode())
     }
+
+    @Provides
+    fun provideCheckCameraUpload() = mock<CheckCameraUpload> {}
 }

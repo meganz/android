@@ -16,20 +16,22 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetInboxNode
+import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
+import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
+import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
-import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
@@ -60,8 +62,11 @@ class ManagerViewModelTest {
     private val savedStateHandle = SavedStateHandle(mapOf())
     private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
     private val getInboxNode = mock<GetInboxNode>()
-    private val getUploadFolderHandle = mock<GetUploadFolderHandle>()
     private val monitorStorageState = mock<MonitorStorageStateEvent>()
+    private val getPrimarySyncHandle = mock<GetPrimarySyncHandle>()
+    private val getSecondarySyncHandle = mock<GetSecondarySyncHandle>()
+    private val checkCameraUpload = mock<CheckCameraUpload>()
+
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -90,8 +95,10 @@ class ManagerViewModelTest {
             monitorMyAvatarFile = monitorMyAvatarFile,
             ioDispatcher = StandardTestDispatcher(),
             getInboxNode = getInboxNode,
-            getUploadFolderHandle = getUploadFolderHandle,
             monitorStorageStateEvent = monitorStorageState,
+            getPrimarySyncHandle = getPrimarySyncHandle,
+            getSecondarySyncHandle = getSecondarySyncHandle,
+            checkCameraUpload = checkCameraUpload
         )
     }
 
@@ -416,7 +423,7 @@ class ManagerViewModelTest {
     fun `test that saved state values are returned`() = runTest {
         setUnderTest()
 
-        savedStateHandle.set(underTest.isFirstLoginKey, true)
+        savedStateHandle[underTest.isFirstLoginKey] = true
 
         underTest.state.filter {
             it.isFirstLogin
