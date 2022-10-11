@@ -463,7 +463,7 @@ pipeline {
                     // Compile and run unit tests for available modules
                     sh "./gradlew testGmsDebugUnitTest"
                     sh "./gradlew domain:test"
-                    sh "./gradlew :data:testDebugUnitTest"
+                    sh "./gradlew :data:testGmsDebugUnitTest"
 
                     script {
                         // below code is only run when UnitTest is OK, before test reports are cleaned up.
@@ -471,7 +471,7 @@ pipeline {
                         // We have to collect the report here, before they are cleaned in the last stage.
                         APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
                         DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
-                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testDebugUnitTest")
+                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
                         APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports", "app_unit_test_result.zip")
                         DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports", "domain_unit_test_result.zip")
                         DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports", "data_unit_test_result.zip")
@@ -497,8 +497,8 @@ pipeline {
                         println("DOMAIN_COVERAGE = ${DOMAIN_COVERAGE}")
 
                         // data coverage
-                        sh "./gradlew data:testDebugUnitTestCoverage"
-                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.csv")}"
+                        sh "./gradlew data:testGmsDebugUnitTestCoverage"
+                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
                         println("DATA_COVERAGE = ${DATA_COVERAGE}")
 
                         // temporarily disable the failed test cases

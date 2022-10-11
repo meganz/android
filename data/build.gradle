@@ -54,6 +54,16 @@ android {
             }
         }
     }
+
+    flavorDimensions "service"
+    productFlavors {
+        gms {
+            dimension "service"
+        }
+        hms {
+            dimension "service"
+        }
+    }
 }
 
 dependencies {
