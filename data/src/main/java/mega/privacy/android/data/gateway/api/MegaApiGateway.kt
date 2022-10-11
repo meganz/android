@@ -1,8 +1,8 @@
-package mega.privacy.android.app.data.gateway.api
+package mega.privacy.android.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.data.model.GlobalUpdate
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
@@ -761,4 +761,9 @@ interface MegaApiGateway {
      * @param listener
      */
     fun creditCardQuerySubscriptions(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Get the selected user attribute for the logged in user
+     */
+    fun getUserAttribute(attributeIdentifier: Int, listener: MegaRequestListenerInterface)
 }

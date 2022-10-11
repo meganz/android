@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.favourites.facade
 
 import android.content.Context
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util

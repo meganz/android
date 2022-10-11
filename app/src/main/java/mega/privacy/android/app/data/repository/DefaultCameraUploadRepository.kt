@@ -2,9 +2,10 @@ package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
+    private val fileAttributeGateway: FileAttributeGateway,
     private val cacheGateway: CacheGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CameraUploadRepository {
@@ -27,7 +29,6 @@ class DefaultCameraUploadRepository @Inject constructor(
     override fun getInvalidHandle(): Long {
         return megaApiGateway.getInvalidHandle()
     }
-
 
     override suspend fun getPrimarySyncHandle(): Long? = withContext(ioDispatcher) {
         localStorageGateway.getCamSyncHandle()
@@ -89,9 +90,11 @@ class DefaultCameraUploadRepository @Inject constructor(
         isSecondary: Boolean,
     ) =
         withContext(ioDispatcher) {
-            localStorageGateway.deleteSyncRecordByFingerPrint(originalPrint,
+            localStorageGateway.deleteSyncRecordByFingerPrint(
+                originalPrint,
                 newPrint,
-                isSecondary)
+                isSecondary
+            )
         }
 
     override suspend fun getSyncRecordByFingerprint(
@@ -150,9 +153,11 @@ class DefaultCameraUploadRepository @Inject constructor(
                 SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.setPhotoTimeStamp(timeStamp)
                 SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.setVideoTimeStamp(timeStamp)
                 SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.setSecondaryPhotoTimeStamp(
-                    timeStamp)
+                    timeStamp
+                )
                 SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.setSecondaryVideoTimeStamp(
-                    timeStamp)
+                    timeStamp
+                )
             }
         }
     }
@@ -254,10 +259,22 @@ class DefaultCameraUploadRepository @Inject constructor(
         localPath: String?,
         isSecondary: Boolean,
     ) = withContext(ioDispatcher) {
-        localStorageGateway.updateSyncRecordStatusByLocalPath(syncStatusType,
+        localStorageGateway.updateSyncRecordStatusByLocalPath(
+            syncStatusType,
             localPath,
-            isSecondary)
+            isSecondary
+        )
     }
+
+    override suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float> =
+        withContext(ioDispatcher) {
+            fileAttributeGateway.getVideoGPSCoordinates(filePath)
+        }
+
+    override suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Float, Float> =
+        withContext(ioDispatcher) {
+            fileAttributeGateway.getPhotoGPSCoordinates(filePath)
+        }
 
     override suspend fun backupTimestampsAndFolderHandle() = withContext(ioDispatcher) {
         val primaryHandle = localStorageGateway.getCamSyncHandle() ?: getInvalidHandle()

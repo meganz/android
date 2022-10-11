@@ -1,5 +1,8 @@
 package mega.privacy.android.app;
 
+import androidx.annotation.NonNull;
+
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiJava;
 import timber.log.Timber;
 
@@ -20,7 +23,7 @@ public class MegaAttributes {
     private String lastPublicHandle;
     private String lastPublicHandleTimeStamp;
     private int lastPublicHandleType;
-    private int storageState;
+    private StorageState storageState;
     private String myChatFilesFolderHandle;
     private String transferQueueStatus;
 
@@ -29,7 +32,7 @@ public class MegaAttributes {
                           String pricingTimeStamp, String extendedAccountDetailsTimeStamp,
                           String invalidateSdkCache, String useHttpsOnly, String showCopyright,
                           String showNotifOff, String lastPublicHandle,
-                          String lastPublicHandleTimeStamp, int lastPublicHandleType, int storageState,
+                          String lastPublicHandleTimeStamp, int lastPublicHandleType, @NonNull StorageState storageState,
                           String myChatFilesFolderHandle, String transferQueueStatus) {
         this.online = online;
         this.attempts = attemps;
@@ -171,11 +174,11 @@ public class MegaAttributes {
         this.lastPublicHandleType = lastPublicHandleType;
     }
 
-    public int getStorageState() {
+    public @NonNull StorageState getStorageState() {
         return storageState;
     }
 
-    public void setStorageState(int storageState) {
+    public void setStorageState(@NonNull StorageState storageState) {
         this.storageState = storageState;
     }
 

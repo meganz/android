@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.preferences
+package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -36,7 +36,7 @@ private val Context.loggingDataStore: DataStore<Preferences> by preferencesDataS
  * @property ioDispatcher
  * @constructor Create empty Logging preferences data store
  */
-class LoggingPreferencesDataStore @Inject constructor(
+internal class LoggingPreferencesDataStore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : LoggingPreferencesGateway {

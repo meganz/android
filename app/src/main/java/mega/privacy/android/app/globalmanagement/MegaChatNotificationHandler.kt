@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import me.leolin.shortcutbadger.ShortcutBadger
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.main.megachat.BadgeIntentService
 import mega.privacy.android.app.utils.Constants
 import nz.mega.sdk.MegaApiAndroid

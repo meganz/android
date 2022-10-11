@@ -6,6 +6,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
+
 import mega.privacy.android.app.di.MapperModule
 import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
@@ -17,7 +18,6 @@ import org.mockito.kotlin.mock
 )
 @Module
 object TestMapperModule {
-
     @Provides
     fun provideDataMapper(): DataMapper = mock()
 
@@ -29,5 +29,4 @@ object TestMapperModule {
 
     @Provides
     fun provideRepeatToggleModeMapper(): RepeatToggleModeMapper = mock()
-
 }

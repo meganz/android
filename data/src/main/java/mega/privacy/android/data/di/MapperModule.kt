@@ -11,11 +11,11 @@ import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
+import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
@@ -25,10 +25,10 @@ import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodMapper
-import mega.privacy.android.data.mapper.SkuMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanMapper
@@ -43,6 +43,7 @@ import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
+import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toChatRequest
 import mega.privacy.android.data.mapper.toContactData
@@ -70,7 +71,6 @@ import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
-import nz.mega.sdk.MegaRequest
 
 /**
  * Module for providing mapper dependencies
@@ -179,6 +179,12 @@ internal class MapperModule {
      */
     @Provides
     fun provideStorageStateMapper(): StorageStateMapper = ::toStorageState
+
+    /**
+     * Provide [StorageState] to [Int] mapper
+     */
+    @Provides
+    fun provideStorageStateIntMapper(): StorageStateIntMapper = ::storageStateToInt
 
     /**
      * Provide node update mapper

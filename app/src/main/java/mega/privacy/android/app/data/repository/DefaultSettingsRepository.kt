@@ -15,7 +15,7 @@ import mega.privacy.android.app.data.extensions.failWithException
 import mega.privacy.android.app.data.extensions.isTypeWithParam
 import mega.privacy.android.app.data.gateway.MonitorHideRecentActivityFacade
 import mega.privacy.android.app.data.gateway.MonitorStartScreenFacade
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil

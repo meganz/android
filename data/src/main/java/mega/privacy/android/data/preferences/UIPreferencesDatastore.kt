@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.preferences
+package mega.privacy.android.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
-import mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN
-import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import java.io.IOException
 import javax.inject.Inject
 
+private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
+private const val PREFERRED_START_SCREEN = "PREFERRED_START_SCREEN"
 private const val uiPreferenceFileName = USER_INTERFACE_PREFERENCES
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = uiPreferenceFileName,
@@ -33,7 +33,7 @@ private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferences
         )
     })
 
-class UIPreferencesDatastore @Inject constructor(
+internal class UIPreferencesDatastore @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : UIPreferencesGateway {
     private val preferredStartScreenKey = intPreferencesKey(PREFERRED_START_SCREEN)

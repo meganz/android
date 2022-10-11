@@ -1,7 +1,7 @@
 package mega.privacy.android.app.usecase.chat
 
 import io.reactivex.rxjava3.core.Single
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.usecase.exception.AttachmentDoesNotExistException
 import mega.privacy.android.app.usecase.exception.ChatDoesNotExistException
 import mega.privacy.android.app.usecase.exception.MessageDoesNotExistException
