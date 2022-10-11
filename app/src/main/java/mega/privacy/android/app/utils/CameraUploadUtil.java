@@ -225,6 +225,13 @@ public class CameraUploadUtil {
         fireStopCameraUploadJob(app);
     }
 
+
+    public static void disableMediaUploadProcess() {
+        resetMUTimestampsAndCache();
+        dbH.setSecondaryUploadEnabled(false);
+        fireStopCameraUploadJob(app);
+    }
+
     /**
      * This method is to disable the settings in database, clean the sync records by default
      */
