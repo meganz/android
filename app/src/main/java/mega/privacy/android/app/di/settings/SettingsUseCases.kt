@@ -46,9 +46,6 @@ import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 abstract class SettingsUseCases {
 
     @Binds
-    abstract fun bindGetAccountDetails(useCase: DefaultGetAccountDetails): GetAccountDetails
-
-    @Binds
     abstract fun bindCanDeleteAccount(useCase: DefaultCanDeleteAccount): CanDeleteAccount
 
     @Binds
