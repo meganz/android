@@ -10,6 +10,7 @@ import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.di.MapperModule
 import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -18,6 +19,9 @@ import org.mockito.kotlin.mock
 )
 @Module
 object TestMapperModule {
+
+    val sortOrderIntMapper = mock<SortOrderIntMapper>()
+
     @Provides
     fun provideDataMapper(): DataMapper = mock()
 

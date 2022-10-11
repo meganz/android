@@ -29,16 +29,30 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.ActiveFragment
+import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
-import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.app.utils.ChangeApiServerUtil
+import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
+import mega.privacy.android.app.utils.Constants.FREE
+import mega.privacy.android.app.utils.Constants.PRO_FLEXI
+import mega.privacy.android.app.utils.Constants.PRO_I
+import mega.privacy.android.app.utils.Constants.PRO_II
+import mega.privacy.android.app.utils.Constants.PRO_III
+import mega.privacy.android.app.utils.Constants.PRO_LITE
+import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaUser
@@ -324,7 +338,7 @@ class MyAccountFragment : Fragment(), Scrollable {
         }
 
         binding.accountTypeText.isVisible = true
-        binding.upgradeButton.isVisible = true
+        binding.upgradeButton.isVisible = !viewModel.isProFlexiAccount()
 
         binding.accountTypeIcon.setImageDrawable(
             ContextCompat.getDrawable(
@@ -335,6 +349,7 @@ class MyAccountFragment : Fragment(), Scrollable {
                     PRO_II -> R.drawable.ic_pro_ii_account
                     PRO_III -> R.drawable.ic_pro_iii_account
                     PRO_LITE -> R.drawable.ic_lite_account
+                    PRO_FLEXI -> R.drawable.ic_pro_flexi_account
                     else -> R.drawable.ic_free_account
                 }
             )
@@ -347,6 +362,7 @@ class MyAccountFragment : Fragment(), Scrollable {
                 PRO_II -> R.string.pro2_account
                 PRO_III -> R.string.pro3_account
                 PRO_LITE -> R.string.prolite_account
+                PRO_FLEXI -> R.string.pro_flexi_account
                 else -> R.string.recovering_info
             }
         )
@@ -357,7 +373,7 @@ class MyAccountFragment : Fragment(), Scrollable {
                 when (viewModel.getAccountType()) {
                     FREE -> R.color.green_400_green_300
                     PRO_LITE -> R.color.orange_600_orange_300
-                    PRO_I, PRO_II, PRO_III -> R.color.red_300_red_200
+                    PRO_I, PRO_II, PRO_III, PRO_FLEXI -> R.color.red_300_red_200
                     else -> R.color.white_black
                 }
             )
@@ -367,7 +383,11 @@ class MyAccountFragment : Fragment(), Scrollable {
 
         binding.businessAccountManagementText.isVisible = false
 
-        usageBinding.update(viewModel)
+        if (viewModel.isProFlexiAccount()) {
+            usageBinding.updateBusinessOrProFlexi(viewModel)
+        } else {
+            usageBinding.update(viewModel)
+        }
     }
 
     private fun setupBusinessAccount() {
@@ -413,7 +433,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             binding.businessAccountManagementText.isVisible = false
         }
 
-        usageBinding.businessUpdate(viewModel)
+        usageBinding.updateBusinessOrProFlexi(viewModel)
 
         binding.achievementsLayout.isVisible = false
     }

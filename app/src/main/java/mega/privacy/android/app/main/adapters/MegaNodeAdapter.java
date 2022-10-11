@@ -89,7 +89,7 @@ import mega.privacy.android.app.main.ContactSharedFolderFragment;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.main.managerSections.InboxFragment;
+import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
@@ -288,6 +288,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             Timber.d("PUT pos: %s", pos);
             selectedItems.put(pos, true);
         }
+
+        hideMultipleSelect();
         notifyItemChanged(pos);
     }
 

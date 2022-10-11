@@ -77,9 +77,6 @@ import static mega.privacy.android.app.utils.CallUtil.setCallMenuItem;
 import static mega.privacy.android.app.utils.CallUtil.showCallLayout;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationInACall;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationOpenCamera;
-import static mega.privacy.android.app.utils.CameraUploadUtil.backupTimestampsAndFolderHandle;
-import static mega.privacy.android.app.utils.CameraUploadUtil.disableCameraUploadSettingProcess;
-import static mega.privacy.android.app.utils.CameraUploadUtil.disableMediaUploadProcess;
 import static mega.privacy.android.app.utils.CameraUploadUtil.getPrimaryFolderHandle;
 import static mega.privacy.android.app.utils.CameraUploadUtil.getSecondaryFolderHandle;
 import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
@@ -115,7 +112,6 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TE
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
-import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbish;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog;
@@ -335,7 +331,7 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment;
-import mega.privacy.android.app.main.managerSections.InboxFragment;
+import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.main.managerSections.NotificationsFragment;
 import mega.privacy.android.app.main.managerSections.TransfersFragment;
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment;
@@ -413,6 +409,7 @@ import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
@@ -521,8 +518,6 @@ public class ManagerActivity extends TransfersManagementActivity
     CheckPasswordReminderUseCase checkPasswordReminderUseCase;
     @Inject
     CookieDialogHandler cookieDialogHandler;
-    @Inject
-    SortOrderManagement sortOrderManagement;
     @Inject
     MyAccountInfo myAccountInfo;
     @Inject
@@ -710,6 +705,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private EmojiTextView nVDisplayName;
     TextView nVEmail;
     TextView businessLabel;
+    private TextView proFlexiLabel;
     RoundedImageView nVPictureProfile;
     TextView spaceTV;
     ProgressBar usedSpacePB;
@@ -1137,7 +1133,7 @@ public class ManagerActivity extends TransfersManagementActivity
             ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
                             ? parentNode
                             : megaApi.getRootNode(),
-                    sortOrderManagement.getOrderCloud());
+                    viewModel.getOrder());
 
             fileBrowserFragment.setNodes(nodes);
             fileBrowserFragment.getRecyclerView().invalidate();
@@ -1876,6 +1872,8 @@ public class ManagerActivity extends TransfersManagementActivity
 
         businessLabel = findViewById(R.id.business_label);
         businessLabel.setVisibility(View.GONE);
+
+        proFlexiLabel = findViewById(R.id.pro_flexi_label);
 
         fragmentContainer = findViewById(R.id.fragment_container);
         spaceTV = (TextView) findViewById(R.id.navigation_drawer_space);
@@ -2645,6 +2643,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
             updateInboxSectionVisibility(managerState.getHasInboxChildren());
+            stopUploadProcessAndSendBroadcast(managerState.getShouldStopCameraUpload(), managerState.getShouldSendCameraBroadcastEvent());
             return Unit.INSTANCE;
         });
     }
@@ -5827,68 +5826,17 @@ public class ManagerActivity extends TransfersManagementActivity
             LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
         }
 
-        checkCameraUploadFolder(true, null);
+        viewModel.checkCameraUploadFolder(true, null);
         refreshRubbishBin();
         setToolbarTitle();
     }
 
-    /**
-     * After nodes on Cloud Drive changed or some nodes are moved to rubbish bin,
-     * need to check CU and MU folders' status.
-     *
-     * @param shouldDisable If CU or MU folder is deleted by current client, then CU should be disabled. Otherwise not.
-     * @param updatedNodes  Nodes which have changed.
-     */
-    private void checkCameraUploadFolder(boolean shouldDisable, List<MegaNode> updatedNodes) {
-        // Get CU and MU folder hanlde from local setting.
-        long primaryHandle = getPrimaryFolderHandle();
-        long secondaryHandle = getSecondaryFolderHandle();
-
-        if (updatedNodes != null) {
-            List<Long> handles = new ArrayList<>();
-            for (MegaNode node : updatedNodes) {
-                handles.add(node.getHandle());
-            }
-            // If CU and MU folder don't change then return.
-            if (!handles.contains(primaryHandle) && !handles.contains(secondaryHandle)) {
-                Timber.d("Updated nodes don't include CU/MU, return.");
-                return;
-            }
+    private void stopUploadProcessAndSendBroadcast(boolean shouldStopUpload, boolean shouldSendBroadCastEvent) {
+        if (shouldStopUpload) {
+            fireStopCameraUploadJob(app);
         }
-
-        MegaPreferences prefs = dbH.getPreferences();
-        boolean isSecondaryEnabled = false;
-        if (prefs != null) {
-            isSecondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
-        }
-
-        // Check if CU and MU folder are moved to rubbish bin.
-        boolean isPrimaryFolderInRubbish = isNodeInRubbish(primaryHandle);
-        boolean isSecondaryFolderInRubbish = isSecondaryEnabled && isNodeInRubbish(secondaryHandle);
-
-        // If only MU folder is in rubbish bin.
-        if (isSecondaryFolderInRubbish && !isPrimaryFolderInRubbish) {
-            Timber.d("MU folder is deleted, backup settings and disable MU.");
-            if (shouldDisable) {
-                // Back up timestamps and disabled MU upload.
-                backupTimestampsAndFolderHandle();
-                disableMediaUploadProcess();
-            } else {
-                // Just stop the upload process.
-                fireStopCameraUploadJob(app);
-            }
-        } else if (isPrimaryFolderInRubbish) {
-            // If CU folder is in rubbish bin.
-            Timber.d("CU folder is deleted, backup settings and disable CU.");
-            if (shouldDisable) {
-                // Disable both CU and MU.
-                backupTimestampsAndFolderHandle();
-                disableCameraUploadSettingProcess(false);
-                sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
-            } else {
-                // Just stop the upload process.
-                fireStopCameraUploadJob(app);
-            }
+        if (shouldSendBroadCastEvent) {
+            sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
         }
     }
 
@@ -5897,10 +5845,10 @@ public class ManagerActivity extends TransfersManagementActivity
         if (rubbishBinFragment != null) {
             ArrayList<MegaNode> nodes;
             if (viewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
-                nodes = megaApi.getChildren(megaApi.getRubbishNode(), sortOrderManagement.getOrderCloud());
+                nodes = megaApi.getChildren(megaApi.getRubbishNode(), viewModel.getOrder());
             } else {
                 nodes = megaApi.getChildren(megaApi.getNodeByHandle(viewModel.getState().getValue().getRubbishBinParentHandle()),
-                        sortOrderManagement.getOrderCloud());
+                        viewModel.getOrder());
             }
 
             rubbishBinFragment.hideMultipleSelect();
@@ -7630,7 +7578,14 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             } else {
                 businessLabel.setVisibility(View.GONE);
-                upgradeAccount.setVisibility(View.VISIBLE);
+                if (myAccountInfo.getAccountType() == PRO_FLEXI) {
+                    upgradeAccount.setVisibility(View.GONE);
+                    proFlexiLabel.setVisibility(View.VISIBLE);
+                } else {
+                    upgradeAccount.setVisibility(View.VISIBLE);
+                    proFlexiLabel.setVisibility(View.GONE);
+                }
+
                 if (settingsSeparator != null) {
                     settingsSeparator.setVisibility(View.GONE);
                 }
@@ -7666,7 +7621,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 long usedSpace = myAccountInfo.getUsedStorage();
                 Timber.d("Progress: %d, Used space: %d", progress, usedSpace);
                 usedSpacePB.setProgress(progress);
-                if (progress >= 0 && usedSpace >= 0) {
+                if (myAccountInfo.getAccountType() != PRO_FLEXI && progress >= 0 && usedSpace >= 0) {
                     usedSpaceLayout.setVisibility(View.VISIBLE);
                 } else {
                     usedSpaceLayout.setVisibility(View.GONE);
@@ -7709,12 +7664,12 @@ public class ManagerActivity extends TransfersManagementActivity
         if (isCloudAdded()) {
             ArrayList<MegaNode> nodes;
             if (viewModel.getState().getValue().getBrowserParentHandle() == -1) {
-                nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+                nodes = megaApi.getChildren(parentNode, viewModel.getOrder());
             } else {
                 parentNode = megaApi.getNodeByHandle(viewModel.getState().getValue().getBrowserParentHandle());
                 if (parentNode == null) return;
 
-                nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+                nodes = megaApi.getChildren(parentNode, viewModel.getOrder());
             }
             Timber.d("Nodes: %s", nodes.size());
             if (comesFromNotificationChildNodeHandleList == null) {
@@ -8296,7 +8251,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
                                 ? parentNode
                                 : megaApi.getRootNode(),
-                        sortOrderManagement.getOrderCloud());
+                        viewModel.getOrder());
 
                 fileBrowserFragment.setNodes(nodes);
                 fileBrowserFragment.getRecyclerView().invalidate();
@@ -8523,7 +8478,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
             if (isCloudAdded()) {
                 ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(viewModel.getState().getValue().getBrowserParentHandle()),
-                        sortOrderManagement.getOrderCloud());
+                        viewModel.getOrder());
                 fileBrowserFragment.setNodes(nodes);
                 fileBrowserFragment.getRecyclerView().invalidate();
             }
@@ -8539,18 +8494,18 @@ public class ManagerActivity extends TransfersManagementActivity
         Timber.d("Create group chat with participants: %s", peers.size());
 
         if (isEKR) {
-            megaChatApi.createGroupChat(peers, chatTitle,  false, false, allowAddParticipants, this);
+            megaChatApi.createGroupChat(peers, chatTitle, false, false, allowAddParticipants, this);
         } else {
             if (chatLink) {
                 if (chatTitle != null && !chatTitle.isEmpty()) {
                     CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
-                    megaChatApi.createPublicChat(peers, chatTitle,  false, false, allowAddParticipants, listener);
+                    megaChatApi.createPublicChat(peers, chatTitle, false, false, allowAddParticipants, listener);
 
                 } else {
                     showAlert(this, getString(R.string.message_error_set_title_get_link), null);
                 }
             } else {
-                megaChatApi.createPublicChat(peers, chatTitle,  false, false, allowAddParticipants, this);
+                megaChatApi.createPublicChat(peers, chatTitle, false, false, allowAddParticipants, this);
             }
         }
     }
@@ -9933,7 +9888,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private void onUpdateNodes(@NonNull List<MegaNode> updatedNodes) {
         dismissAlertDialogIfExists(statusDialog);
 
-        checkCameraUploadFolder(false, updatedNodes);
+        viewModel.checkCameraUploadFolder(false, updatedNodes);
 
         LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
 
@@ -10017,7 +9972,7 @@ public class ManagerActivity extends TransfersManagementActivity
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setMessage(getResources().getQuantityString(R.plurals.cancel_selected_transfers, selectedTransfers.size()))
                 .setPositiveButton(R.string.button_continue, (dialog, which) -> {
-                    for (MegaTransfer transfer: selectedTransfers) {
+                    for (MegaTransfer transfer : selectedTransfers) {
                         megaApi.cancelTransfer(transfer, new OptionalMegaRequestListenerInterface() {
                             @Override
                             public void onRequestFinish(@NonNull MegaApiJava api,

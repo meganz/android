@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
-import android.text.TextUtils
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -531,30 +530,31 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 if (!includeGPS) {
                     dbH.setRemoveGPS(true)
                     JobUtil.rescheduleCameraUpload(context)
-                }
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                    // Devices whose Android OS is below Android 10 do not need to request for the
-                    // ACCESS_MEDIA_LOCATION permission. Enable Camera Uploads with Location Tags immediately
-                    Timber.d("Device OS is below Android 10. Enable Camera Uploads with Location Tags")
-                    dbH.setRemoveGPS(false)
-                    JobUtil.rescheduleCameraUpload(context)
                 } else {
-                    // Otherwise if the device is running on Android 10 above, check whether the
-                    // ACCESS_MEDIA_LOCATION permission is granted or not
-                    Timber.d("Device OS is Android 10 above. Checking if ACCESS_MEDIA_LOCATION is granted")
-                    if (hasPermissions(context, Manifest.permission.ACCESS_MEDIA_LOCATION)) {
-                        // ACCESS_MEDIA_LOCATION permission is granted. Enable Camera Uploads with Location Tags
-                        Timber.d("ACCESS_MEDIA_LOCATION permission granted. Enable Camera Uploads with Location Tags")
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                        // Devices whose Android OS is below Android 10 do not need to request for the
+                        // ACCESS_MEDIA_LOCATION permission. Enable Camera Uploads with Location Tags immediately
+                        Timber.d("Device OS is below Android 10. Enable Camera Uploads with Location Tags")
                         dbH.setRemoveGPS(false)
                         JobUtil.rescheduleCameraUpload(context)
                     } else {
-                        // ACCESS_MEDIA_LOCATION permission is denied. Request to enable the
-                        // ACCESS_MEDIA_LOCATION permission
-                        Timber.d("ACCESS_MEDIA_LOCATION permission denied. Launching permission window")
-                        includeGPS = false
-                        dbH.setRemoveGPS(true)
-                        cameraUploadIncludeGPS?.isChecked = includeGPS
-                        enableCameraUploadsWithLocationPermissionLauncher.launch(Manifest.permission.ACCESS_MEDIA_LOCATION)
+                        // Otherwise if the device is running on Android 10 above, check whether the
+                        // ACCESS_MEDIA_LOCATION permission is granted or not
+                        Timber.d("Device OS is Android 10 above. Checking if ACCESS_MEDIA_LOCATION is granted")
+                        if (hasPermissions(context, Manifest.permission.ACCESS_MEDIA_LOCATION)) {
+                            // ACCESS_MEDIA_LOCATION permission is granted. Enable Camera Uploads with Location Tags
+                            Timber.d("ACCESS_MEDIA_LOCATION permission granted. Enable Camera Uploads with Location Tags")
+                            dbH.setRemoveGPS(false)
+                            JobUtil.rescheduleCameraUpload(context)
+                        } else {
+                            // ACCESS_MEDIA_LOCATION permission is denied. Request to enable the
+                            // ACCESS_MEDIA_LOCATION permission
+                            Timber.d("ACCESS_MEDIA_LOCATION permission denied. Launching permission window")
+                            includeGPS = false
+                            dbH.setRemoveGPS(true)
+                            cameraUploadIncludeGPS?.isChecked = includeGPS
+                            enableCameraUploadsWithLocationPermissionLauncher.launch(Manifest.permission.ACCESS_MEDIA_LOCATION)
+                        }
                     }
                 }
             }
@@ -950,6 +950,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * Displays an [AlertDialog] informing the user that the Business Account administrator can
      * access your Camera Uploads
      */
+
     private fun showBusinessCameraUploadsAlert() {
         if (businessCameraUploadsAlertDialog != null && (businessCameraUploadsAlertDialog
                 ?: return).isShowing
@@ -1022,7 +1023,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             includeGPS = false
             dbH.setRemoveGPS(true)
         } else {
-            includeGPS = removeGPSString.toBoolean()
+            Timber.d("Remove GPS is $removeGPSString")
+            includeGPS = !removeGPSString.toBoolean()
         }
 
         cameraUploadIncludeGPS?.let {
@@ -1269,7 +1271,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         prefs = dbH.preferences
         videoQuality?.let { preferenceScreen.addPreference(it) }
         val uploadQuality = prefs.uploadVideoQuality
-        if (TextUtils.isEmpty(uploadQuality)) {
+        if (uploadQuality.isNullOrBlank()) {
             prefs.uploadVideoQuality =
                 VideoQuality.ORIGINAL.value.toString()
             dbH.setCameraUploadVideoQuality(VideoQuality.ORIGINAL.value)

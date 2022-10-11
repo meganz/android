@@ -320,7 +320,7 @@ class FavouritesViewModel @Inject constructor(
                 favourite = null,
                 forceUpdate = headerForceUpdate,
                 orderStringId = SortByHeaderViewModel.orderNameMap[order
-                    ?: getCloudSortOrder()]
+                    ?: sortOrderIntMapper(getCloudSortOrder())]
             )
         )
         favouriteList.map { favourite ->

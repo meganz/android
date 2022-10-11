@@ -710,7 +710,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA SDK軟體開發包版本</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGAchat SDK版本</string>
+    <string name="settings_about_karere_version">MEGA chat SDK版本</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">檢視來源碼</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -888,7 +888,7 @@
         <item quantity="other">此資料夾正與%1$d個聯絡人共享中。請問要取消所有的共享嗎？</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">無效的電子信箱和/或密碼。請再試一次。</string>
+    <string name="error_incorrect_email_or_password">無效的電子郵件地址或密碼。請重試。</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">由於違反服務條款，您的帳戶已被暫停。請聯繫 support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
@@ -1852,7 +1852,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">啟用網址連結預覽功能</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">讓MEGAchat使用更順暢。為了顯示預覽縮圖，系統將對您所傳的連結內容進行檢索，此動作並不會使用點對點加密。</string>
+    <string name="text_enable_rich_links">讓MEGA chat使用更順暢。為了顯示預覽縮圖，系統將對您所傳的連結內容進行檢索，此動作並不會使用點對點加密。</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">請輸入一組更高強度的密碼</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2787,10 +2787,6 @@
     <string name="browse_files_label">瀏覽檔案</string>
     <!-- Title of the File Provider activity -->
     <string name="file_provider_title">附加自⋯</string>
-    <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
-    <string name="inactive_chat_title_2">對話已建立%s</string>
-    <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
-    <string name="inactive_chat_title">對話建立於%s</string>
     <!-- Title of the chat when multi-selection is activated -->
     <string name="select_message_title">選擇訊息</string>
     <!-- The label that describes that a transfer failed. -->
@@ -3127,8 +3123,6 @@
     <string name="settings_media_audio_files">音樂檔案</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">在背景中播放</string>
-    <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]沒有[/B][A]相片[/A][B]被找到[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">自動備份相片與影片到您的MEGA雲端硬碟。</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3399,8 +3393,6 @@
     <string name="show_activity_action">顯示動態</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]近期[/B]動態已隱藏</string>
-    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
-    <string name="video_quality_info">您可以在相機上傳的設定中調降影片畫質來節省空間。</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">原始品質</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
@@ -3765,14 +3757,8 @@
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">篩選</string>
-    <!-- Filter option to show all photos -->
-    <string name="photos_filter_all_photos"></string>
-    <!-- Filter option to show only photos from Cloud Drive -->
-    <string name="photos_filter_cloud_drive">從雲端硬碟</string>
     <!-- Filter option to show only photos and videos from Camera Uploads folder -->
     <string name="photos_filter_camera_uploads">相機上傳</string>
-    <!-- Filter option to show only videos from Camera Uploads -->
-    <string name="photos_filter_videos_only">只有影片</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
     <string name="dialog_cannot_open_file_title">無法開啟檔案</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
@@ -3866,7 +3852,7 @@
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
     <string name="text_editor_creation_error">檔案未儲存到雲端硬碟。請重試。</string>
     <!-- Action label to start images slideshow -->
-    <string name="action_slideshow">投影播放</string>
+    <string name="action_slideshow">幻燈片</string>
     <!-- Filter page: Prompt to choose media type -->
     <string name="filter_prompt_media_type">選擇類型</string>
     <!-- Filter page: Button text for all media type -->
@@ -3899,4 +3885,34 @@
     <string name="dialog_account_suspended_ToS_copyright_message">帳戶因侵犯版權而被暫停。我們向您發送了一封電子郵件，其中包含有關此內容的更多訊息。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">帳戶因違反MEGA服務條款而被終止，例如侵犯他人權益、共享和匯入非法資料、或濫用系統資源行為。</string>
+    <!-- Title of the Meetings tab for the chat section -->
+    <string name="chat_tab_meetings_title">會議</string>
+    <!-- Title of the location option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_location_option">位置</string>
+    <!-- Used in chat screen to indicate last message sent by me -->
+    <string name="chat_last_message_sender_me">我</string>
+    <!-- Hint the screen is locked in video player page -->
+    <string name="video_player_locked_hint">螢幕被鎖定</string>
+    <!-- Hint that tap to unlock in video player page -->
+    <string name="video_player_unlock_hint">點按即可解鎖</string>
+    <!-- Label that schedule a meeting -->
+    <string name="chat_schedule_meeting">安排會議</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
+    <string name="upgrade_account_successful_pro_lite_monthly">感謝您訂閱Pro&#160;Lite月方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
+    <string name="upgrade_account_successful_pro_lite_yearly">感謝您訂閱Pro&#160;Lite年方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
+    <string name="upgrade_account_successful_pro_1_monthly">感謝您訂閱Pro&#160;I月方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
+    <string name="upgrade_account_successful_pro_1_yearly">感謝您訂閱Pro&#160;I年方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
+    <string name="upgrade_account_successful_pro_2_monthly">感謝您訂閱Pro&#160;II月方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
+    <string name="upgrade_account_successful_pro_2_yearly">感謝您訂閱Pro&#160;II年方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
+    <string name="upgrade_account_successful_pro_3_monthly">感謝您訂閱Pro&#160;III月方案</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
+    <string name="upgrade_account_successful_pro_3_yearly">感謝您訂閱Pro&#160;III年方案</string>
+    <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
+    <string name="chat_group_chat_info_allow_non_host_participants_option">允許非主持人新增參與者</string>
 </resources>
