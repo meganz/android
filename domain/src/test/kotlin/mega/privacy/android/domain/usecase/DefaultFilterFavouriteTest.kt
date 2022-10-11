@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.repository.PhotosRepository
 import org.junit.Before
@@ -99,6 +101,7 @@ class DefaultFilterFavouriteTest {
             thumbnailFilePath = "thumbnailFilePath",
             previewFilePath = "previewFilePath",
             duration = 123,
+            fileTypeInfo = VideoFileTypeInfo("","")
         )
     }
 
@@ -118,6 +121,7 @@ class DefaultFilterFavouriteTest {
             modificationTime = modificationTime,
             thumbnailFilePath = "thumbnailFilePath",
             previewFilePath = "previewFilePath",
+            fileTypeInfo = StaticImageFileTypeInfo("","")
         )
     }
 
