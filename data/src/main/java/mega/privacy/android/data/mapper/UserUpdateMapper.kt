@@ -28,8 +28,8 @@ private fun fromMegaUserChangeFlags(changeFlags: Int) =
     else userChangesMap.filter { it.key and changeFlags != 0 }.values.toList()
 
 private val userChangesMap = mapOf(
-    MegaUser.CHANGE_TYPE_AUTHRING to UserChanges.Authring,
-    MegaUser.CHANGE_TYPE_LSTINT to UserChanges.Lstint,
+    MegaUser.CHANGE_TYPE_AUTHRING to UserChanges.AuthenticationInformation,
+    MegaUser.CHANGE_TYPE_LSTINT to UserChanges.LastInteractionTimestamp,
     MegaUser.CHANGE_TYPE_AVATAR to UserChanges.Avatar,
     MegaUser.CHANGE_TYPE_FIRSTNAME to UserChanges.Firstname,
     MegaUser.CHANGE_TYPE_LASTNAME to UserChanges.Lastname,
@@ -37,10 +37,10 @@ private val userChangesMap = mapOf(
     MegaUser.CHANGE_TYPE_KEYRING to UserChanges.Keyring,
     MegaUser.CHANGE_TYPE_COUNTRY to UserChanges.Country,
     MegaUser.CHANGE_TYPE_BIRTHDAY to UserChanges.Birthday,
-    MegaUser.CHANGE_TYPE_PUBKEY_CU255 to UserChanges.PublicKeyCu255,
-    MegaUser.CHANGE_TYPE_PUBKEY_ED255 to UserChanges.PublicKeyEd255,
-    MegaUser.CHANGE_TYPE_SIG_PUBKEY_RSA to UserChanges.SignaturePublicKeyRsa,
-    MegaUser.CHANGE_TYPE_SIG_PUBKEY_CU255 to UserChanges.SignaturePublicKeyCu255,
+    MegaUser.CHANGE_TYPE_PUBKEY_CU255 to UserChanges.ChatPublicKey,
+    MegaUser.CHANGE_TYPE_PUBKEY_ED255 to UserChanges.SigningPublicKey,
+    MegaUser.CHANGE_TYPE_SIG_PUBKEY_RSA to UserChanges.RsaPublicKeySignature,
+    MegaUser.CHANGE_TYPE_SIG_PUBKEY_CU255 to UserChanges.ChatPublicKeySignature,
     MegaUser.CHANGE_TYPE_LANGUAGE to UserChanges.Language,
     MegaUser.CHANGE_TYPE_PWD_REMINDER to UserChanges.PasswordReminder,
     MegaUser.CHANGE_TYPE_DISABLE_VERSIONS to UserChanges.DisableVersions,

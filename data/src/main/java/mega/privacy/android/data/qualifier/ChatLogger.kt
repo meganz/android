@@ -1,11 +1,11 @@
-package mega.privacy.android.app.logging
+package mega.privacy.android.data.qualifier
 
 import javax.inject.Qualifier
 
 /**
- * Sdk logger
+ * Chat logger
  *
  */
 @Qualifier
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FIELD)
-annotation class SdkLogger()
+annotation class ChatLogger()

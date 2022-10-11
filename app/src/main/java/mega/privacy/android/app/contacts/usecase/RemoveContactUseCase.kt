@@ -2,7 +2,7 @@ package mega.privacy.android.app.contacts.usecase
 
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CallUtil

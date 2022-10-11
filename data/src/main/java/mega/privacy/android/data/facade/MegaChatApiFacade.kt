@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.facade
+package mega.privacy.android.data.facade
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
-import mega.privacy.android.app.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -29,7 +29,7 @@ import javax.inject.Inject
  * @property chatApi      [MegaChatApiAndroid]
  * @property sharingScope [CoroutineScope]
  */
-class MegaChatApiFacade @Inject constructor(
+internal class MegaChatApiFacade @Inject constructor(
     private val chatApi: MegaChatApiAndroid,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) : MegaChatApiGateway {

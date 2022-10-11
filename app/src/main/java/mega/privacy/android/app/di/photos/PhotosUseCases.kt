@@ -13,7 +13,10 @@ import mega.privacy.android.domain.usecase.DefaultDownloadThumbnail
 import mega.privacy.android.domain.usecase.DefaultEnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.DefaultFilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.DefaultFilterCloudDrivePhotos
+import mega.privacy.android.domain.usecase.DefaultFilterFavourite
+import mega.privacy.android.domain.usecase.DefaultFilterGIF
 import mega.privacy.android.domain.usecase.DefaultGetAlbums
+import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.DefaultGetPreview
 import mega.privacy.android.domain.usecase.DefaultGetThumbnail
 import mega.privacy.android.domain.usecase.DefaultGetTimelinePhotos
@@ -23,7 +26,10 @@ import mega.privacy.android.domain.usecase.DownloadThumbnail
 import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
+import mega.privacy.android.domain.usecase.FilterFavourite
+import mega.privacy.android.domain.usecase.FilterGIF
 import mega.privacy.android.domain.usecase.GetAlbums
+import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.GetTimelinePhotos
@@ -66,6 +72,15 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindGetNodeListByIds(useCase: DefaultGetNodeListByIds): GetNodeListByIds
+
+    @Binds
+    abstract fun bindGetDefaultAlbumPhotos(useCase: DefaultGetDefaultAlbumPhotos): GetDefaultAlbumPhotos
+
+    @Binds
+    abstract fun bindFilterFavourite(useCase: DefaultFilterFavourite): FilterFavourite
+
+    @Binds
+    abstract fun bindFilterGIF(useCase: DefaultFilterGIF): FilterGIF
 
     companion object {
         @Provides

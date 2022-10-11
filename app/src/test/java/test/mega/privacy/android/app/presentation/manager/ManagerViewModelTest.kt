@@ -28,15 +28,19 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.usecase.CheckCameraUpload
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
 import org.junit.Rule
@@ -66,7 +70,8 @@ class ManagerViewModelTest {
     private val getPrimarySyncHandle = mock<GetPrimarySyncHandle>()
     private val getSecondarySyncHandle = mock<GetSecondarySyncHandle>()
     private val checkCameraUpload = mock<CheckCameraUpload>()
-
+    private val getCloudSortOrder = mock<GetCloudSortOrder>()
+    private val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -98,7 +103,9 @@ class ManagerViewModelTest {
             monitorStorageStateEvent = monitorStorageState,
             getPrimarySyncHandle = getPrimarySyncHandle,
             getSecondarySyncHandle = getSecondarySyncHandle,
-            checkCameraUpload = checkCameraUpload
+            checkCameraUpload = checkCameraUpload,
+            getCloudSortOrder = getCloudSortOrder,
+            sortOrderIntMapper = sortOrderIntMapper,
         )
     }
 
@@ -442,5 +449,15 @@ class ManagerViewModelTest {
                 underTest.setIsFirstLogin(true)
                 assertThat(awaitItem()).isTrue()
             }
+    }
+
+    @Test
+    fun `test that get order returns cloud sort order`() = runTest {
+        setUnderTest()
+        val order = SortOrder.ORDER_MODIFICATION_DESC
+        val expected = MegaApiJava.ORDER_MODIFICATION_DESC
+        whenever(getCloudSortOrder()).thenReturn(order)
+        whenever(sortOrderIntMapper(order)).thenReturn(expected)
+        assertThat(underTest.getOrder()).isEqualTo(expected)
     }
 }

@@ -37,9 +37,11 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.CheckCameraUpload
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
@@ -61,9 +63,19 @@ import javax.inject.Inject
  * @param monitorGlobalUpdates Monitor global updates
  * @param getRubbishBinChildrenNode Fetch the rubbish bin nodes
  * @param getBrowserChildrenNode Fetch the browser nodes
+ * @param monitorContactRequestUpdates
+ * @param getUploadFolderHandle
+ * @param getInboxNode
  * @param getRootFolder Fetch the root node
  * @param getNumUnreadUserAlerts
  * @param hasInboxChildren
+ * @param sendStatisticsMediaDiscovery
+ * @param savedStateHandle
+ * @param ioDispatcher
+ * @param monitorMyAvatarFile
+ * @param monitorStorageStateEvent monitor global storage state changes
+ * @param getCloudSortOrder
+ * @param sortOrderIntMapper
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -84,6 +96,8 @@ class ManagerViewModel @Inject constructor(
     private val getPrimarySyncHandle: GetPrimarySyncHandle,
     private val getSecondarySyncHandle: GetSecondarySyncHandle,
     private val checkCameraUpload: CheckCameraUpload,
+    private val getCloudSortOrder: GetCloudSortOrder,
+    private val sortOrderIntMapper: SortOrderIntMapper,
 ) : ViewModel() {
 
     /**
@@ -347,6 +361,11 @@ class ManagerViewModel @Inject constructor(
      * Get latest [StorageState]
      */
     fun getStorageState() = monitorStorageStateEvent.getState()
+
+    /**
+     * Get Cloud Sort Order
+     */
+    fun getOrder() = runBlocking { sortOrderIntMapper(getCloudSortOrder()) }
 
 
     /**

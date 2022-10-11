@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.favourites.FavouritesFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.domain.entity.SortOrder
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
@@ -39,6 +40,7 @@ import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.di.TestSortOrderUseCases
 import test.mega.privacy.android.app.di.TestWrapperModule
 import test.mega.privacy.android.app.di.FavouritesTestModule
+import test.mega.privacy.android.app.di.TestMapperModule
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 import test.mega.privacy.android.app.testFragment
 
@@ -154,6 +156,7 @@ class FavouritesFragmentTest {
         val list = listOf(favouriteInfo)
         runBlocking {
             whenever(TestSortOrderUseCases.getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(TestMapperModule.sortOrderIntMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(MegaApiJava.ORDER_DEFAULT_ASC)
             whenever(FavouritesTestModule.getAllFavourites()).thenReturn(
                 flowOf(list)
             )

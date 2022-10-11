@@ -15,7 +15,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMyAccountUsageBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.ActiveFragment
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate

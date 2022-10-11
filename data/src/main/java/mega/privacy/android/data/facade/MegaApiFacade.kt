@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.facade
+package mega.privacy.android.data.facade
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
@@ -7,12 +7,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.suspendCancellableCoroutine
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -43,7 +43,7 @@ import kotlin.coroutines.resume
  * @property megaApi
  */
 @Singleton
-class MegaApiFacade @Inject constructor(
+internal class MegaApiFacade @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) : MegaApiGateway {
@@ -349,8 +349,7 @@ class MegaApiFacade @Inject constructor(
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, e ->
                     continuation.resume(e.errorCode == MegaError.API_OK)
-                },
-                onRequestTemporaryError = { _, e -> continuation.resume(e.errorCode == MegaError.API_OK) })
+                })
 
             continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
             megaApi.getUserAvatar(
@@ -463,5 +462,12 @@ class MegaApiFacade @Inject constructor(
 
     override fun creditCardQuerySubscriptions(listener: MegaRequestListenerInterface?) {
         megaApi.creditCardQuerySubscriptions(listener)
+    }
+
+    override fun getUserAttribute(
+        attributeIdentifier: Int,
+        listener: MegaRequestListenerInterface
+    ) {
+        megaApi.getUserAttribute(attributeIdentifier, listener)
     }
 }

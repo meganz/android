@@ -50,7 +50,7 @@
         <appender-ref ref="ROLLING_CHAT" />
     </logger>
 
-    <logger name="mega.privacy.android.app.presentation.logging.tree.LineNumberDebugTree">
+    <logger name="mega.privacy.android.data.logging.LineNumberDebugTree">
         <appender-ref ref="LOGCAT" />
     </logger>
 

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.di
+package mega.privacy.android.data.qualifier
 
 import javax.inject.Qualifier
 

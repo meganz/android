@@ -21,10 +21,10 @@ class DefaultGetTimelinePhotos @Inject constructor(
 
     override fun invoke(): Flow<List<Photo>> = flow {
         emit(photosRepository.searchMegaPhotos())
-        emitAll(getUpdatePhotosFlow())
+        emitAll(getUpdatePhotos())
     }
 
-    private fun getUpdatePhotosFlow(): Flow<List<Photo>> = photosRepository.monitorNodeUpdates()
+    private fun getUpdatePhotos(): Flow<List<Photo>> = photosRepository.monitorNodeUpdates()
         .map { (changes) ->
             changes
                 .filter { (_, value) ->

@@ -6,12 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class TypedFilesRepository @Inject constructor(
     @ApplicationContext val context: Context,

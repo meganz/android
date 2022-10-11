@@ -22,7 +22,7 @@ import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsP
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity
 import mega.privacy.android.app.components.TwoLineCheckPreference
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.settings.chat.imagequality.SettingsChatImageQualityActivity

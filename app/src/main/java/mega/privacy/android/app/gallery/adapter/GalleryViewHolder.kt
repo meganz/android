@@ -15,7 +15,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemGalleryImageBinding
 import mega.privacy.android.app.databinding.ItemGalleryTitleBinding
 import mega.privacy.android.app.databinding.ItemGalleryVideoBinding
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.gallery.data.GalleryItem

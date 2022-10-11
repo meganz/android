@@ -9,13 +9,13 @@ enum class UserChanges {
      * User has new or modified authentication information
      *
      */
-    Authring,
+    AuthenticationInformation,
 
     /**
      * Last interaction timestamp is modified
      *
      */
-    Lstint,
+    LastInteractionTimestamp,
 
     /**
      * User has a new or modified avatar image
@@ -63,25 +63,25 @@ enum class UserChanges {
      * User has new or modified public key for chat
      *
      */
-    PublicKeyCu255,
+    ChatPublicKey,
 
     /**
      * User has new or modified public key for signing
      *
      */
-    PublicKeyEd255,
+    SigningPublicKey,
 
     /**
      * User has new or modified signature for RSA public key
      *
      */
-    SignaturePublicKeyRsa,
+    RsaPublicKeySignature,
 
     /**
      * User has new or modified signature for chat public key
      *
      */
-    SignaturePublicKeyCu255,
+    ChatPublicKeySignature,
 
     /**
      * User has new or modified language

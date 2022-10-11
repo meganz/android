@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -11,15 +11,15 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.logging.ChatLogger
-import mega.privacy.android.app.logging.SdkLogger
-import mega.privacy.android.app.presentation.logging.tree.LineNumberDebugTree
-import mega.privacy.android.app.presentation.logging.tree.LogFlowTree
 import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.LogWriterGateway
 import mega.privacy.android.data.gateway.LogbackLogConfigurationGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.LoggingPreferencesGateway
+import mega.privacy.android.data.logging.LineNumberDebugTree
+import mega.privacy.android.data.logging.LogFlowTree
+import mega.privacy.android.data.qualifier.ChatLogger
+import mega.privacy.android.data.qualifier.SdkLogger
 import mega.privacy.android.domain.entity.logging.LogEntry
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -53,7 +53,7 @@ import javax.inject.Inject
  * @property loggingPreferencesGateway
  * @property appScope
  */
-class TimberLoggingRepository @Inject constructor(
+internal class TimberLoggingRepository @Inject constructor(
     private val megaSdkLogger: MegaLoggerInterface,
     private val megaChatLogger: MegaChatLoggerInterface,
     @SdkLogger private val sdkLogFlowTree: LogFlowTree,
