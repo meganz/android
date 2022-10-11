@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -6,7 +6,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
-import mega.privacy.android.app.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
 import org.junit.Before
 import org.junit.Test

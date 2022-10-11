@@ -1,4 +1,4 @@
-package mega.privacy.android.app.di.featuretoggle
+package mega.privacy.android.data.qualifier
 
 import dagger.MapKey
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
@@ -12,7 +12,7 @@ import javax.inject.Inject
 /**
  * Default [StatisticsRepository] implementation
  */
-class DefaultStatisticsRepository @Inject constructor(
+internal class DefaultStatisticsRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaApiGateway: MegaApiGateway,
     private val statisticsPreferencesGateway: StatisticsPreferencesGateway,

@@ -1,11 +1,11 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.R
+import mega.privacy.android.data.R
 import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -20,7 +20,7 @@ import javax.inject.Inject
  * [EnvironmentRepository] Implementation
  *
  */
-class DefaultEnvironmentRepository @Inject constructor(
+internal class DefaultEnvironmentRepository @Inject constructor(
     private val deviceGateway: DeviceGateway,
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -31,7 +31,7 @@ import javax.inject.Singleton
  * @property megaApi
  */
 @Singleton
-class DefaultNetworkRepository @Inject constructor(
+internal class DefaultNetworkRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaApi: MegaApiGateway,
     @ApplicationScope private val applicationScope: CoroutineScope,
