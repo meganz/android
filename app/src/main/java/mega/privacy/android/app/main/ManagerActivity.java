@@ -2637,7 +2637,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
             updateInboxSectionVisibility(managerState.getHasInboxChildren());
-            stopUploadProcessAndSendBroadCast(managerState.getShouldStopCameraUpload(), managerState.getShouldSendCameraBroadCastEvent());
+            stopUploadProcessAndSendBroadcast(managerState.getShouldStopCameraUpload(), managerState.getShouldSendCameraBroadcastEvent());
             return Unit.INSTANCE;
         });
     }
@@ -5825,7 +5825,7 @@ public class ManagerActivity extends TransfersManagementActivity
         setToolbarTitle();
     }
 
-    private void stopUploadProcessAndSendBroadCast(boolean shouldStopUpload, boolean shouldSendBroadCastEvent) {
+    private void stopUploadProcessAndSendBroadcast(boolean shouldStopUpload, boolean shouldSendBroadCastEvent) {
         if (shouldStopUpload) {
             fireStopCameraUploadJob(app);
         }

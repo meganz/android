@@ -372,7 +372,7 @@ class ManagerViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     shouldStopCameraUpload = result.shouldStopProcess,
-                    shouldSendCameraBroadCastEvent = result.shouldSendEvent,
+                    shouldSendCameraBroadcastEvent = result.shouldSendEvent,
                 )
             }
         }

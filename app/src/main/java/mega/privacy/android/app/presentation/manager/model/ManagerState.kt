@@ -23,5 +23,5 @@ data class ManagerState(
     val isFirstLogin: Boolean = false,
     val hasInboxChildren: Boolean = false,
     val shouldStopCameraUpload: Boolean = false,
-    val shouldSendCameraBroadCastEvent: Boolean = false,
+    val shouldSendCameraBroadcastEvent: Boolean = false,
 )
