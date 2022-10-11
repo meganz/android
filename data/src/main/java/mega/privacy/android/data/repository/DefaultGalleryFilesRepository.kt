@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import android.content.ContentUris
 import android.content.Context
@@ -9,16 +9,17 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import timber.log.Timber
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
  * The repository implementation class regarding gallery files
  */
-class DefaultGalleryFilesRepository @Inject constructor(
+internal class DefaultGalleryFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : GalleryFilesRepository {
 
@@ -132,8 +133,7 @@ class DefaultGalleryFilesRepository @Inject constructor(
                     retriever.setDataSource(context, contentUri)
                     val duration =
                         retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                    val durationText =
-                        TimeUtils.getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)
+                    val durationText = getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)
                     val file = FileGalleryItem(
                         id = id,
                         isImage = false,
@@ -154,4 +154,20 @@ class DefaultGalleryFilesRepository @Inject constructor(
 
             awaitClose {}
         }
+
+    /**
+     * Method of getting the appropriate string from a given duration
+     *
+     * @param duration The duration
+     * @return The appropriate string
+     */
+    private fun getGalleryVideoDuration(duration: Long): String {
+        val hours = TimeUnit.MILLISECONDS.toHours(duration)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toSeconds(hours)
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(duration) -
+                TimeUnit.MINUTES.toSeconds(minutes)
+        return if (hours > 0) {
+            String.format(Locale.getDefault(), "%d:%02d:%02d", hours, minutes, seconds)
+        } else String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
+    }
 }

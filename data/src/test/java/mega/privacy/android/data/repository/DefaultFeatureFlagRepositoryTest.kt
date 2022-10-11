@@ -1,11 +1,10 @@
-package test.mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.repository.DefaultFeatureFlagRepository
-import mega.privacy.android.app.di.featuretoggle.FeatureFlagPriorityKey
+import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider

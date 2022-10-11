@@ -1,8 +1,8 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.di.featuretoggle.FeatureFlagPriorityKey
+import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -16,7 +16,7 @@ import javax.inject.Inject
  * @property ioDispatcher
  * @property featureFlagValueProvider
  */
-class DefaultFeatureFlagRepository @Inject constructor(
+internal class DefaultFeatureFlagRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val featureFlagValueProvider: Map<FeatureFlagPriorityKey, @JvmSuppressWildcards FeatureFlagValueProvider>,
 ) : FeatureFlagRepository {

@@ -16,6 +16,8 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
 
+        resValue("string", "app_version", "\"${versionName}\"")
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -84,6 +86,9 @@ dependencies {
     implementation "org.slf4j:slf4j-api:$slf4jVersion"
     implementation "com.github.tony19:logback-android:$logbackVersion"
     implementation "com.jakewharton.timber:timber:$timberVersion"
+
+    implementation "com.google.auto.value:auto-value-annotations:$autovalueAnnotationVersion"
+    kapt "com.google.auto.value:auto-value:$autovalueVersion"
 
     // Testing dependencies
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"

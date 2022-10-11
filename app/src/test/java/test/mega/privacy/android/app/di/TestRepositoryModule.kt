@@ -15,17 +15,12 @@ import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
-import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
-import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileRepository
-import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.LoginRepository
-import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
-import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import org.mockito.kotlin.mock
@@ -42,9 +37,6 @@ object TestRepositoryModule {
 
     @Provides
     fun provideAccountRepository(): AccountRepository = mock()
-
-    @Provides
-    fun provideNetworkRepository(): NetworkRepository = mock()
 
     @Provides
     fun provideChatRepository(): ChatRepository = mock()
@@ -68,9 +60,6 @@ object TestRepositoryModule {
     fun bindSupportRepository(): SupportRepository = mock()
 
     @Provides
-    fun bindDeviceRepository(): EnvironmentRepository = mock()
-
-    @Provides
     fun provideContactsRepository(): ContactsRepository = mock()
 
     @Provides
@@ -86,19 +75,10 @@ object TestRepositoryModule {
     fun provideTransfersRepository(): TransfersRepository = mock()
 
     @Provides
-    fun provideFeatureFlagRepository(): FeatureFlagRepository = mock()
-
-    @Provides
-    fun provideStatisticsRepository(): StatisticsRepository = mock()
-
-    @Provides
     fun provideTransferRepository(): TransferRepository = mock()
 
     @Provides
     fun provideAvatarRepository(): AvatarRepository = mock()
-
-    @Provides
-    fun provideGalleryFilesRepository(): GalleryFilesRepository = mock()
 
     @Provides
     fun provideDomainFilesRepository(): FileRepository = mock()
