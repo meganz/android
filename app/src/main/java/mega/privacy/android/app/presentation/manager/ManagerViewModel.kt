@@ -34,8 +34,10 @@ import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
@@ -69,6 +71,8 @@ import javax.inject.Inject
  * @param ioDispatcher
  * @param monitorMyAvatarFile
  * @param monitorStorageStateEvent monitor global storage state changes
+ * @param getCloudSortOrder
+ * @param sortOrderIntMapper
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -87,6 +91,8 @@ class ManagerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val getCloudSortOrder: GetCloudSortOrder,
+    private val sortOrderIntMapper: SortOrderIntMapper,
 ) : ViewModel() {
 
     /**
@@ -350,4 +356,9 @@ class ManagerViewModel @Inject constructor(
      * Get latest [StorageState]
      */
     fun getStorageState() = monitorStorageStateEvent.getState()
+
+    /**
+     * Get Cloud Sort Order
+     */
+    fun getOrder() = runBlocking { sortOrderIntMapper(getCloudSortOrder()) }
 }
