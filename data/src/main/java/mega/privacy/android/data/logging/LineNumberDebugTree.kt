@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.logging.tree
+package mega.privacy.android.data.logging
 
 import android.util.Log
 import mega.privacy.android.data.gateway.TimberChatLogger
@@ -10,7 +10,7 @@ import timber.log.Timber
  *
  * Debug log output tree for logcat
  */
-class LineNumberDebugTree : Timber.DebugTree() {
+internal class LineNumberDebugTree : Timber.DebugTree() {
     private val ignoredClasses = listOf(
         Timber::class.java.name,
         Timber.Forest::class.java.name,

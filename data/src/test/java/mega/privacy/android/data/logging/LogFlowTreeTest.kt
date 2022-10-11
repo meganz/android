@@ -1,9 +1,8 @@
-package test.mega.privacy.android.app.presentation.logging.tree
+package mega.privacy.android.data.logging
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.logging.tree.LogFlowTree
 import mega.privacy.android.domain.entity.logging.LogEntry
 import mega.privacy.android.domain.usecase.CreateLogEntry
 import org.junit.Before
@@ -35,7 +34,7 @@ class LogFlowTreeTest {
     fun `test that correct ignored classes are passed to create entry`() = runTest {
         val expected = listOf<String>(
             Timber::class.java.name,
-            Timber.Forest::class.java.name,
+            Timber::class.java.name,
             Timber.Tree::class.java.name,
             Timber.DebugTree::class.java.name,
             LogFlowTree::class.java.name,

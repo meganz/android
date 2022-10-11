@@ -29,7 +29,6 @@ import mega.privacy.android.app.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.app.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.app.data.repository.DefaultSupportRepository
 import mega.privacy.android.app.data.repository.DefaultTransfersRepository
-import mega.privacy.android.app.data.repository.TimberLoggingRepository
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.repository.GlobalStatesRepository
 import mega.privacy.android.app.domain.repository.RecentActionsRepository
@@ -46,7 +45,6 @@ import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.ImageRepository
-import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
@@ -95,10 +93,6 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindFavouritesRepository(repository: DefaultFavouritesRepository): FavouritesRepository
-
-    @Singleton
-    @Binds
-    abstract fun bindLoggingRepository(repository: TimberLoggingRepository): LoggingRepository
 
     @Binds
     abstract fun bindAlbumsRepository(repository: DefaultAlbumsRepository): AlbumsRepository
