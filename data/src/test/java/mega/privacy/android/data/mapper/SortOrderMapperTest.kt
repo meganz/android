@@ -35,15 +35,14 @@ class SortOrderMapperTest {
 
     @Test
     fun `test that mapper returns correct value when input is in the mapping range`() {
-        val randomIndex = (Math.random() * sortOrderMap.size).toInt()
-        val input = sortOrderMap.keys.elementAt(randomIndex)
-        val expected = sortOrderMap.values.elementAt(randomIndex)
-        assertThat(underTest(input)).isEqualTo(expected)
+        sortOrderMap.forEach { (key, value) ->
+            assertThat(underTest(key)).isEqualTo(value)
+        }
     }
 
     @Test
-    fun `test that mapper returns default value when input is outside the mapping range`() {
-        val expected = SortOrder.ORDER_NONE
+    fun `test that mapper returns null when input is outside the mapping range`() {
+        val expected = null
         assertThat(underTest(-1)).isEqualTo(expected)
     }
 }

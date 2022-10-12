@@ -45,6 +45,7 @@ import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
+import mega.privacy.android.data.mapper.sortOrderToInt
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toChatRequest
@@ -55,7 +56,6 @@ import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.data.mapper.toFavouriteInfo
 import mega.privacy.android.data.mapper.toImage
-import mega.privacy.android.data.mapper.toInt
 import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toOnlineStatus
@@ -176,7 +176,7 @@ internal class MapperModule {
      * Provide sort order int mapper
      */
     @Provides
-    fun provideSortOrderIntMapper(): SortOrderIntMapper = ::toInt
+    fun provideSortOrderIntMapper(): SortOrderIntMapper = ::sortOrderToInt
 
     /**
      * Provide sync record type mapper
