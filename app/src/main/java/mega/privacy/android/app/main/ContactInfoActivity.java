@@ -73,7 +73,6 @@ import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.getScaleH;
 import static mega.privacy.android.app.utils.Util.getScaleW;
 import static mega.privacy.android.app.utils.Util.isDarkMode;
-import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
@@ -663,7 +662,7 @@ public class ContactInfoActivity extends PasscodeActivity
             updateVerifyCredentialsLayout();
             checkScreenRotationToShowCall();
 
-            if (isOnline(this)) {
+            if (viewModel.isOnline()) {
                 Timber.d("online -- network connection");
                 setAvatar();
 
@@ -870,7 +869,7 @@ public class ContactInfoActivity extends PasscodeActivity
 
         sendFileMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
 
-        if (isOnline(this)) {
+        if (viewModel.isOnline()) {
             sendFileMenuItem.setVisible(fromContacts);
         } else {
             Timber.d("Hide all - no network connection");
@@ -957,7 +956,7 @@ public class ContactInfoActivity extends PasscodeActivity
             }
             case R.id.cab_menu_send_file: {
 
-                if (!isOnline(this)) {
+                if (!viewModel.isOnline()) {
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                     return true;
                 }
@@ -1334,7 +1333,7 @@ public class ContactInfoActivity extends PasscodeActivity
     }
 
     private void updateAvatar() {
-        if (isOnline(this)) {
+        if (viewModel.isOnline()) {
             setAvatar();
         } else if (chat != null) {
             setOfflineAvatar(chatC.getParticipantEmail(chat.getPeerHandle(0)));
@@ -1356,7 +1355,7 @@ public class ContactInfoActivity extends PasscodeActivity
 
         if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 
-            if (!isOnline(this)) {
+            if (!viewModel.isOnline()) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
@@ -1389,7 +1388,7 @@ public class ContactInfoActivity extends PasscodeActivity
 
             megaAttacher.handleSelectFileResult(intent, user, this);
         } else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
+            if (!viewModel.isOnline()) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
@@ -1687,7 +1686,7 @@ public class ContactInfoActivity extends PasscodeActivity
 
             updateRetentionTimeLayout(retentionTimeText, getUpdatedRetentionTimeFromAChat(chatHandle));
 
-            if (isOnline(this)) {
+            if (viewModel.isOnline()) {
                 manageChatLayout.setVisibility(View.VISIBLE);
                 dividerClearChatLayout.setVisibility(View.VISIBLE);
             } else {
@@ -1857,7 +1856,7 @@ public class ContactInfoActivity extends PasscodeActivity
     public void moveToTrash(final ArrayList<Long> handleList) {
         Timber.d("moveToTrash: ");
         moveToRubbish = true;
-        if (!isOnline(this)) {
+        if (!viewModel.isOnline()) {
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
