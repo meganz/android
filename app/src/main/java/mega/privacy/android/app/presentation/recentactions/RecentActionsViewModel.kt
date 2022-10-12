@@ -1,23 +1,22 @@
 package mega.privacy.android.app.presentation.recentactions
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.domain.usecase.GetRecentActions
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
-import mega.privacy.android.app.utils.SharedPreferenceConstants
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.GetVisibleContacts
+import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
+import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import nz.mega.sdk.MegaRecentActionBucket
 import javax.inject.Inject
 
@@ -32,7 +31,8 @@ import javax.inject.Inject
 class RecentActionsViewModel @Inject constructor(
     private val getRecentActions: GetRecentActions,
     private val getVisibleContacts: GetVisibleContacts,
-    @ApplicationContext private val applicationContext: Context,
+    private val setHideRecentActivity: SetHideRecentActivity,
+    monitorHideRecentActivity: MonitorHideRecentActivity,
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
@@ -55,6 +55,13 @@ class RecentActionsViewModel @Inject constructor(
      */
     var snapShotActionList: List<MegaRecentActionBucket>? = null
 
+    /**
+     * Monitor hide recent activity setting
+     */
+    val hideRecentActionsActivity =
+        monitorHideRecentActivity()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+
     init {
         viewModelScope.launch {
             monitorNodeUpdates().collectLatest {
@@ -73,24 +80,10 @@ class RecentActionsViewModel @Inject constructor(
     }
 
     /**
-     * Disable the hide recent actions activity settings
+     * Disable hide recent actions activity setting
      */
-    fun disableHideRecentActionsActivitySettings() {
-        LiveEventBus.get(EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
-            .post(false)
-        applicationContext.getSharedPreferences(SharedPreferenceConstants.USER_INTERFACE_PREFERENCES,
-            Context.MODE_PRIVATE)
-            .edit().putBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false).apply()
-    }
-
-    /**
-     * Retrieve the hide recent actions activity settings
-     */
-    fun getHideRecentActionsActivitySettings(): Boolean {
-        return applicationContext
-            .getSharedPreferences(SharedPreferenceConstants.USER_INTERFACE_PREFERENCES,
-                Context.MODE_PRIVATE)
-            .getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
+    fun disableHideRecentActionsActivitySetting() = viewModelScope.launch {
+        setHideRecentActivity(false)
     }
 
     /**

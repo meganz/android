@@ -10,16 +10,15 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.DefaultCanDeleteAccount
 import mega.privacy.android.domain.usecase.DefaultFetchMultiFactorAuthSetting
-import mega.privacy.android.domain.usecase.DefaultGetAccountDetails
 import mega.privacy.android.domain.usecase.DefaultGetStartScreen
 import mega.privacy.android.domain.usecase.DefaultIsChatLoggedIn
 import mega.privacy.android.domain.usecase.DefaultIsHideRecentActivityEnabled
 import mega.privacy.android.domain.usecase.DefaultMonitorAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.DefaultMonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.DefaultRefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.DefaultToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
-import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
@@ -29,6 +28,7 @@ import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsHideRecentActivityEnabled
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
@@ -69,6 +69,9 @@ abstract class SettingsUseCases {
 
     @Binds
     abstract fun bindMonitorAutoAcceptQRLinks(implementation: DefaultMonitorAutoAcceptQRLinks): MonitorAutoAcceptQRLinks
+
+    @Binds
+    abstract fun bindMonitorHideRecentActivity(implementation: DefaultMonitorHideRecentActivity): MonitorHideRecentActivity
 
     companion object {
         @Provides

@@ -16,7 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -27,7 +26,6 @@ import mega.privacy.android.app.components.TopSnappedStickyLayoutManager
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.FragmentRecentsBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForSingleNode
 import mega.privacy.android.app.main.ManagerActivity
@@ -83,7 +81,7 @@ class RecentActionsFragment : Fragment() {
         emptyText = binding.emptyTextRecents
         showActivityButton = binding.showActivityButton
         showActivityButton.setOnClickListener {
-            viewModel.disableHideRecentActionsActivitySettings()
+            viewModel.disableHideRecentActionsActivitySetting()
         }
         emptySpanned = TextUtil.formatEmptyScreenText(requireContext(),
             StringResourcesUtils.getString(R.string.context_empty_recents))
@@ -100,21 +98,21 @@ class RecentActionsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        LiveEventBus.get(EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
-            .observe(viewLifecycleOwner) { hideRecentActivity: Boolean ->
-                this.displayRecentActionsActivity(hideRecentActivity,
-                    viewModel.recentActionsItems.value.size)
-            }
-
         observeDragSupportEvents(viewLifecycleOwner, listView, Constants.VIEWER_FROM_RECETS)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.recentActionsItems.collectLatest {
                     setRecentActions(it)
-                    displayRecentActionsActivity(viewModel.getHideRecentActionsActivitySettings(),
-                        it.size)
+                    displayRecentActionsActivity(viewModel.hideRecentActionsActivity.value, it.size)
                     (requireActivity() as ManagerActivity).setToolbarTitle()
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.hideRecentActionsActivity.collectLatest {
+                    displayRecentActionsActivity(it, viewModel.recentActionsItems.value.size)
                 }
             }
         }
