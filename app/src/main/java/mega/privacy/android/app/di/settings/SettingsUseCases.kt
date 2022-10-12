@@ -12,7 +12,6 @@ import mega.privacy.android.domain.usecase.DefaultCanDeleteAccount
 import mega.privacy.android.domain.usecase.DefaultFetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.DefaultGetStartScreen
 import mega.privacy.android.domain.usecase.DefaultIsChatLoggedIn
-import mega.privacy.android.domain.usecase.DefaultIsHideRecentActivityEnabled
 import mega.privacy.android.domain.usecase.DefaultMonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.DefaultMonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.DefaultRefreshPasscodeLockPreference
@@ -25,7 +24,6 @@ import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.GetStartScreen
 import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
-import mega.privacy.android.domain.usecase.IsHideRecentActivityEnabled
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
@@ -54,9 +52,6 @@ abstract class SettingsUseCases {
 
     @Binds
     abstract fun bindStartScreen(useCase: DefaultGetStartScreen): GetStartScreen
-
-    @Binds
-    abstract fun bindIsHideRecentActivityEnabled(useCase: DefaultIsHideRecentActivityEnabled): IsHideRecentActivityEnabled
 
     @Binds
     abstract fun bindToggleAutoAcceptQRLinks(useCase: DefaultToggleAutoAcceptQRLinks): ToggleAutoAcceptQRLinks

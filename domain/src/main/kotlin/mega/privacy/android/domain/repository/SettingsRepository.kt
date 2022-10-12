@@ -45,13 +45,6 @@ interface SettingsRepository {
     fun getStartScreen(): Int
 
     /**
-     * Should hide recent activity
-     *
-     * @return true if option is enabled, else false
-     */
-    fun shouldHideRecentActivity(): Boolean
-
-    /**
      * Set auto accept qr requests
      *
      * @param accept
@@ -65,13 +58,6 @@ interface SettingsRepository {
      * @return start screen key changes as a flow
      */
     fun monitorStartScreen(): Flow<Int>
-
-    /**
-     * Monitor hide recent activity event
-     *
-     * @return hide recent activity option enabled status as a flow
-     */
-    fun monitorHideRecentActivityEvent(): Flow<Boolean>
 
     /**
      * Monitor hide recent activity setting

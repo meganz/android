@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.isTypeWithParam
-import mega.privacy.android.app.data.gateway.MonitorHideRecentActivityFacade
 import mega.privacy.android.app.data.gateway.MonitorStartScreenFacade
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
@@ -50,7 +49,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property context
  * @property apiFacade
  * @property monitorStartScreenFacade
- * @property monitorHideRecentActivityFacade
  * @property ioDispatcher
  * @property chatPreferencesGateway
  * @property callsPreferencesGateway
@@ -67,7 +65,6 @@ class DefaultSettingsRepository @Inject constructor(
     private val apiFacade: MegaApiGateway,
     private val monitorStartScreenFacade: MonitorStartScreenFacade,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
-    private val monitorHideRecentActivityFacade: MonitorHideRecentActivityFacade,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val chatPreferencesGateway: ChatPreferencesGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
@@ -140,9 +137,6 @@ class DefaultSettingsRepository @Inject constructor(
         StartScreenUtil.HOME_BNV
     )
 
-    override fun shouldHideRecentActivity() =
-        getUiPreferences().getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
-
     override suspend fun setAutoAcceptQR(accept: Boolean): Boolean =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
@@ -184,9 +178,6 @@ class DefaultSettingsRepository @Inject constructor(
         )
 
     override fun monitorStartScreen(): Flow<Int> = monitorStartScreenFacade.getEvents()
-
-    override fun monitorHideRecentActivityEvent(): Flow<Boolean> =
-        monitorHideRecentActivityFacade.getEvents()
 
     override fun monitorHideRecentActivity(): Flow<Boolean?> =
         uiPreferencesGateway.monitorHideRecentActivity()
