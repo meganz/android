@@ -1,6 +1,6 @@
-package mega.privacy.android.app;
+package mega.privacy.android.data.model;
 
-import static mega.privacy.android.app.utils.TextUtil.*;
+import android.text.TextUtils;
 
 public class MegaContactDB {
     String handle;
@@ -68,7 +68,7 @@ public class MegaContactDB {
     }
 
     public void setNickname(String nickname) {
-        if (isTextEmpty(nickname)) {
+        if (TextUtils.isEmpty(nickname) || TextUtils.isEmpty(nickname.trim())) {
             this.nickname = null;
         } else {
             this.nickname = nickname;

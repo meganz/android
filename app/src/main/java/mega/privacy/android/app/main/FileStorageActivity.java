@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Stack;
 
 import mega.privacy.android.app.FileDocument;
-import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;

@@ -150,7 +150,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
+import mega.privacy.android.data.model.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;

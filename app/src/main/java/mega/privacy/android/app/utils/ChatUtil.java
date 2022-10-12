@@ -40,10 +40,8 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder;
-import static mega.privacy.android.app.utils.TimeUtils.DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT;
 import static mega.privacy.android.app.utils.TimeUtils.formatDate;
 import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
-import static mega.privacy.android.app.utils.TimeUtils.isTodayOrYesterday;
 import static mega.privacy.android.app.utils.TimeUtils.isUntilThisMorning;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
@@ -89,12 +87,10 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -113,7 +109,7 @@ import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.ManageReactionListener;
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
-import mega.privacy.android.app.main.megachat.ChatSettings;
+import mega.privacy.android.data.model.ChatSettings;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.main.megachat.PendingMessageSingle;
@@ -1590,7 +1586,7 @@ public class ChatUtil {
      */
     public static PendingMessageSingle createAttachmentPendingMessage(long idChat, String filePath, String fileName, boolean fromExplorer) {
         long idPendingMessage;
-        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        LegacyDatabaseHandler dbH = MegaApplication.getInstance().getDbH();
 
         PendingMessageSingle pendingMsg = new PendingMessageSingle();
         pendingMsg.setChatId(idChat);
@@ -1603,7 +1599,7 @@ public class ChatUtil {
             idPendingMessage = dbH.addPendingMessage(pendingMsg, PendingMessageSingle.STATE_COMPRESSING);
             pendingMsg.setState(PendingMessageSingle.STATE_COMPRESSING);
         } else if (fromExplorer) {
-            idPendingMessage = dbH.addPendingMessageFromExplorer(pendingMsg);
+            idPendingMessage = dbH.addPendingMessageFromFileExplorer(pendingMsg);
         } else {
             idPendingMessage = dbH.addPendingMessage(pendingMsg);
         }

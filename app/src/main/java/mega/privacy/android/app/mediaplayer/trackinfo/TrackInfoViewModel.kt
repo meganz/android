@@ -11,9 +11,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
@@ -32,6 +31,7 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
 import java.io.File
@@ -45,7 +45,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TrackInfoViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbHandler: DatabaseHandler,
+    private val dbHandler: LegacyDatabaseHandler,
     @ApplicationContext private val context: Context,
     private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
     private val monitorStorageStateEvent: MonitorStorageStateEvent,

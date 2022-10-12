@@ -49,7 +49,7 @@ import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.MegaPreferences
+import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS
 import mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS

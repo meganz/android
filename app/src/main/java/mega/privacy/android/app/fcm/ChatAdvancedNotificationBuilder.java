@@ -75,14 +75,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
-import mega.privacy.android.app.main.megachat.ChatSettings;
+import mega.privacy.android.data.model.ChatSettings;
 import mega.privacy.android.app.meeting.CallNotificationIntentService;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.utils.CallUtil;

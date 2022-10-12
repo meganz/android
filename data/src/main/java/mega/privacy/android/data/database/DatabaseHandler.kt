@@ -1,15 +1,12 @@
-package mega.privacy.android.app
+package mega.privacy.android.data.database
 
 import android.database.sqlite.SQLiteDatabase
-import mega.privacy.android.app.data.model.UserCredentials
-import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
-import mega.privacy.android.app.main.megachat.ChatItemPreferences
-import mega.privacy.android.app.main.megachat.ChatSettings
-import mega.privacy.android.app.main.megachat.NonContactInfo
-import mega.privacy.android.app.main.megachat.PendingMessageSingle
-import mega.privacy.android.app.objects.SDTransfer
-import mega.privacy.android.app.sync.Backup
-import mega.privacy.android.app.utils.contacts.MegaContactGetter
+import mega.privacy.android.data.model.ChatSettings
+import mega.privacy.android.data.model.MegaAttributes
+import mega.privacy.android.data.model.MegaContactDB
+import mega.privacy.android.data.model.MegaPreferences
+import mega.privacy.android.data.model.UserCredentials
+import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 
@@ -23,10 +20,6 @@ interface DatabaseHandler {
 
     //get the credential of last login
     val credentials: UserCredentials?
-
-    val megaContacts: ArrayList<MegaContactGetter.MegaContact>
-
-    val ephemeral: EphemeralCredentials?
 
     /**
      * Gets preferences.
@@ -51,28 +44,7 @@ interface DatabaseHandler {
      */
     var chatVideoQuality: Int
 
-    /**
-     * Gets the completed transfers.
-     *
-     * @return The list with the completed transfers.
-     */
-    val completedTransfers: ArrayList<AndroidCompletedTransfer?>
-
-    /**
-     * Gets the completed transfers which have as state cancelled or failed.
-     *
-     * @return The list the cancelled or failed transfers.
-     */
-    val failedOrCancelledTransfers: ArrayList<AndroidCompletedTransfer?>
-
-    /**
-     * Saves attributes in DB.
-     *
-     * @param attr Attributes to save.
-     */
-    var attributes: MegaAttributes?
     val contactsSize: Int
-    val offlineFiles: ArrayList<MegaOffline>
 
     /**
      * Sets the local path selected from an external SD card as Media Uploads local folder.
@@ -144,10 +116,13 @@ interface DatabaseHandler {
     val showNotifOff: String?
     val autoPlayEnabled: String?
     var sdCardUri: String?
-    val sDTransfers: ArrayList<SDTransfer>
-    val cuBackup: Backup?
-    val muBackup: Backup?
-    val allBackups: List<Backup>?
+
+    /**
+     * Saves attributes in DB.
+     *
+     * @param attr Attributes to save.
+     */
+    var attributes: MegaAttributes?
 
     fun saveCredentials(userCredentials: UserCredentials)
     fun saveSyncRecord(record: SyncRecord)
@@ -187,19 +162,15 @@ interface DatabaseHandler {
     fun setConversionOnCharging(onCharging: Boolean)
     fun setChargingOnSize(size: Int)
     fun setRemoveGPS(removeGPS: Boolean)
-    fun saveEphemeral(ephemeralCredentials: EphemeralCredentials)
     fun saveMyEmail(email: String?)
     fun saveMyFirstName(firstName: String?)
     fun saveMyLastName(lastName: String?)
-    fun batchInsertMegaContacts(contacts: List<MegaContactGetter.MegaContact>?)
     fun clearMegaContacts()
     fun shouldAskForDisplayOver(): Boolean
     fun dontAskForDisplayOver()
     fun setNotificationSoundChat(sound: String?)
     fun setVibrationEnabledChat(enabled: String?)
-    fun setChatItemPreferences(chatPrefs: ChatItemPreferences)
     fun setWrittenTextItem(handle: String?, text: String?, editedMsgId: String?): Int
-    fun findChatPreferencesByHandle(handle: String?): ChatItemPreferences?
     fun areNotificationsEnabled(handle: String?): String?
 
     /**
@@ -209,22 +180,6 @@ interface DatabaseHandler {
      */
     fun deleteTransfer(id: Long)
 
-    /**
-     * Gets a completed transfer.
-     *
-     * @param id the identifier of the transfer to get
-     * @return The completed transfer which has the id value as identifier.
-     */
-    fun getcompletedTransfer(id: Long): AndroidCompletedTransfer?
-    fun setCompletedTransfer(transfer: AndroidCompletedTransfer): Long
-
-    /**
-     * Checks if a completed transfer exists before add it to DB.
-     * If so, does nothing. If not, adds the transfer to the DB.
-     *
-     * @param transfer The transfer to check and add.
-     */
-    fun setCompletedTransferWithCheck(transfer: AndroidCompletedTransfer)
     fun emptyCompletedTransfers()
 
     /**
@@ -232,39 +187,17 @@ interface DatabaseHandler {
      */
     fun removeFailedOrCancelledTransfers()
 
-    /**
-     * Gets a list with completed transfers depending on the query received by parameter.
-     *
-     * @param selectQuery the query which selects specific completed transfers
-     * @return The list with the completed transfers.
-     */
-    fun getCompletedTransfers(selectQuery: String?): ArrayList<AndroidCompletedTransfer?>
     fun isPasscodeLockEnabled(db: SQLiteDatabase): Boolean
     fun setNonContactFirstName(name: String?, handle: String?): Int
     fun setNonContactLastName(lastName: String?, handle: String?): Int
     fun setNonContactEmail(email: String?, handle: String?): Int
-    fun findNonContactByHandle(handle: String?): NonContactInfo?
-    fun setContact(contact: MegaContactDB)
     fun setContactName(name: String?, mail: String?): Int
     fun setContactLastName(lastName: String?, mail: String?): Int
     fun setContactNickname(nickname: String?, handle: Long): Int
     fun setContactMail(handle: Long, mail: String?): Int
-    fun findContactByHandle(handleParam: String?): MegaContactDB?
-    fun findContactByEmail(mail: String?): MegaContactDB?
-    fun setOfflineFile(offline: MegaOffline): Long
-    fun setOfflineFile(offline: MegaOffline, db: SQLiteDatabase): Long
-    fun setOfflineFileOld(offline: MegaOffline): Long
-    fun setOfflineFileOld(offline: MegaOffline, db: SQLiteDatabase): Long
-    fun getOfflineFilesOld(db: SQLiteDatabase): ArrayList<MegaOffline>
+
     fun exists(handle: Long): Boolean
-    fun findByHandle(handle: Long): MegaOffline?
-    fun findByHandle(handle: String?): MegaOffline?
-    fun findByParentId(parentId: Int): ArrayList<MegaOffline>
-    fun findById(id: Int): MegaOffline?
     fun removeById(id: Int): Int
-    fun findByPath(path: String?): ArrayList<MegaOffline>
-    fun findbyPathAndName(path: String?, name: String?): MegaOffline?
-    fun deleteOfflineFile(mOff: MegaOffline): Int
     fun setFirstTime(firstTime: Boolean)
     fun setCamSyncWifi(wifi: Boolean)
     fun setPreferredViewList(list: Boolean)
@@ -319,35 +252,6 @@ interface DatabaseHandler {
     fun clearCompletedTransfers()
     fun clearPendingMessage()
 
-    /**
-     * Adds a pending message from File Explorer.
-     *
-     * @param message Pending message to add.
-     * @return The identifier of the pending message.
-     */
-    fun addPendingMessageFromExplorer(message: PendingMessageSingle): Long
-
-    /**
-     * Adds a pending message.
-     *
-     * @param message Pending message to add.
-     * @param state   State of the pending message.
-     * @return The identifier of the pending message.
-     */
-    fun addPendingMessage(message: PendingMessageSingle): Long
-
-    /**
-     * Adds a pending message.
-     *
-     * @param message Pending message to add.
-     * @return The identifier of the pending message.
-     */
-    fun addPendingMessage(
-        message: PendingMessageSingle,
-        state: Int,
-    ): Long
-
-    fun findPendingMessageById(messageId: Long): PendingMessageSingle?
 
     /**
      * Updates a pending message.
@@ -376,19 +280,19 @@ interface DatabaseHandler {
      */
     fun updatePendingMessage(idMessage: Long, transferTag: Int, nodeHandle: String?, state: Int)
     fun updatePendingMessageOnAttach(idMessage: Long, temporalId: String?, state: Int)
-    fun findPendingMessagesNotSent(idChat: Long): ArrayList<AndroidMegaChatMessage>
     fun findPendingMessageByIdTempKarere(idTemp: Long): Long
     fun removeSentPendingMessages()
     fun removePendingMessageByChatId(idChat: Long)
     fun removePendingMessageById(idMsg: Long)
     fun setAutoPlayEnabled(enabled: String)
     fun setShowInviteBanner(show: String)
-    fun addSDTransfer(transfer: SDTransfer): Long
     fun removeSDTransfer(tag: Int)
-    fun saveBackup(backup: Backup): Boolean
     fun setBackupAsOutdated(id: Long)
-    fun getBackupById(id: Long): Backup?
     fun deleteBackupById(id: Long)
-    fun updateBackup(backup: Backup?)
     fun clearBackups()
+
+    fun findNonContactByHandle(handle: String?): NonContactInfo?
+    fun setContact(contact: MegaContactDB)
+    fun findContactByHandle(handleParam: String?): MegaContactDB?
+    fun findContactByEmail(mail: String?): MegaContactDB?
 }

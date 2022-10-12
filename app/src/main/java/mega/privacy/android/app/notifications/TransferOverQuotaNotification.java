@@ -10,7 +10,7 @@ import android.widget.RemoteViews;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
