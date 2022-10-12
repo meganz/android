@@ -55,7 +55,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
             transferId = transfer.getId();
         } else {
             transferId = savedInstanceState.getLong(TRANSFER_ID, INVALID_ID);
-            transfer = dbH.getcompletedTransfer(transferId);
+            transfer = dbH.getCompletedTransfer(transferId);
         }
 
         return contentView;

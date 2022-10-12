@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.objects.SDTransfer;
 import nz.mega.sdk.MegaApiJava;
@@ -141,8 +141,8 @@ public class SDCardUtils {
     public static void checkSDCardCompletedTransfers() {
         MegaApplication app = MegaApplication.getInstance();
         MegaApiJava megaApi = app.getMegaApi();
-        DatabaseHandler dbH = app.getDbH();
-        ArrayList<SDTransfer> sdTransfers = dbH.getSDTransfers();
+        LegacyDatabaseHandler dbH = app.getDbH();
+        ArrayList<SDTransfer> sdTransfers = dbH.getSdTransfers();
         if (sdTransfers == null || sdTransfers.isEmpty()) {
             return;
         }

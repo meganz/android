@@ -2,14 +2,14 @@ package mega.privacy.android.app.data.facade
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaAttributes
-import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.data.model.UserCredentials
-import mega.privacy.android.app.main.megachat.NonContactInfo
 import mega.privacy.android.app.utils.SharedPreferenceConstants
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.model.MegaAttributes
+import mega.privacy.android.data.model.MegaPreferences
+import mega.privacy.android.data.model.UserCredentials
+import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC

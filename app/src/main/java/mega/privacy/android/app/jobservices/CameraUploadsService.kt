@@ -34,7 +34,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import mega.privacy.android.app.AndroidCompletedTransfer
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -459,7 +459,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * DatabaseHandler
      */
     @Inject
-    lateinit var tempDbHandler: DatabaseHandler
+    lateinit var tempDbHandler: LegacyDatabaseHandler
 
     /**
      * AreAllUploadTransfersPaused

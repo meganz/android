@@ -35,7 +35,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.LegacyDatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -102,7 +103,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
     lateinit var megaChatApi: MegaChatApiAndroid
 
     @Inject
-    lateinit var dbH: DatabaseHandler
+    lateinit var dbH: LegacyDatabaseHandler
 
     @ApplicationScope
     @Inject

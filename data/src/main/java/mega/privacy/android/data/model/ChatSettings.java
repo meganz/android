@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megachat;
+package mega.privacy.android.data.model;
 
 public class ChatSettings {
 

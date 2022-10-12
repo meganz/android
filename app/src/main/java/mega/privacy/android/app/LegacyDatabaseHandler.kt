@@ -1,0 +1,115 @@
+package mega.privacy.android.app
+
+import android.database.sqlite.SQLiteDatabase
+import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
+import mega.privacy.android.app.main.megachat.ChatItemPreferences
+import mega.privacy.android.app.main.megachat.PendingMessageSingle
+import mega.privacy.android.app.objects.SDTransfer
+import mega.privacy.android.app.sync.Backup
+import mega.privacy.android.app.utils.contacts.MegaContactGetter
+import mega.privacy.android.data.database.DatabaseHandler
+
+interface LegacyDatabaseHandler : DatabaseHandler {
+    val megaContacts: ArrayList<MegaContactGetter.MegaContact>
+
+    val ephemeral: EphemeralCredentials?
+
+    /**
+     * Gets the completed transfers.
+     *
+     * @return The list with the completed transfers.
+     */
+    val completedTransfers: ArrayList<AndroidCompletedTransfer?>
+
+    /**
+     * Gets the completed transfers which have as state cancelled or failed.
+     *
+     * @return The list the cancelled or failed transfers.
+     */
+    val failedOrCancelledTransfers: ArrayList<AndroidCompletedTransfer?>
+
+    val offlineFiles: ArrayList<MegaOffline>
+
+    val sdTransfers: ArrayList<SDTransfer>
+    val cuBackup: Backup?
+    val muBackup: Backup?
+    val allBackups: List<Backup>?
+
+    fun saveEphemeral(ephemeralCredentials: EphemeralCredentials)
+    fun batchInsertMegaContacts(contacts: List<MegaContactGetter.MegaContact>?)
+    fun setChatItemPreferences(chatPrefs: ChatItemPreferences)
+    fun findChatPreferencesByHandle(handle: String?): ChatItemPreferences?
+
+    /**
+     * Gets a completed transfer.
+     *
+     * @param id the identifier of the transfer to get
+     * @return The completed transfer which has the id value as identifier.
+     */
+    fun getCompletedTransfer(id: Long): AndroidCompletedTransfer?
+    fun setCompletedTransfer(transfer: AndroidCompletedTransfer): Long
+
+    /**
+     * Checks if a completed transfer exists before add it to DB.
+     * If so, does nothing. If not, adds the transfer to the DB.
+     *
+     * @param transfer The transfer to check and add.
+     */
+    fun setCompletedTransferWithCheck(transfer: AndroidCompletedTransfer)
+
+    /**
+     * Gets a list with completed transfers depending on the query received by parameter.
+     *
+     * @param selectQuery the query which selects specific completed transfers
+     * @return The list with the completed transfers.
+     */
+    fun getCompletedTransfers(selectQuery: String?): ArrayList<AndroidCompletedTransfer?>
+    fun setOfflineFile(offline: MegaOffline): Long
+    fun setOfflineFile(offline: MegaOffline, db: SQLiteDatabase): Long
+    fun setOfflineFileOld(offline: MegaOffline): Long
+    fun setOfflineFileOld(offline: MegaOffline, db: SQLiteDatabase): Long
+    fun getOfflineFilesOld(db: SQLiteDatabase): ArrayList<MegaOffline>
+    fun findByHandle(handle: Long): MegaOffline?
+    fun findByHandle(handle: String?): MegaOffline?
+    fun findByParentId(parentId: Int): ArrayList<MegaOffline>
+    fun findById(id: Int): MegaOffline?
+    fun findByPath(path: String?): ArrayList<MegaOffline>
+    fun findbyPathAndName(path: String?, name: String?): MegaOffline?
+    fun deleteOfflineFile(mOff: MegaOffline): Int
+
+
+    /**
+     * Adds a pending message from File Explorer.
+     *
+     * @param message Pending message to add.
+     * @return The identifier of the pending message.
+     */
+    fun addPendingMessageFromFileExplorer(message: PendingMessageSingle): Long
+
+    /**
+     * Adds a pending message.
+     *
+     * @param message Pending message to add.
+     * @param state   State of the pending message.
+     * @return The identifier of the pending message.
+     */
+    fun addPendingMessage(message: PendingMessageSingle): Long
+
+    /**
+     * Adds a pending message.
+     *
+     * @param message Pending message to add.
+     * @return The identifier of the pending message.
+     */
+    fun addPendingMessage(
+        message: PendingMessageSingle,
+        state: Int,
+    ): Long
+
+    fun findPendingMessageById(messageId: Long): PendingMessageSingle?
+    fun findPendingMessagesNotSent(idChat: Long): ArrayList<AndroidMegaChatMessage>
+    fun addSDTransfer(transfer: SDTransfer): Long
+    fun saveBackup(backup: Backup): Boolean
+    fun getBackupById(id: Long): Backup?
+    fun updateBackup(backup: Backup?)
+}

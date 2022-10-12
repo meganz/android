@@ -13,7 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.LegacyDatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import timber.log.Timber;
@@ -23,7 +24,7 @@ import timber.log.Timber;
  */
 public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
     Context context;
-    DatabaseHandler dbH;
+    LegacyDatabaseHandler dbH;
 
     public CheckOfflineNodesTask(Context context) {
         this.context = context;

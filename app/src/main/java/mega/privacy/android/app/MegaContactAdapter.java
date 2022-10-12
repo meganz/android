@@ -1,6 +1,7 @@
 package mega.privacy.android.app;
 
 
+import mega.privacy.android.data.model.MegaContactDB;
 import nz.mega.sdk.MegaUser;
 
 public class MegaContactAdapter {

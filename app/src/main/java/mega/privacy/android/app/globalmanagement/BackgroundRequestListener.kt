@@ -3,7 +3,7 @@ package mega.privacy.android.app.globalmanagement
 import android.app.Application
 import android.content.Intent
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE

@@ -7,8 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaPreferences
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.fragments.homepage.NodeItem

@@ -8,7 +8,7 @@ import android.content.Context;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;

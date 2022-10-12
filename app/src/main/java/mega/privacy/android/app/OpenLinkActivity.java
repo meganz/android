@@ -65,6 +65,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
