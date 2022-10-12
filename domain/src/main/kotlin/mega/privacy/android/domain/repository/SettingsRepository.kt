@@ -67,11 +67,25 @@ interface SettingsRepository {
     fun monitorStartScreen(): Flow<Int>
 
     /**
-     * Monitor hide recent activity
+     * Monitor hide recent activity event
      *
      * @return hide recent activity option enabled status as a flow
      */
-    fun monitorHideRecentActivity(): Flow<Boolean>
+    fun monitorHideRecentActivityEvent(): Flow<Boolean>
+
+    /**
+     * Monitor hide recent activity setting
+     *
+     * @return hide recent activity option enabled status as a flow
+     */
+    fun monitorHideRecentActivity(): Flow<Boolean?>
+
+    /**
+     * Set hide recent activity
+     *
+     * @param value
+     */
+    suspend fun setHideRecentActivity(value: Boolean)
 
     /**
      * Is camera sync enabled
