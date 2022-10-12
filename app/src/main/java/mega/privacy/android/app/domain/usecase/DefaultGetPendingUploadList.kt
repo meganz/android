@@ -1,6 +1,7 @@
 package mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.yield
+import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -31,6 +32,7 @@ class DefaultGetPendingUploadList @Inject constructor(
     private val mediaLocalPathExists: MediaLocalPathExists,
     private val shouldCompressVideo: ShouldCompressVideo,
     private val getGPSCoordinates: GetGPSCoordinates,
+    private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
 ) : GetPendingUploadList {
 
     override suspend fun invoke(
@@ -42,7 +44,7 @@ class DefaultGetPendingUploadList @Inject constructor(
         val pendingList = mutableListOf<SyncRecord>()
         val parentNodeHandle = if (isSecondary) getSecondarySyncHandle() else getPrimarySyncHandle()
         Timber.d("Upload to parent node with handle: $parentNodeHandle")
-        val type = if (isVideo) SyncRecordType.TYPE_VIDEO.value else SyncRecordType.TYPE_PHOTO.value
+        val type = if (isVideo) SyncRecordType.TYPE_VIDEO else SyncRecordType.TYPE_PHOTO
 
         while (mediaList.size > 0) {
             yield()
@@ -83,11 +85,11 @@ class DefaultGetPendingUploadList @Inject constructor(
                     sourceFile?.name,
                     gpsData?.second,
                     gpsData?.first,
-                    if (shouldCompressVideo() && type == SyncRecordType.TYPE_VIDEO.value)
+                    if (shouldCompressVideo() && type == SyncRecordType.TYPE_VIDEO)
                         SyncStatus.STATUS_TO_COMPRESS.value
                     else
                         SyncStatus.STATUS_PENDING.value,
-                    type,
+                    syncRecordTypeIntMapper(type),
                     null,
                     false,
                     isSecondary
@@ -108,7 +110,7 @@ class DefaultGetPendingUploadList @Inject constructor(
                         nodeExists.longitude.toFloat(),
                         nodeExists.latitude.toFloat(),
                         SyncStatus.STATUS_PENDING.value,
-                        type,
+                        syncRecordTypeIntMapper(type),
                         nodeExists.handle,
                         true,
                         isSecondary

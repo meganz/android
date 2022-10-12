@@ -44,8 +44,8 @@ public class CameraUploadUtil {
     private static final String KEY_SECONDARY_HANDLE = "KEY_SECONDARY_HANDLE";
     private static final String LAST_CAM_SYNC_TIMESTAMP_FILE = "LAST_CAM_SYNC_TIMESTAMP_FILE";
 
-    private static MegaApplication app = MegaApplication.getInstance();
-    private static DatabaseHandler dbH = app.getDbH();
+    private static final MegaApplication app = MegaApplication.getInstance();
+    private static final DatabaseHandler dbH = app.getDbH();
 
     /**
      * The method is to delete the timestamps backup in share preference
@@ -96,7 +96,7 @@ public class CameraUploadUtil {
             }
         } else {
             // when primary target folder has been changed, delete primary sync records.
-            dbH.deleteAllPrimarySyncRecords(SyncRecordType.TYPE_ANY.getValue());
+            dbH.deleteAllPrimarySyncRecords();
         }
         clearPrimaryBackUp();
     }
@@ -131,7 +131,7 @@ public class CameraUploadUtil {
             }
         } else {
             // when secondary target folder has been changed, delete secondary sync records.
-            dbH.deleteAllSecondarySyncRecords(SyncRecordType.TYPE_ANY.getValue());
+            dbH.deleteAllSecondarySyncRecords();
         }
         clearSecondaryBackUp();
     }
@@ -162,14 +162,14 @@ public class CameraUploadUtil {
         Timber.d("Reset primary timeline");
         dbH.setCamSyncTimeStamp(0);
         dbH.setCamVideoSyncTimeStamp(0);
-        dbH.deleteAllPrimarySyncRecords(SyncRecordType.TYPE_ANY.getValue());
+        dbH.deleteAllPrimarySyncRecords();
     }
 
     public static void resetSecondaryTimeline() {
         Timber.d("Reset secondary timeline");
         dbH.setSecSyncTimeStamp(0);
         dbH.setSecVideoSyncTimeStamp(0);
-        dbH.deleteAllSecondarySyncRecords(SyncRecordType.TYPE_ANY.getValue());
+        dbH.deleteAllSecondarySyncRecords();
     }
 
     public static long getPrimaryFolderHandle() {
@@ -214,7 +214,7 @@ public class CameraUploadUtil {
         resetCUTimestampsAndCache(clearCamsyncRecords);
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (dbH.shouldClearCamsyncRecords()) {
-                dbH.deleteAllSyncRecords(SyncRecordType.TYPE_ANY.getValue());
+                dbH.deleteAllSyncRecordsTypeAny();
                 dbH.saveShouldClearCamsyncRecords(false);
             }
         }, 10 * 1000);

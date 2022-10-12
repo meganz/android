@@ -30,8 +30,10 @@ class DefaultClearSyncRecordsTest {
         runTest {
             whenever(cameraUploadRepository.shouldClearSyncRecords()).thenReturn(true)
             underTest()
-            verify(cameraUploadRepository,
-                times(1)).deleteAllSyncRecords(SyncRecordType.TYPE_ANY.value)
+            verify(
+                cameraUploadRepository,
+                times(1)
+            ).deleteAllSyncRecords(SyncRecordType.TYPE_ANY)
             verify(cameraUploadRepository, times(1)).saveShouldClearCamSyncRecords(false)
         }
 
@@ -40,8 +42,10 @@ class DefaultClearSyncRecordsTest {
         runTest {
             whenever(cameraUploadRepository.shouldClearSyncRecords()).thenReturn(false)
             underTest()
-            verify(cameraUploadRepository,
-                times(0)).deleteAllSyncRecords(SyncRecordType.TYPE_ANY.value)
+            verify(
+                cameraUploadRepository,
+                times(0)
+            ).deleteAllSyncRecords(SyncRecordType.TYPE_ANY)
             verify(cameraUploadRepository, times(0)).saveShouldClearCamSyncRecords(false)
         }
 }

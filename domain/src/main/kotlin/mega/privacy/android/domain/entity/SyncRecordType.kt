@@ -3,24 +3,19 @@ package mega.privacy.android.domain.entity
 /**
  * Type of sync record
  */
-enum class SyncRecordType(
-    /**
-     * sync record type value
-     */
-    val value: Int,
-) {
+enum class SyncRecordType {
     /**
      * type photo
      */
-    TYPE_PHOTO(1),
+    TYPE_PHOTO,
 
     /**
      * type video
      */
-    TYPE_VIDEO(2),
+    TYPE_VIDEO,
 
     /**
      * type any media
      */
-    TYPE_ANY(-1);
+    TYPE_ANY
 }

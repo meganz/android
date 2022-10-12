@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.gateway.FileAttributeGateway
+import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -14,6 +15,7 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
@@ -25,6 +27,7 @@ class DefaultCameraUploadRepositoryTest {
 
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val fileAttributeGateway = mock<FileAttributeGateway>()
+    private val syncRecordTypeIntMapper = mock<SyncRecordTypeIntMapper>()
 
     private val fakeRecord = SyncRecord(
         id = 0,
@@ -37,7 +40,7 @@ class DefaultCameraUploadRepositoryTest {
         longitude = null,
         latitude = null,
         status = SyncStatus.STATUS_PENDING.value,
-        type = SyncRecordType.TYPE_ANY.value,
+        type = -1,
         nodeHandle = null,
         isCopyOnly = false,
         isSecondary = false
@@ -50,6 +53,7 @@ class DefaultCameraUploadRepositoryTest {
             megaApiGateway = mock(),
             cacheGateway = mock(),
             fileAttributeGateway = fileAttributeGateway,
+            syncRecordTypeIntMapper = syncRecordTypeIntMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
         )
     }
@@ -116,36 +120,16 @@ class DefaultCameraUploadRepositoryTest {
 
     @Test
     fun `test camera upload retrieves file name exists`() = runTest {
-        whenever(
-            localStorageGateway.doesFileNameExist(
-                "",
-                false,
-                SyncRecordType.TYPE_ANY.value
-            )
-        ).thenReturn(true)
-        assertThat(underTest.doesFileNameExist("", false, SyncRecordType.TYPE_ANY.value)).isEqualTo(
-            true
-        )
+        whenever(localStorageGateway.doesFileNameExist("", false, -1)).thenReturn(true)
+        whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
+        assertThat(underTest.doesFileNameExist("", false, SyncRecordType.TYPE_ANY)).isEqualTo(true)
     }
 
     @Test
     fun `test camera upload retrieves local path exists`() = runTest {
-        whenever(
-            localStorageGateway.doesLocalPathExist(
-                "",
-                false,
-                SyncRecordType.TYPE_ANY.value
-            )
-        ).thenReturn(true)
-        assertThat(
-            underTest.doesLocalPathExist(
-                "",
-                false,
-                SyncRecordType.TYPE_ANY.value
-            )
-        ).isEqualTo(
-            true
-        )
+        whenever(localStorageGateway.doesLocalPathExist("", false, -1)).thenReturn(true)
+        whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
+        assertThat(underTest.doesLocalPathExist("", false, SyncRecordType.TYPE_ANY)).isEqualTo(true)
     }
 
     @Test
@@ -242,13 +226,9 @@ class DefaultCameraUploadRepositoryTest {
 
     @Test
     fun `test camera upload retrieves maximal time stamp`() = runTest {
-        whenever(
-            localStorageGateway.getMaxTimestamp(
-                false,
-                SyncRecordType.TYPE_ANY.value
-            )
-        ).thenReturn(1000L)
-        assertThat(underTest.getMaxTimestamp(false, SyncRecordType.TYPE_ANY.value)).isEqualTo(1000L)
+        whenever(localStorageGateway.getMaxTimestamp(false, -1)).thenReturn(1000L)
+        whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
+        assertThat(underTest.getMaxTimestamp(false, SyncRecordType.TYPE_ANY)).isEqualTo(1000L)
     }
 
     @Test

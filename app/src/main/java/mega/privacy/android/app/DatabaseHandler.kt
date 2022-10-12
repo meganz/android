@@ -162,9 +162,10 @@ interface DatabaseHandler {
 
     fun findAllPendingSyncRecords(): List<SyncRecord>
     fun findVideoSyncRecordsByState(state: Int): List<SyncRecord>
-    fun deleteAllSyncRecords(type: Int)
-    fun deleteAllSecondarySyncRecords(type: Int)
-    fun deleteAllPrimarySyncRecords(type: Int)
+    fun deleteAllSyncRecords(fileType: Int)
+    fun deleteAllSyncRecordsTypeAny()
+    fun deleteAllSecondarySyncRecords()
+    fun deleteAllPrimarySyncRecords()
     fun deleteVideoRecordsByState(state: Int)
     fun findSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean): SyncRecord?
     fun deleteSyncRecordByPath(path: String?, isSecondary: Boolean)
@@ -181,7 +182,7 @@ interface DatabaseHandler {
     fun findSyncRecordByNewPath(newPath: String?): SyncRecord?
     fun shouldClearCamsyncRecords(): Boolean
     fun saveShouldClearCamsyncRecords(should: Boolean)
-    fun findMaxTimestamp(isSecondary: Boolean, type: Int): Long?
+    fun findMaxTimestamp(isSecondary: Boolean, fileType: Int): Long?
     fun setCameraUploadVideoQuality(quality: Int)
     fun setConversionOnCharging(onCharging: Boolean)
     fun setChargingOnSize(size: Int)

@@ -14,7 +14,7 @@ class DefaultClearSyncRecords @Inject constructor(
 
     override suspend fun invoke() {
         if (cameraUploadRepository.shouldClearSyncRecords()) {
-            cameraUploadRepository.deleteAllSyncRecords(SyncRecordType.TYPE_ANY.value)
+            cameraUploadRepository.deleteAllSyncRecords(SyncRecordType.TYPE_ANY)
             cameraUploadRepository.saveShouldClearCamSyncRecords(false)
         }
     }
