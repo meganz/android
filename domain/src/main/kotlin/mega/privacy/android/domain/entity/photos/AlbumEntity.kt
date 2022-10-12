@@ -1,3 +1,4 @@
+package mega.privacy.android.domain.entity.photos
 /**
  * Entity album
  *
