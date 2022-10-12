@@ -11,9 +11,9 @@ import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
+import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.SyncRecord
-import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
@@ -43,6 +43,7 @@ class DefaultGetPendingUploadListTest {
     private val mediaLocalPathExists: MediaLocalPathExists = mock()
     private val shouldCompressVideo: ShouldCompressVideo = mock()
     private val getGPSCoordinates: GetGPSCoordinates = mock()
+    private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper = mock()
 
     private val uploadMedia = CameraUploadMedia("", 0)
 
@@ -57,7 +58,7 @@ class DefaultGetPendingUploadListTest {
         1F,
         0F,
         SyncStatus.STATUS_PENDING.value,
-        SyncRecordType.TYPE_PHOTO.value,
+        1,
         null,
         isCopyOnly = false,
         isSecondary = false
@@ -74,7 +75,7 @@ class DefaultGetPendingUploadListTest {
         1F,
         0F,
         SyncStatus.STATUS_PENDING.value,
-        SyncRecordType.TYPE_PHOTO.value,
+        1,
         null,
         isCopyOnly = false,
         isSecondary = true
@@ -91,7 +92,7 @@ class DefaultGetPendingUploadListTest {
         1F,
         0F,
         SyncStatus.STATUS_TO_COMPRESS.value,
-        SyncRecordType.TYPE_VIDEO.value,
+        2,
         null,
         isCopyOnly = false,
         isSecondary = false
@@ -108,7 +109,7 @@ class DefaultGetPendingUploadListTest {
         1F,
         0F,
         SyncStatus.STATUS_PENDING.value,
-        SyncRecordType.TYPE_VIDEO.value,
+        2,
         null,
         isCopyOnly = false,
         isSecondary = true
@@ -126,7 +127,8 @@ class DefaultGetPendingUploadListTest {
             getFingerprint,
             mediaLocalPathExists,
             shouldCompressVideo,
-            getGPSCoordinates
+            getGPSCoordinates,
+            syncRecordTypeIntMapper
         )
     }
 
@@ -142,6 +144,7 @@ class DefaultGetPendingUploadListTest {
             whenever(getNodeFromCloud(any(), any())).thenReturn(null)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getGPSCoordinates(any(), any())).thenReturn(Pair(0F, 1F))
+            whenever(syncRecordTypeIntMapper(any())).thenReturn(1)
             val queue = LinkedList<CameraUploadMedia>()
             queue.add(uploadMedia)
             assertThat(underTest(queue, isSecondary = false, isVideo = false)).isEqualTo(
@@ -163,6 +166,7 @@ class DefaultGetPendingUploadListTest {
             whenever(getNodeFromCloud(any(), any())).thenReturn(null)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getGPSCoordinates(any(), any())).thenReturn(Pair(0F, 1F))
+            whenever(syncRecordTypeIntMapper(any())).thenReturn(1)
             val queue = LinkedList<CameraUploadMedia>()
             queue.add(uploadMedia)
             assertThat(underTest(queue, isSecondary = true, isVideo = false)).isEqualTo(
@@ -184,6 +188,7 @@ class DefaultGetPendingUploadListTest {
             whenever(getNodeFromCloud(any(), any())).thenReturn(null)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getGPSCoordinates(any(), any())).thenReturn(Pair(0F, 1F))
+            whenever(syncRecordTypeIntMapper(any())).thenReturn(2)
             val queue = LinkedList<CameraUploadMedia>()
             queue.add(uploadMedia)
             assertThat(underTest(queue, isSecondary = false, isVideo = true)).isEqualTo(
@@ -205,6 +210,7 @@ class DefaultGetPendingUploadListTest {
             whenever(getNodeFromCloud(any(), any())).thenReturn(null)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getGPSCoordinates(any(), any())).thenReturn(Pair(0F, 1F))
+            whenever(syncRecordTypeIntMapper(any())).thenReturn(2)
             val queue = LinkedList<CameraUploadMedia>()
             queue.add(uploadMedia)
             assertThat(underTest(queue, isSecondary = true, isVideo = true)).isEqualTo(

@@ -728,7 +728,7 @@ open class SqliteDatabaseHandler(
     override fun updateVideoState(state: Int) {
         val sql =
             "UPDATE $TABLE_SYNC_RECORDS SET $KEY_SYNC_STATE = $state  " +
-                    "WHERE $KEY_SYNC_TYPE = ${SyncRecordType.TYPE_VIDEO.value}"
+                    "WHERE $KEY_SYNC_TYPE = $SYNC_RECORD_TYPE_VIDEO"
         db.execSQL(sql)
     }
 
@@ -736,7 +736,7 @@ open class SqliteDatabaseHandler(
         var selectQuery = "SELECT * FROM $TABLE_SYNC_RECORDS " +
                 "WHERE $KEY_SYNC_FILENAME ='${encrypt(name)}' " +
                 "AND $KEY_SYNC_SECONDARY = '${encrypt(isSecondary.toString())}'"
-        if (fileType != SyncRecordType.TYPE_ANY.value) {
+        if (fileType != SYNC_RECORD_TYPE_ANY) {
             selectQuery += " AND $KEY_SYNC_TYPE = $fileType"
         }
         db.rawQuery(selectQuery, null).use { cursor -> return cursor != null && cursor.count == 1 }
@@ -746,7 +746,7 @@ open class SqliteDatabaseHandler(
         var selectQuery = ("SELECT * FROM $TABLE_SYNC_RECORDS " +
                 "WHERE $KEY_SYNC_FILEPATH_ORI ='${encrypt(localPath)}' " +
                 "AND $KEY_SYNC_SECONDARY = '${encrypt(isSecondary.toString())}'")
-        if (fileType != SyncRecordType.TYPE_ANY.value) {
+        if (fileType != SYNC_RECORD_TYPE_ANY) {
             selectQuery += " AND $KEY_SYNC_TYPE = $fileType"
         }
         db.rawQuery(selectQuery, null).use { cursor ->
@@ -797,7 +797,7 @@ open class SqliteDatabaseHandler(
     override fun findVideoSyncRecordsByState(state: Int): List<SyncRecord> {
         val selectQuery = "SELECT * FROM $TABLE_SYNC_RECORDS " +
                 "WHERE $KEY_SYNC_STATE = $state " +
-                "AND $KEY_SYNC_TYPE = ${SyncRecordType.TYPE_VIDEO.value}"
+                "AND $KEY_SYNC_TYPE = $SYNC_RECORD_TYPE_VIDEO"
         val records: MutableList<SyncRecord> = ArrayList()
         try {
             db.rawQuery(selectQuery, null)?.use { cursor ->
@@ -814,36 +814,45 @@ open class SqliteDatabaseHandler(
         return records
     }
 
-    override fun deleteAllSyncRecords(type: Int) {
+    /**
+     * Delete all sync records by a given sync record type
+     */
+    override fun deleteAllSyncRecords(fileType: Int) {
         var sql = "DELETE FROM $TABLE_SYNC_RECORDS"
-        if (type != SyncRecordType.TYPE_ANY.value) {
-            sql += " WHERE $KEY_SYNC_TYPE = $type"
+        if (fileType != SYNC_RECORD_TYPE_ANY) {
+            sql += " WHERE $KEY_SYNC_TYPE = $fileType"
         }
         db.execSQL(sql)
     }
 
-    override fun deleteAllSecondarySyncRecords(type: Int) {
-        var sql =
-            "DELETE FROM $TABLE_SYNC_RECORDS WHERE $KEY_SYNC_SECONDARY ='${encrypt("true")}'"
-        if (type != SyncRecordType.TYPE_ANY.value) {
-            sql += " AND $KEY_SYNC_TYPE = $type"
-        }
+    /**
+     * Delete all sync records with any type
+     */
+    override fun deleteAllSyncRecordsTypeAny() {
+        val sql = "DELETE FROM $TABLE_SYNC_RECORDS"
         db.execSQL(sql)
     }
 
-    override fun deleteAllPrimarySyncRecords(type: Int) {
-        var sql =
-            "DELETE FROM $TABLE_SYNC_RECORDS WHERE $KEY_SYNC_SECONDARY ='${encrypt("false")}'"
-        if (type != SyncRecordType.TYPE_ANY.value) {
-            sql += " AND $KEY_SYNC_TYPE = $type"
-        }
+    /**
+     * Delete all secondary sync records with any type
+     */
+    override fun deleteAllSecondarySyncRecords() {
+        val sql = "DELETE FROM $TABLE_SYNC_RECORDS WHERE $KEY_SYNC_SECONDARY ='${encrypt("true")}'"
+        db.execSQL(sql)
+    }
+
+    /**
+     * Delete all primary sync records with any type
+     */
+    override fun deleteAllPrimarySyncRecords() {
+        val sql = "DELETE FROM $TABLE_SYNC_RECORDS WHERE $KEY_SYNC_SECONDARY ='${encrypt("false")}'"
         db.execSQL(sql)
     }
 
     override fun deleteVideoRecordsByState(state: Int) {
         val sql = "DELETE FROM $TABLE_SYNC_RECORDS " +
                 "WHERE $KEY_SYNC_STATE = $state " +
-                "AND $KEY_SYNC_TYPE = ${SyncRecordType.TYPE_VIDEO.value}"
+                "AND $KEY_SYNC_TYPE = $SYNC_RECORD_TYPE_VIDEO"
         db.execSQL(sql)
     }
 
@@ -975,10 +984,10 @@ open class SqliteDatabaseHandler(
         db.execSQL(sql)
     }
 
-    override fun findMaxTimestamp(isSecondary: Boolean, type: Int): Long? {
+    override fun findMaxTimestamp(isSecondary: Boolean, fileType: Int): Long? {
         val selectQuery = "SELECT $KEY_SYNC_TIMESTAMP FROM $TABLE_SYNC_RECORDS  " +
                 "WHERE $KEY_SYNC_SECONDARY = '${encrypt(isSecondary.toString())}' " +
-                "AND $KEY_SYNC_TYPE = $type"
+                "AND $KEY_SYNC_TYPE = $fileType"
         try {
             db.rawQuery(selectQuery, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
@@ -4678,6 +4687,8 @@ open class SqliteDatabaseHandler(
                 "$KEY_BACKUP_DEL BOOLEAN," +                               //13
                 "$KEY_BACKUP_OUTDATED BOOLEAN)"                            //14
         private const val OLD_VIDEO_QUALITY_ORIGINAL = 0
+        private const val SYNC_RECORD_TYPE_VIDEO = 2
+        private const val SYNC_RECORD_TYPE_ANY = -1
         private var instance: DatabaseHandler? = null
 
         @JvmStatic

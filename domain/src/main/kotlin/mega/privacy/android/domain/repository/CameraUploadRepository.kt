@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncTimeStamp
 
 /**
@@ -113,7 +114,7 @@ interface CameraUploadRepository {
      *
      * @return
      */
-    suspend fun deleteAllSyncRecords(syncRecordType: Int)
+    suspend fun deleteAllSyncRecords(syncRecordType: SyncRecordType)
 
     /**
      * Delete sync record by path
@@ -159,14 +160,22 @@ interface CameraUploadRepository {
      *
      * @return true if file name exists
      */
-    suspend fun doesFileNameExist(fileName: String, isSecondary: Boolean, type: Int): Boolean
+    suspend fun doesFileNameExist(
+        fileName: String,
+        isSecondary: Boolean,
+        type: SyncRecordType,
+    ): Boolean
 
     /**
      * Does local path exist
      *
      * @return true if local path exists
      */
-    suspend fun doesLocalPathExist(fileName: String, isSecondary: Boolean, type: Int): Boolean
+    suspend fun doesLocalPathExist(
+        fileName: String,
+        isSecondary: Boolean,
+        type: SyncRecordType,
+    ): Boolean
 
     /**
      * Do user credentials exist
@@ -286,7 +295,7 @@ interface CameraUploadRepository {
      *
      * @return maximum timestamp
      */
-    suspend fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long
+    suspend fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: SyncRecordType): Long
 
     /**
      * Get video sync records by status

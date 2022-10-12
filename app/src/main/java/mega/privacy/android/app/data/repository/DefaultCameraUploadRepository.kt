@@ -6,7 +6,9 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
+import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CameraUploadRepository
@@ -23,6 +25,7 @@ class DefaultCameraUploadRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val fileAttributeGateway: FileAttributeGateway,
     private val cacheGateway: CacheGateway,
+    private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CameraUploadRepository {
 
@@ -70,9 +73,10 @@ class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.getVideoQuality()
     }
 
-    override suspend fun deleteAllSyncRecords(syncRecordType: Int) = withContext(ioDispatcher) {
-        localStorageGateway.deleteAllSyncRecords(syncRecordType)
-    }
+    override suspend fun deleteAllSyncRecords(syncRecordType: SyncRecordType) =
+        withContext(ioDispatcher) {
+            localStorageGateway.deleteAllSyncRecords(syncRecordTypeIntMapper(syncRecordType))
+        }
 
     override suspend fun deleteSyncRecord(path: String?, isSecondary: Boolean) =
         withContext(ioDispatcher) {
@@ -119,17 +123,17 @@ class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun doesFileNameExist(
         fileName: String,
         isSecondary: Boolean,
-        type: Int,
+        type: SyncRecordType,
     ): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.doesFileNameExist(fileName, isSecondary, type)
+        localStorageGateway.doesFileNameExist(fileName, isSecondary, syncRecordTypeIntMapper(type))
     }
 
     override suspend fun doesLocalPathExist(
         fileName: String,
         isSecondary: Boolean,
-        type: Int,
+        type: SyncRecordType,
     ): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.doesLocalPathExist(fileName, isSecondary, type)
+        localStorageGateway.doesLocalPathExist(fileName, isSecondary, syncRecordTypeIntMapper(type))
     }
 
     override suspend fun saveSyncRecord(record: SyncRecord) = withContext(ioDispatcher) {
@@ -232,9 +236,15 @@ class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.shouldClearSyncRecords()
     }
 
-    override suspend fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long =
+    override suspend fun getMaxTimestamp(
+        isSecondary: Boolean,
+        syncRecordType: SyncRecordType,
+    ): Long =
         withContext(ioDispatcher) {
-            localStorageGateway.getMaxTimestamp(isSecondary, syncRecordType)
+            localStorageGateway.getMaxTimestamp(
+                isSecondary,
+                syncRecordTypeIntMapper(syncRecordType)
+            )
         }
 
     override suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord> =

@@ -361,7 +361,7 @@ class AccountController(private val context: Context) {
             dbH.clearCompletedTransfers()
             dbH.clearPendingMessage()
             dbH.clearAttributes()
-            dbH.deleteAllSyncRecords(SyncRecordType.TYPE_ANY.value)
+            dbH.deleteAllSyncRecordsTypeAny()
             dbH.clearChatSettings()
             dbH.clearBackups()
 
