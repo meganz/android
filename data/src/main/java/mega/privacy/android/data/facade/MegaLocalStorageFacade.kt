@@ -1,11 +1,9 @@
-package mega.privacy.android.app.data.facade
+package mega.privacy.android.data.facade
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE
-import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.utils.SharedPreferenceConstants
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.UserCredentials
@@ -29,7 +27,7 @@ import javax.inject.Inject
  *
  * @property dbHandler
  */
-class MegaLocalStorageFacade @Inject constructor(
+internal class MegaLocalStorageFacade @Inject constructor(
     private val dbHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
 ) : MegaLocalStorageGateway {
@@ -327,21 +325,36 @@ class MegaLocalStorageFacade @Inject constructor(
             Timber.e("Preference is null, while backup.")
             return
         }
-        context.getSharedPreferences(SharedPreferenceConstants.LAST_CAM_SYNC_TIMESTAMP_FILE,
+        context.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE,
             Context.MODE_PRIVATE)
             .edit()
-            .putString(SharedPreferenceConstants.KEY_CAM_SYNC_TIMESTAMP, prefs.camSyncTimeStamp)
-            .putString(SharedPreferenceConstants.KEY_CAM_VIDEO_SYNC_TIMESTAMP,
+            .putString(KEY_CAM_SYNC_TIMESTAMP, prefs.camSyncTimeStamp)
+            .putString(KEY_CAM_VIDEO_SYNC_TIMESTAMP,
                 prefs.camVideoSyncTimeStamp)
-            .putString(SharedPreferenceConstants.KEY_SEC_SYNC_TIMESTAMP, prefs.secSyncTimeStamp)
-            .putString(SharedPreferenceConstants.KEY_SEC_VIDEO_SYNC_TIMESTAMP,
+            .putString(KEY_SEC_SYNC_TIMESTAMP, prefs.secSyncTimeStamp)
+            .putString(KEY_SEC_VIDEO_SYNC_TIMESTAMP,
                 prefs.secVideoSyncTimeStamp)
-            .putLong(SharedPreferenceConstants.KEY_PRIMARY_HANDLE, primaryUploadFolderHandle)
-            .putLong(SharedPreferenceConstants.KEY_SECONDARY_HANDLE, secondaryUploadFolderHandle)
+            .putLong(KEY_PRIMARY_HANDLE, primaryUploadFolderHandle)
+            .putLong(KEY_SECONDARY_HANDLE, secondaryUploadFolderHandle)
             .apply()
     }
 
     override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) {
         dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)
+    }
+
+    companion object {
+        /**
+         * Keys for backing up time stamps
+         */
+        private const val KEY_CAM_SYNC_TIMESTAMP = "KEY_CAM_SYNC_TIMESTAMP"
+        private const val KEY_CAM_VIDEO_SYNC_TIMESTAMP = "KEY_CAM_VIDEO_SYNC_TIMESTAMP"
+        private const val KEY_SEC_SYNC_TIMESTAMP = "KEY_SEC_SYNC_TIMESTAMP"
+        private const val KEY_SEC_VIDEO_SYNC_TIMESTAMP = "KEY_SEC_VIDEO_SYNC_TIMESTAMP"
+        private const val KEY_PRIMARY_HANDLE = "KEY_PRIMARY_HANDLE"
+        private const val KEY_SECONDARY_HANDLE = "KEY_SECONDARY_HANDLE"
+        private const val LAST_CAM_SYNC_TIMESTAMP_FILE = "LAST_CAM_SYNC_TIMESTAMP_FILE"
+
+        private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }
 }

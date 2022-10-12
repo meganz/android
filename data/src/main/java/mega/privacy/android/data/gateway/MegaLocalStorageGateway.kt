@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.gateway.api
+package mega.privacy.android.data.gateway
 
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaContactDB
