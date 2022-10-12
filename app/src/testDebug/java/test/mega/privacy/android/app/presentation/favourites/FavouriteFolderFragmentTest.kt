@@ -34,7 +34,6 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.di.TestWrapperModule
-import test.mega.privacy.android.app.di.FavouritesTestModule
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 
 @HiltAndroidTest
