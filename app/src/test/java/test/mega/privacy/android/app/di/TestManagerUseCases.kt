@@ -9,6 +9,7 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.manager.ManagerUseCases
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.GetInboxChildrenNodes
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
@@ -69,6 +70,11 @@ object TestManagerUseCases {
     @Provides
     fun provideHasInboxChildren() = mock<HasInboxChildren> {
         onBlocking { invoke() }.thenReturn(false)
+    }
+
+    @Provides
+    fun provideGetInboxChildrenNodes() = mock<GetInboxChildrenNodes> {
+        onBlocking { invoke() }.thenReturn(emptyList())
     }
 
     @Provides
