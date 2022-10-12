@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase
 
-import AlbumEntity
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.domain.entity.photos.AlbumEntity
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import org.junit.Before
 import org.junit.Test

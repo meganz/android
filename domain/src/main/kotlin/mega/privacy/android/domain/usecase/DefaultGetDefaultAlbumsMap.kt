@@ -1,9 +1,12 @@
 package mega.privacy.android.domain.usecase
 
-import AlbumEntity
+import mega.privacy.android.domain.entity.photos.AlbumEntity
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import javax.inject.Inject
 
+/**
+ * Get default albums map
+ */
 class DefaultGetDefaultAlbumsMap @Inject constructor(
     private val filterFavourite: FilterFavourite,
     private val filterGIF: FilterGIF,
