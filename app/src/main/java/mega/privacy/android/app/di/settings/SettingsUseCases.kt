@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.SetChatImageQuality
+import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 
 /**
@@ -149,6 +150,10 @@ abstract class SettingsUseCases {
         @Provides
         fun provideSetCallsSoundNotifications(settingsRepository: SettingsRepository): SetCallsSoundNotifications =
             SetCallsSoundNotifications(settingsRepository::setCallsSoundNotifications)
+
+        @Provides
+        fun provideSetHideRecentActivity(settingsRepository: SettingsRepository): SetHideRecentActivity =
+            SetHideRecentActivity(settingsRepository::setHideRecentActivity)
 
     }
 }

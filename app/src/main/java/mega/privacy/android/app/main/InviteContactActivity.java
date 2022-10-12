@@ -82,7 +82,8 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.LegacyDatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ContactInfoListDialog;
@@ -108,7 +109,7 @@ import timber.log.Timber;
 public class InviteContactActivity extends PasscodeActivity implements ContactInfoListDialog.OnMultipleSelectedListener, MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
 
     @Inject
-    DatabaseHandler dbH;
+    LegacyDatabaseHandler dbH;
 
     public static final int SCAN_QR_FOR_INVITE_CONTACTS = 1111;
     private static final String KEY_PHONE_CONTACTS = "KEY_PHONE_CONTACTS";

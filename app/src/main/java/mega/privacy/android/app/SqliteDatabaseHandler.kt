@@ -11,15 +11,15 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Base64
 import dagger.hilt.android.EntryPointAccessors.fromApplication
-import mega.privacy.android.app.DatabaseHandler.Companion.MAX_TRANSFERS
+import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.data.mapper.StorageStateIntMapper
-import mega.privacy.android.app.data.model.UserCredentials
+import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.app.di.LegacyLoggingEntryPoint
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
-import mega.privacy.android.app.main.megachat.ChatSettings
-import mega.privacy.android.app.main.megachat.NonContactInfo
+import mega.privacy.android.data.model.ChatSettings
+import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.app.main.megachat.PendingMessageSingle
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.Backup
@@ -35,10 +35,13 @@ import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.contacts.MegaContactGetter.MegaContact
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.mapper.StorageStateMapper
+import mega.privacy.android.data.model.MegaAttributes
+import mega.privacy.android.data.model.MegaContactDB
+import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
-import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import nz.mega.sdk.MegaApiJava
@@ -49,13 +52,13 @@ import java.util.Collections
 /**
  * Sqlite implementation of database handler
  */
-open class SqliteDatabaseHandler(
+class SqliteDatabaseHandler(
     context: Context?,
     private val legacyLoggingSettings: LegacyLoggingSettings,
     private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
 ) :
-    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), DatabaseHandler {
+    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), LegacyDatabaseHandler {
     private var db: SQLiteDatabase
     override fun onCreate(db: SQLiteDatabase) {
         Timber.d("onCreate")
@@ -728,7 +731,7 @@ open class SqliteDatabaseHandler(
     override fun updateVideoState(state: Int) {
         val sql =
             "UPDATE $TABLE_SYNC_RECORDS SET $KEY_SYNC_STATE = $state  " +
-                    "WHERE $KEY_SYNC_TYPE = ${SyncRecordType.TYPE_VIDEO.value}"
+                    "WHERE $KEY_SYNC_TYPE = $SYNC_RECORD_TYPE_VIDEO"
         db.execSQL(sql)
     }
 
@@ -736,7 +739,7 @@ open class SqliteDatabaseHandler(
         var selectQuery = "SELECT * FROM $TABLE_SYNC_RECORDS " +
                 "WHERE $KEY_SYNC_FILENAME ='${encrypt(name)}' " +
                 "AND $KEY_SYNC_SECONDARY = '${encrypt(isSecondary.toString())}'"
-        if (fileType != SyncRecordType.TYPE_ANY.value) {
+        if (fileType != SYNC_RECORD_TYPE_ANY) {
             selectQuery += " AND $KEY_SYNC_TYPE = $fileType"
         }
         db.rawQuery(selectQuery, null).use { cursor -> return cursor != null && cursor.count == 1 }
@@ -746,7 +749,7 @@ open class SqliteDatabaseHandler(
         var selectQuery = ("SELECT * FROM $TABLE_SYNC_RECORDS " +
                 "WHERE $KEY_SYNC_FILEPATH_ORI ='${encrypt(localPath)}' " +
                 "AND $KEY_SYNC_SECONDARY = '${encrypt(isSecondary.toString())}'")
-        if (fileType != SyncRecordType.TYPE_ANY.value) {
+        if (fileType != SYNC_RECORD_TYPE_ANY) {
             selectQuery += " AND $KEY_SYNC_TYPE = $fileType"
         }
         db.rawQuery(selectQuery, null).use { cursor ->
@@ -797,7 +800,7 @@ open class SqliteDatabaseHandler(
     override fun findVideoSyncRecordsByState(state: Int): List<SyncRecord> {
         val selectQuery = "SELECT * FROM $TABLE_SYNC_RECORDS " +
                 "WHERE $KEY_SYNC_STATE = $state " +
-                "AND $KEY_SYNC_TYPE = ${SyncRecordType.TYPE_VIDEO.value}"
+                "AND $KEY_SYNC_TYPE = $SYNC_RECORD_TYPE_VIDEO"
         val records: MutableList<SyncRecord> = ArrayList()
         try {
             db.rawQuery(selectQuery, null)?.use { cursor ->
@@ -814,36 +817,45 @@ open class SqliteDatabaseHandler(
         return records
     }
 
-    override fun deleteAllSyncRecords(type: Int) {
+    /**
+     * Delete all sync records by a given sync record type
+     */
+    override fun deleteAllSyncRecords(fileType: Int) {
         var sql = "DELETE FROM $TABLE_SYNC_RECORDS"
-        if (type != SyncRecordType.TYPE_ANY.value) {
-            sql += " WHERE $KEY_SYNC_TYPE = $type"
+        if (fileType != SYNC_RECORD_TYPE_ANY) {
+            sql += " WHERE $KEY_SYNC_TYPE = $fileType"
         }
         db.execSQL(sql)
     }
 
-    override fun deleteAllSecondarySyncRecords(type: Int) {
-        var sql =
-            "DELETE FROM $TABLE_SYNC_RECORDS WHERE $KEY_SYNC_SECONDARY ='${encrypt("true")}'"
-        if (type != SyncRecordType.TYPE_ANY.value) {
-            sql += " AND $KEY_SYNC_TYPE = $type"
-        }
+    /**
+     * Delete all sync records with any type
+     */
+    override fun deleteAllSyncRecordsTypeAny() {
+        val sql = "DELETE FROM $TABLE_SYNC_RECORDS"
         db.execSQL(sql)
     }
 
-    override fun deleteAllPrimarySyncRecords(type: Int) {
-        var sql =
-            "DELETE FROM $TABLE_SYNC_RECORDS WHERE $KEY_SYNC_SECONDARY ='${encrypt("false")}'"
-        if (type != SyncRecordType.TYPE_ANY.value) {
-            sql += " AND $KEY_SYNC_TYPE = $type"
-        }
+    /**
+     * Delete all secondary sync records with any type
+     */
+    override fun deleteAllSecondarySyncRecords() {
+        val sql = "DELETE FROM $TABLE_SYNC_RECORDS WHERE $KEY_SYNC_SECONDARY ='${encrypt("true")}'"
+        db.execSQL(sql)
+    }
+
+    /**
+     * Delete all primary sync records with any type
+     */
+    override fun deleteAllPrimarySyncRecords() {
+        val sql = "DELETE FROM $TABLE_SYNC_RECORDS WHERE $KEY_SYNC_SECONDARY ='${encrypt("false")}'"
         db.execSQL(sql)
     }
 
     override fun deleteVideoRecordsByState(state: Int) {
         val sql = "DELETE FROM $TABLE_SYNC_RECORDS " +
                 "WHERE $KEY_SYNC_STATE = $state " +
-                "AND $KEY_SYNC_TYPE = ${SyncRecordType.TYPE_VIDEO.value}"
+                "AND $KEY_SYNC_TYPE = $SYNC_RECORD_TYPE_VIDEO"
         db.execSQL(sql)
     }
 
@@ -975,10 +987,10 @@ open class SqliteDatabaseHandler(
         db.execSQL(sql)
     }
 
-    override fun findMaxTimestamp(isSecondary: Boolean, type: Int): Long? {
+    override fun findMaxTimestamp(isSecondary: Boolean, fileType: Int): Long? {
         val selectQuery = "SELECT $KEY_SYNC_TIMESTAMP FROM $TABLE_SYNC_RECORDS  " +
                 "WHERE $KEY_SYNC_SECONDARY = '${encrypt(isSecondary.toString())}' " +
-                "AND $KEY_SYNC_TYPE = $type"
+                "AND $KEY_SYNC_TYPE = $fileType"
         try {
             db.rawQuery(selectQuery, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
@@ -1520,18 +1532,51 @@ open class SqliteDatabaseHandler(
                         if (cursor.getColumnIndex(KEY_FINGERPRINT_LOCK) != Constants.INVALID_VALUE) decrypt(
                             cursor.getString(getColumnIndex(cursor,
                                 KEY_FINGERPRINT_LOCK))) else "false"
-                    prefs = MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle,
-                        camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
-                        pinLockCode, askAlways, downloadLocation, lastFolderUpload,
-                        lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
-                        secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList,
-                        preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-                        pinLockType, preferredSortCloud, preferredSortOthers, firstTimeChat,
-                        uploadVideoQuality, conversionOnCharging, chargingOnSize,
-                        shouldClearCameraSyncRecords, camVideoSyncTimeStamp, secVideoSyncTimeStamp,
-                        isAutoPlayEnabled, removeGPS, closeInviteBanner, preferredSortCameraUpload,
-                        sdCardUri, askForDisplayOver, askForSetDownloadLocation, mediaSDCardUri,
-                        isMediaOnSDCard, passcodeLockRequireTime, fingerprintLock)
+                    prefs = MegaPreferences(
+                        firstTime,
+                        wifi,
+                        camSyncEnabled,
+                        camSyncHandle,
+                        camSyncLocalPath,
+                        fileUpload,
+                        camSyncTimeStamp,
+                        pinLockEnabled,
+                        pinLockCode,
+                        askAlways,
+                        downloadLocation,
+                        lastFolderUpload,
+                        lastFolderCloud,
+                        secondaryFolderEnabled,
+                        secondaryPath,
+                        secondaryHandle,
+                        secSyncTimeStamp,
+                        keepFileNames,
+                        storageAdvancedDevices,
+                        preferredViewList,
+                        preferredViewListCamera,
+                        uriExternalSDCard,
+                        cameraFolderExternalSDCard,
+                        pinLockType,
+                        preferredSortCloud,
+                        preferredSortOthers,
+                        firstTimeChat,
+                        uploadVideoQuality,
+                        conversionOnCharging,
+                        chargingOnSize,
+                        shouldClearCameraSyncRecords,
+                        camVideoSyncTimeStamp,
+                        secVideoSyncTimeStamp,
+                        isAutoPlayEnabled,
+                        removeGPS,
+                        closeInviteBanner,
+                        preferredSortCameraUpload,
+                        sdCardUri,
+                        askForDisplayOver,
+                        askForSetDownloadLocation,
+                        mediaSDCardUri,
+                        isMediaOnSDCard,
+                        passcodeLockRequireTime,
+                        fingerprintLock)
                 }
             }
         } catch (e: Exception) {
@@ -1558,7 +1603,10 @@ open class SqliteDatabaseHandler(
                     val sendOriginalAttachments = decrypt(cursor.getString(6))
                     val videoQuality =
                         if (sendOriginalAttachments.toBoolean()) VideoQuality.ORIGINAL.value.toString() else VideoQuality.MEDIUM.value.toString()
-                    chatSettings = ChatSettings(notificationSound, vibrationEnabled, videoQuality)
+                    chatSettings = ChatSettings(
+                        notificationSound,
+                        vibrationEnabled,
+                        videoQuality)
                 }
             }
         } catch (e: Exception) {
@@ -1586,7 +1634,10 @@ open class SqliteDatabaseHandler(
                     val sendOriginalAttachments = decrypt(cursor.getString(4))
                     val videoQuality =
                         if (sendOriginalAttachments.toBoolean()) VideoQuality.ORIGINAL.value.toString() else VideoQuality.MEDIUM.value.toString()
-                    chatSettings = ChatSettings(notificationSound, vibrationEnabled, videoQuality)
+                    chatSettings = ChatSettings(
+                        notificationSound,
+                        vibrationEnabled,
+                        videoQuality)
                 }
             }
         } catch (e: Exception) {
@@ -1626,7 +1677,10 @@ open class SqliteDatabaseHandler(
                     val notificationSound = decrypt(cursor.getString(2))
                     val vibrationEnabled = decrypt(cursor.getString(3))
                     val videoQuality = decrypt(cursor.getString(4))
-                    chatSettings = ChatSettings(notificationSound, vibrationEnabled, videoQuality)
+                    chatSettings = ChatSettings(
+                        notificationSound,
+                        vibrationEnabled,
+                        videoQuality)
                 }
             }
         } catch (e: Exception) {
@@ -1814,7 +1868,7 @@ open class SqliteDatabaseHandler(
      * @param id the identifier of the transfer to get
      * @return The completed transfer which has the id value as identifier.
      */
-    override fun getcompletedTransfer(id: Long): AndroidCompletedTransfer? {
+    override fun getCompletedTransfer(id: Long): AndroidCompletedTransfer? {
         val selectQuery =
             "SELECT * FROM $TABLE_COMPLETED_TRANSFERS WHERE $KEY_ID = '$id'"
         try {
@@ -2206,7 +2260,12 @@ open class SqliteDatabaseHandler(
                     val firstName = decrypt(cursor.getString(3))
                     val lastName = decrypt(cursor.getString(4))
                     val email = decrypt(cursor.getString(5))
-                    return NonContactInfo(handle, fullName, firstName, lastName, email)
+                    return NonContactInfo(
+                        handle,
+                        fullName,
+                        firstName,
+                        lastName,
+                        email)
                 }
             }
         } catch (e: Exception) {
@@ -2291,7 +2350,11 @@ open class SqliteDatabaseHandler(
                     val name = decrypt(cursor.getString(3))
                     val lastName = decrypt(cursor.getString(4))
                     val nickname = decrypt(cursor.getString(5))
-                    return MegaContactDB(handle, mail, name, lastName, nickname)
+                    return MegaContactDB(handle,
+                        mail,
+                        name,
+                        lastName,
+                        nickname)
                 }
             }
         } catch (e: Exception) {
@@ -2312,7 +2375,11 @@ open class SqliteDatabaseHandler(
                     val name = decrypt(cursor.getString(3))
                     val lastName = decrypt(cursor.getString(4))
                     val nickname = decrypt(cursor.getString(5))
-                    return MegaContactDB(handle, mail, name, lastName, nickname)
+                    return MegaContactDB(handle,
+                        mail,
+                        name,
+                        lastName,
+                        nickname)
                 }
             }
         } catch (e: Exception) {
@@ -3919,7 +3986,7 @@ open class SqliteDatabaseHandler(
      * @param message Pending message to add.
      * @return The identifier of the pending message.
      */
-    override fun addPendingMessageFromExplorer(message: PendingMessageSingle): Long {
+    override fun addPendingMessageFromFileExplorer(message: PendingMessageSingle): Long {
         return addPendingMessage(message, PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER)
     }
 
@@ -4208,7 +4275,7 @@ open class SqliteDatabaseHandler(
         }
     }
 
-    override val sDTransfers: ArrayList<SDTransfer>
+    override val sdTransfers: ArrayList<SDTransfer>
         get() {
             val sdTransfers = ArrayList<SDTransfer>()
             val selectQuery = "SELECT * FROM $TABLE_SD_TRANSFERS"
@@ -4678,6 +4745,8 @@ open class SqliteDatabaseHandler(
                 "$KEY_BACKUP_DEL BOOLEAN," +                               //13
                 "$KEY_BACKUP_OUTDATED BOOLEAN)"                            //14
         private const val OLD_VIDEO_QUALITY_ORIGINAL = 0
+        private const val SYNC_RECORD_TYPE_VIDEO = 2
+        private const val SYNC_RECORD_TYPE_ANY = -1
         private var instance: DatabaseHandler? = null
 
         @JvmStatic
@@ -4686,7 +4755,7 @@ open class SqliteDatabaseHandler(
             context: Context,
             storageStateMapper: StorageStateMapper,
             storageStateIntMapper: StorageStateIntMapper,
-        ): DatabaseHandler {
+        ): LegacyDatabaseHandler {
             Timber.d("getDbHandler")
 
             if (instance == null) {
@@ -4703,7 +4772,7 @@ open class SqliteDatabaseHandler(
                     storageStateIntMapper = storageStateIntMapper
                 )
             }
-            return instance as DatabaseHandler
+            return instance as LegacyDatabaseHandler
         }
 
         private fun encrypt(original: String?): String? =

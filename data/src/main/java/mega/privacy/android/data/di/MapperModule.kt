@@ -32,6 +32,8 @@ import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanMapper
+import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
+import mega.privacy.android.data.mapper.SyncRecordTypeMapper
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
@@ -62,6 +64,8 @@ import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toSortOrder
 import mega.privacy.android.data.mapper.toStorageState
 import mega.privacy.android.data.mapper.toSubscriptionPlanList
+import mega.privacy.android.data.mapper.toSyncRecordType
+import mega.privacy.android.data.mapper.toSyncRecordTypeInt
 import mega.privacy.android.data.mapper.toTransferEventModel
 import mega.privacy.android.data.mapper.toTransferModel
 import mega.privacy.android.data.mapper.toUserAlert
@@ -175,6 +179,18 @@ internal class MapperModule {
     fun provideSortOrderIntMapper(): SortOrderIntMapper = ::toInt
 
     /**
+     * Provide sync record type mapper
+     */
+    @Provides
+    fun provideSyncRecordTypeMapper(): SyncRecordTypeMapper = ::toSyncRecordType
+
+    /**
+     * Provide sync record type int mapper
+     */
+    @Provides
+    fun provideSyncRecordTypeIntMapper(): SyncRecordTypeIntMapper = ::toSyncRecordTypeInt
+
+    /**
      * Provide storage state mapper
      */
     @Provides
@@ -249,9 +265,11 @@ internal class MapperModule {
      */
     @Provides
     fun provideMimeTypeMapper(): MimeTypeMapper = { extension ->
-        getMimeType(extension,
+        getMimeType(
+            extension,
             MimeTypeMap.getSingleton()
-            ::getMimeTypeFromExtension)
+            ::getMimeTypeFromExtension
+        )
     }
 
 

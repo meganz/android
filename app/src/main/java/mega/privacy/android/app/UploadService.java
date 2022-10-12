@@ -103,6 +103,7 @@ import mega.privacy.android.app.usecase.GetGlobalTransferUseCase.Result;
 import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -130,7 +131,7 @@ public class UploadService extends Service {
     @Inject
     TransfersManagement transfersManagement;
     @Inject
-    DatabaseHandler dbH;
+    LegacyDatabaseHandler dbH;
 
     private boolean isForeground = false;
     private boolean canceled;

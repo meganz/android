@@ -25,7 +25,6 @@ import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.Util.changeToolBarElevation;
 import static mega.privacy.android.app.utils.Util.getMediaIntent;
-import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -568,7 +567,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             } else {
                                 Timber.w("Local Path NULL");
-                                if (isOnline(this)) {
+                                if (viewModel.isOnline()) {
                                     if (megaApi.httpServerIsRunning() == 0) {
                                         megaApi.httpServerStart();
                                         mediaIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
@@ -656,7 +655,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                 pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             } else {
                                 Timber.w("Local Path NULL");
-                                if (isOnline(this)) {
+                                if (viewModel.isOnline()) {
                                     if (megaApi.httpServerIsRunning() == 0) {
                                         megaApi.httpServerStart();
                                         pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
@@ -929,7 +928,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 } else {
 
                     Timber.d("Chat with permissions");
-                    if (isOnline(nodeAttachmentHistoryActivity) && !chatC.isInAnonymousMode()) {
+                    if (viewModel.isOnline() && !chatC.isInAnonymousMode()) {
                         menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
                     } else {
                         menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
@@ -943,7 +942,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                         }
 
-                        if (isOnline(nodeAttachmentHistoryActivity)) {
+                        if (viewModel.isOnline()) {
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
                             if (chatC.isInAnonymousMode()) {
                                 menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
@@ -983,7 +982,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                             }
                         }
 
-                        if (isOnline(nodeAttachmentHistoryActivity)) {
+                        if (viewModel.isOnline()) {
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
                             if (chatC.isInAnonymousMode()) {
                                 menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
@@ -999,7 +998,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                         }
 
                         menu.findItem(R.id.chat_cab_menu_delete).setVisible(showDelete);
-                        if (isOnline(nodeAttachmentHistoryActivity) && !chatC.isInAnonymousMode()) {
+                        if (viewModel.isOnline() && !chatC.isInAnonymousMode()) {
                             menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
                         } else {
                             menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
@@ -1071,7 +1070,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         }
 
         if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
-            if (!isOnline(this) || megaApi == null) {
+            if (!viewModel.isOnline() || megaApi == null) {
                 try {
                     statusDialog.dismiss();
                 } catch (Exception ex) {
@@ -1088,7 +1087,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
             importNodes(toHandle, importMessagesHandles);
         } else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
+            if (!viewModel.isOnline()) {
                 try {
                     statusDialog.dismiss();
                 } catch (Exception ex) {

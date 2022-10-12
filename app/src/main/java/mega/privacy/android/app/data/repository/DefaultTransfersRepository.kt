@@ -5,10 +5,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.domain.repository.TransfersRepository
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -25,7 +26,7 @@ import javax.inject.Inject
 class DefaultTransfersRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val dbH: DatabaseHandler,
+    private val dbH: LegacyDatabaseHandler,
     private val transferEventMapper: TransferEventMapper,
 ) : TransfersRepository, DomainTransferRepository {
 

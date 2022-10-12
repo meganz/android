@@ -27,9 +27,11 @@ import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
+import mega.privacy.android.domain.usecase.DefaultMonitorBackupFolder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
 
 /**
@@ -62,6 +64,10 @@ abstract class ManagerUseCases {
 
     @Binds
     abstract fun bindGetPublicLinks(useCase: DefaultGetPublicLinks): GetPublicLinks
+
+    @Binds
+    abstract fun bindMonitorBackupFolder(implementation: DefaultMonitorBackupFolder): MonitorBackupFolder
+
 
     companion object {
         @Provides

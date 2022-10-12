@@ -16,7 +16,7 @@ class DefaultIsHideRecentActivityEnabled @Inject constructor(private val setting
     override fun invoke(): Flow<Boolean> {
         return flow {
             emit(settingsRepository.shouldHideRecentActivity())
-            emitAll(settingsRepository.monitorHideRecentActivity())
+            emitAll(settingsRepository.monitorHideRecentActivityEvent())
         }
     }
 }

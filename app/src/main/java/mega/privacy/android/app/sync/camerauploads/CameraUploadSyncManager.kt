@@ -3,13 +3,11 @@ package mega.privacy.android.app.sync.camerauploads
 import android.content.Intent
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
-import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_REENABLE_CU_PREFERENCE
 import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.data.model.UserCredentials
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.sync.Backup
@@ -21,6 +19,8 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.domain.entity.SyncRecord
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS
@@ -51,7 +51,7 @@ object CameraUploadSyncManager {
 
     private val megaApi = megaApplication.megaApi
 
-    private val databaseHandler: DatabaseHandler = megaApplication.dbH
+    private val databaseHandler = megaApplication.dbH
 
     /**
      * Periodically execute task, used to send active sync heartbeat.

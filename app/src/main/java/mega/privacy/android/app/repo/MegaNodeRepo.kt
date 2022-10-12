@@ -1,26 +1,35 @@
 package mega.privacy.android.app.repo
 
-import mega.privacy.android.app.*
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.SortUtil.*
+import mega.privacy.android.app.utils.SortUtil.sortOfflineByModificationDateAscending
+import mega.privacy.android.app.utils.SortUtil.sortOfflineByModificationDateDescending
+import mega.privacy.android.app.utils.SortUtil.sortOfflineByNameAscending
+import mega.privacy.android.app.utils.SortUtil.sortOfflineByNameDescending
+import mega.privacy.android.app.utils.SortUtil.sortOfflineBySizeAscending
+import mega.privacy.android.app.utils.SortUtil.sortOfflineBySizeDescending
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
+import nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC
+import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
 import java.io.File
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 class MegaNodeRepo @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbHandler: DatabaseHandler
+    private val dbHandler: LegacyDatabaseHandler
 ) {
 
     /**

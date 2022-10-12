@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaPreferences
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.extensions.failWithException
 import mega.privacy.android.app.data.extensions.isTypeWithParam
@@ -179,8 +179,14 @@ class DefaultSettingsRepository @Inject constructor(
 
     override fun monitorStartScreen(): Flow<Int> = monitorStartScreenFacade.getEvents()
 
-    override fun monitorHideRecentActivity(): Flow<Boolean> =
+    override fun monitorHideRecentActivityEvent(): Flow<Boolean> =
         monitorHideRecentActivityFacade.getEvents()
+
+    override fun monitorHideRecentActivity(): Flow<Boolean?> =
+        uiPreferencesGateway.monitorHideRecentActivity()
+
+    override suspend fun setHideRecentActivity(value: Boolean) =
+        uiPreferencesGateway.setHideRecentActivity(value)
 
     override fun isCameraSyncPreferenceEnabled(): Boolean =
         databaseHandler.preferences?.camSyncEnabled.toBoolean()
@@ -334,7 +340,7 @@ class DefaultSettingsRepository @Inject constructor(
 
     override fun monitorPreferredStartScreen() =
         uiPreferencesGateway.monitorPreferredStartScreen()
-            .map{ startScreenMapper(it) }
+            .map { startScreenMapper(it) }
 
     override suspend fun setPreferredStartScreen(screen: StartScreen) {
         uiPreferencesGateway.setPreferredStartScreen(screen.id)

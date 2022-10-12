@@ -144,7 +144,8 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.LegacyDatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
@@ -206,7 +207,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     @Inject
     CopyNodeUseCase copyNodeUseCase;
     @Inject
-    DatabaseHandler dbH;
+    LegacyDatabaseHandler dbH;
 
     private FileInfoViewModel viewModel;
 

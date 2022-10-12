@@ -44,11 +44,11 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.meeting.chats.ChatTabsFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
+import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
@@ -79,7 +79,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -557,21 +556,18 @@ class PhotosFragment : Fragment() {
 
     fun loadPhotos() {}
 
-    fun openAlbum(album: Album) {
-        when (album) {
-            is Album.FavouriteAlbum -> {
-                activity?.lifecycleScope?.launch {
-                    val dynamicAlbumEnabled = getFeatureFlag(AppFeatures.DynamicAlbum)
-                    if (dynamicAlbumEnabled){
-                        val f = AlbumDynamicContentFragment.getInstance()
-                        val ft: FragmentTransaction = (activity ?: return@launch).supportFragmentManager.beginTransaction()
-                        ft.replace(R.id.fragment_container, f, "dynamicAlbum")
-                        ft.commitNowAllowingStateLoss()
-                    }else{
-                        managerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
-                    }
-
-                }
+    fun openAlbum(album: UIAlbum) {
+        albumsViewModel.setCurrentAlbum(album.id)
+        activity?.lifecycleScope?.launch {
+            val dynamicAlbumEnabled = getFeatureFlag(AppFeatures.DynamicAlbum)
+            if (dynamicAlbumEnabled) {
+                val f = AlbumDynamicContentFragment.getInstance()
+                val ft: FragmentTransaction =
+                    (activity ?: return@launch).supportFragmentManager.beginTransaction()
+                ft.replace(R.id.fragment_container, f)
+                ft.commitNowAllowingStateLoss()
+            } else {
+                managerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
             }
         }
     }

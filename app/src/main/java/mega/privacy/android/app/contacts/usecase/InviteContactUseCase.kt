@@ -1,7 +1,7 @@
 package mega.privacy.android.app.contacts.usecase
 
 import io.reactivex.rxjava3.core.Single
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable

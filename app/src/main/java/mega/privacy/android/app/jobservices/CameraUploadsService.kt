@@ -34,7 +34,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import mega.privacy.android.app.AndroidCompletedTransfer
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -95,6 +95,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback
+import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SyncRecord
@@ -458,13 +459,19 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * DatabaseHandler
      */
     @Inject
-    lateinit var tempDbHandler: DatabaseHandler
+    lateinit var tempDbHandler: LegacyDatabaseHandler
 
     /**
      * AreAllUploadTransfersPaused
      */
     @Inject
     lateinit var areAllUploadTransfersPaused: AreAllUploadTransfersPaused
+
+    /**
+     * Sync Record Type Mapper
+     */
+    @Inject
+    lateinit var syncRecordTypeIntMapper: SyncRecordTypeIntMapper
 
     /**
      * Coroutine dispatcher for camera upload work
@@ -1087,7 +1094,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             val isSecondary = file.isSecondary
             val parent = (if (isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
 
-            if (file.type == SyncRecordType.TYPE_PHOTO.value && !file.isCopyOnly) {
+            if (file.type == syncRecordTypeIntMapper(SyncRecordType.TYPE_PHOTO) && !file.isCopyOnly) {
                 if (getRemoveGps()) {
                     var newPath = createTempFile(file)
                     // IOException occurs.
@@ -1133,7 +1140,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
 
             var path: String?
-            if (isCompressedVideo || file.type == SyncRecordType.TYPE_PHOTO.value || file.type == SyncRecordType.TYPE_VIDEO.value && shouldCompressVideo()) {
+            if (isCompressedVideo || file.type == syncRecordTypeIntMapper(SyncRecordType.TYPE_PHOTO)
+                || file.type == syncRecordTypeIntMapper(SyncRecordType.TYPE_VIDEO) && shouldCompressVideo()
+            ) {
                 path = file.newPath
                 val temp = path?.let { File(it) }
                 if ((temp != null) && !temp.exists()) {

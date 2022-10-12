@@ -2,7 +2,7 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import android.content.Intent
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants

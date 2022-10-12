@@ -158,7 +158,7 @@ abstract class CameraUploadUseCases {
                 cameraUploadRepository.doesLocalPathExist(
                     filePath,
                     isSecondary,
-                    SyncRecordType.TYPE_ANY.value
+                    SyncRecordType.TYPE_ANY
                 )
             }
 
@@ -220,7 +220,7 @@ abstract class CameraUploadUseCases {
                 cameraUploadRepository.doesFileNameExist(
                     fileName,
                     isSecondary,
-                    SyncRecordType.TYPE_ANY.value
+                    SyncRecordType.TYPE_ANY
                 )
             }
 
