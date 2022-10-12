@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
-import mega.privacy.android.domain.entity.photos.AlbumEntity
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
@@ -39,12 +39,12 @@ class AlbumsViewModel @Inject constructor(
     val state = _state.asStateFlow()
     private var currentNodeJob: Job? = null
 
-    private suspend fun getSystemAlbums(): Map<AlbumEntity, PhotoPredicate> {
+    private suspend fun getSystemAlbums(): Map<Album, PhotoPredicate> {
         val albums = getDefaultAlbumsMap()
         return if (getFeatureFlag(AppFeatures.DynamicAlbum)) {
             albums
         } else {
-            albums.filter { it.key is AlbumEntity.FavouriteAlbum }
+            albums.filter { it.key is Album.FavouriteAlbum }
         }
     }
 
@@ -78,11 +78,11 @@ class AlbumsViewModel @Inject constructor(
 
     private fun shouldAddAlbum(
         it: List<Photo>,
-        key: AlbumEntity,
-    ) = it.isNotEmpty() || key == AlbumEntity.FavouriteAlbum
+        key: Album,
+    ) = it.isNotEmpty() || key == Album.FavouriteAlbum
 
 
-    fun setCurrentAlbum(album: AlbumEntity?) {
+    fun setCurrentAlbum(album: Album?) {
         _state.update {
             it.copy(currentAlbum = album)
         }

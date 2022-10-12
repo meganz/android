@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
-import mega.privacy.android.domain.entity.photos.AlbumEntity
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
@@ -48,7 +48,7 @@ class AlbumsViewModelTest {
         whenever(uiAlbumMapper(any(), any())).thenAnswer {
             val photos = it.arguments[0] as List<Photo>
             UIAlbum(
-                id = it.arguments[1] as AlbumEntity,
+                id = it.arguments[1] as Album,
                 title = { _ -> "" },
                 count = photos.size,
                 coverPhoto = photos.maxByOrNull { it.modificationTime },
@@ -89,10 +89,10 @@ class AlbumsViewModelTest {
     @Test
     fun `test that returned albums are added to the state if there are photos for them`() =
         runTest {
-            val defaultAlbums: Map<AlbumEntity, PhotoPredicate> = mapOf(
-                AlbumEntity.FavouriteAlbum to { true },
-                AlbumEntity.GifAlbum to { true },
-                AlbumEntity.RawAlbum to { true },
+            val defaultAlbums: Map<Album, PhotoPredicate> = mapOf(
+                Album.FavouriteAlbum to { true },
+                Album.GifAlbum to { true },
+                Album.RawAlbum to { true },
             )
             whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
 
@@ -105,10 +105,10 @@ class AlbumsViewModelTest {
 
     @Test
     fun `test that albums are not added, if there are no photos in them`() = runTest {
-        val defaultAlbums: Map<AlbumEntity, PhotoPredicate> = mapOf(
-            AlbumEntity.FavouriteAlbum to { true },
-            AlbumEntity.GifAlbum to { true },
-            AlbumEntity.RawAlbum to { false },
+        val defaultAlbums: Map<Album, PhotoPredicate> = mapOf(
+            Album.FavouriteAlbum to { true },
+            Album.GifAlbum to { true },
+            Album.RawAlbum to { false },
         )
         whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
 
@@ -116,16 +116,16 @@ class AlbumsViewModelTest {
 
         underTest.state.drop(1).test {
             assertThat(awaitItem().albums.map { it.id })
-                .containsExactlyElementsIn(defaultAlbums.keys.filterNot { it == AlbumEntity.RawAlbum })
+                .containsExactlyElementsIn(defaultAlbums.keys.filterNot { it == Album.RawAlbum })
         }
     }
 
     @Test
     fun `test that favourite album is displayed even if it contains no photos`() = runTest {
-        val defaultAlbums: Map<AlbumEntity, PhotoPredicate> = mapOf(
-            AlbumEntity.FavouriteAlbum to { false },
-            AlbumEntity.GifAlbum to { false },
-            AlbumEntity.RawAlbum to { false },
+        val defaultAlbums: Map<Album, PhotoPredicate> = mapOf(
+            Album.FavouriteAlbum to { false },
+            Album.GifAlbum to { false },
+            Album.RawAlbum to { false },
         )
         whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
 
@@ -133,16 +133,16 @@ class AlbumsViewModelTest {
 
         underTest.state.drop(1).test {
             assertThat(awaitItem().albums.map { it.id })
-                .containsExactlyElementsIn(defaultAlbums.keys.filter { it == AlbumEntity.FavouriteAlbum })
+                .containsExactlyElementsIn(defaultAlbums.keys.filter { it == Album.FavouriteAlbum })
         }
     }
 
     @Test
     fun `test that feature flag filters out the correct albums`() = runTest {
-        val defaultAlbums: Map<AlbumEntity, PhotoPredicate> = mapOf(
-            AlbumEntity.FavouriteAlbum to { true },
-            AlbumEntity.GifAlbum to { true },
-            AlbumEntity.RawAlbum to { true },
+        val defaultAlbums: Map<Album, PhotoPredicate> = mapOf(
+            Album.FavouriteAlbum to { true },
+            Album.GifAlbum to { true },
+            Album.RawAlbum to { true },
         )
 
 
@@ -155,16 +155,16 @@ class AlbumsViewModelTest {
         underTest.state.drop(1).test {
             val albums = awaitItem().albums
             assertEquals(albums.size, 1)
-            assertThat(albums.first().id).isEqualTo(AlbumEntity.FavouriteAlbum)
+            assertThat(albums.first().id).isEqualTo(Album.FavouriteAlbum)
         }
     }
 
     @Test
     fun `test that album is using latest modification time photo`() = runTest {
-        val defaultAlbums: Map<AlbumEntity, PhotoPredicate> = mapOf(
-            AlbumEntity.FavouriteAlbum to { true },
-            AlbumEntity.GifAlbum to { false },
-            AlbumEntity.RawAlbum to { false },
+        val defaultAlbums: Map<Album, PhotoPredicate> = mapOf(
+            Album.FavouriteAlbum to { true },
+            Album.GifAlbum to { false },
+            Album.RawAlbum to { false },
         )
 
 

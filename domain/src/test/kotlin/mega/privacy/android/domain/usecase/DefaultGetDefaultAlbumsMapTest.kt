@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.domain.entity.photos.AlbumEntity
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import org.junit.Before
 import org.junit.Test
@@ -37,9 +37,9 @@ class DefaultGetDefaultAlbumsMapTest {
     @Test
     fun `test that correct values are returned`() {
         val expected = linkedMapOf(
-            AlbumEntity.FavouriteAlbum to favouritePredicate,
-            AlbumEntity.GifAlbum to gifPredicate,
-            AlbumEntity.RawAlbum to rawPredicate,
+            Album.FavouriteAlbum to favouritePredicate,
+            Album.GifAlbum to gifPredicate,
+            Album.RawAlbum to rawPredicate,
         )
 
         assertThat(underTest()).containsExactlyEntriesIn(expected)

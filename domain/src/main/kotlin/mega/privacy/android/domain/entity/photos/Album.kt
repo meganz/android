@@ -1,26 +1,30 @@
 package mega.privacy.android.domain.entity.photos
-
-import java.io.File
-
 /**
- * A general Album interface include a cover thumbnail, album items count and data classes for specific Album categories
+ * Entity album
+ *
+ * @constructor Create empty Entity album
  */
 sealed interface Album {
     /**
-     * Cover image
+     * Favourite
      */
-    val thumbnail: File?
+    object FavouriteAlbum : Album
 
     /**
-     *  album items count
+     * Gif
      */
-    val itemCount: Int
+    object GifAlbum : Album
 
     /**
-     * Favourite Album
+     * Raw
      */
-    data class FavouriteAlbum(
-        override val thumbnail: File?,
-        override val itemCount: Int,
-    ) : Album
+    object RawAlbum : Album
+
+    /**
+     * User album
+     *
+     * @property id
+     * @property title
+     */
+    data class UserAlbum(val id: Long, val title: String) : Album
 }
