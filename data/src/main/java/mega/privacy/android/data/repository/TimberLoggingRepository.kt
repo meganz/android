@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -30,10 +31,14 @@ import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaLoggerInterface
 import timber.log.Timber
 import java.io.File
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
 /**
@@ -132,9 +137,15 @@ internal class TimberLoggingRepository @Inject constructor(
     private fun getLogFileName() =
         "${getFormattedDate()}_Android_${megaApiGateway.accountEmail}.zip"
 
-    private fun getFormattedDate() = DateTimeFormatter.ofPattern("dd_MM_yyyy__HH_mm_ss")
-        .withZone(ZoneId.from(ZoneOffset.UTC))
-        .format(Instant.now())
+    private fun getFormattedDate() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        DateTimeFormatter.ofPattern("dd_MM_yyyy__HH_mm_ss")
+            .withZone(ZoneId.from(ZoneOffset.UTC))
+            .format(Instant.now())
+    } else {
+        SimpleDateFormat("dd_MM_yyyy__HH_mm_ss", Locale.US).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }.format(Date())
+    }
 
     override fun isSdkLoggingEnabled(): SharedFlow<Boolean> =
         loggingPreferencesGateway.isLoggingPreferenceEnabled()
