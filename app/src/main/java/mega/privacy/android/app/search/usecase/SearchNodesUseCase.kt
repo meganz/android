@@ -13,7 +13,10 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SortUtil.sortByNameAscending
 import mega.privacy.android.app.utils.SortUtil.sortByNameDescending
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
@@ -24,15 +27,17 @@ import javax.inject.Inject
 /**
  * Use case which search nodes.
  *
- * @property megaApi                MegaApiAndroid object.
- * @property sortOrderManagement    SortOrderManagement object to check order.
- * @property getLinksSortOrder
- * @property sortOrderIntMapper
- * @property ioDispatcher
+ * @property megaApi                MegaApiAndroid object
+ * @property getCloudSortOrder      GetCloudSortOrder
+ * @property getOthersSortOrder     GetOthersSortOrder
+ * @property getLinksSortOrder      GetLinksSortOrder     
+ * @property sortOrderIntMapper     SortOrderIntMapper
+ * @property ioDispatcher           CoroutineDispatcher
  */
 class SearchNodesUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val sortOrderManagement: SortOrderManagement,
+    private val getCloudSortOrder: GetCloudSortOrder,
+    private val getOthersSortOrder: GetOthersSortOrder,
     private val getLinksSortOrder: GetLinksSortOrder,
     private val sortOrderIntMapper: SortOrderIntMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -117,7 +122,10 @@ class SearchNodesUseCase @Inject constructor(
                                 when (SharesTab.fromPosition(sharesTab)) {
                                     SharesTab.INCOMING_TAB -> {
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
-                                            emitter.onSuccess(getInShares(query, megaCancelToken))
+                                            runBlocking {
+                                                emitter.onSuccess(getInShares(query,
+                                                    megaCancelToken))
+                                            }
                                             return@create
                                         }
 
@@ -125,12 +133,14 @@ class SearchNodesUseCase @Inject constructor(
                                     }
                                     SharesTab.OUTGOING_TAB -> {
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
-                                            emitter.onSuccess(
-                                                getOutShares(
-                                                    query,
-                                                    megaCancelToken
+                                            runBlocking {
+                                                emitter.onSuccess(
+                                                    getOutShares(
+                                                        query,
+                                                        megaCancelToken
+                                                    )
                                                 )
-                                            )
+                                            }
                                             return@create
                                         }
 
@@ -180,7 +190,9 @@ class SearchNodesUseCase @Inject constructor(
                     }
                     TYPE_INCOMING_EXPLORER -> {
                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
-                            emitter.onSuccess(getInShares(query, megaCancelToken))
+                            runBlocking {
+                                emitter.onSuccess(getInShares(query, megaCancelToken))
+                            }
                             return@create
                         }
 
@@ -195,15 +207,17 @@ class SearchNodesUseCase @Inject constructor(
                 if (query.isEmpty() || parentHandleSearch != MegaApiJava.INVALID_HANDLE) {
                     emitter.onSuccess(megaApi.getChildren(parent))
                 } else {
-                    emitter.onSuccess(
-                        megaApi.search(
-                            parent,
-                            query,
-                            megaCancelToken,
-                            true,
-                            sortOrderManagement.getOrderCloud()
+                    runBlocking {
+                        emitter.onSuccess(
+                            megaApi.search(
+                                parent,
+                                query,
+                                megaCancelToken,
+                                true,
+                                sortOrderIntMapper(getCloudSortOrder())
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
@@ -211,17 +225,25 @@ class SearchNodesUseCase @Inject constructor(
     /**
      * Gets search result nodes of Incoming section, root navigation level.
      */
-    private fun getInShares(query: String, megaCancelToken: MegaCancelToken): ArrayList<MegaNode> =
+    private suspend fun getInShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+    ): ArrayList<MegaNode> =
         if (query.isEmpty()) {
-            megaApi.getInShares(sortOrderManagement.getOrderOthers())
+            megaApi.getInShares(sortOrderIntMapper(getOthersSortOrder()))
         } else {
-            megaApi.searchOnInShares(query, megaCancelToken, sortOrderManagement.getOrderCloud())
+            megaApi.searchOnInShares(query,
+                megaCancelToken,
+                sortOrderIntMapper(getCloudSortOrder()))
         }
 
     /**
      * Gets search result nodes of Outgoing section, root navigation level.
      */
-    private fun getOutShares(query: String, megaCancelToken: MegaCancelToken): ArrayList<MegaNode> =
+    private suspend fun getOutShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+    ): ArrayList<MegaNode> =
         if (query.isEmpty()) {
             val searchNodes = ArrayList<MegaNode>()
             val outShares = megaApi.outShares
@@ -233,7 +255,7 @@ class SearchNodesUseCase @Inject constructor(
                     searchNodes.add(node)
                 }
             }
-            if (sortOrderManagement.getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
+            if (getOthersSortOrder() == SortOrder.ORDER_DEFAULT_DESC) {
                 sortByNameDescending(searchNodes)
             } else {
                 sortByNameAscending(searchNodes)
@@ -241,7 +263,9 @@ class SearchNodesUseCase @Inject constructor(
 
             searchNodes
         } else {
-            megaApi.searchOnOutShares(query, megaCancelToken, sortOrderManagement.getOrderCloud())
+            megaApi.searchOnOutShares(query,
+                megaCancelToken,
+                sortOrderIntMapper(getCloudSortOrder()))
         }
 
     /**
@@ -253,9 +277,12 @@ class SearchNodesUseCase @Inject constructor(
         megaCancelToken: MegaCancelToken,
     ): ArrayList<MegaNode> = withContext(ioDispatcher) {
         if (query.isEmpty()) {
-            megaApi.getPublicLinks(if (isFirstNavigationLevel) sortOrderIntMapper(getLinksSortOrder()) else sortOrderManagement.getOrderCloud())
+            megaApi.getPublicLinks(if (isFirstNavigationLevel) sortOrderIntMapper(getLinksSortOrder()) else sortOrderIntMapper(
+                getCloudSortOrder()))
         } else {
-            megaApi.searchOnPublicLinks(query, megaCancelToken, sortOrderManagement.getOrderCloud())
+            megaApi.searchOnPublicLinks(query,
+                megaCancelToken,
+                sortOrderIntMapper(getCloudSortOrder()))
         }
     }
 }
