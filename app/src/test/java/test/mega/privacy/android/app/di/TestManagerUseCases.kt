@@ -74,7 +74,7 @@ object TestManagerUseCases {
 
     @Provides
     fun provideGetInboxChildrenNodes() = mock<GetInboxChildrenNodes> {
-        onBlocking { invoke() }.thenReturn(emptyList())
+        onBlocking { invoke() }.thenReturn(flowOf(any()))
     }
 
     @Provides

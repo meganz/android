@@ -1,5 +1,6 @@
 package mega.privacy.android.app.domain.usecase
 
+import kotlinx.coroutines.flow.Flow
 import nz.mega.sdk.MegaNode
 
 /**
@@ -8,9 +9,9 @@ import nz.mega.sdk.MegaNode
 fun interface GetInboxChildrenNodes {
 
     /**
-     * Retrieve the list of Inbox Children Nodes
+     * Returns a [Flow] of the latest Inbox Children Nodes
      *
-     * @return the list of Inbox Children Nodes
+     * @return a [Flow] of the latest Inbox Children Nodes
      */
-    suspend operator fun invoke(): List<MegaNode>
+    operator fun invoke(): Flow<List<MegaNode>>
 }
