@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultGetInboxChildrenNodes
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
@@ -39,7 +38,6 @@ class DefaultGetInboxChildrenNodesTest {
             getCloudSortOrder = getCloudSortOrder,
             getInboxNode = getInboxNode,
             hasInboxChildren = hasInboxChildren,
-            ioDispatcher = UnconfinedTestDispatcher(),
         )
     }
 
