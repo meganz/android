@@ -311,7 +311,7 @@ class PhotosFragment : Fragment() {
     @Composable
     private fun timelineView(timelineViewState: TimelineViewState) = TimelineView(
         timelineViewState = timelineViewState,
-        downloadPhotoCover = photosViewModel::downloadPhotoCover,
+        downloadPhotoCover = photosViewModel::downloadPhoto,
         lazyGridState = lazyGridState,
         onTextButtonClick = this::enableCameraUploadClick,
         onFABClick = this::openFilterFragment,
@@ -333,6 +333,7 @@ class PhotosFragment : Fragment() {
     private fun albumsView(albumsViewState: AlbumsViewState) = AlbumsView(
         albumsViewState = albumsViewState,
         openAlbum = this::openAlbum,
+        downloadPhoto = photosViewModel::downloadPhoto
     )
 
     @Composable
@@ -346,7 +347,7 @@ class PhotosFragment : Fragment() {
     @Composable
     private fun photosGridView(timelineViewState: TimelineViewState) = PhotosGridView(
         timelineViewState = timelineViewState,
-        downloadPhotoCover = photosViewModel::downloadPhotoCover,
+        downloadPhoto = photosViewModel::downloadPhoto,
         lazyGridState = lazyGridState,
         onClick = timelineViewModel::onClick,
         onLongPress = timelineViewModel::onLongPress,
