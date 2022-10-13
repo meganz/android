@@ -1,13 +1,13 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.extensions.failWithError
+import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatError
@@ -23,7 +23,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @property chatGateway
  */
-class DefaultChatRepository @Inject constructor(
+internal class DefaultChatRepository @Inject constructor(
     private val chatGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ChatRepository {

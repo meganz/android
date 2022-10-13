@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.LegacyDatabaseHandler
-import mega.privacy.android.app.data.extensions.isBackgroundTransfer
-import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.extensions.isBackgroundTransfer
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.TransferEventMapper
+import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaTransfer

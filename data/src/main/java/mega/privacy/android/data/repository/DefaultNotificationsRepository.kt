@@ -1,16 +1,16 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Event
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -26,7 +26,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @property megaApiGateway
  */
-class DefaultNotificationsRepository @Inject constructor(
+internal class DefaultNotificationsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val userAlertsMapper: UserAlertMapper,
     private val eventMapper: EventMapper,
@@ -62,7 +62,7 @@ class DefaultNotificationsRepository @Inject constructor(
         getEmailLocally(userId) ?: fetchAndCacheEmail(userId)
 
     private suspend fun fetchAndCacheEmail(userId: Long): String? =
-        suspendCoroutine<String?> { continuation ->
+        suspendCoroutine { continuation ->
             val callback = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
                     if (error.errorCode == MegaError.API_OK) {

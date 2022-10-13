@@ -9,6 +9,11 @@ import mega.privacy.android.app.sync.Backup
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.data.database.DatabaseHandler
 
+/**
+ * Legacy database handler
+ *
+ * it contains methods depending on app models, we will move to the data module later
+ */
 interface LegacyDatabaseHandler : DatabaseHandler {
     val megaContacts: ArrayList<MegaContactGetter.MegaContact>
 

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -6,16 +6,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.model.MegaContactDB
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.EventMapper
-import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.app.data.repository.DefaultNotificationsRepository
-import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.mapper.NodeProvider
 import mega.privacy.android.data.mapper.UserAlertContactProvider
 import mega.privacy.android.data.mapper.UserAlertMapper
+import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.model.MegaContactDB
+import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.EventType

@@ -1,15 +1,14 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.extensions.failWithError
+import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.app.fcm.NewTokenWorker.Companion.NEW_TOKEN
-import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -40,11 +39,9 @@ class DefaultPushesRepository @Inject constructor(
     private val chatRequestMapper: ChatRequestMapper,
 ) : PushesRepository {
 
-    private val token = "token"
-
     override fun getPushToken(): String =
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE)
-            .getString(token, "") ?: ""
+            .getString(NEW_TOKEN, "") ?: ""
 
     override suspend fun registerPushNotifications(deviceType: Int, newToken: String): String =
         withContext(ioDispatcher) {
@@ -100,5 +97,6 @@ class DefaultPushesRepository @Inject constructor(
 
     companion object {
         const val PUSH_TOKEN = "PUSH_TOKEN"
+        private const val NEW_TOKEN = "NEW_TOKEN"
     }
 }

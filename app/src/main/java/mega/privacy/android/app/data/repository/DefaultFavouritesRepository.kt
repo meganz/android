@@ -3,13 +3,13 @@ package mega.privacy.android.app.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
+import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
