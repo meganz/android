@@ -107,4 +107,9 @@ interface AccountRepository {
      * @return List of SubscriptionPlans
      */
     suspend fun getSubscriptionPlans(): List<SubscriptionPlan>
+
+    /**
+     * Sets the Authentication Token used to identify the User Account
+     */
+    suspend fun setAccountAuth()
 }

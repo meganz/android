@@ -13,6 +13,7 @@ import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.usecase.SetAccountAuth
 
 /**
  * Account module.
@@ -24,23 +25,46 @@ import mega.privacy.android.domain.usecase.RetryPendingConnections
 @InstallIn(SingletonComponent::class)
 abstract class AccountModule {
 
+    /**
+     * Binds the Use Case [MonitorUserUpdates] to its implementation [DefaultMonitorUserUpdates]
+     */
     @Binds
     abstract fun bindMonitorUserUpdates(implementation: DefaultMonitorUserUpdates): MonitorUserUpdates
 
+    /**
+     * Binds the Use Case [GetAccountDetails] to its implementation [DefaultGetAccountDetails]
+     */
     @Binds
     abstract fun bindGetAccountDetails(useCase: DefaultGetAccountDetails): GetAccountDetails
 
     companion object {
+
+        /**
+         * Provides the Use Case [GetSession]
+         */
         @Provides
         fun provideGetSession(accountRepository: AccountRepository): GetSession =
             GetSession(accountRepository::getSession)
 
+        /**
+         * Provides the Use Case [RetryPendingConnections]
+         */
         @Provides
         fun provideRetryPendingConnections(accountRepository: AccountRepository): RetryPendingConnections =
             RetryPendingConnections(accountRepository::retryPendingConnections)
 
+        /**
+         * Provides the Use Case [IsBusinessAccountActive]
+         */
         @Provides
         fun provideIsBusinessAccountActive(accountRepository: AccountRepository): IsBusinessAccountActive =
             IsBusinessAccountActive(accountRepository::isBusinessAccountActive)
+
+        /**
+         * Provides the Use Case [SetAccountAuth]
+         */
+        @Provides
+        fun provideSetAccountAuth(accountRepository: AccountRepository): SetAccountAuth =
+            SetAccountAuth(accountRepository::setAccountAuth)
     }
 }

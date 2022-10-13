@@ -11,6 +11,7 @@ import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.app.data.repository.DefaultAccountRepository
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
@@ -44,6 +45,7 @@ class DefaultAccountRepositoryTest {
     private val accountInfoWrapper =
         mock<AccountInfoWrapper> { on { accountTypeString }.thenReturn("") }
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val userAccountMapper = ::UserAccount
     private val accountTypeMapper = mock<AccountTypeMapper>()
     private val subscriptionPlanMapper = mock<SubscriptionPlanMapper>()
@@ -81,6 +83,7 @@ class DefaultAccountRepositoryTest {
         underTest = DefaultAccountRepository(
             myAccountInfoFacade = accountInfoWrapper,
             megaApiGateway = megaApiGateway,
+            megaApiFolderGateway = megaApiFolderGateway,
             megaChatApiGateway = mock(),
             monitorMultiFactorAuth = MonitorMultiFactorAuth(),
             ioDispatcher = UnconfinedTestDispatcher(),

@@ -14,6 +14,7 @@ import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.mapper.AccountTypeMapper
@@ -45,6 +46,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @property myAccountInfoFacade
  * @property megaApiGateway
+ * @property megaApiFolderGateway
  * @property megaChatApiGateway
  * @property monitorMultiFactorAuth
  * @property ioDispatcher
@@ -61,6 +63,7 @@ import kotlin.coroutines.suspendCoroutine
 class DefaultAccountRepository @Inject constructor(
     private val myAccountInfoFacade: AccountInfoWrapper,
     private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val monitorMultiFactorAuth: MonitorMultiFactorAuth,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -128,7 +131,7 @@ class DefaultAccountRepository @Inject constructor(
     override fun monitorMultiFactorAuthChanges() =
         monitorMultiFactorAuth.getEvents()
 
-    override suspend fun requestDeleteAccountLink() = withContext<Unit>(ioDispatcher) {
+    override suspend fun requestDeleteAccountLink() = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
             megaApiGateway.cancelAccount(
                 OptionalMegaRequestListenerInterface(
@@ -201,4 +204,8 @@ class DefaultAccountRepository @Inject constructor(
                 ))
             }
         }
+
+    override suspend fun setAccountAuth() = withContext(ioDispatcher) {
+        megaApiFolderGateway.accountAuth = megaApiGateway.accountAuth
+    }
 }
