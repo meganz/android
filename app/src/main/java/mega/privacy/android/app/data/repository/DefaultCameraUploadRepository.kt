@@ -18,12 +18,15 @@ import javax.inject.Inject
 /**
  * Default implementation of [CameraUploadRepository]
  *
- * @property localStorageGateway MegaLocalStorageGateway
+ * @property localStorageGateway [MegaLocalStorageGateway]
+ * @property megaApiGateway [MegaApiGateway]
+ * @property fileAttributeGateway [FileAttributeGateway]
+ * @property cacheGateway [CacheGateway]
+ * @property syncRecordTypeIntMapper [SyncRecordTypeIntMapper]
  * @property ioDispatcher CoroutineDispatcher
  */
 class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
-    private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway,
     private val megaApiGateway: MegaApiGateway,
     private val fileAttributeGateway: FileAttributeGateway,
     private val cacheGateway: CacheGateway,
@@ -295,5 +298,9 @@ class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun clearCacheDirectory() = withContext(ioDispatcher) {
         cacheGateway.clearCacheDirectory()
+    }
+
+    override suspend fun deleteAllPrimarySyncRecords() = withContext(ioDispatcher) {
+        localStorageGateway.deleteAllPrimarySyncRecords()
     }
 }

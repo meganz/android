@@ -493,4 +493,9 @@ interface MegaLocalStorageGateway {
      * @param clearCamSyncRecords the boolean setting whether to clean the cam record
      */
     suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean)
+
+    /**
+     * Delete all Primary Sync Records
+     */
+    suspend fun deleteAllPrimarySyncRecords()
 }

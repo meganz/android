@@ -372,4 +372,9 @@ interface CameraUploadRepository {
      * clear all the contents of Internal cache directory
      */
     suspend fun clearCacheDirectory()
+
+    /**
+     * Delete all Primary Sync Records
+     */
+    suspend fun deleteAllPrimarySyncRecords()
 }

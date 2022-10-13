@@ -55,7 +55,6 @@ class DefaultCameraUploadRepositoryTest {
             fileAttributeGateway = fileAttributeGateway,
             syncRecordTypeIntMapper = syncRecordTypeIntMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
-            cameraTimestampsPreferenceGateway = mock()
         )
     }
 

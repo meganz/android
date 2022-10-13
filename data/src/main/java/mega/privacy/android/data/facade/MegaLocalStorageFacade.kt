@@ -318,4 +318,12 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) {
         dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)
     }
+
+    override suspend fun deleteAllPrimarySyncRecords() {
+        dbHandler.deleteAllPrimarySyncRecords()
+    }
+
+    companion object {
+        private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
+    }
 }
