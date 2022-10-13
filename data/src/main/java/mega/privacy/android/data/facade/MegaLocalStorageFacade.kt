@@ -151,17 +151,13 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun saveSyncRecord(record: SyncRecord) = dbHandler.saveSyncRecord(record)
 
-    override suspend fun getPhotoTimeStamp(): String? =
-        dbHandler.preferences?.camSyncTimeStamp
+    override suspend fun getPhotoTimeStamp() = dbHandler.preferences?.camSyncTimeStamp
 
-    override suspend fun getSecondaryPhotoTimeStamp(): String? =
-        dbHandler.preferences?.secSyncTimeStamp
+    override suspend fun getSecondaryPhotoTimeStamp() = dbHandler.preferences?.secSyncTimeStamp
 
-    override suspend fun getVideoTimeStamp(): String? =
-        dbHandler.preferences?.camVideoSyncTimeStamp
+    override suspend fun getVideoTimeStamp() = dbHandler.preferences?.camVideoSyncTimeStamp
 
-    override suspend fun getSecondaryVideoTimeStamp(): String? =
-        dbHandler.preferences?.secVideoSyncTimeStamp
+    override suspend fun getSecondaryVideoTimeStamp() = dbHandler.preferences?.secVideoSyncTimeStamp
 
     override suspend fun setPhotoTimeStamp(timeStamp: Long) =
         dbHandler.setCamSyncTimeStamp(timeStamp)
