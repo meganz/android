@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.domain.usecase
 
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -15,7 +16,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
 
 /**
  * Test class of [DefaultGetInboxChildrenNodes]
@@ -50,7 +50,7 @@ class DefaultGetInboxChildrenNodesTest {
 
         val result = underTest()
 
-        assertEquals(result, emptyList())
+        assertThat(result).isEmpty()
     }
 
     @Test
@@ -60,7 +60,7 @@ class DefaultGetInboxChildrenNodesTest {
 
             val result = underTest()
 
-            assertEquals(result, emptyList())
+            assertThat(result).isEmpty()
         }
 
     @Test
