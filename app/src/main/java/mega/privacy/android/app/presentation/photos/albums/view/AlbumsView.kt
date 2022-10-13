@@ -11,33 +11,32 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.StrokeCap.Companion.Square
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
-import mega.privacy.android.app.presentation.photos.albums.model.titleId
+import mega.privacy.android.app.presentation.photos.albums.model.PhotoDownload
+import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 
 @Composable
 fun AlbumsView(
     albumsViewState: AlbumsViewState,
-    openAlbum: (album: Album) -> Unit,
+    openAlbum: (album: UIAlbum) -> Unit,
+    downloadPhoto: PhotoDownload,
 ) {
     LazyVerticalGrid(
         contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp),
@@ -57,9 +56,21 @@ fun AlbumsView(
                     .fillMaxSize()
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    val imageState = produceState<String?>(initialValue = null) {
+                        album.coverPhoto?.let {
+                            downloadPhoto(
+                                false,
+                                it
+                            ) { downloadSuccess ->
+                                if (downloadSuccess) {
+                                    value = it.thumbnailFilePath
+                                }
+                            }
+                        }
+                    }
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(album.thumbnail)
+                            .data(imageState.value)
                             .crossfade(true)
                             .build(),
                         contentDescription = null,
@@ -81,13 +92,13 @@ fun AlbumsView(
                     )
                     Text(
                         modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
-                        text = stringResource(id = album.titleId),
+                        text = album.title(LocalContext.current),
                         style = MaterialTheme.typography.subtitle2,
                         color = colorResource(id = R.color.black_white),
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = album.itemCount.toString(),
+                        text = album.count.toString(),
                         style = MaterialTheme.typography.caption,
                         color = colorResource(id = R.color.grey_054_white_054),
                     )

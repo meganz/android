@@ -14,8 +14,8 @@ import androidx.work.WorkManager;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.CancelCameraUploadWorker;

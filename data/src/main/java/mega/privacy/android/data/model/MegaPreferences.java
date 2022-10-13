@@ -1,4 +1,4 @@
-package mega.privacy.android.app;
+package mega.privacy.android.data.model;
 
 import timber.log.Timber;
 
@@ -54,7 +54,7 @@ public class MegaPreferences {
     public final static int PHOTOS_AND_VIDEOS = 1003;
     public final static int CHARGING_ON_SIZE_DEFAULT = 200;
 
-    MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled,
+    public MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled,
                     String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload,
                     String camSyncTimeStamp, String passcodeLockEnabled, String passcodeLockCode,
                     String storageAskAlways, String storageDownloadLocation,

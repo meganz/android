@@ -21,6 +21,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.photos.albums.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.model.ZoomLevel
@@ -40,11 +41,7 @@ const val DATE_FORMAT_MONTH_WITH_DAY = "MMMM"
 @Composable
 fun PhotosGridView(
     timelineViewState: TimelineViewState = TimelineViewState(),
-    downloadPhotoCover: suspend (
-        isPreview: Boolean,
-        photo: Photo,
-        callback: (success: Boolean) -> Unit,
-    ) -> Unit,
+    downloadPhoto: PhotoDownload,
     lazyGridState: LazyGridState = rememberLazyGridState(),
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
@@ -85,7 +82,7 @@ fun PhotosGridView(
                     currentZoomLevel = timelineViewState.currentZoomLevel,
                     onClick = onClick,
                     onLongPress = onLongPress,
-                    downloadPhotoCover = downloadPhotoCover
+                    downloadPhoto = downloadPhoto
                 )
             } else if (item is PhotoListItem.Separator) {
                 Text(

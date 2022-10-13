@@ -11,15 +11,15 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Base64
 import dagger.hilt.android.EntryPointAccessors.fromApplication
-import mega.privacy.android.app.DatabaseHandler.Companion.MAX_TRANSFERS
+import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.data.mapper.StorageStateIntMapper
-import mega.privacy.android.app.data.model.UserCredentials
+import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.app.di.LegacyLoggingEntryPoint
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
-import mega.privacy.android.app.main.megachat.ChatSettings
-import mega.privacy.android.app.main.megachat.NonContactInfo
+import mega.privacy.android.data.model.ChatSettings
+import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.app.main.megachat.PendingMessageSingle
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.Backup
@@ -35,10 +35,13 @@ import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.contacts.MegaContactGetter.MegaContact
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.mapper.StorageStateMapper
+import mega.privacy.android.data.model.MegaAttributes
+import mega.privacy.android.data.model.MegaContactDB
+import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
-import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import nz.mega.sdk.MegaApiJava
@@ -49,13 +52,13 @@ import java.util.Collections
 /**
  * Sqlite implementation of database handler
  */
-open class SqliteDatabaseHandler(
+class SqliteDatabaseHandler(
     context: Context?,
     private val legacyLoggingSettings: LegacyLoggingSettings,
     private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
 ) :
-    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), DatabaseHandler {
+    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), LegacyDatabaseHandler {
     private var db: SQLiteDatabase
     override fun onCreate(db: SQLiteDatabase) {
         Timber.d("onCreate")
@@ -1529,18 +1532,51 @@ open class SqliteDatabaseHandler(
                         if (cursor.getColumnIndex(KEY_FINGERPRINT_LOCK) != Constants.INVALID_VALUE) decrypt(
                             cursor.getString(getColumnIndex(cursor,
                                 KEY_FINGERPRINT_LOCK))) else "false"
-                    prefs = MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle,
-                        camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
-                        pinLockCode, askAlways, downloadLocation, lastFolderUpload,
-                        lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
-                        secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList,
-                        preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-                        pinLockType, preferredSortCloud, preferredSortOthers, firstTimeChat,
-                        uploadVideoQuality, conversionOnCharging, chargingOnSize,
-                        shouldClearCameraSyncRecords, camVideoSyncTimeStamp, secVideoSyncTimeStamp,
-                        isAutoPlayEnabled, removeGPS, closeInviteBanner, preferredSortCameraUpload,
-                        sdCardUri, askForDisplayOver, askForSetDownloadLocation, mediaSDCardUri,
-                        isMediaOnSDCard, passcodeLockRequireTime, fingerprintLock)
+                    prefs = MegaPreferences(
+                        firstTime,
+                        wifi,
+                        camSyncEnabled,
+                        camSyncHandle,
+                        camSyncLocalPath,
+                        fileUpload,
+                        camSyncTimeStamp,
+                        pinLockEnabled,
+                        pinLockCode,
+                        askAlways,
+                        downloadLocation,
+                        lastFolderUpload,
+                        lastFolderCloud,
+                        secondaryFolderEnabled,
+                        secondaryPath,
+                        secondaryHandle,
+                        secSyncTimeStamp,
+                        keepFileNames,
+                        storageAdvancedDevices,
+                        preferredViewList,
+                        preferredViewListCamera,
+                        uriExternalSDCard,
+                        cameraFolderExternalSDCard,
+                        pinLockType,
+                        preferredSortCloud,
+                        preferredSortOthers,
+                        firstTimeChat,
+                        uploadVideoQuality,
+                        conversionOnCharging,
+                        chargingOnSize,
+                        shouldClearCameraSyncRecords,
+                        camVideoSyncTimeStamp,
+                        secVideoSyncTimeStamp,
+                        isAutoPlayEnabled,
+                        removeGPS,
+                        closeInviteBanner,
+                        preferredSortCameraUpload,
+                        sdCardUri,
+                        askForDisplayOver,
+                        askForSetDownloadLocation,
+                        mediaSDCardUri,
+                        isMediaOnSDCard,
+                        passcodeLockRequireTime,
+                        fingerprintLock)
                 }
             }
         } catch (e: Exception) {
@@ -1567,7 +1603,10 @@ open class SqliteDatabaseHandler(
                     val sendOriginalAttachments = decrypt(cursor.getString(6))
                     val videoQuality =
                         if (sendOriginalAttachments.toBoolean()) VideoQuality.ORIGINAL.value.toString() else VideoQuality.MEDIUM.value.toString()
-                    chatSettings = ChatSettings(notificationSound, vibrationEnabled, videoQuality)
+                    chatSettings = ChatSettings(
+                        notificationSound,
+                        vibrationEnabled,
+                        videoQuality)
                 }
             }
         } catch (e: Exception) {
@@ -1595,7 +1634,10 @@ open class SqliteDatabaseHandler(
                     val sendOriginalAttachments = decrypt(cursor.getString(4))
                     val videoQuality =
                         if (sendOriginalAttachments.toBoolean()) VideoQuality.ORIGINAL.value.toString() else VideoQuality.MEDIUM.value.toString()
-                    chatSettings = ChatSettings(notificationSound, vibrationEnabled, videoQuality)
+                    chatSettings = ChatSettings(
+                        notificationSound,
+                        vibrationEnabled,
+                        videoQuality)
                 }
             }
         } catch (e: Exception) {
@@ -1635,7 +1677,10 @@ open class SqliteDatabaseHandler(
                     val notificationSound = decrypt(cursor.getString(2))
                     val vibrationEnabled = decrypt(cursor.getString(3))
                     val videoQuality = decrypt(cursor.getString(4))
-                    chatSettings = ChatSettings(notificationSound, vibrationEnabled, videoQuality)
+                    chatSettings = ChatSettings(
+                        notificationSound,
+                        vibrationEnabled,
+                        videoQuality)
                 }
             }
         } catch (e: Exception) {
@@ -1823,7 +1868,7 @@ open class SqliteDatabaseHandler(
      * @param id the identifier of the transfer to get
      * @return The completed transfer which has the id value as identifier.
      */
-    override fun getcompletedTransfer(id: Long): AndroidCompletedTransfer? {
+    override fun getCompletedTransfer(id: Long): AndroidCompletedTransfer? {
         val selectQuery =
             "SELECT * FROM $TABLE_COMPLETED_TRANSFERS WHERE $KEY_ID = '$id'"
         try {
@@ -2215,7 +2260,12 @@ open class SqliteDatabaseHandler(
                     val firstName = decrypt(cursor.getString(3))
                     val lastName = decrypt(cursor.getString(4))
                     val email = decrypt(cursor.getString(5))
-                    return NonContactInfo(handle, fullName, firstName, lastName, email)
+                    return NonContactInfo(
+                        handle,
+                        fullName,
+                        firstName,
+                        lastName,
+                        email)
                 }
             }
         } catch (e: Exception) {
@@ -2300,7 +2350,11 @@ open class SqliteDatabaseHandler(
                     val name = decrypt(cursor.getString(3))
                     val lastName = decrypt(cursor.getString(4))
                     val nickname = decrypt(cursor.getString(5))
-                    return MegaContactDB(handle, mail, name, lastName, nickname)
+                    return MegaContactDB(handle,
+                        mail,
+                        name,
+                        lastName,
+                        nickname)
                 }
             }
         } catch (e: Exception) {
@@ -2321,7 +2375,11 @@ open class SqliteDatabaseHandler(
                     val name = decrypt(cursor.getString(3))
                     val lastName = decrypt(cursor.getString(4))
                     val nickname = decrypt(cursor.getString(5))
-                    return MegaContactDB(handle, mail, name, lastName, nickname)
+                    return MegaContactDB(handle,
+                        mail,
+                        name,
+                        lastName,
+                        nickname)
                 }
             }
         } catch (e: Exception) {
@@ -3928,7 +3986,7 @@ open class SqliteDatabaseHandler(
      * @param message Pending message to add.
      * @return The identifier of the pending message.
      */
-    override fun addPendingMessageFromExplorer(message: PendingMessageSingle): Long {
+    override fun addPendingMessageFromFileExplorer(message: PendingMessageSingle): Long {
         return addPendingMessage(message, PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER)
     }
 
@@ -4217,7 +4275,7 @@ open class SqliteDatabaseHandler(
         }
     }
 
-    override val sDTransfers: ArrayList<SDTransfer>
+    override val sdTransfers: ArrayList<SDTransfer>
         get() {
             val sdTransfers = ArrayList<SDTransfer>()
             val selectQuery = "SELECT * FROM $TABLE_SD_TRANSFERS"
@@ -4697,7 +4755,7 @@ open class SqliteDatabaseHandler(
             context: Context,
             storageStateMapper: StorageStateMapper,
             storageStateIntMapper: StorageStateIntMapper,
-        ): DatabaseHandler {
+        ): LegacyDatabaseHandler {
             Timber.d("getDbHandler")
 
             if (instance == null) {
@@ -4714,7 +4772,7 @@ open class SqliteDatabaseHandler(
                     storageStateIntMapper = storageStateIntMapper
                 )
             }
-            return instance as DatabaseHandler
+            return instance as LegacyDatabaseHandler
         }
 
         private fun encrypt(original: String?): String? =

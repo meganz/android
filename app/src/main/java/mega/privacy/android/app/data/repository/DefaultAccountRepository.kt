@@ -11,7 +11,7 @@ import mega.privacy.android.app.data.extensions.failWithException
 import mega.privacy.android.app.data.extensions.isType
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
-import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.data.gateway.api.MegaApiGateway

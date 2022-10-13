@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.DatabaseHandler.Companion.MAX_TRANSFERS
+import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaTransfer
@@ -33,7 +33,7 @@ import javax.inject.Inject
 class TransfersViewModel @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val transfersManagement: TransfersManagement,
-    private val dbH: DatabaseHandler,
+    private val dbH: LegacyDatabaseHandler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val _activeState = MutableStateFlow<ActiveTransfersState>(ActiveTransfersState.Default)

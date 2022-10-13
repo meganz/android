@@ -1,6 +1,6 @@
 package mega.privacy.android.app.globalmanagement
 
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_FAV_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_LABEL_ASC

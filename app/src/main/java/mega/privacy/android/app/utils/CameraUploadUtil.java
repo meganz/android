@@ -20,13 +20,12 @@ import android.os.Looper;
 
 import java.io.File;
 
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.RenameListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.domain.entity.SyncRecordType;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
