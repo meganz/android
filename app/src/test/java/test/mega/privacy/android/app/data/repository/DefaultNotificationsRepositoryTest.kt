@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.app.data.repository.DefaultNotificationsRepository

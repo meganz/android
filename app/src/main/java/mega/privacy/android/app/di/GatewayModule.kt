@@ -8,8 +8,6 @@ import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.facade.CacheFolderFacade
 import mega.privacy.android.app.data.facade.MegaApiFolderFacade
-import mega.privacy.android.app.data.facade.MegaLocalStorageFacade
-import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
@@ -38,9 +36,6 @@ abstract class GatewayModule {
 
     @Binds
     abstract fun bindMegaApiFolderGateway(implementation: MegaApiFolderFacade): MegaApiFolderGateway
-
-    @Binds
-    abstract fun bindMegaDBHandlerWrapper(implementation: MegaLocalStorageFacade): MegaLocalStorageGateway
 
     /**
      * Provides @CacheFolderGateway
