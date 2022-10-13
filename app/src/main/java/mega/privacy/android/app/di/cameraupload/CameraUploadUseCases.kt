@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
+import mega.privacy.android.domain.usecase.DefaultBackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.DefaultCheckCameraUpload
 import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
@@ -336,13 +337,6 @@ abstract class CameraUploadUseCases {
             IsNodeInRubbish(fileRepository::isNodeInRubbish)
 
         /**
-         * Provide the BackupTimeStampsAndFolderHandle implementation
-         */
-        @Provides
-        fun provideBackupTimeStampsAndFolderHandle(cameraUploadRepository: CameraUploadRepository): BackupTimeStampsAndFolderHandle =
-            BackupTimeStampsAndFolderHandle(cameraUploadRepository::backupTimestampsAndFolderHandle)
-
-        /**
          * Provide the ClearCacheDirectory implementation
          */
         @Provides
@@ -511,4 +505,10 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindCheckCameraUpload(defaultCheckCameraUpload: DefaultCheckCameraUpload): CheckCameraUpload
+
+    /**
+     * Provide the BackupTimeStampsAndFolderHandle implementation
+     */
+    @Binds
+    abstract fun bindBackupTimeStampsAndFolderHandle(defaultBackupTimeStampsAndFolderHandle: DefaultBackupTimeStampsAndFolderHandle): BackupTimeStampsAndFolderHandle
 }

@@ -6,6 +6,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
+import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -22,6 +23,7 @@ import javax.inject.Inject
  */
 class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
+    private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway,
     private val megaApiGateway: MegaApiGateway,
     private val fileAttributeGateway: FileAttributeGateway,
     private val cacheGateway: CacheGateway,
@@ -140,7 +142,7 @@ class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.saveSyncRecord(record)
     }
 
-    override suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long {
+    override suspend fun getSyncTimeStamp(type: SyncTimeStamp): String? {
         return withContext(ioDispatcher) {
             when (type) {
                 SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.getPhotoTimeStamp()
@@ -285,13 +287,6 @@ class DefaultCameraUploadRepository @Inject constructor(
         withContext(ioDispatcher) {
             fileAttributeGateway.getPhotoGPSCoordinates(filePath)
         }
-
-    override suspend fun backupTimestampsAndFolderHandle() = withContext(ioDispatcher) {
-        val primaryHandle = localStorageGateway.getCamSyncHandle() ?: getInvalidHandle()
-        val secondaryHandle =
-            localStorageGateway.getMegaHandleSecondaryFolder() ?: getInvalidHandle()
-        localStorageGateway.backupTimestampsAndFolderHandle(primaryHandle, secondaryHandle)
-    }
 
     override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) =
         withContext(ioDispatcher) {

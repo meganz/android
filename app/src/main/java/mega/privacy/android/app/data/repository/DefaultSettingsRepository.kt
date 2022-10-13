@@ -345,4 +345,39 @@ class DefaultSettingsRepository @Inject constructor(
     override suspend fun setPreferredStartScreen(screen: StartScreen) {
         uiPreferencesGateway.setPreferredStartScreen(screen.id)
     }
+
+    override suspend fun backupTimestampsAndFolderHandle(
+        primaryUploadFolderHandle: Long,
+        secondaryUploadFolderHandle: Long,
+        camSyncTimeStamp: String?,
+        camVideoSyncTimeStamp: String?,
+        secSyncTimeStamp: String?,
+        secVideoSyncTimeStamp: String?,
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getPrimaryHandle(): Long? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getSecondaryHandle(): Long? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getPrimaryFolderPhotoSyncTime(): String? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getSecondaryFolderPhotoSyncTime(): String? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getPrimaryFolderVideoSyncTime(): String? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getSecondaryFolderVideoSyncTime(): String? {
+        TODO("Not yet implemented")
+    }
 }

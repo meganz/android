@@ -154,17 +154,17 @@ class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun saveSyncRecord(record: SyncRecord) = dbHandler.saveSyncRecord(record)
 
-    override suspend fun getPhotoTimeStamp(): Long =
-        dbHandler.preferences?.camSyncTimeStamp?.toLongOrNull() ?: 0
+    override suspend fun getPhotoTimeStamp(): String? =
+        dbHandler.preferences?.camSyncTimeStamp
 
-    override suspend fun getSecondaryPhotoTimeStamp(): Long =
-        dbHandler.preferences?.secSyncTimeStamp?.toLongOrNull() ?: 0
+    override suspend fun getSecondaryPhotoTimeStamp(): String? =
+        dbHandler.preferences?.secSyncTimeStamp
 
-    override suspend fun getVideoTimeStamp(): Long =
-        dbHandler.preferences?.camVideoSyncTimeStamp?.toLongOrNull() ?: 0
+    override suspend fun getVideoTimeStamp(): String? =
+        dbHandler.preferences?.camVideoSyncTimeStamp
 
-    override suspend fun getSecondaryVideoTimeStamp(): Long =
-        dbHandler.preferences?.secVideoSyncTimeStamp?.toLongOrNull() ?: 0
+    override suspend fun getSecondaryVideoTimeStamp(): String? =
+        dbHandler.preferences?.secVideoSyncTimeStamp
 
     override suspend fun setPhotoTimeStamp(timeStamp: Long) =
         dbHandler.setCamSyncTimeStamp(timeStamp)
@@ -317,29 +317,6 @@ class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getPaymentMethodsTimeStamp(): String? =
         dbHandler.attributes?.paymentMethodsTimeStamp
-
-    override suspend fun backupTimestampsAndFolderHandle(
-        primaryUploadFolderHandle: Long,
-        secondaryUploadFolderHandle: Long,
-    ) {
-        val prefs = dbHandler.preferences
-        if (prefs == null) {
-            Timber.e("Preference is null, while backup.")
-            return
-        }
-        context.getSharedPreferences(SharedPreferenceConstants.LAST_CAM_SYNC_TIMESTAMP_FILE,
-            Context.MODE_PRIVATE)
-            .edit()
-            .putString(SharedPreferenceConstants.KEY_CAM_SYNC_TIMESTAMP, prefs.camSyncTimeStamp)
-            .putString(SharedPreferenceConstants.KEY_CAM_VIDEO_SYNC_TIMESTAMP,
-                prefs.camVideoSyncTimeStamp)
-            .putString(SharedPreferenceConstants.KEY_SEC_SYNC_TIMESTAMP, prefs.secSyncTimeStamp)
-            .putString(SharedPreferenceConstants.KEY_SEC_VIDEO_SYNC_TIMESTAMP,
-                prefs.secVideoSyncTimeStamp)
-            .putLong(SharedPreferenceConstants.KEY_PRIMARY_HANDLE, primaryUploadFolderHandle)
-            .putLong(SharedPreferenceConstants.KEY_SECONDARY_HANDLE, secondaryUploadFolderHandle)
-            .apply()
-    }
 
     override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) {
         dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)
