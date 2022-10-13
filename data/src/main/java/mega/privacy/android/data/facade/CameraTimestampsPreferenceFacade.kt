@@ -8,7 +8,7 @@ import javax.inject.Inject
 /**
  * Default implementation of [CameraTimestampsPreferenceGateway]
  */
-class CameraTimestampsPreferenceFacade @Inject constructor(@ApplicationContext private val context: Context) :
+internal class CameraTimestampsPreferenceFacade @Inject constructor(@ApplicationContext private val context: Context) :
     CameraTimestampsPreferenceGateway {
 
     override suspend fun backupTimestampsAndFolderHandle(
