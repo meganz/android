@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.facade.AssetsFacade
 import mega.privacy.android.data.facade.CacheFacade
+import mega.privacy.android.data.facade.CameraTimestampsPreferenceFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.MegaApiFacade
 import mega.privacy.android.data.facade.MegaChatApiFacade
@@ -25,6 +26,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.LoggingPreferencesGateway
@@ -100,4 +102,10 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindMegaDBHandlerWrapper(implementation: MegaLocalStorageFacade): MegaLocalStorageGateway
+
+    /**
+     * Provide camera timestamps preference gateway implementation
+     */
+    @Binds
+    abstract fun bindCameraTimestampsPreferenceGateway(implementation: CameraTimestampsPreferenceFacade): CameraTimestampsPreferenceGateway
 }
