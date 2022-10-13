@@ -42,8 +42,8 @@ class DefaultLoginRepository @Inject constructor(
     override suspend fun fastLogin(session: String) =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                if (allowBackgroundLogin && !MegaApplication.isLoggingIn()) {
-                    MegaApplication.setLoggingIn(true)
+                if (allowBackgroundLogin && !MegaApplication.isLoggingIn) {
+                    MegaApplication.isLoggingIn = true
                     allowBackgroundLogin = false
                     megaApiGateway.fastLogin(
                         session,
@@ -98,7 +98,7 @@ class DefaultLoginRepository @Inject constructor(
 
                     when (state) {
                         MegaChatApi.INIT_NO_CACHE -> Timber.d("INIT_NO_CACHE")
-                        MegaChatApi.INIT_ERROR -> if (!MegaApplication.isLoggingIn()) {
+                        MegaChatApi.INIT_ERROR -> if (!MegaApplication.isLoggingIn) {
                             megaChatApiGateway.logout()
                         }
                         else -> Timber.d("Chat correctly initialized")

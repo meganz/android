@@ -6,10 +6,10 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
@@ -88,7 +88,7 @@ class StartConversationViewModelTest {
     }
 
     private val monitorConnectivity = mock<MonitorConnectivity> {
-        on { invoke() }.thenReturn(flowOf(true))
+        on { invoke() }.thenReturn(MutableStateFlow(true))
     }
 
     private val invalidHandle = -1L
@@ -285,7 +285,7 @@ class StartConversationViewModelTest {
     @Test
     fun `test that connection error is returned if attempting to start a conversation and no internet available`() =
         runTest {
-            whenever(monitorConnectivity()).thenReturn(flowOf(false))
+            whenever(monitorConnectivity()).thenReturn(MutableStateFlow(true))
 
             underTest.state.map { it.error }.distinctUntilChanged()
                 .test {

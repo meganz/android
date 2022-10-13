@@ -14,10 +14,9 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
@@ -25,10 +24,9 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUtilsAndroid
 import timber.log.Timber
 import javax.inject.Inject
@@ -84,7 +82,7 @@ class HomepageRepository @Inject constructor(
     /**
      * Get the actual avatar from the server and save it to the cache folder
      */
-    suspend fun createAvatar(listener: BaseListener) = withContext(Dispatchers.IO) {
+    suspend fun createAvatar(listener: MegaRequestListenerInterface) = withContext(Dispatchers.IO) {
         megaApi.getUserAvatar(
             megaApi.myUser,
             CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + ".jpg")?.absolutePath,
@@ -112,21 +110,15 @@ class HomepageRepository @Inject constructor(
         getBannerSuccess = false
 
         withContext(Dispatchers.IO) {
-            megaApi.getBanners(object : BaseListener(MegaApplication.getInstance()) {
-                override fun onRequestFinish(
-                    api: MegaApiJava,
-                    request: MegaRequest,
-                    e: MegaError,
-                ) {
-                    if (e.errorCode == MegaError.API_OK) {
-                        MegaUtilsAndroid.bannersToArray(request.megaBannerList)?.also {
-                            prefetchBannerImages(it)
-                        }
-                    } else if (e.errorCode == MegaError.API_ENOENT) {
-                        bannerList.value = null
+            megaApi.getBanners(OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, megaError ->
+                if (megaError.errorCode == MegaError.API_OK) {
+                    MegaUtilsAndroid.bannersToArray(megaRequest.megaBannerList)?.also {
+                        prefetchBannerImages(it)
                     }
+                } else if (megaError.errorCode == MegaError.API_ENOENT) {
+                    bannerList.value = null
                 }
-            })
+            }))
         }
     }
 

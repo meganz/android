@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.GetSession
+import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 
 /**
@@ -26,5 +27,9 @@ abstract class AccountModule {
         @Provides
         fun provideRetryPendingConnections(accountRepository: AccountRepository): RetryPendingConnections =
             RetryPendingConnections(accountRepository::retryPendingConnections)
+
+        @Provides
+        fun provideIsBusinessAccountActive(accountRepository: AccountRepository): IsBusinessAccountActive =
+            IsBusinessAccountActive(accountRepository::isBusinessAccountActive)
     }
 }

@@ -5,6 +5,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.preference.PreferenceManager
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.domain.entity.StorageState
 import nz.mega.sdk.MegaApiJava
 
 /**
@@ -60,15 +62,13 @@ abstract class RatingHandler(val context: Context) {
         if (!meetBaseCondition()) return
 
         val app = MegaApplication.getInstance()
-        val condition = if (app != null && app.megaApi != null) {
+        val condition = run {
             val contact = app.megaApi.contacts
             if (contact.isNullOrEmpty()) {
                 false
             } else {
                 contact.size > CONTACTS_NUMBER_LIMIT
             }
-        } else {
-            false
         }
 
         if (condition) {
@@ -95,11 +95,9 @@ abstract class RatingHandler(val context: Context) {
         if (!meetBaseCondition()) return
 
         val app = MegaApplication.getInstance()
-        val condition = if (app != null && app.megaApi != null) {
+        val condition = run {
             val totalNum = app.megaApi.publicLinks.size + app.megaApi.outShares.size
             totalNum >= SHARED_NUM_LIMIT
-        } else {
-            false
         }
 
         if (condition) {
@@ -122,7 +120,7 @@ abstract class RatingHandler(val context: Context) {
 
         // Exclude ODQ & OBQ accounts
         if (megaApi.bandwidthOverquotaDelay > 0
-            && app.storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
+            && getStorageState() == StorageState.PayWall) {
             return false
         }
 

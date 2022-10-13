@@ -25,7 +25,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_REPEAT_MODE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_SHUFFLE_ENABLED
 import mega.privacy.android.app.constants.SettingsConstants.KEY_VIDEO_REPEAT_MODE
-import mega.privacy.android.app.listeners.MegaRequestFinishListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
@@ -128,13 +128,13 @@ class MediaPlayerServiceViewModel(
 
 
     private val createThumbnailFinished = PublishSubject.create<Boolean>()
-    private val createThumbnailRequest = MegaRequestFinishListener({
-        createThumbnailFinished.onNext(true)
-
-        if (it.nodeHandle == playingHandle) {
-            postPlayingThumbnail()
-        }
-    })
+    private val createThumbnailRequest =
+        OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, _ ->
+            createThumbnailFinished.onNext(true)
+            if (megaRequest.nodeHandle == playingHandle) {
+                postPlayingThumbnail()
+            }
+        })
 
     private var currentIntent: Intent? = null
 

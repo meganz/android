@@ -102,7 +102,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
      * @param versionsInfo Text to show as versions info.
      */
     private fun refreshVersionsInfo(versionsInfo: String) {
-        if (MegaApplication.isDisableFileVersions() == 0) {
+        if (MegaApplication.isDisableFileVersions == 0) {
             binding.rubbishSeparator.isVisible = true
             binding.previousVersionsStorageContainer.isVisible = true
             binding.previousVersionsText.text = versionsInfo

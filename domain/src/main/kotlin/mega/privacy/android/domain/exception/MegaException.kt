@@ -7,5 +7,5 @@ package mega.privacy.android.domain.exception
  * @param errorCode
  * @param errorString
  */
-open class MegaException(errorCode: Int?, errorString: String?) :
+open class MegaException(val errorCode: Int, val errorString: String?) :
     Throwable(message = "ErrorCode: $errorCode ___ ErrorString: $errorString")

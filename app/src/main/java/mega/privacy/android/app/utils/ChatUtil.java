@@ -928,15 +928,7 @@ public class ChatUtil {
             return "";
         }
 
-        if (chat.isActive()) {
-            return chat.getTitle();
-        }
-
-        String date = formatDate(chat.getCreationTs(), DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT);
-
-        return isTodayOrYesterday(chat.getCreationTs())
-                ? getString(R.string.inactive_chat_title_2, date.toLowerCase(Locale.getDefault()))
-                : getString(R.string.inactive_chat_title, date);
+        return chat.getTitle();
     }
 
     /**
@@ -951,11 +943,7 @@ public class ChatUtil {
             return "";
         }
 
-        if (chat.isActive()) {
-            return chat.getTitle();
-        }
-
-        return getTitleChat(MegaApplication.getInstance().getMegaChatApi().getChatRoom(chat.getChatId()));
+        return chat.getTitle();
     }
 
     /**

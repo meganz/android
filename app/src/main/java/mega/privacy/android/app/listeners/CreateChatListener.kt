@@ -8,9 +8,13 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRequest.TYPE_CREATE_CHATROOM
+import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError.API_OK
+import nz.mega.sdk.MegaUser
 
 class CreateChatListener(
     context: Context,
@@ -119,8 +123,8 @@ class CreateChatListener(
                 if (errorCreatingChat()) {
                     snackbarShower?.showSnackbar(getString(R.string.create_chat_error))
                 } else {
-                    MegaApplication.setUserWaitingForCall(usersNoChat[0].handle)
-                    MegaApplication.setIsWaitingForCall(true)
+                    MegaApplication.userWaitingForCall = usersNoChat[0].handle
+                    MegaApplication.isWaitingForCall = true
                 }
             }
             SEND_MESSAGES -> {

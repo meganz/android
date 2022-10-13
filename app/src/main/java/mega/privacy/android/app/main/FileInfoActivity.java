@@ -77,7 +77,6 @@ import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
@@ -123,6 +122,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -164,6 +164,7 @@ import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDial
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.presentation.clouddrive.FileInfoViewModel;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
@@ -177,6 +178,7 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -205,6 +207,8 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     CopyNodeUseCase copyNodeUseCase;
     @Inject
     DatabaseHandler dbH;
+
+    private FileInfoViewModel viewModel;
 
     public static int MAX_WIDTH_FILENAME_LAND = 400;
     public static int MAX_WIDTH_FILENAME_LAND_2 = 400;
@@ -570,6 +574,8 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate");
+
+        viewModel = new ViewModelProvider(this).get(FileInfoViewModel.class);
 
         initFileBackupManager();
 
@@ -966,7 +972,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         }
 
         return super.onCreateOptionsMenu(menu);
-	}
+    }
 
     /**
      * Checks and applies read-only restrictions (unable to Favourite, Rename, Move, or Move to Rubbish Bin)
@@ -1547,7 +1553,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             case R.id.file_properties_switch: {
                 boolean isChecked = offlineSwitch.isChecked();
 
-                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+                if (viewModel.getStorageState() == StorageState.PayWall) {
                     showOverDiskQuotaPaywallWarning();
                     offlineSwitch.setChecked(!isChecked);
                     return;

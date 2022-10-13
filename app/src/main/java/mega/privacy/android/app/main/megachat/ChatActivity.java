@@ -198,7 +198,6 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedE
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.DATE;
 import static mega.privacy.android.app.utils.TimeUtils.TIME;
-import static mega.privacy.android.app.utils.TimeUtils.formatShortDateTime;
 import static mega.privacy.android.app.utils.TimeUtils.lastGreenDate;
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
@@ -213,7 +212,6 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.Manifest;
@@ -288,6 +286,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
@@ -372,7 +371,6 @@ import mega.privacy.android.app.main.listeners.AudioFocusListener;
 import mega.privacy.android.app.main.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
-import mega.privacy.android.domain.entity.chat.FileGalleryItem;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
@@ -389,6 +387,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.chat.ChatViewModel;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
@@ -414,6 +413,8 @@ import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.domain.entity.StorageState;
+import mega.privacy.android.domain.entity.chat.FileGalleryItem;
 import mega.privacy.android.domain.usecase.GetPushToken;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
@@ -566,6 +567,8 @@ public class ChatActivity extends PasscodeActivity
     MegaChatRequestHandler chatRequestHandler;
     @Inject
     RTCAudioManagerGateway rtcAudioManagerGateway;
+
+    private ChatViewModel viewModel;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -1499,6 +1502,8 @@ public class ChatActivity extends PasscodeActivity
     public void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+
+        viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
 
         if (shouldRefreshSessionDueToKarere()) {
             return;
@@ -2653,7 +2658,7 @@ public class ChatActivity extends PasscodeActivity
      * @param show indicates which layout has to be shown at the bottom of the UI
      */
     public void setBottomLayout(int show) {
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             show = SHOW_NOTHING_LAYOUT;
         } else if (joiningOrLeaving) {
             show = SHOW_JOINING_OR_LEFTING_LAYOUT;
@@ -3121,7 +3126,7 @@ public class ChatActivity extends PasscodeActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         Timber.d("onOptionsItemSelected");
 
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL &&
+        if (viewModel.getStorageState() == StorageState.PayWall &&
                 (item.getItemId() == R.id.cab_menu_call_chat || item.getItemId() == R.id.cab_menu_video_chat)) {
             showOverDiskQuotaPaywallWarning();
             return false;
@@ -3759,7 +3764,7 @@ public class ChatActivity extends PasscodeActivity
 
     private boolean checkPermissionsReadStorage() {
         Timber.d("checkPermissionsReadStorage");
-        String[] PERMISSIONS = new String[] {
+        String[] PERMISSIONS = new String[]{
                 PermissionUtils.getImagePermissionByVersion(),
                 PermissionUtils.getAudioPermissionByVersion(),
                 PermissionUtils.getVideoPermissionByVersion(),
@@ -3908,7 +3913,7 @@ public class ChatActivity extends PasscodeActivity
      * @param listener         The listener to retrieve all the links of the nodes to be exported.
      */
     public void importNodeToShare(ArrayList<AndroidMegaChatMessage> messagesSelected, ExportListener listener) {
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
@@ -3924,7 +3929,7 @@ public class ChatActivity extends PasscodeActivity
     }
 
     public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected) {
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
@@ -4952,7 +4957,7 @@ public class ChatActivity extends PasscodeActivity
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             ArrayList<AndroidMegaChatMessage> messagesSelected = adapter.getSelectedMessages();
 
-            if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+            if (viewModel.getStorageState()== StorageState.PayWall) {
                 showOverDiskQuotaPaywallWarning();
                 return false;
             }
@@ -5334,7 +5339,7 @@ public class ChatActivity extends PasscodeActivity
                                 Timber.e(throwable);
                             } else {
                                 if (result) {
-                                    if(allNodeAttachments && isOnlineNotUploadingNotAnonymousNotRemoved) {
+                                    if (allNodeAttachments && isOnlineNotUploadingNotAnonymousNotRemoved) {
                                         showOptionsForAvailableNode();
                                     }
 
@@ -5358,7 +5363,7 @@ public class ChatActivity extends PasscodeActivity
                         });
 
             } else {
-                if(allNodeAttachments && isOnlineNotUploadingNotAnonymousNotRemoved) {
+                if (allNodeAttachments && isOnlineNotUploadingNotAnonymousNotRemoved) {
                     showOptionsForAvailableNode();
                 }
 
@@ -9365,7 +9370,7 @@ public class ChatActivity extends PasscodeActivity
                             R.string.join_call_layout);
 
                     if (chatRoom.isGroup()) {
-                        if (callInThisChat.getNumParticipants() == 0 || (callInThisChat.getPeeridParticipants().size() == 1 && callInThisChat.getPeeridParticipants().get(0) == megaChatApi.getMyUserHandle())) {
+                        if (callInThisChat.getNumParticipants() == 0) {
                             hideCallBar(callInThisChat);
                             break;
                         }

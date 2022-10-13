@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.list.adapter
 
+import android.content.res.ColorStateList
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
@@ -22,20 +23,28 @@ class MeetingsViewHolder(
     }
 
     fun bind(item: MeetingItem, isSelected: Boolean) {
-        binding.txtTitle.text = item.title
-        binding.txtTimestamp.text = item.formattedTimestamp
-        binding.txtLastMessage.text = item.lastMessage
-        binding.txtLastMessage.isVisible = !item.lastMessage.isNullOrBlank()
-        binding.imgMute.isVisible = item.isMuted
-        binding.imgPrivate.isVisible = !item.isPublic
-        binding.txtUnreadCount.text = item.unreadCount.toString()
-        binding.txtUnreadCount.isVisible = item.unreadCount > 0
         val lastMessageColor = if (item.highlight) {
             ContextCompat.getColor(itemView.context, R.color.teal_300_teal_200)
         } else {
             getThemeColor(itemView.context, android.R.attr.textColorSecondary)
         }
+
+        binding.txtTitle.text = item.title
+        binding.txtTimestamp.text = item.formattedTimestamp
+        binding.txtLastMessage.text = item.lastMessage
         binding.txtLastMessage.setTextColor(lastMessageColor)
+        binding.txtLastMessage.isVisible = !item.lastMessage.isNullOrBlank()
+        if (item.lastMessageIcon != null) {
+            binding.imgLastMessage.setImageResource(item.lastMessageIcon)
+        } else {
+            binding.imgLastMessage.setImageDrawable(null)
+        }
+        binding.imgLastMessage.imageTintList = ColorStateList.valueOf(lastMessageColor)
+        binding.imgLastMessage.isVisible = item.lastMessageIcon != null
+        binding.imgMute.isVisible = item.isMuted
+        binding.imgPrivate.isVisible = !item.isPublic
+        binding.txtUnreadCount.text = item.unreadCount.toString()
+        binding.txtUnreadCount.isVisible = item.unreadCount > 0
 
         val firstUserPlaceholder = item.firstUser.getImagePlaceholder(itemView.context)
         if (item.isSingleMeeting() || item.lastUser == null) {

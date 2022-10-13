@@ -775,26 +775,26 @@ object CameraUploadSyncManager {
      * Only call in Worker class.
      */
     fun doRegularHeartbeat() {
-        val isLoggingIn = MegaApplication.isLoggingIn()
+        val isLoggingIn = MegaApplication.isLoggingIn
         if (megaApi.rootNode == null && !isLoggingIn) {
             Timber.w("RootNode = null, need to login again")
             val dbH = getDbHandler()
             val gSession = dbH.credentials?.session
-            MegaApplication.setLoggingIn(true)
+            MegaApplication.isLoggingIn = true
             megaApi.fastLogin(gSession, createHeartbeatListener(onSuccess = {
                 saveCredentials()
                 Timber.d("CameraUploadSyncManager: fast logged in and saved session")
                 megaApi.fetchNodes(createHeartbeatListener(onSuccess = {
-                    MegaApplication.setLoggingIn(false)
+                    MegaApplication.isLoggingIn = false
                     MegaApplication.setHeartBeatAlive(true)
 
                     sendPrimaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
                     sendSecondaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
                 }, onError = {
-                    MegaApplication.setLoggingIn(false)
+                    MegaApplication.isLoggingIn = false
                 }))
             }, onError = {
-                MegaApplication.setLoggingIn(false)
+                MegaApplication.isLoggingIn = false
             }))
         } else {
             sendPrimaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)

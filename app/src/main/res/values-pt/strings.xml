@@ -133,7 +133,7 @@
     <!-- Login button -->
     <string name="login_text">Fazer&#160;login</string>
     <!-- email label -->
-    <string name="email_text">Email</string>
+    <string name="email_text">E-mail</string>
     <!-- password label -->
     <string name="password_text">Senha</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -145,9 +145,9 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Criar conta</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Por favor, digite seu email</string>
+    <string name="error_enter_email">Por favor, digite seu e-mail</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="error_invalid_email">Endereço de email inválido</string>
+    <string name="error_invalid_email">Endereço de e-mail inválido</string>
     <!-- when the user tries to log in MEGA without typing the password -->
     <string name="error_enter_password">Por favor digite sua senha</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
@@ -193,7 +193,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">As senhas não coincidem</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Já existe uma conta no MEGA com esse email</string>
+    <string name="error_email_registered">Já existe uma conta no MEGA com esse e-mail</string>
     <!--  -->
     <string name="create_account_creating_account">Conectando-se ao servidor: criando conta</string>
     <!--  -->
@@ -734,7 +734,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA - versão do SDK</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGAchat - versão do SDK</string>
+    <string name="settings_about_karere_version">MEGA chat - versão do SDK</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Ver o código-fonte</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -796,7 +796,7 @@
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="backup_second_paragraph">Exportar a chave de recuperação e guardá-la em um lugar seguro permite que você altere a sua senha sem perder os seus dados.</string>
     <!-- Third paragraph of the screen to backup the master key -->
-    <string name="backup_third_paragraph">Um atacante externo não pode obter acesso à sua conta apenas com a sua chave. A recuperação de senha necessita tanto a chave como o acesso ao seu email.</string>
+    <string name="backup_third_paragraph">Um atacante externo não pode obter acesso à sua conta apenas com a sua chave. A recuperação de senha necessita tanto a chave como o acesso ao seu e-mail.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
     <string name="backup_action">Copie a chave de recuperação à área de transferência ou salve-a como um arquivo de texto.</string>
     <!-- Action of a button to save something -->
@@ -818,25 +818,25 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Este é o último passo para excluir a sua conta. Todos os dados armazenados na sua nuvem de arquivos serão permanentemente deletados. Por favor, digite sua senha abaixo para confirmar.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Comprovação de email</string>
+    <string name="email_verification_title">Comprovação de e-mail</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Por favor, verifique seu email para continuar.</string>
+    <string name="email_verification_text">Por favor, verifique seu e-mail para continuar.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">Ocorreu um erro. Por favor, tente novamente.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Você precisa estar logado para realizar esta ação.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">Você precisa estar logado para completar a sua mudança de email. Por favor, faça login novamente com o seu endereço de email atual e, em seguida, toque novamente no link de confirmação.</string>
+    <string name="change_email_not_logged_in">Você precisa estar logado para completar a sua mudança de e-mail. Por favor, faça login novamente com o seu endereço de e-mail atual e, em seguida, toque novamente no link de confirmação.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
-    <string name="email_changed">Parabéns, o novo email desta conta no MEGA é: %1$s</string>
+    <string name="email_changed">Parabéns, o novo e-mail desta conta no MEGA é: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
     <string name="invalid_string">Incorreto</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">Entrada inválida</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">Endereço de email inválido</string>
+    <string name="invalid_email_title">Endereço de e-mail inválido</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">Por favor, confirme o endereço de email e tente novamente.</string>
+    <string name="invalid_email_text">Por favor, confirme o endereço de e-mail e tente novamente.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Resetar senha</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -862,15 +862,15 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Aumente a capacidade da sua nuvem.[A]Obtenha um maior espaço de armazenamento e mais cota de transferência com um plano Pro.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Este email já está sendo usado. Por favor, use outro email.</string>
+    <string name="mail_already_used">Este e-mail já está sendo usado. Por favor, use outro e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
-    <string name="mail_changed_confirm_requested">Você já solicitou um link de confirmação para esse endereço de email.</string>
+    <string name="mail_changed_confirm_requested">Você já solicitou um link de confirmação para esse endereço de e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
-    <string name="mail_same_as_old">Este é o seu email atual.</string>
+    <string name="mail_same_as_old">Este é o seu e-mail atual.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">Este é o último passo para alterar o seu email. Por favor, digite a sua senha abaixo.</string>
+    <string name="change_mail_text_last_step">Este é o último passo para alterar o seu e-mail. Por favor, digite a sua senha abaixo.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
-    <string name="change_mail_title_last_step">Alterar email</string>
+    <string name="change_mail_title_last_step">Alterar e-mail</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="take_photo_avatar_panel">Capturar</string>
     <!-- Option of the sliding panel to change the avatar by choosing an existing picture -->
@@ -914,13 +914,13 @@
         <item quantity="other">Esta pasta está compartilhada com %1$d contatos. Você quer deixar de compartilhar?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">Email e/ou senha inválidos. Por favor, tente novamente.</string>
+    <string name="error_incorrect_email_or_password">E-mail ou senha inválidos. Por favor, tente novamente.</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">A sua conta foi suspensa for infringir os Termos de serviço. Para mais informações, entre em contato com support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Muitas tentativas de login incorretas. Por favor, aguarde uma hora.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Esta conta ainda não foi confirmada. Por favor, verifique o seu email.</string>
+    <string name="account_not_validated_login">Esta conta ainda não foi confirmada. Por favor, verifique o seu e-mail.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">O link da pasta não está disponível</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -932,7 +932,7 @@
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Esta URL está corrupta ou mal formada. O link que você está tentando acessar não existe.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">Esperando confirmação por email</string>
+    <string name="confirm_email_text">Esperando confirmação por e-mail</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
     <string name="confirm_email_explanation">Por favor, verifique o seu e-mail e toque no link para confirmar a sua conta.</string>
     <!-- Plural of items which contains a folder. 2 items -->
@@ -1343,17 +1343,17 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s já foi convidado. Consulte as suas solicitações pendentes.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">Se você errou ao digitar o seu email, corrija e pressione [A]Reenviar[A].</string>
+    <string name="confirm_email_misspelled">Se você errou ao digitar o seu e-mail, corrija e pressione [A]Reenviar[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Reenviar</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">Email enviado</string>
+    <string name="confirm_email_misspelled_email_sent">E-mail enviado</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Aviso de direitos autorais a todos os usuários</string>
     <!-- text_copyright_alert_first_paragraph -->
     <string name="copyright_alert_first_paragraph">O MEGA respeita os direitos autorais de terceiros e exige que os usuários do serviço de nuvem MEGA cumpram as leis de direitos autorais.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">Você está estritamente proibido de usar o serviço de nuvem do MEGA para infringir direitos autorais. Você não pode fazer upload, download, armazenar, compartilhar, visualizar, fazer streaming, distribuir, enviar por email, criar um link, difundir ou disponibilizar quaisquer arquivos, dados ou conteúdos que infinjam os direitos de autor ou outros direitos de propriedade de qualquer pessoa ou entidade.</string>
+    <string name="copyright_alert_second_paragraph">Você está estritamente proibido de usar o serviço de nuvem do MEGA para infringir direitos autorais. Você não pode fazer upload, download, armazenar, compartilhar, visualizar, fazer streaming, distribuir, enviar por e-mail, criar um link, difundir ou disponibilizar quaisquer arquivos, dados ou conteúdos que infinjam os direitos de autor ou outros direitos de propriedade de qualquer pessoa ou entidade.</string>
     <!-- text of the Agree button -->
     <string name="copyright_alert_agree_button">Concordo</string>
     <!-- text of the Disagree button -->
@@ -1525,7 +1525,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Convite enviado</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Formato de email incorreto</string>
+    <string name="invalid_email_to_invite">Formato de e-mail incorreto</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Ao instalar o aplicativo para desktop do MEGA, você recebe grátis %1$s de espaço de armazenamento, válidos por 365 dias. O aplicativo para desktop do MEGA está disponível para Windows, macOS e a maioria das distribuições Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1579,7 +1579,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">ASSUNTO</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">EMAIL</string>
+    <string name="new_file_email_when_uploading">E-MAIL</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Encaminhar</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1944,7 +1944,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Ativar a visualização de URLs avançadas</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Melhore a sua experiência no MEGAchat. O conteúdo de URLs será recuperado sem criptografia de ponta a ponta.</string>
+    <string name="text_enable_rich_links">Melhore a sua experiência no MEGA chat. O conteúdo de URLs será recuperado sem criptografia de ponta a ponta.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Por favor, digite uma senha mais segura</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2004,7 +2004,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
     <string name="verify_2fa_subtitle_change_password">Alterar senha</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
-    <string name="verify_2fa_subtitle_change_email">Alterar email</string>
+    <string name="verify_2fa_subtitle_change_email">Alterar e-mail</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
     <string name="verify_2fa_subtitle_delete_account">Deletar conta</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
@@ -2148,7 +2148,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Ativar ou desativar o controle das versões de arquivos na sua conta. \nDesativar o controle das versões de arquivos não impede que os seus contatos criem novas versões em pastas compartilhadas.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Digite o nome ou email</string>
+    <string name="type_mail">Digite o nome ou e-mail</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Você quer adicionar %s aos seus contatos?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2168,7 +2168,7 @@
     <!-- Text shown to indicate user that his account should be confirmed typing his password -->
     <string name="confirm_account">Por favor, digite sua senha para confirmar sua conta</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
-    <string name="error_own_email_as_contact">Não é necessário adicionar o seu próprio email</string>
+    <string name="error_own_email_as_contact">Não é necessário adicionar o seu próprio e-mail</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Código inválido</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
@@ -2876,17 +2876,17 @@
     <!-- Error shown when it was not possible to create a folder for any reason -->
     <string name="error_creating_folder">Erro. Não foi possível criar a pasta %1$s</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
-    <string name="verify_email_label">Confirme o seu email</string>
+    <string name="verify_email_label">Confirme o seu e-mail</string>
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">A sua conta foi bloqueada temporalmente por motivos de segurança.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">Siga os passos do [A]email de verificação[/A] para desbloquear a sua conta.</string>
+    <string name="verify_email_and_follow_steps">Siga os passos do [A]e-mail de verificação[/A] para desbloquear a sua conta.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Por que estou vendo isso?</string>
     <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">Reenviar email</string>
+    <string name="resend_email_label">Reenviar e-mail</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
-    <string name="resend_email_error">O email já foi enviado. Espere alguns minutos antes de tentar novamente.</string>
+    <string name="resend_email_error">O e-mail já foi enviado. Espere alguns minutos antes de tentar novamente.</string>
     <!-- Title of a helping view about locked accounts -->
     <string name="locked_accounts_label">Contas bloqueadas</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
@@ -2935,10 +2935,6 @@
     <string name="browse_files_label">Navegar entre os arquivos</string>
     <!-- Title of the File Provider activity -->
     <string name="file_provider_title">Anexar de&#8230;</string>
-    <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
-    <string name="inactive_chat_title_2">Chat criado %s</string>
-    <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
-    <string name="inactive_chat_title">Chat criado em %s</string>
     <!-- Title of the chat when multi-selection is activated -->
     <string name="select_message_title">Selecionar mensagens</string>
     <!-- The label that describes that a transfer failed. -->
@@ -2961,12 +2957,12 @@
     <string name="over_disk_quota_paywall_title">Os seus dados estão em perigo!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
-        <item quantity="one">Enviamos um email de notificação a %1$s em %2$s, mas você ainda tem %3$s arquivos ocupando %4$s na sua conta do MEGA, o que requer que você tenha um plano %5$s.</item>
-        <item quantity="many">Enviamos um email de notificação a %1$s em %2$s e em %3$s mas você ainda tem %4$s arquivos ocupando %5$s na sua conta do MEGA, o que requer que você tenha um plano %6$s.</item>
-        <item quantity="other">Enviamos um email de notificação a %1$s em %2$s e em %3$s mas você ainda tem %4$s arquivos ocupando %5$s na sua conta do MEGA, o que requer que você tenha um plano %6$s.</item>
+        <item quantity="one">Enviamos um e-mail de notificação a %1$s em %2$s, mas você ainda tem %3$s arquivos ocupando %4$s na sua conta do MEGA, o que requer que você tenha um plano %5$s.</item>
+        <item quantity="many">Enviamos um e-mail de notificação a %1$s em %2$s e em %3$s mas você ainda tem %4$s arquivos ocupando %5$s na sua conta do MEGA, o que requer que você tenha um plano %6$s.</item>
+        <item quantity="other">Enviamos um e-mail de notificação a %1$s em %2$s e em %3$s mas você ainda tem %4$s arquivos ocupando %5$s na sua conta do MEGA, o que requer que você tenha um plano %6$s.</item>
     </plurals>
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
-    <string name="over_disk_quota_paywall_text_no_warning_dates_info">Enviamos um email de notificação a %1$s, mas você ainda tem %2$s arquivos ocupando %3$s na sua conta do MEGA, o que requer que você tenha um plano %4$s.</string>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info">Enviamos um e-mail de notificação a %1$s, mas você ainda tem %2$s arquivos ocupando %3$s na sua conta do MEGA, o que requer que você tenha um plano %4$s.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color -->
     <string name="over_disk_quota_paywall_deletion_warning">[B]Você tem [M]%s[/M] para fazer o upgrade.[/B] Se você não fizer o upgrade neste período, os seus arquivos serão deletados.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no data available -->
@@ -3293,8 +3289,6 @@
     <string name="settings_media_audio_files">Arquivos de áudio</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Reproduzindo em segundo plano</string>
-    <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Não[/B] [B]há[/B] [A]fotos[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Faça o backup automático de fotos e vídeos na sua Nuvem.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3595,8 +3589,6 @@
     <string name="show_activity_action">Mostrar atividade</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]Atividade recente[/B] oculta</string>
-    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
-    <string name="video_quality_info">Você pode economizar espaço diminuindo a qualidade dos vídeos nas configurações dos Uploads da câmera.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Qualidade original</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
@@ -3965,14 +3957,8 @@
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filtro</string>
-    <!-- Filter option to show all photos -->
-    <string name="photos_filter_all_photos"></string>
-    <!-- Filter option to show only photos from Cloud Drive -->
-    <string name="photos_filter_cloud_drive">Da Nuvem de arquivos</string>
     <!-- Filter option to show only photos and videos from Camera Uploads folder -->
     <string name="photos_filter_camera_uploads">Uploads da câmera</string>
-    <!-- Filter option to show only videos from Camera Uploads -->
-    <string name="photos_filter_videos_only">Somente vídeos</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
     <string name="dialog_cannot_open_file_title">Não foi possível abrir o arquivo</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
@@ -4104,7 +4090,37 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">É aqui que os seus arquivos e as pastas de backup são armazenados. Os itens de backup são  “somente leitura” para protegê-los de alterações acidentais na sua Nuvem de arquivos. \nVocê pode fazer o backup de itens do seu computador para o MEGA usando o nosso aplicativo para desktop.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Conta suspensa devido a infrações de direitos autorais. Enviamos um email com mais informações.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Conta suspensa devido a infrações de direitos autorais. Enviamos um e-mail com mais informações.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Conta encerrada devido a uma infração dos Termos de serviço do MEGA, como abuso dos direitos de terceiros, compartilhamento e importação de dados ilegais ou abuso do sistema.</string>
+    <!-- Title of the Meetings tab for the chat section -->
+    <string name="chat_tab_meetings_title">Reuniões</string>
+    <!-- Title of the location option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_location_option">Localização</string>
+    <!-- Used in chat screen to indicate last message sent by me -->
+    <string name="chat_last_message_sender_me">Eu</string>
+    <!-- Hint the screen is locked in video player page -->
+    <string name="video_player_locked_hint">A tela está bloqueada</string>
+    <!-- Hint that tap to unlock in video player page -->
+    <string name="video_player_unlock_hint">Toque para desbloquear</string>
+    <!-- Label that schedule a meeting -->
+    <string name="chat_schedule_meeting">Programar reunião</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
+    <string name="upgrade_account_successful_pro_lite_monthly">Obrigado pela assinatura mensal do Pro&#160;Lite</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
+    <string name="upgrade_account_successful_pro_lite_yearly">Obrigado pela assinatura anual do Pro&#160;Lite</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
+    <string name="upgrade_account_successful_pro_1_monthly">Obrigado pela assinatura mensal do Pro&#160;I</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
+    <string name="upgrade_account_successful_pro_1_yearly">Obrigado pela assinatura anual do Pro&#160;I</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
+    <string name="upgrade_account_successful_pro_2_monthly">Obrigado pela assinatura mensal do Pro&#160;II</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
+    <string name="upgrade_account_successful_pro_2_yearly">Obrigado pela assinatura anual do Pro&#160;II</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
+    <string name="upgrade_account_successful_pro_3_monthly">Obrigado pela assinatura mensal do Pro&#160;III</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
+    <string name="upgrade_account_successful_pro_3_yearly">Obrigado pela assinatura anual do Pro&#160;III</string>
+    <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
+    <string name="chat_group_chat_info_allow_non_host_participants_option">Permitir adicionar participantes a usuários que não forem anfitriões</string>
 </resources>

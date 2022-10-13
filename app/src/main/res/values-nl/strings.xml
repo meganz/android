@@ -722,7 +722,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA SDK Versie</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGAchat SDK versie</string>
+    <string name="settings_about_karere_version">MEGA chat SDK versie</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Broncode weergeven</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -901,7 +901,7 @@
         <item quantity="other">De map is gedeeld met %1$d contacten. Alle delingen verwijderen?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">Ongeldige email en/of wachtwoord. Probeer nogmaals.</string>
+    <string name="error_incorrect_email_or_password">Ongeldig e-mailadres of wachtwoord. Probeer nogmaals.</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">Uw account is geschorst door schending van de Algemene Voorwaarden. Neem contact op met support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
@@ -1898,7 +1898,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Rijke URL weergave inschakelen</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Verbeter de MEGAchat ervaring. URL inhoud wordt binnengehaald zonder end-to-end encryptie.</string>
+    <string name="text_enable_rich_links">Verbeter de MEGA chat ervaring. URL inhoud wordt binnengehaald zonder end-to-end encryptie.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Voer een sterker wachtwoord in</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2861,10 +2861,6 @@
     <string name="browse_files_label">Bestanden doorbladeren</string>
     <!-- Title of the File Provider activity -->
     <string name="file_provider_title">Bijvoegen vanaf &#8230;</string>
-    <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
-    <string name="inactive_chat_title_2">Gesprek gecreëerd %s</string>
-    <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
-    <string name="inactive_chat_title">Chat gecreëerd op %s</string>
     <!-- Title of the chat when multi-selection is activated -->
     <string name="select_message_title">Selecteer berichten</string>
     <!-- The label that describes that a transfer failed. -->
@@ -3210,8 +3206,6 @@
     <string name="settings_media_audio_files">Audio bestanden</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Afspelen op de achtergrond</string>
-    <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Geen[/B] [A]foto\’s[/A] [B]Gevonden[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Automatisch een backup van uw foto\’s en video\’s maken naar uw Cloud Schijf.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3497,8 +3491,6 @@
     <string name="show_activity_action">Activiteit weergeven</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]Recent[/B] activiteit verborgen</string>
-    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
-    <string name="video_quality_info">U kunt ruimte besparen door de videokwaliteit te verlagen in de Camera Upload instellingen.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Originele kwaliteit</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
@@ -3865,14 +3857,8 @@
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filter</string>
-    <!-- Filter option to show all photos -->
-    <string name="photos_filter_all_photos"></string>
-    <!-- Filter option to show only photos from Cloud Drive -->
-    <string name="photos_filter_cloud_drive">Van Cloud Schijf</string>
     <!-- Filter option to show only photos and videos from Camera Uploads folder -->
     <string name="photos_filter_camera_uploads">Camera uploads</string>
-    <!-- Filter option to show only videos from Camera Uploads -->
-    <string name="photos_filter_videos_only">Alleen video’s</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
     <string name="dialog_cannot_open_file_title">Kan bestand niet openen</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
@@ -4003,4 +3989,34 @@
     <string name="dialog_account_suspended_ToS_copyright_message">Account is geschorst vanwege copyright overtredingen. We hebben u een email gestuurd met meer informatie hierover.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Uw account was beëindigd door een schending van MEGA’s Algemene Voorwaarden, zoals misbruik van rechten van anderen; Het delen en/of importen van illegale gegevens; of systeem misbruik.</string>
+    <!-- Title of the Meetings tab for the chat section -->
+    <string name="chat_tab_meetings_title">Vergaderingen</string>
+    <!-- Title of the location option displayed in the chat room toolbar -->
+    <string name="chat_room_toolbar_location_option">Lokatie</string>
+    <!-- Used in chat screen to indicate last message sent by me -->
+    <string name="chat_last_message_sender_me">Mij</string>
+    <!-- Hint the screen is locked in video player page -->
+    <string name="video_player_locked_hint">Scherm is vergrendeld</string>
+    <!-- Hint that tap to unlock in video player page -->
+    <string name="video_player_unlock_hint">Tik om te ontgrendelen</string>
+    <!-- Label that schedule a meeting -->
+    <string name="chat_schedule_meeting">Plan vergadering</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
+    <string name="upgrade_account_successful_pro_lite_monthly">Bedankt voor uw Pro&#160;Lite maandelijkse abonnement</string>
+    <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
+    <string name="upgrade_account_successful_pro_lite_yearly">Bedankt voor uw Pro&#160;Lite jaarlijkse abonnement</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
+    <string name="upgrade_account_successful_pro_1_monthly">Bedankt voor uw Pro&#160;I maandelijkse abonnement</string>
+    <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
+    <string name="upgrade_account_successful_pro_1_yearly">Bedankt voor uw Pro&#160;I jaarlijkse abonnement</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
+    <string name="upgrade_account_successful_pro_2_monthly">Bedankt voor uw Pro&#160;II maandelijkse abonnement</string>
+    <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
+    <string name="upgrade_account_successful_pro_2_yearly">Bedankt voor uw Pro&#160;II jaarlijkse abonnement</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
+    <string name="upgrade_account_successful_pro_3_monthly">Bedankt voor uw Pro&#160;III maandelijkse abonnement</string>
+    <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
+    <string name="upgrade_account_successful_pro_3_yearly">Bedankt voor uw Pro&#160;III jaarlijkse abonnement</string>
+    <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
+    <string name="chat_group_chat_info_allow_non_host_participants_option">Toestaan ​​dat non-hosts deelnemers kan toevoegen</string>
 </resources>

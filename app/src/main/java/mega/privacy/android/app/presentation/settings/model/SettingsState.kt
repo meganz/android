@@ -32,6 +32,6 @@ data class SettingsState(
     val startScreen: Int,
     val hideRecentActivityChecked: Boolean,
     val email: String,
-    val accountType: Int,
+    val accountType: String,
 ) {
 }

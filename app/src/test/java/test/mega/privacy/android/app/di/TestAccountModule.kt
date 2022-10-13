@@ -7,6 +7,7 @@ import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.AccountModule
 import mega.privacy.android.domain.usecase.GetSession
+import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import org.mockito.kotlin.mock
 
@@ -23,10 +24,16 @@ object TestAccountModule {
     private val retryPendingConnections = mock<RetryPendingConnections> {
         on { runBlocking { invoke(false) } }
     }
+    private val isBusinessAccountActive = mock<IsBusinessAccountActive> {
+        on { runBlocking { invoke() } }.thenReturn(false)
+    }
 
     @Provides
     fun bindGetSession() = getSession
 
     @Provides
     fun bindRetryPendingConnections() = retryPendingConnections
+
+    @Provides
+    fun bindIsBusinessAccountActive() = isBusinessAccountActive
 }

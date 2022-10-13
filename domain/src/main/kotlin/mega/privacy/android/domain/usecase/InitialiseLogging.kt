@@ -4,11 +4,10 @@ package mega.privacy.android.domain.usecase
  * Initialise logging
  *
  */
-fun interface InitialiseLogging {
+interface InitialiseLogging {
     /**
-     * Invoke
+     * invoke
      *
-     * @param isDebug
      */
-    suspend operator fun invoke(isDebug: Boolean)
+    suspend operator fun invoke()
 }

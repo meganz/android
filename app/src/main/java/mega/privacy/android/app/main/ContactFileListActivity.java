@@ -45,7 +45,6 @@ import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.Manifest;
@@ -74,6 +73,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -105,6 +105,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.presentation.contact.ContactFileListViewModel;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
@@ -116,6 +117,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -147,6 +149,8 @@ public class ContactFileListActivity extends PasscodeActivity
     @Inject
     CopyNodeUseCase copyNodeUseCase;
 
+    private ContactFileListViewModel viewModel;
+
     FrameLayout fragmentContainer;
 
     String userEmail;
@@ -170,8 +174,6 @@ public class ContactFileListActivity extends PasscodeActivity
     static ContactFileListActivity contactPropertiesMainActivity;
 
     long parentHandle = -1;
-
-
 
     private AlertDialog newFolderDialog;
     DisplayMetrics outMetrics;
@@ -372,6 +374,8 @@ public class ContactFileListActivity extends PasscodeActivity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         Timber.d("onCreate first");
         super.onCreate(savedInstanceState);
+
+        viewModel = new ViewModelProvider(this).get(ContactFileListViewModel.class);
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
@@ -875,7 +879,7 @@ public class ContactFileListActivity extends PasscodeActivity
             return;
         }
 
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             dismissAlertDialogIfExists(statusDialog);
             showOverDiskQuotaPaywallWarning();
             return;
