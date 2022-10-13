@@ -44,14 +44,13 @@ class DefaultGetInboxChildrenNodes @Inject constructor(
      * is null or has no Children Nodes
      */
     private suspend fun getInboxChildrenNodes(): List<MegaNode> =
-        if (hasInboxChildren()) {
-            getInboxNode()?.let { inboxNode ->
+        takeIf { hasInboxChildren() }
+            ?.run { getInboxNode() }
+            ?.let { inboxNode ->
                 getChildrenNode(
                     parent = inboxNode,
                     order = getCloudSortOrder(),
                 )
-            } ?: emptyList()
-        } else {
-            emptyList()
-        }
+            }.orEmpty()
+
 }
