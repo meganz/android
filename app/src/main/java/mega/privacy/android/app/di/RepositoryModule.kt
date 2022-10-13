@@ -1,6 +1,5 @@
 package mega.privacy.android.app.di
 
-import mega.privacy.android.domain.repository.TransferRepository as DomainTransferRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -9,41 +8,30 @@ import mega.privacy.android.app.data.repository.DefaultAccountRepository
 import mega.privacy.android.app.data.repository.DefaultAlbumsRepository
 import mega.privacy.android.app.data.repository.DefaultAvatarRepository
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
-import mega.privacy.android.app.data.repository.DefaultChatRepository
 import mega.privacy.android.app.data.repository.DefaultContactsRepository
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.app.data.repository.DefaultFilesRepository
 import mega.privacy.android.app.data.repository.DefaultGlobalStatesRepository
 import mega.privacy.android.app.data.repository.DefaultImageRepository
 import mega.privacy.android.app.data.repository.DefaultLoginRepository
-import mega.privacy.android.app.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.app.data.repository.DefaultPhotosRepository
-import mega.privacy.android.app.data.repository.DefaultPushesRepository
-import mega.privacy.android.app.data.repository.DefaultRecentActionsRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
-import mega.privacy.android.app.data.repository.DefaultSortOrderRepository
-import mega.privacy.android.app.data.repository.DefaultSupportRepository
 import mega.privacy.android.app.data.repository.DefaultTransfersRepository
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.domain.repository.GlobalStatesRepository
-import mega.privacy.android.app.domain.repository.RecentActionsRepository
-import mega.privacy.android.app.domain.repository.TransfersRepository
+import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.LoginRepository
-import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PhotosRepository
-import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
-import mega.privacy.android.domain.repository.SortOrderRepository
-import mega.privacy.android.domain.repository.SupportRepository
+import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
@@ -70,9 +58,6 @@ abstract class RepositoryModule {
     abstract fun bindCameraUploadRepository(repository: DefaultCameraUploadRepository): CameraUploadRepository
 
     @Binds
-    abstract fun bindChatRepository(repository: DefaultChatRepository): ChatRepository
-
-    @Binds
     abstract fun bindFilesRepository(repository: DefaultFilesRepository): FilesRepository
 
     @Binds
@@ -88,31 +73,13 @@ abstract class RepositoryModule {
     abstract fun bindGlobalUpdatesRepository(repository: DefaultGlobalStatesRepository): GlobalStatesRepository
 
     @Binds
-    abstract fun bindSupportRepository(implementation: DefaultSupportRepository): SupportRepository
-
-    @Binds
     abstract fun bindGetImageRepository(repository: DefaultImageRepository): ImageRepository
-
-    @Binds
-    abstract fun bindNotificationsRepository(repository: DefaultNotificationsRepository): NotificationsRepository
 
     @Binds
     abstract fun bindContactsRepository(repository: DefaultContactsRepository): ContactsRepository
 
     @Binds
-    abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository
-
-    @Binds
     abstract fun bindLoginRepository(repository: DefaultLoginRepository): LoginRepository
-
-    @Binds
-    abstract fun bindTransfersRepository(repository: DefaultTransfersRepository): TransfersRepository
-
-    /**
-     * Bind domain transfers repository
-     */
-    @Binds
-    abstract fun bindDomainTransfersRepository(repository: DefaultTransfersRepository): DomainTransferRepository
 
     @Binds
     @Singleton
@@ -121,15 +88,12 @@ abstract class RepositoryModule {
     @Binds
     abstract fun bindPhotosRepository(repository: DefaultPhotosRepository): PhotosRepository
 
-    /**
-     * Bind recent actions repository
-     */
     @Binds
-    abstract fun bindRecentActionsRepository(repository: DefaultRecentActionsRepository): RecentActionsRepository
+    abstract fun bindTransfersRepository(repository: DefaultTransfersRepository): TransfersRepository
 
     /**
-     * Bind sort order repository
+     * Bind domain transfers repository
      */
     @Binds
-    abstract fun bindSortOrderRepository(repository: DefaultSortOrderRepository): SortOrderRepository
+    abstract fun bindDomainTransfersRepository(repository: DefaultTransfersRepository): TransferRepository
 }

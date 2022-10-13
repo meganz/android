@@ -32,7 +32,6 @@ import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.data.repository.DefaultPushesRepository.Companion.PUSH_TOKEN
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -71,8 +70,8 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.repository.DefaultPushesRepository.Companion.PUSH_TOKEN
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.SyncRecordType
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError

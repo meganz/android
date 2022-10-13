@@ -1,15 +1,14 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import mega.privacy.android.app.data.extensions.failWithError
-import mega.privacy.android.app.data.extensions.toException
+import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
-import mega.privacy.android.app.utils.Constants.MAIL_SUPPORT
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.domain.repository.SupportRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaTransfer
@@ -23,7 +22,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @property megaApi
  */
-class DefaultSupportRepository @Inject constructor(
+internal class DefaultSupportRepository @Inject constructor(
     private val megaApi: MegaApiGateway,
 ) : SupportRepository {
     override suspend fun logTicket(ticketContent: String) = suspendCoroutine<Unit> { continuation ->
@@ -80,5 +79,5 @@ class DefaultSupportRepository @Inject constructor(
                 "A temporary error occurred whilst uploading log files to support")
         }
 
-    override suspend fun getSupportEmail() = MAIL_SUPPORT
+    override suspend fun getSupportEmail() = "support@mega.nz"
 }
