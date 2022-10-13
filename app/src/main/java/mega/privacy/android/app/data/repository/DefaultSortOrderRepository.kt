@@ -25,24 +25,24 @@ class DefaultSortOrderRepository @Inject constructor(
     private val sortOrderIntMapper: SortOrderIntMapper,
 ) : SortOrderRepository {
 
-    override suspend fun getCameraSortOrder(): SortOrder = withContext(ioDispatcher) {
-        sortOrderMapper(megaLocalStorageGateway.getCameraSortOrder())!!
+    override suspend fun getCameraSortOrder(): SortOrder? = withContext(ioDispatcher) {
+        sortOrderMapper(megaLocalStorageGateway.getCameraSortOrder())
     }
 
-    override suspend fun getCloudSortOrder(): SortOrder = withContext(ioDispatcher) {
-        sortOrderMapper(megaLocalStorageGateway.getCloudSortOrder())!!
+    override suspend fun getCloudSortOrder(): SortOrder? = withContext(ioDispatcher) {
+        sortOrderMapper(megaLocalStorageGateway.getCloudSortOrder())
     }
 
-    override suspend fun getLinksSortOrder(): SortOrder = withContext(ioDispatcher) {
-        sortOrderMapper(megaLocalStorageGateway.getLinksSortOrder())!!
+    override suspend fun getLinksSortOrder(): SortOrder? = withContext(ioDispatcher) {
+        sortOrderMapper(megaLocalStorageGateway.getLinksSortOrder())
     }
 
-    override suspend fun getOthersSortOrder(): SortOrder = withContext(ioDispatcher) {
-        sortOrderMapper(megaLocalStorageGateway.getOthersSortOrder())!!
+    override suspend fun getOthersSortOrder(): SortOrder? = withContext(ioDispatcher) {
+        sortOrderMapper(megaLocalStorageGateway.getOthersSortOrder())
     }
 
-    override suspend fun getOfflineSortOrder(): SortOrder = withContext(ioDispatcher) {
-        sortOrderMapper(megaLocalStorageGateway.getOfflineSortOrder())!!
+    override suspend fun getOfflineSortOrder(): SortOrder? = withContext(ioDispatcher) {
+        sortOrderMapper(megaLocalStorageGateway.getOfflineSortOrder())
     }
 
     override suspend fun setOfflineSortOrder(order: SortOrder) = withContext(ioDispatcher) {

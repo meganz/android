@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.repository.FilesRepository
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -28,35 +29,45 @@ class SortOrderUseCases {
      */
     @Provides
     fun provideGetCloudSortOrder(sortOrderRepository: SortOrderRepository): GetCloudSortOrder =
-        GetCloudSortOrder(sortOrderRepository::getCloudSortOrder)
+        GetCloudSortOrder {
+            sortOrderRepository.getCloudSortOrder() ?: SortOrder.ORDER_DEFAULT_ASC
+        }
 
     /**
      * Provide the GetCameraSortOrder implementation
      */
     @Provides
     fun provideGetCameraSortOrder(sortOrderRepository: SortOrderRepository): GetCameraSortOrder =
-        GetCameraSortOrder(sortOrderRepository::getCameraSortOrder)
+        GetCameraSortOrder {
+            sortOrderRepository.getCameraSortOrder() ?: SortOrder.ORDER_MODIFICATION_DESC
+        }
 
     /**
      * Provide the GetOthersSortOrder implementation
      */
     @Provides
     fun provideGetOthersSortOrder(sortOrderRepository: SortOrderRepository): GetOthersSortOrder =
-        GetOthersSortOrder(sortOrderRepository::getOthersSortOrder)
+        GetOthersSortOrder {
+            sortOrderRepository.getOthersSortOrder() ?: SortOrder.ORDER_DEFAULT_ASC
+        }
 
     /**
      * Provide the GetLinksSortOrder implementation
      */
     @Provides
     fun provideGetLinksSortOrder(sortOrderRepository: SortOrderRepository): GetLinksSortOrder =
-        GetLinksSortOrder(sortOrderRepository::getLinksSortOrder)
+        GetLinksSortOrder {
+            sortOrderRepository.getLinksSortOrder() ?: SortOrder.ORDER_DEFAULT_ASC
+        }
 
     /**
      * Provide the GetOfflineSortOrder implementation
      */
     @Provides
     fun provideGetOfflineSortOrder(sortOrderRepository: SortOrderRepository): GetOfflineSortOrder =
-        GetOfflineSortOrder(sortOrderRepository::getOfflineSortOrder)
+        GetOfflineSortOrder {
+            sortOrderRepository.getOfflineSortOrder() ?: SortOrder.ORDER_DEFAULT_ASC
+        }
 
     /**
      * Provide the SetOfflineSortOrder implementation
