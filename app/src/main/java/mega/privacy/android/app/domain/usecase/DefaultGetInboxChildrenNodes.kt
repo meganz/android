@@ -1,6 +1,5 @@
 package mega.privacy.android.app.domain.usecase
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -30,11 +29,9 @@ class DefaultGetInboxChildrenNodes @Inject constructor(
      *
      * @return the list of Inbox Children Nodes, or an empty list if the Inbox Node does not exist
      */
-    override fun invoke(): Flow<List<MegaNode>> {
-        return flow {
-            emit(getInboxChildrenNodes())
-            emitAll(monitorNodeUpdates().map { getInboxChildrenNodes() })
-        }
+    override fun invoke() = flow {
+        emit(getInboxChildrenNodes())
+        emitAll(monitorNodeUpdates().map { getInboxChildrenNodes() })
     }
 
     /**
@@ -52,5 +49,4 @@ class DefaultGetInboxChildrenNodes @Inject constructor(
                     order = getCloudSortOrder(),
                 )
             }.orEmpty()
-
 }
