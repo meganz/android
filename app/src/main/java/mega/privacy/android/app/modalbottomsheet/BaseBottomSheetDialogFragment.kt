@@ -18,13 +18,16 @@ import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.R
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.app.utils.Util.getNavigationBarHeight
+import mega.privacy.android.app.utils.Util.getStatusBarHeight
+import mega.privacy.android.app.utils.Util.isDarkMode
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Inject
@@ -74,7 +77,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     lateinit var megaChatApi: MegaChatApiAndroid
 
     @Inject
-    lateinit var dbH: DatabaseHandler
+    lateinit var dbH: LegacyDatabaseHandler
 
     protected lateinit var contentView: View
     protected lateinit var itemsLayout: View

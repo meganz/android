@@ -1,8 +1,8 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -18,7 +18,7 @@ import javax.inject.Inject
  * @property sortOrderMapper
  * @property sortOrderIntMapper
  */
-class DefaultSortOrderRepository @Inject constructor(
+internal class DefaultSortOrderRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val sortOrderMapper: SortOrderMapper,

@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.app.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper

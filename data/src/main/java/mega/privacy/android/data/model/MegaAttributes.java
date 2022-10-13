@@ -1,4 +1,4 @@
-package mega.privacy.android.app;
+package mega.privacy.android.data.model;
 
 import androidx.annotation.NonNull;
 

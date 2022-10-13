@@ -7,10 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.MediaCardType
@@ -21,6 +18,9 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.model.MegaPreferences
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError

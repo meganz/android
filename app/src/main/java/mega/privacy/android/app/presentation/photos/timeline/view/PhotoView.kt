@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.photos.albums.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.model.ZoomLevel
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.photos.Photo
@@ -47,11 +48,7 @@ fun PhotoView(
     currentZoomLevel: ZoomLevel,
     onClick: (Photo) -> Unit,
     onLongPress: (Photo) -> Unit,
-    downloadPhotoCover: suspend (
-        isPreview: Boolean,
-        photo: Photo,
-        callback: (success: Boolean) -> Unit,
-    ) -> Unit,
+    downloadPhoto: PhotoDownload,
 ) {
     var modifier = remember {
         when (currentZoomLevel) {
@@ -81,7 +78,7 @@ fun PhotoView(
         PhotoCoverView(
             photo = photo,
             currentZoomLevel = currentZoomLevel,
-            downloadPhotoCover = downloadPhotoCover,
+            downloadPhoto = downloadPhoto,
             modifier = Modifier
                 .fillMaxSize()
                 .combinedClickable(
@@ -131,11 +128,7 @@ fun PhotoCoverView(
     photo: Photo,
     currentZoomLevel: ZoomLevel,
     modifier: Modifier,
-    downloadPhotoCover: suspend (
-        isPreview: Boolean,
-        photo: Photo,
-        callback: (success: Boolean) -> Unit,
-    ) -> Unit,
+    downloadPhoto: PhotoDownload,
 ) {
     val configuration = LocalConfiguration.current
     val isDownloadPreview = isDownloadPreview(configuration, currentZoomLevel)
@@ -148,7 +141,7 @@ fun PhotoCoverView(
                 PhotoImageView(
                     photo = photo,
                     isPreview = isDownloadPreview,
-                    downloadPhotoCover = downloadPhotoCover
+                    downloadPhoto = downloadPhoto
                 )
                 if (photo.isFavourite) {
                     Image(
@@ -164,7 +157,7 @@ fun PhotoCoverView(
                 PhotoImageView(
                     photo = photo,
                     isPreview = isDownloadPreview,
-                    downloadPhotoCover = downloadPhotoCover
+                    downloadPhoto = downloadPhoto
                 )
                 Spacer(modifier = Modifier
                     .matchParentSize()
@@ -200,14 +193,10 @@ fun PhotoCoverView(
 fun PhotoImageView(
     photo: Photo,
     isPreview: Boolean,
-    downloadPhotoCover: suspend (
-        isPreview: Boolean,
-        photo: Photo,
-        callback: (success: Boolean) -> Unit,
-    ) -> Unit,
+    downloadPhoto: PhotoDownload,
 ) {
     val imageState = produceState<String?>(initialValue = null) {
-        downloadPhotoCover(isPreview, photo) { downloadSuccess ->
+        downloadPhoto(isPreview, photo) { downloadSuccess ->
             if (downloadSuccess) {
                 value = if (isPreview) {
                     photo.previewFilePath

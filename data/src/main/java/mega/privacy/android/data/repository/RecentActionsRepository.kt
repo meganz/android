@@ -1,4 +1,4 @@
-package mega.privacy.android.app.domain.repository
+package mega.privacy.android.data.repository
 
 import nz.mega.sdk.MegaRecentActionBucket
 

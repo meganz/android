@@ -28,12 +28,12 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.isLoggingIn
-import mega.privacy.android.app.MegaPreferences
+import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
-import mega.privacy.android.app.data.model.UserCredentials
+import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.interfaces.ActionNodeCallback

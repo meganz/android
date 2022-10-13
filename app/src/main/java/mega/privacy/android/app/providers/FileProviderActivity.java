@@ -78,14 +78,14 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.BaseActivity;
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
-import mega.privacy.android.app.data.model.UserCredentials;
+import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.app.main.providers.CloudDriveProviderFragment;
 import mega.privacy.android.app.main.providers.IncomingSharesProviderFragment;
 import mega.privacy.android.app.main.providers.ProviderPageAdapter;

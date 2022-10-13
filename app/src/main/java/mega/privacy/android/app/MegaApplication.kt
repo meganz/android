@@ -56,6 +56,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContextUtils.getAvailableMemory
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams.get
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.InitialiseLogging
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
@@ -114,7 +115,7 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     lateinit var megaChatApi: MegaChatApiAndroid
 
     @Inject
-    lateinit var dbH: DatabaseHandler
+    lateinit var dbH: LegacyDatabaseHandler
 
     @Inject
     lateinit var getCookieSettingsUseCase: GetCookieSettingsUseCase

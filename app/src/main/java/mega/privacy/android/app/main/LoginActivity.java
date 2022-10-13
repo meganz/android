@@ -58,7 +58,8 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.BaseActivity;
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.LegacyDatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -97,7 +98,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     public String accountBlocked = null;
 
     @Inject
-    DatabaseHandler dbH;
+    LegacyDatabaseHandler dbH;
     @Inject
     MegaChatRequestHandler chatRequestHandler;
 

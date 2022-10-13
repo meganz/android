@@ -46,7 +46,8 @@ import java.util.List;
 import java.util.Map;
 
 import kotlin.Unit;
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.LegacyDatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
@@ -127,7 +128,7 @@ public class OfflineUtils {
         }
     }
 
-    public static void removeOffline(MegaOffline mOffDelete, DatabaseHandler dbH, Context context) {
+    public static void removeOffline(MegaOffline mOffDelete, LegacyDatabaseHandler dbH, Context context) {
 
         if (mOffDelete == null) {
             return;
@@ -166,7 +167,7 @@ public class OfflineUtils {
 
     }
 
-    public static void updateParentOfflineStatus(int parentId, DatabaseHandler dbH) {
+    public static void updateParentOfflineStatus(int parentId, LegacyDatabaseHandler dbH) {
         ArrayList<MegaOffline> offlineSiblings = dbH.findByParentId(parentId);
 
         if (offlineSiblings.size() > 0) {
@@ -183,7 +184,7 @@ public class OfflineUtils {
         }
     }
 
-    public static void deleteChildrenDB(ArrayList<MegaOffline> mOffList, DatabaseHandler dbH) {
+    public static void deleteChildrenDB(ArrayList<MegaOffline> mOffList, LegacyDatabaseHandler dbH) {
 
         Timber.d("deleteChildenDB");
         MegaOffline mOffDelete = null;
@@ -203,7 +204,7 @@ public class OfflineUtils {
 
     public static boolean availableOffline(Context context, MegaNode node) {
 
-        DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
+        LegacyDatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
 
         if (dbH.exists(node.getHandle())) {
             Timber.d("Exists OFFLINE in the DB!!!");
@@ -263,7 +264,7 @@ public class OfflineUtils {
      * @param handle  handle of the offline node
      */
     public static String getOfflineFolderName(Context context, long handle) {
-        DatabaseHandler dbHandler = DbHandlerModuleKt.getDbHandler();
+        LegacyDatabaseHandler dbHandler = DbHandlerModuleKt.getDbHandler();
         MegaOffline node = dbHandler.findByHandle(handle);
         if (node == null) {
             return "";
@@ -378,7 +379,7 @@ public class OfflineUtils {
         }
     }
 
-    public static void saveOffline(Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, MegaNode node, String path) {
+    public static void saveOffline(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, MegaNode node, String path) {
         Timber.d("Destination: %s", path);
 
         File destination = new File(path);
@@ -408,7 +409,7 @@ public class OfflineUtils {
         }
     }
 
-    public static void saveOfflineChatFile(DatabaseHandler dbH, MegaTransfer transfer) {
+    public static void saveOfflineChatFile(LegacyDatabaseHandler dbH, MegaTransfer transfer) {
         Timber.d("saveOfflineChatFile: %d %s", transfer.getNodeHandle(), transfer.getFileName());
 
         MegaOffline mOffInsert = new MegaOffline(Long.toString(transfer.getNodeHandle()), "/", transfer.getFileName(), -1, DB_FILE, 0, "-1");
@@ -433,7 +434,7 @@ public class OfflineUtils {
         return MegaOffline.OTHER;
     }
 
-    private static void insertDB(Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, ArrayList<MegaNode> nodesToDB, boolean fromInbox) {
+    private static void insertDB(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, ArrayList<MegaNode> nodesToDB, boolean fromInbox) {
         Timber.d("insertDB");
 
         MegaNode parentNode = null;
@@ -521,7 +522,7 @@ public class OfflineUtils {
     }
 
     //Insert for incoming
-    private static void insertIncomingParentDB(Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, MegaNode parentNode) {
+    private static void insertIncomingParentDB(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, MegaNode parentNode) {
         Timber.d("insertIncomingParentDB");
 
         String fileOrFolder = isFileOrFolder(parentNode);
@@ -566,7 +567,7 @@ public class OfflineUtils {
         Timber.d("Test insert B: %s", checkInsert);
     }
 
-    private static void insertParentDB(Context context, MegaApiAndroid megaApi, DatabaseHandler dbH, MegaNode parentNode, boolean fromInbox) {
+    private static void insertParentDB(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, MegaNode parentNode, boolean fromInbox) {
         Timber.d("insertParentDB");
 
         String fileOrFolder = isFileOrFolder(parentNode);
@@ -629,7 +630,7 @@ public class OfflineUtils {
 
         if (megaApi == null || megaApi.getRootNode() == null) return;
 
-        DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
+        LegacyDatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
         ArrayList<MegaOffline> offlineFiles = dbH.getOfflineFiles();
 
         if (offlineFiles == null || offlineFiles.isEmpty()) return; //No files to move
@@ -744,7 +745,7 @@ public class OfflineUtils {
      * @param nodeHandle Offline node handle to be shared
      */
     public static void shareOfflineNode(Context context, Long nodeHandle) {
-        DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
+        LegacyDatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
         MegaOffline node = dbH.findByHandle(nodeHandle);
         if (node == null) return;
 
@@ -829,7 +830,7 @@ public class OfflineUtils {
      * @param nodeHandle Offline node handle to be open with
      */
     public static void openWithOffline(Context context, Long nodeHandle) {
-        DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
+        LegacyDatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
         MegaOffline node = dbH.findByHandle(nodeHandle);
         if (node == null) return;
 

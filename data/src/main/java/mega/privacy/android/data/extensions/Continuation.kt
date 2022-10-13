@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.extensions
+package mega.privacy.android.data.extensions
 
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaChatError
