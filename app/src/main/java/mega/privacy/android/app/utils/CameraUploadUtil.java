@@ -14,91 +14,25 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 
 import java.io.File;
 
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.RenameListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.MegaPreferences;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
 public class CameraUploadUtil {
 
-    /**
-     * Keys for backing up time stamps
-     */
-    private static final String KEY_CAM_SYNC_TIMESTAMP = "KEY_CAM_SYNC_TIMESTAMP";
-    private static final String KEY_CAM_VIDEO_SYNC_TIMESTAMP = "KEY_CAM_VIDEO_SYNC_TIMESTAMP";
-    private static final String KEY_SEC_SYNC_TIMESTAMP = "KEY_SEC_SYNC_TIMESTAMP";
-    private static final String KEY_SEC_VIDEO_SYNC_TIMESTAMP = "KEY_SEC_VIDEO_SYNC_TIMESTAMP";
-    private static final String KEY_PRIMARY_HANDLE = "KEY_PRIMARY_HANDLE";
-    private static final String KEY_SECONDARY_HANDLE = "KEY_SECONDARY_HANDLE";
-    private static final String LAST_CAM_SYNC_TIMESTAMP_FILE = "LAST_CAM_SYNC_TIMESTAMP_FILE";
-
     private static final MegaApplication app = MegaApplication.getInstance();
     private static final DatabaseHandler dbH = app.getDbH();
-
-    /**
-     * The method is to delete the timestamps backup in share preference
-     */
-    private static void clearPrimaryBackUp() {
-        app.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE).edit()
-                .putString(KEY_CAM_SYNC_TIMESTAMP, "")
-                .putString(KEY_CAM_VIDEO_SYNC_TIMESTAMP, "")
-                .putLong(KEY_PRIMARY_HANDLE, -2L)
-                .apply();
-    }
-
-    private static void clearSecondaryBackUp() {
-        app.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE).edit()
-                .putString(KEY_SEC_SYNC_TIMESTAMP, "")
-                .putString(KEY_SEC_VIDEO_SYNC_TIMESTAMP, "")
-                .putLong(KEY_SECONDARY_HANDLE, -2L)
-                .apply();
-    }
-
-    /**
-     * If the handle matches the previous secondary folder's handle, restore the time stamp from stamps
-     * if not clean the sync record from previous primary folder
-     */
-    public static void restoreSecondaryTimestampsAndSyncRecordProcess() {
-        SharedPreferences sharedPreferences = app.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
-        long backupedHanlde = sharedPreferences.getLong(KEY_SECONDARY_HANDLE, -2);
-        long detectedSecondaryKey = getSecondaryFolderHandle();
-        Timber.d("Secondary handle in local is: %d, backuped handle is: %d", detectedSecondaryKey, backupedHanlde);
-        if (backupedHanlde == detectedSecondaryKey) {
-            // if the secondary handle matches to previous deleted secondary folder's handle, restore the time stamp
-            String secSyncStamp = sharedPreferences.getString(KEY_SEC_SYNC_TIMESTAMP, "");
-            if (!isTextEmpty(secSyncStamp)) {
-                try {
-                    dbH.setSecSyncTimeStamp(Long.parseLong(secSyncStamp));
-                } catch (Exception ex) {
-                    Timber.e(ex);
-                }
-            }
-
-            String secVideoSyncStamp = sharedPreferences.getString(KEY_SEC_VIDEO_SYNC_TIMESTAMP, "");
-            if (!isTextEmpty(secVideoSyncStamp)) {
-                try {
-                    dbH.setSecVideoSyncTimeStamp(Long.parseLong(secVideoSyncStamp));
-                } catch (Exception ex) {
-                    Timber.e(ex);
-                }
-            }
-        } else {
-            // when secondary target folder has been changed, delete secondary sync records.
-            dbH.deleteAllSecondarySyncRecords();
-        }
-        clearSecondaryBackUp();
-    }
 
     /**
      * set all the time stamps to 0 for uploading, clean the cache directory for gps process
