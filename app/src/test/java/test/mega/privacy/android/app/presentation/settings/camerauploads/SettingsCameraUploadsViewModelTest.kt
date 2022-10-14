@@ -34,6 +34,7 @@ class SettingsCameraUploadsViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = SettingsCameraUploadsViewModel(
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
+            restorePrimaryTimestamps = mock()
         )
     }
 

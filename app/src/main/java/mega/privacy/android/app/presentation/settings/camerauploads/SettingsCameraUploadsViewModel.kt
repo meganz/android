@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
+import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import javax.inject.Inject
 
 /**
@@ -21,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
+    private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -66,4 +68,14 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun setTriggerCameraUploadsState(updatedValue: Boolean) =
         _state.update { it.copy(shouldTriggerCameraUploads = updatedValue) }
+
+    /**
+     * If the handle matches the previous primary folder's handle, restore the time stamp from stamps
+     * if not clean the sync record from previous primary folder
+     */
+    fun restorePrimaryTimestampsAndSyncRecordProcess() {
+        viewModelScope.launch {
+            restorePrimaryTimestamps()
+        }
+    }
 }

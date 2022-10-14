@@ -65,6 +65,7 @@ import mega.privacy.android.domain.usecase.DefaultGetUploadFolderHandle
 import mega.privacy.android.domain.usecase.DefaultIsChargingRequired
 import mega.privacy.android.domain.usecase.DefaultResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.DefaultResetMediaUploadTimeStamps
+import mega.privacy.android.domain.usecase.DefaultRestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.DefaultShouldCompressVideo
 import mega.privacy.android.domain.usecase.DefaultUpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
@@ -93,6 +94,7 @@ import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
+import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
@@ -511,4 +513,12 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindBackupTimeStampsAndFolderHandle(defaultBackupTimeStampsAndFolderHandle: DefaultBackupTimeStampsAndFolderHandle): BackupTimeStampsAndFolderHandle
+
+    /**
+     * Provide the RestorePrimaryTimestamps implementation
+     */
+    @Binds
+    abstract fun bindRestorePrimaryTimestamps(defaultRestorePrimaryTimestamps: DefaultRestorePrimaryTimestamps): RestorePrimaryTimestamps
+
+
 }
