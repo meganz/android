@@ -25,23 +25,23 @@ internal class DefaultSortOrderRepository @Inject constructor(
     private val sortOrderIntMapper: SortOrderIntMapper,
 ) : SortOrderRepository {
 
-    override suspend fun getCameraSortOrder(): SortOrder = withContext(ioDispatcher) {
+    override suspend fun getCameraSortOrder(): SortOrder? = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getCameraSortOrder())
     }
 
-    override suspend fun getCloudSortOrder(): SortOrder = withContext(ioDispatcher) {
+    override suspend fun getCloudSortOrder(): SortOrder? = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getCloudSortOrder())
     }
 
-    override suspend fun getLinksSortOrder(): SortOrder = withContext(ioDispatcher) {
+    override suspend fun getLinksSortOrder(): SortOrder? = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getLinksSortOrder())
     }
 
-    override suspend fun getOthersSortOrder(): SortOrder = withContext(ioDispatcher) {
+    override suspend fun getOthersSortOrder(): SortOrder? = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getOthersSortOrder())
     }
 
-    override suspend fun getOfflineSortOrder(): SortOrder = withContext(ioDispatcher) {
+    override suspend fun getOfflineSortOrder(): SortOrder? = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getOfflineSortOrder())
     }
 

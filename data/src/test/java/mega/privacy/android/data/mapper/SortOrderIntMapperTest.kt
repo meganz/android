@@ -9,7 +9,7 @@ import org.junit.Test
  * SortOrder Int mapper test
  */
 class SortOrderIntMapperTest {
-    private val underTest = ::toInt
+    private val underTest = ::sortOrderToInt
 
     private val sortOrderIntMap = mapOf(SortOrder.ORDER_NONE to MegaApiJava.ORDER_NONE,
         SortOrder.ORDER_DEFAULT_ASC to MegaApiJava.ORDER_DEFAULT_ASC,
@@ -34,16 +34,9 @@ class SortOrderIntMapperTest {
         SortOrder.ORDER_FAV_DESC to MegaApiJava.ORDER_FAV_DESC)
 
     @Test
-    fun `test that mapper returns correct value when input is in the mapping range`() {
-        val randomIndex = (Math.random() * sortOrderIntMap.size).toInt()
-        val input = sortOrderIntMap.keys.elementAt(randomIndex)
-        val expected = sortOrderIntMap.values.elementAt(randomIndex)
-        assertThat(underTest(input)).isEqualTo(expected)
-    }
-
-    @Test
-    fun `test that mapper returns default value when input is null`() {
-        val expected = MegaApiJava.ORDER_NONE
-        assertThat(underTest(null)).isEqualTo(expected)
+    fun `test that sort order is mapped correctly`() {
+        sortOrderIntMap.forEach { (key, value) ->
+            assertThat(underTest(key)).isEqualTo(value)
+        }
     }
 }

@@ -122,7 +122,7 @@ class DefaultFilesRepository @Inject constructor(
             megaApiGateway.getChildNode(parentNode, name)
         }
 
-    override suspend fun getChildrenNode(parentNode: MegaNode, order: SortOrder?): List<MegaNode> =
+    override suspend fun getChildrenNode(parentNode: MegaNode, order: SortOrder): List<MegaNode> =
         withContext(ioDispatcher) {
             megaApiGateway.getChildrenByNode(parentNode, sortOrderIntMapper(order))
         }
