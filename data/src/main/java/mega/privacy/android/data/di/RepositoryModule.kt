@@ -4,10 +4,14 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.data.repository.DefaultAlbumsRepository
+import mega.privacy.android.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
 import mega.privacy.android.data.repository.DefaultEnvironmentRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
+import mega.privacy.android.data.repository.DefaultGlobalStatesRepository
+import mega.privacy.android.data.repository.DefaultImageRepository
 import mega.privacy.android.data.repository.DefaultNetworkRepository
 import mega.privacy.android.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.data.repository.DefaultPushesRepository
@@ -15,11 +19,15 @@ import mega.privacy.android.data.repository.DefaultRecentActionsRepository
 import mega.privacy.android.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.data.repository.DefaultSupportRepository
+import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.RecentActionsRepository
+import mega.privacy.android.domain.repository.AlbumsRepository
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
+import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PushesRepository
@@ -70,4 +78,16 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository
+
+    @Binds
+    abstract fun bindCameraUploadRepository(repository: DefaultCameraUploadRepository): CameraUploadRepository
+
+    @Binds
+    abstract fun bindAlbumsRepository(repository: DefaultAlbumsRepository): AlbumsRepository
+
+    @Binds
+    abstract fun bindGlobalUpdatesRepository(repository: DefaultGlobalStatesRepository): GlobalStatesRepository
+
+    @Binds
+    abstract fun bindGetImageRepository(repository: DefaultImageRepository): ImageRepository
 }

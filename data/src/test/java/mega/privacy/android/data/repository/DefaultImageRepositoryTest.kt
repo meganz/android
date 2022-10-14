@@ -1,13 +1,12 @@
-package test.mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheGateway
-import mega.privacy.android.app.data.repository.DefaultImageRepository
-import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ImageRepository
 import nz.mega.sdk.MegaApiJava
@@ -47,7 +46,7 @@ class DefaultImageRepositoryTest {
             val node = mock<MegaNode>()
             val thumbnailName = "test"
             val expectedPath =
-                "${cacheDir.path}/${CacheFolderManager.THUMBNAIL_FOLDER}/$thumbnailName"
+                "${cacheDir.path}/${CacheFolderConstant.THUMBNAIL_FOLDER}/$thumbnailName"
             val thumbnail = File(expectedPath)
 
             whenever(node.base64Handle).thenReturn(thumbnailName)
@@ -79,7 +78,7 @@ class DefaultImageRepositoryTest {
             val node = mock<MegaNode>()
             val thumbnailName = "test"
             val expectedPath =
-                "${cacheDir.path}/${CacheFolderManager.THUMBNAIL_FOLDER}/$thumbnailName"
+                "${cacheDir.path}/${CacheFolderConstant.THUMBNAIL_FOLDER}/$thumbnailName"
             val thumbnail = File(expectedPath)
 
             whenever(node.base64Handle).thenReturn(thumbnailName)
