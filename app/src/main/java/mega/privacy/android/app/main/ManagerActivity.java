@@ -8787,7 +8787,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         storageState = newStorageState;
-        app.setStorageState(storageState);
     }
 
     /**

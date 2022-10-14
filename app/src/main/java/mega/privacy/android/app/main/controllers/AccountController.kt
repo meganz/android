@@ -70,7 +70,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.repository.PushesRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -419,7 +418,6 @@ class AccountController(private val context: Context) {
 
             //Clear MyAccountInfo
             app.resetMyAccountInfo()
-            app.storageState = StorageState.Unknown
 
             // Clear get banner success flag
             LiveEventBus.get(Constants.EVENT_LOGOUT_CLEARED).post(null)
