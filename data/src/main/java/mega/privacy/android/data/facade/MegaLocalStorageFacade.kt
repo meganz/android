@@ -1,7 +1,5 @@
 package mega.privacy.android.data.facade
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.MegaAttributes
@@ -17,7 +15,6 @@ import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_LINK_CREATION_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -29,7 +26,6 @@ import javax.inject.Inject
  */
 internal class MegaLocalStorageFacade @Inject constructor(
     private val dbHandler: DatabaseHandler,
-    @ApplicationContext private val context: Context,
 ) : MegaLocalStorageGateway {
 
     override suspend fun getCamSyncHandle(): Long? =
@@ -152,17 +148,13 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun saveSyncRecord(record: SyncRecord) = dbHandler.saveSyncRecord(record)
 
-    override suspend fun getPhotoTimeStamp(): Long =
-        dbHandler.preferences?.camSyncTimeStamp?.toLongOrNull() ?: 0
+    override suspend fun getPhotoTimeStamp() = dbHandler.preferences?.camSyncTimeStamp
 
-    override suspend fun getSecondaryPhotoTimeStamp(): Long =
-        dbHandler.preferences?.secSyncTimeStamp?.toLongOrNull() ?: 0
+    override suspend fun getSecondaryPhotoTimeStamp() = dbHandler.preferences?.secSyncTimeStamp
 
-    override suspend fun getVideoTimeStamp(): Long =
-        dbHandler.preferences?.camVideoSyncTimeStamp?.toLongOrNull() ?: 0
+    override suspend fun getVideoTimeStamp() = dbHandler.preferences?.camVideoSyncTimeStamp
 
-    override suspend fun getSecondaryVideoTimeStamp(): Long =
-        dbHandler.preferences?.secVideoSyncTimeStamp?.toLongOrNull() ?: 0
+    override suspend fun getSecondaryVideoTimeStamp() = dbHandler.preferences?.secVideoSyncTimeStamp
 
     override suspend fun setPhotoTimeStamp(timeStamp: Long) =
         dbHandler.setCamSyncTimeStamp(timeStamp)
@@ -316,45 +308,15 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getPaymentMethodsTimeStamp(): String? =
         dbHandler.attributes?.paymentMethodsTimeStamp
 
-    override suspend fun backupTimestampsAndFolderHandle(
-        primaryUploadFolderHandle: Long,
-        secondaryUploadFolderHandle: Long,
-    ) {
-        val prefs = dbHandler.preferences
-        if (prefs == null) {
-            Timber.e("Preference is null, while backup.")
-            return
-        }
-        context.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE,
-            Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_CAM_SYNC_TIMESTAMP, prefs.camSyncTimeStamp)
-            .putString(KEY_CAM_VIDEO_SYNC_TIMESTAMP,
-                prefs.camVideoSyncTimeStamp)
-            .putString(KEY_SEC_SYNC_TIMESTAMP, prefs.secSyncTimeStamp)
-            .putString(KEY_SEC_VIDEO_SYNC_TIMESTAMP,
-                prefs.secVideoSyncTimeStamp)
-            .putLong(KEY_PRIMARY_HANDLE, primaryUploadFolderHandle)
-            .putLong(KEY_SECONDARY_HANDLE, secondaryUploadFolderHandle)
-            .apply()
-    }
-
     override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) {
         dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)
     }
 
-    companion object {
-        /**
-         * Keys for backing up time stamps
-         */
-        private const val KEY_CAM_SYNC_TIMESTAMP = "KEY_CAM_SYNC_TIMESTAMP"
-        private const val KEY_CAM_VIDEO_SYNC_TIMESTAMP = "KEY_CAM_VIDEO_SYNC_TIMESTAMP"
-        private const val KEY_SEC_SYNC_TIMESTAMP = "KEY_SEC_SYNC_TIMESTAMP"
-        private const val KEY_SEC_VIDEO_SYNC_TIMESTAMP = "KEY_SEC_VIDEO_SYNC_TIMESTAMP"
-        private const val KEY_PRIMARY_HANDLE = "KEY_PRIMARY_HANDLE"
-        private const val KEY_SECONDARY_HANDLE = "KEY_SECONDARY_HANDLE"
-        private const val LAST_CAM_SYNC_TIMESTAMP_FILE = "LAST_CAM_SYNC_TIMESTAMP_FILE"
+    override suspend fun deleteAllPrimarySyncRecords() {
+        dbHandler.deleteAllPrimarySyncRecords()
+    }
 
+    companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }
 }

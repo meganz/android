@@ -23,6 +23,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.StartScreenMapper
@@ -53,7 +54,11 @@ import kotlin.coroutines.suspendCoroutine
  * @property ioDispatcher
  * @property chatPreferencesGateway
  * @property callsPreferencesGateway
-
+ * @property appPreferencesGateway
+ * @property cacheFolderGateway
+ * @property uiPreferencesGateway
+ * @property startScreenMapper
+ * @property cameraTimestampsPreferenceGateway
  */
 @ExperimentalContracts
 class DefaultSettingsRepository @Inject constructor(
@@ -70,6 +75,7 @@ class DefaultSettingsRepository @Inject constructor(
     private val cacheFolderGateway: CacheFolderGateway,
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val startScreenMapper: StartScreenMapper,
+    private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway,
 ) : SettingsRepository {
     init {
         initialisePreferences()
@@ -345,4 +351,58 @@ class DefaultSettingsRepository @Inject constructor(
     override suspend fun setPreferredStartScreen(screen: StartScreen) {
         uiPreferencesGateway.setPreferredStartScreen(screen.id)
     }
+
+    override suspend fun backupTimestampsAndFolderHandle(
+        primaryUploadFolderHandle: Long,
+        secondaryUploadFolderHandle: Long,
+        camSyncTimeStamp: String?,
+        camVideoSyncTimeStamp: String?,
+        secSyncTimeStamp: String?,
+        secVideoSyncTimeStamp: String?,
+    ) {
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.backupTimestampsAndFolderHandle(
+                primaryUploadFolderHandle,
+                secondaryUploadFolderHandle,
+                camSyncTimeStamp,
+                camVideoSyncTimeStamp,
+                secSyncTimeStamp,
+                secVideoSyncTimeStamp)
+        }
+    }
+
+    override suspend fun getPrimaryHandle() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.getPrimaryHandle()
+        }
+
+    override suspend fun getSecondaryHandle() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.getSecondaryHandle()
+        }
+
+    override suspend fun getPrimaryFolderPhotoSyncTime() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.getPrimaryFolderPhotoSyncTime()
+        }
+
+    override suspend fun getSecondaryFolderPhotoSyncTime() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.getSecondaryFolderPhotoSyncTime()
+        }
+
+    override suspend fun getPrimaryFolderVideoSyncTime() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.getPrimaryFolderVideoSyncTime()
+        }
+
+    override suspend fun getSecondaryFolderVideoSyncTime() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.getSecondaryFolderVideoSyncTime()
+        }
+
+    override suspend fun clearPrimaryCameraSyncRecords() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.clearPrimaryCameraSyncRecords()
+        }
 }

@@ -6,6 +6,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
+import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -17,7 +18,11 @@ import javax.inject.Inject
 /**
  * Default implementation of [CameraUploadRepository]
  *
- * @property localStorageGateway MegaLocalStorageGateway
+ * @property localStorageGateway [MegaLocalStorageGateway]
+ * @property megaApiGateway [MegaApiGateway]
+ * @property fileAttributeGateway [FileAttributeGateway]
+ * @property cacheGateway [CacheGateway]
+ * @property syncRecordTypeIntMapper [SyncRecordTypeIntMapper]
  * @property ioDispatcher CoroutineDispatcher
  */
 class DefaultCameraUploadRepository @Inject constructor(
@@ -140,7 +145,7 @@ class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.saveSyncRecord(record)
     }
 
-    override suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long {
+    override suspend fun getSyncTimeStamp(type: SyncTimeStamp): String? {
         return withContext(ioDispatcher) {
             when (type) {
                 SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.getPhotoTimeStamp()
@@ -286,13 +291,6 @@ class DefaultCameraUploadRepository @Inject constructor(
             fileAttributeGateway.getPhotoGPSCoordinates(filePath)
         }
 
-    override suspend fun backupTimestampsAndFolderHandle() = withContext(ioDispatcher) {
-        val primaryHandle = localStorageGateway.getCamSyncHandle() ?: getInvalidHandle()
-        val secondaryHandle =
-            localStorageGateway.getMegaHandleSecondaryFolder() ?: getInvalidHandle()
-        localStorageGateway.backupTimestampsAndFolderHandle(primaryHandle, secondaryHandle)
-    }
-
     override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) =
         withContext(ioDispatcher) {
             localStorageGateway.saveShouldClearCamSyncRecords(clearCamSyncRecords)
@@ -300,5 +298,9 @@ class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun clearCacheDirectory() = withContext(ioDispatcher) {
         cacheGateway.clearCacheDirectory()
+    }
+
+    override suspend fun deleteAllPrimarySyncRecords() = withContext(ioDispatcher) {
+        localStorageGateway.deleteAllPrimarySyncRecords()
     }
 }

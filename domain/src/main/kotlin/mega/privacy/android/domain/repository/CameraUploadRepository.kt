@@ -54,7 +54,7 @@ interface CameraUploadRepository {
      *
      * @return sync timestamp
      */
-    suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long
+    suspend fun getSyncTimeStamp(type: SyncTimeStamp): String?
 
     /**
      * Set camera upload sync timestamp
@@ -362,12 +362,6 @@ interface CameraUploadRepository {
     suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Float, Float>
 
     /**
-     * The method is to backup time stamps, primary upload folder and secondary folder in share preference after
-     * database records being cleaned
-     */
-    suspend fun backupTimestampsAndFolderHandle()
-
-    /**
      * This method is to clear Camera Sync Records from the Database
      *
      * @param clearCamSyncRecords the boolean setting whether to clean the cam record
@@ -378,4 +372,9 @@ interface CameraUploadRepository {
      * clear all the contents of Internal cache directory
      */
     suspend fun clearCacheDirectory()
+
+    /**
+     * Delete all Primary Sync Records
+     */
+    suspend fun deleteAllPrimarySyncRecords()
 }

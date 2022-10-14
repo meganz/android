@@ -60,7 +60,8 @@ class DefaultUpdateCameraUploadTimeStamp @Inject constructor(
         newTimeStamp: Long,
         timestampType: SyncTimeStamp,
     ) {
-        val currentTimeStamp = cameraUploadRepository.getSyncTimeStamp(timestampType)
+        val currentTimeStamp =
+            cameraUploadRepository.getSyncTimeStamp(timestampType)?.toLongOrNull() ?: 0L
         if (newTimeStamp > currentTimeStamp) {
             cameraUploadRepository.setSyncTimeStamp(newTimeStamp, timestampType)
         }

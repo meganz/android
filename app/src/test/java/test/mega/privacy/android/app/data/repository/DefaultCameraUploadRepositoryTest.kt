@@ -134,9 +134,9 @@ class DefaultCameraUploadRepositoryTest {
 
     @Test
     fun `test camera upload retrieves the correct sync time stamp`() = runTest {
-        whenever(localStorageGateway.getPhotoTimeStamp()).thenReturn(150L)
+        whenever(localStorageGateway.getPhotoTimeStamp()).thenReturn("150")
         assertThat(underTest.getSyncTimeStamp(SyncTimeStamp.PRIMARY_PHOTO)).isEqualTo(
-            150L
+            "150"
         )
     }
 

@@ -199,22 +199,22 @@ interface MegaLocalStorageGateway {
     /**
      * Get photo time stamp
      */
-    suspend fun getPhotoTimeStamp(): Long
+    suspend fun getPhotoTimeStamp(): String?
 
     /**
      * Get video time stamp
      */
-    suspend fun getVideoTimeStamp(): Long
+    suspend fun getVideoTimeStamp(): String?
 
     /**
      * Get secondary photo time stamp
      */
-    suspend fun getSecondaryPhotoTimeStamp(): Long
+    suspend fun getSecondaryPhotoTimeStamp(): String?
 
     /**
      * Get secondary video time stamp
      */
-    suspend fun getSecondaryVideoTimeStamp(): Long
+    suspend fun getSecondaryVideoTimeStamp(): String?
 
     /**
      * Set photo time stamp
@@ -488,20 +488,14 @@ interface MegaLocalStorageGateway {
     suspend fun getPaymentMethodsTimeStamp(): String?
 
     /**
-     * The method is to backup time stamps, primary upload folder and secondary folder in share preference after
-     * database records being cleaned
-     * @param primaryUploadFolderHandle
-     * @param secondaryUploadFolderHandle
-     */
-    suspend fun backupTimestampsAndFolderHandle(
-        primaryUploadFolderHandle: Long,
-        secondaryUploadFolderHandle: Long,
-    )
-
-    /**
      * This method is to clear Camera Sync Records from the Database
      *
      * @param clearCamSyncRecords the boolean setting whether to clean the cam record
      */
     suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean)
+
+    /**
+     * Delete all Primary Sync Records
+     */
+    suspend fun deleteAllPrimarySyncRecords()
 }

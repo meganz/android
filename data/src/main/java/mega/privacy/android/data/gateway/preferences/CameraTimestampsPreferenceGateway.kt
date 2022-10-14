@@ -53,4 +53,9 @@ interface CameraTimestampsPreferenceGateway {
      * @return [String] secondary folder video sync timestamp
      */
     suspend fun getSecondaryFolderVideoSyncTime(): String?
+
+    /**
+     * Clear Primary Sync Records from Preference
+     */
+    suspend fun clearPrimaryCameraSyncRecords()
 }
