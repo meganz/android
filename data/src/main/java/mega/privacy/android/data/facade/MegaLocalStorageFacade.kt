@@ -1,7 +1,5 @@
 package mega.privacy.android.data.facade
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.MegaAttributes
@@ -28,7 +26,6 @@ import javax.inject.Inject
  */
 internal class MegaLocalStorageFacade @Inject constructor(
     private val dbHandler: DatabaseHandler,
-    @ApplicationContext private val context: Context,
 ) : MegaLocalStorageGateway {
 
     override suspend fun getCamSyncHandle(): Long? =
