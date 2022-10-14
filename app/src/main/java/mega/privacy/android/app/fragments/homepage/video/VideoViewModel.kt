@@ -118,10 +118,7 @@ class VideoViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch {
-            sortOrder = getCloudSortOrder()
-            loadVideo(true)
-        }
+        fetchOrderAndLoadVideo(true)
 
         items.observeForever(loadFinishedObserver)
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
@@ -133,6 +130,25 @@ class VideoViewModel @Inject constructor(
                 loadVideo(true)
             }
         }
+    }
+
+    /**
+     * Fetch latest order & load video
+     * @param forceUpdate
+     */
+    private fun fetchOrderAndLoadVideo(forceUpdate: Boolean) {
+        viewModelScope.launch {
+            sortOrder = getCloudSortOrder()
+            loadVideo(forceUpdate)
+        }
+    }
+
+    /**
+     * On SortOrder change
+     * @param forceUpdate
+     */
+    fun onOrderChange(forceUpdate: Boolean) {
+        fetchOrderAndLoadVideo(forceUpdate)
     }
 
     /**
