@@ -59,9 +59,6 @@ internal abstract class RepositoryModule {
     @Binds
     abstract fun bindNotificationsRepository(repository: DefaultNotificationsRepository): NotificationsRepository
 
-    @Binds
-    abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository
-
     /**
      * Bind sort order repository
      */
@@ -70,4 +67,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindChatRepository(repository: DefaultChatRepository): ChatRepository
+
+    @Binds
+    abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository
 }
