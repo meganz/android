@@ -303,4 +303,8 @@ class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun deleteAllPrimarySyncRecords() = withContext(ioDispatcher) {
         localStorageGateway.deleteAllPrimarySyncRecords()
     }
+
+    override suspend fun deleteAllSecondarySyncRecords() = withContext(ioDispatcher) {
+        localStorageGateway.deleteAllSecondarySyncRecords()
+    }
 }

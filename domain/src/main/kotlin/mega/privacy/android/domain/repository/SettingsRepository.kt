@@ -392,4 +392,9 @@ interface SettingsRepository {
      * Clear Primary Sync Records from Preference
      */
     suspend fun clearPrimaryCameraSyncRecords()
+
+    /**
+     * Clear Secondary Sync Records from Preference
+     */
+    suspend fun clearSecondaryCameraSyncRecords()
 }

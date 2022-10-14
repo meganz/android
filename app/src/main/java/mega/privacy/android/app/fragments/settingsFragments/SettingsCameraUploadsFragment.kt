@@ -608,7 +608,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                             possibleSecondaryFolderHandle,
                             setAttrUserListener)
                     }
-                    CameraUploadUtil.restoreSecondaryTimestampsAndSyncRecordProcess()
+                    viewModel.restoreSecondaryTimestampsAndSyncRecordProcess()
                     dbH.setSecondaryUploadEnabled(true)
 
                     // To prevent user switch on/off rapidly. After set backup, will be re-enabled.

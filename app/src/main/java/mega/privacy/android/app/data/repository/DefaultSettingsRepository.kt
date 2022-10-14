@@ -405,4 +405,9 @@ class DefaultSettingsRepository @Inject constructor(
         withContext(ioDispatcher) {
             cameraTimestampsPreferenceGateway.clearPrimaryCameraSyncRecords()
         }
+
+    override suspend fun clearSecondaryCameraSyncRecords() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.clearSecondaryCameraSyncRecords()
+        }
 }
