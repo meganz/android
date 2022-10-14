@@ -295,4 +295,9 @@ interface DatabaseHandler {
     fun setContact(contact: MegaContactDB)
     fun findContactByHandle(handleParam: String?): MegaContactDB?
     fun findContactByEmail(mail: String?): MegaContactDB?
+
+    /**
+     * Is completed transfers empty
+     */
+    val isCompletedTransfersEmpty: Boolean
 }

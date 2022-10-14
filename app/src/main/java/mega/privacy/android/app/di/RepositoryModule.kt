@@ -12,9 +12,7 @@ import mega.privacy.android.app.data.repository.DefaultFilesRepository
 import mega.privacy.android.app.data.repository.DefaultLoginRepository
 import mega.privacy.android.app.data.repository.DefaultPhotosRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
-import mega.privacy.android.app.data.repository.DefaultTransfersRepository
 import mega.privacy.android.app.domain.repository.FilesRepository
-import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ContactsRepository
@@ -23,7 +21,6 @@ import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.SettingsRepository
-import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
@@ -67,13 +64,4 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPhotosRepository(repository: DefaultPhotosRepository): PhotosRepository
-
-    @Binds
-    abstract fun bindTransfersRepository(repository: DefaultTransfersRepository): TransfersRepository
-
-    /**
-     * Bind domain transfers repository
-     */
-    @Binds
-    abstract fun bindDomainTransfersRepository(repository: DefaultTransfersRepository): TransferRepository
 }
