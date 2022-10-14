@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.HasInboxChildren
-import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
@@ -40,13 +39,12 @@ class DefaultGetInboxChildrenNodes @Inject constructor(
      * @return the list of Inbox Children Nodes, or an empty list if the parent Inbox Node
      * is null or has no Children Nodes
      */
-    private suspend fun getInboxChildrenNodes(): List<MegaNode> =
-        takeIf { hasInboxChildren() }
-            ?.run { getInboxNode() }
-            ?.let { inboxNode ->
-                getChildrenNode(
-                    parent = inboxNode,
-                    order = getCloudSortOrder(),
-                )
-            }.orEmpty()
+    private suspend fun getInboxChildrenNodes() = takeIf { hasInboxChildren() }
+        ?.run { getInboxNode() }
+        ?.let { inboxNode ->
+            getChildrenNode(
+                parent = inboxNode,
+                order = getCloudSortOrder(),
+            )
+        }.orEmpty()
 }
