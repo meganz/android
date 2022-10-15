@@ -5,14 +5,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetRecentActions
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
+import mega.privacy.android.app.presentation.recentactions.model.RecentActionsState
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
@@ -25,6 +25,8 @@ import javax.inject.Inject
  *
  * @param getRecentActions
  * @param getVisibleContacts
+ * @param getVisibleContacts
+ * @param setHideRecentActivity
  * @param monitorNodeUpdates
  */
 @HiltViewModel
@@ -38,12 +40,11 @@ class RecentActionsViewModel @Inject constructor(
 
     private var _buckets = listOf<MegaRecentActionBucket>()
 
-    private val _recentActionsItems = MutableStateFlow<List<RecentActionItemType>>(emptyList())
+    /** private UI state */
+    private val _state = MutableStateFlow(RecentActionsState())
 
-    /**
-     * List of recent actions to display
-     */
-    val recentActionsItems = _recentActionsItems.asStateFlow()
+    /** public UI state */
+    val state: StateFlow<RecentActionsState> = _state
 
     /**
      * Selected recent actions bucket
@@ -51,28 +52,31 @@ class RecentActionsViewModel @Inject constructor(
     var selected: MegaRecentActionBucket? = null
 
     /**
-     * Snapshot of recent actions bucket list
+     * Snapshot of recent actions bucket list when a user select one item
      */
     var snapShotActionList: List<MegaRecentActionBucket>? = null
 
-    /**
-     * Monitor hide recent activity setting
-     */
-    val hideRecentActionsActivity =
-        monitorHideRecentActivity()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
-
     init {
+        updateRecentActions()
+
+        // monitor node updates
         viewModelScope.launch {
             monitorNodeUpdates().collectLatest {
                 updateRecentActions()
             }
         }
-        updateRecentActions()
+        // monitor hide recent activity preference
+        viewModelScope.launch {
+            monitorHideRecentActivity().collectLatest {
+                setUiHideRecentActivity(it)
+            }
+        }
     }
 
     /**
      * Set the selected recent actions bucket and current recent actions bucket list
+     *
+     * @param bucket
      */
     fun select(bucket: MegaRecentActionBucket) {
         selected = bucket
@@ -82,12 +86,28 @@ class RecentActionsViewModel @Inject constructor(
     /**
      * Disable hide recent actions activity setting
      */
-    fun disableHideRecentActionsActivitySetting() = viewModelScope.launch {
+    fun disableHideRecentActivitySetting() = viewModelScope.launch {
         setHideRecentActivity(false)
     }
 
     /**
-     * Update the recent actions list
+     * Set recent actions items ui state
+     *
+     * @param list
+     */
+    private fun setUiRecentActionsItems(list: List<RecentActionItemType>) {
+        _state.update { it.copy(recentActionItems = list) }
+    }
+
+    /**
+     * Set hide recent activity ui state
+     */
+    private fun setUiHideRecentActivity(hide: Boolean) {
+        _state.update { it.copy(hideRecentActivity = hide) }
+    }
+
+    /**
+     * Update the recent actions list by combination
      */
     private fun updateRecentActions() = viewModelScope.launch {
         val getRecentActions = async {
@@ -97,7 +117,8 @@ class RecentActionsViewModel @Inject constructor(
 
         val formattedList =
             formatRecentActions(getRecentActions.await(), getVisibleContacts.await())
-        _recentActionsItems.emit(formattedList)
+
+        setUiRecentActionsItems(formattedList)
     }
 
     /**

@@ -17,7 +17,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -81,7 +80,7 @@ class RecentActionsFragment : Fragment() {
         emptyText = binding.emptyTextRecents
         showActivityButton = binding.showActivityButton
         showActivityButton.setOnClickListener {
-            viewModel.disableHideRecentActionsActivitySetting()
+            viewModel.disableHideRecentActivitySetting()
         }
         emptySpanned = TextUtil.formatEmptyScreenText(requireContext(),
             StringResourcesUtils.getString(R.string.context_empty_recents))
@@ -101,18 +100,15 @@ class RecentActionsFragment : Fragment() {
         observeDragSupportEvents(viewLifecycleOwner, listView, Constants.VIEWER_FROM_RECETS)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.recentActionsItems.collectLatest {
-                    setRecentActions(it)
-                    displayRecentActionsActivity(viewModel.hideRecentActionsActivity.value, it.size)
-                    (requireActivity() as ManagerActivity).setToolbarTitle()
-                }
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.hideRecentActionsActivity.collectLatest {
-                    displayRecentActionsActivity(it, viewModel.recentActionsItems.value.size)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    Timber.d("Collect ui state")
+                    setRecentActions(it.recentActionItems)
+                    displayRecentActionsActivity(
+                        it.hideRecentActivity,
+                        it.recentActionItems.size
+                    )
+
                 }
             }
         }
