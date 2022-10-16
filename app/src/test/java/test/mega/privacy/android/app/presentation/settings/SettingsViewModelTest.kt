@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.SettingsViewModel
@@ -26,6 +27,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.TEST_USER_ACCOUNT
 
@@ -192,5 +194,34 @@ class SettingsViewModelTest {
                 .test {
                     assertThat(awaitItem()).isFalse()
                 }
+        }
+
+    @Test
+    fun `test that hideRecentActivityChecked is set with return value of monitorHideRecentActivity`() =
+        runTest {
+            whenever(monitorHideRecentActivity()).thenReturn(
+                flow {
+                    emit(true)
+                    emit(false)
+                }
+            )
+
+            underTest.uiState
+                .map { it.hideRecentActivityChecked }
+                .distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isFalse()
+                    assertThat(awaitItem()).isTrue()
+                    assertThat(awaitItem()).isFalse()
+                }
+        }
+
+    @Test
+    fun `test that hideRecentActivity will call setHideRecentActivity use case`() =
+        runTest {
+            val expected = false
+            underTest.hideRecentActivity(expected)
+            advanceUntilIdle()
+            verify(setHideRecentActivity).invoke(expected)
         }
 }
