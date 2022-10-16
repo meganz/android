@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation
+package test.mega.privacy.android.app.presentation.shares
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow

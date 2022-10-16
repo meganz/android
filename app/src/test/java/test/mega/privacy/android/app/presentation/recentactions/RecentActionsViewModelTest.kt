@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -16,6 +17,7 @@ import mega.privacy.android.app.presentation.recentactions.model.RecentActionIte
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.GetVisibleContacts
+import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -26,8 +28,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.presentation.FakeMonitorHideRecentActivity
-import test.mega.privacy.android.app.presentation.FakeMonitorUpdates
+import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 
 @ExperimentalCoroutinesApi
 class RecentActionsViewModelTest {
@@ -40,7 +41,7 @@ class RecentActionsViewModelTest {
         onBlocking { invoke() }.thenReturn(emptyList())
     }
     private val setHideRecentActivity = mock<SetHideRecentActivity>()
-    private val monitorHideRecentActivity = FakeMonitorHideRecentActivity()
+    private val monitorHideRecentActivity = mock<MonitorHideRecentActivity>()
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
     private val megaNode: MegaNode = mock {
@@ -223,12 +224,17 @@ class RecentActionsViewModelTest {
     @Test
     fun `test that hide recent activity is set with value of monitor hide recent activity`() =
         runTest {
+            whenever(monitorHideRecentActivity()).thenReturn(
+                flow {
+                    emit(true)
+                    emit(false)
+                }
+            )
             underTest.state.map { it.hideRecentActivity }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(false)
-                    advanceUntilIdle()
-                    monitorHideRecentActivity.emit(true)
                     assertThat(awaitItem()).isEqualTo(true)
+                    assertThat(awaitItem()).isEqualTo(false)
                 }
         }
 
