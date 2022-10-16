@@ -26,6 +26,7 @@ import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
@@ -33,6 +34,7 @@ import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
+import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import org.mockito.kotlin.any
@@ -199,4 +201,11 @@ object TestSettingsModule {
     @Provides
     @ElementsIntoSet
     fun providePreferenceResourceSet(): Set<@JvmSuppressWildcards PreferenceResource> = setOf()
+
+    @Provides
+    fun provideMonitorHideRecentActivity(): MonitorHideRecentActivity = mock()
+
+    @Provides
+    fun provideSetHideRecentActivity(): SetHideRecentActivity = mock()
+
 }

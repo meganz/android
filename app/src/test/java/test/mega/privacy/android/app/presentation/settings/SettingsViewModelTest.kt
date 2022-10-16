@@ -19,6 +19,8 @@ import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
+import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import org.junit.Before
 import org.junit.Test
@@ -43,7 +45,8 @@ class SettingsViewModelTest {
     private val isChatLoggedInValue = MutableStateFlow(true)
     private val isChatLoggedIn =
         mock<IsChatLoggedIn> { on { invoke() }.thenReturn(isChatLoggedInValue) }
-
+    private val monitorHideRecentActivity = mock<MonitorHideRecentActivity>()
+    private val setHideRecentActivity = mock<SetHideRecentActivity>()
 
     @Before
     fun setUp() {
@@ -61,7 +64,8 @@ class SettingsViewModelTest {
             monitorAutoAcceptQRLinks = monitorAutoAcceptQRLinks,
             fetchMultiFactorAuthSetting = fetchMultiFactorAuthSetting,
             startScreen = mock { on { invoke() }.thenReturn(emptyFlow()) },
-            isHideRecentActivityEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
+            monitorHideRecentActivity = monitorHideRecentActivity,
+            setHideRecentActivity = setHideRecentActivity,
             toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,
             monitorConnectivity = mock { on { invoke() }.thenReturn(MutableStateFlow(true)) },
             requestAccountDeletion = mock(),
