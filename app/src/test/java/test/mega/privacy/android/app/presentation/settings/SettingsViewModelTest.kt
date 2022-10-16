@@ -47,7 +47,11 @@ class SettingsViewModelTest {
     private val isChatLoggedInValue = MutableStateFlow(true)
     private val isChatLoggedIn =
         mock<IsChatLoggedIn> { on { invoke() }.thenReturn(isChatLoggedInValue) }
-    private val monitorHideRecentActivity = mock<MonitorHideRecentActivity>()
+    private val monitorHideRecentActivity = mock<MonitorHideRecentActivity> {
+        on { invoke() }.thenReturn(
+            emptyFlow()
+        )
+    }
     private val setHideRecentActivity = mock<SetHideRecentActivity>()
 
     @Before
