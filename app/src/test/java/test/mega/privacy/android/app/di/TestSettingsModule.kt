@@ -64,6 +64,8 @@ object TestSettingsModule {
         mock<FetchMultiFactorAuthSetting> { on { invoke() }.thenReturn(emptyFlow()) }
     val getAccountDetails =
         mock<GetAccountDetails> { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
+    val monitorHideRecentActivity =
+        mock<MonitorHideRecentActivity> { on { invoke() }.thenReturn(emptyFlow()) }
     val getChatImageQuality = mock<GetChatImageQuality> { on { invoke() }.thenReturn(emptyFlow()) }
     val setChatImageQuality = mock<SetChatImageQuality>()
     val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
@@ -110,6 +112,12 @@ object TestSettingsModule {
 
     @Provides
     fun provideGetStartScreen(): MonitorStartScreenPreference = monitorStartScreenPreference
+
+    @Provides
+    fun provideMonitorHideRecentActivity(): MonitorHideRecentActivity = monitorHideRecentActivity
+
+    @Provides
+    fun provideSetHideRecentActivity(): SetHideRecentActivity = mock()
 
     @Provides
     fun provideToggleAutoAcceptQRLinks(): ToggleAutoAcceptQRLinks =
@@ -201,11 +209,5 @@ object TestSettingsModule {
     @Provides
     @ElementsIntoSet
     fun providePreferenceResourceSet(): Set<@JvmSuppressWildcards PreferenceResource> = setOf()
-
-    @Provides
-    fun provideMonitorHideRecentActivity(): MonitorHideRecentActivity = mock()
-
-    @Provides
-    fun provideSetHideRecentActivity(): SetHideRecentActivity = mock()
 
 }
