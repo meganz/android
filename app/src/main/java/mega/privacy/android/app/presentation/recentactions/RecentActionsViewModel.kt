@@ -54,7 +54,7 @@ class RecentActionsViewModel @Inject constructor(
     /**
      * Snapshot of recent actions bucket list when a user select one item
      */
-    var snapShotActionList: List<MegaRecentActionBucket>? = null
+    var snapshotActionList: List<MegaRecentActionBucket>? = null
 
     init {
         updateRecentActions()
@@ -80,7 +80,7 @@ class RecentActionsViewModel @Inject constructor(
      */
     fun select(bucket: MegaRecentActionBucket) {
         selected = bucket
-        snapShotActionList = _buckets
+        snapshotActionList = _buckets
     }
 
     /**
