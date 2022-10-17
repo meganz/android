@@ -58,7 +58,7 @@ class RecentActionsFragment : Fragment() {
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
 
-    private var adapter: RecentsAdapter? = null
+    private var adapter: RecentActionsAdapter? = null
     private lateinit var emptyLayout: ScrollView
     private lateinit var emptyText: TextView
     private lateinit var showActivityButton: Button
@@ -123,7 +123,7 @@ class RecentActionsFragment : Fragment() {
      * Initialize the adapter
      */
     private fun initAdapter() {
-        adapter = RecentsAdapter(
+        adapter = RecentActionsAdapter(
             requireActivity(),
             this,
         )
