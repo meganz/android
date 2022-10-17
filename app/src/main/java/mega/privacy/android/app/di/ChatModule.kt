@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.AnswerChatCall
 import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.StartChatCall
 
 /**
  * Chats module.
@@ -21,6 +22,10 @@ class ChatModule {
     @Provides
     fun provideSetOpenInvite(chatRepository: ChatRepository): SetOpenInvite =
         SetOpenInvite(chatRepository::setOpenInvite)
+
+    @Provides
+    fun provideStartChatCall(chatRepository: ChatRepository): StartChatCall =
+        StartChatCall(chatRepository::startChatCall)
 
     @Provides
     fun provideAnswerChatCall(chatRepository: ChatRepository): AnswerChatCall =

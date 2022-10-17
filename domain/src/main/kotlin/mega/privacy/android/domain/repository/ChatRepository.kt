@@ -15,12 +15,26 @@ interface ChatRepository {
     fun notifyChatLogout(): Flow<Boolean>
 
     /**
-     * Starts a chat conversation with the provided contacts.
+     * Update open invite setting.
      *
      * @param chatId   The Chat id.
      * @return True if non-hosts are allowed to add participants, false otherwise.
      */
     suspend fun setOpenInvite(chatId: Long): Boolean
+
+    /**
+     * Starts call.
+     *
+     * @param chatId   The Chat id.
+     * @param enabledVideo True for audio-video call, false for audio call
+     * @param enabledAudio True for starting a call with audio (mute disabled)
+     * @return The chat conversation handle.
+     */
+    suspend fun startChatCall(
+        chatId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+    ): ChatRequest
 
     /**
      * Answers call.

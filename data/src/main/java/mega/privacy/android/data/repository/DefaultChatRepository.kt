@@ -19,7 +19,6 @@ import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
-
 /**
  * Default implementation of [ChatRepository]
  *
@@ -62,6 +61,28 @@ internal class DefaultChatRepository @Inject constructor(
             }
         }
 
+    private fun onRequestSetOpenInviteCompleted(continuation: Continuation<Boolean>) =
+        { request: MegaChatRequest, error: MegaChatError ->
+            if (error.errorCode == MegaChatError.ERROR_OK) {
+                continuation.resumeWith(Result.success(request.flag))
+            } else {
+                continuation.failWithError(error)
+            }
+        }
+
+
+    override suspend fun startChatCall(chatId: Long, enabledVideo: Boolean, enabledAudio: Boolean) =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                chatGateway.startChatCall(chatId,
+                    enabledVideo,
+                    enabledAudio,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = onRequestChatCallCompleted(continuation)
+                    ))
+            }
+        }
+
     override suspend fun answerChatCall(
         chatId: Long,
         enabledVideo: Boolean,
@@ -77,15 +98,6 @@ internal class DefaultChatRepository @Inject constructor(
                 ))
         }
     }
-
-    private fun onRequestSetOpenInviteCompleted(continuation: Continuation<Boolean>) =
-        { request: MegaChatRequest, error: MegaChatError ->
-            if (error.errorCode == MegaChatError.ERROR_OK) {
-                continuation.resumeWith(Result.success(request.flag))
-            } else {
-                continuation.failWithError(error)
-            }
-        }
 
     private fun onRequestChatCallCompleted(continuation: Continuation<ChatRequest>) =
         { request: MegaChatRequest, error: MegaChatError ->
