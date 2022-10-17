@@ -35,4 +35,20 @@ interface ChatRepository {
         enabledVideo: Boolean,
         enabledAudio: Boolean,
     ): ChatRequest
+
+    /**
+     * Answers call.
+     *
+     * @param chatId   The Chat id.
+     * @param enabledVideo True for audio-video call, false for audio call
+     * @param enabledAudio True for answering a call with audio (mute disabled)
+     * @param enabledSpeaker True speaker on. False speaker off.
+     * @return The chat conversation handle.
+     */
+    suspend fun answerChatCall(
+        chatId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+        enabledSpeaker: Boolean,
+    ): ChatRequest
 }

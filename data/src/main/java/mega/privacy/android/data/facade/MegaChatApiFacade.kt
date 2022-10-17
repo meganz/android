@@ -189,6 +189,7 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun getChatRoom(chatId: Long): MegaChatRoom? =
         chatApi.getChatRoom(chatId)
 
+
     override fun getChatCall(chatId: Long): MegaChatCall? =
         chatApi.getChatCall(chatId)
 
@@ -198,6 +199,18 @@ internal class MegaChatApiFacade @Inject constructor(
         enabledAudio: Boolean,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.startChatCall(chatId, enabledVideo, enabledAudio, listener)
+
+    override fun answerChatCall(
+        chatId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.answerChatCall(chatId, enabledVideo, enabledAudio, listener)
+
+    override fun setChatVideoInDevice(
+        device: String,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.setChatVideoInDevice(device, listener)
 
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE

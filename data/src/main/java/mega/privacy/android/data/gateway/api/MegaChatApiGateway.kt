@@ -185,4 +185,30 @@ interface MegaChatApiGateway {
         enabledAudio: Boolean,
         listener: MegaChatRequestListenerInterface,
     )
+
+    /**
+     * Answer call.
+     *
+     * @param chatId  The chat id.
+     * @param enabledVideo True for audio-video call, false for audio call.
+     * @param enabledAudio True for answering a call with audio (mute disabled).
+     * @param listener Listener.
+     */
+    fun answerChatCall(
+        chatId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Select the video device to be used in calls.
+     *
+     * @param device Identifier of device to be selected.
+     * @param listener Listener.
+     */
+    fun setChatVideoInDevice(
+        device: String,
+        listener: MegaChatRequestListenerInterface?,
+    )
 }

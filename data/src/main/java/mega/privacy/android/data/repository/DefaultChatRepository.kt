@@ -70,6 +70,7 @@ internal class DefaultChatRepository @Inject constructor(
             }
         }
 
+
     override suspend fun startChatCall(chatId: Long, enabledVideo: Boolean, enabledAudio: Boolean) =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
@@ -77,12 +78,28 @@ internal class DefaultChatRepository @Inject constructor(
                     enabledVideo,
                     enabledAudio,
                     OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestStartChatCallCompleted(continuation)
+                        onRequestFinish = onRequestChatCallCompleted(continuation)
                     ))
             }
         }
 
-    private fun onRequestStartChatCallCompleted(continuation: Continuation<ChatRequest>) =
+    override suspend fun answerChatCall(
+        chatId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+        enabledSpeaker: Boolean,
+    ): ChatRequest = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            chatGateway.answerChatCall(chatId,
+                enabledVideo,
+                enabledAudio,
+                OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = onRequestChatCallCompleted(continuation)
+                ))
+        }
+    }
+
+    private fun onRequestChatCallCompleted(continuation: Continuation<ChatRequest>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {
                 continuation.resumeWith(Result.success(chatRequestMapper(request)))
