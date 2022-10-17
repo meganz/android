@@ -19,7 +19,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HO
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_MY_BACKUPS_FOLDER_CHANGED;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
@@ -150,7 +149,6 @@ import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED;
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
@@ -276,6 +274,7 @@ import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
 import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaOffline;
@@ -547,6 +546,8 @@ public class ManagerActivity extends TransfersManagementActivity
     LegacyLoggingSettings loggingSettings;
     @Inject
     ActivityLifecycleHandler activityLifecycleHandler;
+    @Inject
+    MegaNodeUtilWrapper megaNodeUtilWrapper;
 
     public ArrayList<Integer> transfersInProgress;
     public MegaTransferData transferData;
@@ -872,12 +873,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 closeDrawer();
             }
             refreshAddPhoneNumberButton();
-        }
-    };
-
-    private final Observer<Boolean> fileBackupChangedObserver = change -> {
-        if (change) {
-            getMyBackupsFolder();
         }
     };
 
@@ -1600,8 +1595,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).observeForever(finishObserver);
 
-        LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).observeForever(fileBackupChangedObserver);
-
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
         cC = new ContactController(this);
@@ -1701,7 +1694,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         observePsa();
 
-        getMyBackupsFolder();
+        megaNodeUtilWrapper.observeBackupFolder();
 
         //Set toolbar
         abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
@@ -2761,12 +2754,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    /**
-     * Retrieves the My Backups node by calling MegaApiJava.getUserAttribute(USER_ATTR_MY_BACKUPS_FOLDER, listener)
-     */
-    private void getMyBackupsFolder() {
-        megaApi.getUserAttribute(USER_ATTR_MY_BACKUPS_FOLDER, this);
-    }
 
     /**
      * Proceeds to enable CU action.
@@ -3585,7 +3572,6 @@ public class ManagerActivity extends TransfersManagementActivity
         unregisterReceiver(transferFinishReceiver);
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
         LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
-        LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).removeObserver(fileBackupChangedObserver);
         LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
 
         destroyPayments();
@@ -9396,11 +9382,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             } else if (request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS) {
                 MegaApplication.setDisableFileVersions(request.getFlag());
-            } else if (request.getParamType() == USER_ATTR_MY_BACKUPS_FOLDER) {
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    Timber.d("requesting myBackupHandle");
-                    MegaNodeUtil.myBackupHandle = request.getNodeHandle();
-                }
             }
         } else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {
             Timber.d("TYPE_GET_CANCEL_LINK");

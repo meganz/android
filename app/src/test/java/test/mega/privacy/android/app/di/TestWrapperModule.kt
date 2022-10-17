@@ -17,6 +17,7 @@ import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnlineWrapper
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import org.mockito.kotlin.mock
 
@@ -83,4 +84,7 @@ object TestWrapperModule {
 
     @Provides
     fun provideBitmapFactoryWrapper(): BitmapFactoryWrapper = bitmapFactoryWrapper
+
+    @Provides
+    fun provideMegaNodeUtilWrapper(): MegaNodeUtilWrapper = mock()
 }

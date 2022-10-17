@@ -16,15 +16,11 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_MY_BACKUPS_FOLDER_CHANGED
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
@@ -37,7 +33,9 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywall
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.mapper.StorageStateMapper
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -103,13 +101,6 @@ class GlobalListener @Inject constructor(
             if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange == 0) {
                 LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long::class.java)
                     .post(user.handle)
-            }
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_BACKUPS_FOLDER) && isMyChange) {
-                //user has change backup attribute, need to update local ones
-                Timber.d("MyBackup + Get backup attribute when change on other client.")
-                LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean::class.java)
-                    .post(true)
-                return@forEach
             }
         }
     }
