@@ -1,176 +1,224 @@
-package mega.privacy.android.app.meeting;
+package mega.privacy.android.app.meeting
 
-import static mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification;
-import static mega.privacy.android.app.utils.CallUtil.openMeetingInProgress;
-import static mega.privacy.android.app.utils.Constants.CHAT_ID_OF_CURRENT_CALL;
-import static mega.privacy.android.app.utils.Constants.CHAT_ID_OF_INCOMING_CALL;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import mega.privacy.android.app.MegaApplication.Companion.getInstance
+import dagger.hilt.android.AndroidEntryPoint
+import android.app.Service
+import android.content.Intent
+import android.os.IBinder
+import mega.privacy.android.app.meeting.listeners.HangChatCallListener.OnCallHungUpCallback
+import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener.OnCallOnHoldCallback
+import javax.inject.Inject
+import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.usecase.call.AnswerCallUseCase
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaApiAndroid
+import mega.privacy.android.app.MegaApplication
+import nz.mega.sdk.MegaChatApiJava
+import timber.log.Timber
+import nz.mega.sdk.MegaChatCall
+import mega.privacy.android.app.meeting.listeners.HangChatCallListener
+import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
+import mega.privacy.android.app.R
+import mega.privacy.android.app.usecase.call.AnswerCallUseCase.AnswerCallResult
+import mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification
+import mega.privacy.android.app.utils.CallUtil.openMeetingInProgress
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import java.lang.IllegalArgumentException
 
-import android.app.IntentService;
-import android.content.Intent;
-
-import javax.inject.Inject;
-
-import dagger.hilt.android.AndroidEntryPoint;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
-import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
-import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
-import mega.privacy.android.app.objects.PasscodeManagement;
-import mega.privacy.android.app.usecase.call.AnswerCallUseCase;
-import mega.privacy.android.app.utils.StringResourcesUtils;
-import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatRoom;
-import timber.log.Timber;
-
+/**
+ * Service which should be for call notifications.
+ *
+ * @property passcodeManagement [PasscodeManagement]
+ * @property rtcAudioManagerGateway [RTCAudioManagerGateway]
+ * @property answerCallUseCase [AnswerCallUseCase]
+ * @property ioDispatcher [CoroutineDispatcher]
+ * @property coroutineScope [CoroutineScope]
+ * @property megaApi [MegaApiAndroid]
+ * @property megaChatApi [MegaApiAndroid]
+ * @property app [MegaApplication]
+ */
 @AndroidEntryPoint
-public class CallNotificationIntentService extends IntentService implements HangChatCallListener.OnCallHungUpCallback, SetCallOnHoldListener.OnCallOnHoldCallback {
-
-    public static final String ANSWER = "ANSWER";
-    public static final String DECLINE = "DECLINE";
-    public static final String HOLD_ANSWER = "HOLD_ANSWER";
-    public static final String END_ANSWER = "END_ANSWER";
-    public static final String IGNORE = "IGNORE";
-    public static final String HOLD_JOIN = "HOLD_JOIN";
-    public static final String END_JOIN = "END_JOIN";
+class CallNotificationIntentService : Service(),
+    OnCallHungUpCallback, OnCallOnHoldCallback {
 
     @Inject
-    PasscodeManagement passcodeManagement;
+    lateinit var passcodeManagement: PasscodeManagement
 
     @Inject
-    AnswerCallUseCase answerCallUseCase;
+    lateinit var answerCallUseCase: AnswerCallUseCase
 
     @Inject
-    RTCAudioManagerGateway rtcAudioManagerGateway;
+    lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
 
-    MegaChatApiAndroid megaChatApi;
-    MegaApiAndroid megaApi;
-    MegaApplication app;
+    /**
+     * Coroutine dispatcher for camera upload work
+     */
+    @IoDispatcher
+    @Inject
+    lateinit var ioDispatcher: CoroutineDispatcher
 
-    private long chatIdIncomingCall;
-    private long callIdIncomingCall = MEGACHAT_INVALID_HANDLE;
+    @MegaApi
+    @Inject
+    lateinit var megaApi: MegaApiAndroid
 
-    private long chatIdCurrentCall;
-    private long callIdCurrentCall = MEGACHAT_INVALID_HANDLE;
-    private boolean isTraditionalCall = true;
+    @Inject
+    lateinit var megaChatApi: MegaChatApiAndroid
 
-    public CallNotificationIntentService() {
-        super("CallNotificationIntentService");
+    var app: MegaApplication? = null
+
+    /**
+     * Coroutine Scope for camera upload work
+     */
+    private var coroutineScope: CoroutineScope? = null
+
+    private var chatIdIncomingCall: Long = 0
+    private var callIdIncomingCall = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+    private var chatIdCurrentCall: Long = 0
+    private var callIdCurrentCall = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+    private var isTraditionalCall = true
+
+    /**
+     * Service starts
+     */
+    override fun onCreate() {
+        super.onCreate()
+
+        coroutineScope = CoroutineScope(ioDispatcher)
+
+        app = application as MegaApplication
     }
 
-    public void onCreate() {
-        super.onCreate();
+    /**
+     * Bind service
+     */
+    override fun onBind(intent: Intent?): IBinder? = null
 
-        app = (MegaApplication) getApplication();
-        megaChatApi = app.getMegaChatApi();
-        megaApi = app.getMegaApi();
-    }
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Timber.d("Flags: $flags, Start ID: $startId")
 
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        Timber.d("onHandleIntent");
-
-        if (intent == null || intent.getExtras() == null)
-            return;
-
-        chatIdCurrentCall = intent.getExtras().getLong(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
-        MegaChatCall currentCall = megaChatApi.getChatCall(chatIdCurrentCall);
-        if (currentCall != null) {
-            callIdCurrentCall = currentCall.getCallId();
+        if (intent == null) {
+            return START_NOT_STICKY
         }
 
-        chatIdIncomingCall = intent.getExtras().getLong(CHAT_ID_OF_INCOMING_CALL, MEGACHAT_INVALID_HANDLE);
-        MegaChatCall incomingCall = megaChatApi.getChatCall(chatIdIncomingCall);
+        onHandleIntent(intent)
+        return START_NOT_STICKY
+    }
 
-        if (incomingCall != null) {
-            callIdIncomingCall = incomingCall.getCallId();
-            clearIncomingCallNotification(callIdIncomingCall);
-            MegaChatRoom incomingCallChat = megaChatApi.getChatRoom(chatIdIncomingCall);
-            if (incomingCallChat != null && incomingCallChat.isMeeting()) {
-                isTraditionalCall = false;
+    /**
+     * Service ends
+     */
+    override fun onDestroy() {
+        Timber.d("Service destroys.")
+        super.onDestroy()
+        coroutineScope?.cancel()
+    }
+
+    private fun onHandleIntent(intent: Intent?) {
+        Timber.d("onHandleIntent")
+        if (intent == null) return
+
+        intent.extras?.let { extras ->
+            chatIdCurrentCall = extras.getLong(Constants.CHAT_ID_OF_CURRENT_CALL,
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+
+            val currentCall = megaChatApi.getChatCall(chatIdCurrentCall)
+            if (currentCall != null) {
+                callIdCurrentCall = currentCall.callId
             }
-        }
 
-        final String action = intent.getAction();
-        if (action == null)
-            return;
-
-        Timber.d("The button clicked is : %s, currentChatId = %d, incomingCall = %d", action, chatIdCurrentCall, chatIdIncomingCall);
-        switch (action) {
-            case ANSWER:
-            case END_ANSWER:
-            case END_JOIN:
-                if (chatIdCurrentCall == MEGACHAT_INVALID_HANDLE) {
-                    MegaChatCall call = megaChatApi.getChatCall(chatIdIncomingCall);
-                    if (call != null && call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-                        Timber.d("Answering incoming call ...");
-                        answerCall(chatIdIncomingCall);
+            chatIdIncomingCall = extras.getLong(Constants.CHAT_ID_OF_INCOMING_CALL,
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+            megaChatApi.getChatCall(chatIdIncomingCall)?.let { incomingCall ->
+                callIdIncomingCall = incomingCall.callId
+                clearIncomingCallNotification(callIdIncomingCall)
+                megaChatApi.getChatRoom(chatIdIncomingCall)?.let { incomingCallChat ->
+                    if (incomingCallChat.isMeeting) {
+                        isTraditionalCall = false
                     }
+                }
+            }
 
+            val action = intent.action ?: return
+            Timber.d("The button clicked is : $action, currentChatId = $chatIdCurrentCall, incomingCall = $chatIdIncomingCall")
+
+            when (action) {
+                ANSWER, END_ANSWER, END_JOIN -> if (chatIdCurrentCall == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+                    val call = megaChatApi.getChatCall(chatIdIncomingCall)
+                    if (call != null && call.status == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+                        Timber.d("Answering incoming call ...")
+                        answerCall(chatIdIncomingCall)
+                    }
                 } else {
                     if (currentCall == null) {
-                        Timber.d("Answering incoming call ...");
-                        answerCall(chatIdIncomingCall);
+                        Timber.d("Answering incoming call ...")
+                        answerCall(chatIdIncomingCall)
                     } else {
-                        Timber.d("Hanging up current call ... ");
-                        megaChatApi.hangChatCall(callIdCurrentCall, new HangChatCallListener(this, this));
+                        Timber.d("Hanging up current call ... ")
+                        megaChatApi.hangChatCall(callIdCurrentCall,
+                            HangChatCallListener(this, this))
                     }
-
                 }
-                break;
-
-            case DECLINE:
-                Timber.d("Hanging up incoming call ... ");
-                megaChatApi.hangChatCall(callIdIncomingCall, new HangChatCallListener(this, this));
-                break;
-
-            case IGNORE:
-                Timber.d("Ignore incoming call... ");
-                megaChatApi.setIgnoredCall(chatIdIncomingCall);
-                rtcAudioManagerGateway.stopSounds();
-                clearIncomingCallNotification(callIdIncomingCall);
-                stopSelf();
-                break;
-
-            case HOLD_ANSWER:
-            case HOLD_JOIN:
-                if (currentCall == null || currentCall.isOnHold()) {
-                    Timber.d("Answering incoming call ...");
-                    answerCall(chatIdIncomingCall);
+                DECLINE -> {
+                    Timber.d("Hanging up incoming call ... ")
+                    megaChatApi.hangChatCall(callIdIncomingCall, HangChatCallListener(this, this))
+                }
+                IGNORE -> {
+                    Timber.d("Ignore incoming call... ")
+                    megaChatApi.setIgnoredCall(chatIdIncomingCall)
+                    rtcAudioManagerGateway.stopSounds()
+                    clearIncomingCallNotification(callIdIncomingCall)
+                    stopSelf()
+                }
+                HOLD_ANSWER, HOLD_JOIN -> if (currentCall == null || currentCall.isOnHold) {
+                    Timber.d("Answering incoming call ...")
+                    answerCall(chatIdIncomingCall)
                 } else {
-                    Timber.d("Putting the current call on hold...");
-                    megaChatApi.setCallOnHold(chatIdCurrentCall, true, new SetCallOnHoldListener(this, this));
+                    Timber.d("Putting the current call on hold...")
+                    megaChatApi.setCallOnHold(chatIdCurrentCall,
+                        true,
+                        SetCallOnHoldListener(this, this))
                 }
-                break;
-
-            default:
-                throw new IllegalArgumentException("Unsupported action: " + action);
+                else -> throw IllegalArgumentException("Unsupported action: $action")
+            }
         }
     }
 
-    @Override
-    public void onCallHungUp(long callId) {
+    /**
+     * Hang call
+     *
+     * @param callId The call id.
+     */
+    override fun onCallHungUp(callId: Long) {
         if (callId == callIdIncomingCall) {
-            Timber.d("Incoming call hung up. ");
-            clearIncomingCallNotification(callIdIncomingCall);
-            stopSelf();
+            Timber.d("Incoming call hung up. ")
+            clearIncomingCallNotification(callIdIncomingCall)
+            stopSelf()
         } else if (callId == callIdCurrentCall) {
-            Timber.d("Current call hung up. Answering incoming call ...");
-            answerCall(chatIdIncomingCall);
+            Timber.d("Current call hung up. Answering incoming call ...")
+            answerCall(chatIdIncomingCall)
         }
     }
 
-    @Override
-    public void onCallOnHold(long chatId, boolean isOnHold) {
+    /**
+     * Put call on hold
+     *
+     * @param chatId The chat id.
+     * @param isOnHold True, if should be on hold, false otherwise.
+     */
+    override fun onCallOnHold(chatId: Long, isOnHold: Boolean) {
         if (chatIdCurrentCall == chatId && isOnHold) {
-            Timber.d("Current call on hold. Answering incoming call ...");
-            answerCall(chatIdIncomingCall);
+            Timber.d("Current call on hold. Answering incoming call ...")
+            answerCall(chatIdIncomingCall)
         }
     }
 
@@ -179,23 +227,35 @@ public class CallNotificationIntentService extends IntentService implements Hang
      *
      * @param chatId Chat ID
      */
-    private void answerCall(long chatId) {
+    private fun answerCall(chatId: Long) {
         answerCallUseCase.answerCall(chatId, false, isTraditionalCall, false)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result, throwable) -> {
-                    long resultChatId = result.component1();
-                    if (resultChatId != chatIdIncomingCall)
-                        return;
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { (resultChatId): AnswerCallResult, throwable: Throwable? ->
+                if (resultChatId != chatIdIncomingCall) return@subscribe
 
-                    if (throwable == null) {
-                        Timber.d("Incoming call answered");
-                        openMeetingInProgress(this, chatIdIncomingCall, true, passcodeManagement);
-                        clearIncomingCallNotification(callIdIncomingCall);
-                        stopSelf();
-                    } else {
-                        Util.showSnackbar(MegaApplication.getInstance().getApplicationContext(), StringResourcesUtils.getString(R.string.call_error));
-                    }
-                });
+                if (throwable == null) {
+                    Timber.d("Incoming call answered")
+                    openMeetingInProgress(this,
+                        chatIdIncomingCall,
+                        true,
+                        passcodeManagement)
+                    clearIncomingCallNotification(callIdIncomingCall)
+                    stopSelf()
+                } else {
+                    Util.showSnackbar(getInstance().applicationContext,
+                        StringResourcesUtils.getString(R.string.call_error))
+                }
+            }
+    }
+
+    companion object {
+        const val ANSWER = "ANSWER"
+        const val DECLINE = "DECLINE"
+        const val HOLD_ANSWER = "HOLD_ANSWER"
+        const val END_ANSWER = "END_ANSWER"
+        const val IGNORE = "IGNORE"
+        const val HOLD_JOIN = "HOLD_JOIN"
+        const val END_JOIN = "END_JOIN"
     }
 }
