@@ -195,6 +195,11 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.answerChatCall(chatId, enabledVideo, enabledAudio, listener)
 
+    override fun setChatVideoInDevice(
+        device: String,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.setChatVideoInDevice(device, listener)
+
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
     }

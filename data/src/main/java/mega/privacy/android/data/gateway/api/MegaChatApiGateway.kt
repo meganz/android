@@ -176,4 +176,15 @@ interface MegaChatApiGateway {
         enabledAudio: Boolean,
         listener: MegaChatRequestListenerInterface,
     )
+
+    /**
+     * Select the video device to be used in calls.
+     *
+     * @param device Identifier of device to be selected.
+     * @param listener Listener.
+     */
+    fun setChatVideoInDevice(
+        device: String,
+        listener: MegaChatRequestListenerInterface?,
+    )
 }
