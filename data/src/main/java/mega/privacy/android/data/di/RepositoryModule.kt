@@ -20,6 +20,7 @@ import mega.privacy.android.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.data.repository.DefaultSupportRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
+import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
+import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Singleton
 
 @Module
@@ -78,6 +80,12 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository
+
+    /**
+     * Bind domain transfers repository
+     */
+    @Binds
+    abstract fun bindDomainTransfersRepository(repository: DefaultTransfersRepository): TransferRepository
 
     @Binds
     abstract fun bindCameraUploadRepository(repository: DefaultCameraUploadRepository): CameraUploadRepository

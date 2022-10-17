@@ -1,40 +1,38 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
-import mega.privacy.android.domain.repository.TransferRepository as DomainTransferRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.isBackgroundTransfer
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.TransferEventMapper
-import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.repository.TransferRepository
 import nz.mega.sdk.MegaTransfer
 import javax.inject.Inject
 
 /**
- * Default [TransfersRepository] implementation.
+ * Default [TransferRepository] implementation.
  *
  * @param megaApiGateway    [MegaApiGateway]
  * @param ioDispatcher      [IoDispatcher]
  * @param dbH               [DatabaseHandler]
  */
-class DefaultTransfersRepository @Inject constructor(
+internal class DefaultTransfersRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val dbH: LegacyDatabaseHandler,
+    private val dbH: DatabaseHandler,
     private val transferEventMapper: TransferEventMapper,
-) : TransfersRepository, DomainTransferRepository {
+) : TransferRepository {
 
-    override suspend fun getUploadTransfers(): List<MegaTransfer> = withContext(ioDispatcher) {
+    private suspend fun getUploadTransfers(): List<MegaTransfer> = withContext(ioDispatcher) {
         megaApiGateway.getTransfers(MegaTransfer.TYPE_UPLOAD)
     }
 
-    override suspend fun getDownloadTransfers(): List<MegaTransfer> = withContext(ioDispatcher) {
+    private suspend fun getDownloadTransfers(): List<MegaTransfer> = withContext(ioDispatcher) {
         megaApiGateway.getTransfers(MegaTransfer.TYPE_DOWNLOAD)
     }
 
@@ -53,7 +51,7 @@ class DefaultTransfersRepository @Inject constructor(
     }
 
     override suspend fun isCompletedTransfersEmpty(): Boolean = withContext(ioDispatcher) {
-        dbH.completedTransfers.isEmpty()
+        dbH.isCompletedTransfersEmpty
     }
 
     override suspend fun areTransfersPaused(): Boolean = withContext(ioDispatcher) {
