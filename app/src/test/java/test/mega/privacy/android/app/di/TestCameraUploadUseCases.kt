@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
+import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
@@ -218,4 +219,7 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetUploadFolderHandle() = mock<GetUploadFolderHandle>()
+
+    @Provides
+    fun provideRestorePrimaryTimestamps() = mock<RestorePrimaryTimestamps>()
 }

@@ -66,41 +66,6 @@ public class CameraUploadUtil {
     }
 
     /**
-     * If the handle matches the previous primary folder's handle, restore the time stamp from stamps
-     * if not clean the sync record from previous primary folder
-     */
-    public static void restorePrimaryTimestampsAndSyncRecordProcess() {
-        SharedPreferences sharedPreferences = app.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
-        long backupedHandle = sharedPreferences.getLong(KEY_PRIMARY_HANDLE, -2);
-        long detectedPrimaryKey = getPrimaryFolderHandle();
-        Timber.d("Primary handle in local is: %d, backuped handle is: %d", detectedPrimaryKey, backupedHandle);
-        if (detectedPrimaryKey == backupedHandle) {
-            // if the primary handle matches to previous deleted primary folder's handle, restore the time stamp
-            String camSyncStamp = sharedPreferences.getString(KEY_CAM_SYNC_TIMESTAMP, "");
-            if (!isTextEmpty(camSyncStamp)) {
-                try {
-                    dbH.setCamSyncTimeStamp(Long.parseLong(camSyncStamp));
-                } catch (Exception ex) {
-                    Timber.e(ex);
-                }
-            }
-
-            String camVideoSyncStamp = sharedPreferences.getString(KEY_CAM_VIDEO_SYNC_TIMESTAMP, "");
-            if (!isTextEmpty(camVideoSyncStamp)) {
-                try {
-                    dbH.setCamVideoSyncTimeStamp(Long.parseLong(camVideoSyncStamp));
-                } catch (Exception ex) {
-                    Timber.e(ex);
-                }
-            }
-        } else {
-            // when primary target folder has been changed, delete primary sync records.
-            dbH.deleteAllPrimarySyncRecords();
-        }
-        clearPrimaryBackUp();
-    }
-
-    /**
      * If the handle matches the previous secondary folder's handle, restore the time stamp from stamps
      * if not clean the sync record from previous primary folder
      */

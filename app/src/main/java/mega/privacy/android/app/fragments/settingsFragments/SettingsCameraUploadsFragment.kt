@@ -1368,7 +1368,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
 
         // Local Primary Folder
         setupLocalPathForCameraUpload()
-        CameraUploadUtil.restorePrimaryTimestampsAndSyncRecordProcess()
+        viewModel.restorePrimaryTimestampsAndSyncRecordProcess()
 
         // Cloud Primary Folder
         setupPrimaryCloudFolder()
