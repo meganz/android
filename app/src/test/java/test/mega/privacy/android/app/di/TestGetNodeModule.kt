@@ -21,7 +21,7 @@ object TestGetNodeModule {
 
     @Provides
     fun provideGetChildrenNode() = mock<GetChildrenNode> {
-        onBlocking { invoke(any(), null) }.thenReturn(emptyList())
+        onBlocking { invoke(any(), any()) }.thenReturn(emptyList())
     }
 
     @Provides

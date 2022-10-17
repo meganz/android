@@ -1,8 +1,6 @@
 package mega.privacy.android.app
 
 import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
@@ -26,7 +24,6 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
@@ -56,7 +53,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContextUtils.getAvailableMemory
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams.get
-import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.InitialiseLogging
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
@@ -180,15 +177,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
 
     var isEsid = false
 
-    var storageState = StorageState.Unknown //Default value
-
-    private val logoutReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == Constants.ACTION_LOG_OUT) {
-                storageState = StorageState.Unknown //Default value
-            }
-        }
-    }
     private val meetingListener = MeetingListener()
     private val soundsController = CallSoundsController()
 
@@ -223,8 +211,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         setupMegaApiFolder()
         setupMegaChatApi()
 
-        storageState = dbH.storageState
-
         //Logout check resumed pending transfers
         transfersManagement.checkResumedPendingTransfers()
         val apiServerValue =
@@ -248,7 +234,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         @Suppress("DEPRECATION")
         registerReceiver(NetworkStateReceiver(),
             IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
-        registerReceiver(logoutReceiver, IntentFilter(Constants.ACTION_LOG_OUT))
 
         // clear the cache files stored in the external cache folder.
         clearPublicCache(this)

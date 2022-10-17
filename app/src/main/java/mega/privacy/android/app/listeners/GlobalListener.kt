@@ -201,11 +201,9 @@ class GlobalListener @Inject constructor(
                         api.getAccountDetails(null)
                     }
                     StorageState.PayWall -> {
-                        MegaApplication.getInstance().storageState = state
                         showOverDiskQuotaPaywallWarning()
                     }
                     else -> {
-                        MegaApplication.getInstance().storageState = state
                         val intent =
                             Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS).apply {
                                 action = Constants.ACTION_STORAGE_STATE_CHANGED

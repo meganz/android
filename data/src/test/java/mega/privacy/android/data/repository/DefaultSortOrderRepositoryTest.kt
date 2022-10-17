@@ -121,6 +121,7 @@ class DefaultSortOrderRepositoryTest {
         verify(sortOrderMapper).invoke(order)
     }
 
+    @Test
     fun `test that get offline sort order return type is sort order`() = runTest {
         val order = MegaApiJava.ORDER_CREATION_ASC
         whenever(megaLocalStorageGateway.getOfflineSortOrder()).thenReturn(order)

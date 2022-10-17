@@ -4467,6 +4467,9 @@ class SqliteDatabaseHandler(
         onCreate(db)
     }
 
+    override val isCompletedTransfersEmpty: Boolean
+        get() = completedTransfers.isEmpty()
+
     /**
      * Get the index of a column in a cursor.
      * Avoid to access column with hardcode index.

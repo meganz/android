@@ -5,7 +5,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.repository.FilesRepository
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.repository.SortOrderRepository
+import mega.privacy.android.domain.usecase.DefaultGetCameraSortOrder
+import mega.privacy.android.domain.usecase.DefaultGetCloudSortOrder
+import mega.privacy.android.domain.usecase.DefaultGetLinksSortOrder
+import mega.privacy.android.domain.usecase.DefaultGetOfflineSortOrder
+import mega.privacy.android.domain.usecase.DefaultGetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
@@ -28,35 +34,35 @@ class SortOrderUseCases {
      */
     @Provides
     fun provideGetCloudSortOrder(sortOrderRepository: SortOrderRepository): GetCloudSortOrder =
-        GetCloudSortOrder(sortOrderRepository::getCloudSortOrder)
+        DefaultGetCloudSortOrder(sortOrderRepository)
 
     /**
      * Provide the GetCameraSortOrder implementation
      */
     @Provides
     fun provideGetCameraSortOrder(sortOrderRepository: SortOrderRepository): GetCameraSortOrder =
-        GetCameraSortOrder(sortOrderRepository::getCameraSortOrder)
+        DefaultGetCameraSortOrder(sortOrderRepository)
 
     /**
      * Provide the GetOthersSortOrder implementation
      */
     @Provides
     fun provideGetOthersSortOrder(sortOrderRepository: SortOrderRepository): GetOthersSortOrder =
-        GetOthersSortOrder(sortOrderRepository::getOthersSortOrder)
+        DefaultGetOthersSortOrder(sortOrderRepository)
 
     /**
      * Provide the GetLinksSortOrder implementation
      */
     @Provides
     fun provideGetLinksSortOrder(sortOrderRepository: SortOrderRepository): GetLinksSortOrder =
-        GetLinksSortOrder(sortOrderRepository::getLinksSortOrder)
+        DefaultGetLinksSortOrder(sortOrderRepository)
 
     /**
      * Provide the GetOfflineSortOrder implementation
      */
     @Provides
     fun provideGetOfflineSortOrder(sortOrderRepository: SortOrderRepository): GetOfflineSortOrder =
-        GetOfflineSortOrder(sortOrderRepository::getOfflineSortOrder)
+        DefaultGetOfflineSortOrder(sortOrderRepository)
 
     /**
      * Provide the SetOfflineSortOrder implementation

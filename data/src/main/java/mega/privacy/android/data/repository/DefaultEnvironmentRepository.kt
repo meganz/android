@@ -62,4 +62,6 @@ internal class DefaultEnvironmentRepository @Inject constructor(
     override suspend fun saveVersionCode(newVersionCode: Int) {
         appInfoPreferencesGateway.setLastVersionCode(newVersionCode)
     }
+
+    override suspend fun getDeviceSdkVersion() = deviceGateway.getSdkVersion()
 }

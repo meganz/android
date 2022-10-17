@@ -1,12 +1,11 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
-import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -25,7 +24,7 @@ import javax.inject.Inject
  * @property syncRecordTypeIntMapper [SyncRecordTypeIntMapper]
  * @property ioDispatcher CoroutineDispatcher
  */
-class DefaultCameraUploadRepository @Inject constructor(
+internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
     private val fileAttributeGateway: FileAttributeGateway,

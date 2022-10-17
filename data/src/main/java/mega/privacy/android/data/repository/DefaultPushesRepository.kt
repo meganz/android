@@ -31,7 +31,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaChatApi       Required for notifying about pushes.
  * @property chatRequestMapper [ChatRequestMapper]
  */
-class DefaultPushesRepository @Inject constructor(
+internal class DefaultPushesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaApi: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -81,6 +81,11 @@ class DefaultPushesRepository @Inject constructor(
             }
         }
 
+    override suspend fun clearPushToken() = withContext(ioDispatcher) {
+        context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit()
+            .clear().apply()
+    }
+
     private fun onRequestPushReceivedCompleted(continuation: Continuation<ChatRequest>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {
@@ -96,7 +101,7 @@ class DefaultPushesRepository @Inject constructor(
         }
 
     companion object {
-        const val PUSH_TOKEN = "PUSH_TOKEN"
+        private const val PUSH_TOKEN = "PUSH_TOKEN"
         private const val NEW_TOKEN = "NEW_TOKEN"
     }
 }

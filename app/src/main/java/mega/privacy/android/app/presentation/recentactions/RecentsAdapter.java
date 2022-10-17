@@ -63,11 +63,10 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     private int mHeaderColor = -1;
 
-    public RecentsAdapter(Context context, Object fragment, List<RecentActionItemType> items) {
+    public RecentsAdapter(Context context, Object fragment) {
         Timber.d("new RecentsAdapter");
         this.context = context;
         this.fragment = fragment;
-        setItems(items);
 
         megaApi = MegaApplication.getInstance().getMegaApi();
 
@@ -209,7 +208,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             if (mail.equals(megaApi.getMyEmail())) {
                 holder.actionBy.setVisibility(View.GONE);
             } else {
-                user = ((RecentActionsFragment) fragment).findUserName(mail);
+                user = ((RecentActionItemType.Item) item).getUserName();
                 if (bucket.isUpdate()) {
                     userAction = context.getString(R.string.update_action_bucket, user);
                 } else {
@@ -367,7 +366,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 }
                 if (bucket == null) break;
 
-                ((RecentActionsFragment) fragment).getSelectedBucketModel().select(bucket, megaApi.getRecentActions());
+                ((RecentActionsFragment) fragment).getViewModel().select(bucket);
                 NavDestination currentDestination = Navigation.findNavController(v).getCurrentDestination();
                 if (currentDestination != null && currentDestination.getId() == R.id.homepageFragment) {
                     Navigation.findNavController(v).navigate(HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(), new NavOptions.Builder().build());

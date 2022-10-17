@@ -6,7 +6,9 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 
-
+/**
+ * UIAlbumMapper
+ */
 typealias UIAlbumMapper = (@JvmSuppressWildcards List<@JvmSuppressWildcards Photo>, @JvmSuppressWildcards Album) -> @JvmSuppressWildcards UIAlbum
 
 /**

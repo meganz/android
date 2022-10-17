@@ -70,8 +70,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
-import mega.privacy.android.data.repository.DefaultPushesRepository.Companion.PUSH_TOKEN
-import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.repository.PushesRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
@@ -99,6 +98,12 @@ class AccountController(private val context: Context) {
          *
          */
         fun callsPreferencesGateway(): CallsPreferencesGateway
+
+        /**
+         * Push repository
+         *
+         */
+        fun pushRepository(): PushesRepository
     }
 
     fun existsAvatar(): Boolean {
@@ -378,10 +383,6 @@ class AccountController(private val context: Context) {
                 .putLong(MegaContactGetter.LAST_SYNC_TIMESTAMP_KEY, 0)
                 .apply()
 
-            //clear push token
-            context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit()
-                .clear().apply()
-
             //clear user interface preferences
             context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
                 .edit().clear().apply()
@@ -393,6 +394,8 @@ class AccountController(private val context: Context) {
             sharingScope.launch(Dispatchers.IO) {
                 entryPoint.callsPreferencesGateway().clearPreferences()
                 entryPoint.chatPreferencesGateway().clearPreferences()
+                //clear push token
+                entryPoint.pushRepository().clearPushToken()
             }
 
             // Clear text editor preference
@@ -415,7 +418,6 @@ class AccountController(private val context: Context) {
 
             //Clear MyAccountInfo
             app.resetMyAccountInfo()
-            app.storageState = StorageState.Unknown
 
             // Clear get banner success flag
             LiveEventBus.get(Constants.EVENT_LOGOUT_CLEARED).post(null)

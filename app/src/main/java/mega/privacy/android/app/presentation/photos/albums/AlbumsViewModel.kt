@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
+import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
@@ -38,6 +39,8 @@ class AlbumsViewModel @Inject constructor(
     private val _state = MutableStateFlow(AlbumsViewState())
     val state = _state.asStateFlow()
     private var currentNodeJob: Job? = null
+
+    internal val selectedPhotoIds = mutableSetOf<Long>()
 
     private suspend fun getSystemAlbums(): Map<Album, PhotoPredicate> {
         val albums = getDefaultAlbumsMap()
@@ -85,6 +88,22 @@ class AlbumsViewModel @Inject constructor(
     fun setCurrentAlbum(album: Album?) {
         _state.update {
             it.copy(currentAlbum = album)
+        }
+    }
+
+    fun onClick(photo: Photo) {
+        togglePhotoSelection(photo.id)
+    }
+
+    fun onLongPress(photo: Photo) {
+        //TODO
+    }
+
+    private fun togglePhotoSelection(id: Long) {
+        if (id in selectedPhotoIds) {
+            selectedPhotoIds.remove(id)
+        } else {
+            selectedPhotoIds.add(id)
         }
     }
 }
