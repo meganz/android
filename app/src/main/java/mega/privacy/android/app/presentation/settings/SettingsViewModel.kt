@@ -28,16 +28,17 @@ import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
-import mega.privacy.android.domain.usecase.IsHideRecentActivityEnabled
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
+import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import timber.log.Timber
@@ -55,7 +56,8 @@ class SettingsViewModel @Inject constructor(
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
     private val monitorAutoAcceptQRLinks: MonitorAutoAcceptQRLinks,
     private val startScreen: MonitorStartScreenPreference,
-    private val isHideRecentActivityEnabled: IsHideRecentActivityEnabled,
+    private val monitorHideRecentActivity: MonitorHideRecentActivity,
+    private val setHideRecentActivity: SetHideRecentActivity,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
     fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
     monitorConnectivity: MonitorConnectivity,
@@ -146,7 +148,7 @@ class SettingsViewModel @Inject constructor(
                     .map { screen ->
                         { state: SettingsState -> state.copy(startScreen = screen.id) }
                     },
-                isHideRecentActivityEnabled()
+                monitorHideRecentActivity()
                     .map { hide ->
                         { state: SettingsState -> state.copy(hideRecentActivityChecked = hide) }
                     },
@@ -212,6 +214,15 @@ class SettingsViewModel @Inject constructor(
     fun enableLogger() = viewModelScope.launch { setSdkLogsEnabled(true) }
 
     fun enableChatLogger() = viewModelScope.launch { setChatLoggingEnabled(true) }
+
+    /**
+     * Set hide recent activity setting
+     *
+     * @param hide true if hide recent activity
+     */
+    fun hideRecentActivity(hide: Boolean) = viewModelScope.launch {
+        setHideRecentActivity(hide)
+    }
 
     fun putString(key: String?, value: String?) {
         viewModelScope.launch { putStringPreference(key, value) }

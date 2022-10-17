@@ -74,7 +74,7 @@ class SettingsFragmentTest {
     }
 
     private fun initialiseMockDefaults() {
-        whenever(TestSettingsModule.shouldHideRecentActivity()).thenReturn(hide)
+        whenever(TestSettingsModule.monitorHideRecentActivity()).thenReturn(hide)
     }
 
     @After

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.SettingsViewModel
@@ -19,11 +20,14 @@ import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
+import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.TEST_USER_ACCOUNT
 
@@ -43,7 +47,12 @@ class SettingsViewModelTest {
     private val isChatLoggedInValue = MutableStateFlow(true)
     private val isChatLoggedIn =
         mock<IsChatLoggedIn> { on { invoke() }.thenReturn(isChatLoggedInValue) }
-
+    private val monitorHideRecentActivity = mock<MonitorHideRecentActivity> {
+        on { invoke() }.thenReturn(
+            emptyFlow()
+        )
+    }
+    private val setHideRecentActivity = mock<SetHideRecentActivity>()
 
     @Before
     fun setUp() {
@@ -61,7 +70,8 @@ class SettingsViewModelTest {
             monitorAutoAcceptQRLinks = monitorAutoAcceptQRLinks,
             fetchMultiFactorAuthSetting = fetchMultiFactorAuthSetting,
             startScreen = mock { on { invoke() }.thenReturn(emptyFlow()) },
-            isHideRecentActivityEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
+            monitorHideRecentActivity = monitorHideRecentActivity,
+            setHideRecentActivity = setHideRecentActivity,
             toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,
             monitorConnectivity = mock { on { invoke() }.thenReturn(MutableStateFlow(true)) },
             requestAccountDeletion = mock(),
@@ -188,5 +198,34 @@ class SettingsViewModelTest {
                 .test {
                     assertThat(awaitItem()).isFalse()
                 }
+        }
+
+    @Test
+    fun `test that hideRecentActivityChecked is set with return value of monitorHideRecentActivity`() =
+        runTest {
+            whenever(monitorHideRecentActivity()).thenReturn(
+                flow {
+                    emit(true)
+                    emit(false)
+                }
+            )
+
+            underTest.uiState
+                .map { it.hideRecentActivityChecked }
+                .distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isFalse()
+                    assertThat(awaitItem()).isTrue()
+                    assertThat(awaitItem()).isFalse()
+                }
+        }
+
+    @Test
+    fun `test that hideRecentActivity will call setHideRecentActivity use case`() =
+        runTest {
+            val expected = false
+            underTest.hideRecentActivity(expected)
+            advanceUntilIdle()
+            verify(setHideRecentActivity).invoke(expected)
         }
 }
