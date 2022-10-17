@@ -53,7 +53,6 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
     private val outMetrics: DisplayMetrics = context.resources.displayMetrics
 
     private var recentActionItems: List<RecentActionItemType>? = null
-    private var mHeaderColor = -1
 
     /**
      * The Homepage bottom sheet has a calculated background for elevation, while the
@@ -62,36 +61,11 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
      *
      * @return the header's background color value
      */
-    private val headerColor: Int
-        get() {
-            if (mHeaderColor == -1) {
-                val elevationPx = Util.dp2px(HomepageFragment.BOTTOM_SHEET_ELEVATION,
-                    context.resources.displayMetrics)
-                mHeaderColor = getColorForElevation(context, elevationPx.toFloat())
-            }
-            return mHeaderColor
-        }
-
-    override fun getNodePosition(handle: Long): Int {
-        return recentActionItems
-            ?.filterIsInstance<RecentActionItemType.Item>()
-            ?.mapIndexed { index, item ->
-                if (
-                    item.bucket.nodes != null
-                    && item.bucket.nodes.size() > 0
-                    && item.bucket.nodes.get(0).handle == handle
-                ) index
-                else null
-            }
-            ?.filterNotNull()
-            ?.singleOrNull()
-            ?: Constants.INVALID_POSITION
+    private val headerColor: Int by lazy {
+        val elevationPx = Util.dp2px(HomepageFragment.BOTTOM_SHEET_ELEVATION,
+            context.resources.displayMetrics)
+        getColorForElevation(context, elevationPx.toFloat())
     }
-
-    override fun getThumbnail(viewHolder: RecyclerView.ViewHolder): View? =
-        if (viewHolder is RecentActionViewHolder) {
-            viewHolder.binding.thumbnailView
-        } else null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentActionViewHolder {
         Timber.d("onCreateViewHolder")
@@ -116,18 +90,21 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
                     Timber.d("onBindViewHolder: TYPE_BUCKET")
                     binding.itemBucketLayout.visibility = View.VISIBLE
                     binding.itemBucketLayout.setOnClickListener {
-                        val node = getNodeOfItem(item)
-                        if (node != null) {
-                            (fragment as RecentActionsFragment).openFile(holder.bindingAdapterPosition,
-                                node)
-                            return@setOnClickListener
+                        // If only one element in the bucket
+                        if (item.bucket.nodes.size() == 1) {
+                            (fragment as RecentActionsFragment).openFile(
+                                holder.bindingAdapterPosition,
+                                item.bucket.nodes[0])
                         }
-                        val bucket: MegaRecentActionBucket = item.bucket
-                        (fragment as RecentActionsFragment).viewModel.select(bucket)
-                        val currentDestination = findNavController(it).currentDestination
-                        if (currentDestination != null && currentDestination.id == R.id.homepageFragment) {
-                            findNavController(it).navigate(actionHomepageToRecentBucket(),
-                                NavOptions.Builder().build())
+                        // If more element in the bucket
+                        else {
+                            val bucket: MegaRecentActionBucket = item.bucket
+                            (fragment as RecentActionsFragment).viewModel.select(bucket)
+                            val currentDestination = findNavController(it).currentDestination
+                            if (currentDestination != null && currentDestination.id == R.id.homepageFragment) {
+                                findNavController(it).navigate(actionHomepageToRecentBucket(),
+                                    NavOptions.Builder().build())
+                            }
                         }
                     }
                     binding.headerLayout.visibility = View.GONE
@@ -180,6 +157,8 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
                     params.setMargins(margin, margin, margin, 0)
                     binding.thumbnailView.layoutParams = params
                     binding.thumbnailView.setImageResource(MimeTypeList.typeForName(node.name).iconResourceId)
+
+                    // only one item in the recent action
                     if (nodeList.size() == 1) {
                         binding.threeDots.visibility = View.VISIBLE
                         binding.threeDots.setOnClickListener {
@@ -188,10 +167,10 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
                                     context.getString(
                                         R.string.error_server_connection_problem),
                                     -1)
-                                return@setOnClickListener
+                            } else {
+                                (context as ManagerActivity).showNodeOptionsPanel(node,
+                                    NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
                             }
-                            (context as ManagerActivity).showNodeOptionsPanel(node,
-                                NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
                         }
                         binding.firstLineText.text = node.name
                         if (node.label != MegaNode.NODE_LBL_UNKNOWN) {
@@ -204,7 +183,9 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
                         }
                         binding.imgFavourite.visibility =
                             if (node.isFavourite) View.VISIBLE else View.GONE
-                    } else {
+                    }
+                    // multiple item in the recent action
+                    else {
                         binding.threeDots.visibility = View.INVISIBLE
                         binding.threeDots.setOnClickListener(null)
                         binding.imgLabel.visibility = View.GONE
@@ -228,14 +209,62 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
         }
     }
 
+    override fun getNodePosition(handle: Long): Int {
+        return recentActionItems
+            ?.filterIsInstance<RecentActionItemType.Item>()
+            ?.mapIndexed { index, item ->
+                if (
+                    item.bucket.nodes != null
+                    && item.bucket.nodes.size() > 0
+                    && item.bucket.nodes.get(0).handle == handle
+                ) index
+                else null
+            }
+            ?.filterNotNull()
+            ?.singleOrNull()
+            ?: Constants.INVALID_POSITION
+    }
+
+
+    override fun getItemCount(): Int {
+        return if (recentActionItems.isNullOrEmpty()) 0 else recentActionItems!!.size
+    }
+
+    override fun getThumbnail(viewHolder: RecyclerView.ViewHolder): View? =
+        if (viewHolder is RecentActionViewHolder) {
+            viewHolder.binding.thumbnailView
+        } else null
+
+    override fun getSectionTitle(position: Int): String {
+        return if (recentActionItems.isNullOrEmpty()
+            || position < 0 || position >= (recentActionItems?.size ?: -1)
+        ) "" else TimeUtils.formatBucketDate(context,
+            recentActionItems!![position].timestamp)
+    }
+
+    /**
+     * Set the recent action list and update the adapter
+     *
+     * @param recentItems
+     */
+    fun setItems(recentItems: List<RecentActionItemType>?) {
+        recentActionItems = recentItems
+        notifyDataSetChanged()
+    }
+
+    /**
+     * Format the user action with decoration
+     *
+     * @param userAction the string to decorate
+     * @return spanned string with decoration
+     */
     private fun formatUserAction(userAction: String): Spanned {
         val formattedUserAction = try {
-            val replace = userAction
+            userAction
                 .replace("[A]",
                     "<font color=\'" + getColorHexString(context,
                         R.color.grey_300_grey_600) + "\'>")
                 .replace("[/A]", "</font>")
-            replace
         } catch (e: Exception) {
             Timber.e(e, "Exception formatting string")
             ""
@@ -246,6 +275,12 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
             Html.fromHtml(formattedUserAction, Html.FROM_HTML_MODE_LEGACY)
     }
 
+    /**
+     * Format the title in case there are multiple nodes in one recent action item
+     *
+     * @param nodeList list of nodes contained in the recent action item
+     * @return a string corresponding to the title
+     */
     private fun getMediaTitle(nodeList: MegaNodeList): String {
         var numImages = 0
         var numVideos = 0
@@ -256,34 +291,35 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
                 numVideos++
             }
         }
-        val mediaTitle = if (numImages > 0 && numVideos == 0) {
-            context.resources.getQuantityString(R.plurals.title_media_bucket_only_images,
-                numImages,
-                numImages)
-        } else if (numImages == 0 && numVideos > 0) {
-            context.resources.getQuantityString(R.plurals.title_media_bucket_only_videos,
-                numVideos,
-                numVideos)
-        } else {
-            context.resources.getQuantityString(R.plurals.title_media_bucket_images_and_videos,
-                numImages,
-                numImages) +
-                    context.resources.getQuantityString(R.plurals.title_media_bucket_images_and_videos_2,
-                        numVideos,
-                        numVideos)
+        val mediaTitle = when {
+            numImages > 0 && numVideos == 0 -> {
+                context.resources.getQuantityString(R.plurals.title_media_bucket_only_images,
+                    numImages,
+                    numImages)
+            }
+            numImages == 0 && numVideos > 0 -> {
+                context.resources.getQuantityString(R.plurals.title_media_bucket_only_videos,
+                    numVideos,
+                    numVideos)
+            }
+            else -> {
+                context.resources.getQuantityString(R.plurals.title_media_bucket_images_and_videos,
+                    numImages,
+                    numImages) +
+                        context.resources.getQuantityString(R.plurals.title_media_bucket_images_and_videos_2,
+                            numVideos,
+                            numVideos)
+            }
         }
         return mediaTitle
     }
 
-    fun setItems(recentItems: List<RecentActionItemType>?) {
-        this.recentActionItems = recentItems
-        notifyDataSetChanged()
-    }
-
-    override fun getItemCount(): Int {
-        return if (recentActionItems == null || recentActionItems!!.isEmpty()) 0 else recentActionItems!!.size
-    }
-
+    /**
+     * Return the recent action item at given position
+     *
+     * @param pos the given position
+     * @return the recent action item at position [pos], null if [pos] is invalid index or item is null
+     */
     private fun getItemAtPosition(pos: Int): RecentActionItemType? {
         return if (recentActionItems.isNullOrEmpty()
             || pos < 0 || pos >= (recentActionItems?.size ?: -1)
@@ -291,27 +327,11 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
         else recentActionItems?.get(pos)
     }
 
-    private fun getBucketOfItem(item: RecentActionItemType): MegaRecentActionBucket? {
-        return if (item !is RecentActionItemType.Item) null else item.bucket
-    }
-
-    private fun getMegaNodeListOfItem(item: RecentActionItemType): MegaNodeList? {
-        val bucket = getBucketOfItem(item) ?: return null
-        return bucket.nodes
-    }
-
-    private fun getNodeOfItem(item: RecentActionItemType): MegaNode? {
-        val nodeList = getMegaNodeListOfItem(item)
-        return if (nodeList == null || nodeList.size() > 1) null else nodeList[0]
-    }
-
-    override fun getSectionTitle(position: Int): String {
-        return if (recentActionItems.isNullOrEmpty()
-            || position < 0 || position >= (recentActionItems?.size ?: -1)
-        ) "" else TimeUtils.formatBucketDate(context,
-            recentActionItems!![position].timestamp)
-    }
-
+    /**
+     * ViewHolder for a recent action item
+     *
+     * @property binding
+     */
     inner class RecentActionViewHolder(val binding: ItemBucketBinding) :
         RecyclerView.ViewHolder(binding.root)
 }
