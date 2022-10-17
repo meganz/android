@@ -161,4 +161,19 @@ interface MegaChatApiGateway {
      * @return The chat conversation.
      */
     fun getChatRoom(chatId: Long): MegaChatRoom?
+
+    /**
+     * Answer call.
+     *
+     * @param chatId  The chat id.
+     * @param enabledVideo True for audio-video call, false for audio call.
+     * @param enabledAudio True for answering a call with audio (mute disabled).
+     * @param listener Listener.
+     */
+    fun answerChatCall(
+        chatId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
 }
