@@ -8,6 +8,8 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.data.mapper.ChatRequestMapper
+import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatError
@@ -17,7 +19,6 @@ import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
-
 /**
  * Default implementation of [ChatRepository]
  *
@@ -26,6 +27,7 @@ import kotlin.coroutines.suspendCoroutine
 internal class DefaultChatRepository @Inject constructor(
     private val chatGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val chatRequestMapper: ChatRequestMapper,
 ) : ChatRepository {
 
     override fun notifyChatLogout(): Flow<Boolean> {
@@ -63,6 +65,27 @@ internal class DefaultChatRepository @Inject constructor(
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {
                 continuation.resumeWith(Result.success(request.flag))
+            } else {
+                continuation.failWithError(error)
+            }
+        }
+
+    override suspend fun startChatCall(chatId: Long, enabledVideo: Boolean, enabledAudio: Boolean) =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                chatGateway.startChatCall(chatId,
+                    enabledVideo,
+                    enabledAudio,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = onRequestStartChatCallCompleted(continuation)
+                    ))
+            }
+        }
+
+    private fun onRequestStartChatCallCompleted(continuation: Continuation<ChatRequest>) =
+        { request: MegaChatRequest, error: MegaChatError ->
+            if (error.errorCode == MegaChatError.ERROR_OK) {
+                continuation.resumeWith(Result.success(chatRequestMapper(request)))
             } else {
                 continuation.failWithError(error)
             }
