@@ -76,10 +76,10 @@ class RecentActionsViewModel @Inject constructor(
     /**
      * Set the selected recent actions bucket and current recent actions bucket list
      *
-     * @param bucket
+     * @param item
      */
-    fun select(bucket: MegaRecentActionBucket) {
-        selected = bucket
+    fun select(item: RecentActionItemType.Item) {
+        selected = item.bucket
         snapshotActionList = _buckets
     }
 

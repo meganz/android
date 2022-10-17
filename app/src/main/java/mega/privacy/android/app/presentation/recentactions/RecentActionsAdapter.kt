@@ -9,20 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import androidx.fragment.app.Fragment
-import androidx.navigation.NavOptions
-import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
+import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemBucketBinding
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
-import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections.Companion.actionHomepageToRecentBucket
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.recentactions.RecentActionsAdapter.RecentActionViewHolder
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
@@ -32,25 +26,27 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getOutgoingOrIncomingParent
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Adapter to display a list of recent actions
  *
  * @property context
- * @property fragment
  */
-class RecentActionsAdapter(private val context: Context, private val fragment: Fragment) :
-    RecyclerView.Adapter<RecentActionViewHolder>(), SectionTitleProvider,
-    DragThumbnailGetter {
+class RecentActionsAdapter @Inject constructor(
+    @ApplicationContext private val context: Context,
+    @MegaApi private val megaApi: MegaApiAndroid,
+) : RecyclerView.Adapter<RecentActionViewHolder>(), SectionTitleProvider, DragThumbnailGetter {
 
-    private val megaApi: MegaApiAndroid = getInstance().megaApi
     private val outMetrics: DisplayMetrics = context.resources.displayMetrics
 
     private var recentActionItems: List<RecentActionItemType>? = null
+    private var listener: RecentActionsListener? = null
 
     /**
      * The Homepage bottom sheet has a calculated background for elevation, while the
@@ -59,15 +55,15 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
      *
      * @return the header's background color value
      */
-    private val headerColor: Int by lazy {
-        val elevationPx = Util.dp2px(HomepageFragment.BOTTOM_SHEET_ELEVATION,
-            context.resources.displayMetrics)
-        getColorForElevation(context, elevationPx.toFloat())
-    }
+    private var headerColor: Int = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentActionViewHolder {
         Timber.d("onCreateViewHolder")
         val binding = ItemBucketBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
+        val elevationPx = Util.dp2px(HomepageFragment.BOTTOM_SHEET_ELEVATION, outMetrics)
+        headerColor = getColorForElevation(parent.context, elevationPx.toFloat())
+
         return RecentActionViewHolder(binding)
     }
 
@@ -88,22 +84,8 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
                 Timber.d("onBindViewHolder: TYPE_BUCKET")
                 binding.itemBucketLayout.visibility = View.VISIBLE
                 binding.itemBucketLayout.setOnClickListener {
-                    // If only one element in the bucket
-                    if (item.bucket.nodes.size() == 1) {
-                        (fragment as RecentActionsFragment).openFile(
-                            holder.bindingAdapterPosition,
-                            item.bucket.nodes[0])
-                    }
-                    // If more element in the bucket
-                    else {
-                        (fragment as RecentActionsFragment).viewModel.select(item.bucket)
-
-                        val currentDestination = findNavController(it).currentDestination
-                        if (currentDestination != null && currentDestination.id == R.id.homepageFragment) {
-                            findNavController(it).navigate(actionHomepageToRecentBucket(),
-                                NavOptions.Builder().build())
-                        }
-                    }
+                    listener?.onClickItem(item,
+                        holder.bindingAdapterPosition)
                 }
                 binding.headerLayout.visibility = View.GONE
 
@@ -163,15 +145,7 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
                 if (nodeList.size() == 1) {
                     binding.threeDots.visibility = View.VISIBLE
                     binding.threeDots.setOnClickListener {
-                        if (!Util.isOnline(context)) {
-                            (context as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
-                                context.getString(
-                                    R.string.error_server_connection_problem),
-                                -1)
-                        } else {
-                            (context as ManagerActivity).showNodeOptionsPanel(node,
-                                NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
-                        }
+                        listener?.onClickThreeDots(node)
                     }
                     binding.firstLineText.text = node.name
                     if (node.label != MegaNode.NODE_LBL_UNKNOWN) {
@@ -254,6 +228,15 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
     }
 
     /**
+     * Set the listener dispatch event
+     *
+     * @param recentActionsListener
+     */
+    fun setListener(recentActionsListener: RecentActionsListener) {
+        listener = recentActionsListener
+    }
+
+    /**
      * Format the user action with decoration
      *
      * @param userAction the string to decorate
@@ -329,4 +312,24 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
      */
     inner class RecentActionViewHolder(val binding: ItemBucketBinding) :
         RecyclerView.ViewHolder(binding.root)
+}
+
+/**
+ * Listener for interaction with recent actions adapter
+ */
+interface RecentActionsListener {
+    /**
+     * Triggered when an item is clicked
+     *
+     * @param item the item clicked
+     * @param position the position of the item in the list
+     */
+    fun onClickItem(item: RecentActionItemType.Item, position: Int)
+
+    /**
+     * Triggered when a three dots button is clicked
+     *
+     * @param node the node associated with the three dots
+     */
+    fun onClickThreeDots(node: MegaNode?)
 }
