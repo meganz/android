@@ -114,7 +114,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
-import mega.privacy.android.app.data.model.UserCredentials;
+import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
@@ -130,6 +130,7 @@ import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaCancelToken;
@@ -169,7 +170,7 @@ public class DownloadService extends Service implements MegaRequestListenerInter
     @Inject
     TransfersManagement transfersManagement;
     @Inject
-    DatabaseHandler dbH;
+    LegacyDatabaseHandler dbH;
     @Inject
     ActivityLifecycleHandler activityLifecycleHandler;
 

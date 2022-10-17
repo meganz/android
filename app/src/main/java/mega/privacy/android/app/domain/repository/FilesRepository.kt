@@ -82,7 +82,7 @@ interface FilesRepository {
      * @param order order for the returned list
      * @return Children nodes of a parent node
      */
-    suspend fun getChildrenNode(parentNode: MegaNode, order: SortOrder? = null): List<MegaNode>
+    suspend fun getChildrenNode(parentNode: MegaNode, order: SortOrder): List<MegaNode>
 
     /**
      * Get the node corresponding to a handle

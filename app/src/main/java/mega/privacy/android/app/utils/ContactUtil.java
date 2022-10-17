@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
-import mega.privacy.android.app.MegaContactDB;
+import mega.privacy.android.data.model.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.ContactInfoActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;

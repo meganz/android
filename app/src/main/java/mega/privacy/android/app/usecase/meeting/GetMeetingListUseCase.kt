@@ -16,7 +16,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
-import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
@@ -26,6 +25,7 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -74,49 +74,65 @@ class GetMeetingListUseCase @Inject constructor(
                     if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
 
                     if (error.errorCode == MegaError.API_OK) {
+                        if (request.paramType == MegaApiJava.USER_ATTR_AVATAR && request.file == null) {
+                            Timber.w(IllegalArgumentException("Avatar file not available"))
+                            return@OptionalMegaRequestListenerInterface
+                        }
+
                         val index = meetings.indexOfFirst {
                             request.nodeHandle == it.firstUser.handle || request.nodeHandle == it.lastUser?.handle
                                     || request.email == it.firstUser.email || request.email == it.lastUser?.email
+                                    || request.email == it.firstUser.handle.toString() || request.email == it.lastUser?.handle?.toString()
                         }
 
                         if (index != Constants.INVALID_POSITION) {
                             val currentItem = meetings[index]
-                            when (request.paramType) {
-                                MegaRequest.TYPE_GET_USER_EMAIL -> {
+                            when {
+                                request.type == MegaRequest.TYPE_GET_USER_EMAIL -> {
                                     meetings[index] =
                                         if (request.nodeHandle == currentItem.firstUser.handle) {
                                             currentItem.copy(
-                                                firstUser = currentItem.firstUser.copy(email = request.text)
+                                                firstUser = currentItem.firstUser.copy(
+                                                    email = request.email
+                                                )
                                             )
                                         } else {
                                             currentItem.copy(
-                                                lastUser = currentItem.lastUser?.copy(email = request.text)
+                                                lastUser = currentItem.lastUser?.copy(
+                                                    email = request.email
+                                                )
                                             )
                                         }
                                 }
-                                MegaApiJava.USER_ATTR_FIRSTNAME -> {
+                                request.paramType == MegaApiJava.USER_ATTR_FIRSTNAME -> {
                                     meetings[index] =
-                                        if (request.nodeHandle == currentItem.firstUser.handle) {
+                                        if (request.email == currentItem.firstUser.handle.toString()) {
                                             currentItem.copy(
-                                                firstUser = currentItem.firstUser.copy(firstName = request.text)
+                                                firstUser = currentItem.firstUser.copy(
+                                                    firstName = request.text
+                                                )
                                             )
                                         } else {
                                             currentItem.copy(
-                                                lastUser = currentItem.lastUser?.copy(firstName = request.text)
+                                                lastUser = currentItem.lastUser?.copy(
+                                                    firstName = request.text
+                                                )
                                             )
                                         }
                                 }
-                                MegaApiJava.USER_ATTR_AVATAR -> {
+                                request.paramType == MegaApiJava.USER_ATTR_AVATAR -> {
                                     meetings[index] =
                                         if (request.email == currentItem.firstUser.email) {
                                             currentItem.copy(
-                                                firstUser = currentItem.firstUser.copy(avatar = File(
-                                                    request.file).toUri())
+                                                firstUser = currentItem.firstUser.copy(
+                                                    avatar = request.file.toUri()
+                                                )
                                             )
                                         } else {
                                             currentItem.copy(
-                                                lastUser = currentItem.lastUser?.copy(avatar = File(
-                                                    request.file).toUri())
+                                                lastUser = currentItem.lastUser?.copy(
+                                                    avatar = request.file.toUri()
+                                                )
                                             )
                                         }
                                 }

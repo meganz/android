@@ -10,8 +10,7 @@ fun interface SetOpenInvite {
      * Invoke.
      *
      * @param chatId  The chat id.
-     * @param enabled  True if allow add participants, false otherwise.
-     * @return The chat conversation handle.
+     * @return  True if it's enabled, false if not.
      */
-    suspend operator fun invoke(chatId: Long, enabled: Boolean): Long
+    suspend operator fun invoke(chatId: Long): Boolean
 }

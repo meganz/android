@@ -2,9 +2,8 @@ package mega.privacy.android.app.myAccount.usecase
 
 import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.core.SingleEmitter
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import nz.mega.sdk.MegaApiAndroid

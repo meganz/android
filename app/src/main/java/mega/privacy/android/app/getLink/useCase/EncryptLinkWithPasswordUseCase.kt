@@ -1,7 +1,7 @@
 package mega.privacy.android.app.getLink.useCase
 
 import io.reactivex.rxjava3.core.Single
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import nz.mega.sdk.MegaApiAndroid

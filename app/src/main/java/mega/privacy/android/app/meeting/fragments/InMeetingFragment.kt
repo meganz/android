@@ -27,8 +27,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
@@ -36,8 +38,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
@@ -58,7 +62,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
@@ -137,6 +141,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     @Inject
     lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
+
+    @Inject
+    lateinit var chatManagement: ChatManagement
 
     val args: InMeetingFragmentArgs by navArgs()
 
@@ -892,10 +899,27 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Init View Models
      */
     private fun initViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                inMeetingViewModel.state.collect { (error, enabled) ->
+                    if (error != null) {
+                        sharedModel.showSnackBar(StringResourcesUtils.getString(error))
+                        bottomFloatingPanelViewHolder.checkErrorAllowAddParticipants()
+                    } else if (enabled != null) {
+                        bottomFloatingPanelViewHolder.updateShareAndInviteButton()
+                        bottomFloatingPanelViewHolder.updateAllowAddParticipantsSwitch(enabled)
+                    }
+                }
+            }
+        }
+
         sharedModel.currentChatId.observe(viewLifecycleOwner) {
             it?.let {
                 Timber.d("Chat has changed")
                 inMeetingViewModel.setChatId(it)
+                if (!sharedModel.isChatOpen) {
+                    chatManagement.openChatRoom(it)
+                }
             }
         }
 
@@ -2559,6 +2583,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         meetingActivity.startActivityForResult(
             inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS
         )
+    }
+
+    override fun onAllowAddParticipants() {
+        inMeetingViewModel.onAllowAddParticipantsTap()
     }
 
     /**

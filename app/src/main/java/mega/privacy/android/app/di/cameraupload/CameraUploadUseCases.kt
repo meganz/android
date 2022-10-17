@@ -13,6 +13,7 @@ import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSe
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.DefaultGetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeFromCloud
+import mega.privacy.android.app.domain.usecase.DefaultGetPendingUploadList
 import mega.privacy.android.app.domain.usecase.DefaultGetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetSyncFileUploadUris
@@ -31,6 +32,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByFingerprintAndParentNode
 import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
+import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
@@ -45,22 +47,35 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
+import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
+import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
+import mega.privacy.android.domain.usecase.DefaultBackupTimeStampsAndFolderHandle
+import mega.privacy.android.domain.usecase.DefaultCheckCameraUpload
 import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
+import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadSettings
+import mega.privacy.android.domain.usecase.DefaultDisableMediaUploadSettings
+import mega.privacy.android.domain.usecase.DefaultGetGPSCoordinates
 import mega.privacy.android.domain.usecase.DefaultGetSyncRecordByPath
 import mega.privacy.android.domain.usecase.DefaultGetUploadFolderHandle
 import mega.privacy.android.domain.usecase.DefaultIsChargingRequired
+import mega.privacy.android.domain.usecase.DefaultResetCameraUploadTimeStamps
+import mega.privacy.android.domain.usecase.DefaultResetMediaUploadTimeStamps
+import mega.privacy.android.domain.usecase.DefaultRestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.DefaultShouldCompressVideo
 import mega.privacy.android.domain.usecase.DefaultUpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
+import mega.privacy.android.domain.usecase.DisableCameraUploadSettings
+import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
+import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetRemoveGps
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
@@ -77,6 +92,9 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
+import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
+import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
+import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
@@ -143,7 +161,7 @@ abstract class CameraUploadUseCases {
                 cameraUploadRepository.doesLocalPathExist(
                     filePath,
                     isSecondary,
-                    SyncRecordType.TYPE_ANY.value
+                    SyncRecordType.TYPE_ANY
                 )
             }
 
@@ -205,7 +223,7 @@ abstract class CameraUploadUseCases {
                 cameraUploadRepository.doesFileNameExist(
                     fileName,
                     isSecondary,
-                    SyncRecordType.TYPE_ANY.value
+                    SyncRecordType.TYPE_ANY
                 )
             }
 
@@ -321,11 +339,11 @@ abstract class CameraUploadUseCases {
             IsNodeInRubbish(fileRepository::isNodeInRubbish)
 
         /**
-         * Provide the BackupTimeStampsAndFolderHandle implementation
+         * Provide the ClearCacheDirectory implementation
          */
         @Provides
-        fun provideBackupTimeStampsAndFolderHandle(cameraUploadRepository: CameraUploadRepository): BackupTimeStampsAndFolderHandle =
-            BackupTimeStampsAndFolderHandle(cameraUploadRepository::backupTimestampsAndFolderHandle)
+        fun provideClearCacheDirectory(cameraUploadRepository: CameraUploadRepository): ClearCacheDirectory =
+            ClearCacheDirectory(cameraUploadRepository::clearCacheDirectory)
     }
 
     /**
@@ -431,6 +449,12 @@ abstract class CameraUploadUseCases {
     abstract fun bindCompressedVideoPending(compressedVideoPending: DefaultCompressedVideoPending): CompressedVideoPending
 
     /**
+     * Provide the GetGPSCoordinates implementation
+     */
+    @Binds
+    abstract fun bindGetGPSCoordinates(getGPSCoordinates: DefaultGetGPSCoordinates): GetGPSCoordinates
+
+    /**
      * Provide the IsChargingRequired implementation
      */
     @Binds
@@ -443,8 +467,58 @@ abstract class CameraUploadUseCases {
     abstract fun bindSaveSyncRecordsToDB(saveSyncRecordsToDB: DefaultSaveSyncRecordsToDB): SaveSyncRecordsToDB
 
     /**
+     * Provide the GetPendingUploadList implementation
+     */
+    @Binds
+    abstract fun bindGetPendingUploadList(getPendingUploadList: DefaultGetPendingUploadList): GetPendingUploadList
+
+    /**
      * Provide the GetUploadFolderHandle implementation
      */
     @Binds
     abstract fun bindGetUploadFolderHandle(getUploadFolderHandle: DefaultGetUploadFolderHandle): GetUploadFolderHandle
+
+    /**
+     * Provide the ResetCameraUploadTimeStamps implementation
+     */
+    @Binds
+    abstract fun bindResetCameraUploadTimeStamps(resetCameraUploadTimeStamps: DefaultResetCameraUploadTimeStamps): ResetCameraUploadTimeStamps
+
+    /**
+     * Provide the ResetMediaUploadTimeStamps implementation
+     */
+    @Binds
+    abstract fun bindResetMediaUploadTimeStamps(resetMediaUploadTimeStamps: DefaultResetMediaUploadTimeStamps): ResetMediaUploadTimeStamps
+
+    /**
+     * Provide the DisableCameraUploadSettings implementation
+     */
+    @Binds
+    abstract fun bindDisableCameraUploadSettings(disableCameraUploadSettings: DefaultDisableCameraUploadSettings): DisableCameraUploadSettings
+
+    /**
+     * Provide the DisableMediaUploadSettings implementation
+     */
+    @Binds
+    abstract fun bindDisableMediaUploadSettings(disableMediaUploadSettings: DefaultDisableMediaUploadSettings): DisableMediaUploadSettings
+
+    /**
+     * Provide the CheckCameraUpload implementation
+     */
+    @Binds
+    abstract fun bindCheckCameraUpload(defaultCheckCameraUpload: DefaultCheckCameraUpload): CheckCameraUpload
+
+    /**
+     * Provide the BackupTimeStampsAndFolderHandle implementation
+     */
+    @Binds
+    abstract fun bindBackupTimeStampsAndFolderHandle(defaultBackupTimeStampsAndFolderHandle: DefaultBackupTimeStampsAndFolderHandle): BackupTimeStampsAndFolderHandle
+
+    /**
+     * Provide the RestorePrimaryTimestamps implementation
+     */
+    @Binds
+    abstract fun bindRestorePrimaryTimestamps(defaultRestorePrimaryTimestamps: DefaultRestorePrimaryTimestamps): RestorePrimaryTimestamps
+
+
 }

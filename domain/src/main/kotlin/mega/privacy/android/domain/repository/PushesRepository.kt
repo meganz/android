@@ -37,4 +37,10 @@ interface PushesRepository {
      * @return Result of the request. Required for creating the notification.
      */
     suspend fun pushReceived(beep: Boolean): ChatRequest
+
+    /**
+     * Clear push token
+     *
+     */
+    suspend fun clearPushToken()
 }

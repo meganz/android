@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase
 
 /**
- * Disable Camera Upload Setting Process
+ * Disable Camera Upload Setting
  *
  */
 fun interface DisableCameraUploadSettings {

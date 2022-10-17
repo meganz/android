@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.recentactions;
 
 import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.RECENTS_MODE;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
-import static mega.privacy.android.app.utils.Constants.INVALID_VIEW_TYPE;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getOutgoingOrIncomingParent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.isOutShare;
@@ -41,9 +40,10 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.presentation.recentactions.model.RecentActionItem;
+import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -59,15 +59,14 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     private DisplayMetrics outMetrics;
 
-    private List<RecentActionItem> recentsItems;
+    private List<RecentActionItemType> recentsItems;
 
     private int mHeaderColor = -1;
 
-    public RecentsAdapter(Context context, Object fragment, List<RecentActionItem> items) {
+    public RecentsAdapter(Context context, Object fragment) {
         Timber.d("new RecentsAdapter");
         this.context = context;
         this.fragment = fragment;
-        setItems(items);
 
         megaApi = MegaApplication.getInstance().getMegaApi();
 
@@ -108,7 +107,10 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
     @Override
     public int getNodePosition(long handle) {
         for (int i = 0; i < recentsItems.size(); i++) {
-            MegaRecentActionBucket bucket = recentsItems.get(i).getBucket();
+            MegaRecentActionBucket bucket = null;
+            if (recentsItems.get(i) instanceof RecentActionItemType.Item){
+                bucket = ((RecentActionItemType.Item) recentsItems.get(i)).getBucket();
+            }
             if (bucket == null) {
                 continue;
             }
@@ -167,23 +169,23 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
     @Override
     public void onBindViewHolder(RecentsAdapter.ViewHolderBucket holder, int position) {
         Timber.d("Position: %s", position);
-        RecentActionItem item = getItemtAtPosition(position);
+        RecentActionItemType item = getItemtAtPosition(position);
         if (item == null) return;
 
-        if (item.getViewType() == RecentActionItem.TYPE_HEADER) {
+        if (item instanceof RecentActionItemType.Header) {
             Timber.d("onBindViewHolder: TYPE_HEADER");
             holder.itemBucketLayout.setVisibility(View.GONE);
             holder.headerLayout.setVisibility(View.VISIBLE);
             holder.headerLayout.setBackgroundColor(getHeaderColor());
-            holder.headerText.setText(item.getDate());
-        } else if (item.getViewType() == RecentActionItem.TYPE_BUCKET) {
+            holder.headerText.setText(TimeUtils.formatBucketDate(context, ((RecentActionItemType.Header) item).getTimestamp()));
+        } else if (item instanceof RecentActionItemType.Item) {
             Timber.d("onBindViewHolder: TYPE_BUCKET");
             holder.itemBucketLayout.setVisibility(View.VISIBLE);
             holder.itemBucketLayout.setOnClickListener(this);
             holder.headerLayout.setVisibility(View.GONE);
 
-            MegaRecentActionBucket bucket = item.getBucket();
-            if (bucket == null || bucket.getNodes() == null || bucket.getNodes().size() == 0)
+            MegaRecentActionBucket bucket = ((RecentActionItemType.Item) item).getBucket();
+            if (bucket.getNodes() == null || bucket.getNodes().size() == 0)
                 return;
 
             MegaNodeList nodeList = bucket.getNodes();
@@ -206,7 +208,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             if (mail.equals(megaApi.getMyEmail())) {
                 holder.actionBy.setVisibility(View.GONE);
             } else {
-                user = ((RecentActionsFragment) fragment).findUserName(mail);
+                user = ((RecentActionItemType.Item) item).getUserName();
                 if (bucket.isUpdate()) {
                     userAction = context.getString(R.string.update_action_bucket, user);
                 } else {
@@ -230,7 +232,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 }
             }
 
-            holder.time.setText(item.getTime());
+            holder.time.setText(TimeUtils.formatTime(((RecentActionItemType.Item) item).getTimestamp()));
 
             holder.imageThumbnail.setVisibility(View.VISIBLE);
 
@@ -319,7 +321,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         return mediaTitle;
     }
 
-    public void setItems(List<RecentActionItem> recentsItems) {
+    public void setItems(List<RecentActionItemType> recentsItems) {
         this.recentsItems = recentsItems;
         notifyDataSetChanged();
     }
@@ -337,7 +339,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         ViewHolderBucket holder = (ViewHolderBucket) v.getTag();
         if (holder == null) return;
 
-        RecentActionItem item = getItemtAtPosition(holder.getAdapterPosition());
+        RecentActionItemType item = getItemtAtPosition(holder.getAdapterPosition());
         if (item == null) return;
 
         MegaNode node = getNodeOfItem(item);
@@ -358,10 +360,13 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                     ((RecentActionsFragment) fragment).openFile(holder.getAdapterPosition(), node);
                     break;
                 }
-                MegaRecentActionBucket bucket = item.getBucket();
+                MegaRecentActionBucket bucket = null;
+                if (item instanceof RecentActionItemType.Item) {
+                    bucket = ((RecentActionItemType.Item) item).getBucket();
+                }
                 if (bucket == null) break;
 
-                ((RecentActionsFragment) fragment).getSelectedBucketModel().select(bucket, megaApi.getRecentActions());
+                ((RecentActionsFragment) fragment).getViewModel().select(bucket);
                 NavDestination currentDestination = Navigation.findNavController(v).getCurrentDestination();
                 if (currentDestination != null && currentDestination.getId() == R.id.homepageFragment) {
                     Navigation.findNavController(v).navigate(HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(), new NavOptions.Builder().build());
@@ -371,36 +376,27 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         }
     }
 
-    @Override
-    public int getItemViewType(int pos) {
-        if (recentsItems == null || recentsItems.isEmpty()
-                || pos < 0 || pos >= recentsItems.size())
-            return INVALID_VIEW_TYPE;
-
-        return recentsItems.get(pos).getViewType();
-    }
-
-    private RecentActionItem getItemtAtPosition(int pos) {
+    private RecentActionItemType getItemtAtPosition(int pos) {
         if (recentsItems == null || recentsItems.isEmpty() || pos < 0 || pos >= recentsItems.size())
             return null;
 
         return recentsItems.get(pos);
     }
 
-    private MegaRecentActionBucket getBucketOfItem(RecentActionItem item) {
-        if (item == null) return null;
+    private MegaRecentActionBucket getBucketOfItem(RecentActionItemType item) {
+        if (!(item instanceof RecentActionItemType.Item)) return null;
 
-        return item.getBucket();
+        return ((RecentActionItemType.Item)item).getBucket();
     }
 
-    private MegaNodeList getMegaNodeListOfItem(RecentActionItem item) {
+    private MegaNodeList getMegaNodeListOfItem(RecentActionItemType item) {
         MegaRecentActionBucket bucket = getBucketOfItem(item);
         if (bucket == null) return null;
 
         return bucket.getNodes();
     }
 
-    private MegaNode getNodeOfItem(RecentActionItem item) {
+    private MegaNode getNodeOfItem(RecentActionItemType item) {
         MegaNodeList nodeList = getMegaNodeListOfItem(item);
         if (nodeList == null || nodeList.size() > 1) return null;
 
@@ -412,7 +408,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         if (recentsItems == null || recentsItems.isEmpty()
                 || position < 0 || position >= recentsItems.size()) return "";
 
-        return recentsItems.get(position).getDate();
+        return TimeUtils.formatBucketDate(context, recentsItems.get(position).getTimestamp());
     }
 
     /**

@@ -12,6 +12,7 @@ object EventConstants {
     const val EVENT_CONTACT_NAME_CHANGE = "contact_name_change"
     const val EVENT_MEETING_AVATAR_CHANGE = "meeting_avatar_change"
     const val EVENT_MEETING_GET_AVATAR = "meeting_get_avatar"
+    const val EVENT_CHAT_OPEN_INVITE = "chat_open_invite"
 
     /** Event Keys related to calls*/
     const val EVENT_ERROR_STARTING_CALL = "error_starting_call"
@@ -53,7 +54,6 @@ object EventConstants {
     const val EVENT_PERFORM_SCROLL = "EVENT_PERFORM_SCROLL"
     const val EVENT_REFRESH_PHONE_NUMBER = "EVENT_REFRESH_PHONE_NUMBER"
     const val EVENT_2FA_UPDATED = "EVENT_2FA_UPDATED"
-    const val EVENT_UPDATE_HIDE_RECENT_ACTIVITY = "EVENT_UPDATE_HIDE_RECENT_ACTIVITY"
     const val EVENT_UPDATE_START_SCREEN = "EVENT_UPDATE_START_SCREEN"
 
     const val EVENT_UPDATE_VIEW_MODE = "EVENT_UPDATE_VIEW_MODE"

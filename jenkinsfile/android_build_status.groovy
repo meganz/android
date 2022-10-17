@@ -1,12 +1,18 @@
 BUILD_STEP = ""
+
+// Below values will be read from MR description and are used to decide SDK versions
 SDK_BRANCH = "develop"
 MEGACHAT_BRANCH = "develop"
+SDK_COMMIT = ""
+MEGACHAT_COMMIT = ""
+SDK_TAG = ""
+MEGACHAT_TAG = ""
 
 GMS_APK_BUILD_LOG = "gms_build.log"
 HMS_APK_BUILD_LOG = "hms_build.log"
 QA_APK_BUILD_LOG = "qa_build.log"
 
-MODULE_LIST = ['app', 'domain', 'sdk']
+MODULE_LIST = ['app', 'domain', 'sdk', 'data']
 
 LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
@@ -14,13 +20,17 @@ LINT_REPORT_SUMMARY = ""
 
 APP_UNIT_TEST_SUMMARY = ""
 DOMAIN_UNIT_TEST_SUMMARY = ""
+DATA_UNIT_TEST_SUMMARY = ""
 APP_UNIT_TEST_RESULT = ""
 DOMAIN_UNIT_TEST_RESULT = ""
+DATA_UNIT_TEST_RESULT = ""
 APP_UNIT_TEST_REPORT_ARCHIVE = "app_unit_test_result_${env.GIT_COMMIT}.zip"
 DOMAIN_UNIT_TEST_REPORT_ARCHIVE = "domain_unit_test_result_${env.GIT_COMMIT}.zip"
+DATA_UNIT_TEST_REPORT_ARCHIVE = "data_unit_test_result_${env.GIT_COMMIT}.zip"
 
 APP_COVERAGE = ""
 DOMAIN_COVERAGE = ""
+DATA_COVERAGE = ""
 COVERAGE_ARCHIVE = "coverage.zip"
 COVERAGE_FOLDER = "coverage"
 
@@ -180,6 +190,13 @@ pipeline {
                                 DOMAIN_UNIT_TEST_REPORT_ARCHIVE
                         )
                         unitTestResult += "<br>Domain Unit Test: ${domainUnitTestSummary}"
+
+                        def dataUnitTestSummary = unitTestSummaryWithArchiveLink(
+                                "data/build/test-results/testDebugUnitTest",
+                                "data/build/reports",
+                                DATA_UNIT_TEST_REPORT_ARCHIVE
+                        )
+                        unitTestResult += "<br>Data Unit Test: ${dataUnitTestSummary}"
                     }
 
                     // upload SDK build log if SDK build fails
@@ -239,7 +256,8 @@ pipeline {
                                 "\nCommit:\t${env.GIT_COMMIT}" +
                                 "\nBranch:\t${env.GIT_BRANCH}" +
                                 "\n- app coverage: $APP_COVERAGE" +
-                                "\n- domain coverage: $DOMAIN_COVERAGE"
+                                "\n- domain coverage: $DOMAIN_COVERAGE" +
+                                "\n- data coverage: $DATA_COVERAGE"
                         slackSend color: "good", message: successSlackMessage
                     }
                 }
@@ -259,6 +277,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Preparation"
+                    checkSDKVersion()
                 }
                 gitlabCommitStatus(name: 'Preparation') {
                     script {
@@ -287,13 +306,51 @@ pipeline {
 
                 gitlabCommitStatus(name: 'Fetch SDK Submodules') {
                     withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                        sh 'git checkout -- .'
-                        sh 'git config --file=.gitmodules submodule."sdk/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
-                        sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch ${SDK_BRANCH}"
-                        sh 'git config --file=.gitmodules submodule."sdk/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-                        sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch ${MEGACHAT_BRANCH}"
-                        sh "git submodule sync"
-                        sh "git submodule update --init --recursive --remote"
+                        script {
+                            sh '''
+                            cd ${WORKSPACE}
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
+                            git submodule sync
+                            git submodule update --init --recursive --remote 
+                            cd sdk/src/main/jni/mega/sdk
+                            git fetch
+                            cd ../../megachat/sdk
+                            git fetch
+                            cd ${WORKSPACE}
+                        '''
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Select SDK Version') {
+            steps {
+                script {
+                    BUILD_STEP = 'Select SDK Version'
+                }
+                gitlabCommitStatus(name: 'Select SDK Version') {
+                    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
+                        script {
+                            if (isDefined(SDK_COMMIT)) {
+                                checkoutSdkByCommit(SDK_COMMIT)
+                            } else if (isDefined(SDK_TAG)) {
+                                checkoutSdkByTag(SDK_TAG)
+                            } else {
+                                checkoutSdkByBranch(SDK_BRANCH)
+                            }
+
+                            if (isDefined(MEGACHAT_COMMIT)) {
+                                checkoutMegaChatSdkByCommit(MEGACHAT_COMMIT)
+                            } else if (isDefined(MEGACHAT_TAG)) {
+                                checkoutMegaChatSdkByTag(MEGACHAT_TAG)
+                            } else {
+                                checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
+                            }
+                        }
                     }
                 }
             }
@@ -403,9 +460,10 @@ pipeline {
                     BUILD_STEP = "Unit Test"
                 }
                 gitlabCommitStatus(name: 'Unit Test') {
-                    // Compile and run unit tests for the app and domain
+                    // Compile and run unit tests for available modules
                     sh "./gradlew testGmsDebugUnitTest"
                     sh "./gradlew domain:test"
+                    sh "./gradlew :data:testGmsDebugUnitTest"
 
                     script {
                         // below code is only run when UnitTest is OK, before test reports are cleaned up.
@@ -413,8 +471,10 @@ pipeline {
                         // We have to collect the report here, before they are cleaned in the last stage.
                         APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
                         DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
+                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
                         APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports", "app_unit_test_result.zip")
                         DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports", "domain_unit_test_result.zip")
+                        DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports", "data_unit_test_result.zip")
                     }
                 }
             }
@@ -435,6 +495,11 @@ pipeline {
                         sh "ls -l $WORKSPACE/domain/build/reports/jacoco/test/"
                         DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
                         println("DOMAIN_COVERAGE = ${DOMAIN_COVERAGE}")
+
+                        // data coverage
+                        sh "./gradlew data:testGmsDebugUnitTestCoverage"
+                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
+                        println("DATA_COVERAGE = ${DATA_COVERAGE}")
 
                         // temporarily disable the failed test cases
                         sh "rm -frv ${WORKSPACE}/app/src/testDebug"
@@ -478,16 +543,17 @@ pipeline {
 }
 
 /**
- * Returns a Markdown table-formatted String that holds all Test Results for both app and domain modules
+ * Returns a Markdown table-formatted String that holds all Test Results for available modules
  *
- * @return String that contains all Test Results for both app and domain modules
+ * @return String that contains all Test Results for available modules
  */
 String buildTestResults() {
-    // Break down APP_UNIT_TEST_SUMMARY and DOMAIN_UNIT_TEST_SUMMARY into String arrays.
+    // Break down the Test Summary Reports into String arrays.
     // As dictated in junit_report.py, each value in the String is separated by a comma.
     // Use "," as the delimiter in order to split all values, then add them in their respective String arrays.
     def appSummaryArray = APP_UNIT_TEST_SUMMARY.split(',')
     def domainSummaryArray = DOMAIN_UNIT_TEST_SUMMARY.split(',')
+    def dataSummaryArray = DATA_UNIT_TEST_SUMMARY.split(',')
 
     String appTestResultsRow = "| **app** | " +
             "${APP_COVERAGE} | " +
@@ -507,10 +573,20 @@ String buildTestResults() {
             "${domainSummaryArray[4]} | " +
             "${DOMAIN_UNIT_TEST_RESULT} |"
 
+    String dataTestResultsRow = "| **data** | " +
+            "${DATA_COVERAGE} | " +
+            "${dataSummaryArray[0]} | " +
+            "${dataSummaryArray[1]} | " +
+            "${dataSummaryArray[2]} | " +
+            "${dataSummaryArray[3]} | " +
+            "${dataSummaryArray[4]} | " +
+            "${DATA_UNIT_TEST_RESULT} |"
+
     "| Module | Coverage | Total Cases | Skipped | Errors | Failure | Duration (s) | Test Report |\n" +
             "| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n" +
             "$appTestResultsRow\n" +
-            "$domainTestResultsRow\n"
+            "$domainTestResultsRow\n" +
+            "$dataTestResultsRow\n"
 }
 
 def cleanUp() {
@@ -590,6 +666,7 @@ String lintSummary(String module) {
     summary = sh(
             script: "python3 ${WORKSPACE}/jenkinsfile/lint_report.py $WORKSPACE/${module}/build/reports/lint-results.xml",
             returnStdout: true).trim()
+    if (!summary) summary = 'Warning(0) Error(0) Information(0) Fatal(0)'
     print("lintSummary($module) = $summary")
     return summary
 }
@@ -759,4 +836,137 @@ private String uploadFileToGitLab(String fileName) {
         return link
     }
     return link
+}
+
+/**
+ * Get the value from GitLab MR description by key
+ * @param key the key to check and read
+ * @return actual value of key if key is specified. null otherwise.
+ */
+String getValueInMRDescriptionBy(String key) {
+    if (key == null || key.isEmpty()) return null
+    String description = env.GITLAB_OA_DESCRIPTION
+    if (description == null) return null
+    String[] lines = description.split('\n')
+    for (String line : lines) {
+        line = line.trim()
+        if (line.startsWith(key)) {
+            String value = line.substring(key.length() + 1)
+            print("getValueInMRDescriptionBy(): " + key + " ==> " + value)
+            return value
+        }
+    }
+    return null
+}
+
+/**
+ * Read SDK versions from MR description and assign the values into environment.
+ */
+private void checkSDKVersion() {
+    SDK_COMMIT = getValueInMRDescriptionBy("SDK_COMMIT")
+    MEGACHAT_COMMIT = getValueInMRDescriptionBy("MEGACHAT_COMMIT")
+
+    SDK_TAG = getValueInMRDescriptionBy("SDK_TAG")
+    MEGACHAT_TAG = getValueInMRDescriptionBy("MEGACHAT_TAG")
+
+    SDK_BRANCH = getValueInMRDescriptionBy("SDK_BRANCH")
+    if (!isDefined(SDK_BRANCH)) {
+        SDK_BRANCH = "develop"
+    }
+
+    MEGACHAT_BRANCH = getValueInMRDescriptionBy("MEGACHAT_BRANCH")
+    if (!isDefined(MEGACHAT_BRANCH)) {
+        MEGACHAT_BRANCH = "develop"
+    }
+}
+
+/**
+ * check if a certain value is defined by checking the tag value
+ * @param value value of tag
+ * @return true if tag has a value. false if tag is null or zero length
+ */
+static boolean isDefined(String value) {
+    return value != null && !value.isEmpty()
+}
+
+/**
+ * checkout SDK by commit ID
+ * @param sdkCommitId the commit ID to checkout
+ */
+private void checkoutSdkByCommit(String sdkCommitId) {
+    sh """
+    echo checkoutSdkByCommit
+    cd $WORKSPACE
+    cd sdk/src/main/jni/mega/sdk
+    git checkout $sdkCommitId
+    cd $WORKSPACE
+    """
+}
+
+/**
+ * checkout SDK by git tag
+ * @param sdkTag the tag to checkout
+ */
+private void checkoutSdkByTag(String sdkTag) {
+    sh """
+    echo checkoutSdkByTag
+    cd $WORKSPACE
+    cd sdk/src/main/jni/mega/sdk
+    git checkout tags/$sdkTag
+    cd $WORKSPACE
+    """
+}
+
+/**
+ * checkout SDK by branch
+ * @param sdkBranch the branch to checkout
+ */
+private void checkoutSdkByBranch(String sdkBranch) {
+    sh "echo checkoutSdkByBranch"
+    sh "cd \"$WORKSPACE\""
+    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
+    sh 'git submodule sync'
+    sh 'git submodule update --init --recursive --remote'
+}
+
+/**
+ * checkout MEGAchat SDK by commit ID
+ * @param megaChatCommitId the commit ID to checkout
+ */
+private void checkoutMegaChatSdkByCommit(String megaChatCommitId) {
+    sh """
+    echo checkoutMegaChatSdkByCommit
+    cd $WORKSPACE
+    cd sdk/src/main/jni/megachat/sdk
+    git checkout $megaChatCommitId
+    cd $WORKSPACE
+    """
+}
+
+/**
+ * checkout MEGAchat SDK by git tag
+ * @param megaChatTag the tag to checkout
+ */
+private void checkoutMegaChatSdkByTag(String megaChatTag) {
+    sh """
+    echo checkoutMegaChatSdkByTag
+    cd $WORKSPACE
+    cd sdk/src/main/jni/megachat/sdk
+    git checkout tags/$megaChatTag
+    cd $WORKSPACE
+    """
+}
+
+/**
+ * checkout MEGAchat SDK by branch
+ * @param megaChatBranch the branch to checkout
+ */
+private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
+    sh "echo checkoutMegaChatSdkByBranch"
+    sh "cd \"$WORKSPACE\""
+    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
+    sh 'git submodule sync'
+    sh 'git submodule update --init --recursive --remote'
 }

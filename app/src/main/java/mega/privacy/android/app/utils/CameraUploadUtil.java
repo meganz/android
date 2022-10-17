@@ -20,13 +20,12 @@ import android.os.Looper;
 
 import java.io.File;
 
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.RenameListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.domain.entity.SyncRecordType;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
@@ -44,8 +43,8 @@ public class CameraUploadUtil {
     private static final String KEY_SECONDARY_HANDLE = "KEY_SECONDARY_HANDLE";
     private static final String LAST_CAM_SYNC_TIMESTAMP_FILE = "LAST_CAM_SYNC_TIMESTAMP_FILE";
 
-    private static MegaApplication app = MegaApplication.getInstance();
-    private static DatabaseHandler dbH = app.getDbH();
+    private static final MegaApplication app = MegaApplication.getInstance();
+    private static final DatabaseHandler dbH = app.getDbH();
 
     /**
      * The method is to delete the timestamps backup in share preference
@@ -64,41 +63,6 @@ public class CameraUploadUtil {
                 .putString(KEY_SEC_VIDEO_SYNC_TIMESTAMP, "")
                 .putLong(KEY_SECONDARY_HANDLE, -2L)
                 .apply();
-    }
-
-    /**
-     * If the handle matches the previous primary folder's handle, restore the time stamp from stamps
-     * if not clean the sync record from previous primary folder
-     */
-    public static void restorePrimaryTimestampsAndSyncRecordProcess() {
-        SharedPreferences sharedPreferences = app.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
-        long backupedHandle = sharedPreferences.getLong(KEY_PRIMARY_HANDLE, -2);
-        long detectedPrimaryKey = getPrimaryFolderHandle();
-        Timber.d("Primary handle in local is: %d, backuped handle is: %d", detectedPrimaryKey, backupedHandle);
-        if (detectedPrimaryKey == backupedHandle) {
-            // if the primary handle matches to previous deleted primary folder's handle, restore the time stamp
-            String camSyncStamp = sharedPreferences.getString(KEY_CAM_SYNC_TIMESTAMP, "");
-            if (!isTextEmpty(camSyncStamp)) {
-                try {
-                    dbH.setCamSyncTimeStamp(Long.parseLong(camSyncStamp));
-                } catch (Exception ex) {
-                    Timber.e(ex);
-                }
-            }
-
-            String camVideoSyncStamp = sharedPreferences.getString(KEY_CAM_VIDEO_SYNC_TIMESTAMP, "");
-            if (!isTextEmpty(camVideoSyncStamp)) {
-                try {
-                    dbH.setCamVideoSyncTimeStamp(Long.parseLong(camVideoSyncStamp));
-                } catch (Exception ex) {
-                    Timber.e(ex);
-                }
-            }
-        } else {
-            // when primary target folder has been changed, delete primary sync records.
-            dbH.deleteAllPrimarySyncRecords(SyncRecordType.TYPE_ANY.getValue());
-        }
-        clearPrimaryBackUp();
     }
 
     /**
@@ -131,30 +95,9 @@ public class CameraUploadUtil {
             }
         } else {
             // when secondary target folder has been changed, delete secondary sync records.
-            dbH.deleteAllSecondarySyncRecords(SyncRecordType.TYPE_ANY.getValue());
+            dbH.deleteAllSecondarySyncRecords();
         }
         clearSecondaryBackUp();
-    }
-
-    /**
-     * The method is to backup time stamps, primary upload folder and secondary folder in share preference after
-     * database records being cleaned
-     */
-    public static void backupTimestampsAndFolderHandle() {
-        MegaPreferences prefs = dbH.getPreferences();
-        if (prefs == null) {
-            Timber.e("Preference is null, while backup.");
-            return;
-        }
-        app.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE)
-                .edit()
-                .putString(KEY_CAM_SYNC_TIMESTAMP, prefs.getCamSyncTimeStamp())
-                .putString(KEY_CAM_VIDEO_SYNC_TIMESTAMP, prefs.getCamVideoSyncTimeStamp())
-                .putString(KEY_SEC_SYNC_TIMESTAMP, prefs.getSecSyncTimeStamp())
-                .putString(KEY_SEC_VIDEO_SYNC_TIMESTAMP, prefs.getSecVideoSyncTimeStamp())
-                .putLong(KEY_PRIMARY_HANDLE, getUploadFolderHandle(true))
-                .putLong(KEY_SECONDARY_HANDLE, getUploadFolderHandle(false))
-                .apply();
     }
 
     /**
@@ -183,14 +126,14 @@ public class CameraUploadUtil {
         Timber.d("Reset primary timeline");
         dbH.setCamSyncTimeStamp(0);
         dbH.setCamVideoSyncTimeStamp(0);
-        dbH.deleteAllPrimarySyncRecords(SyncRecordType.TYPE_ANY.getValue());
+        dbH.deleteAllPrimarySyncRecords();
     }
 
     public static void resetSecondaryTimeline() {
         Timber.d("Reset secondary timeline");
         dbH.setSecSyncTimeStamp(0);
         dbH.setSecVideoSyncTimeStamp(0);
-        dbH.deleteAllSecondarySyncRecords(SyncRecordType.TYPE_ANY.getValue());
+        dbH.deleteAllSecondarySyncRecords();
     }
 
     public static long getPrimaryFolderHandle() {
@@ -226,12 +169,6 @@ public class CameraUploadUtil {
         return isTextEmpty(handle) ? INVALID_HANDLE : Long.parseLong(handle);
     }
 
-    public static void disableMediaUploadProcess() {
-        resetMUTimestampsAndCache();
-        dbH.setSecondaryUploadEnabled(false);
-        fireStopCameraUploadJob(app);
-    }
-
     /**
      * This method is to disable the CU and MU settings in database
      *
@@ -241,13 +178,20 @@ public class CameraUploadUtil {
         resetCUTimestampsAndCache(clearCamsyncRecords);
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (dbH.shouldClearCamsyncRecords()) {
-                dbH.deleteAllSyncRecords(SyncRecordType.TYPE_ANY.getValue());
+                dbH.deleteAllSyncRecordsTypeAny();
                 dbH.saveShouldClearCamsyncRecords(false);
             }
         }, 10 * 1000);
 
         // disable both primary and secondary.
         dbH.setCamSyncEnabled(false);
+        dbH.setSecondaryUploadEnabled(false);
+        fireStopCameraUploadJob(app);
+    }
+
+
+    public static void disableMediaUploadProcess() {
+        resetMUTimestampsAndCache();
         dbH.setSecondaryUploadEnabled(false);
         fireStopCameraUploadJob(app);
     }

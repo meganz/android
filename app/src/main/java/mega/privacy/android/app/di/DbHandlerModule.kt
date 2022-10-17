@@ -8,9 +8,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors.fromApplication
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.SqliteDatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.mapper.StorageStateIntMapper
+import mega.privacy.android.data.mapper.StorageStateMapper
 import javax.inject.Singleton
 
 
@@ -19,15 +22,29 @@ import javax.inject.Singleton
 class DatabaseHandlerModule {
     @Singleton
     @Provides
-    fun provideDbHandler(@ApplicationContext context: Context): DatabaseHandler {
-        return SqliteDatabaseHandler.getDbHandler(context)
+    fun provideLegacyDatabaseHandler(
+        @ApplicationContext context: Context,
+        storageStateMapper: StorageStateMapper,
+        storageStateIntMapper: StorageStateIntMapper,
+    ): LegacyDatabaseHandler {
+        return SqliteDatabaseHandler.getDbHandler(
+            context = context,
+            storageStateMapper = storageStateMapper,
+            storageStateIntMapper = storageStateIntMapper
+        )
     }
+
+    @Singleton
+    @Provides
+    fun provideDbHandler(
+        legacyDatabaseHandler: LegacyDatabaseHandler
+    ): DatabaseHandler = legacyDatabaseHandler
 }
 
 /**
  * This method is to inject DatabaseHandler into non-Android classes by Hilt
  */
-fun getDbHandler(): DatabaseHandler = fromApplication(
+fun getDbHandler(): LegacyDatabaseHandler = fromApplication(
     MegaApplication.getInstance(),
     DatabaseHandlerEntryPoint::class.java).dbH
 
@@ -37,5 +54,5 @@ fun getDbHandler(): DatabaseHandler = fromApplication(
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface DatabaseHandlerEntryPoint {
-    var dbH: DatabaseHandler
+    var dbH: LegacyDatabaseHandler
 }

@@ -20,14 +20,12 @@ import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -42,12 +40,15 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
+import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
@@ -78,8 +79,8 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.presentation.theme.AndroidTheme
 import timber.log.Timber
@@ -107,6 +108,9 @@ class PhotosFragment : Fragment() {
     lateinit var getThemeMode: GetThemeMode
     lateinit var pagerState: PagerState
     lateinit var lazyGridState: LazyGridState
+
+    @Inject
+    lateinit var getFeatureFlag: GetFeatureFlagValue
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -261,7 +265,13 @@ class PhotosFragment : Fragment() {
         val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
         val albumsViewState by albumsViewModel.state.collectAsStateWithLifecycle()
 
-        pagerState = rememberPagerState()
+        if (!this::pagerState.isInitialized) {
+            pagerState =
+                if (managerActivity.fromAlbumContent)
+                    rememberPagerState(initialPage = PhotosTab.Albums.ordinal)
+                else
+                    rememberPagerState()
+        }
         lazyGridState =
             rememberSaveable(
                 timelineViewState.scrollStartIndex,
@@ -274,12 +284,12 @@ class PhotosFragment : Fragment() {
                 )
             }
 
+        if (managerActivity.fromAlbumContent) {
+            managerActivity.fromAlbumContent = false
+            photosViewModel.onTabSelected(PhotosTab.Albums)
+        }
+
         LaunchedEffect(pagerState) {
-            if (managerActivity.fromAlbumContent) {
-                managerActivity.fromAlbumContent = false
-                photosViewModel.onTabSelected(PhotosTab.Albums)
-                pagerState.scrollToPage(PhotosTab.Albums.ordinal)
-            }
             snapshotFlow { pagerState.currentPage }.collect { page ->
                 photosViewModel.onTabSelected(selectedTab = photosViewState.tabs[page])
                 pagerState.scrollToPage(PhotosTab.values()[page].ordinal)
@@ -301,7 +311,7 @@ class PhotosFragment : Fragment() {
     @Composable
     private fun timelineView(timelineViewState: TimelineViewState) = TimelineView(
         timelineViewState = timelineViewState,
-        downloadPhotoCover = photosViewModel::downloadPhotoCover,
+        downloadPhotoCover = photosViewModel::downloadPhoto,
         lazyGridState = lazyGridState,
         onTextButtonClick = this::enableCameraUploadClick,
         onFABClick = this::openFilterFragment,
@@ -323,6 +333,7 @@ class PhotosFragment : Fragment() {
     private fun albumsView(albumsViewState: AlbumsViewState) = AlbumsView(
         albumsViewState = albumsViewState,
         openAlbum = this::openAlbum,
+        downloadPhoto = photosViewModel::downloadPhoto
     )
 
     @Composable
@@ -336,7 +347,7 @@ class PhotosFragment : Fragment() {
     @Composable
     private fun photosGridView(timelineViewState: TimelineViewState) = PhotosGridView(
         timelineViewState = timelineViewState,
-        downloadPhotoCover = photosViewModel::downloadPhotoCover,
+        downloadPhoto = photosViewModel::downloadPhoto,
         lazyGridState = lazyGridState,
         onClick = timelineViewModel::onClick,
         onLongPress = timelineViewModel::onLongPress,
@@ -546,9 +557,17 @@ class PhotosFragment : Fragment() {
 
     fun loadPhotos() {}
 
-    fun openAlbum(album: Album) {
-        when (album) {
-            is Album.FavouriteAlbum -> {
+    fun openAlbum(album: UIAlbum) {
+        albumsViewModel.setCurrentAlbum(album.id)
+        activity?.lifecycleScope?.launch {
+            val dynamicAlbumEnabled = getFeatureFlag(AppFeatures.DynamicAlbum)
+            if (dynamicAlbumEnabled) {
+                val f = AlbumDynamicContentFragment.getInstance()
+                val ft: FragmentTransaction =
+                    (activity ?: return@launch).supportFragmentManager.beginTransaction()
+                ft.replace(R.id.fragment_container, f)
+                ft.commitNowAllowingStateLoss()
+            } else {
                 managerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
             }
         }

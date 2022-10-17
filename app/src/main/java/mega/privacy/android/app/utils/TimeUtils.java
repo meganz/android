@@ -397,27 +397,6 @@ public class TimeUtils implements Comparator<Calendar> {
     }
 
     /**
-     * Method of getting the appropriate string from a given duration
-     *
-     * @param duration The duration
-     * @return The appropriate string
-     */
-    public static String getGalleryVideoDuration(long duration) {
-        long hours = TimeUnit.MILLISECONDS.toHours(duration);
-
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toSeconds(hours);
-
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) -
-                TimeUnit.MINUTES.toSeconds(minutes);
-
-        if (hours > 0) {
-            return String.format(Locale.getDefault(), "%d:%02d:%02d", hours, minutes, seconds);
-        }
-
-        return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
-    }
-
-    /**
      * Get minutes and seconds from milliseconds
      *
      * @param milliseconds Time in milliseconds

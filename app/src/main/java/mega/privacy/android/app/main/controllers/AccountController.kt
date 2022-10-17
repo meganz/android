@@ -19,6 +19,10 @@ import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.print.PrintHelper
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,9 +32,6 @@ import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
-import mega.privacy.android.app.data.preferences.ChatPreferencesDataStore
-import mega.privacy.android.app.data.repository.DefaultPushesRepository.Companion.PUSH_TOKEN
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -67,9 +68,10 @@ import mega.privacy.android.app.utils.ZoomUtil.resetZoomLevel
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.domain.repository.PushesRepository
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
 import timber.log.Timber
@@ -77,6 +79,32 @@ import java.io.File
 import java.io.IOException
 
 class AccountController(private val context: Context) {
+
+    /**
+     * Account controller entry point
+     *
+     */
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface AccountControllerEntryPoint {
+        /**
+         * Chat preferences gateway
+         *
+         */
+        fun chatPreferencesGateway(): ChatPreferencesGateway
+
+        /**
+         * Calls preferences gateway
+         *
+         */
+        fun callsPreferencesGateway(): CallsPreferencesGateway
+
+        /**
+         * Push repository
+         *
+         */
+        fun pushRepository(): PushesRepository
+    }
 
     fun existsAvatar(): Boolean {
         val avatar = buildAvatarFile(
@@ -337,7 +365,7 @@ class AccountController(private val context: Context) {
             dbH.clearCompletedTransfers()
             dbH.clearPendingMessage()
             dbH.clearAttributes()
-            dbH.deleteAllSyncRecords(SyncRecordType.TYPE_ANY.value)
+            dbH.deleteAllSyncRecordsTypeAny()
             dbH.clearChatSettings()
             dbH.clearBackups()
 
@@ -355,18 +383,19 @@ class AccountController(private val context: Context) {
                 .putLong(MegaContactGetter.LAST_SYNC_TIMESTAMP_KEY, 0)
                 .apply()
 
-            //clear push token
-            context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit()
-                .clear().apply()
-
             //clear user interface preferences
             context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
                 .edit().clear().apply()
 
             //clear chat and calls preferences
+            val entryPoint =
+                EntryPointAccessors.fromApplication(context,
+                    AccountControllerEntryPoint::class.java)
             sharingScope.launch(Dispatchers.IO) {
-                ChatPreferencesDataStore(context, Dispatchers.IO).clearPreferences()
-                CallsPreferencesDataStore(context, Dispatchers.IO).clearPreferences()
+                entryPoint.callsPreferencesGateway().clearPreferences()
+                entryPoint.chatPreferencesGateway().clearPreferences()
+                //clear push token
+                entryPoint.pushRepository().clearPushToken()
             }
 
             // Clear text editor preference
@@ -389,7 +418,6 @@ class AccountController(private val context: Context) {
 
             //Clear MyAccountInfo
             app.resetMyAccountInfo()
-            app.storageState = MegaApiJava.STORAGE_STATE_UNKNOWN
 
             // Clear get banner success flag
             LiveEventBus.get(Constants.EVENT_LOGOUT_CLEARED).post(null)

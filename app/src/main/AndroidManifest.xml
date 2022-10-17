@@ -262,7 +262,7 @@
             android:name=".providers.PasscodeFileProviderActivity" />
         <activity
             android:name=".providers.FileProviderActivity"
-            android:exported="false"
+            android:exported="true"
             android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.PICK" />
@@ -401,7 +401,7 @@
         <activity
             android:name=".mediaplayer.VideoPlayerActivity"
             android:windowSoftInputMode="adjustNothing"
-            android:theme="@style/Theme.Mega.FullScreen"/>
+            android:theme="@style/Theme.Mega.FullScreen.VideoPlayer"/>
         <activity
             android:name=".mediaplayer.AudioPlayerActivity"
             android:launchMode="singleTop"

@@ -7,7 +7,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import androidx.core.view.isVisible
@@ -192,13 +192,13 @@ class ImageSlideshowFragment : Fragment() {
     private fun enterFullScreenMode(enable: Boolean) {
         if (enable) {
             binding.root.setBackgroundResource(R.color.black)
-            activity?.window?.decorView?.let { ViewCompat.getWindowInsetsController(it) }?.apply {
+            activity?.window?.let { WindowCompat.getInsetsController(it, it.decorView) }?.apply {
                 systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                 hide(WindowInsetsCompat.Type.systemBars())
             }
         } else {
             binding.root.background = null
-            activity?.window?.decorView?.let { ViewCompat.getWindowInsetsController(it) }
+            activity?.window?.let { WindowCompat.getInsetsController(it, it.decorView) }
                 ?.show(WindowInsetsCompat.Type.systemBars())
         }
     }

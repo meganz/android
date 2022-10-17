@@ -41,7 +41,6 @@ import static mega.privacy.android.app.utils.Util.checkTakePicture;
 import static mega.privacy.android.app.utils.Util.getExternalCardPath;
 import static mega.privacy.android.app.utils.Util.getScaleH;
 import static mega.privacy.android.app.utils.Util.getScaleW;
-import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
@@ -171,7 +170,6 @@ public class ContactFileListActivity extends PasscodeActivity
     MenuItem viewSharedItem;
 
     private final static String PARENT_HANDLE = "parentHandle";
-    static ContactFileListActivity contactPropertiesMainActivity;
 
     long parentHandle = -1;
 
@@ -291,7 +289,7 @@ public class ContactFileListActivity extends PasscodeActivity
     public void createFolder(@NotNull String title) {
 
         Timber.d("createFolder");
-        if (!isOnline(this)) {
+        if (!viewModel.isOnline()) {
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
             return;
         }
@@ -390,8 +388,6 @@ public class ContactFileListActivity extends PasscodeActivity
         }
 
         megaApi.addGlobalListener(this);
-
-        contactPropertiesMainActivity = this;
 
         registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
         registerReceiver(destroyActionModeReceiver,
@@ -584,7 +580,7 @@ public class ContactFileListActivity extends PasscodeActivity
 
     public void moveToTrash(final ArrayList<Long> handleList) {
         Timber.d("moveToTrash: ");
-        if (!isOnline(this)) {
+        if (!viewModel.isOnline()) {
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
             return;
         }
@@ -652,7 +648,7 @@ public class ContactFileListActivity extends PasscodeActivity
             if (intent == null) {
                 return;
             }
-            if (!isOnline(this)) {
+            if (!viewModel.isOnline()) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
                 return;
             }
@@ -707,7 +703,7 @@ public class ContactFileListActivity extends PasscodeActivity
             if (intent == null) {
                 return;
             }
-            if (!isOnline(this)) {
+            if (!viewModel.isOnline()) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
                 return;
             }
@@ -788,7 +784,7 @@ public class ContactFileListActivity extends PasscodeActivity
             if (intent == null) {
                 return;
             }
-            if (!isOnline(this)) {
+            if (!viewModel.isOnline()) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
                 return;
             }
@@ -803,7 +799,7 @@ public class ContactFileListActivity extends PasscodeActivity
                 dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
                 final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
                 dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
-                    statusDialog = createProgressDialog(contactPropertiesMainActivity, getString(R.string.context_sharing_folder));
+                    statusDialog = createProgressDialog(this, getString(R.string.context_sharing_folder));
                     permissionsDialog.dismiss();
                     new NodeController(this).shareFolder(parent, selectedContacts, item);
                 });

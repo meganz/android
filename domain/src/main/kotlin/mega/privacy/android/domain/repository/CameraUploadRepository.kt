@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncTimeStamp
 
 /**
@@ -53,7 +54,7 @@ interface CameraUploadRepository {
      *
      * @return sync timestamp
      */
-    suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long
+    suspend fun getSyncTimeStamp(type: SyncTimeStamp): String?
 
     /**
      * Set camera upload sync timestamp
@@ -113,7 +114,7 @@ interface CameraUploadRepository {
      *
      * @return
      */
-    suspend fun deleteAllSyncRecords(syncRecordType: Int)
+    suspend fun deleteAllSyncRecords(syncRecordType: SyncRecordType)
 
     /**
      * Delete sync record by path
@@ -159,14 +160,22 @@ interface CameraUploadRepository {
      *
      * @return true if file name exists
      */
-    suspend fun doesFileNameExist(fileName: String, isSecondary: Boolean, type: Int): Boolean
+    suspend fun doesFileNameExist(
+        fileName: String,
+        isSecondary: Boolean,
+        type: SyncRecordType,
+    ): Boolean
 
     /**
      * Does local path exist
      *
      * @return true if local path exists
      */
-    suspend fun doesLocalPathExist(fileName: String, isSecondary: Boolean, type: Int): Boolean
+    suspend fun doesLocalPathExist(
+        fileName: String,
+        isSecondary: Boolean,
+        type: SyncRecordType,
+    ): Boolean
 
     /**
      * Do user credentials exist
@@ -286,7 +295,7 @@ interface CameraUploadRepository {
      *
      * @return maximum timestamp
      */
-    suspend fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: Int): Long
+    suspend fun getMaxTimestamp(isSecondary: Boolean, syncRecordType: SyncRecordType): Long
 
     /**
      * Get video sync records by status
@@ -335,10 +344,22 @@ interface CameraUploadRepository {
     )
 
     /**
-     * The method is to backup time stamps, primary upload folder and secondary folder in share preference after
-     * database records being cleaned
+     * Get GPS coordinates from video file
+     *
+     * @param filePath
+     *
+     * @return a pair with latitude and longitude coordinates
      */
-    suspend fun backupTimestampsAndFolderHandle()
+    suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float>
+
+    /**
+     * Get GPS coordinates from photo file
+     *
+     * @param filePath
+     *
+     * @return a pair with latitude and longitude coordinates
+     */
+    suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Float, Float>
 
     /**
      * This method is to clear Camera Sync Records from the Database
@@ -346,4 +367,14 @@ interface CameraUploadRepository {
      * @param clearCamSyncRecords the boolean setting whether to clean the cam record
      */
     suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean)
+
+    /**
+     * clear all the contents of Internal cache directory
+     */
+    suspend fun clearCacheDirectory()
+
+    /**
+     * Delete all Primary Sync Records
+     */
+    suspend fun deleteAllPrimarySyncRecords()
 }

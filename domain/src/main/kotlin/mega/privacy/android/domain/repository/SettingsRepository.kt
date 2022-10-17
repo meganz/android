@@ -45,13 +45,6 @@ interface SettingsRepository {
     fun getStartScreen(): Int
 
     /**
-     * Should hide recent activity
-     *
-     * @return true if option is enabled, else false
-     */
-    fun shouldHideRecentActivity(): Boolean
-
-    /**
      * Set auto accept qr requests
      *
      * @param accept
@@ -67,11 +60,18 @@ interface SettingsRepository {
     fun monitorStartScreen(): Flow<Int>
 
     /**
-     * Monitor hide recent activity
+     * Monitor hide recent activity setting
      *
      * @return hide recent activity option enabled status as a flow
      */
-    fun monitorHideRecentActivity(): Flow<Boolean>
+    fun monitorHideRecentActivity(): Flow<Boolean?>
+
+    /**
+     * Set hide recent activity
+     *
+     * @param value
+     */
+    suspend fun setHideRecentActivity(value: Boolean)
 
     /**
      * Is camera sync enabled
@@ -323,4 +323,59 @@ interface SettingsRepository {
      * @param screen
      */
     suspend fun setPreferredStartScreen(screen: StartScreen)
+
+    /**
+     * Backup time stamps, primary upload folder and secondary folder in share preference after
+     * database records being cleaned
+     * @param primaryUploadFolderHandle
+     * @param secondaryUploadFolderHandle
+     * @param camSyncTimeStamp
+     * @param camVideoSyncTimeStamp
+     * @param secSyncTimeStamp
+     * @param secVideoSyncTimeStamp
+     */
+    suspend fun backupTimestampsAndFolderHandle(
+        primaryUploadFolderHandle: Long,
+        secondaryUploadFolderHandle: Long,
+        camSyncTimeStamp: String?,
+        camVideoSyncTimeStamp: String?,
+        secSyncTimeStamp: String?,
+        secVideoSyncTimeStamp: String?,
+    )
+
+
+    /**
+     * @return [Long] primary handle
+     */
+    suspend fun getPrimaryHandle(): Long?
+
+    /**
+     * @return [Long] secondary handle
+     */
+    suspend fun getSecondaryHandle(): Long?
+
+    /**
+     * @return [String] primary folder photo sync timestamp
+     */
+    suspend fun getPrimaryFolderPhotoSyncTime(): String?
+
+    /**
+     * @return [String] secondary folder photo sync timestamp
+     */
+    suspend fun getSecondaryFolderPhotoSyncTime(): String?
+
+    /**
+     * @return [String] primary folder video sync timestamp
+     */
+    suspend fun getPrimaryFolderVideoSyncTime(): String?
+
+    /**
+     * @return [String] secondary folder video sync timestamp
+     */
+    suspend fun getSecondaryFolderVideoSyncTime(): String?
+
+    /**
+     * Clear Primary Sync Records from Preference
+     */
+    suspend fun clearPrimaryCameraSyncRecords()
 }

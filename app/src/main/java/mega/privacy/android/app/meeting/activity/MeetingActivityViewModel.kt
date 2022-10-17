@@ -113,6 +113,8 @@ class MeetingActivityViewModel @Inject constructor(
         _notificationNetworkState.value = it
     }
 
+    var isChatOpen: Boolean = false
+
     private val _currentChatId: MutableLiveData<Long> =
         MutableLiveData<Long>(MEGACHAT_INVALID_HANDLE)
     val currentChatId: LiveData<Long> = _currentChatId

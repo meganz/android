@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.recentactions
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Spanned
@@ -12,14 +11,13 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
-import com.brandongogetap.stickyheaders.StickyLayoutManager
-import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MegaContactAdapter
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.HeaderItemDecoration
@@ -27,30 +25,23 @@ import mega.privacy.android.app.components.TopSnappedStickyLayoutManager
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.FragmentRecentsBinding
-import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.fragments.recent.SelectedBucketViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForSingleNode
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
-import mega.privacy.android.app.presentation.recentactions.model.RecentActionItem
-import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemHeader
+import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
-import mega.privacy.android.app.utils.SharedPreferenceConstants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRecentActionBucket
-import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -58,7 +49,7 @@ import javax.inject.Inject
  * Recent actions page
  */
 @AndroidEntryPoint
-class RecentActionsFragment : Fragment(), StickyHeaderHandler {
+class RecentActionsFragment : Fragment() {
 
     private var _binding: FragmentRecentsBinding? = null
     private val binding get() = _binding!!
@@ -67,31 +58,16 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
 
-    private val visibleContacts = ArrayList<MegaContactAdapter>()
-    private var buckets: List<MegaRecentActionBucket> = listOf()
-    private var recentActionsItems: List<RecentActionItem?> = listOf()
-
     private var adapter: RecentsAdapter? = null
     private lateinit var emptyLayout: ScrollView
     private lateinit var emptyText: TextView
     private lateinit var showActivityButton: Button
     private lateinit var emptySpanned: Spanned
     private lateinit var activityHiddenSpanned: Spanned
-    private lateinit var stickyLayoutManager: StickyLayoutManager
     private lateinit var listView: RecyclerView
     private lateinit var fastScroller: FastScroller
 
-    val selectedBucketModel: SelectedBucketViewModel by activityViewModels()
-
-    private val nodeChangeObserver = Observer { forceUpdate: Boolean ->
-        if (forceUpdate) {
-            buckets = megaApi.recentActions ?: emptyList()
-            reloadItems(buckets)
-            refreshRecentActions()
-            setVisibleContacts()
-            setRecentView()
-        }
-    }
+    val viewModel: RecentActionsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,17 +79,17 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
         emptyLayout = binding.emptyStateRecents
         emptyText = binding.emptyTextRecents
         showActivityButton = binding.showActivityButton
-        showActivityButton.setOnClickListener { showRecentActivity() }
+        showActivityButton.setOnClickListener {
+            viewModel.disableHideRecentActivitySetting()
+        }
         emptySpanned = TextUtil.formatEmptyScreenText(requireContext(),
             StringResourcesUtils.getString(R.string.context_empty_recents))
         activityHiddenSpanned = TextUtil.formatEmptyScreenText(requireContext(),
             StringResourcesUtils.getString(R.string.recents_activity_hidden))
         listView = binding.listViewRecents
         fastScroller = binding.fastscroll
-        stickyLayoutManager = TopSnappedStickyLayoutManager(requireContext(), this)
-        listView.layoutManager = stickyLayoutManager
-        listView.clipToPadding = false
-        listView.itemAnimator = DefaultItemAnimator()
+
+        initAdapter()
 
         return binding.root
     }
@@ -121,122 +97,101 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        buckets = megaApi.recentActions ?: emptyList()
-
-        fillRecentItems(buckets)
-        setRecentView()
-
-        LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
-            .observeForever(nodeChangeObserver)
-        LiveEventBus.get(EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
-            .observe(viewLifecycleOwner) { hideRecentActivity: Boolean ->
-                this.setRecentView(hideRecentActivity)
-            }
-
         observeDragSupportEvents(viewLifecycleOwner, listView, Constants.VIEWER_FROM_RECETS)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    Timber.d("Collect ui state")
+                    setRecentActions(it.recentActionItems)
+                    displayRecentActionsActivity(
+                        it.hideRecentActivity,
+                        it.recentActionItems.size
+                    )
+
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
-            .removeObserver(nodeChangeObserver)
         _binding = null
     }
 
-    override fun getAdapterData(): List<RecentActionItem?> = recentActionsItems
-
-    private fun fillRecentItems(buckets: List<MegaRecentActionBucket>) {
-        this.buckets = buckets
-        reloadItems(buckets)
+    /**
+     * Initialize the adapter
+     */
+    private fun initAdapter() {
         adapter = RecentsAdapter(
             requireActivity(),
             this,
-            recentActionsItems)
+        )
         listView.adapter = adapter
         listView.addItemDecoration(HeaderItemDecoration(requireContext()))
-        setVisibleContacts()
-    }
-
-    private fun reloadItems(buckets: List<MegaRecentActionBucket>) {
-        val recentItemList = arrayListOf<RecentActionItem>()
-        var previousDate = ""
-        var currentDate: String
-        for (i in buckets.indices) {
-            val item =
-                RecentActionItem(
-                    requireContext(),
-                    buckets[i])
-            if (i == 0) {
-                currentDate = item.date
-                previousDate = currentDate
-                recentItemList.add(RecentActionItemHeader(currentDate))
-            } else {
-                currentDate = item.date
-                if (currentDate != previousDate) {
-                    recentItemList.add(RecentActionItemHeader(currentDate))
-                    previousDate = currentDate
-                }
-            }
-            recentItemList.add(item)
-        }
-        recentActionsItems = recentItemList
-    }
-
-    private fun refreshRecentActions() {
-        adapter?.setItems(recentActionsItems)
-        setRecentView()
-    }
-
-    private fun setRecentView() {
-        val hideRecentActivity = requireContext()
-            .getSharedPreferences(SharedPreferenceConstants.USER_INTERFACE_PREFERENCES,
-                Context.MODE_PRIVATE)
-            .getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
-        setRecentView(hideRecentActivity)
-        (requireActivity() as ManagerActivity).setToolbarTitle()
+        listView.clipToPadding = false
+        listView.itemAnimator = DefaultItemAnimator()
     }
 
     /**
-     * Sets the recent view. Hide it if the setting to hide it is enabled, and shows it if the
+     * Set the recent actions list to the adapter
+     *
+     * @param recentActionItems
+     */
+    private fun setRecentActions(recentActionItems: List<RecentActionItemType>) {
+        adapter?.setItems(recentActionItems)
+        listView.layoutManager =
+            TopSnappedStickyLayoutManager(requireContext()) { recentActionItems }
+    }
+
+    /**
+     * Display the recent actions activity.
+     * Hide the activity if the setting to hide is enabled, and shows it if the
      * setting is disabled.
      *
      * @param hideRecentActivity True if the setting to hide the recent activity is enabled,
      * false otherwise.
+     * @param listSize
      */
-    private fun setRecentView(hideRecentActivity: Boolean) {
-        if (hideRecentActivity) {
-            hideRecentActivity()
-        } else {
-            showActivity()
+    private fun displayRecentActionsActivity(hideRecentActivity: Boolean, listSize: Int) {
+        when {
+            hideRecentActivity -> hideActivity()
+            listSize == 0 -> showEmptyActivity()
+            else -> showActivity(listSize)
         }
     }
 
     /**
-     * Shows the recent activity.
+     * Show an empty activity
      */
-    private fun showActivity() {
-        if (buckets.isEmpty()) {
-            emptyLayout.visibility = View.VISIBLE
-            listView.visibility = View.GONE
-            fastScroller.visibility = View.GONE
-            showActivityButton.visibility = View.GONE
-            emptyText.text = emptySpanned
-        } else {
-            emptyLayout.visibility = View.GONE
-            listView.visibility = View.VISIBLE
-            fastScroller.setRecyclerView(listView)
-            if (buckets.size < Constants.MIN_ITEMS_SCROLLBAR) {
-                fastScroller.visibility = View.GONE
-            } else {
-                fastScroller.visibility = View.VISIBLE
-            }
-        }
+    private fun showEmptyActivity() {
+        emptyLayout.visibility = View.VISIBLE
+        listView.visibility = View.GONE
+        fastScroller.visibility = View.GONE
+        showActivityButton.visibility = View.GONE
+        emptyText.text = emptySpanned
     }
 
     /**
-     * Hides the recent activity.
+     * Show the recent activity
+     *
+     * @param listSize
      */
-    private fun hideRecentActivity() {
+    private fun showActivity(listSize: Int) {
+        emptyLayout.visibility = View.GONE
+        listView.visibility = View.VISIBLE
+        fastScroller.setRecyclerView(listView)
+        fastScroller.visibility =
+            if (listSize < Constants.MIN_ITEMS_SCROLLBAR)
+                View.GONE
+            else
+                View.VISIBLE
+    }
+
+    /**
+     * Hide the recent activity
+     */
+    private fun hideActivity() {
         emptyLayout.visibility = View.VISIBLE
         listView.visibility = View.GONE
         fastScroller.visibility = View.GONE
@@ -244,31 +199,6 @@ class RecentActionsFragment : Fragment(), StickyHeaderHandler {
         emptyText.text = activityHiddenSpanned
     }
 
-    /**
-     * Disables the setting to hide recent activity and updates the UI by showing it.
-     */
-    private fun showRecentActivity() {
-        LiveEventBus.get(EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
-            .post(false)
-        requireContext().getSharedPreferences(SharedPreferenceConstants.USER_INTERFACE_PREFERENCES,
-            Context.MODE_PRIVATE)
-            .edit().putBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false).apply()
-    }
-
-    fun findUserName(mail: String): String =
-        visibleContacts.find { mail == it.megaUser.email }?.fullName.orEmpty()
-
-    private fun setVisibleContacts() {
-        visibleContacts.clear()
-        megaApi.contacts
-            .asSequence()
-            .filter { it.visibility == MegaUser.VISIBILITY_VISIBLE }
-            .forEach {
-                val contactDB = ContactUtil.getContactDB(it.handle) ?: return@forEach
-                val fullName = ContactUtil.getContactNameDB(contactDB) ?: it.email
-                visibleContacts.add(MegaContactAdapter(contactDB, it, fullName))
-            }
-    }
 
     fun openFile(index: Int, node: MegaNode) {
         val intent: Intent

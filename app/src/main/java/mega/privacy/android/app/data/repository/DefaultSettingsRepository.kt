@@ -8,30 +8,30 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaPreferences
-import mega.privacy.android.app.data.extensions.failWithError
-import mega.privacy.android.app.data.extensions.failWithException
 import mega.privacy.android.app.data.extensions.isTypeWithParam
-import mega.privacy.android.app.data.gateway.CacheFolderGateway
-import mega.privacy.android.app.data.gateway.MonitorHideRecentActivityFacade
 import mega.privacy.android.app.data.gateway.MonitorStartScreenFacade
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.data.gateway.preferences.AppPreferencesGateway
-import mega.privacy.android.app.data.gateway.preferences.CallsPreferencesGateway
-import mega.privacy.android.app.data.gateway.preferences.ChatPreferencesGateway
-import mega.privacy.android.app.data.gateway.preferences.UIPreferencesGateway
-import mega.privacy.android.app.data.mapper.StartScreenMapper
-import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.SharedPreferenceConstants
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.failWithException
+import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
+import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
+import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.SettingNotFoundException
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SettingsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -49,11 +49,14 @@ import kotlin.coroutines.suspendCoroutine
  * @property context
  * @property apiFacade
  * @property monitorStartScreenFacade
- * @property monitorHideRecentActivityFacade
  * @property ioDispatcher
  * @property chatPreferencesGateway
  * @property callsPreferencesGateway
-
+ * @property appPreferencesGateway
+ * @property cacheFolderGateway
+ * @property uiPreferencesGateway
+ * @property startScreenMapper
+ * @property cameraTimestampsPreferenceGateway
  */
 @ExperimentalContracts
 class DefaultSettingsRepository @Inject constructor(
@@ -62,7 +65,6 @@ class DefaultSettingsRepository @Inject constructor(
     private val apiFacade: MegaApiGateway,
     private val monitorStartScreenFacade: MonitorStartScreenFacade,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
-    private val monitorHideRecentActivityFacade: MonitorHideRecentActivityFacade,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val chatPreferencesGateway: ChatPreferencesGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
@@ -70,6 +72,7 @@ class DefaultSettingsRepository @Inject constructor(
     private val cacheFolderGateway: CacheFolderGateway,
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val startScreenMapper: StartScreenMapper,
+    private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway,
 ) : SettingsRepository {
     init {
         initialisePreferences()
@@ -134,9 +137,6 @@ class DefaultSettingsRepository @Inject constructor(
         StartScreenUtil.HOME_BNV
     )
 
-    override fun shouldHideRecentActivity() =
-        getUiPreferences().getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
-
     override suspend fun setAutoAcceptQR(accept: Boolean): Boolean =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
@@ -179,8 +179,11 @@ class DefaultSettingsRepository @Inject constructor(
 
     override fun monitorStartScreen(): Flow<Int> = monitorStartScreenFacade.getEvents()
 
-    override fun monitorHideRecentActivity(): Flow<Boolean> =
-        monitorHideRecentActivityFacade.getEvents()
+    override fun monitorHideRecentActivity(): Flow<Boolean?> =
+        uiPreferencesGateway.monitorHideRecentActivity()
+
+    override suspend fun setHideRecentActivity(value: Boolean) =
+        uiPreferencesGateway.setHideRecentActivity(value)
 
     override fun isCameraSyncPreferenceEnabled(): Boolean =
         databaseHandler.preferences?.camSyncEnabled.toBoolean()
@@ -334,9 +337,63 @@ class DefaultSettingsRepository @Inject constructor(
 
     override fun monitorPreferredStartScreen() =
         uiPreferencesGateway.monitorPreferredStartScreen()
-            .map{ startScreenMapper(it) }
+            .map { startScreenMapper(it) }
 
     override suspend fun setPreferredStartScreen(screen: StartScreen) {
         uiPreferencesGateway.setPreferredStartScreen(screen.id)
     }
+
+    override suspend fun backupTimestampsAndFolderHandle(
+        primaryUploadFolderHandle: Long,
+        secondaryUploadFolderHandle: Long,
+        camSyncTimeStamp: String?,
+        camVideoSyncTimeStamp: String?,
+        secSyncTimeStamp: String?,
+        secVideoSyncTimeStamp: String?,
+    ) {
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.backupTimestampsAndFolderHandle(
+                primaryUploadFolderHandle,
+                secondaryUploadFolderHandle,
+                camSyncTimeStamp,
+                camVideoSyncTimeStamp,
+                secSyncTimeStamp,
+                secVideoSyncTimeStamp)
+        }
+    }
+
+    override suspend fun getPrimaryHandle() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.getPrimaryHandle()
+        }
+
+    override suspend fun getSecondaryHandle() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.getSecondaryHandle()
+        }
+
+    override suspend fun getPrimaryFolderPhotoSyncTime() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.getPrimaryFolderPhotoSyncTime()
+        }
+
+    override suspend fun getSecondaryFolderPhotoSyncTime() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.getSecondaryFolderPhotoSyncTime()
+        }
+
+    override suspend fun getPrimaryFolderVideoSyncTime() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.getPrimaryFolderVideoSyncTime()
+        }
+
+    override suspend fun getSecondaryFolderVideoSyncTime() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.getSecondaryFolderVideoSyncTime()
+        }
+
+    override suspend fun clearPrimaryCameraSyncRecords() =
+        withContext(ioDispatcher) {
+            cameraTimestampsPreferenceGateway.clearPrimaryCameraSyncRecords()
+        }
 }

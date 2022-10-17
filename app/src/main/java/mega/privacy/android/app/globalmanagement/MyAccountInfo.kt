@@ -1,11 +1,11 @@
 package mega.privacy.android.app.globalmanagement
 
 import android.util.Base64
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.Product
 import mega.privacy.android.app.R
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase
 import mega.privacy.android.app.middlelayer.iab.MegaSku

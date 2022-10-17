@@ -5,29 +5,30 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.extensions.failWithError
-import mega.privacy.android.app.data.gateway.api.MegaApiFolderGateway
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.gateway.api.MegaLocalStorageGateway
-import mega.privacy.android.app.data.mapper.MegaExceptionMapper
-import mega.privacy.android.app.data.mapper.MegaShareMapper
-import mega.privacy.android.app.data.mapper.SortOrderIntMapper
-import mega.privacy.android.app.data.model.GlobalUpdate
 import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
-import mega.privacy.android.app.presentation.photos.timeline.model.Sort
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
+import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.MegaExceptionMapper
+import mega.privacy.android.data.mapper.MegaShareMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileRepository
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -121,7 +122,7 @@ class DefaultFilesRepository @Inject constructor(
             megaApiGateway.getChildNode(parentNode, name)
         }
 
-    override suspend fun getChildrenNode(parentNode: MegaNode, order: SortOrder?): List<MegaNode> =
+    override suspend fun getChildrenNode(parentNode: MegaNode, order: SortOrder): List<MegaNode> =
         withContext(ioDispatcher) {
             megaApiGateway.getChildrenByNode(parentNode, sortOrderIntMapper(order))
         }
@@ -202,7 +203,7 @@ class DefaultFilesRepository @Inject constructor(
                     appData = Constants.APP_DATA_BACKGROUND_TRANSFER,
                     startFirst = true,
                     cancelToken = null,
-                    listener = OptionalMegaTransferListenerInterface(
+                    listener = mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface(
                         onTransferTemporaryError = { _, error ->
                             continuation.failWithError(error)
                         },
@@ -221,5 +222,25 @@ class DefaultFilesRepository @Inject constructor(
     override suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException =
         withContext(ioDispatcher) {
             megaExceptionMapper(megaApiGateway.checkAccessErrorExtended(node, level))
+        }
+
+    override suspend fun getBackupFolderId(): NodeId =
+        withContext(ioDispatcher) {
+            val backupsFolderAttributeIdentifier = MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER
+            suspendCancellableCoroutine { continuation ->
+                megaApiGateway.getUserAttribute(backupsFolderAttributeIdentifier,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request, error ->
+                            if (request.paramType == backupsFolderAttributeIdentifier) {
+                                if (error.errorCode == MegaError.API_OK) {
+                                    continuation.resumeWith(Result.success(NodeId(request.nodeHandle)))
+                                } else {
+                                    continuation.failWithError(error)
+                                }
+                            }
+                        }
+                    ))
+            }
+
         }
 }

@@ -181,6 +181,7 @@ public class Constants {
     public static final int PRO_III = 3;
     public static final int PRO_LITE = 4;
     public static final int BUSINESS = 100;
+    public static final int PRO_FLEXI = 101;
 
     public static final long DISABLED_RETENTION_TIME = 0;
     public static final long SECONDS_IN_MINUTE = 60;

@@ -308,11 +308,11 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             R.id.my_account -> {
                 menu.toggleAllMenuItemsVisibility(true)
 
-                if (viewModel.thereIsNoSubscription()) {
+                if (viewModel.thereIsNoSubscription() || viewModel.isProFlexiAccount()) {
                     menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
                 }
 
-                if (viewModel.isBusinessAccount()) {
+                if (viewModel.isBusinessAccount() || viewModel.isProFlexiAccount()) {
                     menu.findItem(R.id.action_upgrade_account).isVisible = false
                 }
 

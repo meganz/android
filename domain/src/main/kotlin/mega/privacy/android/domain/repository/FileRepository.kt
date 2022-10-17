@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * File repository
@@ -23,4 +24,9 @@ interface FileRepository {
      * @return Boolean
      */
     suspend fun isNodeInRubbish(handle: Long): Boolean
+
+    /**
+     * Get the current backup folder node id
+     */
+    suspend fun getBackupFolderId(): NodeId
 }

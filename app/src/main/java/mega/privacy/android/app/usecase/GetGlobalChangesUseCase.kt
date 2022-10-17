@@ -2,7 +2,7 @@ package mega.privacy.android.app.usecase
 
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaGlobalListenerInterface
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaContactRequest

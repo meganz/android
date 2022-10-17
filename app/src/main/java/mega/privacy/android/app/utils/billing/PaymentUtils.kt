@@ -2,8 +2,8 @@ package mega.privacy.android.app.utils.billing
 
 import android.content.Context
 import android.content.Intent
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaAttributes
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.app.Product
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE

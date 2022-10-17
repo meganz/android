@@ -12,7 +12,7 @@ import dagger.hilt.android.components.FragmentComponent
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.AvatarUtil
@@ -29,6 +29,8 @@ import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnlineWrapper
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 
 /**
@@ -139,4 +141,10 @@ class UtilWrapperModule {
         override fun decodeFile(pathName: String?, opts: BitmapFactory.Options): Bitmap? =
             BitmapFactory.decodeFile(pathName, opts)
     }
+
+    /**
+     * Provide mega node util wrapper
+     */
+    @Provides
+    fun provideMegaNodeUtilWrapper(facade: MegaNodeUtilFacade): MegaNodeUtilWrapper = facade
 }

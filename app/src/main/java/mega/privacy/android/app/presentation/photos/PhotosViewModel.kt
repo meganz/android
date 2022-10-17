@@ -68,7 +68,7 @@ class PhotosViewModel @Inject constructor(
         }
     }
 
-    suspend fun downloadPhotoCover(
+    suspend fun downloadPhoto(
         isPreview: Boolean,
         photo: Photo,
         callback: (success: Boolean) -> Unit,

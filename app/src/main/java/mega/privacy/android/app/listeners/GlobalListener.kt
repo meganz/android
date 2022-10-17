@@ -16,7 +16,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.PushNotificationSettingManagement
@@ -24,7 +24,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MY_BACKUPS_FOLDER_CHANGED
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
@@ -37,6 +37,8 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywall
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.mapper.StorageStateMapper
+import mega.privacy.android.domain.entity.StorageState
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -57,6 +59,7 @@ class GlobalListener @Inject constructor(
     private val performanceReporter: PerformanceReporter,
     @ApplicationContext private val appContext: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
+    private val storageStateMapper: StorageStateMapper,
 ) : MegaGlobalListenerInterface {
 
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser?>?) {
@@ -191,17 +194,16 @@ class GlobalListener @Inject constructor(
 
         when (event.type) {
             MegaEvent.EVENT_STORAGE -> {
-                Timber.d("EVENT_STORAGE: %s", event.number)
-                when (val state = event.number.toInt()) {
-                    MegaApiJava.STORAGE_STATE_CHANGE -> {
+                val state = storageStateMapper(event.number.toInt())
+                Timber.d("EVENT_STORAGE: $state")
+                when (state) {
+                    StorageState.Change -> {
                         api.getAccountDetails(null)
                     }
-                    MegaApiJava.STORAGE_STATE_PAYWALL -> {
-                        MegaApplication.getInstance().storageState = state
+                    StorageState.PayWall -> {
                         showOverDiskQuotaPaywallWarning()
                     }
                     else -> {
-                        MegaApplication.getInstance().storageState = state
                         val intent =
                             Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS).apply {
                                 action = Constants.ACTION_STORAGE_STATE_CHANGED
