@@ -40,4 +40,10 @@ interface EnvironmentRepository {
      * @param newVersionCode
      */
     suspend fun saveVersionCode(newVersionCode: Int)
+
+    /**
+     * Get device sdk version
+     *
+     */
+    suspend fun getDeviceSdkVersion(): Int
 }
