@@ -29,14 +29,11 @@ import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getOutgoingOrIncomingParent
-import mega.privacy.android.app.utils.MegaNodeUtil.isOutShare
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
-import nz.mega.sdk.MegaRecentActionBucket
 import timber.log.Timber
 
 /**
@@ -73,137 +70,142 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
         return RecentActionViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: RecentActionViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecentActionViewHolder, position: Int) = with(holder) {
         Timber.d("Position: %s", position)
         val item = getItemAtPosition(position) ?: return
-        with(holder) {
-            when (item) {
-                is RecentActionItemType.Header -> {
-                    Timber.d("onBindViewHolder: TYPE_HEADER")
-                    binding.itemBucketLayout.visibility = View.GONE
-                    binding.headerLayout.visibility = View.VISIBLE
-                    binding.headerLayout.setBackgroundColor(headerColor)
-                    binding.headerText.text = TimeUtils.formatBucketDate(context, item.timestamp)
+
+        when (item) {
+            is RecentActionItemType.Header -> {
+                Timber.d("onBindViewHolder: TYPE_HEADER")
+                binding.itemBucketLayout.visibility = View.GONE
+                binding.headerLayout.visibility = View.VISIBLE
+                binding.headerLayout.setBackgroundColor(headerColor)
+                binding.headerText.text = TimeUtils.formatBucketDate(context, item.timestamp)
+            }
+
+            is RecentActionItemType.Item -> {
+                Timber.d("onBindViewHolder: TYPE_BUCKET")
+                binding.itemBucketLayout.visibility = View.VISIBLE
+                binding.itemBucketLayout.setOnClickListener {
+                    // If only one element in the bucket
+                    if (item.bucket.nodes.size() == 1) {
+                        (fragment as RecentActionsFragment).openFile(
+                            holder.bindingAdapterPosition,
+                            item.bucket.nodes[0])
+                    }
+                    // If more element in the bucket
+                    else {
+                        (fragment as RecentActionsFragment).viewModel.select(item.bucket)
+
+                        val currentDestination = findNavController(it).currentDestination
+                        if (currentDestination != null && currentDestination.id == R.id.homepageFragment) {
+                            findNavController(it).navigate(actionHomepageToRecentBucket(),
+                                NavOptions.Builder().build())
+                        }
+                    }
+                }
+                binding.headerLayout.visibility = View.GONE
+
+                val bucket = item.bucket
+                val nodeList = bucket.nodes
+                if (nodeList == null || nodeList.size() == 0) return
+                val node = nodeList[0] ?: return
+                var parentNode: MegaNode? =
+                    megaApi.getNodeByHandle(bucket.parentHandle) ?: return
+                binding.nameText.text =
+                    if (parentNode?.name == "Cloud Drive") {
+                        context.getString(R.string.section_cloud_drive)
+                    } else {
+                        parentNode?.name ?: ""
+                    }
+
+                if (bucket.userEmail == megaApi.myEmail) {
+                    binding.secondLineText.visibility = View.GONE
+                } else {
+                    val userAction = if (bucket.isUpdate) {
+                        context.getString(R.string.update_action_bucket, item.userName)
+                    } else {
+                        context.getString(R.string.create_action_bucket, item.userName)
+                    }
+                    binding.secondLineText.visibility = View.VISIBLE
+                    binding.secondLineText.text = formatUserAction(userAction)
+                }
+                val parentRootNode = parentNode?.let { getOutgoingOrIncomingParent(it) }
+                when {
+                    parentRootNode == null -> {
+                        binding.sharedImage.visibility = View.GONE
+                    }
+
+                    parentRootNode.isInShare -> {
+                        binding.sharedImage.visibility = View.VISIBLE
+                        binding.sharedImage.setImageResource(R.drawable.ic_folder_incoming_list)
+                    }
+
+                    parentRootNode.isOutShare || megaApi.isPendingShare(parentRootNode) -> {
+                        binding.sharedImage.visibility = View.VISIBLE
+                        binding.sharedImage.setImageResource(R.drawable.ic_folder_outgoing_list)
+                    }
                 }
 
-                is RecentActionItemType.Item -> {
-                    Timber.d("onBindViewHolder: TYPE_BUCKET")
-                    binding.itemBucketLayout.visibility = View.VISIBLE
-                    binding.itemBucketLayout.setOnClickListener {
-                        // If only one element in the bucket
-                        if (item.bucket.nodes.size() == 1) {
-                            (fragment as RecentActionsFragment).openFile(
-                                holder.bindingAdapterPosition,
-                                item.bucket.nodes[0])
-                        }
-                        // If more element in the bucket
-                        else {
-                            val bucket: MegaRecentActionBucket = item.bucket
-                            (fragment as RecentActionsFragment).viewModel.select(bucket)
-                            val currentDestination = findNavController(it).currentDestination
-                            if (currentDestination != null && currentDestination.id == R.id.homepageFragment) {
-                                findNavController(it).navigate(actionHomepageToRecentBucket(),
-                                    NavOptions.Builder().build())
-                            }
-                        }
-                    }
-                    binding.headerLayout.visibility = View.GONE
+                binding.timeText.text = TimeUtils.formatTime(item.timestamp)
+                binding.thumbnailView.visibility = View.VISIBLE
 
-                    val bucket = item.bucket
-                    if (bucket.nodes == null || bucket.nodes.size() == 0) return
-                    val nodeList = bucket.nodes
-                    val node = nodeList[0] ?: return
-                    var parentNode: MegaNode? =
-                        megaApi.getNodeByHandle(bucket.parentHandle) ?: return
-                    var parentName = parentNode?.name
-                    if (!TextUtil.isTextEmpty(parentName) && parentName == "Cloud Drive") {
-                        parentName = context.getString(R.string.section_cloud_drive)
-                    }
-                    binding.nameText.text = parentName
-                    val mail = bucket.userEmail
-                    val user: String
-                    val userAction: String
-                    if (mail == megaApi.myEmail) {
-                        binding.secondLineText.visibility = View.GONE
-                    } else {
-                        user = item.userName
-                        userAction = if (bucket.isUpdate) {
-                            context.getString(R.string.update_action_bucket, user)
-                        } else {
-                            context.getString(R.string.create_action_bucket, user)
-                        }
-                        binding.secondLineText.visibility = View.VISIBLE
-                        binding.secondLineText.text = formatUserAction(userAction)
-                    }
-                    parentNode = parentNode?.let { getOutgoingOrIncomingParent(it) }
-                    if (parentNode == null) {
-//              No outShare, no inShare
-                        binding.sharedImage.visibility = View.GONE
-                    } else {
-                        binding.sharedImage.visibility = View.VISIBLE
-                        if (parentNode.isInShare) {
-                            binding.sharedImage.setImageResource(R.drawable.ic_folder_incoming_list)
-                        } else if (isOutShare(parentNode)) {
-                            binding.sharedImage.setImageResource(R.drawable.ic_folder_outgoing_list)
-                        }
-                    }
-                    binding.timeText.text =
-                        TimeUtils.formatTime(item.timestamp)
-                    binding.thumbnailView.visibility = View.VISIBLE
-                    val params = binding.thumbnailView.layoutParams as RelativeLayout.LayoutParams
-                    params.height = Util.dp2px(48f, outMetrics)
-                    params.width = params.height
-                    val margin = Util.dp2px(12f, outMetrics)
-                    params.setMargins(margin, margin, margin, 0)
-                    binding.thumbnailView.layoutParams = params
-                    binding.thumbnailView.setImageResource(MimeTypeList.typeForName(node.name).iconResourceId)
+                val params = binding.thumbnailView.layoutParams as RelativeLayout.LayoutParams
+                params.height = Util.dp2px(48f, outMetrics)
+                params.width = params.height
+                val margin = Util.dp2px(12f, outMetrics)
+                params.setMargins(margin, margin, margin, 0)
+                binding.thumbnailView.layoutParams = params
+                binding.thumbnailView.setImageResource(MimeTypeList.typeForName(node.name).iconResourceId)
 
-                    // only one item in the recent action
-                    if (nodeList.size() == 1) {
-                        binding.threeDots.visibility = View.VISIBLE
-                        binding.threeDots.setOnClickListener {
-                            if (!Util.isOnline(context)) {
-                                (context as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
-                                    context.getString(
-                                        R.string.error_server_connection_problem),
-                                    -1)
-                            } else {
-                                (context as ManagerActivity).showNodeOptionsPanel(node,
-                                    NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
-                            }
-                        }
-                        binding.firstLineText.text = node.name
-                        if (node.label != MegaNode.NODE_LBL_UNKNOWN) {
-                            val drawable =
-                                getNodeLabelDrawable(node.label, holder.itemView.resources)
-                            binding.imgLabel.setImageDrawable(drawable)
-                            binding.imgLabel.visibility = View.VISIBLE
+                // only one item in the recent action
+                if (nodeList.size() == 1) {
+                    binding.threeDots.visibility = View.VISIBLE
+                    binding.threeDots.setOnClickListener {
+                        if (!Util.isOnline(context)) {
+                            (context as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
+                                context.getString(
+                                    R.string.error_server_connection_problem),
+                                -1)
                         } else {
-                            binding.imgLabel.visibility = View.GONE
+                            (context as ManagerActivity).showNodeOptionsPanel(node,
+                                NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
                         }
-                        binding.imgFavourite.visibility =
-                            if (node.isFavourite) View.VISIBLE else View.GONE
                     }
-                    // multiple item in the recent action
-                    else {
-                        binding.threeDots.visibility = View.INVISIBLE
-                        binding.threeDots.setOnClickListener(null)
+                    binding.firstLineText.text = node.name
+                    if (node.label != MegaNode.NODE_LBL_UNKNOWN) {
+                        val drawable =
+                            getNodeLabelDrawable(node.label, holder.itemView.resources)
+                        binding.imgLabel.setImageDrawable(drawable)
+                        binding.imgLabel.visibility = View.VISIBLE
+                    } else {
                         binding.imgLabel.visibility = View.GONE
-                        binding.imgFavourite.visibility = View.GONE
-                        if (bucket.isMedia) {
-                            binding.firstLineText.text = getMediaTitle(nodeList)
-                            binding.thumbnailView.setImageResource(R.drawable.media)
-                        } else {
-                            binding.firstLineText.text = context.getString(R.string.title_bucket,
-                                node.name,
-                                nodeList.size() - 1)
-                        }
                     }
-                    if (bucket.isUpdate) {
-                        binding.actionImage.setImageResource(R.drawable.ic_versions_small)
+
+                    binding.imgFavourite.visibility =
+                        if (node.isFavourite) View.VISIBLE else View.GONE
+                }
+                // multiple items in the recent action
+                else {
+                    binding.threeDots.visibility = View.INVISIBLE
+                    binding.threeDots.setOnClickListener(null)
+                    binding.imgLabel.visibility = View.GONE
+                    binding.imgFavourite.visibility = View.GONE
+
+                    if (bucket.isMedia) {
+                        binding.firstLineText.text = getMediaTitle(nodeList)
+                        binding.thumbnailView.setImageResource(R.drawable.media)
                     } else {
-                        binding.actionImage.setImageResource(R.drawable.ic_recents_up)
+                        binding.firstLineText.text = context.getString(R.string.title_bucket,
+                            node.name,
+                            nodeList.size() - 1)
                     }
+                }
+
+                if (bucket.isUpdate) {
+                    binding.actionImage.setImageResource(R.drawable.ic_versions_small)
+                } else {
+                    binding.actionImage.setImageResource(R.drawable.ic_recents_up)
                 }
             }
         }
@@ -236,10 +238,9 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
         } else null
 
     override fun getSectionTitle(position: Int): String {
-        return if (recentActionItems.isNullOrEmpty()
-            || position < 0 || position >= (recentActionItems?.size ?: -1)
-        ) "" else TimeUtils.formatBucketDate(context,
-            recentActionItems!![position].timestamp)
+        return if (recentActionItems.isNullOrEmpty() || position < 0 || position >= itemCount)
+            ""
+        else TimeUtils.formatBucketDate(context, recentActionItems!![position].timestamp)
     }
 
     /**
@@ -270,6 +271,7 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
             ""
         }
         return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            @Suppress("DEPRECATION")
             Html.fromHtml(formattedUserAction)
         } else
             Html.fromHtml(formattedUserAction, Html.FROM_HTML_MODE_LEGACY)
@@ -282,15 +284,12 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
      * @return a string corresponding to the title
      */
     private fun getMediaTitle(nodeList: MegaNodeList): String {
-        var numImages = 0
-        var numVideos = 0
-        for (i in 0 until nodeList.size()) {
-            if (MimeTypeList.typeForName(nodeList[i].name).isImage) {
-                numImages++
-            } else {
-                numVideos++
-            }
-        }
+        val partition = (0 until nodeList.size())
+            .map { nodeList[it] }
+            .partition { MimeTypeList.typeForName(it.name).isImage }
+        val numImages = partition.first.size
+        val numVideos = partition.second.size
+
         val mediaTitle = when {
             numImages > 0 && numVideos == 0 -> {
                 context.resources.getQuantityString(R.plurals.title_media_bucket_only_images,
@@ -317,14 +316,12 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
     /**
      * Return the recent action item at given position
      *
-     * @param pos the given position
-     * @return the recent action item at position [pos], null if [pos] is invalid index or item is null
+     * @param position the given position
+     * @return the recent action item at position [position], null if [position] is invalid index or item is null
      */
-    private fun getItemAtPosition(pos: Int): RecentActionItemType? {
-        return if (recentActionItems.isNullOrEmpty()
-            || pos < 0 || pos >= (recentActionItems?.size ?: -1)
-        ) null
-        else recentActionItems?.get(pos)
+    private fun getItemAtPosition(position: Int): RecentActionItemType? {
+        return if (recentActionItems.isNullOrEmpty() || position < 0 || position >= itemCount) null
+        else recentActionItems?.get(position)
     }
 
     /**
