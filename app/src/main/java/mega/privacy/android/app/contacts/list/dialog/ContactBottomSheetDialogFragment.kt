@@ -1,5 +1,6 @@
 package mega.privacy.android.app.contacts.list.dialog
 
+import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.DialogInterface
 import android.content.Intent
@@ -36,8 +37,10 @@ import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
 import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
 import mega.privacy.android.app.utils.ContactUtil
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.setImageRequestFromUri
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 
@@ -196,7 +199,13 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.optionCall.setOnClickListener {
             MegaApplication.userWaitingForCall = megaUser.handle
             if (CallUtil.canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
-                viewModel.startCall()
+                viewModel.getChatRoomId(megaUser.handle)
+                    .observe(viewLifecycleOwner) { chatId ->
+                        if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+                            val audio = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
+                            viewModel.onCallTap(chatId = chatId, video = false, audio = audio)
+                        }
+                    }
             }
             dismiss()
         }

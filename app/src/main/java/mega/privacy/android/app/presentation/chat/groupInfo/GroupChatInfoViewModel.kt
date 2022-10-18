@@ -41,6 +41,9 @@ import javax.inject.Inject
  * @property setOpenInvite               [SetOpenInvite]
  * @property startChatCall               [StartChatCall]
  * @property getChatRoomUseCase          [GetChatRoomUseCase]
+ * @property passcodeManagement          [PasscodeManagement]
+ * @property chatApiGateway              [MegaChatApiGateway]
+ * @property chatManagement              [ChatManagement]
  * @property state                       Current view state as [GroupInfoState]
  */
 @HiltViewModel

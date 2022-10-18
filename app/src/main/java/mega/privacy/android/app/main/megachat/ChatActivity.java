@@ -1565,8 +1565,6 @@ public class ChatActivity extends PasscodeActivity
                     }
                 });
 
-        collectFlows();
-
         registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
         IntentFilter leftChatFilter = new IntentFilter(BROADCAST_ACTION_INTENT_LEFT_CHAT);
@@ -2057,20 +2055,6 @@ public class ChatActivity extends PasscodeActivity
 
         Util.changeToolBarElevation(this, tB, listView.canScrollVertically(-1) || adapter.isMultipleSelect());
         setStatusIcon();
-    }
-
-    /**
-     * Collecting Flows from ViewModels
-     */
-    private void collectFlows() {
-        /*ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, chatState -> {
-            if (chatState.getError() != null) {
-                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
-            } else if (chatState.getResultAnswerCall() != null) {
-                callInProgressLayout.setEnabled(true);
-            }
-            return Unit.INSTANCE;
-        });*/
     }
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState) {

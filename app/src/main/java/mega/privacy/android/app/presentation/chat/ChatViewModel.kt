@@ -19,6 +19,12 @@ import javax.inject.Inject
 
 /**
  * View Model for [mega.privacy.android.app.main.megachat.ChatActivity]
+ *
+ * @property monitorStorageStateEvent [MonitorStorageStateEvent]
+ * @property startChatCall [StartChatCall]
+ * @property passcodeManagement [PasscodeManagement]
+ * @property chatApiGateway [MegaChatApiGateway]
+ * @property chatManagement [ChatManagement]
  */
 @HiltViewModel
 class ChatViewModel @Inject constructor(

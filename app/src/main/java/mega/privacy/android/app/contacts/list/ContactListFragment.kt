@@ -1,5 +1,6 @@
 package mega.privacy.android.app.contacts.list
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -10,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.list.adapter.ContactActionsListAdapter
@@ -24,6 +26,8 @@ import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.utils.permission.PermissionUtils
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
  * Fragment that represents the UI showing the list of contacts for the current user.
@@ -75,7 +79,13 @@ class ContactListFragment : Fragment() {
      * Start call
      */
     fun startCall() {
-        viewModel.startCall()
+        viewModel.getChatRoomId(MegaApplication.userWaitingForCall)
+            .observe(viewLifecycleOwner) { chatId ->
+                if (chatId != MEGACHAT_INVALID_HANDLE) {
+                    val audio = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
+                    viewModel.onCallTap(chatId = chatId, video = false, audio = audio)
+                }
+            }
     }
 
     private fun setupView() {
