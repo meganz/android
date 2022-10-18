@@ -60,6 +60,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChat
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.groupInfo.GroupChatInfoViewModel
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
+import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.StartCallUseCase
@@ -488,6 +489,9 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             val contacts = megaApi.contacts
             if (contacts.isNullOrEmpty() || !contacts.any { it.visibility == VISIBILITY_VISIBLE }) {
                 val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
+                dialog.show(supportFragmentManager, dialog.tag)
+            } else if (ChatUtil.areAllMyContactsChatParticipants(chat)) {
+                val dialog = AddParticipantsNoContactsLeftToAddDialogFragment.newInstance()
                 dialog.show(supportFragmentManager, dialog.tag)
             } else {
                 val intent = Intent(this, AddContactActivity::class.java)

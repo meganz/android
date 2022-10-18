@@ -14,10 +14,10 @@ import javax.inject.Inject
 
 /**
  * Fragment to display a custom two buttons alert dialog when user is trying to add participants
- * to a chat/meeting but has no contacts
+ * to a chat/meeting but all contacts are already participants
  */
 @AndroidEntryPoint
-class AddParticipantsNoContactsDialogFragment : DialogFragment() {
+class AddParticipantsNoContactsLeftToAddDialogFragment : DialogFragment() {
 
     @Inject
     /** Current theme */
@@ -27,8 +27,8 @@ class AddParticipantsNoContactsDialogFragment : DialogFragment() {
         MaterialAlertDialogBuilder(requireContext(),
             R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .apply {
-                setTitle(StringResourcesUtils.getString(R.string.chat_add_participants_no_contacts_title))
-                setMessage(StringResourcesUtils.getString(R.string.chat_add_participants_no_contacts_message))
+                setTitle(StringResourcesUtils.getString(R.string.chat_add_participants_no_contacts_left_to_add_title))
+                setMessage(StringResourcesUtils.getString(R.string.chat_add_participants_no_contacts_left_to_add_message))
                 setNegativeButton(StringResourcesUtils.getString(R.string.button_cancel)) { _, _ ->
                     dismiss()
                 }
@@ -42,9 +42,9 @@ class AddParticipantsNoContactsDialogFragment : DialogFragment() {
         /**
          * Creates an instance of this class
          *
-         * @return AddParticipantsNoContactsDialogFragment new instance
+         * @return AddParticipantsNoContactsLeftToAddDialogFragment new instance
          */
         @JvmStatic
-        fun newInstance() = AddParticipantsNoContactsDialogFragment()
+        fun newInstance() = AddParticipantsNoContactsLeftToAddDialogFragment()
     }
 }
