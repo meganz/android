@@ -312,9 +312,9 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)
     }
 
-    override suspend fun deleteAllPrimarySyncRecords() {
-        dbHandler.deleteAllPrimarySyncRecords()
-    }
+    override suspend fun deleteAllPrimarySyncRecords() = dbHandler.deleteAllPrimarySyncRecords()
+
+    override suspend fun deleteAllSecondarySyncRecords() = dbHandler.deleteAllSecondarySyncRecords()
 
     override suspend fun getChatFilesFolderHandle() = dbHandler.myChatFilesFolderHandle
 
