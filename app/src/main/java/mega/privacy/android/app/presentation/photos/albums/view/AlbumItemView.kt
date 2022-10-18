@@ -1,7 +1,10 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,15 +17,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -43,6 +49,7 @@ internal fun PhotosBig2SmallItems(
     photoDownload: PhotoDownload,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
+    selectedPhotoIds: MutableSet<Long>,
 ) {
     Column {
         Row(
@@ -59,7 +66,8 @@ internal fun PhotosBig2SmallItems(
                         photoDownload = photoDownload,
                     )
                 },
-                photo = photos[0]
+                photo = photos[0],
+                isSelected = photos[0].id in selectedPhotoIds
             )
             if (photos.size >= 2) {
                 Column(
@@ -75,7 +83,8 @@ internal fun PhotosBig2SmallItems(
                                 photoDownload = photoDownload,
                             )
                         },
-                        photo = photos[1]
+                        photo = photos[1],
+                        isSelected = photos[1].id in selectedPhotoIds
                     )
                     if (photos.size == 3) {
                         AlbumPhotoContainer(
@@ -88,7 +97,8 @@ internal fun PhotosBig2SmallItems(
                                     photoDownload = photoDownload,
                                 )
                             },
-                            photo = photos[2]
+                            photo = photos[2],
+                            isSelected = photos[2].id in selectedPhotoIds
                         )
                     }
                 }
@@ -104,13 +114,10 @@ internal fun PhotosBig2SmallItems(
 internal fun Photos3SmallItems(
     size: Dp,
     photos: List<Photo>,
-    downloadPhoto: suspend (
-        isPreview: Boolean,
-        photo: Photo,
-        callback: (success: Boolean) -> Unit,
-    ) -> Unit,
+    downloadPhoto: PhotoDownload,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
+    selectedPhotoIds: MutableSet<Long>,
 ) {
     Column {
         Row(
@@ -127,7 +134,8 @@ internal fun Photos3SmallItems(
                         photoDownload = downloadPhoto,
                     )
                 },
-                photo = photos[0]
+                photo = photos[0],
+                isSelected = photos[0].id in selectedPhotoIds
             )
             if (photos.size >= 2) {
                 AlbumPhotoContainer(
@@ -140,7 +148,8 @@ internal fun Photos3SmallItems(
                             photoDownload = downloadPhoto,
                         )
                     },
-                    photo = photos[1]
+                    photo = photos[1],
+                    isSelected = photos[1].id in selectedPhotoIds
                 )
                 if (photos.size == 2) {
                     Spacer(modifier = Modifier.size(size))
@@ -157,7 +166,8 @@ internal fun Photos3SmallItems(
                             photoDownload = downloadPhoto,
                         )
                     },
-                    photo = photos[2]
+                    photo = photos[2],
+                    isSelected = photos[2].id in selectedPhotoIds
                 )
             }
         }
@@ -170,13 +180,10 @@ internal fun Photos3SmallItems(
 @Composable
 internal fun Photos2SmallBigItems(
     size: Dp, photos: List<Photo>,
-    downloadPhoto: suspend (
-        isPreview: Boolean,
-        photo: Photo,
-        callback: (success: Boolean) -> Unit,
-    ) -> Unit,
+    downloadPhoto: PhotoDownload,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
+    selectedPhotoIds: MutableSet<Long>,
 ) {
     Column {
         Row(
@@ -196,7 +203,8 @@ internal fun Photos2SmallBigItems(
                             photoDownload = downloadPhoto,
                         )
                     },
-                    photo = photos[0]
+                    photo = photos[0],
+                    isSelected = photos[0].id in selectedPhotoIds
                 )
 
                 if (photos.size == 3) {
@@ -210,7 +218,8 @@ internal fun Photos2SmallBigItems(
                                 photoDownload = downloadPhoto,
                             )
                         },
-                        photo = photos[2]
+                        photo = photos[2],
+                        isSelected = photos[2].id in selectedPhotoIds
                     )
                 }
             }
@@ -225,7 +234,8 @@ internal fun Photos2SmallBigItems(
                             photoDownload = downloadPhoto,
                         )
                     },
-                    photo = photos[1]
+                    photo = photos[1],
+                    isSelected = photos[1].id in selectedPhotoIds
                 )
             }
         }
@@ -243,9 +253,10 @@ private fun AlbumPhotoContainer(
     onLongPress: (Photo) -> Unit = {},
     albumPhotoView: @Composable () -> Unit,
     photo: Photo,
+    isSelected: Boolean,
 ) {
     Box(
-        modifier = Modifier
+        modifier = isSelected(isSelected)
             .combinedClickable(
                 onClick = { onClick(photo) },
                 onLongClick = { onLongPress(photo) }
@@ -253,6 +264,15 @@ private fun AlbumPhotoContainer(
     ) {
         albumPhotoView()
         if (photo.isFavourite) {
+            if (photo is Photo.Image) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_overlay),
+                    contentScale = ContentScale.FillBounds,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .matchParentSize()
+                )
+            }
             Icon(
                 painter = painterResource(id = R.drawable.ic_favourite_white),
                 contentDescription = null,
@@ -279,6 +299,16 @@ private fun AlbumPhotoContainer(
                     .padding(6.dp),
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold
+            )
+        }
+        if (isSelected) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_select_folder),
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(10.dp),
+                tint = Color.Unspecified
             )
         }
     }
@@ -316,4 +346,13 @@ private fun AlbumPhotoView(
             .aspectRatio(1f)
     )
 }
+
+@Composable
+private fun isSelected(isSelected: Boolean) = if (isSelected) Modifier
+    .border(BorderStroke(
+        width = 2.dp,
+        color = colorResource(id = R.color.teal_300)),
+        shape = RoundedCornerShape(4.dp)
+    )
+    .clip(RoundedCornerShape(4.dp)) else Modifier
 
