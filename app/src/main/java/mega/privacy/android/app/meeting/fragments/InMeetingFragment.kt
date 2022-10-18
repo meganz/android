@@ -88,6 +88,7 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
@@ -124,6 +125,7 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -2569,20 +2571,26 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun onInviteParticipants() {
         Timber.d("chooseAddContactDialog")
-        val inviteParticipantIntent =
-            Intent(meetingActivity, AddContactActivity::class.java).apply {
-                putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-                putExtra(INTENT_EXTRA_KEY_CHAT, true)
-                putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)
-                putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.currentChatId)
-                putExtra(
-                    INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                    StringResourcesUtils.getString(R.string.invite_participants)
-                )
-            }
-        meetingActivity.startActivityForResult(
-            inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS
-        )
+        val contacts = megaApi.contacts
+        if (contacts.isNullOrEmpty() || !contacts.any { it.visibility == VISIBILITY_VISIBLE }) {
+            val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
+            dialog.show(childFragmentManager, dialog.tag)
+        } else {
+            val inviteParticipantIntent =
+                Intent(meetingActivity, AddContactActivity::class.java).apply {
+                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                    putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                    putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)
+                    putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.currentChatId)
+                    putExtra(
+                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                        StringResourcesUtils.getString(R.string.invite_participants)
+                    )
+                }
+            meetingActivity.startActivityForResult(
+                inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS
+            )
+        }
     }
 
     override fun onAllowAddParticipants() {
