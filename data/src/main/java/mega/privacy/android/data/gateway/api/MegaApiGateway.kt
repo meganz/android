@@ -261,6 +261,15 @@ interface MegaApiGateway {
     suspend fun getOutgoingSharesNode(order: Int?): List<MegaShare>
 
     /**
+     * Check if a MegaNode is pending to be shared with another User. This situation
+     * happens when a node is to be shared with a User which is not a contact yet.
+     *
+     * @param node Node to check
+     * @return true is the MegaNode is pending to be shared, otherwise false
+     */
+    suspend fun isPendingShare(node: MegaNode): Boolean
+
+    /**
      * Get a list with all public links
      *
      * Valid value for order are: MegaApi::ORDER_NONE, MegaApi::ORDER_DEFAULT_ASC,

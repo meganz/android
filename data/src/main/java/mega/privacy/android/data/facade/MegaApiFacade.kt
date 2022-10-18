@@ -238,6 +238,8 @@ internal class MegaApiFacade @Inject constructor(
         else
             megaApi.getOutShares(order)
 
+    override suspend fun isPendingShare(node: MegaNode): Boolean = megaApi.isPendingShare(node)
+
     override suspend fun getPublicLinks(order: Int?): List<MegaNode> =
         if (order == null)
             megaApi.publicLinks

@@ -185,6 +185,10 @@ internal class DefaultFilesRepository @Inject constructor(
             megaApiGateway.getPublicLinks(sortOrderIntMapper(order))
         }
 
+    override suspend fun isPendingShare(node: MegaNode): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.isPendingShare(node)
+    }
+
     override suspend fun hasInboxChildren(): Boolean = withContext(ioDispatcher) {
         megaApiGateway.getInboxNode()?.let { megaApiGateway.hasChildren(it) } ?: false
     }
