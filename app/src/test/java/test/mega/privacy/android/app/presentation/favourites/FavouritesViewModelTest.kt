@@ -8,7 +8,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.presentation.favourites.FavouritesViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
@@ -40,7 +39,6 @@ class FavouritesViewModelTest {
 
     private val fetchNodeWrapper =
         mock<FetchNodeWrapper> { onBlocking { invoke(any()) }.thenReturn(megaNode) }
-    private val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     @Before
     fun setUp() {
@@ -55,7 +53,6 @@ class FavouritesViewModelTest {
             removeFavourites = mock(),
             favouriteMapper = favouriteMapper,
             fetchNode = fetchNodeWrapper,
-            sortOrderIntMapper = sortOrderIntMapper,
         )
     }
 
@@ -105,7 +102,6 @@ class FavouritesViewModelTest {
         )
         val list = listOf(favourite)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(sortOrderIntMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(MegaApiJava.ORDER_DEFAULT_ASC)
         whenever(getAllFavorites()).thenReturn(
             flowOf(list)
         )
