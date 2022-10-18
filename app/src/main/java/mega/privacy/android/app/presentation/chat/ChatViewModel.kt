@@ -7,11 +7,14 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.objects.PasscodeManagement
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.StartChatCall
 import timber.log.Timber
@@ -25,6 +28,7 @@ import javax.inject.Inject
  * @property passcodeManagement [PasscodeManagement]
  * @property chatApiGateway [MegaChatApiGateway]
  * @property chatManagement [ChatManagement]
+ * @property isConnected True if the app has some network connection, false otherwise.
  */
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -33,6 +37,7 @@ class ChatViewModel @Inject constructor(
     private val passcodeManagement: PasscodeManagement,
     private val chatApiGateway: MegaChatApiGateway,
     private val chatManagement: ChatManagement,
+    monitorConnectivity: MonitorConnectivity,
 ) : ViewModel() {
 
     /**
@@ -40,6 +45,9 @@ class ChatViewModel @Inject constructor(
      * @return the latest [StorageState]
      */
     fun getStorageState(): StorageState = monitorStorageStateEvent.getState()
+
+    val isConnected =
+        monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false).value
 
     /**
      * Starts a call.

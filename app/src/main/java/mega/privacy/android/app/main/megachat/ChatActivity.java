@@ -1505,6 +1505,11 @@ public class ChatActivity extends PasscodeActivity
 
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
 
+        if (!viewModel.isConnected() && megaApi.getRootNode() == null) {
+            finish();
+            return;
+        }
+
         if (shouldRefreshSessionDueToKarere()) {
             return;
         }
