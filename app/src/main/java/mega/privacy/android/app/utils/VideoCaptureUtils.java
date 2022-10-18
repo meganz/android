@@ -104,7 +104,7 @@ public class VideoCaptureUtils {
      * @param front Value to indicate the camera device to get (true: front / false: back).
      * @return The camera device (front or back) requested. NULL if the requested device does not exist.
      */
-    static private String getCameraDevice(boolean front) {
+    static public String getCameraDevice(boolean front) {
         CameraEnumerator enumerator = new Camera1Enumerator(true);
         String[] deviceList = deviceList();
         for (String device : deviceList) {
