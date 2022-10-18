@@ -22,8 +22,8 @@ class CameraFacade @Inject constructor(
     }
 
     override fun getFrontCamera(): String =
-        VideoCaptureUtils.getCameraDevice(true)
+        VideoCaptureUtils.getFrontCamera()
 
     override fun getBackCamera(): String =
-        VideoCaptureUtils.getCameraDevice(true)
+        VideoCaptureUtils.getBackCamera()
 }
