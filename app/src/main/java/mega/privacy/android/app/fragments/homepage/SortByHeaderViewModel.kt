@@ -179,7 +179,7 @@ class SortByHeaderViewModel @Inject constructor(
     /**
      * Set Camera Sort Order
      */
-    fun setOrderCamera(order: SortOrder) = runBlocking {
+    suspend fun setOrderCamera(order: SortOrder) = viewModelScope.launch {
         _cameraSortOrder.value = order
         setCameraSortOrder(order)
     }
@@ -187,7 +187,7 @@ class SortByHeaderViewModel @Inject constructor(
     /**
      * Set Cloud Sort Order
      */
-    fun setOrderCloud(order: SortOrder) = runBlocking {
+    suspend fun setOrderCloud(order: SortOrder) = viewModelScope.launch {
         _cloudSortOrder.value = order
         setCloudSortOrder(order)
     }
@@ -195,7 +195,7 @@ class SortByHeaderViewModel @Inject constructor(
     /**
      * Set Others Sort Order
      */
-    fun setOrderOthers(order: SortOrder) = runBlocking {
+    suspend fun setOrderOthers(order: SortOrder) = viewModelScope.launch {
         _othersSortOrder.value = order
         setOthersSortOrder(order)
     }
@@ -203,7 +203,7 @@ class SortByHeaderViewModel @Inject constructor(
     /**
      * Set Offline Sort Order
      */
-    fun setOrderOffline(order: SortOrder) = runBlocking {
+    suspend fun setOrderOffline(order: SortOrder) = viewModelScope.launch {
         _offlineSortOrder.value = order
         setOfflineSortOrder(order)
     }

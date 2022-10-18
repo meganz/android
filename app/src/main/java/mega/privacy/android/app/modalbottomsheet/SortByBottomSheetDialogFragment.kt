@@ -196,79 +196,81 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun setNewOrder(order: SortOrder) {
-        if (sortByHeaderViewModel.oldOrder.value == order) {
-            return
-        }
-
-        when (orderType) {
-            ORDER_FAVOURITES,
-            ORDER_CLOUD,
-            -> {
-                sortByHeaderViewModel.setOrderCloud(order)
-                LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
-                    .post(
-                        Triple(
-                            order,
-                            sortByHeaderViewModel.othersSortOrder.value,
-                            sortByHeaderViewModel.offlineSortOrder.value,
-                        )
-                    )
-                if (requireActivity() is ManagerActivity) {
-                    (requireActivity() as ManagerActivity).refreshCloudOrder(sortOrderIntMapper(
-                        order))
-                } else if (requireActivity() is FileExplorerActivity) {
-                    updateFileExplorerOrder(sortOrderIntMapper(order))
-                }
+        lifecycleScope.launch {
+            if (sortByHeaderViewModel.oldOrder.value == order) {
+                return@launch
             }
-            ORDER_CAMERA -> {
-                sortByHeaderViewModel.setOrderCamera(order)
 
-                callManager { manager ->
-                    manager.refreshCUNodes()
-
-                    if (manager.isInMDPage) {
-                        manager.mdFragment.loadPhotos()
-                    }
-
-                    if (manager.isInAlbumContentPage) {
-                        manager.albumContentFragment.loadPhotos()
+            when (orderType) {
+                ORDER_FAVOURITES,
+                ORDER_CLOUD,
+                -> {
+                    sortByHeaderViewModel.setOrderCloud(order).join()
+                    LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
+                        .post(
+                            Triple(
+                                order,
+                                sortByHeaderViewModel.othersSortOrder.value,
+                                sortByHeaderViewModel.offlineSortOrder.value,
+                            )
+                        )
+                    if (requireActivity() is ManagerActivity) {
+                        (requireActivity() as ManagerActivity).refreshCloudOrder(sortOrderIntMapper(
+                            order))
+                    } else if (requireActivity() is FileExplorerActivity) {
+                        updateFileExplorerOrder(sortOrderIntMapper(order))
                     }
                 }
-            }
-            ORDER_OTHERS -> {
-                sortByHeaderViewModel.setOrderOthers(order)
-                LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
-                    .post(
-                        Triple(
-                            sortByHeaderViewModel.cloudSortOrder.value,
-                            order,
-                            sortByHeaderViewModel.offlineSortOrder.value,
-                        )
-                    )
-                if (requireActivity() is ManagerActivity) {
-                    (requireActivity() as ManagerActivity).refreshOthersOrder()
-                } else if (requireActivity() is FileExplorerActivity) {
-                    updateFileExplorerOrder(sortOrderIntMapper(order))
-                }
-            }
-            ORDER_OFFLINE -> {
-                sortByHeaderViewModel.setOrderOffline(order)
-                LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
-                    .post(
-                        Triple(
-                            sortByHeaderViewModel.cloudSortOrder.value,
-                            sortByHeaderViewModel.othersSortOrder.value,
-                            order
-                        )
-                    )
+                ORDER_CAMERA -> {
+                    sortByHeaderViewModel.setOrderCamera(order).join()
 
-                callManager { manager ->
-                    manager.refreshOthersOrder()
+                    callManager { manager ->
+                        manager.refreshCUNodes()
+
+                        if (manager.isInMDPage) {
+                            manager.mdFragment.loadPhotos()
+                        }
+
+                        if (manager.isInAlbumContentPage) {
+                            manager.albumContentFragment.loadPhotos()
+                        }
+                    }
+                }
+                ORDER_OTHERS -> {
+                    sortByHeaderViewModel.setOrderOthers(order).join()
+                    LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
+                        .post(
+                            Triple(
+                                sortByHeaderViewModel.cloudSortOrder.value,
+                                order,
+                                sortByHeaderViewModel.offlineSortOrder.value,
+                            )
+                        )
+                    if (requireActivity() is ManagerActivity) {
+                        (requireActivity() as ManagerActivity).refreshOthersOrder()
+                    } else if (requireActivity() is FileExplorerActivity) {
+                        updateFileExplorerOrder(sortOrderIntMapper(order))
+                    }
+                }
+                ORDER_OFFLINE -> {
+                    sortByHeaderViewModel.setOrderOffline(order).join()
+                    LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
+                        .post(
+                            Triple(
+                                sortByHeaderViewModel.cloudSortOrder.value,
+                                sortByHeaderViewModel.othersSortOrder.value,
+                                order
+                            )
+                        )
+
+                    callManager { manager ->
+                        manager.refreshOthersOrder()
+                    }
                 }
             }
+
+            setStateBottomSheetBehaviorHidden()
         }
-
-        setStateBottomSheetBehaviorHidden()
     }
 
     private fun updateFileExplorerOrder(order: Int) {
