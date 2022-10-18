@@ -4,14 +4,14 @@ import androidx.annotation.DrawableRes
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.BackupType
 import mega.privacy.android.domain.entity.DeviceType
-import mega.privacy.android.domain.entity.FolderNode
+import mega.privacy.android.domain.entity.Folder
 
 /**
  * Get folder icon drawable
  */
 @DrawableRes
 internal fun getFolderIcon(
-    folder: FolderNode,
+    folder: Folder,
     isMediaSyncFolder: Boolean,
     isChatFilesFolder: Boolean,
     backupType: BackupType,

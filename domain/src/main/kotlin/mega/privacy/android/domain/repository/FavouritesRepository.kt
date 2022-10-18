@@ -2,7 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.entity.NodeInfo
 
 /**
  * The repository interface regarding favourites
@@ -13,7 +13,7 @@ interface FavouritesRepository {
      * Get favourites
      * @return List<FavouriteInfo>
      */
-    suspend fun getAllFavorites(): List<FavouriteInfo>
+    suspend fun getAllFavorites(): List<NodeInfo>
 
     /**
      * Get children nodes by node

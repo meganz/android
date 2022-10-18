@@ -1,14 +1,14 @@
 package mega.privacy.android.data.mapper
 
-import mega.privacy.android.domain.entity.FavouriteFile
-import mega.privacy.android.domain.entity.FavouriteFolder
-import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.entity.NodeFile
+import mega.privacy.android.domain.entity.NodeFolder
+import mega.privacy.android.domain.entity.NodeInfo
 import nz.mega.sdk.MegaNode
 
 /**
  * The mapper class for converting the data entity to FavouriteInfo
  */
-typealias FavouriteInfoMapper = @JvmSuppressWildcards suspend (
+typealias NodeInfoMapper = @JvmSuppressWildcards suspend (
     @JvmSuppressWildcards MegaNode,
     @JvmSuppressWildcards MapThumbnail,
     @JvmSuppressWildcards MapHasVersion,
@@ -17,7 +17,7 @@ typealias FavouriteInfoMapper = @JvmSuppressWildcards suspend (
     @JvmSuppressWildcards FileTypeInfoMapper,
     @JvmSuppressWildcards MapPendingShare,
     @JvmSuppressWildcards MapInRubbish,
-) -> @JvmSuppressWildcards FavouriteInfo
+) -> @JvmSuppressWildcards NodeInfo
 
 internal typealias MapThumbnail = suspend (MegaNode) -> String?
 internal typealias MapHasVersion = suspend (MegaNode) -> Boolean
@@ -26,7 +26,7 @@ internal typealias MapNumberOfChildFiles = suspend (MegaNode) -> Int
 internal typealias MapPendingShare = suspend (MegaNode) -> Boolean
 internal typealias MapInRubbish = suspend (MegaNode) -> Boolean
 
-internal suspend fun toFavouriteInfo(
+internal suspend fun toNodeInfo(
     megaNode: MegaNode,
     thumbnailPath: MapThumbnail,
     hasVersion: MapHasVersion,
@@ -36,7 +36,7 @@ internal suspend fun toFavouriteInfo(
     isPendingShare: MapPendingShare,
     isInRubbish: MapInRubbish,
 ) = if (megaNode.isFolder) {
-    FavouriteFolder(
+    NodeFolder(
         id = megaNode.handle,
         name = megaNode.name,
         label = megaNode.label,
@@ -55,7 +55,7 @@ internal suspend fun toFavouriteInfo(
         device = megaNode.deviceId,
     )
 } else {
-    FavouriteFile(
+    NodeFile(
         id = megaNode.handle,
         name = megaNode.name,
         size = megaNode.size,

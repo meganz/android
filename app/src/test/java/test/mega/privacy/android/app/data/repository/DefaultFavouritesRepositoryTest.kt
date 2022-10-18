@@ -8,9 +8,9 @@ import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
-import mega.privacy.android.data.mapper.FavouriteInfoMapper
+import mega.privacy.android.data.mapper.NodeInfoMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.domain.entity.FavouriteFolder
+import mega.privacy.android.domain.entity.NodeFolder
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.FavouritesRepository
@@ -41,7 +41,7 @@ class DefaultFavouritesRepositoryTest {
         on { label }.thenReturn(MegaNode.NODE_LBL_RED)
     }
 
-    private val favouriteInfo = FavouriteFolder(
+    private val favouriteInfo = NodeFolder(
         id = 0,
         name = node.name,
         label = node.label,
@@ -60,7 +60,7 @@ class DefaultFavouritesRepositoryTest {
         device = null,
     )
 
-    private val favouriteInfoMapper: FavouriteInfoMapper = { _, _, _, _, _, _, _, _ -> favouriteInfo }
+    private val nodeInfoMapper: NodeInfoMapper = { _, _, _, _, _, _, _, _ -> favouriteInfo }
 
     private val favouriteFolderInfoMapper = mock<FavouriteFolderInfoMapper>()
 
@@ -71,7 +71,7 @@ class DefaultFavouritesRepositoryTest {
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             monitorNodeChangeFacade = MonitorNodeChangeFacade(),
-            favouriteInfoMapper = favouriteInfoMapper,
+            nodeInfoMapper = nodeInfoMapper,
             favouriteFolderInfoMapper = favouriteFolderInfoMapper,
             cacheFolder = mock(),
             fileTypeInfoMapper = fileTypeInfoMapper

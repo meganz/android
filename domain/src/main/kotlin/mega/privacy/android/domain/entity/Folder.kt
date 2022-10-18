@@ -1,9 +1,10 @@
 package mega.privacy.android.domain.entity
 
+
 /**
- * Folder node
+ * Folder
  */
-interface FolderNode {
+interface Folder {
     /**
      * Is folder in the rubbish bin
      */
