@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * Chat repository
@@ -51,4 +52,10 @@ interface ChatRepository {
         enabledAudio: Boolean,
         enabledSpeaker: Boolean,
     ): ChatRequest
+
+
+    /**
+     * Get chat files folder id if it exists
+     */
+    suspend fun getChatFilesFolderId(): NodeId?
 }
