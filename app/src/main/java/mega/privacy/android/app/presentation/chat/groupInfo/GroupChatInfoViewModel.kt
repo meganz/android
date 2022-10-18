@@ -22,6 +22,7 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
+import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.groupInfo.model.GroupInfoState
 import mega.privacy.android.app.utils.CallUtil
@@ -43,6 +44,7 @@ import javax.inject.Inject
  * @property getChatRoomUseCase          [GetChatRoomUseCase]
  * @property passcodeManagement          [PasscodeManagement]
  * @property chatApiGateway              [MegaChatApiGateway]
+ * @property cameraGateway               [CameraGateway]
  * @property chatManagement              [ChatManagement]
  * @property state                       Current view state as [GroupInfoState]
  */
@@ -54,6 +56,7 @@ class GroupChatInfoViewModel @Inject constructor(
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val passcodeManagement: PasscodeManagement,
     private val chatApiGateway: MegaChatApiGateway,
+    private val cameraGateway: CameraGateway,
     private val chatManagement: ChatManagement,
 ) : BaseRxViewModel() {
 
@@ -149,7 +152,7 @@ class GroupChatInfoViewModel @Inject constructor(
 
         MegaApplication.isWaitingForCall = false
 
-        /*CameraGateway*/
+        cameraGateway.setFrontCamera()
 
         viewModelScope.launch {
             runCatching {

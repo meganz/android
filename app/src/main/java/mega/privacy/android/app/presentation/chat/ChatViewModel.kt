@@ -9,6 +9,7 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.objects.PasscodeManagement
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -23,11 +24,12 @@ import javax.inject.Inject
 /**
  * View Model for [mega.privacy.android.app.main.megachat.ChatActivity]
  *
- * @property monitorStorageStateEvent [MonitorStorageStateEvent]
- * @property startChatCall [StartChatCall]
- * @property passcodeManagement [PasscodeManagement]
- * @property chatApiGateway [MegaChatApiGateway]
- * @property chatManagement [ChatManagement]
+ * @property monitorStorageStateEvent   [MonitorStorageStateEvent]
+ * @property startChatCall              [StartChatCall]
+ * @property passcodeManagement         [PasscodeManagement]
+ * @property chatApiGateway             [MegaChatApiGateway]
+*  @property cameraGateway              [CameraGateway]
+ * @property chatManagement             [ChatManagement]
  * @property isConnected True if the app has some network connection, false otherwise.
  */
 @HiltViewModel
@@ -36,6 +38,7 @@ class ChatViewModel @Inject constructor(
     private val startChatCall: StartChatCall,
     private val passcodeManagement: PasscodeManagement,
     private val chatApiGateway: MegaChatApiGateway,
+    private val cameraGateway: CameraGateway,
     private val chatManagement: ChatManagement,
     monitorConnectivity: MonitorConnectivity,
 ) : ViewModel() {
@@ -68,7 +71,7 @@ class ChatViewModel @Inject constructor(
 
         MegaApplication.isWaitingForCall = false
 
-        /*CameraGateway*/
+        cameraGateway.setFrontCamera()
 
         viewModelScope.launch {
             runCatching {

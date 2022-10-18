@@ -22,6 +22,7 @@ import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
+import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.RxUtil.debounceImmediate
@@ -45,6 +46,7 @@ import javax.inject.Inject
  * @property passcodeManagement         [PasscodeManagement]
  * @property startChatCall              [StartChatCall]
  * @property chatApiGateway             [MegaChatApiGateway]
+ * @property cameraGateway              [CameraGateway]
  * @property chatManagement             [ChatManagement]
  */
 @HiltViewModel
@@ -56,6 +58,7 @@ class ContactListViewModel @Inject constructor(
     private val startChatCall: StartChatCall,
     private val passcodeManagement: PasscodeManagement,
     private val chatApiGateway: MegaChatApiGateway,
+    private val cameraGateway: CameraGateway,
     private val chatManagement: ChatManagement,
 ) : BaseRxViewModel() {
 
@@ -200,7 +203,7 @@ class ContactListViewModel @Inject constructor(
 
         MegaApplication.isWaitingForCall = false
 
-        /*CameraGateway*/
+        cameraGateway.setFrontCamera()
 
         viewModelScope.launch {
             runCatching {
@@ -213,7 +216,6 @@ class ContactListViewModel @Inject constructor(
                     val videoEnable = resultStartCall.flag
                     val paramType = resultStartCall.paramType
                     val audioEnable: Boolean = paramType == ChatRequestParamType.Video
-                    Timber.d("**************************** LLAMADA ESTABLECIDA")
                     CallUtil.addChecksForACall(resultChatId, videoEnable)
 
                     chatApiGateway.getChatCall(resultChatId)?.let { call ->
