@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -42,7 +43,7 @@ import timber.log.Timber
  * @property context
  * @property fragment
  */
-class RecentActionsAdapter(private val context: Context, private val fragment: Any) :
+class RecentActionsAdapter(private val context: Context, private val fragment: Fragment) :
     RecyclerView.Adapter<RecentActionViewHolder>(), SectionTitleProvider,
     DragThumbnailGetter {
 
@@ -110,13 +111,13 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
                 val nodeList = bucket.nodes
                 if (nodeList == null || nodeList.size() == 0) return
                 val node = nodeList[0] ?: return
-                var parentNode: MegaNode? =
+                val parentNode: MegaNode =
                     megaApi.getNodeByHandle(bucket.parentHandle) ?: return
                 binding.nameText.text =
-                    if (parentNode?.name == "Cloud Drive") {
+                    if (parentNode.name == "Cloud Drive") {
                         context.getString(R.string.section_cloud_drive)
                     } else {
-                        parentNode?.name ?: ""
+                        parentNode.name ?: ""
                     }
 
                 if (bucket.userEmail == megaApi.myEmail) {
@@ -130,7 +131,7 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
                     binding.secondLineText.visibility = View.VISIBLE
                     binding.secondLineText.text = formatUserAction(userAction)
                 }
-                val parentRootNode = parentNode?.let { getOutgoingOrIncomingParent(it) }
+                val parentRootNode = getOutgoingOrIncomingParent(parentNode)
                 when {
                     parentRootNode == null -> {
                         binding.sharedImage.visibility = View.GONE
@@ -213,6 +214,7 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
 
     override fun getNodePosition(handle: Long): Int {
         return recentActionItems
+            ?.asSequence()
             ?.filterIsInstance<RecentActionItemType.Item>()
             ?.mapIndexed { index, item ->
                 if (
@@ -228,9 +230,7 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
     }
 
 
-    override fun getItemCount(): Int {
-        return if (recentActionItems.isNullOrEmpty()) 0 else recentActionItems!!.size
-    }
+    override fun getItemCount(): Int = recentActionItems?.size ?: 0
 
     override fun getThumbnail(viewHolder: RecyclerView.ViewHolder): View? =
         if (viewHolder is RecentActionViewHolder) {
@@ -319,10 +319,8 @@ class RecentActionsAdapter(private val context: Context, private val fragment: A
      * @param position the given position
      * @return the recent action item at position [position], null if [position] is invalid index or item is null
      */
-    private fun getItemAtPosition(position: Int): RecentActionItemType? {
-        return if (recentActionItems.isNullOrEmpty() || position < 0 || position >= itemCount) null
-        else recentActionItems?.get(position)
-    }
+    private fun getItemAtPosition(position: Int): RecentActionItemType? =
+        recentActionItems?.getOrNull(position)
 
     /**
      * ViewHolder for a recent action item
