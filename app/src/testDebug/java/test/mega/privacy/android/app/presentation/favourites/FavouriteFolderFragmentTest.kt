@@ -138,6 +138,11 @@ class FavouriteFolderFragmentTest {
             isFavourite = true,
             isExported = false,
             isTakenDown = false,
+            isInRubbishBin = false,
+            isIncomingShare = false,
+            isShared = false,
+            isPendingShare = false,
+            device = ""
         )
         val favourites = listOf(
             favouriteInfo

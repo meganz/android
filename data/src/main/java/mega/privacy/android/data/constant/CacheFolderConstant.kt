@@ -15,4 +15,9 @@ object CacheFolderConstant {
      * Preview Folder
      */
     const val PREVIEW_FOLDER = "previewsMEGA"
+
+    /**
+     * Temporary Folder
+     */
+    const val TEMPORARY_FOLDER = "tempMEGA"
 }

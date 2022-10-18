@@ -8,16 +8,13 @@ import mega.privacy.android.app.data.repository.DefaultAccountRepository
 import mega.privacy.android.app.data.repository.DefaultAvatarRepository
 import mega.privacy.android.app.data.repository.DefaultContactsRepository
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
-import mega.privacy.android.app.data.repository.DefaultFilesRepository
 import mega.privacy.android.app.data.repository.DefaultLoginRepository
 import mega.privacy.android.app.data.repository.DefaultPhotosRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
-import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
-import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -42,12 +39,6 @@ abstract class RepositoryModule {
     @ExperimentalContracts
     @Binds
     abstract fun bindAccountRepository(repository: DefaultAccountRepository): AccountRepository
-
-    @Binds
-    abstract fun bindFilesRepository(repository: DefaultFilesRepository): FilesRepository
-
-    @Binds
-    abstract fun bindDomainFilesRepository(repository: DefaultFilesRepository): FileRepository
 
     @Binds
     abstract fun bindFavouritesRepository(repository: DefaultFavouritesRepository): FavouritesRepository

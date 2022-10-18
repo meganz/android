@@ -763,6 +763,11 @@ interface MegaApiGateway {
     fun creditCardQuerySubscriptions(listener: MegaRequestListenerInterface?)
 
     /**
+     * Checks if the node is part of a pending share
+     */
+    suspend fun isPendingShare(node: MegaNode): Boolean
+
+    /**
      * Get the selected user attribute for the logged in user
      */
     fun getUserAttribute(attributeIdentifier: Int, listener: MegaRequestListenerInterface)

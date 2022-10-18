@@ -3,7 +3,7 @@ package test.mega.privacy.android.app.domain.usecase
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.repository.FilesRepository
+import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode

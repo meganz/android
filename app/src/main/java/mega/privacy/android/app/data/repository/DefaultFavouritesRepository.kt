@@ -105,6 +105,8 @@ class DefaultFavouritesRepository @Inject constructor(
                 megaApiGateway::getNumChildFolders,
                 megaApiGateway::getNumChildFiles,
                 fileTypeInfoMapper,
+                megaApiGateway::isPendingShare,
+                megaApiGateway::isInRubbish,
             )
         }
 

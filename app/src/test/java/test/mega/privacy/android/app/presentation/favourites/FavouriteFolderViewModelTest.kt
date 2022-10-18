@@ -68,6 +68,11 @@ class FavouriteFolderViewModelTest {
         isFavourite = true,
         isExported = false,
         isTakenDown = false,
+        isInRubbishBin = false,
+        isIncomingShare = false,
+        isShared = false,
+        isPendingShare = false,
+        device = ""
     )
 
     private val list = listOf(favourite)

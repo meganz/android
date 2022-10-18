@@ -9,6 +9,7 @@ import mega.privacy.android.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
 import mega.privacy.android.data.repository.DefaultEnvironmentRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
+import mega.privacy.android.data.repository.DefaultFilesRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
 import mega.privacy.android.data.repository.DefaultGlobalStatesRepository
 import mega.privacy.android.data.repository.DefaultImageRepository
@@ -19,14 +20,16 @@ import mega.privacy.android.data.repository.DefaultRecentActionsRepository
 import mega.privacy.android.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.data.repository.DefaultSupportRepository
-import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
+import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
+import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.NetworkRepository
@@ -98,4 +101,10 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindGetImageRepository(repository: DefaultImageRepository): ImageRepository
+
+    @Binds
+    abstract fun bindFilesRepository(repository: DefaultFilesRepository): FilesRepository
+
+    @Binds
+    abstract fun bindDomainFilesRepository(repository: DefaultFilesRepository): FileRepository
 }
