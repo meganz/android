@@ -25,7 +25,6 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentVideoBinding
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -36,7 +35,6 @@ import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.NodeListAdapter
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
-import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
@@ -62,6 +60,8 @@ import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.displayMetrics
+import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -90,7 +90,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
     lateinit var megaApi: MegaApiAndroid
 
     @Inject
-    lateinit var sortOrderManagement: SortOrderManagement
+    lateinit var sortOrderIntMapper: SortOrderIntMapper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -372,7 +372,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.onOrderChange(true)
+            viewModel.onOrderChange(true, order = it.first)
         })
 
         sortByHeaderViewModel.listGridChangeEvent.observe(
@@ -406,7 +406,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
         }
 
         intent.putExtra(INTENT_EXTRA_KEY_POSITION, index)
-        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrderManagement.getOrderCloud())
+        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrderIntMapper(sortByHeaderViewModel.cloudSortOrder.value))
         intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
         intent.putExtra(INTENT_EXTRA_KEY_HANDLE, file.handle)
 

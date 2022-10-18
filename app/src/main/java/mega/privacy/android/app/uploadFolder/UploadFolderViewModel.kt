@@ -22,6 +22,7 @@ import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.notifyObserver
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.exception.EmptyFolderException
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -50,7 +51,7 @@ class UploadFolderViewModel @Inject constructor(
 
     private lateinit var parentFolder: String
     private var parentHandle: Long = INVALID_HANDLE
-    private var order: Int = MegaApiJava.ORDER_DEFAULT_ASC
+    private var order: SortOrder = SortOrder.ORDER_DEFAULT_ASC
     private var isList: Boolean = true
     var query: String? = null
     private var isPendingToFinishSelection = false
@@ -78,7 +79,7 @@ class UploadFolderViewModel @Inject constructor(
     fun retrieveFolderContent(
         documentFile: DocumentFile,
         parentHandle: Long,
-        order: Int,
+        order: SortOrder,
         isList: Boolean,
     ) {
         parentFolder = documentFile.name.toString()
@@ -161,7 +162,7 @@ class UploadFolderViewModel @Inject constructor(
      *
      * @param newOrder The new order to set.
      */
-    fun setOrder(newOrder: Int) {
+    fun setOrder(newOrder: SortOrder) {
         if (newOrder != order) {
             order = newOrder
 

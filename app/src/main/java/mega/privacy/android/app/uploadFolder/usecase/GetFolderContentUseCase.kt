@@ -15,15 +15,10 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.EmptySearchException
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
-import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
-import nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.security.InvalidParameterException
@@ -79,7 +74,7 @@ class GetFolderContentUseCase @Inject constructor(
      */
     fun get(
         currentFolder: FolderContent.Data,
-        order: Int,
+        order: SortOrder,
         isList: Boolean,
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
@@ -322,7 +317,7 @@ class GetFolderContentUseCase @Inject constructor(
      */
     private fun completeAndReorder(
         folderItems: List<FolderContent.Data>,
-        order: Int,
+        order: SortOrder,
         isList: Boolean,
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
@@ -348,7 +343,7 @@ class GetFolderContentUseCase @Inject constructor(
      */
     fun reorder(
         folderItems: MutableList<FolderContent>,
-        order: Int,
+        order: SortOrder,
         isList: Boolean,
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
@@ -370,30 +365,31 @@ class GetFolderContentUseCase @Inject constructor(
                 }
 
                 when (order) {
-                    ORDER_DEFAULT_ASC -> {
+                    SortOrder.ORDER_DEFAULT_ASC -> {
                         folders.sortBy { item -> item.name }
                         files.sortBy { item -> item.name }
                     }
-                    ORDER_DEFAULT_DESC -> {
+                    SortOrder.ORDER_DEFAULT_DESC -> {
                         folders.sortByDescending { item -> item.name }
                         files.sortByDescending { item -> item.name }
                     }
-                    ORDER_MODIFICATION_ASC -> {
+                    SortOrder.ORDER_MODIFICATION_ASC -> {
                         folders.sortBy { item -> item.name }
                         files.sortBy { item -> item.lastModified }
                     }
-                    ORDER_MODIFICATION_DESC -> {
+                    SortOrder.ORDER_MODIFICATION_DESC -> {
                         folders.sortBy { item -> item.name }
                         files.sortByDescending { item -> item.lastModified }
                     }
-                    ORDER_SIZE_ASC -> {
+                    SortOrder.ORDER_SIZE_ASC -> {
                         folders.sortBy { item -> item.name }
                         files.sortBy { item -> item.size }
                     }
-                    ORDER_SIZE_DESC -> {
+                    SortOrder.ORDER_SIZE_DESC -> {
                         folders.sortBy { item -> item.name }
                         files.sortByDescending { item -> item.size }
                     }
+                    else -> {}
                 }
 
                 finalContent.addAll(folders)
@@ -419,7 +415,7 @@ class GetFolderContentUseCase @Inject constructor(
     fun reorder(
         folderContent: HashMap<FolderContent.Data?, MutableList<FolderContent>>,
         currentFolder: FolderContent.Data?,
-        order: Int,
+        order: SortOrder,
         isList: Boolean,
     ): Single<HashMap<FolderContent.Data?, MutableList<FolderContent>>> =
         Single.create { emitter ->
@@ -583,7 +579,7 @@ class GetFolderContentUseCase @Inject constructor(
     fun search(
         query: String,
         currentFolder: FolderContent.Data,
-        order: Int,
+        order: SortOrder,
         isList: Boolean,
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
