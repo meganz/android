@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -13,13 +14,18 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
+import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumContentActionModeCallback
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.albums.view.EmptyView
@@ -35,12 +41,16 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AlbumDynamicContentFragment : Fragment() {
 
-    private val viewModel: AlbumsViewModel by activityViewModels()
+    internal val albumsViewModel: AlbumsViewModel by activityViewModels()
     private val photosViewModel: PhotosViewModel by activityViewModels()
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
     internal lateinit var managerActivity: ManagerActivity
+
+    // Action mode
+    private var actionMode: ActionMode? = null
+    private lateinit var actionModeCallback: AlbumContentActionModeCallback
 
     companion object {
         @JvmStatic
@@ -52,6 +62,8 @@ class AlbumDynamicContentFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         managerActivity = activity as ManagerActivity
+        actionModeCallback =
+            AlbumContentActionModeCallback(this, albumsViewModel.state.value.currentAlbum)
     }
 
     override fun onCreateView(
@@ -64,7 +76,31 @@ class AlbumDynamicContentFragment : Fragment() {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 AndroidTheme(isDark = mode.isDarkMode()) {
-                    AlbumContentBody(viewModel)
+                    AlbumContentBody(albumsViewModel)
+                }
+            }
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupFlow()
+    }
+
+    private fun setupFlow() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                albumsViewModel.state.collect { state ->
+                    if (state.selectedPhotoIds.isEmpty()) {
+                        if (actionMode != null) {
+                            exitActionMode()
+                        }
+                    } else {
+                        if (actionMode == null) {
+                            enterActionMode()
+                        }
+                        actionMode?.title = state.selectedPhotoIds.size.toString()
+                    }
                 }
             }
         }
@@ -89,18 +125,9 @@ class AlbumDynamicContentFragment : Fragment() {
                 photos = photos,
                 smallWidth = smallWidth,
                 photoDownload = photosViewModel::downloadPhoto,
-                onClick = {
-                    Toast.makeText(context, "onClick", Toast.LENGTH_SHORT).show()
-                    if (viewModel.selectedPhotoIds.isEmpty()) {
-                        openPhoto(it)
-                    } else {
-                        viewModel.onClick(it)
-                    }
-                },
-                onLongPress = {
-                    Toast.makeText(context, "onLongPress", Toast.LENGTH_SHORT).show()
-                    viewModel.onLongPress(it)
-                },
+                onClick = this::onClick,
+                onLongPress = this::onLongPress,
+                selectedPhotoIds = uiState.selectedPhotoIds
             )
         } else {
             EmptyView()
@@ -108,9 +135,9 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun openPhoto(photo: Photo) {
-        viewModel.state.value.currentAlbum?.let { album ->
+        albumsViewModel.state.value.currentAlbum?.let { album ->
             val albumPhotosHandles =
-                viewModel.state.value.albums.getAlbumPhotos(album).map { photo ->
+                albumsViewModel.state.value.albums.getAlbumPhotos(album).map { photo ->
                     photo.id
                 }
 
@@ -126,8 +153,46 @@ class AlbumDynamicContentFragment : Fragment() {
         }
     }
 
+    fun onClick(photo: Photo) {
+        if (albumsViewModel.selectedPhotoIds.isEmpty()) {
+            openPhoto(photo)
+        } else {
+            if (actionMode != null) {
+                albumsViewModel.togglePhotoSelection(photo.id)
+            }
+        }
+    }
+
+    fun onLongPress(photo: Photo) {
+        handleActionMode(photo)
+    }
+
+    private fun enterActionMode() {
+        actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
+            actionModeCallback
+        )
+        managerActivity.showHideBottomNavigationView(true)
+    }
+
+    private fun exitActionMode() {
+        actionMode?.finish()
+        actionMode = null
+        managerActivity.showHideBottomNavigationView(false)
+    }
+
+    private fun handleActionMode(photo: Photo) {
+        if (albumsViewModel.selectedPhotoIds.isEmpty()) {
+            if (actionMode == null) {
+                enterActionMode()
+            }
+            albumsViewModel.togglePhotoSelection(photo.id)
+        } else {
+            onClick(photo)
+        }
+    }
+
     override fun onDestroy() {
-        viewModel.setCurrentAlbum(null)
+        albumsViewModel.setCurrentAlbum(null)
         super.onDestroy()
     }
 
