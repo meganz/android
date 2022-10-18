@@ -59,6 +59,7 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSh
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.groupInfo.GroupChatInfoViewModel
+import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.StartCallUseCase
@@ -97,6 +98,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -484,8 +486,9 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         }
         if (megaApi.rootNode != null) {
             val contacts = megaApi.contacts
-            if (contacts.isNullOrEmpty()) {
-                showSnackbar(getString(R.string.no_contacts_invite))
+            if (contacts.isNullOrEmpty() || !contacts.any { it.visibility == VISIBILITY_VISIBLE }) {
+                val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
+                dialog.show(supportFragmentManager, dialog.tag)
             } else {
                 val intent = Intent(this, AddContactActivity::class.java)
                 intent.putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)

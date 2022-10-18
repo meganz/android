@@ -10,8 +10,12 @@ import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.exception.LocalStorageException
+import mega.privacy.android.domain.exception.UnKnownException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import timber.log.Timber
+import java.io.IOException
 import javax.inject.Inject
 
 /**
@@ -156,17 +160,25 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun setSyncTimeStamp(timeStamp: Long, type: SyncTimeStamp) {
-        withContext(ioDispatcher) {
-            when (type) {
-                SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.setPhotoTimeStamp(timeStamp)
-                SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.setVideoTimeStamp(timeStamp)
-                SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.setSecondaryPhotoTimeStamp(
-                    timeStamp
-                )
-                SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.setSecondaryVideoTimeStamp(
-                    timeStamp
-                )
+        try {
+            withContext(ioDispatcher) {
+                when (type) {
+                    SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.setPhotoTimeStamp(timeStamp)
+                    SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.setVideoTimeStamp(timeStamp)
+                    SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.setSecondaryPhotoTimeStamp(
+                        timeStamp
+                    )
+                    SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.setSecondaryVideoTimeStamp(
+                        timeStamp
+                    )
+                }
             }
+        } catch (e: IOException) {
+            Timber.e(e)
+            throw LocalStorageException(e.message, e.cause)
+        } catch (e: Exception) {
+            Timber.e(e)
+            throw UnKnownException(e.message, e.cause)
         }
     }
 

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.domain.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FolderVersionInfo
@@ -164,6 +164,15 @@ interface FilesRepository {
      * @return List of MegaNode corresponding of a public link
      */
     suspend fun getPublicLinks(order: SortOrder): List<MegaNode>
+
+    /**
+     * Check if a MegaNode is pending to be shared with another User. This situation
+     * happens when a node is to be shared with a User which is not a contact yet.
+     *
+     * @param node Node to check
+     * @return true is the MegaNode is pending to be shared, otherwise false
+     */
+    suspend fun isPendingShare(node: MegaNode): Boolean
 
     /**
      * Checks if Inbox node has children.

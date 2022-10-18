@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.RemoveFavourites
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -40,6 +42,8 @@ class AlbumsViewModelTest {
     private val getFeatureFlag =
         mock<GetFeatureFlagValue> { onBlocking { invoke(any()) }.thenReturn(true) }
     private val getDefaultAlbumsMap = mock<GetDefaultAlbumsMap>()
+    private val removeFavourites = mock<RemoveFavourites>()
+    private val getNodeListByIds = mock<GetNodeListByIds>()
 
     @Before
     fun setUp() {
@@ -61,6 +65,8 @@ class AlbumsViewModelTest {
             getDefaultAlbumsMap = getDefaultAlbumsMap,
             uiAlbumMapper = uiAlbumMapper,
             getFeatureFlag = getFeatureFlag,
+            removeFavourites = removeFavourites,
+            getNodeListByIds = getNodeListByIds
         )
     }
 

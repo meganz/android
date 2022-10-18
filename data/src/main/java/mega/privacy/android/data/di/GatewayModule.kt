@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.facade.AssetsFacade
 import mega.privacy.android.data.facade.CacheFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
+import mega.privacy.android.data.facade.FileFacade
 import mega.privacy.android.data.facade.MegaApiFacade
 import mega.privacy.android.data.facade.MegaChatApiFacade
 import mega.privacy.android.data.facade.MegaLocalStorageFacade
@@ -18,6 +19,7 @@ import mega.privacy.android.data.gateway.DefaultAppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileCompressionGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.ZipFileCompressionGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -102,6 +104,9 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindMegaDBHandlerWrapper(implementation: MegaLocalStorageFacade): MegaLocalStorageGateway
+
+    @Binds
+    abstract fun bindFileGateway(implementation: FileFacade): FileGateway
 
     /**
      * Provide camera timestamps preference gateway implementation

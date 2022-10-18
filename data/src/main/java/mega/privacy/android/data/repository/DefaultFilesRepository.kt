@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -7,15 +7,16 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.domain.repository.FilesRepository
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
+import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getFileName
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -48,7 +49,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaShareMapper
  * @property megaExceptionMapper
  */
-class DefaultFilesRepository @Inject constructor(
+internal class DefaultFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
@@ -57,6 +58,7 @@ class DefaultFilesRepository @Inject constructor(
     private val megaShareMapper: MegaShareMapper,
     private val megaExceptionMapper: MegaExceptionMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
+    private val cacheFolderGateway: CacheFolderGateway,
 ) : FilesRepository, FileRepository {
 
 
@@ -183,6 +185,10 @@ class DefaultFilesRepository @Inject constructor(
             megaApiGateway.getPublicLinks(sortOrderIntMapper(order))
         }
 
+    override suspend fun isPendingShare(node: MegaNode): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.isPendingShare(node)
+    }
+
     override suspend fun hasInboxChildren(): Boolean = withContext(ioDispatcher) {
         megaApiGateway.getInboxNode()?.let { megaApiGateway.hasChildren(it) } ?: false
     }
@@ -190,7 +196,8 @@ class DefaultFilesRepository @Inject constructor(
     override suspend fun downloadBackgroundFile(node: MegaNode): String =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                val file = CacheFolderManager.buildTempFile(context, node.getFileName())
+                val file = cacheFolderGateway.getCacheFile(CacheFolderConstant.TEMPORARY_FOLDER,
+                    node.getFileName())
                 if (file == null) {
                     continuation.resumeWith(Result.failure(NullFileException()))
                     return@suspendCoroutine
@@ -200,10 +207,10 @@ class DefaultFilesRepository @Inject constructor(
                     node = node,
                     localPath = file.absolutePath,
                     fileName = file.name,
-                    appData = Constants.APP_DATA_BACKGROUND_TRANSFER,
+                    appData = APP_DATA_BACKGROUND_TRANSFER,
                     startFirst = true,
                     cancelToken = null,
-                    listener = mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface(
+                    listener = OptionalMegaTransferListenerInterface(
                         onTransferTemporaryError = { _, error ->
                             continuation.failWithError(error)
                         },
@@ -241,6 +248,5 @@ class DefaultFilesRepository @Inject constructor(
                         }
                     ))
             }
-
         }
 }

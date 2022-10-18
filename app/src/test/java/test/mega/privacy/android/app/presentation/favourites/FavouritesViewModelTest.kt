@@ -8,12 +8,12 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.presentation.favourites.FavouritesViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.FavouriteFolder
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetAllFavorites
@@ -102,6 +102,11 @@ class FavouritesViewModelTest {
             isFavourite = true,
             isExported = false,
             isTakenDown = false,
+            isInRubbishBin = false,
+            isIncomingShare = false,
+            isShared = false,
+            isPendingShare = false,
+            device = ""
         )
         val list = listOf(favourite)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)

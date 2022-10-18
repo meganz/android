@@ -15,16 +15,6 @@ interface FolderNode {
     val isIncomingShare: Boolean
 
     /**
-     * Is the folder a media sync folder
-     */
-    val isMediaSyncFolder: Boolean
-
-    /**
-     * Is the folder the chat files folder
-     */
-    val isChatFilesFolder: Boolean
-
-    /**
      * Is the folder an outgoing share
      */
     val isShared: Boolean
@@ -35,7 +25,7 @@ interface FolderNode {
     val isPendingShare: Boolean
 
     /**
-     * Backup type information of the folder
+     * Device
      */
-    val backupType: BackupType
+    val device: String?
 }

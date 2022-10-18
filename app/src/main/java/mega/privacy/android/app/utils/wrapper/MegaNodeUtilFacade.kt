@@ -4,6 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -11,17 +15,31 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import java.io.File
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Mega node util facade
  */
-class MegaNodeUtilFacade @Inject constructor() : MegaNodeUtilWrapper {
-    override fun setBackupHandle(handle: Long) {
-        MegaNodeUtil.myBackupHandle = handle
+@Singleton
+class MegaNodeUtilFacade @Inject constructor(
+    @ApplicationScope private val scope: CoroutineScope,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val monitorBackupFolder: MonitorBackupFolder,
+) : MegaNodeUtilWrapper {
+
+    override fun observeBackupFolder() {
+        scope.launch(ioDispatcher) {
+            monitorBackupFolder().collectLatest {
+                MegaNodeUtil.myBackupHandle = it.id
+            }
+        }
     }
 
     override fun getMyChatFilesFolder() = MegaNodeUtil.myChatFilesFolder

@@ -316,7 +316,10 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun deleteAllSecondarySyncRecords() = dbHandler.deleteAllSecondarySyncRecords()
 
+    override suspend fun getChatFilesFolderHandle() = dbHandler.myChatFilesFolderHandle
+
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }
+
 }

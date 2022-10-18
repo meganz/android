@@ -40,6 +40,7 @@ internal fun DynamicView(
     photoDownload: PhotoDownload,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
+    selectedPhotoIds: MutableSet<Long>,
 ) {
     val dynamicList = remember(photos) {
         photos.chunked(3).mapIndexed { i, list ->
@@ -74,6 +75,7 @@ internal fun DynamicView(
                         photoDownload = photoDownload,
                         onClick = onClick,
                         onLongPress = onLongPress,
+                        selectedPhotoIds = selectedPhotoIds
                     )
                 }
                 is AlbumPhotoItem.Small3Item -> {
@@ -83,6 +85,7 @@ internal fun DynamicView(
                         downloadPhoto = photoDownload,
                         onClick = onClick,
                         onLongPress = onLongPress,
+                        selectedPhotoIds = selectedPhotoIds
                     )
                 }
                 is AlbumPhotoItem.Small2BigItem -> {
@@ -92,6 +95,7 @@ internal fun DynamicView(
                         downloadPhoto = photoDownload,
                         onClick = onClick,
                         onLongPress = onLongPress,
+                        selectedPhotoIds = selectedPhotoIds
                     )
                 }
             }

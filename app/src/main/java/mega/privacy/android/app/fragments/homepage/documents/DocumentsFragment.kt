@@ -201,7 +201,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.loadDocuments(true)
+            viewModel.onOrderChange(true)
         })
 
         sortByHeaderViewModel.listGridChangeEvent.observe(

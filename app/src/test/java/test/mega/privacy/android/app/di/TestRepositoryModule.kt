@@ -5,7 +5,6 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.RepositoryModule
-import mega.privacy.android.app.domain.repository.FilesRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
@@ -13,7 +12,6 @@ import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
-import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import org.mockito.kotlin.mock
@@ -35,9 +33,6 @@ object TestRepositoryModule {
     fun provideCameraUploadRepository(): CameraUploadRepository = mock()
 
     @Provides
-    fun provideFilesRepository(): FilesRepository = mock()
-
-    @Provides
     fun bindFavouritesRepository(): FavouritesRepository = mock()
 
     @Provides
@@ -54,7 +49,4 @@ object TestRepositoryModule {
 
     @Provides
     fun provideAvatarRepository(): AvatarRepository = mock()
-
-    @Provides
-    fun provideDomainFilesRepository(): FileRepository = mock()
 }
