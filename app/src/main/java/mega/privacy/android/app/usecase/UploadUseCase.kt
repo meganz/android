@@ -2,6 +2,7 @@ package mega.privacy.android.app.usecase
 
 import android.content.Context
 import android.content.Intent
+import androidx.core.content.ContextCompat
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
@@ -57,13 +58,12 @@ class UploadUseCase @Inject constructor(
             return@create
         }
 
-        context.startService(
-            Intent(context, UploadService::class.java)
-                .putExtra(UploadService.EXTRA_FILE_PATH, absolutePath)
-                .putExtra(UploadService.EXTRA_NAME, fileName)
-                .putExtra(UploadService.EXTRA_LAST_MODIFIED, lastModified / 1000)
-                .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
-        )
+        val uploadServiceIntent = Intent(context, UploadService::class.java)
+            .putExtra(UploadService.EXTRA_FILE_PATH, absolutePath)
+            .putExtra(UploadService.EXTRA_NAME, fileName)
+            .putExtra(UploadService.EXTRA_LAST_MODIFIED, lastModified / 1000)
+            .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
+        ContextCompat.startForegroundService(context, uploadServiceIntent)
 
         if (emitter.isDisposed) {
             return@create
