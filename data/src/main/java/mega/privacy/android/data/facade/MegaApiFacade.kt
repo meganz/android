@@ -464,6 +464,8 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.creditCardQuerySubscriptions(listener)
     }
 
+    override suspend fun isPendingShare(node: MegaNode) = megaApi.isPendingShare(node)
+
     override fun getUserAttribute(
         attributeIdentifier: Int,
         listener: MegaRequestListenerInterface
