@@ -3,7 +3,9 @@ package mega.privacy.android.data.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.FavouriteFile
+import mega.privacy.android.domain.entity.FavouriteFolder
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import nz.mega.sdk.MegaNode
 import org.junit.Test
@@ -23,7 +25,16 @@ class FavouriteInfoMapperTest {
     fun `test that files are mapped if isFile is true`() = runTest {
         val megaNode = getMockNode(isFile = true)
         val actual =
-            toFavouriteInfo(megaNode, { null }, { false }, { 0 }, { 1 }) { PdfFileTypeInfo }
+            toFavouriteInfo(
+                megaNode = megaNode,
+                thumbnailPath = { null },
+                hasVersion = { false },
+                numberOfChildFolders = { 0 },
+                numberOfChildFiles = { 1 },
+                isInRubbish = { false },
+                fileTypeInfoMapper = { PdfFileTypeInfo },
+                isPendingShare = { false },
+            )
 
         assertThat(actual).isInstanceOf(FavouriteFile::class.java)
     }
@@ -32,40 +43,59 @@ class FavouriteInfoMapperTest {
     fun `test that folders are mapped if isFile is false`() = runTest {
         val megaNode = getMockNode(isFile = false)
         val actual =
-            toFavouriteInfo(megaNode, { null }, { false }, { 0 }, { 1 }) { PdfFileTypeInfo }
+            toFavouriteInfo(
+                megaNode = megaNode,
+                thumbnailPath = { null },
+                hasVersion = { false },
+                numberOfChildFolders = { 0 },
+                numberOfChildFiles = { 1 },
+                isInRubbish = { false },
+                fileTypeInfoMapper = { PdfFileTypeInfo },
+                isPendingShare = { false },
+            )
 
-        assertThat(actual).isInstanceOf(FavouriteFile::class.java)
+        assertThat(actual).isInstanceOf(FavouriteFolder::class.java)
     }
 
-    // TODO: Uncomment when move MegaApiGateway to data layer
-//    @Test
-//    fun `test that values returned by gateway are used`() = runTest {
-//        val node = getMockNode(isFile = false)
-//        val expectedHasVersion = true
-//        val expectedNumChildFolders = 2
-//        val expectedNumChildFiles = 3
-//        val gateway = mock<MegaApiGateway> {
-//            onBlocking { hasVersion(node) }.thenReturn(expectedHasVersion)
-//            onBlocking { getNumChildFolders(node) }.thenReturn(expectedNumChildFolders)
-//            onBlocking { getNumChildFiles(node) }.thenReturn(expectedNumChildFiles)
-//        }
-//
-//        val actual = toFavouriteInfo(node,
-//            { null },
-//            gateway::hasVersion,
-//            gateway::getNumChildFolders,
-//            gateway::getNumChildFiles) { VideoFileTypeInfo("", "") }
-//
-//        assertThat(actual.name).isEqualTo(expectedName)
-//        assertThat(actual.label).isEqualTo(expectedLabel)
-//        assertThat(actual.hasVersion).isEqualTo(expectedHasVersion)
-//        assertThat(actual.id).isEqualTo(expectedId)
-//        assertThat(actual.parentId).isEqualTo(expectedParentId)
-//        assertThat(actual.base64Id).isEqualTo(expectedBase64Id)
-//        assertThat(actual.isFavourite).isEqualTo(node.isFavourite)
-//        assertThat(actual.isExported).isEqualTo(node.isExported)
-//        assertThat(actual.isTakenDown).isEqualTo(node.isTakenDown)
-//    }
+    @Test
+    fun `test that values returned by gateway are used`() = runTest {
+        val node = getMockNode(isFile = false)
+        val expectedHasVersion = true
+        val expectedNumChildFolders = 2
+        val expectedNumChildFiles = 3
+        val gateway = mock<MegaApiGateway> {
+            onBlocking { hasVersion(node) }.thenReturn(expectedHasVersion)
+            onBlocking { getNumChildFolders(node) }.thenReturn(expectedNumChildFolders)
+            onBlocking { getNumChildFiles(node) }.thenReturn(expectedNumChildFiles)
+            onBlocking { isInRubbish(node) }.thenReturn(true)
+            onBlocking { isPendingShare(node) }.thenReturn(true)
+        }
+
+        val actual = toFavouriteInfo(
+            megaNode = node,
+            thumbnailPath = { null },
+            hasVersion = gateway::hasVersion,
+            numberOfChildFolders = gateway::getNumChildFolders,
+            numberOfChildFiles = gateway::getNumChildFiles,
+            isInRubbish = gateway::isInRubbish,
+            fileTypeInfoMapper = { PdfFileTypeInfo },
+            isPendingShare = gateway::isPendingShare,
+        )
+
+        assertThat(actual.name).isEqualTo(expectedName)
+        assertThat(actual.label).isEqualTo(expectedLabel)
+        assertThat(actual.hasVersion).isEqualTo(expectedHasVersion)
+        assertThat(actual.id).isEqualTo(expectedId)
+        assertThat(actual.parentId).isEqualTo(expectedParentId)
+        assertThat(actual.base64Id).isEqualTo(expectedBase64Id)
+        assertThat(actual.isFavourite).isEqualTo(node.isFavourite)
+        assertThat(actual.isExported).isEqualTo(node.isExported)
+        assertThat(actual.isTakenDown).isEqualTo(node.isTakenDown)
+        assertThat(actual).isInstanceOf(FavouriteFolder::class.java)
+        val actualAsFolder = actual as FavouriteFolder
+        assertThat(actualAsFolder.isInRubbishBin).isTrue()
+        assertThat(actualAsFolder.isPendingShare).isTrue()
+    }
 
     private fun getMockNode(
         name: String = expectedName,
@@ -86,6 +116,7 @@ class FavouriteInfoMapperTest {
             on { this.base64Handle }.thenReturn(base64Id)
             on { this.modificationTime }.thenReturn(modificationTime)
             on { this.isFile }.thenReturn(isFile)
+            on { this.isFolder }.thenReturn(!isFile)
         }
         return node
     }

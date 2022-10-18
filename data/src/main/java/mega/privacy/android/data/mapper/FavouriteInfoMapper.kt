@@ -15,6 +15,8 @@ typealias FavouriteInfoMapper = @JvmSuppressWildcards suspend (
     @JvmSuppressWildcards MapNumberOfChildFolders,
     @JvmSuppressWildcards MapNumberOfChildFiles,
     @JvmSuppressWildcards FileTypeInfoMapper,
+    @JvmSuppressWildcards MapPendingShare,
+    @JvmSuppressWildcards MapInRubbish,
 ) -> @JvmSuppressWildcards FavouriteInfo
 
 internal typealias MapThumbnail = suspend (MegaNode) -> String?
@@ -31,6 +33,8 @@ internal suspend fun toFavouriteInfo(
     numberOfChildFolders: MapNumberOfChildFolders,
     numberOfChildFiles: MapNumberOfChildFiles,
     fileTypeInfoMapper: FileTypeInfoMapper,
+    isPendingShare: MapPendingShare,
+    isInRubbish: MapInRubbish,
 ) = if (megaNode.isFolder) {
     FavouriteFolder(
         id = megaNode.handle,
@@ -44,6 +48,11 @@ internal suspend fun toFavouriteInfo(
         isFavourite = megaNode.isFavourite,
         isExported = megaNode.isExported,
         isTakenDown = megaNode.isTakenDown,
+        isInRubbishBin = isInRubbish(megaNode),
+        isIncomingShare = megaNode.isInShare,
+        isShared = megaNode.isOutShare,
+        isPendingShare = isPendingShare(megaNode),
+        device = megaNode.deviceId,
     )
 } else {
     FavouriteFile(

@@ -5,8 +5,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
@@ -53,9 +53,14 @@ class DefaultFavouritesRepositoryTest {
         isFavourite = true,
         isExported = false,
         isTakenDown = false,
+        isInRubbishBin = false,
+        isIncomingShare = false,
+        isShared = false,
+        isPendingShare = false,
+        device = null,
     )
 
-    private val favouriteInfoMapper: FavouriteInfoMapper = { _, _, _, _, _, _ -> favouriteInfo }
+    private val favouriteInfoMapper: FavouriteInfoMapper = { _, _, _, _, _, _, _, _ -> favouriteInfo }
 
     private val favouriteFolderInfoMapper = mock<FavouriteFolderInfoMapper>()
 

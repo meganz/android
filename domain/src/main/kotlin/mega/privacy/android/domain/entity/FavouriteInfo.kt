@@ -113,4 +113,9 @@ data class FavouriteFolder(
     override val isFavourite: Boolean,
     override val isExported: Boolean,
     override val isTakenDown: Boolean,
-) : FavouriteInfo
+    override val isInRubbishBin: Boolean,
+    override val isIncomingShare: Boolean,
+    override val isShared: Boolean,
+    override val isPendingShare: Boolean,
+    override val device: String?,
+) : FavouriteInfo, FolderNode
