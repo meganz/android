@@ -6,10 +6,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatError
@@ -28,6 +30,7 @@ internal class DefaultChatRepository @Inject constructor(
     private val chatGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val chatRequestMapper: ChatRequestMapper,
+    private val localStorageGateway: MegaLocalStorageGateway,
 ) : ChatRepository {
 
     override fun notifyChatLogout(): Flow<Boolean> {
@@ -107,4 +110,7 @@ internal class DefaultChatRepository @Inject constructor(
                 continuation.failWithError(error)
             }
         }
+
+    override suspend fun getChatFilesFolderId(): NodeId? =
+        localStorageGateway.getChatFilesFolderHandle()?.let { NodeId(it) }
 }

@@ -498,4 +498,10 @@ interface MegaLocalStorageGateway {
      * Delete all Primary Sync Records
      */
     suspend fun deleteAllPrimarySyncRecords()
+
+
+    /**
+     * Get chat files folder handle
+     */
+    suspend fun getChatFilesFolderHandle(): Long?
 }
