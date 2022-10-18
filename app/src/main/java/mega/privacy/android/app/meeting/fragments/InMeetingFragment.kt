@@ -115,6 +115,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.VideoCaptureUtils
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -2744,11 +2745,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to answer the call
      */
     private fun answerCall() {
-        sharedModel.answerCall(camIsEnable, micIsEnable, speakerIsEnable)
-            .observe(viewLifecycleOwner) { (chatHandle, enableVideo) ->
-                MegaApplication.getChatManagement().setSpeakerStatus(chatHandle,
-                    enableVideo
-                )
+        var audio = micIsEnable
+        if (audio) {
+            audio =
+                PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
+        }
+
+        var video = camIsEnable
+        if (video) {
+            video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
+        }
+
+        sharedModel.answerCall(video, audio, speakerIsEnable)
+            .observe(viewLifecycleOwner) { (chatHandle) ->
                 checkCallStarted(chatHandle)
             }
     }
@@ -2757,11 +2766,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to start the call
      */
     private fun startCall() {
-        inMeetingViewModel.startMeeting(camIsEnable, micIsEnable)
-            .observe(viewLifecycleOwner) { result ->
-                result?.let {
-                    checkCallStarted(result.chatHandle)
-                }
+        var audio = micIsEnable
+        if (audio) {
+            audio =
+                PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
+        }
+
+        var video = camIsEnable
+        if (video) {
+            video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
+        }
+
+        inMeetingViewModel.startMeeting(video, audio)
+            .observe(viewLifecycleOwner) { chatIdResult ->
+                checkCallStarted(chatIdResult)
             }
     }
 
