@@ -136,7 +136,7 @@ class FavouritesFragmentTest {
         whenever(node.name).thenReturn("testName.txt")
         whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
         whenever(node.size).thenReturn(1000L)
-        val favouriteInfo = mega.privacy.android.domain.entity.FavouriteFolder(
+        val favouriteInfo = mega.privacy.android.domain.entity.NodeFolder(
             id = 123,
             name = node.name,
             label = node.label,

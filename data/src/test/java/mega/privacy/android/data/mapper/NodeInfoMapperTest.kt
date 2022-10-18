@@ -4,15 +4,15 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.domain.entity.FavouriteFile
-import mega.privacy.android.domain.entity.FavouriteFolder
+import mega.privacy.android.domain.entity.NodeFile
+import mega.privacy.android.domain.entity.NodeFolder
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class FavouriteInfoMapperTest {
+class NodeInfoMapperTest {
     private val expectedName = "testName"
     private val expectedSize = 1000L
     private val expectedLabel = MegaNode.NODE_LBL_RED
@@ -25,7 +25,7 @@ class FavouriteInfoMapperTest {
     fun `test that files are mapped if isFile is true`() = runTest {
         val megaNode = getMockNode(isFile = true)
         val actual =
-            toFavouriteInfo(
+            toNodeInfo(
                 megaNode = megaNode,
                 thumbnailPath = { null },
                 hasVersion = { false },
@@ -36,14 +36,14 @@ class FavouriteInfoMapperTest {
                 isPendingShare = { false },
             )
 
-        assertThat(actual).isInstanceOf(FavouriteFile::class.java)
+        assertThat(actual).isInstanceOf(NodeFile::class.java)
     }
 
     @Test
     fun `test that folders are mapped if isFile is false`() = runTest {
         val megaNode = getMockNode(isFile = false)
         val actual =
-            toFavouriteInfo(
+            toNodeInfo(
                 megaNode = megaNode,
                 thumbnailPath = { null },
                 hasVersion = { false },
@@ -54,7 +54,7 @@ class FavouriteInfoMapperTest {
                 isPendingShare = { false },
             )
 
-        assertThat(actual).isInstanceOf(FavouriteFolder::class.java)
+        assertThat(actual).isInstanceOf(NodeFolder::class.java)
     }
 
     @Test
@@ -71,7 +71,7 @@ class FavouriteInfoMapperTest {
             onBlocking { isPendingShare(node) }.thenReturn(true)
         }
 
-        val actual = toFavouriteInfo(
+        val actual = toNodeInfo(
             megaNode = node,
             thumbnailPath = { null },
             hasVersion = gateway::hasVersion,
@@ -91,8 +91,8 @@ class FavouriteInfoMapperTest {
         assertThat(actual.isFavourite).isEqualTo(node.isFavourite)
         assertThat(actual.isExported).isEqualTo(node.isExported)
         assertThat(actual.isTakenDown).isEqualTo(node.isTakenDown)
-        assertThat(actual).isInstanceOf(FavouriteFolder::class.java)
-        val actualAsFolder = actual as FavouriteFolder
+        assertThat(actual).isInstanceOf(NodeFolder::class.java)
+        val actualAsFolder = actual as NodeFolder
         assertThat(actualAsFolder.isInRubbishBin).isTrue()
         assertThat(actualAsFolder.isPendingShare).isTrue()
     }
