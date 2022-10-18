@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.chat.groupInfo
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +19,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
@@ -50,7 +50,8 @@ class GroupChatInfoViewModel @Inject constructor(
     private val startChatCall: StartChatCall,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val passcodeManagement: PasscodeManagement,
-    private val chatApiGateway: MegaChatApiGateway
+    private val chatApiGateway: MegaChatApiGateway,
+    private val chatManagement: ChatManagement,
 ) : BaseRxViewModel() {
 
     /**
@@ -134,7 +135,18 @@ class GroupChatInfoViewModel @Inject constructor(
      * @param audio Start call with audio on or off
      */
     fun onCallTap(chatId: Long, video: Boolean, audio: Boolean) {
+        if (chatApiGateway.getChatCall(chatId) != null) {
+            Timber.d("There is a call, open it")
+            CallUtil.openMeetingInProgress(MegaApplication.getInstance().applicationContext,
+                chatId,
+                true,
+                passcodeManagement)
+            return
+        }
+
         MegaApplication.isWaitingForCall = false
+
+        /*CameraGateway*/
 
         viewModelScope.launch {
             runCatching {
@@ -149,10 +161,10 @@ class GroupChatInfoViewModel @Inject constructor(
                     val audioEnable: Boolean = paramType == ChatRequestParamType.Video
 
                     CallUtil.addChecksForACall(resultChatId, videoEnable)
+
                     chatApiGateway.getChatCall(resultChatId)?.let { call ->
                         if (call.isOutgoing) {
-                            MegaApplication.getChatManagement()
-                                .setRequestSentCall(call.callId, true)
+                            chatManagement.setRequestSentCall(call.callId, true)
                         }
                     }
 

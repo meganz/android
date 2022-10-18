@@ -400,7 +400,6 @@ import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase;
 import mega.privacy.android.app.usecase.call.GetCallUseCase;
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase;
-import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -545,8 +544,6 @@ public class ChatActivity extends PasscodeActivity
     GetChatChangesUseCase getChatChangesUseCase;
     @Inject
     AnswerCallUseCase answerCallUseCase;
-    @Inject
-    StartCallUseCase startCallUseCase;
     @Inject
     EndCallUseCase endCallUseCase;
     @Inject
@@ -1568,6 +1565,8 @@ public class ChatActivity extends PasscodeActivity
                     }
                 });
 
+        collectFlows();
+
         registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
         IntentFilter leftChatFilter = new IntentFilter(BROADCAST_ACTION_INTENT_LEFT_CHAT);
@@ -2058,6 +2057,20 @@ public class ChatActivity extends PasscodeActivity
 
         Util.changeToolBarElevation(this, tB, listView.canScrollVertically(-1) || adapter.isMultipleSelect());
         setStatusIcon();
+    }
+
+    /**
+     * Collecting Flows from ViewModels
+     */
+    private void collectFlows() {
+        /*ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, chatState -> {
+            if (chatState.getError() != null) {
+                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
+            } else if (chatState.getResultAnswerCall() != null) {
+                callInProgressLayout.setEnabled(true);
+            }
+            return Unit.INSTANCE;
+        });*/
     }
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState) {
@@ -3646,20 +3659,7 @@ public class ChatActivity extends PasscodeActivity
      */
     private void startCall() {
         enableCallMenuItems(false);
-        startCallUseCase.startCallFromChatId(chatRoom.getChatId(), startVideo, true)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result, throwable) -> {
-                    enableCallMenuItems(true);
-                    if (throwable == null) {
-                        long chatId = result.component1();
-                        if (chatId == chatRoom.getChatId()) {
-                            boolean videoEnable = result.component2();
-                            boolean audioEnable = result.component3();
-                            openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
-                        }
-                    }
-                });
+        viewModel.onCallTap(chatRoom.getChatId(), startVideo, true);
     }
 
     private void enableCallMenuItems(Boolean enable) {
