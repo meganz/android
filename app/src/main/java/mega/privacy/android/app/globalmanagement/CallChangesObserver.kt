@@ -352,8 +352,12 @@ class CallChangesObserver @Inject constructor(
         }
         wakeLock?.takeIf { it.isHeld }?.release()
         chatManagement.removeNotificationShown(chatId)
+
+        val isRequestSent = chatManagement.isRequestSent(callId)
+        chatManagement.setRequestSentCall(callId, false)
+
         try {
-            if (endCallReason == MegaChatCall.END_CALL_REASON_NO_ANSWER && !isIgnored) {
+            if (endCallReason == MegaChatCall.END_CALL_REASON_NO_ANSWER && !isIgnored && !isRequestSent) {
                 val chatRoom = megaChatApi.getChatRoom(chatId)
                 if (chatRoom != null
                     && !chatRoom.isGroup
