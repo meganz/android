@@ -3,8 +3,8 @@ package mega.privacy.android.app.utils
 import android.content.Context
 import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.di.EntryPointsModule
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import java.io.File
 
 object CacheFolderManager {
@@ -106,7 +106,7 @@ object CacheFolderManager {
 
     @JvmStatic
     @Suppress("UNUSED_PARAMETER")
-    fun getCacheSize(context: Context): String {
+    fun getCacheSize(): Long {
         return cacheFolderGateway.getCacheSize()
     }
 

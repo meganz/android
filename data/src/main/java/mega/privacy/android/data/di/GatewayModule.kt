@@ -6,14 +6,17 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.facade.AssetsFacade
 import mega.privacy.android.data.facade.CacheFacade
+import mega.privacy.android.data.facade.CacheFolderFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
 import mega.privacy.android.data.facade.MegaApiFacade
+import mega.privacy.android.data.facade.MegaApiFolderFacade
 import mega.privacy.android.data.facade.MegaChatApiFacade
 import mega.privacy.android.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.AssetsGateway
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DefaultAppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
@@ -22,6 +25,7 @@ import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.ZipFileCompressionGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
@@ -113,4 +117,15 @@ internal abstract class GatewayModule {
      */
     @Binds
     abstract fun bindCameraTimestampsPreferenceGateway(implementation: CameraTimestampsPreferenceDataStore): CameraTimestampsPreferenceGateway
+
+    @Binds
+    abstract fun bindMegaApiFolderGateway(implementation: MegaApiFolderFacade): MegaApiFolderGateway
+
+    /**
+     * Provides @CacheFolderGateway
+     * @param implementation : @CacheFolderFacade
+     * @return CacheFolderGateway : @CacheFolderGateway
+     */
+    @Binds
+    abstract fun bindCacheFolderGateway(implementation: CacheFolderFacade): CacheFolderGateway
 }
