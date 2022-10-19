@@ -14,7 +14,7 @@ import javax.inject.Inject
 /**
  * Default Implementation of [CameraTimestampsPreferenceGateway]
  */
-class CameraTimestampsPreferenceDataStore
+internal class CameraTimestampsPreferenceDataStore
 @Inject constructor(@CameraTimestampsPreference private val dataStore: DataStore<Preferences>) :
     CameraTimestampsPreferenceGateway {
     override suspend fun backupTimestampsAndFolderHandle(
@@ -76,34 +76,34 @@ class CameraTimestampsPreferenceDataStore
         /**
          * String Preference Key for Primary Camera Photo
          */
-        val KEY_CAM_SYNC_TIMESTAMP = stringPreferencesKey("KEY_CAM_SYNC_TIMESTAMP")
+        private val KEY_CAM_SYNC_TIMESTAMP = stringPreferencesKey("KEY_CAM_SYNC_TIMESTAMP")
 
         /**
          * String Preference Key for Primary Camera Video
          */
-        val KEY_CAM_VIDEO_SYNC_TIMESTAMP =
+        private val KEY_CAM_VIDEO_SYNC_TIMESTAMP =
             stringPreferencesKey("KEY_CAM_VIDEO_SYNC_TIMESTAMP")
 
         /**
          * String Preference Key for Secondary Camera Photo
          */
-        val KEY_SEC_SYNC_TIMESTAMP = stringPreferencesKey("KEY_SEC_SYNC_TIMESTAMP")
+        private val KEY_SEC_SYNC_TIMESTAMP = stringPreferencesKey("KEY_SEC_SYNC_TIMESTAMP")
 
         /**
          * String Preference Key for Secondary Camera Video
          */
-        val KEY_SEC_VIDEO_SYNC_TIMESTAMP =
+        private val KEY_SEC_VIDEO_SYNC_TIMESTAMP =
             stringPreferencesKey("KEY_SEC_VIDEO_SYNC_TIMESTAMP")
 
         /**
          * Long Preference Key for Primary Folder Handle
          */
-        val KEY_PRIMARY_HANDLE = longPreferencesKey("KEY_PRIMARY_HANDLE")
+        private val KEY_PRIMARY_HANDLE = longPreferencesKey("KEY_PRIMARY_HANDLE")
 
         /**
          * Long Preference Key for Secondary Folder Handle
          */
-        val KEY_SECONDARY_HANDLE = longPreferencesKey("KEY_SECONDARY_HANDLE")
+        private val KEY_SECONDARY_HANDLE = longPreferencesKey("KEY_SECONDARY_HANDLE")
 
         /**
          * DataStore File Name

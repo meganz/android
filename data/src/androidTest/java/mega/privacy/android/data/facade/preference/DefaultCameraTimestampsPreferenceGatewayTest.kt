@@ -12,22 +12,14 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore
-import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore.Companion.KEY_CAM_SYNC_TIMESTAMP
-import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore.Companion.KEY_CAM_VIDEO_SYNC_TIMESTAMP
-import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore.Companion.KEY_PRIMARY_HANDLE
-import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore.Companion.KEY_SECONDARY_HANDLE
-import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore.Companion.KEY_SEC_SYNC_TIMESTAMP
-import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore.Companion.KEY_SEC_VIDEO_SYNC_TIMESTAMP
 import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore.Companion.LAST_CAM_SYNC_TIMESTAMP_FILE
 import org.junit.After
 import org.junit.Before
@@ -74,28 +66,24 @@ class DefaultCameraTimestampsPreferenceGatewayTest {
     fun test_time_stamps_and_handles_are_backed_up() {
         testCoroutineScope.runTest {
             saveTimeStamps()
-            assertThat(testDataStore.monitor(KEY_CAM_SYNC_TIMESTAMP).firstOrNull())
-                .isEqualTo(camSyncTimeStamp)
-            assertThat(testDataStore.monitor(KEY_CAM_VIDEO_SYNC_TIMESTAMP).firstOrNull())
-                .isEqualTo(camVideoSyncTimeStamp)
-            assertThat(testDataStore.monitor(KEY_SEC_SYNC_TIMESTAMP).firstOrNull())
-                .isEqualTo(secSyncTimeStamp)
-            assertThat(testDataStore.monitor(KEY_SEC_VIDEO_SYNC_TIMESTAMP).firstOrNull())
-                .isEqualTo(secVideoSyncTimeStamp)
-            assertThat(testDataStore.monitor(KEY_PRIMARY_HANDLE).firstOrNull())
-                .isEqualTo(primaryHandle)
-            assertThat(testDataStore.monitor(KEY_SECONDARY_HANDLE).firstOrNull())
-                .isEqualTo(secondaryHandle)
+            assertThat(underTest.getPrimaryFolderPhotoSyncTime()).isEqualTo(camSyncTimeStamp)
+            assertThat(underTest.getPrimaryFolderVideoSyncTime()).isEqualTo(camVideoSyncTimeStamp)
+            assertThat(underTest.getSecondaryFolderPhotoSyncTime()).isEqualTo(secSyncTimeStamp)
+            assertThat(underTest.getSecondaryFolderVideoSyncTime()).isEqualTo(secVideoSyncTimeStamp)
+            assertThat(underTest.getPrimaryHandle()).isEqualTo(primaryHandle)
+            assertThat(underTest.getSecondaryHandle()).isEqualTo(secondaryHandle)
         }
     }
 
     private suspend fun saveTimeStamps() {
-        underTest.backupTimestampsAndFolderHandle(primaryHandle,
+        underTest.backupTimestampsAndFolderHandle(
+            primaryHandle,
             secondaryHandle,
             camSyncTimeStamp = camSyncTimeStamp,
             camVideoSyncTimeStamp = camVideoSyncTimeStamp,
             secSyncTimeStamp = secSyncTimeStamp,
-            secVideoSyncTimeStamp = secVideoSyncTimeStamp)
+            secVideoSyncTimeStamp = secVideoSyncTimeStamp,
+        )
     }
 
     @Test
@@ -103,18 +91,12 @@ class DefaultCameraTimestampsPreferenceGatewayTest {
         testCoroutineScope.runTest {
             saveTimeStamps()
             underTest.clearPrimaryCameraSyncRecords()
-            assertThat(testDataStore.monitor(KEY_PRIMARY_HANDLE).firstOrNull())
-                .isEqualTo(0)
-            assertThat(testDataStore.monitor(KEY_CAM_VIDEO_SYNC_TIMESTAMP).firstOrNull())
-                .isEqualTo("")
-            assertThat(testDataStore.monitor(KEY_CAM_SYNC_TIMESTAMP).firstOrNull())
-                .isEqualTo("")
-            assertThat(testDataStore.monitor(KEY_SEC_SYNC_TIMESTAMP).firstOrNull())
-                .isEqualTo(secSyncTimeStamp)
-            assertThat(testDataStore.monitor(KEY_SEC_VIDEO_SYNC_TIMESTAMP).firstOrNull())
-                .isEqualTo(secVideoSyncTimeStamp)
-            assertThat(testDataStore.monitor(KEY_SECONDARY_HANDLE).firstOrNull())
-                .isEqualTo(secondaryHandle)
+            assertThat(underTest.getPrimaryFolderPhotoSyncTime()).isEqualTo("")
+            assertThat(underTest.getPrimaryFolderVideoSyncTime()).isEqualTo("")
+            assertThat(underTest.getSecondaryFolderPhotoSyncTime()).isEqualTo(secSyncTimeStamp)
+            assertThat(underTest.getSecondaryFolderVideoSyncTime()).isEqualTo(secVideoSyncTimeStamp)
+            assertThat(underTest.getPrimaryHandle()).isEqualTo(0)
+            assertThat(underTest.getSecondaryHandle()).isEqualTo(secondaryHandle)
         }
     }
 
@@ -123,18 +105,12 @@ class DefaultCameraTimestampsPreferenceGatewayTest {
         testCoroutineScope.runTest {
             saveTimeStamps()
             underTest.clearSecondaryCameraSyncRecords()
-            assertThat(testDataStore.monitor(KEY_PRIMARY_HANDLE).firstOrNull())
-                .isEqualTo(primaryHandle)
-            assertThat(testDataStore.monitor(KEY_CAM_VIDEO_SYNC_TIMESTAMP).firstOrNull())
-                .isEqualTo(camVideoSyncTimeStamp)
-            assertThat(testDataStore.monitor(KEY_CAM_SYNC_TIMESTAMP).firstOrNull())
-                .isEqualTo(camSyncTimeStamp)
-            assertThat(testDataStore.monitor(KEY_SEC_SYNC_TIMESTAMP).firstOrNull())
-                .isEqualTo("")
-            assertThat(testDataStore.monitor(KEY_SEC_VIDEO_SYNC_TIMESTAMP).firstOrNull())
-                .isEqualTo("")
-            assertThat(testDataStore.monitor(KEY_SECONDARY_HANDLE).firstOrNull())
-                .isEqualTo(0)
+            assertThat(underTest.getPrimaryFolderPhotoSyncTime()).isEqualTo(camSyncTimeStamp)
+            assertThat(underTest.getPrimaryFolderVideoSyncTime()).isEqualTo(camVideoSyncTimeStamp)
+            assertThat(underTest.getSecondaryFolderPhotoSyncTime()).isEqualTo("")
+            assertThat(underTest.getSecondaryFolderVideoSyncTime()).isEqualTo("")
+            assertThat(underTest.getPrimaryHandle()).isEqualTo(primaryHandle)
+            assertThat(underTest.getSecondaryHandle()).isEqualTo(0)
         }
     }
 

@@ -20,10 +20,16 @@ import mega.privacy.android.data.qualifier.CameraTimestampsPreference
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Singleton
 
+/**
+ * DataStore Module of DataStore<Preferences>
+ */
 @Module
 @InstallIn(SingletonComponent::class)
-object DataStoreModule {
+internal object DataStoreModule {
 
+    /**
+     * provides DataStore<Preferences> for [LAST_CAM_SYNC_TIMESTAMP_FILE]
+     */
     @Singleton
     @Provides
     @CameraTimestampsPreference
