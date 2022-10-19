@@ -25,7 +25,7 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-object DataStoreModule {
+internal object DataStoreModule {
 
     /**
      * provides DataStore<Preferences> for [LAST_CAM_SYNC_TIMESTAMP_FILE]
