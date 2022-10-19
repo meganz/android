@@ -14,7 +14,7 @@ import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
-import mega.privacy.android.data.mapper.NodeInfoMapper
+import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
@@ -55,7 +55,7 @@ import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toFavouriteFolderInfo
-import mega.privacy.android.data.mapper.toNodeInfo
+import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaChatPeerList
@@ -279,7 +279,7 @@ internal class MapperModule {
      * Provide favourite info mapper
      */
     @Provides
-    fun provideFavouriteInfoMapper(): NodeInfoMapper = ::toNodeInfo
+    fun provideFavouriteInfoMapper(): NodeMapper = ::toNode
 
 
     /**

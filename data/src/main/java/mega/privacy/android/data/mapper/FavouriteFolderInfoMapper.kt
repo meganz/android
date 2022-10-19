@@ -1,13 +1,13 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.NodeInfo
+import mega.privacy.android.domain.entity.node.Node
 import nz.mega.sdk.MegaNode
 
 /**
  * Mapper for [FavouriteFolderInfo]
  */
-typealias FavouriteFolderInfoMapper = (@JvmSuppressWildcards MegaNode, @JvmSuppressWildcards List<@JvmSuppressWildcards NodeInfo>, @JvmSuppressWildcards Long) -> @JvmSuppressWildcards FavouriteFolderInfo
+typealias FavouriteFolderInfoMapper = (@JvmSuppressWildcards MegaNode, @JvmSuppressWildcards List<@JvmSuppressWildcards Node>, @JvmSuppressWildcards Long) -> @JvmSuppressWildcards FavouriteFolderInfo
 
 /**
  * To favourite folder info
@@ -18,7 +18,7 @@ typealias FavouriteFolderInfoMapper = (@JvmSuppressWildcards MegaNode, @JvmSuppr
  */
 internal fun toFavouriteFolderInfo(
     node: MegaNode,
-    children: List<NodeInfo>,
+    children: List<Node>,
     id: Long,
 ) = FavouriteFolderInfo(
     children = children,

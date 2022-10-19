@@ -23,6 +23,8 @@ import mega.privacy.android.app.presentation.favourites.FavouritesFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.DefaultFolderNode
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.hamcrest.Matcher
@@ -136,15 +138,15 @@ class FavouritesFragmentTest {
         whenever(node.name).thenReturn("testName.txt")
         whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
         whenever(node.size).thenReturn(1000L)
-        val favouriteInfo = mega.privacy.android.domain.entity.NodeFolder(
-            id = 123,
+        val favouriteInfo = DefaultFolderNode(
+            id = NodeId(123),
             name = node.name,
             label = node.label,
-            parentId = 1234,
+            parentId = NodeId(1234),
             base64Id = "base64Handle",
             hasVersion = false,
-            numChildFolders = 0,
-            numChildFiles = 0,
+            childFolderCount = 0,
+            childFileCount = 0,
             isFavourite = true,
             isExported = false,
             isTakenDown = false,

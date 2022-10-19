@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
-import mega.privacy.android.domain.entity.NodeInfo
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.repository.FavouritesRepository
 import javax.inject.Inject
 
@@ -17,7 +17,7 @@ class DefaultGetAllFavorites @Inject constructor(private val repository: Favouri
     GetAllFavorites {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun invoke(): Flow<List<NodeInfo>> =
+    override fun invoke(): Flow<List<Node>> =
         flow {
             emit(repository.getAllFavorites())
             emitAll(repository.monitorNodeChange().mapLatest { repository.getAllFavorites() })
