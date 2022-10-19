@@ -392,6 +392,7 @@ import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment;
+import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
@@ -3862,7 +3863,10 @@ public class ChatActivity extends PasscodeActivity
         if (megaApi != null && megaApi.getRootNode() != null) {
             ArrayList<MegaUser> contacts = megaApi.getContacts();
             if (contacts == null || contacts.isEmpty() || contacts.stream().noneMatch(it -> it.getVisibility() == MegaUser.VISIBILITY_VISIBLE)) {
-                AddParticipantsNoContactsDialogFragment dialog = AddParticipantsNoContactsDialogFragment.newInstance();
+                var dialog = AddParticipantsNoContactsDialogFragment.newInstance();
+                dialog.show(getSupportFragmentManager(), dialog.getTag());
+            } else if (ChatUtil.areAllMyContactsChatParticipants(chatRoom)) {
+                var dialog = AddParticipantsNoContactsLeftToAddDialogFragment.newInstance();
                 dialog.show(getSupportFragmentManager(), dialog.getTag());
             } else {
                 Intent in = new Intent(this, AddContactActivity.class);
