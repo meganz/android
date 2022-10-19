@@ -52,6 +52,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
+import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
@@ -60,10 +61,12 @@ import mega.privacy.android.app.presentation.photos.timeline.view.EnableCU
 import mega.privacy.android.app.presentation.photos.timeline.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.timeline.view.TimelineView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getCurrentSort
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onCardClick
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onTimeBarTabSelected
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUploadVideos
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseCellularConnection
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCurrentSort
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setShowProgressBar
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showEnableCUPage
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingFilterPage
@@ -431,7 +434,17 @@ class PhotosFragment : Fragment() {
             }
             R.id.action_photos_sortby -> {
                 timelineViewModel.showingSortByDialog(true)
-                showSortByDialog(managerActivity)
+                showSortByDialog(
+                    context = managerActivity,
+                    checkedItem = timelineViewModel.getCurrentSort().ordinal,
+                    onClickListener = { _, i ->
+                        timelineViewModel.setCurrentSort(Sort.values()[i])
+                        timelineViewModel.sortByOrder()
+                    },
+                    onDismissListener = {
+                        timelineViewModel.showingSortByDialog(false)
+                    }
+                )
                 true
             }
             else -> super.onOptionsItemSelected(item)

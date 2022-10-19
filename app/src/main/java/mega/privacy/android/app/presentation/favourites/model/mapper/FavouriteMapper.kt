@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.favourites.model.mapper
 
-import mega.privacy.android.domain.entity.FavouriteFile as FileEntity
-import mega.privacy.android.domain.entity.FavouriteFolder as FolderEntity
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
@@ -9,9 +7,11 @@ import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
-import mega.privacy.android.domain.entity.FavouriteInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.NodeFile
+import mega.privacy.android.domain.entity.NodeFolder
+import mega.privacy.android.domain.entity.NodeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import nz.mega.sdk.MegaNode
@@ -21,15 +21,15 @@ import nz.mega.sdk.MegaNode
  */
 typealias FavouriteMapper = (
     @JvmSuppressWildcards MegaNode,
-    @JvmSuppressWildcards FavouriteInfo,
+    @JvmSuppressWildcards NodeInfo,
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards StringUtilWrapper,
     @JvmSuppressWildcards (String) -> Int,
 ) -> @JvmSuppressWildcards Favourite
 
 /**
- * Convert FavouriteInfo to Favourite
- * @param favouriteInfo FavouriteInfo
+ * Convert NodeInfo to Favourite
+ * @param nodeInfo FavouriteInfo
  * @param isAvailableOffline isAvailableOffline
  * @param stringUtil StringUtilWrapper
  * @param getFileIcon getFileIcon
@@ -37,22 +37,22 @@ typealias FavouriteMapper = (
  */
 internal fun toFavourite(
     node: MegaNode,
-    favouriteInfo: FavouriteInfo,
+    nodeInfo: NodeInfo,
     isAvailableOffline: Boolean,
     stringUtil: StringUtilWrapper,
     getFileIcon: (String) -> Int = { 0 },
-) = when (favouriteInfo) {
-    is FolderEntity -> {
-        favouriteInfo.createFolder(
+) = when (nodeInfo) {
+    is NodeFolder -> {
+        nodeInfo.createFolder(
             node,
-            getFolderInfo(favouriteInfo, stringUtil),
+            getFolderInfo(nodeInfo, stringUtil),
             isAvailableOffline,
         )
     }
-    is FileEntity -> {
-        favouriteInfo.createFile(
+    is NodeFile -> {
+        nodeInfo.createFile(
             node,
-            getFileInfo(favouriteInfo, stringUtil),
+            getFileInfo(nodeInfo, stringUtil),
             isAvailableOffline,
             getFileIcon,
         )
@@ -67,7 +67,7 @@ internal fun toFavourite(
  * @param isAvailableOffline whether is available for offline
  * @return FavouriteFolder
  */
-private fun FolderEntity.createFolder(
+private fun NodeFolder.createFolder(
     node: MegaNode,
     folderInfo: String,
     isAvailableOffline: Boolean,
@@ -96,7 +96,7 @@ private fun FolderEntity.createFolder(
  * @param getFileIcon getFileIcon
  * @return FavouriteFile
  */
-private fun FileEntity.createFile(
+private fun NodeFile.createFile(
     node: MegaNode,
     fileInfo: String,
     isAvailableOffline: Boolean,
@@ -135,7 +135,7 @@ private fun FileTypeInfo.hasThumbnail(): Boolean = when (this) {
  * @param stringUtil StringUtilWrapper
  * @return file info
  */
-private fun getFileInfo(favouriteInfo: FileEntity, stringUtil: StringUtilWrapper) =
+private fun getFileInfo(favouriteInfo: NodeFile, stringUtil: StringUtilWrapper) =
     String.format(
         "%s · %s",
         stringUtil.getSizeString(favouriteInfo.size),
@@ -148,5 +148,5 @@ private fun getFileInfo(favouriteInfo: FileEntity, stringUtil: StringUtilWrapper
  * @param stringUtil StringUtilWrapper
  * @return folder info
  */
-private fun getFolderInfo(favouriteInfo: FolderEntity, stringUtil: StringUtilWrapper) =
+private fun getFolderInfo(favouriteInfo: NodeFolder, stringUtil: StringUtilWrapper) =
     stringUtil.getFolderInfo(favouriteInfo.numChildFolders, favouriteInfo.numChildFiles)

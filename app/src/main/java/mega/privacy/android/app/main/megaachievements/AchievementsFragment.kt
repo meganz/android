@@ -16,12 +16,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.getBigFormattedStorageString
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.GetAchievementsListener
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
@@ -42,6 +42,9 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var getAchievementsListener: GetAchievementsListener
 
     private lateinit var registrationLayout: RelativeLayout
     private lateinit var separatorRegistration: LinearLayout
@@ -226,9 +229,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
         }
 
         // The root view has been created, fill it with the data when data ready
-        if (AchievementsActivity.sFetcher != null) {
-            AchievementsActivity.sFetcher.setDataCallback(this)
-        }
+        getAchievementsListener.setDataCallback(this)
     }
 
     /**
@@ -240,7 +241,6 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
                 Timber.d("Go to section Referral bonuses")
                 (requireActivity() as AchievementsActivity).showFragment(
                     if (transferReferrals > 0 || storageReferrals > 0) Constants.BONUSES_FRAGMENT else Constants.INVITE_FRIENDS_FRAGMENT,
-                    AchievementsActivity.INVALID_TYPE
                 )
             }
             R.id.install_app_layout -> {
@@ -285,13 +285,9 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
      * Receive Achievements
      */
     override fun onAchievementsReceived() {
+        val details = getAchievementsListener.achievementsDetails ?: return
+        val bonuses = getAchievementsListener.referralBonuses
         Timber.d("Achievements received - Update UI")
-        if (AchievementsActivity.sFetcher == null) return
-        val details = AchievementsActivity.sFetcher.achievementsDetails
-        val bonuses = AchievementsActivity.sFetcher.referralBonuses
-        if (details == null) {
-            return
-        }
 
         var totalStorage: Long = 0
         var totalTransfer: Long = 0

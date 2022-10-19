@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
@@ -38,23 +39,26 @@ import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
+import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
 import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.model.InMeetingState
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetNetworkChangesUseCase
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
-import mega.privacy.android.app.usecase.call.StartCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.StartChatCall
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
 import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
@@ -75,26 +79,34 @@ import javax.inject.Inject
  *
  * @property inMeetingRepository            [InMeetingRepository]
  * @property getCallUseCase                 [GetCallUseCase]
- * @property startCallUseCase               [StartCallUseCase]
+ * @property startChatCall                  [StartChatCall]
  * @property getNetworkChangesUseCase       [GetNetworkChangesUseCase]
  * @property getCallStatusChangesUseCase    [GetCallStatusChangesUseCase]
  * @property endCallUseCase                 [EndCallUseCase]
  * @property getParticipantsChangesUseCase  [GetParticipantsChangesUseCase]
  * @property rtcAudioManagerGateway         [RTCAudioManagerGateway]
  * @property setOpenInvite                  [SetOpenInvite]
+ * @property cameraGateway                  [CameraGateway]
+ * @property megaChatApiGateway             [MegaChatApiGateway]
+ * @property passcodeManagement             [PasscodeManagement]
+ * @property chatManagement                 [ChatManagement]
  * @property state                       Current view state as [InMeetingState]
  */
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository,
     private val getCallUseCase: GetCallUseCase,
-    private val startCallUseCase: StartCallUseCase,
+    private val startChatCall: StartChatCall,
     private val getNetworkChangesUseCase: GetNetworkChangesUseCase,
     private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
     private val endCallUseCase: EndCallUseCase,
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val setOpenInvite: SetOpenInvite,
+    private val cameraGateway: CameraGateway,
+    private val megaChatApiGateway: MegaChatApiGateway,
+    private val passcodeManagement: PasscodeManagement,
+    private val chatManagement: ChatManagement,
     monitorConnectivity: MonitorConnectivity,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
@@ -1072,13 +1084,13 @@ class InMeetingViewModel @Inject constructor(
      *
      * @param enableVideo The video should be enabled
      * @param enableAudio The audio should be enabled
-     * @return Result of the call
+     * @return Chat id
      */
     fun startMeeting(
         enableVideo: Boolean,
         enableAudio: Boolean,
-    ): LiveData<StartCallUseCase.StartCallResult> {
-        val result = MutableLiveData<StartCallUseCase.StartCallResult>()
+    ): LiveData<Long> {
+        val chatIdResult = MutableLiveData<Long>()
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             Timber.d("The chat exists")
             if (CallUtil.isStatusConnected(
@@ -1086,21 +1098,42 @@ class InMeetingViewModel @Inject constructor(
                     it.chatId
                 )
             ) {
+                megaChatApiGateway.getChatCall(currentChatId)?.let {
+                    Timber.d("There is a call, open it")
+                    chatIdResult.value = it.chatid
+                    CallUtil.openMeetingInProgress(MegaApplication.getInstance().applicationContext,
+                        currentChatId,
+                        true,
+                        passcodeManagement)
+
+                    return chatIdResult
+                }
+
                 Timber.d("Chat status is connected")
-                startCallUseCase.startCallFromChatId(currentChatId, enableVideo, enableAudio)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onSuccess = { resultStartCall ->
-                            result.value = resultStartCall
-                        },
-                        onError = { error ->
-                            Timber.e(error.stackTraceToString())
+                MegaApplication.isWaitingForCall = false
+                cameraGateway.setFrontCamera()
+
+                viewModelScope.launch {
+                    runCatching {
+                        startChatCall(currentChatId, enableVideo, enableAudio)
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                    }.onSuccess { resultStartCall ->
+                        val chatId = resultStartCall.chatHandle
+                        if (chatId != null && chatId != MEGACHAT_INVALID_HANDLE) {
+                            chatManagement.setSpeakerStatus(chatId, resultStartCall.flag)
+                            megaChatApiGateway.getChatCall(chatId)?.let { call ->
+                                if (call.isOutgoing) {
+                                    chatManagement.setRequestSentCall(call.callId, true)
+                                }
+                            }
+
+                            chatIdResult.value = chatId
                         }
-                    )
-                    .addTo(composite)
+                    }
+                }
             }
-            return result
+            return chatIdResult
         }
 
         Timber.d("The chat doesn't exists")
@@ -1108,8 +1141,10 @@ class InMeetingViewModel @Inject constructor(
             _chatTitle.value!!,
             CreateGroupChatWithPublicLink()
         )
-        return result
+
+        return chatIdResult
     }
+
 
     /**
      * Get my own privileges in the chat

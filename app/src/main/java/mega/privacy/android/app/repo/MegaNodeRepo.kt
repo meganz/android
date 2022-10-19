@@ -13,6 +13,7 @@ import mega.privacy.android.app.utils.SortUtil.sortOfflineByNameDescending
 import mega.privacy.android.app.utils.SortUtil.sortOfflineBySizeAscending
 import mega.privacy.android.app.utils.SortUtil.sortOfflineBySizeDescending
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
@@ -111,7 +112,7 @@ class MegaNodeRepo @Inject constructor(
         return dbHandler.findByHandle(handle)
     }
 
-    fun loadOfflineNodes(path: String, order: Int, searchQuery: String?): List<MegaOffline> {
+    fun loadOfflineNodes(path: String, order: SortOrder, searchQuery: String?): List<MegaOffline> {
         val nodes = if (searchQuery != null && searchQuery.isNotEmpty()) {
             searchOfflineNodes(path, searchQuery)
         } else {
@@ -119,22 +120,22 @@ class MegaNodeRepo @Inject constructor(
         }
 
         when (order) {
-            ORDER_DEFAULT_DESC -> {
+            SortOrder.ORDER_DEFAULT_DESC -> {
                 sortOfflineByNameDescending(nodes)
             }
-            ORDER_DEFAULT_ASC -> {
+            SortOrder.ORDER_DEFAULT_ASC -> {
                 sortOfflineByNameAscending(nodes)
             }
-            ORDER_MODIFICATION_ASC -> {
+            SortOrder.ORDER_MODIFICATION_ASC -> {
                 sortOfflineByModificationDateAscending(nodes)
             }
-            ORDER_MODIFICATION_DESC -> {
+            SortOrder.ORDER_MODIFICATION_DESC -> {
                 sortOfflineByModificationDateDescending(nodes)
             }
-            ORDER_SIZE_ASC -> {
+            SortOrder.ORDER_SIZE_ASC -> {
                 sortOfflineBySizeAscending(nodes)
             }
-            ORDER_SIZE_DESC -> {
+            SortOrder.ORDER_SIZE_DESC -> {
                 sortOfflineBySizeDescending(nodes)
             }
             else -> {

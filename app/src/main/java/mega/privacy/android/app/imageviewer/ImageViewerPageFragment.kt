@@ -87,6 +87,7 @@ class ImageViewerPageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
         setupObservers()
+        viewModel.startSlideshow()
     }
 
     override fun onResume() {

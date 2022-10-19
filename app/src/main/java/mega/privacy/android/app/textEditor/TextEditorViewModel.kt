@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -569,14 +570,15 @@ class TextEditorViewModel @Inject constructor(
         parentHandle: Long,
     ) {
         PermissionUtils.checkNotificationsPermission(activity)
-        activity.startService(
-            Intent(activity, UploadService::class.java)
-                .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
-                .putExtra(FROM_HOME_PAGE, fromHome)
-                .putExtra(UploadService.EXTRA_FILE_PATH, tempFile.absolutePath)
-                .putExtra(UploadService.EXTRA_NAME, fileName.value)
-                .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
-        )
+
+        val uploadServiceIntent = Intent(activity, UploadService::class.java)
+            .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
+            .putExtra(FROM_HOME_PAGE, fromHome)
+            .putExtra(UploadService.EXTRA_FILE_PATH, tempFile.absolutePath)
+            .putExtra(UploadService.EXTRA_NAME, fileName.value)
+            .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
+        ContextCompat.startForegroundService(activity, uploadServiceIntent)
+
         activity.finish()
     }
 

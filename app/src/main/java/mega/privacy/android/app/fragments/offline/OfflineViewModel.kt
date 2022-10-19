@@ -37,6 +37,7 @@ import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getURLOfflineFileContent
 import mega.privacy.android.app.utils.RxUtil.logErr
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetThumbnail
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaNode
@@ -56,7 +57,7 @@ class OfflineViewModel @Inject constructor(
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
-    private var order = ORDER_DEFAULT_ASC
+    private var order = SortOrder.ORDER_DEFAULT_ASC
     private var searchQuery: String? = null
     private var historySearchQuery: String? = null
     private var historySearchPath: String? = null
@@ -377,7 +378,7 @@ class OfflineViewModel @Inject constructor(
         loadOfflineNodes(autoScrollPos = autoScrollPos)
     }
 
-    fun setOrder(order: Int) {
+    fun setOrder(order: SortOrder) {
         if (!rootFolderOnly) {
             this.order = order
             loadOfflineNodes()
@@ -406,7 +407,7 @@ class OfflineViewModel @Inject constructor(
         isList: Boolean,
         spanCount: Int,
         path: String,
-        order: Int,
+        order: SortOrder,
     ) {
         Timber.d("setDisplayParam rootFolderOnly $rootFolderOnly, isList $isList")
 

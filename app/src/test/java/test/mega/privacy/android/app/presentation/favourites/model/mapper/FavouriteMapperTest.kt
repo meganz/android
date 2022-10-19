@@ -7,8 +7,8 @@ import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
-import mega.privacy.android.domain.entity.FavouriteFile
-import mega.privacy.android.domain.entity.FavouriteFolder
+import mega.privacy.android.domain.entity.NodeFile
+import mega.privacy.android.domain.entity.NodeFolder
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import nz.mega.sdk.MegaNode
 import org.junit.Test
@@ -41,7 +41,7 @@ class FavouriteMapperTest {
             on { isInShare }.thenReturn(expectedIsShared)
         }
 
-        val favouriteInfo = FavouriteFolder(
+        val favouriteInfo = NodeFolder(
             id = expectedHandle,
             name = expectedName,
             label = expectedLabel,
@@ -125,7 +125,7 @@ class FavouriteMapperTest {
             on { isVideo() }.thenReturn(false)
         }
 
-        val favouriteInfo = FavouriteFile(
+        val favouriteInfo = NodeFile(
             id = expectedHandle,
             name = expectedName,
             size = expectedSize,

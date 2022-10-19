@@ -2,13 +2,9 @@ package mega.privacy.android.app.presentation.photos.albums.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -25,13 +21,14 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumPhotoItem
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.presentation.theme.grey_alpha_054
-import mega.privacy.android.presentation.theme.grey_alpha_087
+import mega.privacy.android.presentation.theme.grey_100
+import mega.privacy.android.presentation.theme.grey_300
+import mega.privacy.android.presentation.theme.grey_600
+import mega.privacy.android.presentation.theme.grey_900
 
 @Composable
 internal fun DynamicView(
@@ -115,7 +112,7 @@ internal fun EmptyView() {
         Image(
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_homepage_empty_favourite),
             contentDescription = "Empty",
-            alpha = if (MaterialTheme.colors.isLight) 1F else 0.16F
+            alpha = 40f
         )
 
         val placeHolderStart = "[B]"
@@ -127,7 +124,7 @@ internal fun EmptyView() {
             stringResource(id = R.string.empty_hint_favourite_album).uppercase()
 
         Text(
-            color = grey_alpha_054,
+            color = if (MaterialTheme.colors.isLight) grey_600 else grey_300,
             text = buildAnnotatedString {
                 append(text.substring(0, text.indexOf(placeHolderStart)))
 
@@ -145,7 +142,7 @@ internal fun EmptyView() {
                     ).replace("[/B]", "")
                 )
 
-                withStyle(SpanStyle(color = grey_alpha_087)) {
+                withStyle(SpanStyle(if (MaterialTheme.colors.isLight) grey_900 else grey_100)) {
                     append(
                         text.substring(
                             text.indexOf(boldPlaceHolderStart),
@@ -155,17 +152,9 @@ internal fun EmptyView() {
                 }
 
                 append(
-                    text.substring(
-                        text.indexOf(boldPlaceHolderStart),
-                        text.indexOf(boldPlaceHolderEnd)
-                    ).replace("[A]", "")
-                )
-
-                append(
                     text.substring(text.indexOf(boldPlaceHolderEnd)).replace("[/A]", "")
                 )
             }
         )
-
     }
 }

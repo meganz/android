@@ -17,7 +17,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMe
 import mega.privacy.android.app.presentation.photos.timeline.model.DateCard
 import mega.privacy.android.app.presentation.photos.timeline.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
-import mega.privacy.android.app.presentation.photos.timeline.model.Sort
+import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.ZoomLevel
