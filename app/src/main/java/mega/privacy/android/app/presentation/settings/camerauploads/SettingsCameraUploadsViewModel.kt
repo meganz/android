@@ -12,6 +12,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.model.Settin
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
+import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import javax.inject.Inject
 
 /**
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class SettingsCameraUploadsViewModel @Inject constructor(
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
     private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
+    private val restoreSecondaryTimestamps: RestoreSecondaryTimestamps,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -76,6 +78,16 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun restorePrimaryTimestampsAndSyncRecordProcess() {
         viewModelScope.launch {
             restorePrimaryTimestamps()
+        }
+    }
+
+    /**
+     * If the handle matches the previous secondary folder's handle, restore the time stamp from stamps
+     * if not clean the sync record from previous primary folder
+     */
+    fun restoreSecondaryTimestampsAndSyncRecordProcess(){
+        viewModelScope.launch {
+            restoreSecondaryTimestamps()
         }
     }
 }

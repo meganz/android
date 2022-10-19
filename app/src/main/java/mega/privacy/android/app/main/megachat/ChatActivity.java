@@ -389,6 +389,7 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
+import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
@@ -1506,6 +1507,11 @@ public class ChatActivity extends PasscodeActivity
         super.onCreate(savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+
+        if (!viewModel.isConnected() && megaApi.getRootNode() == null) {
+            finish();
+            return;
+        }
 
         if (shouldRefreshSessionDueToKarere()) {
             return;
@@ -3839,19 +3845,16 @@ public class ChatActivity extends PasscodeActivity
 
         if (megaApi != null && megaApi.getRootNode() != null) {
             ArrayList<MegaUser> contacts = megaApi.getContacts();
-            if (contacts == null) {
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.no_contacts_invite), -1);
+            if (contacts == null || contacts.isEmpty() || contacts.stream().noneMatch(it -> it.getVisibility() == MegaUser.VISIBILITY_VISIBLE)) {
+                AddParticipantsNoContactsDialogFragment dialog = AddParticipantsNoContactsDialogFragment.newInstance();
+                dialog.show(getSupportFragmentManager(), dialog.getTag());
             } else {
-                if (contacts.isEmpty()) {
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.no_contacts_invite), -1);
-                } else {
-                    Intent in = new Intent(this, AddContactActivity.class);
-                    in.putExtra("contactType", CONTACT_TYPE_MEGA);
-                    in.putExtra("chat", true);
-                    in.putExtra("chatId", idChat);
-                    in.putExtra("aBtitle", getString(R.string.add_participants_menu_item));
-                    startActivityForResult(in, REQUEST_ADD_PARTICIPANTS);
-                }
+                Intent in = new Intent(this, AddContactActivity.class);
+                in.putExtra("contactType", CONTACT_TYPE_MEGA);
+                in.putExtra("chat", true);
+                in.putExtra("chatId", idChat);
+                in.putExtra("aBtitle", getString(R.string.add_participants_menu_item));
+                startActivityForResult(in, REQUEST_ADD_PARTICIPANTS);
             }
         } else {
             Timber.w("Online but not megaApi");

@@ -4,13 +4,18 @@ import androidx.annotation.DrawableRes
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.BackupType
 import mega.privacy.android.domain.entity.DeviceType
-import mega.privacy.android.domain.entity.FolderNode
+import mega.privacy.android.domain.entity.Folder
 
 /**
  * Get folder icon drawable
  */
 @DrawableRes
-internal fun getFolderIcon(folder: FolderNode) = with(folder) {
+internal fun getFolderIcon(
+    folder: Folder,
+    isMediaSyncFolder: Boolean,
+    isChatFilesFolder: Boolean,
+    backupType: BackupType,
+) = with(folder) {
     when {
         isInRubbishBin -> R.drawable.ic_folder_list
         isIncomingShare -> R.drawable.ic_folder_incoming
@@ -18,7 +23,7 @@ internal fun getFolderIcon(folder: FolderNode) = with(folder) {
         isChatFilesFolder -> R.drawable.ic_folder_chat_list
         isShared || folder.isPendingShare -> R.drawable.ic_folder_outgoing
         backupType == BackupType.Root -> R.drawable.backup
-        backupType is BackupType.Device -> getDeviceFolderIcon(backupType as BackupType.Device)
+        backupType is BackupType.Device -> getDeviceFolderIcon(backupType)
         backupType == BackupType.Child -> R.drawable.ic_folder_backup
         else -> R.drawable.ic_folder_list
     }

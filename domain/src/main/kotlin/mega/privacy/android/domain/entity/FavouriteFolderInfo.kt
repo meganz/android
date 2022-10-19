@@ -8,7 +8,7 @@ package mega.privacy.android.domain.entity
  * @param parentHandle parent node handle of current folder node
  */
 data class FavouriteFolderInfo(
-    val children: List<FavouriteInfo>,
+    val children: List<NodeInfo>,
     val name: String,
     val currentHandle: Long,
     val parentHandle: Long,

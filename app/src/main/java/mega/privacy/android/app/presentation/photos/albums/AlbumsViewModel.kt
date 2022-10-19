@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.RemoveFavourites
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -34,6 +36,8 @@ class AlbumsViewModel @Inject constructor(
     private val getDefaultAlbumsMap: GetDefaultAlbumsMap,
     private val uiAlbumMapper: UIAlbumMapper,
     private var getFeatureFlag: GetFeatureFlagValue,
+    private val removeFavourites: RemoveFavourites,
+    private val getNodeListByIds: GetNodeListByIds,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AlbumsViewState())
@@ -91,19 +95,48 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
-    fun onClick(photo: Photo) {
-        togglePhotoSelection(photo.id)
-    }
-
-    fun onLongPress(photo: Photo) {
-        //TODO
-    }
-
-    private fun togglePhotoSelection(id: Long) {
+    fun togglePhotoSelection(id: Long) {
         if (id in selectedPhotoIds) {
             selectedPhotoIds.remove(id)
         } else {
             selectedPhotoIds.add(id)
         }
+        _state.update {
+            it.copy(selectedPhotoIds = selectedPhotoIds.toMutableSet())
+        }
     }
+
+    fun clearSelectedPhotos() {
+        selectedPhotoIds.clear()
+        _state.update {
+            it.copy(selectedPhotoIds = selectedPhotoIds.toMutableSet())
+        }
+    }
+
+    fun selectAllPhotos() {
+        _state.value.currentAlbum?.let { album ->
+            val albumPhotosHandles =
+                _state.value.albums.getAlbumPhotos(album).map { photo ->
+                    photo.id
+                }
+            selectedPhotoIds.clear()
+            selectedPhotoIds.addAll(albumPhotosHandles)
+            _state.update {
+                it.copy(selectedPhotoIds = selectedPhotoIds.toMutableSet())
+            }
+        }
+    }
+
+    fun removeFavourites() {
+        viewModelScope.launch {
+            removeFavourites(selectedPhotoIds.toList())
+        }
+        selectedPhotoIds.clear()
+        _state.update {
+            it.copy(selectedPhotoIds = selectedPhotoIds.toMutableSet())
+        }
+    }
+
+    suspend fun getSelectedNodes() =
+        getNodeListByIds(selectedPhotoIds.toList())
 }

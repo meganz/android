@@ -12,7 +12,9 @@ sealed interface AlbumPhotoItem {
         val photos: List<Photo>,
     ) : AlbumPhotoItem {
         override val key: String
-            get() = photos.first().toString()
+            get() = photos.joinToString {
+                it.id.toString()
+            }
     }
 
 
@@ -20,7 +22,9 @@ sealed interface AlbumPhotoItem {
         val photos: List<Photo>,
     ) : AlbumPhotoItem {
         override val key: String
-            get() = photos.first().toString()
+            get() = photos.joinToString {
+                it.id.toString()
+            }
     }
 
 
@@ -28,7 +32,9 @@ sealed interface AlbumPhotoItem {
         val photos: List<Photo>,
     ) : AlbumPhotoItem {
         override val key: String
-            get() = photos.first().toString()
+            get() = photos.joinToString {
+                it.id.toString()
+            }
     }
 
 }

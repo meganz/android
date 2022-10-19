@@ -62,11 +62,18 @@ internal class CameraTimestampsPreferenceFacade @Inject constructor(@Application
             Context.MODE_PRIVATE)
             .edit()
             .putString(KEY_CAM_SYNC_TIMESTAMP, "")
-            .putString(KEY_CAM_VIDEO_SYNC_TIMESTAMP,
-                "")
+            .putString(KEY_CAM_VIDEO_SYNC_TIMESTAMP, "")
             .putLong(KEY_PRIMARY_HANDLE, -2L)
             .apply()
 
+    override suspend fun clearSecondaryCameraSyncRecords() =
+        context.getSharedPreferences(LAST_CAM_SYNC_TIMESTAMP_FILE,
+            Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_SEC_SYNC_TIMESTAMP, "")
+            .putString(KEY_SEC_VIDEO_SYNC_TIMESTAMP, "")
+            .putLong(KEY_SECONDARY_HANDLE, -2L)
+            .apply()
 
     /**
      * Keys for backing up time stamps

@@ -1,9 +1,10 @@
 package mega.privacy.android.domain.entity
 
+
 /**
- * Folder node
+ * Folder
  */
-interface FolderNode {
+interface Folder {
     /**
      * Is folder in the rubbish bin
      */
@@ -13,16 +14,6 @@ interface FolderNode {
      * Is the folder an incoming share
      */
     val isIncomingShare: Boolean
-
-    /**
-     * Is the folder a media sync folder
-     */
-    val isMediaSyncFolder: Boolean
-
-    /**
-     * Is the folder the chat files folder
-     */
-    val isChatFilesFolder: Boolean
 
     /**
      * Is the folder an outgoing share
@@ -35,7 +26,7 @@ interface FolderNode {
     val isPendingShare: Boolean
 
     /**
-     * Backup type information of the folder
+     * Device
      */
-    val backupType: BackupType
+    val device: String?
 }

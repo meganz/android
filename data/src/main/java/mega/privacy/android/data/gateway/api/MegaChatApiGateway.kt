@@ -7,6 +7,7 @@ import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaChatCall
 
 /**
  * Mega chat api gateway
@@ -161,4 +162,53 @@ interface MegaChatApiGateway {
      * @return The chat conversation.
      */
     fun getChatRoom(chatId: Long): MegaChatRoom?
+
+    /**
+     * Gets the MegaChatCall
+     *
+     * @param chatId The chat id.
+     * @return the appropriate call.
+     */
+    fun getChatCall(chatId: Long): MegaChatCall?
+
+    /**
+     * Start new call.
+     *
+     * @param chatId  The chat id.
+     * @param enabledVideo True for audio-video call, false for audio call.
+     * @param enabledAudio True for starting a call with audio (mute disabled).
+     * @param listener Listener.
+     */
+    fun startChatCall(
+        chatId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Answer call.
+     *
+     * @param chatId  The chat id.
+     * @param enabledVideo True for audio-video call, false for audio call.
+     * @param enabledAudio True for answering a call with audio (mute disabled).
+     * @param listener Listener.
+     */
+    fun answerChatCall(
+        chatId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Select the video device to be used in calls.
+     *
+     * @param device Identifier of device to be selected.
+     * @param listener Listener.
+     */
+    fun setChatVideoInDevice(
+        device: String,
+        listener: MegaChatRequestListenerInterface?,
+    )
 }

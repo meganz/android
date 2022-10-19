@@ -55,7 +55,7 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter;
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter.ViewHolderTransfer;
 import mega.privacy.android.app.main.adapters.MultipleBucketAdapter;
-import mega.privacy.android.app.presentation.recentactions.RecentsAdapter;
+import mega.privacy.android.app.presentation.recentactions.RecentActionsAdapter;
 import mega.privacy.android.app.main.adapters.VersionsFileAdapter;
 import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.main.providers.MegaProviderAdapter;
@@ -929,7 +929,7 @@ public class ThumbnailUtils {
                 ((VersionsFileAdapter.ViewHolderVersion) holder).imageView.setLayoutParams(params1);
 
                 onThumbnailGeneratedList(context, megaApi, thumbFile, param.document, holder, adapter);
-            } else if (holder instanceof RecentsAdapter.ViewHolderBucket
+            } else if (holder instanceof RecentActionsAdapter.RecentActionViewHolder
                     || holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
                 onThumbnailGeneratedList(context, megaApi, thumbFile, param.document, holder, adapter);
             }

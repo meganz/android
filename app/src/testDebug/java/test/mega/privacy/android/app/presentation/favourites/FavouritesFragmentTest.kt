@@ -37,9 +37,9 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.di.TestMapperModule
 import test.mega.privacy.android.app.di.TestSortOrderUseCases
 import test.mega.privacy.android.app.di.TestWrapperModule
-import test.mega.privacy.android.app.di.TestMapperModule
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 import test.mega.privacy.android.app.testFragment
 
@@ -136,7 +136,7 @@ class FavouritesFragmentTest {
         whenever(node.name).thenReturn("testName.txt")
         whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
         whenever(node.size).thenReturn(1000L)
-        val favouriteInfo = mega.privacy.android.domain.entity.FavouriteFolder(
+        val favouriteInfo = mega.privacy.android.domain.entity.NodeFolder(
             id = 123,
             name = node.name,
             label = node.label,
@@ -148,6 +148,11 @@ class FavouritesFragmentTest {
             isFavourite = true,
             isExported = false,
             isTakenDown = false,
+            isInRubbishBin = false,
+            isIncomingShare = false,
+            isShared = false,
+            isPendingShare = false,
+            device = ""
         )
         val favourite = mock<Favourite>()
         whenever(favourite.labelColour).thenReturn(R.color.salmon_400_salmon_300)

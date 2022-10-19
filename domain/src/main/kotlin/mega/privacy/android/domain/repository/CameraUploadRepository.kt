@@ -377,4 +377,9 @@ interface CameraUploadRepository {
      * Delete all Primary Sync Records
      */
     suspend fun deleteAllPrimarySyncRecords()
+
+    /**
+     * Delete all Secondary Sync Records
+     */
+    suspend fun deleteAllSecondarySyncRecords()
 }

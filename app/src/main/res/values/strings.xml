@@ -4020,7 +4020,11 @@
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Allow non-hosts to add participants</string>
     <!-- Title of gif album. -->
-    <string name="photos_album_title_gif">GIF</string>
+    <string name="photos_album_title_gif">GIFs</string>
     <!-- Title of raw album. -->
     <string name="photos_album_title_raw">RAW</string>
+    <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_title">No contacts</string>
+    <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_message">You have no contacts to add to this chat. If you want to add participants, first invite them to your contact list.</string>
 </resources>

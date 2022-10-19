@@ -19,10 +19,13 @@ import nz.mega.sdk.MegaNode
 import java.io.File
 
 interface MegaNodeUtilWrapper {
+
+
     /**
-     * The node handle of the "My Backup" folder if exist
+     * Initialise this component
+     *
      */
-    fun setBackupHandle(handle: Long)
+    fun observeBackupFolder()
 
     /**
      * Gets the node of the user attribute "My chat files" from the DB.

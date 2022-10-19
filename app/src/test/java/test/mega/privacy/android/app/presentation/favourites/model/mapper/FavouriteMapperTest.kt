@@ -7,8 +7,8 @@ import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
-import mega.privacy.android.domain.entity.FavouriteFile
-import mega.privacy.android.domain.entity.FavouriteFolder
+import mega.privacy.android.domain.entity.NodeFile
+import mega.privacy.android.domain.entity.NodeFolder
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import nz.mega.sdk.MegaNode
 import org.junit.Test
@@ -22,7 +22,6 @@ class FavouriteMapperTest {
     fun `test that values returned when FavouriteInfo is folder`() {
         val expectedHandle = 1L
         val expectedName = "TestFolder"
-        val expectedSize = 10L
         val expectedLabel = MegaNode.NODE_LBL_RED
         val expectedInfo = "Test folder info"
         val expectedIcon = R.drawable.ic_folder_incoming
@@ -33,25 +32,16 @@ class FavouriteMapperTest {
         val expectedHasVersion = true
         val expectedIsAvailableOffline = false
         val expectedLabelColour = R.color.salmon_400_salmon_300
-        val expectedModificationTime = 1000L
+        val expectedIsInRubbishBin = true
+        val expectedIsIncomingShare = true
+        val expectedIsShared = true
+        val expectedIsPendingShare = true
 
         val testNode = mock<MegaNode> {
-            on { handle }.thenReturn(expectedHandle)
-            on { name }.thenReturn(expectedName)
-            on { size }.thenReturn(expectedSize)
-            on { label }.thenReturn(expectedLabel)
-            on { isFavourite }.thenReturn(expectedIsFavourite)
-            on { isExported }.thenReturn(expectedIsExported)
-            on { isTakenDown }.thenReturn(expectedIsTakenDown)
-            on { isTakenDown }.thenReturn(expectedIsTakenDown)
-            on { modificationTime }.thenReturn(expectedModificationTime)
-            on { isFolder }.thenReturn(true)
-            on { isInShare }.thenReturn(true)
-            on { isImage() }.thenReturn(false)
-            on { isVideo() }.thenReturn(false)
+            on { isInShare }.thenReturn(expectedIsShared)
         }
 
-        val favouriteInfo = FavouriteFolder(
+        val favouriteInfo = NodeFolder(
             id = expectedHandle,
             name = expectedName,
             label = expectedLabel,
@@ -63,6 +53,11 @@ class FavouriteMapperTest {
             isFavourite = expectedIsFavourite,
             isExported = expectedIsExported,
             isTakenDown = expectedIsTakenDown,
+            isInRubbishBin = expectedIsInRubbishBin,
+            isIncomingShare = expectedIsIncomingShare,
+            isShared = expectedIsShared,
+            isPendingShare = expectedIsPendingShare,
+            device = null,
         )
 
 
@@ -130,7 +125,7 @@ class FavouriteMapperTest {
             on { isVideo() }.thenReturn(false)
         }
 
-        val favouriteInfo = FavouriteFile(
+        val favouriteInfo = NodeFile(
             id = expectedHandle,
             name = expectedName,
             size = expectedSize,
