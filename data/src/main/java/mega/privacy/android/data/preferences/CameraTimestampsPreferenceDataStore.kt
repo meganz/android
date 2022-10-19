@@ -14,7 +14,7 @@ import javax.inject.Inject
 /**
  * Default Implementation of [CameraTimestampsPreferenceGateway]
  */
-class CameraTimestampsPreferenceDataStore
+internal class CameraTimestampsPreferenceDataStore
 @Inject constructor(@CameraTimestampsPreference private val dataStore: DataStore<Preferences>) :
     CameraTimestampsPreferenceGateway {
     override suspend fun backupTimestampsAndFolderHandle(
