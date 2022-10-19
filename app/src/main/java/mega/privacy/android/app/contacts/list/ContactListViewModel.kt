@@ -185,13 +185,32 @@ class ContactListViewModel @Inject constructor(
     }
 
     /**
+     * Method for processing when clicking on the call option
+     *
+     * @param video Start call with video on or off
+     * @param audio Start call with audio on or off
+     */
+    fun onCallTap(video: Boolean, audio: Boolean) {
+        getChatRoomUseCase.get(MegaApplication.userWaitingForCall)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { chatId ->
+                    startCall(chatId, video, audio)
+                },
+                onError = Timber::e
+            )
+            .addTo(composite)
+    }
+
+    /**
      * Starts a call
      *
      * @param chatId Chat id
      * @param video Start call with video on or off
      * @param audio Start call with audio on or off
      */
-    fun onCallTap(chatId: Long, video: Boolean, audio: Boolean) {
+    private fun startCall(chatId: Long, video: Boolean, audio: Boolean) {
         if (chatApiGateway.getChatCall(chatId) != null) {
             Timber.d("There is a call, open it")
             CallUtil.openMeetingInProgress(MegaApplication.getInstance().applicationContext,

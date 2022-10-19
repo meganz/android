@@ -79,13 +79,9 @@ class ContactListFragment : Fragment() {
      * Start call
      */
     fun startCall() {
-        viewModel.getChatRoomId(MegaApplication.userWaitingForCall)
-            .observe(viewLifecycleOwner) { chatId ->
-                if (chatId != MEGACHAT_INVALID_HANDLE) {
-                    val audio = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
-                    viewModel.onCallTap(chatId = chatId, video = false, audio = audio)
-                }
-            }
+        val audio =
+            PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
+        viewModel.onCallTap(video = false, audio = audio)
     }
 
     private fun setupView() {

@@ -114,23 +114,23 @@ class GroupChatInfoViewModel @Inject constructor(
     }
 
     /**
-     * Get chat id
+     * Method for processing when clicking on the call option
      *
-     * @param userHandle User handle
+     * @param userHandle Use handle
+     * @param video Start call with video on or off
+     * @param audio Start call with audio on or off
      */
-    fun getChatRoomId(userHandle: Long): LiveData<Long> {
-        val result = MutableLiveData<Long>()
+    fun onCallTap(userHandle: Long, video: Boolean, audio: Boolean) {
         getChatRoomUseCase.get(userHandle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { chatId ->
-                    result.value = chatId
+                    startCall(chatId, video, audio)
                 },
                 onError = Timber::e
             )
             .addTo(composite)
-        return result
     }
 
     /**
@@ -140,7 +140,7 @@ class GroupChatInfoViewModel @Inject constructor(
      * @param video Start call with video on or off
      * @param audio Start call with audio on or off
      */
-    fun onCallTap(chatId: Long, video: Boolean, audio: Boolean) {
+    private fun startCall(chatId: Long, video: Boolean, audio: Boolean) {
         if (chatApiGateway.getChatCall(chatId) != null) {
             Timber.d("There is a call, open it")
             CallUtil.openMeetingInProgress(MegaApplication.getInstance().applicationContext,

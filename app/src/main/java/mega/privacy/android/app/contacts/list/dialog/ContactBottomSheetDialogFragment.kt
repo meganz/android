@@ -199,13 +199,8 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.optionCall.setOnClickListener {
             MegaApplication.userWaitingForCall = megaUser.handle
             if (CallUtil.canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
-                viewModel.getChatRoomId(megaUser.handle)
-                    .observe(viewLifecycleOwner) { chatId ->
-                        if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-                            val audio = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
-                            viewModel.onCallTap(chatId = chatId, video = false, audio = audio)
-                        }
-                    }
+                val audio = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
+                viewModel.onCallTap(video = false, audio = audio)
             }
             dismiss()
         }
