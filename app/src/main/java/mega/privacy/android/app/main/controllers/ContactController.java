@@ -200,7 +200,7 @@ public class ContactController {
             }
 
             if (contactEmails.size() == 1) {
-                megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, AchievementsActivity.sFetcher);
+                megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, ((AchievementsActivity) context).getFetcher());
             } else if (contactEmails.size() > 1) {
                 inviteMultipleListener = new MultipleRequestListener(-1, context);
                 for (int i = 0; i < contactEmails.size(); i++) {

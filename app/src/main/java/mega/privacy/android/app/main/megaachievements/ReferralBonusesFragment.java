@@ -1,7 +1,5 @@
 package mega.privacy.android.app.main.megaachievements;
 
-import static mega.privacy.android.app.main.megaachievements.AchievementsActivity.sFetcher;
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,9 +22,9 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.data.qualifier.MegaApi;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.data.qualifier.MegaApi;
 import nz.mega.sdk.MegaApiAndroid;
 import timber.log.Timber;
 
@@ -41,6 +39,9 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
     @Inject
     @MegaApi
     MegaApiAndroid megaApi;
+
+    @Inject
+    GetAchievementsListener getAchievementsListener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,9 +74,7 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
         }
 
         // The root view has been created, fill it with the data when data ready
-        if (sFetcher != null) {
-            sFetcher.setDataCallback(this);
-        }
+        getAchievementsListener.setDataCallback(this);
     }
 
     @Override
@@ -96,18 +95,17 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 
     private void updateUI() {
         requireContext();
-        if (sFetcher == null) return;
 
-        ArrayList<ReferralBonus> bonuses = sFetcher.getReferralBonuses();
-        if (bonuses.size() == 0) return;
+        ArrayList<ReferralBonus> bonuses = getAchievementsListener.getReferralBonuses();
+        if (!bonuses.isEmpty()) {
+            if (adapter == null) {
+                adapter = new MegaReferralBonusesAdapter(requireActivity(), this, bonuses, recyclerView);
+            } else {
+                adapter.setReferralBonuses(bonuses);
+            }
 
-        if (adapter == null) {
-            adapter = new MegaReferralBonusesAdapter(requireActivity(), this, bonuses, recyclerView);
-        } else {
-            adapter.setReferralBonuses(bonuses);
+            recyclerView.setAdapter(adapter);
         }
-
-        recyclerView.setAdapter(adapter);
     }
 
     @Override
