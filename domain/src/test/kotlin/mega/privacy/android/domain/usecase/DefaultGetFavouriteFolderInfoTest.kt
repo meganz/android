@@ -4,7 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.NodeInfo
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.repository.FavouritesRepository
 import org.junit.Before
 import org.junit.Test
@@ -26,7 +26,7 @@ class DefaultGetFavouriteFolderInfoTest {
     @Test
     fun `test that children of current folder is not empty`() {
         runTest {
-            val list = mock<List<NodeInfo>>()
+            val list = mock<List<Node>>()
             val favouriteFolderInfo = FavouriteFolderInfo(
                 list,
                 "",

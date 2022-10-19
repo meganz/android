@@ -31,9 +31,9 @@ import mega.privacy.android.app.presentation.favourites.model.FavouritesEventSta
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.entity.NodeInfo
 import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.RemoveFavourites
@@ -437,19 +437,19 @@ class FavouritesViewModel @Inject constructor(
      * Build favourite source list
      * @param list List<FavouriteInfo>
      */
-    private suspend fun buildFavouriteSourceList(list: List<NodeInfo>) {
+    private suspend fun buildFavouriteSourceList(list: List<Node>) {
         if (favouriteSourceList.isNotEmpty()) {
             favouriteSourceList.clear()
         }
         favouriteSourceList.addAll(
             list.mapNotNull { favouriteInfo ->
-                val node = fetchNode(favouriteInfo.id) ?: return@mapNotNull null
+                val node = fetchNode(favouriteInfo.id.id) ?: return@mapNotNull null
                 favouriteMapper(
                     node,
                     favouriteInfo,
                     megaUtilWrapper.availableOffline(
                         context,
-                        favouriteInfo.id
+                        favouriteInfo.id.id
                     ),
                     stringUtilWrapper
                 ) { name ->

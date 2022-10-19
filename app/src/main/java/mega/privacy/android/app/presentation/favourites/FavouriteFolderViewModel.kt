@@ -28,7 +28,7 @@ import mega.privacy.android.app.presentation.favourites.model.FavouritesEventSta
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.NodeInfo
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import javax.inject.Inject
 
@@ -111,21 +111,21 @@ class FavouriteFolderViewModel @Inject constructor(
 
     private suspend fun getData(
         name: String,
-        children: List<NodeInfo>,
+        children: List<Node>,
         folderInfo: FavouriteFolderInfo
     ): ChildrenNodesLoadState {
         return withContext(ioDispatcher) {
             ChildrenNodesLoadState.Success(
                 title = name,
                 children = children.mapNotNull { favouriteInfo ->
-                    val node = fetchNode(favouriteInfo.id) ?: return@mapNotNull null
+                    val node = fetchNode(favouriteInfo.id.id) ?: return@mapNotNull null
                     FavouriteListItem(
                         favourite = favouriteMapper(
                             node,
                             favouriteInfo,
                             megaUtilWrapper.availableOffline(
                                 context,
-                                favouriteInfo.id
+                                favouriteInfo.id.id
                             ),
                             stringUtilWrapper
                         ) { name ->

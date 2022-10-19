@@ -11,10 +11,10 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
-import mega.privacy.android.data.mapper.NodeInfoMapper
+import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.NodeInfo
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FavouritesRepository
 import nz.mega.sdk.MegaError
@@ -34,13 +34,13 @@ class DefaultFavouritesRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorNodeChangeFacade: MonitorNodeChangeFacade,
-    private val nodeInfoMapper: NodeInfoMapper,
+    private val nodeMapper: NodeMapper,
     private val favouriteFolderInfoMapper: FavouriteFolderInfoMapper,
     private val cacheFolder: CacheFolderGateway,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
 ) : FavouritesRepository {
 
-    override suspend fun getAllFavorites(): List<NodeInfo> =
+    override suspend fun getAllFavorites(): List<Node> =
         withContext(ioDispatcher) {
             val handleList = suspendCoroutine<MegaHandleList> { continuation ->
                 megaApiGateway.getFavourites(
@@ -98,7 +98,7 @@ class DefaultFavouritesRepository @Inject constructor(
      */
     private suspend fun mapNodesToFavouriteInfo(nodes: List<MegaNode>) =
         nodes.map { megaNode ->
-            nodeInfoMapper(
+            nodeMapper(
                 megaNode,
                 ::getThumbnailCacheFilePath,
                 megaApiGateway::hasVersion,
