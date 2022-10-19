@@ -32,6 +32,7 @@ import mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR
 import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
@@ -115,9 +116,16 @@ class RingingMeetingFragment : MeetingBaseFragment() {
      * @param enableVideo True, if it should be answered with video on. False, if it should be answered with video off
      */
     private fun answerCall(enableVideo: Boolean) {
-        sharedModel.answerCall(enableVideo, true, enableVideo)
-            .observe(viewLifecycleOwner) { result ->
-                val actionString = if (result.enableVideo) {
+        val audio =
+            PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
+        var video = enableVideo
+        if (video) {
+            video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
+        }
+
+        sharedModel.answerCall(enableVideo, audio, video)
+            .observe(viewLifecycleOwner) { (chatHandle, enableVideo, _) ->
+                val actionString = if (enableVideo) {
                     Timber.d("Call answered with video ON and audio ON")
                     MEETING_ACTION_RINGING_VIDEO_ON
                 } else {
@@ -127,7 +135,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
 
                 val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
                     actionString,
-                    result.chatHandle
+                    chatHandle
                 )
                 findNavController().navigate(action)
             }
