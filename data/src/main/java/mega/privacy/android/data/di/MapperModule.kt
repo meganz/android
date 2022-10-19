@@ -17,6 +17,7 @@ import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.data.mapper.FavouriteInfoMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
+import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
@@ -56,6 +57,7 @@ import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.data.mapper.toFavouriteInfo
 import mega.privacy.android.data.mapper.toImage
+import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toOnlineStatus
@@ -311,4 +313,10 @@ internal class MapperModule {
     @Provides
     fun provideSubscriptionPlanListMapper(): SubscriptionPlanListMapper =
         ::toSubscriptionPlanList
+
+    /**
+     * Provide mega achievement mapper
+     */
+    @Provides
+    fun provideMegaAchievementMapper(): MegaAchievementMapper = ::toMegaAchievement
 }
