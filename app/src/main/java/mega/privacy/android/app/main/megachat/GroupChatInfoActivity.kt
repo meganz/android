@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.megachat
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -63,8 +64,6 @@ import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContac
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
-import mega.privacy.android.app.usecase.call.StartCallUseCase
-import mega.privacy.android.app.usecase.call.StartCallUseCase.StartCallResult
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -84,10 +83,12 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatPeerList
@@ -107,7 +108,6 @@ import javax.inject.Inject
  * Activity which shows group chat room information.
  *
  * @property getChatChangesUseCase [GetChatChangesUseCase]
- * @property startCallUseCase   [StartCallUseCase]
  * @property endCallUseCase [EndCallUseCase]
  * @property getCallUseCase [GetCallUseCase]
  * @property binding [ActivityGroupChatPropertiesBinding]
@@ -126,9 +126,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     @Inject
     lateinit var getChatChangesUseCase: GetChatChangesUseCase
-
-    @Inject
-    lateinit var startCallUseCase: StartCallUseCase
 
     @Inject
     lateinit var endCallUseCase: EndCallUseCase
@@ -230,8 +227,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
 
         intent.extras?.let { extras ->
-            chatHandle = extras.getLong(Constants.HANDLE, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
-            if (chatHandle == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+            chatHandle = extras.getLong(Constants.HANDLE, MEGACHAT_INVALID_HANDLE)
+            if (chatHandle == MEGACHAT_INVALID_HANDLE) {
                 finish()
                 return
             }
@@ -1383,20 +1380,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
      * Start a call
      */
     fun startCall() {
-        startCallUseCase.startCallFromUserHandle(userHandle = userWaitingForCall,
-            enableVideo = false,
-            enableAudio = true)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { (id, videoEnable, audioEnable): StartCallResult, error: Throwable? ->
-                if (error == null) {
-                    CallUtil.openMeetingWithAudioOrVideo(this,
-                        id,
-                        audioEnable,
-                        videoEnable,
-                        passcodeManagement)
-                }
-            }
+        val audio = PermissionUtils.hasPermissions(this, Manifest.permission.RECORD_AUDIO)
+        viewModel.onCallTap(userHandle = userWaitingForCall, video = false, audio = audio)
     }
 
     private fun onChatPresenceLastGreen(userHandle: Long, lastGreen: Int) {

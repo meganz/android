@@ -402,7 +402,6 @@ import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase;
 import mega.privacy.android.app.usecase.call.GetCallUseCase;
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase;
-import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -545,8 +544,6 @@ public class ChatActivity extends PasscodeActivity
     GetPublicNodeUseCase getPublicNodeUseCase;
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
-    @Inject
-    StartCallUseCase startCallUseCase;
     @Inject
     EndCallUseCase endCallUseCase;
     @Inject
@@ -3668,20 +3665,7 @@ public class ChatActivity extends PasscodeActivity
      */
     private void startCall() {
         enableCallMenuItems(false);
-        startCallUseCase.startCallFromChatId(chatRoom.getChatId(), startVideo, true)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result, throwable) -> {
-                    enableCallMenuItems(true);
-                    if (throwable == null) {
-                        long chatId = result.component1();
-                        if (chatId == chatRoom.getChatId()) {
-                            boolean videoEnable = result.component2();
-                            boolean audioEnable = result.component3();
-                            openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
-                        }
-                    }
-                });
+        viewModel.onCallTap(chatRoom.getChatId(), startVideo, true);
     }
 
     private void enableCallMenuItems(Boolean enable) {
