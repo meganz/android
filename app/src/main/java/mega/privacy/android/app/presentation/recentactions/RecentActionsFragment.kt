@@ -127,35 +127,34 @@ class RecentActionsFragment : Fragment() {
      * Initialize the adapter
      */
     private fun initAdapter() {
-        adapter.setListener(object : RecentActionsListener {
-            override fun onClickItem(item: RecentActionItemType.Item, position: Int) {
-                // If only one element in the bucket
-                if (item.bucket.nodes.size() == 1) {
-                    openFile(position, item.bucket.nodes[0])
-                }
-                // If more element in the bucket
-                else {
-                    viewModel.select(item)
-                    val currentDestination =
-                        Navigation.findNavController(requireView()).currentDestination
-                    if (currentDestination != null && currentDestination.id == R.id.homepageFragment) {
-                        Navigation.findNavController(requireView())
-                            .navigate(HomepageFragmentDirections.actionHomepageToRecentBucket(),
-                                NavOptions.Builder().build())
-                    }
+        adapter.setOnItemClickListener { item, position ->
+            // If only one element in the bucket
+            if (item.bucket.nodes.size() == 1) {
+                openFile(position, item.bucket.nodes[0])
+            }
+            // If more element in the bucket
+            else {
+                viewModel.select(item)
+                val currentDestination =
+                    Navigation.findNavController(requireView()).currentDestination
+                if (currentDestination != null && currentDestination.id == R.id.homepageFragment) {
+                    Navigation.findNavController(requireView())
+                        .navigate(HomepageFragmentDirections.actionHomepageToRecentBucket(),
+                            NavOptions.Builder().build())
                 }
             }
+        }
 
-            override fun onClickThreeDots(node: MegaNode?) {
-                if (!Util.isOnline(context)) {
-                    (requireActivity() as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
-                        requireContext().getString(R.string.error_server_connection_problem), -1)
-                } else {
-                    (requireActivity() as ManagerActivity).showNodeOptionsPanel(node,
-                        NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
-                }
+        adapter.setOnThreeDotsClickListener { node ->
+            if (!Util.isOnline(context)) {
+                (requireActivity() as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
+                    requireContext().getString(R.string.error_server_connection_problem), -1)
+            } else {
+                (requireActivity() as ManagerActivity).showNodeOptionsPanel(node,
+                    NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
             }
-        })
+        }
+
         listView.adapter = adapter
         listView.addItemDecoration(HeaderItemDecoration(requireContext()))
         listView.clipToPadding = false

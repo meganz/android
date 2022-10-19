@@ -46,7 +46,23 @@ class RecentActionsAdapter @Inject constructor(
     private val outMetrics: DisplayMetrics = context.resources.displayMetrics
 
     private var recentActionItems: List<RecentActionItemType>? = null
-    private var listener: RecentActionsListener? = null
+
+    /**
+     * Lambda function to be invoked when an item is clicked with
+     *
+     * Parameters:
+     * RecentActionItemType.Item: the item clicked
+     * Int the position of the item in the list
+     */
+    private var onItemClickListener: ((RecentActionItemType.Item, Int) -> Unit)? = null
+
+    /**
+     * Lambda function to be invoked when a three dots button is clicked
+     *
+     * Parameters:
+     * MegaNode: the node associated with the three dots
+     */
+    private var onThreeDotsClickListener: ((MegaNode) -> Unit)? = null
 
     /**
      * The Homepage bottom sheet has a calculated background for elevation, while the
@@ -84,8 +100,7 @@ class RecentActionsAdapter @Inject constructor(
                 Timber.d("onBindViewHolder: TYPE_BUCKET")
                 binding.itemBucketLayout.visibility = View.VISIBLE
                 binding.itemBucketLayout.setOnClickListener {
-                    listener?.onClickItem(item,
-                        holder.bindingAdapterPosition)
+                    onItemClickListener?.invoke(item, holder.bindingAdapterPosition)
                 }
                 binding.headerLayout.visibility = View.GONE
 
@@ -145,7 +160,7 @@ class RecentActionsAdapter @Inject constructor(
                 if (nodeList.size() == 1) {
                     binding.threeDots.visibility = View.VISIBLE
                     binding.threeDots.setOnClickListener {
-                        listener?.onClickThreeDots(node)
+                        onThreeDotsClickListener?.invoke(node)
                     }
                     binding.firstLineText.text = node.name
                     if (node.label != MegaNode.NODE_LBL_UNKNOWN) {
@@ -228,12 +243,21 @@ class RecentActionsAdapter @Inject constructor(
     }
 
     /**
-     * Set the listener dispatch event
+     * Set the on item click listener
      *
-     * @param recentActionsListener
+     * @param listener function to trigger
      */
-    fun setListener(recentActionsListener: RecentActionsListener) {
-        listener = recentActionsListener
+    fun setOnItemClickListener(listener: (RecentActionItemType.Item, Int) -> Unit) {
+        onItemClickListener = listener
+    }
+
+    /**
+     * Set the on three dots click listener
+     *
+     * @param listener function to trigger
+     */
+    fun setOnThreeDotsClickListener(listener: (MegaNode) -> Unit) {
+        onThreeDotsClickListener = listener
     }
 
     /**
@@ -312,24 +336,4 @@ class RecentActionsAdapter @Inject constructor(
      */
     inner class RecentActionViewHolder(val binding: ItemBucketBinding) :
         RecyclerView.ViewHolder(binding.root)
-}
-
-/**
- * Listener for interaction with recent actions adapter
- */
-interface RecentActionsListener {
-    /**
-     * Triggered when an item is clicked
-     *
-     * @param item the item clicked
-     * @param position the position of the item in the list
-     */
-    fun onClickItem(item: RecentActionItemType.Item, position: Int)
-
-    /**
-     * Triggered when a three dots button is clicked
-     *
-     * @param node the node associated with the three dots
-     */
-    fun onClickThreeDots(node: MegaNode?)
 }
