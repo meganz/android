@@ -1211,6 +1211,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         requestPermission(this, requestCode, *permissions)
     }
 
+    @SuppressWarnings("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         Timber.d("Request code: %d, Result code:%d", requestCode, resultCode)
         if (requestCode == RequestCode.REQ_CODE_BUY) {
