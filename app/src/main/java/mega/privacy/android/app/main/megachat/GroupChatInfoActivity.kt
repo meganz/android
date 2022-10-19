@@ -1378,13 +1378,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     fun startCall() {
         val audio = PermissionUtils.hasPermissions(this, Manifest.permission.RECORD_AUDIO)
         viewModel.onCallTap(userHandle = userWaitingForCall, video = false, audio = audio)
-
-       /* viewModel.getChatRoomId(userWaitingForCall).observe(this) { chatId ->
-            if (chatId != MEGACHAT_INVALID_HANDLE) {
-                val audio = PermissionUtils.hasPermissions(this, Manifest.permission.RECORD_AUDIO)
-                viewModel.onCallTap(chatId = chatId, video = false, audio = audio)
-            }
-        }*/
     }
 
     private fun onChatPresenceLastGreen(userHandle: Long, lastGreen: Int) {
