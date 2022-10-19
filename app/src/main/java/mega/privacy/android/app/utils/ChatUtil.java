@@ -40,12 +40,12 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder;
-import static mega.privacy.android.app.utils.TimeUtils.formatDate;
 import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
 import static mega.privacy.android.app.utils.TimeUtils.isUntilThisMorning;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import static nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE;
 
 import android.app.Activity;
 import android.content.Context;
@@ -1971,5 +1971,39 @@ public class ChatUtil {
                     break;
             }
         }
+    }
+
+    /**
+     * Method to check if all user's contacts are participants of the chat.
+     *
+     * @param chatRoom MegaChatRoom to check
+     * @return True if all user's contacts are participants of the chat room or false otherwise.
+     */
+    public static boolean areAllMyContactsChatParticipants(MegaChatRoom chatRoom) {
+        if (chatRoom == null) {
+            return false;
+        }
+
+        var contacts = MegaApplication.getInstance().getMegaApi().getContacts();
+        var peerCount = chatRoom.getPeerCount();
+        var areAllMyContactsChatParticipants = true;
+
+        for (int i = 0; i < contacts.size(); i++) {
+            if (contacts.get(i).getVisibility() == VISIBILITY_VISIBLE) {
+                var contactIsParticipant = false;
+                for (int j = 0; j < peerCount; j++) {
+                    if (contacts.get(i).getHandle() == chatRoom.getPeerHandle(j)) {
+                        contactIsParticipant = true;
+                        break;
+                    }
+                }
+                if (!contactIsParticipant) {
+                    areAllMyContactsChatParticipants = false;
+                    break;
+                }
+            }
+        }
+
+        return areAllMyContactsChatParticipants;
     }
 }
