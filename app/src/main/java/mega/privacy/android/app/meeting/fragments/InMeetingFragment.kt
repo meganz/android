@@ -89,7 +89,9 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
+import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
 import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_IS_FROM_MEETING
@@ -2575,6 +2577,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         val contacts = megaApi.contacts
         if (contacts.isNullOrEmpty() || !contacts.any { it.visibility == VISIBILITY_VISIBLE }) {
             val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
+            dialog.show(childFragmentManager, dialog.tag)
+        } else if (ChatUtil.areAllMyContactsChatParticipants(inMeetingViewModel.getChat())) {
+            val dialog = AddParticipantsNoContactsLeftToAddDialogFragment.newInstance()
             dialog.show(childFragmentManager, dialog.tag)
         } else {
             val inviteParticipantIntent =
