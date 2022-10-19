@@ -16,8 +16,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.data.mapper.SortOrderIntMapper
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
@@ -33,11 +31,12 @@ import mega.privacy.android.app.presentation.favourites.model.FavouritesEventSta
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.entity.NodeInfo
 import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.RemoveFavourites
-import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -51,7 +50,6 @@ import javax.inject.Inject
  * @param getCloudSortOrder GetCloudSortOrder
  * @param megaUtilWrapper MegaUtilWrapper
  * @param fetchNode FetchNodeWrapper
- * @param sortOrderIntMapper SortOrderIntMapper
  */
 @HiltViewModel
 class FavouritesViewModel @Inject constructor(
@@ -64,7 +62,6 @@ class FavouritesViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val megaUtilWrapper: MegaUtilWrapper,
     private val fetchNode: FetchNodeWrapper,
-    private val sortOrderIntMapper: SortOrderIntMapper,
 ) :
     ViewModel() {
     private val _favouritesState =
@@ -126,7 +123,7 @@ class FavouritesViewModel @Inject constructor(
                                     FavouriteLoadState.Success(
                                         favouriteListToFavouriteItemList(
                                             favouriteList = reorganizeFavouritesByConditions(
-                                                sortOrderIntMapper(getCloudSortOrder()),
+                                                getCloudSortOrder(),
                                                 if (searchMode) {
                                                     searchQuery
                                                 } else {
@@ -312,7 +309,7 @@ class FavouritesViewModel @Inject constructor(
         isList: Boolean,
         forceUpdate: Boolean = false,
         headerForceUpdate: Boolean = false,
-        order: Int? = null,
+        order: SortOrder? = null,
     ): List<FavouriteItem> {
         val favouriteItemList = mutableListOf<FavouriteItem>()
         favouriteItemList.add(
@@ -320,7 +317,7 @@ class FavouritesViewModel @Inject constructor(
                 favourite = null,
                 forceUpdate = headerForceUpdate,
                 orderStringId = SortByHeaderViewModel.orderNameMap[order
-                    ?: sortOrderIntMapper(getCloudSortOrder())]
+                    ?: getCloudSortOrder()]
             )
         )
         favouriteList.map { favourite ->
@@ -382,7 +379,7 @@ class FavouritesViewModel @Inject constructor(
      * @param query search query
      */
     fun getFavouritesByConditions(
-        order: Int? = null,
+        order: SortOrder? = null,
         query: String? = null,
     ) {
         viewModelScope.launch {
@@ -390,7 +387,7 @@ class FavouritesViewModel @Inject constructor(
                 FavouriteLoadState.Success(
                     favouriteListToFavouriteItemList(
                         favouriteList = reorganizeFavouritesByConditions(
-                            order ?: sortOrderIntMapper(getCloudSortOrder()),
+                            order ?: getCloudSortOrder(),
                             query ?: if (searchMode) {
                                 searchQuery
                             } else {
@@ -410,7 +407,7 @@ class FavouritesViewModel @Inject constructor(
      * @return List<Favourite>
      */
     private fun reorganizeFavouritesByConditions(
-        order: Int? = null,
+        order: SortOrder? = null,
         query: String? = null,
     ): List<Favourite> {
         if (favouriteList.isNotEmpty()) {
@@ -468,29 +465,29 @@ class FavouritesViewModel @Inject constructor(
      * @param order sort order
      * @return List<FavouriteInfo>
      */
-    private fun sortOrder(list: List<Favourite>, order: Int): List<Favourite> =
+    private fun sortOrder(list: List<Favourite>, order: SortOrder): List<Favourite> =
         mutableListOf<Favourite>().apply {
             addAll(list)
             sortWith { item1, item2 ->
                 sortOrderByType(
                     sortByType = {
                         when (order) {
-                            MegaApiJava.ORDER_DEFAULT_ASC -> {
+                            SortOrder.ORDER_DEFAULT_ASC -> {
                                 item1.name.compareTo(item2.name)
                             }
-                            MegaApiJava.ORDER_DEFAULT_DESC -> {
+                            SortOrder.ORDER_DEFAULT_DESC -> {
                                 item2.name.compareTo(item1.name)
                             }
-                            MegaApiJava.ORDER_SIZE_DESC -> {
+                            SortOrder.ORDER_SIZE_DESC -> {
                                 item2.size.compareTo(item1.size)
                             }
-                            MegaApiJava.ORDER_SIZE_ASC -> {
+                            SortOrder.ORDER_SIZE_ASC -> {
                                 item1.size.compareTo(item2.size)
                             }
-                            MegaApiJava.ORDER_MODIFICATION_DESC -> {
+                            SortOrder.ORDER_MODIFICATION_DESC -> {
                                 item2.modificationTime.compareTo(item1.modificationTime)
                             }
-                            MegaApiJava.ORDER_MODIFICATION_ASC -> {
+                            SortOrder.ORDER_MODIFICATION_ASC -> {
                                 item1.modificationTime.compareTo(item2.modificationTime)
                             }
                             else -> {

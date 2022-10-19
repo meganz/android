@@ -71,19 +71,19 @@ internal class MegaLocalStorageFacade @Inject constructor(
         }
 
     override suspend fun setOfflineSortOrder(order: Int) {
-        dbHandler.preferences?.preferredSortCloud = order.toString()
+        dbHandler.setPreferredSortCloud(order.toString())
     }
 
     override suspend fun setCloudSortOrder(order: Int) {
-        dbHandler.preferences?.preferredSortCloud = order.toString()
+        dbHandler.setPreferredSortCloud(order.toString())
     }
 
     override suspend fun setCameraSortOrder(order: Int) {
-        dbHandler.preferences?.preferredSortCameraUpload = order.toString()
+        dbHandler.setPreferredSortCameraUpload(order.toString())
     }
 
     override suspend fun setOthersSortOrder(order: Int) {
-        dbHandler.preferences?.preferredSortOthers = order.toString()
+        dbHandler.setPreferredSortOthers(order.toString())
     }
 
     override suspend fun getUserCredentials(): UserCredentials? = dbHandler.credentials

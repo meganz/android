@@ -40,7 +40,6 @@ class FavouritesViewModelTest {
 
     private val fetchNodeWrapper =
         mock<FetchNodeWrapper> { onBlocking { invoke(any()) }.thenReturn(megaNode) }
-    private val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     @Before
     fun setUp() {
@@ -55,7 +54,6 @@ class FavouritesViewModelTest {
             removeFavourites = mock(),
             favouriteMapper = favouriteMapper,
             fetchNode = fetchNodeWrapper,
-            sortOrderIntMapper = sortOrderIntMapper,
         )
     }
 
@@ -110,7 +108,6 @@ class FavouritesViewModelTest {
         )
         val list = listOf(favourite)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(sortOrderIntMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(MegaApiJava.ORDER_DEFAULT_ASC)
         whenever(getAllFavorites()).thenReturn(
             flowOf(list)
         )
