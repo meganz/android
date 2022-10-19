@@ -286,6 +286,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
@@ -324,6 +325,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.MarqueeTextView;
@@ -395,7 +397,6 @@ import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
-import mega.privacy.android.app.usecase.call.AnswerCallUseCase;
 import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase;
 import mega.privacy.android.app.usecase.call.GetCallUseCase;
@@ -543,8 +544,6 @@ public class ChatActivity extends PasscodeActivity
     GetPublicNodeUseCase getPublicNodeUseCase;
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
-    @Inject
-    AnswerCallUseCase answerCallUseCase;
     @Inject
     StartCallUseCase startCallUseCase;
     @Inject
@@ -1091,17 +1090,17 @@ public class ChatActivity extends PasscodeActivity
      */
     private void answerCall(long chatId, Boolean video, Boolean audio, Boolean speaker) {
         callInProgressLayout.setEnabled(false);
-        answerCallUseCase.answerCall(chatId, video, audio, speaker)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result, throwable) -> {
-                    if (throwable == null) {
-                        callInProgressLayout.setEnabled(true);
-                        openMeetingInProgress(this, chatId, true, passcodeManagement);
-                    } else {
-                        showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
-                    }
-                });
+        var enableAudio = audio;
+        if (enableAudio) {
+            enableAudio = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
+        }
+
+        var enableVideo = video;
+        if (enableVideo) {
+            enableVideo = hasPermissions(this, Manifest.permission.CAMERA);
+        }
+
+        viewModel.onAnswerCall(chatId, enableVideo, enableAudio, speaker);
     }
 
     /**
@@ -1523,6 +1522,9 @@ public class ChatActivity extends PasscodeActivity
 
         chatActivity = this;
         chatC = new ChatController(chatActivity);
+
+        collectFlows();
+
         registerReceiver(historyTruncatedByRetentionTimeReceiver, new IntentFilter(BROADCAST_ACTION_UPDATE_HISTORY_BY_RT));
         registerReceiver(dialogConnectReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
         registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
@@ -2056,6 +2058,20 @@ public class ChatActivity extends PasscodeActivity
         }
 
         emojiKeyboard.showLetterKeyboard();
+    }
+
+    /**
+     * Collecting Flows from ViewModels
+     */
+    private void collectFlows() {
+        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, chatState -> {
+            if (chatState.getError() != null) {
+                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
+            } else if (chatState.isCallAnswered()) {
+                callInProgressLayout.setEnabled(true);
+            }
+            return Unit.INSTANCE;
+        });
     }
 
     public void checkScroll() {
