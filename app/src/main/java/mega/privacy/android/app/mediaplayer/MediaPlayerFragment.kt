@@ -199,7 +199,7 @@ class MediaPlayerFragment : Fragment() {
                     ).onEach {
                         Timber.d("MediaPlayerService observed playlist ${it.first.size} items")
 
-                        audioPlayerVH?.togglePlaylistEnabled(it.first)
+                        audioPlayerVH?.togglePlaylistEnabled(requireContext(), it.first)
                         videoPlayerVH?.togglePlaylistEnabled(it.first)
                     }.launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -256,7 +256,7 @@ class MediaPlayerFragment : Fragment() {
             }
 
             playerServiceViewModelGateway?.run {
-                viewHolder.setupPlaylistButton(getPlaylistItems()) {
+                viewHolder.setupPlaylistButton(requireContext(), getPlaylistItems()) {
                     findNavController().navigate(R.id.action_player_to_playlist)
                 }
             }
