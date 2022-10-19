@@ -30,6 +30,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.allHaveFullAccess
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -195,7 +196,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
     override val viewerFrom: Int = Constants.VIEWER_FROM_INCOMING_SHARES
     override val currentSharesTab: SharesTab = SharesTab.INCOMING_TAB
-    override val sortOrder: Int
+    override val sortOrder: SortOrder
         get() = state().sortOrder
     override val parentHandle: Long
         get() = state().incomingHandle

@@ -46,10 +46,6 @@ class IncomingSharesViewModelTest {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_DESC)
     }
     private val monitorNodeUpdates = FakeMonitorUpdates()
-    private val sortOrderIntMapper = mock<SortOrderIntMapper> {
-        onBlocking { invoke(SortOrder.ORDER_DEFAULT_ASC) }.thenReturn(1)
-        onBlocking { invoke(SortOrder.ORDER_DEFAULT_DESC) }.thenReturn(2)
-    }
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -64,7 +60,6 @@ class IncomingSharesViewModelTest {
             getIncomingSharesChildrenNode,
             getCloudSortOrder,
             getOtherSortOrder,
-            sortOrderIntMapper,
             monitorNodeUpdates,
         )
     }
@@ -78,7 +73,7 @@ class IncomingSharesViewModelTest {
             assertThat(initial.nodes).isEmpty()
             assertThat(initial.isInvalidHandle).isEqualTo(true)
             assertThat(initial.incomingParentHandle).isEqualTo(null)
-            assertThat(initial.sortOrder).isEqualTo(0)
+            assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
         }
     }
 
@@ -401,14 +396,14 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that sort order is set with result of getOthersSortOrder if depth is equals to 0 when call setIncomingTreeDepth`() =
         runTest {
-            val expected = MegaApiJava.ORDER_CREATION_ASC
+            val default = SortOrder.ORDER_NONE
+            val expected = SortOrder.ORDER_CREATION_ASC
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
-            whenever(getOtherSortOrder()).thenReturn(SortOrder.ORDER_CREATION_ASC)
-            whenever(sortOrderIntMapper(SortOrder.ORDER_CREATION_ASC)).thenReturn(expected)
+            whenever(getOtherSortOrder()).thenReturn(expected)
 
             underTest.state.map { it.sortOrder }.distinctUntilChanged()
                 .test {
-                    assertThat(awaitItem()).isEqualTo(0)
+                    assertThat(awaitItem()).isEqualTo(default)
                     underTest.setIncomingTreeDepth(0, any())
                     assertThat(awaitItem()).isEqualTo(expected)
                 }
@@ -417,14 +412,14 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that sort order is set with result of getCloudSortOrder if depth is different than 0 when call setIncomingTreeDepth`() =
         runTest {
-            val expected = MegaApiJava.ORDER_CREATION_ASC
+            val default = SortOrder.ORDER_NONE
+            val expected = SortOrder.ORDER_CREATION_ASC
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_CREATION_ASC)
-            whenever(sortOrderIntMapper(SortOrder.ORDER_CREATION_ASC)).thenReturn(expected)
+            whenever(getCloudSortOrder()).thenReturn(expected)
 
             underTest.state.map { it.sortOrder }.distinctUntilChanged()
                 .test {
-                    assertThat(awaitItem()).isEqualTo(0)
+                    assertThat(awaitItem()).isEqualTo(default)
                     underTest.setIncomingTreeDepth(1, any())
                     assertThat(awaitItem()).isEqualTo(expected)
                 }
@@ -433,14 +428,14 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that sort order is set with result of getOtherSortOrder when refreshNodes fails`() =
         runTest {
-            val expected = MegaApiJava.ORDER_CREATION_ASC
+            val default = SortOrder.ORDER_NONE
+            val expected = SortOrder.ORDER_CREATION_ASC
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(null)
-            whenever(getOtherSortOrder()).thenReturn(SortOrder.ORDER_CREATION_ASC)
-            whenever(sortOrderIntMapper(SortOrder.ORDER_CREATION_ASC)).thenReturn(expected)
+            whenever(getOtherSortOrder()).thenReturn(expected)
 
             underTest.state.map { it.sortOrder }.distinctUntilChanged()
                 .test {
-                    assertThat(awaitItem()).isEqualTo(0)
+                    assertThat(awaitItem()).isEqualTo(default)
                     underTest.setIncomingTreeDepth(1, any())
                     assertThat(awaitItem()).isEqualTo(expected)
                 }
