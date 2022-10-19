@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -4038,27 +4038,27 @@
     <!--Action text to start a meeting from Meeting screen empty view-->
     <string name="meetings_list_empty_action">Începe o întâlnire</string>
     <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Talk securely and privately on audio or video calls with friends and colleagues around the world.</string>
+    <string name="meetings_list_empty_description">Discută securizat și privat în apeluri audio sau video cu prieteni și colegi din întreaga lume.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">Începe să chatuiești acum</string>
     <!--Description text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_description">Chat securely and privately, with anyone and on any device, knowing that no one can read your chats, not even MEGA.</string>
+    <string name="chat_recent_list_empty_description">Chatuiește securizat și privat, cu oricine și de pe orice dispozitiv, știind că nimeni nu îți poate citi chaturile, nici măcar MEGA.</string>
     <!-- Title of the option on the meeting list to archive a meeting -->
-    <string name="archive_meeting_option">Archive meeting</string>
+    <string name="archive_meeting_option">Arhivează întâlnirea</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">Începe întâlnirea acum</string>
     <!-- Label for call option on settings -->
     <string name="settings_calls_preferences">Apeluri</string>
     <!-- Label for the sound notifications option on calls settings -->
-    <string name="settings_calls_preferences_sound_notifications">Sound notifications</string>
+    <string name="settings_calls_preferences_sound_notifications">Notificări sonore</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications_text">Hear a sound when someone joins or leaves a call.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Nu acum</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
-    <string name="text_editor_creation_success">File saved to Cloud drive.</string>
+    <string name="text_editor_creation_success">Fișier salvat în unitatea cloud.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
-    <string name="text_editor_creation_error">File not saved to Cloud drive. Try again.</string>
+    <string name="text_editor_creation_error">Fișier nesalvat în unitatea cloud. Încearcă din nou.</string>
     <!-- Action label to start images slideshow -->
     <string name="action_slideshow">Expunere de diapozitive</string>
     <!-- Filter page: Prompt to choose media type -->
@@ -4066,21 +4066,21 @@
     <!-- Filter page: Button text for all media type -->
     <string name="filter_button_all_media_type">Toate media</string>
     <!-- Filter page: Prompt to choose photos source -->
-    <string name="filter_prompt_media_source">Show items from</string>
+    <string name="filter_prompt_media_source">Afișează elemente din</string>
     <!-- Filter page: Radio button text for CD + CU source -->
     <string name="filter_button_all_source">Toate locațiile</string>
     <!-- Filter page: Radio button text for CD only source -->
     <string name="filter_button_cd_only">Unitate cloud</string>
     <!-- Timeline: Empty state for No Media (No Images and Videos) -->
-    <string name="timeline_empty_media">No [B]media[/B] found</string>
+    <string name="timeline_empty_media">Niciun [B]element media[/B] găsit</string>
     <!-- Timeline: Empty state for No Images -->
-    <string name="timeline_empty_images">No [B]images[/B] found</string>
+    <string name="timeline_empty_images">Nicio [B]imagine[/B] găsită</string>
     <!-- Timeline: Empty state for No Videos -->
-    <string name="timeline_empty_videos">No [B]videos[/B] found</string>
+    <string name="timeline_empty_videos">Niciun [B]videoclip[/B] găsit</string>
     <!-- Button to skip asking permissions. -->
     <string name="permissions_not_now_button">Nu acum</string>
     <!-- Title of the screen asking for enabling notifications permission. -->
-    <string name="permissions_notifications_title">Get notified</string>
+    <string name="permissions_notifications_title">Primește notificări</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA will send you call, chat, and file transfer notifications.</string>
     <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
@@ -4123,4 +4123,12 @@
     <string name="upgrade_account_successful_pro_3_yearly">Thank you for your Pro&#160;III yearly subscription</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Allow non-hosts to add participants</string>
+    <!-- Title of gif album. -->
+    <string name="photos_album_title_gif">GIFs</string>
+    <!-- Title of raw album. -->
+    <string name="photos_album_title_raw">RAW</string>
+    <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_title">Niciun contact</string>
+    <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_message">You have no contacts to add to this chat. If you want to add participants, first invite them to your contact list.</string>
 </resources>

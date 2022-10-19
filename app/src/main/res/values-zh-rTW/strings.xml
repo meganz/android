@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -3915,4 +3915,12 @@
     <string name="upgrade_account_successful_pro_3_yearly">感謝您訂閱Pro&#160;III年方案</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">允許非主持人新增參與者</string>
+    <!-- Title of gif album. -->
+    <string name="photos_album_title_gif">GIF</string>
+    <!-- Title of raw album. -->
+    <string name="photos_album_title_raw">RAW</string>
+    <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_title">沒有聯絡人</string>
+    <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_message">您沒有聯絡人可以加到此對話中。如果您想加入更多與會者，請先邀請他們成為您的聯絡人。</string>
 </resources>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -4123,4 +4123,12 @@
     <string name="upgrade_account_successful_pro_3_yearly">Thank you for your Pro&#160;III yearly subscription</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Permetti a chi non è host di aggiungere partecipanti</string>
+    <!-- Title of gif album. -->
+    <string name="photos_album_title_gif">GIFs</string>
+    <!-- Title of raw album. -->
+    <string name="photos_album_title_raw">RAW</string>
+    <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_title">Nessun contatto</string>
+    <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_message">Non hai contatti da poter aggiungere a questa chat. Se vuoi aggiungere partecipanti, prima invitali ad unirsi alla tua Rubrica.</string>
 </resources>
