@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.exception.LocalStorageException
-import mega.privacy.android.domain.exception.UnKnownException
+import mega.privacy.android.domain.exception.UnknownException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import timber.log.Timber
@@ -185,7 +185,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             throw LocalStorageException(e.message, e.cause)
         } catch (e: Exception) {
             Timber.e(e)
-            throw UnKnownException(e.message, e.cause)
+            throw UnknownException(e.message, e.cause)
         }
     }
 
