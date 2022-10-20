@@ -472,4 +472,8 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.getUserAttribute(attributeIdentifier, listener)
     }
+
+    override fun getAccountAchievements(listener: MegaRequestListenerInterface?) =
+        megaApi.getAccountAchievements(listener)
+
 }
