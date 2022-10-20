@@ -775,4 +775,11 @@ interface MegaApiGateway {
      * Get the selected user attribute for the logged in user
      */
     fun getUserAttribute(attributeIdentifier: Int, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get account achievements
+     *
+     * @param listener : MegaRequestListenerInterface
+     */
+    fun getAccountAchievements(listener: MegaRequestListenerInterface?)
 }
