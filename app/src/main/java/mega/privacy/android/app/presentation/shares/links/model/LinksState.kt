@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.shares.links.model
 
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaNode
 
 /**
@@ -20,7 +21,7 @@ data class LinksState(
     val nodes: List<MegaNode> = emptyList(),
     val isInvalidHandle: Boolean = true,
     val isLoading: Boolean = false,
-    val sortOrder: Int = 0,
+    val sortOrder: SortOrder = SortOrder.ORDER_NONE,
 ) {
     /**
      * Check if we are at the root of the links shares page

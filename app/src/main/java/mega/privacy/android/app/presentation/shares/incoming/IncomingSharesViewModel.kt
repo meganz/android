@@ -33,7 +33,6 @@ class IncomingSharesViewModel @Inject constructor(
     private val getIncomingSharesChildrenNode: GetIncomingSharesChildrenNode,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
-    private val sortOrderIntMapper: SortOrderIntMapper,
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
@@ -117,8 +116,8 @@ class IncomingSharesViewModel @Inject constructor(
                 incomingTreeDepth = depth,
                 incomingHandle = handle,
                 incomingParentHandle = getParentNodeHandle(handle),
-                sortOrder = if (depth == 0) sortOrderIntMapper(getOthersSortOrder()) else sortOrderIntMapper(
-                    getCloudSortOrder())
+                sortOrder = if (depth == 0) getOthersSortOrder() else
+                    getCloudSortOrder()
             )
         }
 
@@ -138,7 +137,7 @@ class IncomingSharesViewModel @Inject constructor(
                     isInvalidHandle = true,
                     isLoading = false,
                     incomingParentHandle = null,
-                    sortOrder = sortOrderIntMapper(getOthersSortOrder())
+                    sortOrder = getOthersSortOrder()
                 )
             }
         }

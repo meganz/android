@@ -28,6 +28,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDow
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -186,7 +187,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
     override val viewerFrom: Int = Constants.VIEWER_FROM_OUTGOING_SHARES
     override val currentSharesTab: SharesTab = SharesTab.OUTGOING_TAB
-    override val sortOrder: Int
+    override val sortOrder: SortOrder
         get() = state().sortOrder
     override val parentHandle: Long
         get() = state().outgoingHandle
