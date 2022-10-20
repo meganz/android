@@ -55,7 +55,7 @@ public interface BillingManager {
     /**
      * Check if the purchase is purchased.
      *
-     * @param purchase In-app subsciption object.
+     * @param purchase In-app subscription object.
      * @return true if purchased, false otherwise.
      */
     boolean isPurchased(MegaPurchase purchase);
@@ -64,15 +64,15 @@ public interface BillingManager {
      * Launch a purchase flow.
      *
      * @param oldSku Subscription id of current active subscription.
-     *               Currentlt it's only useful on GMS for downgrade purchase.
+     *               Currently it's only useful on GMS for downgrade purchase.
      * @param purchaseToken Subscription token of current active subscription.
-     *                      Currentlt it's only useful on GMS for downgrade purchase.
+     *                      Currently it's only useful on GMS for downgrade purchase.
      * @param skuDetails The new subscription about to purchase.
      */
     void initiatePurchaseFlow(@Nullable String oldSku, @Nullable String purchaseToken, @NonNull MegaSku skuDetails);
 
     /**
-     * Execute when Acrivity destorys. Implementation depends on current platform, GMS or HMS.
+     * Execute when Activity destroys. Implementation depends on current platform, GMS or HMS.
      */
     void destroy();
 
@@ -87,7 +87,7 @@ public interface BillingManager {
     /**
      * Query purchases across various use cases and deliver the result in a formalized way through
      * a listener.
-     * This method executes every time when BillingManager initialize to get current subscrptions.
+     * This method executes every time when BillingManager initialize to get current subscriptions.
      */
     void queryPurchases();
 
