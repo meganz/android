@@ -600,6 +600,10 @@
             <meta-data
                 android:name="mega.privacy.android.app.initializer.SetupMegaApiInitializer"
                 android:value="androidx.startup" />
+
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.MegaApiFolderInitializer"
+                android:value="androidx.startup" />
         </provider>
 
         <activity
