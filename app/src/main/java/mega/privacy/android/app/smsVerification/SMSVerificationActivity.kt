@@ -506,12 +506,14 @@ class SMSVerificationActivity : PasscodeActivity(), View.OnClickListener,
                     for (j in 0 until listMap[key].size()) {
                         val dialCode = listMap[key][j]
                         if (key.equals(inferredCountryCode, ignoreCase = true)) {
-                            val locale = Locale("", inferredCountryCode)
-                            selectedCountryName = locale.displayName
-                            selectedCountryCode = key
-                            selectedDialCode = "+$dialCode"
-                            val label = "$selectedCountryName ($selectedDialCode)"
-                            selectedCountry.text = label
+                            inferredCountryCode?.let {
+                                val locale = Locale("", it)
+                                selectedCountryName = locale.displayName
+                                selectedCountryCode = key
+                                selectedDialCode = "+$dialCode"
+                                val label = "$selectedCountryName ($selectedDialCode)"
+                                selectedCountry.text = label
+                            }
                         }
                         contentBuffer.append("$dialCode,")
                     }
