@@ -31,7 +31,8 @@ class DefaultCreateSupportTicketTest {
     private val accountTypeString = "accountTypeString"
     private val fileName = "123-fileName.zip"
     private val description = "Issue description"
-    private val deviceSdkVersion = 1
+    private val deviceSdkVersionInt = 31
+    private val deviceSdkVersionName = "Android 12"
 
     @Before
     fun setUp() {
@@ -52,7 +53,8 @@ class DefaultCreateSupportTicketTest {
         }
 
         runBlocking {
-            whenever(deviceRepository.getDeviceSdkVersion()).thenReturn(deviceSdkVersion)
+            whenever(deviceRepository.getDeviceSdkVersionInt()).thenReturn(deviceSdkVersionInt)
+            whenever(deviceRepository.getDeviceSdkVersionName()).thenReturn(deviceSdkVersionName)
         }
 
         runBlocking {
@@ -89,9 +91,15 @@ class DefaultCreateSupportTicketTest {
     }
 
     @Test
-    fun `test that device sdk version is retrieved`() = runTest {
+    fun `test that device sdk version int is retrieved`() = runTest {
         underTest(description = description, null)
-        verify(deviceRepository).getDeviceSdkVersion()
+        verify(deviceRepository).getDeviceSdkVersionInt()
+    }
+
+    @Test
+    fun `test that device sdk version name is retrieved`() = runTest {
+        underTest(description = description, null)
+        verify(deviceRepository).getDeviceSdkVersionName()
     }
 
     @Test
@@ -105,7 +113,8 @@ class DefaultCreateSupportTicketTest {
             currentLanguage = languageCode,
             description = description,
             logFileName = fileName,
-            deviceSdkVersion = deviceSdkVersion
+            deviceSdkVersionInt = deviceSdkVersionInt,
+            deviceSdkVersionName = deviceSdkVersionName,
         )
 
         val actual = underTest(description, fileName)

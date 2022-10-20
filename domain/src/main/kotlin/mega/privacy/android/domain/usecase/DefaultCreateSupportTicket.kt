@@ -31,7 +31,8 @@ class DefaultCreateSupportTicket @Inject constructor(
             accountType = accountDetails.accountTypeString,
             description = description,
             logFileName = logFileName,
-            deviceSdkVersion = environmentRepository.getDeviceSdkVersion()
+            deviceSdkVersionInt = environmentRepository.getDeviceSdkVersionInt(),
+            deviceSdkVersionName = environmentRepository.getDeviceSdkVersionName()
         )
     }
 }

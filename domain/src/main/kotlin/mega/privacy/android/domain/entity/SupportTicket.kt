@@ -11,7 +11,8 @@ package mega.privacy.android.domain.entity
  * @property accountType
  * @property description
  * @property logFileName
- * @property deviceSdkVersion
+ * @property deviceSdkVersionInt
+ * @property deviceSdkVersionName
  */
 data class SupportTicket(
     val androidAppVersion: String,
@@ -22,6 +23,7 @@ data class SupportTicket(
     val accountType: String,
     val description: String,
     val logFileName: String?,
-    val deviceSdkVersion: Int,
+    val deviceSdkVersionInt: Int,
+    val deviceSdkVersionName: String,
 )
 
