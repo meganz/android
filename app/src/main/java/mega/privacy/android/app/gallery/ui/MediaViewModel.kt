@@ -154,8 +154,9 @@ class MediaViewModel @Inject constructor(
             emit(
                 listOf(
                     days.sortDescending(),
-                    cardsProvider.getMonths().sortDescending(),
-                    cardsProvider.getYears().sortDescending())
+                    cardsProvider.latestSortedMonths,
+                    cardsProvider.latestSortedYears,
+                )
             )
 
             fetchMissingPreviews(days)
