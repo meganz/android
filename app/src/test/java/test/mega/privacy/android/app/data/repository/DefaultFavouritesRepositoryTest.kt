@@ -8,9 +8,8 @@ import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
-import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.domain.entity.node.DefaultFolderNode
+import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.exception.MegaException
