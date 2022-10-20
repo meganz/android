@@ -21,8 +21,14 @@ interface DeviceGateway {
     fun getCurrentDeviceLanguage(): String
 
     /**
-     * Get sdk version
+     * Get sdk version int
      *
      */
-    suspend fun getSdkVersion(): Int
+    suspend fun getSdkVersionInt(): Int
+
+    /**
+     * Get sdk version name
+     *
+     */
+    suspend fun getSdkVersionName(): String
 }
