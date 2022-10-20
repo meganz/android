@@ -1,7 +1,17 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.Rect
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.view.PixelCopy
+import android.view.SurfaceView
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -9,9 +19,12 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -22,8 +35,13 @@ import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
 import javax.inject.Inject
 
 /**
@@ -38,6 +56,7 @@ class MediaPlayerViewModel @Inject constructor(
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -202,5 +221,77 @@ class MediaPlayerViewModel @Inject constructor(
                 }
             )
             .addTo(composite)
+    }
+
+    /**
+     * Capture the screenshot when video playing
+     *
+     * @param captureAreaView the view that capture area
+     * @param rootFolderPath the root folder path of screenshots
+     * @param captureView the view that will be captured
+     * @param successCallback the callback after the screenshot is saved successfully
+     *
+     */
+    @SuppressLint("SimpleDateFormat")
+    fun screenshotWhenVideoPlaying(
+        captureAreaView: View,
+        rootFolderPath: String,
+        captureView: View,
+        successCallback: (bitmap: Bitmap) -> Unit,
+    ) {
+        File(rootFolderPath).apply {
+            if (exists().not()) {
+                mkdirs()
+            }
+        }
+        val screenshotFileName =
+            SimpleDateFormat(DATE_FORMAT_PATTERN).format(Date(System.currentTimeMillis()))
+        val filePath =
+            "$rootFolderPath$SCREENSHOT_NAME_PREFIX$screenshotFileName$SCREENSHOT_NAME_SUFFIX"
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val screenshotBitmap = Bitmap.createBitmap(captureView.width,
+                    captureView.height,
+                    Bitmap.Config.ARGB_8888)
+                PixelCopy.request(captureView as SurfaceView,
+                    Rect(0, 0, captureAreaView.width, captureAreaView.height),
+                    screenshotBitmap,
+                    { copyResult ->
+                        if (copyResult == PixelCopy.SUCCESS) {
+                            viewModelScope.launch {
+                                saveBitmap(filePath, screenshotBitmap, successCallback)
+                            }
+                        }
+                    },
+                    Handler(Looper.getMainLooper()))
+            }
+        } catch (e: Exception) {
+            Timber.e("Capture screenshot error: ${e.message}")
+        }
+    }
+
+    private suspend fun saveBitmap(
+        filePath: String,
+        bitmap: Bitmap,
+        successCallback: (bitmap: Bitmap) -> Unit,
+    ) =
+        withContext(ioDispatcher) {
+            val screenshotFile = File(filePath)
+            try {
+                val outputStream = FileOutputStream(screenshotFile)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITY_SCREENSHOT, outputStream)
+                outputStream.flush()
+                outputStream.close()
+                successCallback(bitmap)
+            } catch (e: Exception) {
+                Timber.e("Bitmap is saved error: ${e.message}")
+            }
+        }
+
+    companion object {
+        private const val QUALITY_SCREENSHOT = 100
+        private const val DATE_FORMAT_PATTERN = "yyyyMMdd-HHmmss"
+        private const val SCREENSHOT_NAME_PREFIX = "Screenshot_"
+        private const val SCREENSHOT_NAME_SUFFIX = ".jpg"
     }
 }
