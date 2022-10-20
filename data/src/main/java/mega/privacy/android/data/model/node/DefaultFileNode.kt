@@ -1,8 +1,10 @@
-package mega.privacy.android.domain.entity.node
+package mega.privacy.android.data.model.node
 
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeId
 
-data class DefaultFileNode(
+internal data class DefaultFileNode(
     override val id: NodeId,
     override val name: String,
     override val parentId: NodeId,
