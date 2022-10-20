@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer
 
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
@@ -28,6 +29,7 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
     private val unlockButton = binding.root.findViewById<ImageButton>(R.id.image_button_unlock)
     private val playerLayout = binding.root.findViewById<ConstraintLayout>(R.id.layout_player)
     private val unlockLayout = binding.root.findViewById<ConstraintLayout>(R.id.layout_unlock)
+    private val screenshotButton = binding.root.findViewById<ImageButton>(R.id.image_screenshot)
 
     /**
      * Setup playlist button.
@@ -44,6 +46,21 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
     }
 
     /**
+     * Setup the screenshot button
+     *
+     * @param clickedCallback the callback of screenshot button clicked
+     */
+    fun setupScreenshotButton(clickedCallback: () -> Unit) {
+        // The screenshot feature is not available if the Android version is lower that API 26
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            screenshotButton.isVisible = false
+        }
+        screenshotButton.setOnClickListener {
+            clickedCallback()
+        }
+    }
+
+    /**
      * Setup the repeat toggle button
      *
      * @param defaultRepeatToggleMode the default RepeatToggleMode
@@ -52,7 +69,7 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
     fun setupRepeatToggleButton(
         context: Context,
         defaultRepeatToggleMode: RepeatToggleMode,
-        clickedCallback: (repeatToggleButton: ImageButton) -> Unit
+        clickedCallback: (repeatToggleButton: ImageButton) -> Unit,
     ) {
         with(repeatToggleButton) {
             isVisible = true

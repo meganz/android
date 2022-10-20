@@ -13,6 +13,23 @@
         app:shutter_background_color="@color/dark_grey"
         app:surface_type="surface_view" />
 
+    <LinearLayout
+        android:id="@+id/screenshot_scale_animation_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/screenshot_round_background"
+        android:padding="8dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/screenshot_scale_animation_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop" />
+    </LinearLayout>
+
+
     <ProgressBar
         android:id="@+id/loading"
         android:layout_width="82dp"
