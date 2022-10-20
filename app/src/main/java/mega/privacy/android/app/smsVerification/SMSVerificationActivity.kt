@@ -18,6 +18,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -76,12 +77,23 @@ class SMSVerificationActivity : PasscodeActivity(), View.OnClickListener,
     private var inferredCountryCode: String? = null
     private var bonusStorageSMS = "GB"
 
+    private val onBackPressedCallback by lazy {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                Timber.d("onBackPressed")
+                if (isUserLocked) {
+                    return
+                }
+                finish()
+            }
+        }
+    }
+
     /**
      * listener for [MegaChatRequestHandler]
      */
-    @JvmField
     @Inject
-    var chatRequestHandler: MegaChatRequestHandler? = null
+    lateinit var chatRequestHandler: MegaChatRequestHandler
 
     /**
      * onCreate
@@ -90,6 +102,7 @@ class SMSVerificationActivity : PasscodeActivity(), View.OnClickListener,
         super.onCreate(savedInstanceState)
         smsVerifyShowed(true)
         setContentView(R.layout.activity_sms_verification)
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         // For this page, designer requires to change status bar color to match the background color.
         changeStatusBarColor(this, R.color.blue_400_blue_200)
         container = findViewById(R.id.scroller_container)
@@ -220,23 +233,6 @@ class SMSVerificationActivity : PasscodeActivity(), View.OnClickListener,
     }
 
     /**
-     * onBackPressed
-     */
-    @Suppress("Deprecation")
-    @Deprecated("")
-    override fun onBackPressed() {
-        Timber.d("onBackPressed")
-        psaWebBrowser?.let {
-            it.consumeBack()
-            return@let
-        }
-        if (isUserLocked) {
-            return
-        }
-        finish()
-    }
-
-    /**
      * onDestroy
      */
     override fun onDestroy() {
@@ -286,7 +282,7 @@ class SMSVerificationActivity : PasscodeActivity(), View.OnClickListener,
                         /*
                        If the account is trying to login,
                        at this stage should set isLoggingRunning as `false` to indicate the login process is ended.
-                     */chatRequestHandler?.setIsLoggingRunning(false)
+                     */chatRequestHandler.setIsLoggingRunning(false)
                         megaApi.logout()
                     }
                     DialogInterface.BUTTON_NEGATIVE -> {}
