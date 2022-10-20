@@ -51,8 +51,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RecentActionsFragment : Fragment() {
 
-    private var _binding: FragmentRecentsBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentRecentsBinding
 
     @Inject
     @MegaApi
@@ -74,8 +73,31 @@ class RecentActionsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentRecentsBinding.inflate(inflater, container, false)
+        binding = FragmentRecentsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupView()
+        observeDragSupportEvents(viewLifecycleOwner, listView, Constants.VIEWER_FROM_RECETS)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    Timber.d("Collect ui state")
+                    setRecentActions(it.recentActionItems)
+                    displayRecentActionsActivity(
+                        it.hideRecentActivity,
+                        it.recentActionItems.size
+                    )
+                }
+            }
+        }
+    }
+
+    private fun setupView() {
         emptyLayout = binding.emptyStateRecents
         emptyText = binding.emptyTextRecents
         showActivityButton = binding.showActivityButton
@@ -90,33 +112,6 @@ class RecentActionsFragment : Fragment() {
         fastScroller = binding.fastscroll
 
         initAdapter()
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        observeDragSupportEvents(viewLifecycleOwner, listView, Constants.VIEWER_FROM_RECETS)
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect {
-                    Timber.d("Collect ui state")
-                    setRecentActions(it.recentActionItems)
-                    displayRecentActionsActivity(
-                        it.hideRecentActivity,
-                        it.recentActionItems.size
-                    )
-
-                }
-            }
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     /**

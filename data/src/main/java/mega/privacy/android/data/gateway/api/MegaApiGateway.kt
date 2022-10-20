@@ -708,9 +708,23 @@ interface MegaApiGateway {
     /**
      * Get the list of recent actions
      *
-     * @return a list of recent actions
+     * @param days     Age of actions since added/modified nodes will be considered (in days).
+     * @param maxNodes Maximum amount of nodes to be considered.
+     * @param listener [MegaRequestListenerInterface]
      */
-    suspend fun getRecentActions(): List<MegaRecentActionBucket>
+    fun getRecentActionsAsync(
+        days: Long,
+        maxNodes: Long,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Creates a copy of MegaRecentActionBucket required for its usage in the app.
+     *
+     * @param bucket The MegaRecentActionBucket received.
+     * @return A copy of MegaRecentActionBucket.
+     */
+    fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket
 
     /**
      * Check access error extended
