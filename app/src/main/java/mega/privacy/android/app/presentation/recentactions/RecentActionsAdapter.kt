@@ -19,15 +19,13 @@ import mega.privacy.android.app.databinding.ItemBucketBinding
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.presentation.recentactions.RecentActionsAdapter.RecentActionViewHolder
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
+import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
-import mega.privacy.android.app.utils.MegaNodeUtil.getOutgoingOrIncomingParent
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.qualifier.MegaApi
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
@@ -40,7 +38,6 @@ import javax.inject.Inject
  */
 class RecentActionsAdapter @Inject constructor(
     @ApplicationContext private val context: Context,
-    @MegaApi private val megaApi: MegaApiAndroid,
 ) : RecyclerView.Adapter<RecentActionViewHolder>(), SectionTitleProvider, DragThumbnailGetter {
 
     private val outMetrics: DisplayMetrics = context.resources.displayMetrics
@@ -74,7 +71,6 @@ class RecentActionsAdapter @Inject constructor(
     private var headerColor: Int = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentActionViewHolder {
-        Timber.d("onCreateViewHolder")
         val binding = ItemBucketBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
         val elevationPx = Util.dp2px(HomepageFragment.BOTTOM_SHEET_ELEVATION, outMetrics)
@@ -84,7 +80,6 @@ class RecentActionsAdapter @Inject constructor(
     }
 
     override fun onBindViewHolder(holder: RecentActionViewHolder, position: Int) = with(holder) {
-        Timber.d("Position: %s", position)
         val item = getItemAtPosition(position) ?: return
 
         when (item) {
@@ -106,18 +101,17 @@ class RecentActionsAdapter @Inject constructor(
 
                 val bucket = item.bucket
                 val nodeList = bucket.nodes
-                if (nodeList == null || nodeList.size() == 0) return
-                val node = nodeList[0] ?: return
-                val parentNode: MegaNode =
-                    megaApi.getNodeByHandle(bucket.parentHandle) ?: return
+                val node = nodeList[0]
+
+                // folder name
                 binding.nameText.text =
-                    if (parentNode.name == "Cloud Drive") {
-                        context.getString(R.string.section_cloud_drive)
-                    } else {
-                        parentNode.name ?: ""
+                    when (item.parentFolderName) {
+                        "Cloud Drive" -> context.getString(R.string.section_cloud_drive)
+                        else -> item.parentFolderName
                     }
 
-                if (bucket.userEmail == megaApi.myEmail) {
+                // owner description
+                if (item.currentUserIsOwner) {
                     binding.secondLineText.visibility = View.GONE
                 } else {
                     val userAction = if (bucket.isUpdate) {
@@ -128,26 +122,31 @@ class RecentActionsAdapter @Inject constructor(
                     binding.secondLineText.visibility = View.VISIBLE
                     binding.secondLineText.text = formatUserAction(userAction)
                 }
-                val parentRootNode = getOutgoingOrIncomingParent(parentNode)
-                when {
-                    parentRootNode == null -> {
+
+                // shares icon
+                when (item.parentFolderSharesType) {
+                    RecentActionsSharesType.NONE -> {
                         binding.sharedImage.visibility = View.GONE
                     }
 
-                    parentRootNode.isInShare -> {
+                    RecentActionsSharesType.INCOMING_SHARES -> {
                         binding.sharedImage.visibility = View.VISIBLE
                         binding.sharedImage.setImageResource(R.drawable.ic_folder_incoming_list)
                     }
 
-                    parentRootNode.isOutShare || megaApi.isPendingShare(parentRootNode) -> {
+                    RecentActionsSharesType.OUTGOING_SHARES,
+                    RecentActionsSharesType.PENDING_OUTGOING_SHARES,
+                    -> {
                         binding.sharedImage.visibility = View.VISIBLE
                         binding.sharedImage.setImageResource(R.drawable.ic_folder_outgoing_list)
                     }
                 }
 
+                // time
                 binding.timeText.text = TimeUtils.formatTime(item.timestamp)
-                binding.thumbnailView.visibility = View.VISIBLE
 
+                // thumbnail
+                binding.thumbnailView.visibility = View.VISIBLE
                 val params = binding.thumbnailView.layoutParams as RelativeLayout.LayoutParams
                 params.height = Util.dp2px(48f, outMetrics)
                 params.width = params.height
