@@ -17,6 +17,8 @@ import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
+import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
+import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
@@ -57,6 +59,8 @@ import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toImage
+import mega.privacy.android.data.mapper.toMediaStoreFileType
+import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
 import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
@@ -191,6 +195,19 @@ internal class MapperModule {
      */
     @Provides
     fun provideSyncRecordTypeIntMapper(): SyncRecordTypeIntMapper = ::toSyncRecordTypeInt
+
+    /**
+     * Provide media store file type mapper
+     */
+    @Provides
+    fun provideMediaStoreFileTypeMapper(): MediaStoreFileTypeMapper = ::toMediaStoreFileType
+
+    /**
+     * Provide media store file type uri mapper
+     */
+    @Provides
+    fun provideMediaStoreFileTypeUriMapper(): MediaStoreFileTypeUriMapper =
+        ::toMediaStoreFileTypeUri
 
     /**
      * Provide storage state mapper

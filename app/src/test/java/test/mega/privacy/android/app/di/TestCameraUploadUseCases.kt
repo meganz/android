@@ -24,6 +24,7 @@ import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
+import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
@@ -199,6 +200,9 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetPendingUploadList() = mock<GetPendingUploadList>()
+
+    @Provides
+    fun provideProcessMediaForUpload() = mock<ProcessMediaForUpload>()
 
     @Provides
     fun provideGetDefaultNodeHandle() = mock<GetDefaultNodeHandle>()

@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.facade.AssetsFacade
 import mega.privacy.android.data.facade.CacheFacade
+import mega.privacy.android.data.facade.CameraUploadMediaFacade
 import mega.privacy.android.data.facade.CacheFolderFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
@@ -18,6 +19,7 @@ import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.AssetsGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.DefaultAppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
@@ -63,6 +65,9 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindFileAttributeGateway(implementation: FileAttributeFacade): FileAttributeGateway
+
+    @Binds
+    abstract fun bindCameraUploadMediaGateway(implementation: CameraUploadMediaFacade): CameraUploadMediaGateway
 
     @Binds
     abstract fun bindFileCompressionGateway(implementation: ZipFileCompressionGateway): FileCompressionGateway
