@@ -2,6 +2,8 @@ package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -29,4 +31,20 @@ interface FileRepository {
      * Get the current backup folder node id
      */
     suspend fun getBackupFolderId(): NodeId
+
+    /**
+     * Get node by id
+     *
+     * @param nodeId
+     * @return The node if found else null
+     */
+    suspend fun getNodeById(nodeId: NodeId): Node?
+
+    /**
+     * Get node children
+     *
+     * @param folderNode
+     * @return
+     */
+    suspend fun getNodeChildren(folderNode: FolderNode): List<Node>
 }
