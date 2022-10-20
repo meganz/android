@@ -20,6 +20,7 @@ import mega.privacy.android.app.domain.usecase.DefaultGetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsWifiNotSatisfied
+import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.DefaultSaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
@@ -39,6 +40,7 @@ import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
+import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
@@ -473,6 +475,12 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindGetPendingUploadList(getPendingUploadList: DefaultGetPendingUploadList): GetPendingUploadList
+
+    /**
+     * Provide the ProcessMediaForUpload implementation
+     */
+    @Binds
+    abstract fun bindProcessMediaForUpload(processMediaForUpload: DefaultProcessMediaForUpload): ProcessMediaForUpload
 
     /**
      * Provide the GetUploadFolderHandle implementation

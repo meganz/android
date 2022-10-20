@@ -1,12 +1,17 @@
 package mega.privacy.android.data.repository
 
+import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
+import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -15,8 +20,10 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.LinkedList
 import kotlin.contracts.ExperimentalContracts
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -26,7 +33,9 @@ class DefaultCameraUploadRepositoryTest {
 
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val fileAttributeGateway = mock<FileAttributeGateway>()
+    private val cameraUploadMediaGateway = mock<CameraUploadMediaGateway>()
     private val syncRecordTypeIntMapper = mock<SyncRecordTypeIntMapper>()
+    private val mediaStoreFileTypeUriWrapper = mock<MediaStoreFileTypeUriMapper>()
 
     private val fakeRecord = SyncRecord(
         id = 0,
@@ -52,7 +61,9 @@ class DefaultCameraUploadRepositoryTest {
             megaApiGateway = mock(),
             cacheGateway = mock(),
             fileAttributeGateway = fileAttributeGateway,
+            cameraUploadMediaGateway = cameraUploadMediaGateway,
             syncRecordTypeIntMapper = syncRecordTypeIntMapper,
+            mediaStoreFileTypeUriMapper = mediaStoreFileTypeUriWrapper,
             ioDispatcher = UnconfinedTestDispatcher(),
         )
     }
@@ -250,6 +261,29 @@ class DefaultCameraUploadRepositoryTest {
     fun `test camera upload retrieves convert on charging setting`() = runTest {
         whenever(localStorageGateway.convertOnCharging()).thenReturn(false)
         assertThat(underTest.convertOnCharging()).isEqualTo(false)
+    }
+
+    @Test
+    fun `test camera upload get the correct media queues by media store file type`() = runTest {
+        val result = LinkedList(listOf(CameraUploadMedia("", 1)))
+        whenever(
+            cameraUploadMediaGateway.getMediaQueue(
+                anyOrNull(),
+                any(),
+                any(),
+                any()
+            )
+        ).thenReturn(
+            result
+        )
+        whenever(mediaStoreFileTypeUriWrapper(any())).thenReturn(Uri.EMPTY)
+        val actual = underTest.getMediaQueue(
+            MediaStoreFileType.IMAGES_INTERNAL,
+            "",
+            false,
+            ""
+        )
+        assertThat(actual).isEqualTo(result)
     }
 
     @Test
