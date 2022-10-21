@@ -4409,6 +4409,8 @@ public class ManagerActivity extends TransfersManagementActivity
 
         switch (drawerItem) {
             case SHARED_ITEMS:
+                if (!(currentTab instanceof SharesTab)) break;
+
                 switch ((SharesTab) currentTab) {
                     case INCOMING_TAB:
                         if (!isIncomingAdded() || (!hide && incomingSharesState(this).getIncomingHandle() != INVALID_HANDLE)) {
