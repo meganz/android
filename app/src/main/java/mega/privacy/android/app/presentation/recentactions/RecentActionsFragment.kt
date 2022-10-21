@@ -248,7 +248,7 @@ class RecentActionsFragment : Fragment() {
             manageTextFileIntent(requireContext(), node, Constants.RECENTS_ADAPTER)
         } else {
             Timber.d("itemClick:isFile:otherOption")
-            onNodeTapped(requireContext(),
+            onNodeTapped(requireActivity(),
                 node,
                 { n: MegaNode? -> (requireActivity() as ManagerActivity).saveNodeByTap(n) },
                 (requireActivity() as ManagerActivity),
