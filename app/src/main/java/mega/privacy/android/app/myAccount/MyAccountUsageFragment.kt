@@ -19,6 +19,7 @@ import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.ActiveFragment
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
+import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.setRenewalDateForProFlexi
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.StyleUtils.setTextStyle
@@ -26,6 +27,9 @@ import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
+/**
+ * Fragment for my account usage
+ */
 @AndroidEntryPoint
 class MyAccountUsageFragment : Fragment(), Scrollable {
 
@@ -125,6 +129,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
             paymentAlertBinding.root.isVisible = true
         } else if (viewModel.isProFlexiAccount()) {
             usageBinding.updateBusinessOrProFlexi(viewModel)
+            paymentAlertBinding.setRenewalDateForProFlexi(viewModel)
         } else {
             usageBinding.update(viewModel)
             paymentAlertBinding.root.isVisible = paymentAlertBinding.update(

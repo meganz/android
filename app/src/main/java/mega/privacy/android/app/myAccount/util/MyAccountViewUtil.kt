@@ -193,6 +193,29 @@ object MyAccountViewUtil {
     }
 
     /**
+     * Updates the views related to payments for only Pro Flexi accounts.
+     *
+     * @param viewModel [MyAccountViewModel] to check the data.
+     */
+    fun MyAccountPaymentInfoContainerBinding.setRenewalDateForProFlexi(
+        viewModel: MyAccountViewModel,
+    ) {
+        businessStatusText.isVisible = false
+
+        renewExpiryText.apply {
+            isVisible = true
+            val renewalDate = TimeUtils.formatDate(
+                viewModel.getRenewTime(),
+                TimeUtils.DATE_MM_DD_YYYY_FORMAT
+            )
+            text = getString(R.string.account_info_renewal_date, renewalDate)
+                .formatColorTag(context, 'A', R.color.dark_grey_white)
+                .formatColorTag(context, 'B', R.color.dark_grey_white)
+                .toSpannedHtmlText()
+        }
+    }
+
+    /**
      * Updates the views related to payments for all type of accounts.
      *
      * @param viewModel MyAccountViewModel to check the data.
