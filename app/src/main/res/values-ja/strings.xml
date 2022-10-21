@@ -2700,9 +2700,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">最後のお支払いで問題がありました。詳細については、デスクトップブラウザを使用してMEGAにアクセスしてください。</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">あなたのビジネスアカウントは期限切れです</string>
+    <string name="expired_business_title">Account deactivated</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">お支払いの処理中に問題が発生しました。MEGAは、この問題がデスクトップウェブブラウザで修正されるまで、表示のみに制限されています。</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">あなたのアカウントは現在[B]凍結[/B]されています。あなたのデータの閲覧のみ可能です。</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3923,4 +3923,10 @@
     <string name="chat_add_participants_no_contacts_title">連絡先がありません</string>
     <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_message">このチャットに追加する連絡先はありません。さらに参加者を追加する場合は、まず連絡先リストに招待してください。</string>
+    <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_title">すべての連絡先が追加されました</string>
+    <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_message">すでにすべての連絡先をこのチャットに追加しています。さらに参加者を追加する場合は、まず連絡先リストに招待してください。</string>
+    <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
+    <string name="media_player_video_snackbar_screenshot_saved">画像を端末のギャラリーに保存しました</string>
 </resources>

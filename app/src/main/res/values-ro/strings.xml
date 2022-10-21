@@ -2846,9 +2846,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">A apărut o problemă cu ultima plată. Te rugăm să accesezi MEGA folosind un browser desktop pentru mai multe informații.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Contul tău business a expirat</string>
+    <string name="expired_business_title">Account deactivated</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">A apărut o problemă la procesarea plății. MEGA este limitat în modul numai vizualizare până când această problemă a fost rezolvată într-un browser web desktop.</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">În prezent, contul tău este [B]suspendat[/B]. Poți răsfoi numai prin datele tale.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3504,7 +3504,7 @@
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">Modifică numele întâlnirii</string>
     <!-- The literal meeting link text-->
-    <string name="meeting_link">Linkul întâlnirii</string>
+    <string name="meeting_link">Link al întâlnirii</string>
     <!-- Subtitle of the meeting screen-->
     <string name="duration_meeting">Durată</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
@@ -3942,7 +3942,7 @@
     <!-- Message shown during log file upload-->
     <string name="settings_help_report_issue_uploading_log_file">Uploading log file</string>
     <!-- Message shown if user tries to leave report screen without submitting their report-->
-    <string name="settings_help_report_issue_discard_dialog_title">Discard report?</string>
+    <string name="settings_help_report_issue_discard_dialog_title">Renunți la raport?</string>
     <!-- Button text for discard dialog option-->
     <string name="settings_help_report_issue_discard_button">Înlătură</string>
     <!-- Text shown when editing a chatroom message -->
@@ -3950,7 +3950,7 @@
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">Apel vocal</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_scan_option">Scan</string>
+    <string name="chat_room_toolbar_scan_option">Scanează</string>
     <!-- Title of the voice clip option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_clip_option">Voice clip</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
@@ -4100,11 +4100,11 @@
     <!-- Used in chat screen to indicate last message sent by me -->
     <string name="chat_last_message_sender_me">Eu</string>
     <!-- Hint the screen is locked in video player page -->
-    <string name="video_player_locked_hint">Screen is locked</string>
+    <string name="video_player_locked_hint">Ecranul este blocat</string>
     <!-- Hint that tap to unlock in video player page -->
-    <string name="video_player_unlock_hint">Tap to unlock</string>
+    <string name="video_player_unlock_hint">Atinge pentru a debloca</string>
     <!-- Label that schedule a meeting -->
-    <string name="chat_schedule_meeting">Schedule meeting</string>
+    <string name="chat_schedule_meeting">Planiifică o întâlnire</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
     <string name="upgrade_account_successful_pro_lite_monthly">Thank you for your Pro&#160;Lite monthly subscription</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
@@ -4124,11 +4124,17 @@
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Allow non-hosts to add participants</string>
     <!-- Title of gif album. -->
-    <string name="photos_album_title_gif">GIFs</string>
+    <string name="photos_album_title_gif">GIF-uri</string>
     <!-- Title of raw album. -->
     <string name="photos_album_title_raw">RAW</string>
     <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_title">Niciun contact</string>
     <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_message">You have no contacts to add to this chat. If you want to add participants, first invite them to your contact list.</string>
+    <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_title">Toate contactele au fost adăugate</string>
+    <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_message">You’ve already added all your contacts to this chat. If you want to add more participants, first invite them to your contact list.</string>
+    <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
+    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
 </resources>

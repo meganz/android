@@ -2700,9 +2700,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">지난 결제에 문제가 있었습니다. 자세한 정보를 보려면 데스크톱 브라우저를 이용하여 MEGA에 접속하세요.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">당신의 비즈니스 계정이 만료되었습니다</string>
+    <string name="expired_business_title">Account deactivated</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">결제를 처리하는 과정에 문제가 있었습니다. 이 문제가 데스크톱 브라우저에서 해결될 때까지 MEGA가 보기 전용으로 제한됩니다.</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">당신의 계정은 현재 [B]정지[/B]되었습니다. 당신의 데이터를 탐색만할 수 있습니다.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3923,4 +3923,10 @@
     <string name="chat_add_participants_no_contacts_title">연락처 없음</string>
     <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_message">이 대화에 추가된 연락처가 없습니다. 만약 참여자를 추가하고 싶다면, 먼저 당신의 연락처 목록에 초대하세요.</string>
+    <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_title">모든 연락처 추가됨</string>
+    <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_message">이미 이 대화에 모든 연락처를 추가하였습니다. 만약 더 많은 참여자를 원한다면, 먼저 당신의 연락처 목록에 초대하세요.</string>
+    <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
+    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
 </resources>

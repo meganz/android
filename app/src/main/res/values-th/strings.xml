@@ -2700,9 +2700,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">เกิดปัญหากับการชำระเงินครั้งล่าสุดของคุณ กรุณาไปที่เว็บ MEGA ผ่านเบราว์เซอร์เดสก์ท็อปเพื่อดูข้อมูลเพิ่มเติม</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">บัญชีธุรกิจของคุณหมดอายุแล้ว</string>
+    <string name="expired_business_title">Account deactivated</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">พบปัญหาในการดำเนินการชำระเงินของคุณ MEGA ถูกจำกัดให้ดูได้เฉพาะเมื่อปัญหานี้ที่ได้รับการแก้ไขในเว็บเบราว์เซอร์เดสก์ท็อปเท่านั้น</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">บัญชีของคุณ[B]ถูกระงับ[/B]ในขณะนี้ คุณสามารถเรียกดูได้แค่ข้อมูลของคุณเท่านั้น</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3923,4 +3923,10 @@
     <string name="chat_add_participants_no_contacts_title">ไม่มีรายชื่อผู้ติดต่อ</string>
     <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_message">คุณไม่มีรายชื่อผู้ติดต่อที่จะเพิ่มเข้าไปในแชทนี้แล้ว หากคุณต้องการเพิ่มผู้เข้าร่วมคนอื่น ขั้นแรกให้ส่งคำเชิญเพื่อเพิ่มไปที่รายชื่อผู้ติดต่อของคุณก่อน</string>
+    <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_title">เพิ่มผู้ติดต่อทั้งหมดแล้ว</string>
+    <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_message">คุณได้เพิ่มผู้ติดต่อทั้งหมดในแชทนี้แล้ว หากคุณต้องการเพิ่มผู้เข้าร่วมคนอื่น ขั้นแรกให้ส่งคำเชิญเพื่อเพิ่มไปที่รายชื่อผู้ติดต่อของคุณก่อน</string>
+    <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
+    <string name="media_player_video_snackbar_screenshot_saved">บันทึกภาพไว้ในแกลเลอรี่อุปกรณ์ของคุณแล้ว</string>
 </resources>

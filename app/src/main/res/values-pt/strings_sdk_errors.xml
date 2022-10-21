@@ -35,7 +35,7 @@
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">ID de sessão inválido</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="api_eblocked_ec_import_ec_download">Não acessível pois infringiu os nossos Termos de Serviço</string>
+    <string name="api_eblocked_ec_import_ec_download">Não acessível por infringir os nossos Termos de serviço</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Bloqueado</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
@@ -59,7 +59,7 @@
     <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
     <string name="api_emasteronly">Acesso negado para usuários sem permissão de administrador</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="api_ebusinesspastdue">A sua conta Business expirou</string>
+    <string name="api_ebusinesspastdue">Account deactivated</string>
     <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
     <string name="payment_ecard">Cartão de crédito recusado</string>
     <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->

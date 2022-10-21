@@ -2700,9 +2700,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Terjadi masalah dengan pembayaran terakhir anda. Silakan akses MEGA menggunakan browser desktop untuk informasi lebih lanjut.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Akun Bisnis anda telah kedaluwarsa</string>
+    <string name="expired_business_title">Account deactivated</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Terjadi masalah saat memproses pembayaran anda. MEGA terbatas hanya untuk melihat sampai masalah ini telah diperbaiki di browser web desktop.</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Akun anda saat ini [B]ditangguhkan[/B]. Anda hanya dapat menelusuri data anda.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3923,4 +3923,10 @@
     <string name="chat_add_participants_no_contacts_title">Tidak ada kontak</string>
     <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_message">Anda tidak memiliki kontak untuk ditambahkan ke obrolan ini. Jika anda ingin menambahkan peserta, undang mereka terlebih dahulu ke daftar kontak anda.</string>
+    <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_title">Semua kontak ditambahkan</string>
+    <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_message">Anda telah menambahkan semua kontak anda ke obrolan ini. Jika anda ingin menambahkan lebih banyak peserta, undang mereka terlebih dahulu ke daftar kontak anda.</string>
+    <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
+    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
 </resources>
