@@ -4027,4 +4027,12 @@
     <string name="chat_add_participants_no_contacts_title">No contacts</string>
     <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_message">You have no contacts to add to this chat. If you want to add participants, first invite them to your contact list.</string>
+    <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_title">All contacts added</string>
+    <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_message">You’ve already added all your contacts to this chat. If you want to add more participants, first invite them to your contact list.</string>
+    <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
+    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]Renewal date:[/A] [B]%s[/B]</string>
 </resources>
