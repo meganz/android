@@ -15,8 +15,8 @@ import mega.privacy.android.app.domain.usecase.GetRecentActions
 import mega.privacy.android.app.domain.usecase.IsPendingShare
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
-import mega.privacy.android.app.presentation.recentactions.model.RecentActionsState
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
+import mega.privacy.android.app.presentation.recentactions.model.RecentActionsState
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetVisibleContacts

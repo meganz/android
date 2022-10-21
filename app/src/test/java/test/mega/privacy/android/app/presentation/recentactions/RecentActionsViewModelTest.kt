@@ -11,11 +11,16 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetRecentActions
+import mega.privacy.android.app.domain.usecase.IsPendingShare
 import mega.privacy.android.app.presentation.recentactions.RecentActionsViewModel
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
+import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
@@ -24,6 +29,7 @@ import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRecentActionBucket
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -40,8 +46,24 @@ class RecentActionsViewModelTest {
     private val getVisibleContacts = mock<GetVisibleContacts> {
         onBlocking { invoke() }.thenReturn(emptyList())
     }
+    private val getNodeByHandle = mock<GetNodeByHandle> {
+        onBlocking { invoke(any()) }.thenReturn(null)
+    }
+    private val getAccountDetails = mock<GetAccountDetails> {
+        onBlocking { invoke(any()) }.thenReturn(mock())
+    }
+    private val isPendingShare = mock<IsPendingShare> {
+        onBlocking { invoke(any()) }.thenReturn(false)
+    }
+    private val getParentMegaNode = mock<GetParentMegaNode> {
+        onBlocking { invoke(any()) }.thenReturn(null)
+    }
     private val setHideRecentActivity = mock<SetHideRecentActivity>()
-    private val monitorHideRecentActivity = mock<MonitorHideRecentActivity>()
+    private val monitorHideRecentActivity = mock<MonitorHideRecentActivity> {
+        flow {
+            emit(false)
+        }
+    }
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
     private val megaNode: MegaNode = mock {
@@ -88,6 +110,10 @@ class RecentActionsViewModelTest {
             getRecentActions,
             getVisibleContacts,
             setHideRecentActivity,
+            getNodeByHandle,
+            getAccountDetails,
+            isPendingShare,
+            getParentMegaNode,
             monitorHideRecentActivity,
             monitorNodeUpdates,
         )
@@ -249,14 +275,16 @@ class RecentActionsViewModelTest {
     @Test
     fun `test that calling select will set selected and snapShotActionList properties`() =
         runTest {
-            val expectedSelected = megaRecentActionBucket
+            val expectedSelected = RecentActionItemType.Item(
+                bucket = megaRecentActionBucket
+            )
             val expectedSnapshotActionList = listOf(megaRecentActionBucket)
             whenever(getRecentActions()).thenReturn(expectedSnapshotActionList)
             assertThat(underTest.selected).isEqualTo(null)
             assertThat(underTest.snapshotActionList).isEqualTo(null)
             advanceUntilIdle()
             underTest.select(expectedSelected)
-            assertThat(underTest.selected).isEqualTo(expectedSelected)
+            assertThat(underTest.selected).isEqualTo(expectedSelected.bucket)
             assertThat(underTest.snapshotActionList).isEqualTo(expectedSnapshotActionList)
         }
 
