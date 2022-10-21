@@ -40,6 +40,13 @@ class RecentActionsAdapter @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : RecyclerView.Adapter<RecentActionViewHolder>(), SectionTitleProvider, DragThumbnailGetter {
 
+    companion object {
+        /**
+         * Cloud drive folder name
+         */
+        private const val CLOUD_DRIVE_FOLDER_NAME = "Cloud Drive"
+    }
+
     private val outMetrics: DisplayMetrics = context.resources.displayMetrics
 
     private var recentActionItems: List<RecentActionItemType>? = null
@@ -106,7 +113,7 @@ class RecentActionsAdapter @Inject constructor(
                 // folder name
                 binding.nameText.text =
                     when (item.parentFolderName) {
-                        "Cloud Drive" -> context.getString(R.string.section_cloud_drive)
+                        CLOUD_DRIVE_FOLDER_NAME -> context.getString(R.string.section_cloud_drive)
                         else -> item.parentFolderName
                     }
 
