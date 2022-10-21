@@ -25,7 +25,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -51,8 +50,8 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
-import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
 import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
 import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
@@ -273,7 +272,7 @@ class PhotosFragment : Fragment() {
                 if (managerActivity.fromAlbumContent)
                     rememberPagerState(initialPage = PhotosTab.Albums.ordinal)
                 else
-                    rememberPagerState()
+                    rememberPagerState(initialPage = photosViewState.selectedTab.ordinal)
         }
         lazyGridState =
             rememberSaveable(
@@ -575,11 +574,7 @@ class PhotosFragment : Fragment() {
         activity?.lifecycleScope?.launch {
             val dynamicAlbumEnabled = getFeatureFlag(AppFeatures.DynamicAlbum)
             if (dynamicAlbumEnabled) {
-                val f = AlbumDynamicContentFragment.getInstance()
-                val ft: FragmentTransaction =
-                    (activity ?: return@launch).supportFragmentManager.beginTransaction()
-                ft.replace(R.id.fragment_container, f)
-                ft.commitNowAllowingStateLoss()
+                managerActivity.skipToAlbumContentFragment(AlbumDynamicContentFragment.getInstance())
             } else {
                 managerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
             }

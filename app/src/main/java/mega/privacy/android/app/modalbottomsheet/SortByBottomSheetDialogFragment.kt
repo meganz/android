@@ -21,15 +21,23 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ORDER
+import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
+import mega.privacy.android.app.utils.Constants.IS_CLOUD_ORDER
+import mega.privacy.android.app.utils.Constants.NEW_ORDER
+import mega.privacy.android.app.utils.Constants.ORDER_CAMERA
+import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
+import mega.privacy.android.app.utils.Constants.ORDER_FAVOURITES
+import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
+import mega.privacy.android.app.utils.Constants.ORDER_OTHERS
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
-import timber.log.Timber
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -232,7 +240,10 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         }
 
                         if (manager.isInAlbumContentPage) {
-                            manager.albumContentFragment.loadPhotos()
+                            val f = manager.albumContentFragment
+                            if (f is AlbumContentFragment) {
+                                f.loadPhotos()
+                            }
                         }
                     }
                 }
