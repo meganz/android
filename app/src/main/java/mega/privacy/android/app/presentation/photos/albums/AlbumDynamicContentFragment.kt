@@ -93,6 +93,16 @@ class AlbumDynamicContentFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         setupFlow()
+        setupParentActivityUI()
+    }
+
+    /**
+     * Setup ManagerActivity UI
+     */
+    private fun setupParentActivityUI() {
+        managerActivity.setToolbarTitle()
+        managerActivity.invalidateOptionsMenu()
+        managerActivity.hideFabButton()
     }
 
     private fun setupFlow() {
@@ -242,12 +252,6 @@ class AlbumDynamicContentFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onDestroy() {
-        albumsViewModel.setCurrentAlbum(null)
-        albumsViewModel.setCurrentSort(Sort.NEWEST)
-        super.onDestroy()
     }
 
 }

@@ -274,11 +274,8 @@ import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
-import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
@@ -294,7 +291,6 @@ import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
-import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
@@ -303,7 +299,6 @@ import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
-import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
@@ -329,7 +324,6 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment;
-import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.main.managerSections.NotificationsFragment;
 import mega.privacy.android.app.main.managerSections.TransfersFragment;
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment;
@@ -358,6 +352,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
+import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
@@ -419,7 +414,11 @@ import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
+import mega.privacy.android.data.model.MegaAttributes;
+import mega.privacy.android.data.model.MegaPreferences;
+import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
@@ -764,7 +763,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private CompletedTransfersFragment completedTransfersFragment;
     private SearchFragment searchFragment;
     private PhotosFragment photosFragment;
-    private AlbumContentFragment albumContentFragment;
+    private Fragment albumContentFragment;
     private PhotosFilterFragment photosFilterFragment;
     private ChatTabsFragment chatTabsFragment;
     private NotificationsFragment notificationsFragment;
@@ -1369,7 +1368,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         outState.putBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, isInAlbumContent);
-        albumContentFragment = (AlbumContentFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.ALBUM_CONTENT.getTag());
+        albumContentFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.ALBUM_CONTENT.getTag());
         if (albumContentFragment != null) {
             getSupportFragmentManager().putFragment(outState, FragmentTag.ALBUM_CONTENT.getTag(), albumContentFragment);
         }
@@ -3611,7 +3610,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void skipToAlbumContentFragment(Fragment f) {
-        albumContentFragment = (AlbumContentFragment) f;
+        albumContentFragment = f;
         replaceFragment(f, FragmentTag.ALBUM_CONTENT.getTag());
         isInAlbumContent = true;
         viewModel.setIsFirstNavigationLevel(false);
@@ -4643,10 +4642,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
             }
             case PHOTOS: {
-                if (isInAlbumContent) {
-                    skipToAlbumContentFragment(AlbumContentFragment.getInstance());
-                } else if (isInFilterPage) {
-                    skipToFilterFragment(PhotosFilterFragment.getInstance());
+                if (isInAlbumContent || isInFilterPage) {
+                    showHideBottomNavigationView(true);
                 } else {
                     abL.setVisibility(View.VISIBLE);
                     if (getPhotosFragment() == null) {
@@ -11150,7 +11147,7 @@ public class ManagerActivity extends TransfersManagementActivity
         return mediaDiscoveryFragment;
     }
 
-    public AlbumContentFragment getAlbumContentFragment() {
+    public Fragment getAlbumContentFragment() {
         return albumContentFragment;
     }
 
