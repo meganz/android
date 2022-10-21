@@ -252,7 +252,7 @@ dependencies {
     implementation "com.anggrayudi:storage:$simpleStorageVersion"
 
     //GMS
-    gmsImplementation 'com.android.billingclient:billing:3.0.2'
+    gmsImplementation 'com.android.billingclient:billing:5.0.0'
     gmsImplementation 'com.google.android.gms:play-services-location:17.1.0'
     gmsImplementation 'com.google.android.gms:play-services-maps:17.0.0'
     gmsImplementation 'com.google.maps.android:android-maps-utils:0.5'
