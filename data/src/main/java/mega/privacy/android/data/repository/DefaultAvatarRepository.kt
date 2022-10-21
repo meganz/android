@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -11,13 +11,13 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
+import mega.privacy.android.data.constant.FileConstant
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.wrapper.AvatarWrapper
-import mega.privacy.android.app.utils.wrapper.BitmapFactoryWrapper
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.repository.DefaultAvatarRepository.Companion.AVATAR_PRIMARY_COLOR
+import mega.privacy.android.data.wrapper.AvatarWrapper
+import mega.privacy.android.data.wrapper.BitmapFactoryWrapper
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AvatarRepository
@@ -35,7 +35,7 @@ import javax.inject.Inject
  * @param ioDispatcher coroutine dispatcher to execute
  * @param bitmapFactoryWrapper
  */
-class DefaultAvatarRepository @Inject constructor(
+internal class DefaultAvatarRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val cacheFolderGateway: CacheFolderGateway,
     private val avatarWrapper: AvatarWrapper,
@@ -59,7 +59,7 @@ class DefaultAvatarRepository @Inject constructor(
 
     private fun deleteAvatarFile(user: MegaUser) {
         val oldFile =
-            cacheFolderGateway.buildAvatarFile(user.email + FileUtil.JPG_EXTENSION) ?: return
+            cacheFolderGateway.buildAvatarFile(user.email + FileConstant.JPG_EXTENSION) ?: return
         if (oldFile.exists()) {
             oldFile.delete()
         }
@@ -67,7 +67,8 @@ class DefaultAvatarRepository @Inject constructor(
 
     private suspend fun loadAvatarFile(user: MegaUser): File? {
         val avatarFile =
-            cacheFolderGateway.buildAvatarFile(user.email + FileUtil.JPG_EXTENSION) ?: return null
+            cacheFolderGateway.buildAvatarFile(user.email + FileConstant.JPG_EXTENSION)
+                ?: return null
         megaApiGateway.getUserAvatar(user, avatarFile.absolutePath)
         return avatarFile
     }
@@ -86,11 +87,18 @@ class DefaultAvatarRepository @Inject constructor(
     }
 
     override suspend fun getMyAvatarFile(): File? =
-        cacheFolderGateway.buildAvatarFile(megaApiGateway.accountEmail + FileUtil.JPG_EXTENSION)
+        cacheFolderGateway.buildAvatarFile(megaApiGateway.accountEmail + FileConstant.JPG_EXTENSION)
 
     private fun getColor(color: String?): Int {
         return if (color == null) {
-            avatarWrapper.getSpecificAvatarColor(Constants.AVATAR_PRIMARY_COLOR)
+            avatarWrapper.getSpecificAvatarColor(AVATAR_PRIMARY_COLOR)
         } else Color.parseColor(color)
+    }
+
+    companion object {
+        /**
+         * refer [mega.privacy.android.app.utils.Constants.AVATAR_PRIMARY_COLOR]
+         */
+        private const val AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR"
     }
 }

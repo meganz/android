@@ -1,4 +1,4 @@
-package mega.privacy.android.app.utils.wrapper
+package mega.privacy.android.data.wrapper
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory
 /**
  * define methods relate to BitmapFactory
  */
-interface BitmapFactoryWrapper {
+internal interface BitmapFactoryWrapper {
     /**
      * decode file
      *
