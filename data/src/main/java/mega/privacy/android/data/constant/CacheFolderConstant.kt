@@ -20,4 +20,9 @@ object CacheFolderConstant {
      * Temporary Folder
      */
     const val TEMPORARY_FOLDER = "tempMEGA"
+
+    /**
+     * Avatar Folder
+     */
+    const val AVATAR_FOLDER = "avatarsMEGA"
 }

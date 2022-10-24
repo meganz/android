@@ -1,6 +1,6 @@
-package mega.privacy.android.app.data.extensions
+package mega.privacy.android.data.extensions
 
-import mega.privacy.android.app.utils.StringUtils.decodeBase64
+import android.util.Base64
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaStringMap
 import timber.log.Timber
@@ -23,3 +23,13 @@ fun MegaStringMap.getDecodedAliases(): Map<Long, String> {
 
     return aliases
 }
+
+/**
+ * Decode the Base64-encoded data into a new formatted String
+ */
+fun String.decodeBase64(): String =
+    try {
+        Base64.decode(this.trim(), Base64.DEFAULT).toString(Charsets.UTF_8)
+    } catch (ignore: IllegalArgumentException) {
+        Base64.decode(this.trim(), Base64.URL_SAFE).toString(Charsets.UTF_8)
+    }

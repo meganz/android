@@ -8,6 +8,7 @@ import mega.privacy.android.data.repository.DefaultAlbumsRepository
 import mega.privacy.android.data.repository.DefaultAvatarRepository
 import mega.privacy.android.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
+import mega.privacy.android.data.repository.DefaultContactsRepository
 import mega.privacy.android.data.repository.DefaultEnvironmentRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultFilesRepository
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.repository.AlbumsRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileRepository
@@ -46,6 +48,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class RepositoryModule {
+    @Binds
+    abstract fun bindContactsRepository(repository: DefaultContactsRepository): ContactsRepository
+
     @Binds
     abstract fun bindNetworkRepository(repository: DefaultNetworkRepository): NetworkRepository
 

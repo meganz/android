@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -8,17 +8,17 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.extensions.findItemByHandle
-import mega.privacy.android.app.data.extensions.getDecodedAliases
-import mega.privacy.android.app.data.extensions.replaceIfExists
-import mega.privacy.android.app.data.extensions.sortList
-import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.findItemByHandle
+import mega.privacy.android.data.extensions.getDecodedAliases
+import mega.privacy.android.data.extensions.replaceIfExists
+import mega.privacy.android.data.extensions.sortList
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
@@ -61,7 +61,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property contactItemMapper      [ContactItemMapper]
  * @property contactDataMapper      [ContactDataMapper]
  */
-class DefaultContactsRepository @Inject constructor(
+internal class DefaultContactsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -145,7 +145,7 @@ class DefaultContactsRepository @Inject constructor(
                 val fullName = megaChatApiGateway.getUserFullNameFromCache(megaUser.handle)
                 val alias = megaChatApiGateway.getUserAliasFromCache(megaUser.handle)
                 val status = megaChatApiGateway.getUserOnlineStatus(megaUser.handle)
-                val avatarUri = cacheFolderGateway.getCacheFile(CacheFolderManager.AVATAR_FOLDER,
+                val avatarUri = cacheFolderGateway.getCacheFile(CacheFolderConstant.AVATAR_FOLDER,
                     "${megaUser.email}.jpg")?.absolutePath
 
                 checkLastGreen(status, megaUser.handle)
@@ -224,7 +224,7 @@ class DefaultContactsRepository @Inject constructor(
     private suspend fun getAvatarUri(email: String, avatarFileName: String): String? =
         runCatching {
             val avatarFile =
-                cacheFolderGateway.getCacheFile(CacheFolderManager.AVATAR_FOLDER, avatarFileName)
+                cacheFolderGateway.getCacheFile(CacheFolderConstant.AVATAR_FOLDER, avatarFileName)
 
             getContactAvatar(email, avatarFile?.absolutePath ?: return@runCatching null)
         }.fold(
@@ -308,7 +308,7 @@ class DefaultContactsRepository @Inject constructor(
             if (changes.isEmpty()
                 && (megaUser == null || megaUser.visibility != MegaUser.VISIBILITY_VISIBLE)
             ) {
-                updatedList.removeIf { (handle) -> handle == userId.id }
+                updatedList.removeAll { (handle) -> handle == userId.id }
             } else if (megaUser != null) {
                 if (updatedContact == null && megaUser.visibility == MegaUser.VISIBILITY_VISIBLE) {
                     updatedContact = getVisibleContact(megaUser)
