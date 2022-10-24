@@ -53,7 +53,6 @@ class StartScreenViewModelTest {
             monitorStartScreenPreference = monitorStartScreenPreference,
             setStartScreenPreference = setStartScreenPreference,
             startScreenOptionMapper = mapStartScreenOption,
-            eventBus = {},
         )
     }
 

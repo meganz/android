@@ -1,7 +1,6 @@
 package mega.privacy.android.app.data.repository
 
 import android.content.Context
-import android.content.SharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -9,11 +8,8 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.extensions.isTypeWithParam
-import mega.privacy.android.app.data.gateway.MonitorStartScreenFacade
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.SharedPreferenceConstants
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
@@ -48,7 +44,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property databaseHandler
  * @property context
  * @property apiFacade
- * @property monitorStartScreenFacade
  * @property ioDispatcher
  * @property chatPreferencesGateway
  * @property callsPreferencesGateway
@@ -63,7 +58,6 @@ class DefaultSettingsRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
     private val apiFacade: MegaApiGateway,
-    private val monitorStartScreenFacade: MonitorStartScreenFacade,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val chatPreferencesGateway: ChatPreferencesGateway,
@@ -132,11 +126,6 @@ class DefaultSettingsRepository @Inject constructor(
             MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
         )
 
-    override fun getStartScreen() = getUiPreferences().getInt(
-        SharedPreferenceConstants.PREFERRED_START_SCREEN,
-        StartScreenUtil.HOME_BNV
-    )
-
     override suspend fun setAutoAcceptQR(accept: Boolean): Boolean =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
@@ -170,14 +159,6 @@ class DefaultSettingsRepository @Inject constructor(
             MegaRequest.TYPE_SET_ATTR_USER,
             MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
         )
-
-    private fun getUiPreferences(): SharedPreferences =
-        context.getSharedPreferences(
-            SharedPreferenceConstants.USER_INTERFACE_PREFERENCES,
-            Context.MODE_PRIVATE
-        )
-
-    override fun monitorStartScreen(): Flow<Int> = monitorStartScreenFacade.getEvents()
 
     override fun monitorHideRecentActivity(): Flow<Boolean?> =
         uiPreferencesGateway.monitorHideRecentActivity()

@@ -18,7 +18,6 @@ import javax.inject.Inject
 class StartScreenViewModel @Inject constructor(
     private val monitorStartScreenPreference: MonitorStartScreenPreference,
     private val setStartScreenPreference: SetStartScreenPreference,
-    private val eventBus: StartScreenEventWrapper,
     startScreenOptionMapper: StartScreenOptionMapper,
 ) : ViewModel() {
 
@@ -43,7 +42,5 @@ class StartScreenViewModel @Inject constructor(
         viewModelScope.launch {
             setStartScreenPreference(newScreen)
         }
-//        TODO("Remove this call once all code has been refactored to use monitor instead")
-        eventBus(newScreen.id)
     }
 }
