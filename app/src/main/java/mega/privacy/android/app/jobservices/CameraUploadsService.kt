@@ -1286,6 +1286,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             onSuccess = { Timber.d("MEGA Chat initialization successful") },
             onFailure = { Timber.e("MEGA Chat initialization unsuccessful with error $it") },
         )
+        Timber.d("Waiting for the user to log in")
     }
 
     /**
