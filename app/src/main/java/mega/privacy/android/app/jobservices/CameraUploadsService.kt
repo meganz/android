@@ -1298,6 +1298,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER,
             getAttrUserListener
         )
+        Timber.d("Waiting to check the user attribute")
     }
 
     /**
