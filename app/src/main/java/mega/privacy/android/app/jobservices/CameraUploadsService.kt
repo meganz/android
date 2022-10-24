@@ -789,7 +789,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * 2. The Preferences exist - [preferencesExist],
      * 3. The Camera Uploads sync is enabled - [cameraUploadsSyncEnabled],
      * 4. The User is online - [isUserOnline],
-     * 5. The Device battery level is above battery level - [isDeviceAboveBatteryLevel],
+     * 5. The Device battery level is above the minimum threshold - [isDeviceAboveBatteryLevel],
      * 6. The Camera Uploads local path exists - [hasCameraUploadsLocalPath],
      * 7. The Wi-Fi Constraint is satisfied - [isWifiConstraintSatisfied],
      * 8. The local Primary Folder exists - [hasLocalPrimaryFolder],
@@ -814,67 +814,59 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      *
      * @return true if it exists, and false if otherwise
      */
-    private suspend fun userCredentialsExist(): Boolean {
+    private suspend fun userCredentialsExist(): Boolean =
         hasCredentials().also {
             if (!it) {
                 Timber.w("There are no user credentials")
                 endService()
             }
-            return it
         }
-    }
 
     /**
      * Checks if the Preferences from [hasPreferences] exist
      *
      * @return true if it exists, and false if otherwise
      */
-    private suspend fun preferencesExist(): Boolean {
+    private suspend fun preferencesExist(): Boolean =
         hasPreferences().also {
             if (!it) {
                 Timber.w("Preferences not defined, so not enabled")
                 endService()
             }
-            return it
         }
-    }
 
     /**
      * Checks if the Camera Uploads sync from [isCameraUploadSyncEnabled] is enabled
      *
      * @return true if enabled, and false if otherwise
      */
-    private suspend fun cameraUploadsSyncEnabled(): Boolean {
+    private suspend fun cameraUploadsSyncEnabled(): Boolean =
         isCameraUploadSyncEnabled().also {
             if (!it) {
                 Timber.w("Camera Upload sync disabled")
                 endService()
             }
-            return it
         }
-    }
 
     /**
      * Checks if the User is online through [Util.isOnline]
      *
      * @return true if the User is online, and false if otherwise
      */
-    private fun isUserOnline(): Boolean {
+    private fun isUserOnline(): Boolean =
         Util.isOnline(applicationContext).also {
             if (!it) {
                 Timber.w("User is not online")
                 endService()
             }
-            return it
         }
-    }
 
     /**
      * Checks if the device is above battery level through [isDeviceNotLowOnBattery]
      *
      * @return true if the device is above battery level, and false if otherwise
      */
-    private fun isDeviceAboveBatteryLevel(): Boolean {
+    private fun isDeviceAboveBatteryLevel(): Boolean =
         isDeviceNotLowOnBattery(batteryIntent).also {
             if (!it) {
                 Timber.w("Device is low on battery")
@@ -882,85 +874,73 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
             return it
         }
-    }
 
     /**
      * Checks if the Camera Uploads local path from [localPath] exists
      *
      * @return true if the Camera Uploads local path exists, and false if otherwise
      */
-    private suspend fun hasCameraUploadsLocalPath(): Boolean {
-        val localPathExists = localPath()?.isNotBlank() == true
-        if (!localPathExists) {
-            Timber.w("Camera Uploads local path is empty")
-            endService()
+    private suspend fun hasCameraUploadsLocalPath(): Boolean =
+        !localPath().isNullOrBlank().also {
+            if (!it) {
+                Timber.w("Camera Uploads local path is empty")
+                endService()
+            }
         }
-        return localPathExists
-    }
 
     /**
      * Checks if the Wi-Fi constraint from the negated [isWifiNotSatisfied] is satisfied
      *
      * @return true if the Wi-Fi constraint is satisfied, and false if otherwise
      */
-    private suspend fun isWifiConstraintSatisfied(): Boolean {
-        isWifiNotSatisfied().also {
-            if (it) {
+    private suspend fun isWifiConstraintSatisfied(): Boolean =
+        !isWifiNotSatisfied().also {
+            if (!it) {
                 Timber.w("Cannot start, Wi-Fi required")
                 endService()
             }
-            return !it
         }
-    }
 
     /**
      * Checks if the local Primary Folder from [isLocalPrimaryFolderSet] exists
      *
      * @return true if it exists, and false if otherwise
      */
-    private suspend fun hasLocalPrimaryFolder(): Boolean {
+    private suspend fun hasLocalPrimaryFolder(): Boolean =
         isLocalPrimaryFolderSet().also {
-            if (it) notificationManager?.cancel(LOCAL_FOLDER_REMINDER_PRIMARY)
-            else {
+            if (!it) {
                 Timber.w("Local Primary Folder is not set")
                 handleLocalPrimaryFolderDisabled()
                 endService()
-            }
-            return it
+            } else notificationManager?.cancel(LOCAL_FOLDER_REMINDER_PRIMARY)
         }
-    }
 
     /**
      * Checks if the local Secondary Folder from [isLocalSecondaryFolderSet] exists
      *
      * @return true if it exists, and false if otherwise
      */
-    private suspend fun hasLocalSecondaryFolder(): Boolean {
+    private suspend fun hasLocalSecondaryFolder(): Boolean =
         isLocalSecondaryFolderSet().also {
-            if (it) notificationManager?.cancel(LOCAL_FOLDER_REMINDER_SECONDARY)
-            else {
+            if (!it) {
                 Timber.w("Local Secondary Folder is not set")
                 handleLocalSecondaryFolderDisabled()
                 endService()
-            }
-            return it
+            } else notificationManager?.cancel(LOCAL_FOLDER_REMINDER_SECONDARY)
         }
-    }
 
     /**
      * Checks if the user is logged in through [rootNodeExists] and [MegaApplication.isLoggingIn]
      *
      * @return true if the user is logged in, and false if otherwise
      */
-    private suspend fun isUserLoggedIn(): Boolean {
+    private suspend fun isUserLoggedIn(): Boolean =
         (rootNodeExists() || MegaApplication.isLoggingIn).also {
             if (!it) {
                 Timber.w("The Root Node is null. Wait for the user to login")
                 handleUserNotLoggedIn()
             }
-            return it
         }
-    }
 
     /**
      * Checks if the user's Camera Uploads attribute exists
