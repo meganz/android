@@ -4,13 +4,11 @@ import android.content.Context
 import android.os.Build
 import android.text.Html
 import android.text.Spanned
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
-import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
@@ -34,11 +32,9 @@ import javax.inject.Inject
 /**
  * Adapter to display a list of recent actions
  *
- * @property context
  */
-class RecentActionsAdapter @Inject constructor(
-    @ApplicationContext private val context: Context,
-) : RecyclerView.Adapter<RecentActionViewHolder>(), SectionTitleProvider, DragThumbnailGetter {
+class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentActionViewHolder>(),
+    SectionTitleProvider, DragThumbnailGetter {
 
     companion object {
         /**
@@ -46,8 +42,6 @@ class RecentActionsAdapter @Inject constructor(
          */
         private const val CLOUD_DRIVE_FOLDER_NAME = "Cloud Drive"
     }
-
-    private val outMetrics: DisplayMetrics = context.resources.displayMetrics
 
     private var recentActionItems: List<RecentActionItemType>? = null
 
@@ -80,7 +74,7 @@ class RecentActionsAdapter @Inject constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentActionViewHolder {
         val binding = ItemBucketBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
-        val elevationPx = Util.dp2px(HomepageFragment.BOTTOM_SHEET_ELEVATION, outMetrics)
+        val elevationPx = Util.dp2px(HomepageFragment.BOTTOM_SHEET_ELEVATION)
         headerColor = getColorForElevation(parent.context, elevationPx.toFloat())
 
         return RecentActionViewHolder(binding)
@@ -89,13 +83,15 @@ class RecentActionsAdapter @Inject constructor(
     override fun onBindViewHolder(holder: RecentActionViewHolder, position: Int) = with(holder) {
         val item = getItemAtPosition(position) ?: return
 
+        val context = holder.itemView.context
+
         when (item) {
             is RecentActionItemType.Header -> {
                 Timber.d("onBindViewHolder: TYPE_HEADER")
                 binding.itemBucketLayout.visibility = View.GONE
                 binding.headerLayout.visibility = View.VISIBLE
                 binding.headerLayout.setBackgroundColor(headerColor)
-                binding.headerText.text = TimeUtils.formatBucketDate(context, item.timestamp)
+                binding.headerText.text = TimeUtils.formatBucketDate(item.timestamp)
             }
 
             is RecentActionItemType.Item -> {
@@ -127,7 +123,7 @@ class RecentActionsAdapter @Inject constructor(
                         context.getString(R.string.create_action_bucket, item.userName)
                     }
                     binding.secondLineText.visibility = View.VISIBLE
-                    binding.secondLineText.text = formatUserAction(userAction)
+                    binding.secondLineText.text = formatUserAction(context, userAction)
                 }
 
                 // shares icon
@@ -155,9 +151,9 @@ class RecentActionsAdapter @Inject constructor(
                 // thumbnail
                 binding.thumbnailView.visibility = View.VISIBLE
                 val params = binding.thumbnailView.layoutParams as RelativeLayout.LayoutParams
-                params.height = Util.dp2px(48f, outMetrics)
+                params.height = Util.dp2px(48f)
                 params.width = params.height
-                val margin = Util.dp2px(12f, outMetrics)
+                val margin = Util.dp2px(12f)
                 params.setMargins(margin, margin, margin, 0)
                 binding.thumbnailView.layoutParams = params
                 binding.thumbnailView.setImageResource(MimeTypeList.typeForName(node.name).iconResourceId)
@@ -189,7 +185,7 @@ class RecentActionsAdapter @Inject constructor(
                     binding.imgFavourite.visibility = View.GONE
 
                     if (bucket.isMedia) {
-                        binding.firstLineText.text = getMediaTitle(nodeList)
+                        binding.firstLineText.text = getMediaTitle(context, nodeList)
                         binding.thumbnailView.setImageResource(R.drawable.media)
                     } else {
                         binding.firstLineText.text = context.getString(R.string.title_bucket,
@@ -235,7 +231,7 @@ class RecentActionsAdapter @Inject constructor(
     override fun getSectionTitle(position: Int): String {
         return if (recentActionItems.isNullOrEmpty() || position < 0 || position >= itemCount)
             ""
-        else TimeUtils.formatBucketDate(context, recentActionItems!![position].timestamp)
+        else TimeUtils.formatBucketDate(recentActionItems!![position].timestamp)
     }
 
     /**
@@ -269,10 +265,11 @@ class RecentActionsAdapter @Inject constructor(
     /**
      * Format the user action with decoration
      *
+     * @param context
      * @param userAction the string to decorate
      * @return spanned string with decoration
      */
-    private fun formatUserAction(userAction: String): Spanned {
+    private fun formatUserAction(context: Context, userAction: String): Spanned {
         val formattedUserAction = try {
             userAction
                 .replace("[A]",
@@ -293,10 +290,11 @@ class RecentActionsAdapter @Inject constructor(
     /**
      * Format the title in case there are multiple nodes in one recent action item
      *
+     * @param context
      * @param nodeList list of nodes contained in the recent action item
      * @return a string corresponding to the title
      */
-    private fun getMediaTitle(nodeList: MegaNodeList): String {
+    private fun getMediaTitle(context: Context, nodeList: MegaNodeList): String {
         val partition = (0 until nodeList.size())
             .map { nodeList[it] }
             .partition { MimeTypeList.typeForName(it.name).isImage }
