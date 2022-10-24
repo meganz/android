@@ -1,15 +1,15 @@
-package mega.privacy.android.domain.entity
+package mega.privacy.android.domain.entity.node
 
 
 /**
- * Node info
+ * Node
  */
-sealed interface NodeInfo {
+sealed interface Node {
 
     /**
      * Id
      */
-    val id: Long
+    val id: NodeId
 
     /**
      * Name
@@ -19,7 +19,7 @@ sealed interface NodeInfo {
     /**
      * Parent id
      */
-    val parentId: Long
+    val parentId: NodeId
 
     /**
      * Base64id

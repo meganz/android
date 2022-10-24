@@ -8,10 +8,10 @@ import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
-import mega.privacy.android.data.mapper.NodeInfoMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.domain.entity.NodeFolder
+import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.FavouritesRepository
 import nz.mega.sdk.MegaApiJava
@@ -41,26 +41,9 @@ class DefaultFavouritesRepositoryTest {
         on { label }.thenReturn(MegaNode.NODE_LBL_RED)
     }
 
-    private val favouriteInfo = NodeFolder(
-        id = 0,
-        name = node.name,
-        label = node.label,
-        parentId = 0,
-        base64Id = "",
-        hasVersion = true,
-        numChildFiles = 0,
-        numChildFolders = 0,
-        isFavourite = true,
-        isExported = false,
-        isTakenDown = false,
-        isInRubbishBin = false,
-        isIncomingShare = false,
-        isShared = false,
-        isPendingShare = false,
-        device = null,
-    )
+    private val favouriteInfo = mock<Node>()
 
-    private val nodeInfoMapper: NodeInfoMapper = { _, _, _, _, _, _, _, _ -> favouriteInfo }
+    private val nodeMapper: NodeMapper = { _, _, _, _, _, _, _, _ -> favouriteInfo }
 
     private val favouriteFolderInfoMapper = mock<FavouriteFolderInfoMapper>()
 
@@ -71,7 +54,7 @@ class DefaultFavouritesRepositoryTest {
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             monitorNodeChangeFacade = MonitorNodeChangeFacade(),
-            nodeInfoMapper = nodeInfoMapper,
+            nodeMapper = nodeMapper,
             favouriteFolderInfoMapper = favouriteFolderInfoMapper,
             cacheFolder = mock(),
             fileTypeInfoMapper = fileTypeInfoMapper

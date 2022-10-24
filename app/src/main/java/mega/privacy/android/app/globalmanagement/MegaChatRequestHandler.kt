@@ -50,7 +50,6 @@ class MegaChatRequestHandler @Inject constructor(
     @ApplicationScope
     private val sharingScope: CoroutineScope,
     private val chatManagement: ChatManagement,
-    private val sortOrderManagement: SortOrderManagement,
     private val myAccountInfo: MyAccountInfo,
     private val passcodeManagement: PasscodeManagement,
     private val transfersManagement: TransfersManagement,
@@ -188,7 +187,6 @@ class MegaChatRequestHandler @Inject constructor(
      * Resets all SingleObjects to their default values.
      */
     private fun resetDefaults() {
-        sortOrderManagement.resetDefaults()
         passcodeManagement.resetDefaults()
         myAccountInfo.resetDefaults()
         transfersManagement.resetDefaults()

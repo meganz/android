@@ -8,12 +8,11 @@ import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.di.AppModule
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.app.di.MegaApiFolder
+import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import org.mockito.kotlin.mock
-import java.util.concurrent.ThreadPoolExecutor
 
 @Module
 @TestInstallIn(
@@ -34,9 +33,6 @@ object TestAppModule {
 
     @Provides
     fun providePreferences(): SharedPreferences = mock()
-
-    @Provides
-    fun provideThreadPoolExecutor(): ThreadPoolExecutor = mock()
 
     @Provides
     fun provideGetThemeModePreference(): GetThemeMode =

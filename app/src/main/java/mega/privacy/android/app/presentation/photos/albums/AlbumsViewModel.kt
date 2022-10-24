@@ -16,6 +16,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
+import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
@@ -139,4 +140,10 @@ class AlbumsViewModel @Inject constructor(
 
     suspend fun getSelectedNodes() =
         getNodeListByIds(selectedPhotoIds.toList())
+
+    fun setCurrentSort(sort: Sort) {
+        _state.update {
+            it.copy(currentSort = sort)
+        }
+    }
 }

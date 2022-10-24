@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.megaachievements;
 
-import static mega.privacy.android.app.main.megaachievements.AchievementsActivity.sFetcher;
 import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 
@@ -19,8 +18,10 @@ import androidx.fragment.app.Fragment;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -29,7 +30,11 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class InfoAchievementsFragment extends Fragment implements GetAchievementsListener.DataCallback {
+    @Inject
+    GetAchievementsListener getAchievementsListener;
+
     ActionBar actionBar;
 
     ImageView icon;
@@ -78,9 +83,7 @@ public class InfoAchievementsFragment extends Fragment implements GetAchievement
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // The root view has been created, fill it with the data when data ready
-        if (sFetcher != null) {
-            sFetcher.setDataCallback(this);
-        }
+        getAchievementsListener.setDataCallback(this);
 
         updateBarTitle();
     }
@@ -112,8 +115,7 @@ public class InfoAchievementsFragment extends Fragment implements GetAchievement
     }
 
     private void updateUI() {
-        if (sFetcher == null) return;
-        MegaAchievementsDetails details = sFetcher.getAchievementsDetails();
+        MegaAchievementsDetails details = getAchievementsListener.getAchievementsDetails();
 
         if (details == null) return;
 

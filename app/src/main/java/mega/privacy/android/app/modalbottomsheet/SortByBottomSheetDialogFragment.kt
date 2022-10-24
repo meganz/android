@@ -10,18 +10,34 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
-import mega.privacy.android.app.globalmanagement.SortOrderManagement
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ORDER
+import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
+import mega.privacy.android.app.utils.Constants.IS_CLOUD_ORDER
+import mega.privacy.android.app.utils.Constants.NEW_ORDER
+import mega.privacy.android.app.utils.Constants.ORDER_CAMERA
+import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
+import mega.privacy.android.app.utils.Constants.ORDER_FAVOURITES
+import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
+import mega.privacy.android.app.utils.Constants.ORDER_OTHERS
 import mega.privacy.android.app.utils.callManager
-import nz.mega.sdk.MegaApiJava.*
-import java.util.*
+import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.domain.entity.SortOrder
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,19 +58,26 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
     }
 
-    @Inject
-    lateinit var sortOrderManagement: SortOrderManagement
-
     private lateinit var binding: BottomSheetSortByBinding
 
-    private var oldOrder: Int = ORDER_DEFAULT_ASC
     private var orderType: Int = ORDER_CLOUD
-    private var isIncomingRootOrder: Boolean = false
+
+    /**
+     * SortByHeaderViewModel
+     */
+    val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
+
+    /**
+     * SortOrderIntMapper
+     */
+    @Inject
+    lateinit var sortOrderIntMapper: SortOrderIntMapper
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = BottomSheetSortByBinding.inflate(LayoutInflater.from(context), null, false)
         contentView = binding.root
@@ -70,15 +93,30 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.sortByNameAsc.text = "$sortByName ($sortByAsc)"
         binding.sortByNameDesc.text = "$sortByName ($sortByDesc)"
 
-        orderType = arguments?.getInt(ORDER_TYPE)!!
+        orderType = arguments?.getInt(ORDER_TYPE) ?: ORDER_CLOUD
 
-        oldOrder = when (orderType) {
-            ORDER_CLOUD -> sortOrderManagement.getOrderCloud()
-            ORDER_CAMERA -> sortOrderManagement.getOrderCamera()
-            ORDER_OTHERS -> sortOrderManagement.getOrderOthers()
-            ORDER_OFFLINE -> sortOrderManagement.getOrderOffline()
-            ORDER_FAVOURITES -> sortOrderManagement.getOrderCloud()
-            else -> ORDER_DEFAULT_ASC
+        sortByHeaderViewModel.setOrderType(orderType)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                sortByHeaderViewModel.oldOrder.collectLatest { oldOrder ->
+                    when (oldOrder) {
+                        SortOrder.ORDER_DEFAULT_ASC -> setSelectedColor(binding.sortByNameAsc)
+                        SortOrder.ORDER_DEFAULT_DESC -> setSelectedColor(binding.sortByNameDesc)
+                        SortOrder.ORDER_CREATION_ASC -> setSelectedColor(binding.sortByNewestDate)
+                        SortOrder.ORDER_MODIFICATION_DESC -> setSelectedColor(binding.sortByNewestDate)
+                        SortOrder.ORDER_CREATION_DESC -> setSelectedColor(binding.sortByOldestDate)
+                        SortOrder.ORDER_MODIFICATION_ASC -> setSelectedColor(binding.sortByOldestDate)
+                        SortOrder.ORDER_SIZE_DESC -> setSelectedColor(binding.sortByLargestSize)
+                        SortOrder.ORDER_SIZE_ASC -> setSelectedColor(binding.sortBySmallestSize)
+                        SortOrder.ORDER_FAV_ASC -> setSelectedColor(binding.sortByFavoritesType)
+                        SortOrder.ORDER_LABEL_ASC -> setSelectedColor(binding.sortByLabelType)
+                        SortOrder.ORDER_PHOTO_DESC -> setSelectedColor(binding.sortByPhotosMediaType)
+                        SortOrder.ORDER_VIDEO_DESC -> setSelectedColor(binding.sortByVideosMediaType)
+                        else -> {}
+                    }
+                }
+            }
         }
 
         when (orderType) {
@@ -112,59 +150,44 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
         }
 
-        when (oldOrder) {
-            ORDER_DEFAULT_ASC -> setSelectedColor(binding.sortByNameAsc)
-            ORDER_DEFAULT_DESC -> setSelectedColor(binding.sortByNameDesc)
-            ORDER_CREATION_ASC -> setSelectedColor(binding.sortByNewestDate)
-            ORDER_MODIFICATION_DESC -> setSelectedColor(binding.sortByNewestDate)
-            ORDER_CREATION_DESC -> setSelectedColor(binding.sortByOldestDate)
-            ORDER_MODIFICATION_ASC -> setSelectedColor(binding.sortByOldestDate)
-            ORDER_SIZE_DESC -> setSelectedColor(binding.sortByLargestSize)
-            ORDER_SIZE_ASC -> setSelectedColor(binding.sortBySmallestSize)
-            ORDER_FAV_ASC -> setSelectedColor(binding.sortByFavoritesType)
-            ORDER_LABEL_ASC -> setSelectedColor(binding.sortByLabelType)
-            ORDER_PHOTO_DESC -> setSelectedColor(binding.sortByPhotosMediaType)
-            ORDER_VIDEO_DESC -> setSelectedColor(binding.sortByVideosMediaType)
-        }
-
         binding.sortByNameAsc.setOnClickListener {
-            setNewOrder(ORDER_DEFAULT_ASC)
+            setNewOrder(SortOrder.ORDER_DEFAULT_ASC)
         }
 
         binding.sortByNameDesc.setOnClickListener {
-            setNewOrder(ORDER_DEFAULT_DESC)
+            setNewOrder(SortOrder.ORDER_DEFAULT_DESC)
         }
 
         binding.sortByNewestDate.setOnClickListener {
-            setNewOrder(ORDER_MODIFICATION_DESC)
+            setNewOrder(SortOrder.ORDER_MODIFICATION_DESC)
         }
 
         binding.sortByOldestDate.setOnClickListener {
-            setNewOrder(ORDER_MODIFICATION_ASC)
+            setNewOrder(SortOrder.ORDER_MODIFICATION_ASC)
         }
 
         binding.sortByLargestSize.setOnClickListener {
-            setNewOrder(ORDER_SIZE_DESC)
+            setNewOrder(SortOrder.ORDER_SIZE_DESC)
         }
 
         binding.sortBySmallestSize.setOnClickListener {
-            setNewOrder(ORDER_SIZE_ASC)
+            setNewOrder(SortOrder.ORDER_SIZE_ASC)
         }
 
         binding.sortByFavoritesType.setOnClickListener {
-            setNewOrder(ORDER_FAV_ASC)
+            setNewOrder(SortOrder.ORDER_FAV_ASC)
         }
 
         binding.sortByLabelType.setOnClickListener {
-            setNewOrder(ORDER_LABEL_ASC)
+            setNewOrder(SortOrder.ORDER_LABEL_ASC)
         }
 
         binding.sortByPhotosMediaType.setOnClickListener {
-            setNewOrder(ORDER_PHOTO_DESC)
+            setNewOrder(SortOrder.ORDER_PHOTO_DESC)
         }
 
         binding.sortByVideosMediaType.setOnClickListener {
-            setNewOrder(ORDER_VIDEO_DESC)
+            setNewOrder(SortOrder.ORDER_VIDEO_DESC)
         }
 
         super.onViewCreated(view, savedInstanceState)
@@ -180,80 +203,85 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         text.setCompoundDrawablesRelative(icon, null, null, null)
     }
 
-    private fun setNewOrder(order: Int) {
-        if (oldOrder == order) {
-            return
-        }
-
-        when (orderType) {
-            ORDER_FAVOURITES,
-            ORDER_CLOUD -> {
-                sortOrderManagement.setOrderCloud(order)
-                LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
-                    .post(
-                        Triple(
-                            order,
-                            sortOrderManagement.getOrderOthers(),
-                            sortOrderManagement.getOrderOffline()
-                        )
-                    )
-
-                if (requireActivity() is ManagerActivity) {
-                    (requireActivity() as ManagerActivity).refreshCloudOrder(order)
-                } else if (requireActivity() is FileExplorerActivity) {
-                    updateFileExplorerOrder(order)
-                }
+    private fun setNewOrder(order: SortOrder) {
+        lifecycleScope.launch {
+            if (sortByHeaderViewModel.oldOrder.value == order) {
+                return@launch
             }
-            ORDER_CAMERA -> {
-                sortOrderManagement.setOrderCamera(order)
 
-                callManager { manager ->
-                    manager.refreshCUNodes()
-
-                    if(manager.isInMDPage) {
-                        manager.mdFragment.loadPhotos()
-                    }
-
-                    if(manager.isInAlbumContentPage) {
-                        manager.albumContentFragment.loadPhotos()
+            when (orderType) {
+                ORDER_FAVOURITES,
+                ORDER_CLOUD,
+                -> {
+                    sortByHeaderViewModel.setOrderCloud(order).join()
+                    LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
+                        .post(
+                            Triple(
+                                order,
+                                sortByHeaderViewModel.othersSortOrder.value,
+                                sortByHeaderViewModel.offlineSortOrder.value,
+                            )
+                        )
+                    if (requireActivity() is ManagerActivity) {
+                        (requireActivity() as ManagerActivity).refreshCloudOrder(sortOrderIntMapper(
+                            order))
+                    } else if (requireActivity() is FileExplorerActivity) {
+                        updateFileExplorerOrder(sortOrderIntMapper(order))
                     }
                 }
-            }
-            ORDER_OTHERS -> {
-                sortOrderManagement.setOrderOthers(order)
-                LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
-                    .post(
-                        Triple(
-                            sortOrderManagement.getOrderCloud(),
-                            order,
-                            sortOrderManagement.getOrderOffline()
-                        )
-                    )
+                ORDER_CAMERA -> {
+                    sortByHeaderViewModel.setOrderCamera(order).join()
 
-                if (requireActivity() is ManagerActivity) {
-                    (requireActivity() as ManagerActivity).refreshOthersOrder()
-                } else if (requireActivity() is FileExplorerActivity) {
-                    updateFileExplorerOrder(order)
+                    callManager { manager ->
+                        manager.refreshCUNodes()
+
+                        if (manager.isInMDPage) {
+                            manager.mdFragment.loadPhotos()
+                        }
+
+                        if (manager.isInAlbumContentPage) {
+                            val f = manager.albumContentFragment
+                            if (f is AlbumContentFragment) {
+                                f.loadPhotos()
+                            }
+                        }
+                    }
+                }
+                ORDER_OTHERS -> {
+                    sortByHeaderViewModel.setOrderOthers(order).join()
+                    LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
+                        .post(
+                            Triple(
+                                sortByHeaderViewModel.cloudSortOrder.value,
+                                order,
+                                sortByHeaderViewModel.offlineSortOrder.value,
+                            )
+                        )
+                    if (requireActivity() is ManagerActivity) {
+                        (requireActivity() as ManagerActivity).refreshOthersOrder()
+                    } else if (requireActivity() is FileExplorerActivity) {
+                        updateFileExplorerOrder(sortOrderIntMapper(order))
+                    }
+                }
+                ORDER_OFFLINE -> {
+                    sortByHeaderViewModel.setOrderOffline(order).join()
+                    LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
+                        .post(
+                            Triple(
+                                sortByHeaderViewModel.cloudSortOrder.value,
+                                sortByHeaderViewModel.othersSortOrder.value,
+                                order
+                            )
+                        )
+
+                    callManager { manager ->
+                        manager.refreshOthersOrder()
+                    }
                 }
             }
-            ORDER_OFFLINE -> {
-                sortOrderManagement.setOrderOffline(order)
-                LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
-                    .post(
-                        Triple(
-                            sortOrderManagement.getOrderCloud(),
-                            sortOrderManagement.getOrderOthers(),
-                            order
-                        )
-                    )
 
-                callManager { manager ->
-                    manager.refreshOthersOrder()
-                }
-            }
+            setStateBottomSheetBehaviorHidden()
         }
-
-        setStateBottomSheetBehaviorHidden()
     }
 
     private fun updateFileExplorerOrder(order: Int) {

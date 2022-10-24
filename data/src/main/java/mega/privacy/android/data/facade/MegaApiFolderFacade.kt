@@ -1,7 +1,7 @@
-package mega.privacy.android.app.data.facade
+package mega.privacy.android.data.facade
 
-import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
+import mega.privacy.android.data.qualifier.MegaApiFolder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
@@ -13,7 +13,7 @@ import javax.inject.Inject
  *
  * @property megaApiFolder
  */
-class MegaApiFolderFacade @Inject constructor(
+internal class MegaApiFolderFacade @Inject constructor(
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
 ) : MegaApiFolderGateway {
 

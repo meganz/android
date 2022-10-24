@@ -4,13 +4,21 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.res.Configuration.ORIENTATION_LANDSCAPE
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Environment
 import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.ScaleAnimation
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -38,8 +46,11 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIS
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.ViewUtils.isVisible
+import org.jetbrains.anko.configuration
 import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
+import java.io.File
 
 /**
  * MediaPlayer Fragment
@@ -199,7 +210,7 @@ class MediaPlayerFragment : Fragment() {
                     ).onEach {
                         Timber.d("MediaPlayerService observed playlist ${it.first.size} items")
 
-                        audioPlayerVH?.togglePlaylistEnabled(it.first)
+                        audioPlayerVH?.togglePlaylistEnabled(requireContext(), it.first)
                         videoPlayerVH?.togglePlaylistEnabled(it.first)
                     }.launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -256,7 +267,7 @@ class MediaPlayerFragment : Fragment() {
             }
 
             playerServiceViewModelGateway?.run {
-                viewHolder.setupPlaylistButton(getPlaylistItems()) {
+                viewHolder.setupPlaylistButton(requireContext(), getPlaylistItems()) {
                     findNavController().navigate(R.id.action_player_to_playlist)
                 }
             }
@@ -271,20 +282,87 @@ class MediaPlayerFragment : Fragment() {
                         videoPlayerPausedForPlaylist = false
                     }
                 }
-                // we need setup control buttons again, because reset player would reset PlayerControlView
-                viewHolder.setupPlaylistButton(playerServiceViewModelGateway?.getPlaylistItems()) {
-                    (requireActivity() as MediaPlayerActivity).setDraggable(false)
-                    findNavController().navigate(R.id.action_player_to_playlist)
-                }
-                viewHolder.setupLockUI(viewModel.isLockUpdate.value) { isLock ->
-                    viewModel.updateLockStatus(isLock)
-                    if (isLock) {
-                        delayHideWhenLocked()
+                with(viewHolder) {
+                    // we need setup control buttons again, because reset player would reset PlayerControlView
+                    setupPlaylistButton(playerServiceViewModelGateway?.getPlaylistItems()) {
+                        (requireActivity() as MediaPlayerActivity).setDraggable(false)
+                        findNavController().navigate(R.id.action_player_to_playlist)
+                    }
+                    setupLockUI(viewModel.isLockUpdate.value) { isLock ->
+                        viewModel.updateLockStatus(isLock)
+                        if (isLock) {
+                            delayHideWhenLocked()
+                        }
+                    }
+                    setupScreenshotButton {
+                        val rootPath =
+                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
+                        val screenshotsFolderPath =
+                            "${rootPath}${File.separator}$MEGA_SCREENSHOTS_FOLDER_NAME${File.separator}"
+                        viewHolder.binding.playerView.videoSurfaceView?.let { view ->
+                            viewModel.screenshotWhenVideoPlaying(requireActivity().window.decorView,
+                                screenshotsFolderPath,
+                                view) { bitmap ->
+                                requireActivity().runOnUiThread {
+                                    showCaptureScreenshotAnimation(
+                                        view = binding.screenshotScaleAnimationView,
+                                        layout = binding.screenshotScaleAnimationLayout,
+                                        bitmap = bitmap
+                                    )
+                                    (requireActivity() as MediaPlayerActivity)
+                                        .showSnackbarForVideoPlayer(
+                                            getString(R.string.media_player_video_snackbar_screenshot_saved)
+                                        )
+                                }
+                            }
+                        }
                     }
                 }
                 initRepeatToggleButtonForVideo(viewHolder)
             }
         }
+    }
+
+    private fun showCaptureScreenshotAnimation(
+        view: ImageView,
+        layout: LinearLayout,
+        bitmap: Bitmap,
+    ) {
+        if (!layout.isVisible()) {
+            layout.isVisible = true
+        }
+        view.setImageBitmap(bitmap)
+        val scaleY = if (requireActivity().configuration.orientation == ORIENTATION_LANDSCAPE) {
+            SCREENSHOT_SCALE_LANDSCAPE
+        } else {
+            SCREENSHOT_SCALE_PORTRAIT
+        }
+        val anim: Animation = ScaleAnimation(
+            SCREENSHOT_SCALE_ORIGINAL, scaleY,  // Start and end values for the X axis scaling
+            SCREENSHOT_SCALE_ORIGINAL, scaleY,  // Start and end values for the Y axis scaling
+            Animation.RELATIVE_TO_SELF, SCREENSHOT_RELATE_X,  // Pivot point of X scaling
+            Animation.RELATIVE_TO_PARENT, SCREENSHOT_RELATE_Y) // Pivot point of Y scaling
+
+        anim.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(p0: Animation?) {
+            }
+
+            override fun onAnimationEnd(p0: Animation?) {
+                view.postDelayed({
+                    view.setImageDrawable(null)
+                    layout.isVisible = false
+                    layout.clearAnimation()
+                    bitmap.recycle()
+                }, SCREENSHOT_DURATION)
+            }
+
+            override fun onAnimationRepeat(p0: Animation?) {
+            }
+
+        })
+        anim.fillAfter = true
+        anim.duration = ANIMATION_DURATION
+        layout.startAnimation(anim)
     }
 
     private fun initRepeatToggleButtonForVideo(viewHolder: VideoPlayerViewHolder) {
@@ -449,5 +527,13 @@ class MediaPlayerFragment : Fragment() {
 
     companion object {
         private const val KEY_VIDEO_PAUSED_FOR_PLAYLIST = "VIDEO_PAUSED_FOR_PLAYLIST"
+        private const val MEGA_SCREENSHOTS_FOLDER_NAME = "MEGA Screenshots"
+        private const val SCREENSHOT_SCALE_ORIGINAL: Float = 1F
+        private const val SCREENSHOT_SCALE_PORTRAIT: Float = 0.4F
+        private const val SCREENSHOT_SCALE_LANDSCAPE: Float = 0.3F
+        private const val SCREENSHOT_RELATE_X: Float = 0.9F
+        private const val SCREENSHOT_RELATE_Y: Float = 0.6F
+        private const val ANIMATION_DURATION: Long = 500
+        private const val SCREENSHOT_DURATION: Long = 500
     }
 }

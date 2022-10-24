@@ -13,7 +13,8 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
 /**
- * Fragment to display a composable two buttons alert dialog with action and cancel options
+ * Fragment to display a custom two buttons alert dialog when user is trying to add participants
+ * to a chat/meeting but has no contacts
  */
 @AndroidEntryPoint
 class AddParticipantsNoContactsDialogFragment : DialogFragment() {
@@ -41,7 +42,7 @@ class AddParticipantsNoContactsDialogFragment : DialogFragment() {
         /**
          * Creates an instance of this class
          *
-         * @return ActionOrCancelDialogFragment new instance
+         * @return AddParticipantsNoContactsDialogFragment new instance
          */
         @JvmStatic
         fun newInstance() = AddParticipantsNoContactsDialogFragment()

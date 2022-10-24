@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.presentation.photos.timeline.model.DateCard
-import mega.privacy.android.app.presentation.photos.timeline.model.Sort
+import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
 import mega.privacy.android.domain.entity.photos.Photo
 import java.text.SimpleDateFormat

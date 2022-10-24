@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.R
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.app.di.MegaApiFolder
+import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway

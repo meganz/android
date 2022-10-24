@@ -150,4 +150,16 @@ class DateCardsProvider(
         .distinctBy { it.modifiedDate.year }
         .map { createYearCard(it) }
 
+    val latestSortedMonths: List<GalleryCard>
+        get() = dayNodes.keys
+            .sortedByDescending { it.modifiedDate }
+            .distinctBy {
+                YearMonth.from(it.modifiedDate)
+            }.map { createMonthCard(it) }
+
+    val latestSortedYears: List<GalleryCard>
+        get() = dayNodes.keys
+            .sortedByDescending { it.modifiedDate }
+            .distinctBy { it.modifiedDate.year }
+            .map { createYearCard(it) }
 }

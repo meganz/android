@@ -24,7 +24,6 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
-import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
@@ -54,11 +53,11 @@ import mega.privacy.android.app.utils.ContextUtils.getAvailableMemory
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams.get
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.InitialiseLogging
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
@@ -208,7 +207,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         registerActivityLifecycleCallbacks(activityLifecycleHandler)
         isVerifySMSShowed = false
 
-        setupMegaApiFolder()
         setupMegaChatApi()
 
         //Logout check resumed pending transfers
@@ -407,22 +405,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
             registeredChatListeners = false
         } catch (e: Exception) {
             Timber.e(e)
-        }
-    }
-
-    /**
-     * Setup the MegaApiAndroid instance for folder link.
-     */
-    private fun setupMegaApiFolder() {
-        // If logged in set the account auth token
-        megaApiFolder.apply {
-            if (megaApi.isLoggedIn != 0) {
-                Timber.d("Logged in. Setting account auth token for folder links.")
-                accountAuth = megaApi.accountAuth
-            }
-            retrySSLerrors(true)
-            downloadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
-            uploadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
         }
     }
 

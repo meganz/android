@@ -4,15 +4,16 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.domain.entity.NodeFile
-import mega.privacy.android.domain.entity.NodeFolder
+import mega.privacy.android.data.model.node.DefaultFileNode
+import mega.privacy.android.data.model.node.DefaultFolderNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class NodeInfoMapperTest {
+class NodeMapperTest {
     private val expectedName = "testName"
     private val expectedSize = 1000L
     private val expectedLabel = MegaNode.NODE_LBL_RED
@@ -25,7 +26,7 @@ class NodeInfoMapperTest {
     fun `test that files are mapped if isFile is true`() = runTest {
         val megaNode = getMockNode(isFile = true)
         val actual =
-            toNodeInfo(
+            toNode(
                 megaNode = megaNode,
                 thumbnailPath = { null },
                 hasVersion = { false },
@@ -36,14 +37,14 @@ class NodeInfoMapperTest {
                 isPendingShare = { false },
             )
 
-        assertThat(actual).isInstanceOf(NodeFile::class.java)
+        assertThat(actual).isInstanceOf(DefaultFileNode::class.java)
     }
 
     @Test
     fun `test that folders are mapped if isFile is false`() = runTest {
         val megaNode = getMockNode(isFile = false)
         val actual =
-            toNodeInfo(
+            toNode(
                 megaNode = megaNode,
                 thumbnailPath = { null },
                 hasVersion = { false },
@@ -54,7 +55,7 @@ class NodeInfoMapperTest {
                 isPendingShare = { false },
             )
 
-        assertThat(actual).isInstanceOf(NodeFolder::class.java)
+        assertThat(actual).isInstanceOf(DefaultFolderNode::class.java)
     }
 
     @Test
@@ -71,7 +72,7 @@ class NodeInfoMapperTest {
             onBlocking { isPendingShare(node) }.thenReturn(true)
         }
 
-        val actual = toNodeInfo(
+        val actual = toNode(
             megaNode = node,
             thumbnailPath = { null },
             hasVersion = gateway::hasVersion,
@@ -85,14 +86,14 @@ class NodeInfoMapperTest {
         assertThat(actual.name).isEqualTo(expectedName)
         assertThat(actual.label).isEqualTo(expectedLabel)
         assertThat(actual.hasVersion).isEqualTo(expectedHasVersion)
-        assertThat(actual.id).isEqualTo(expectedId)
-        assertThat(actual.parentId).isEqualTo(expectedParentId)
+        assertThat(actual.id).isEqualTo(NodeId(expectedId))
+        assertThat(actual.parentId).isEqualTo(NodeId(expectedParentId))
         assertThat(actual.base64Id).isEqualTo(expectedBase64Id)
         assertThat(actual.isFavourite).isEqualTo(node.isFavourite)
         assertThat(actual.isExported).isEqualTo(node.isExported)
         assertThat(actual.isTakenDown).isEqualTo(node.isTakenDown)
-        assertThat(actual).isInstanceOf(NodeFolder::class.java)
-        val actualAsFolder = actual as NodeFolder
+        assertThat(actual).isInstanceOf(DefaultFolderNode::class.java)
+        val actualAsFolder = actual as DefaultFolderNode
         assertThat(actualAsFolder.isInRubbishBin).isTrue()
         assertThat(actualAsFolder.isPendingShare).isTrue()
     }

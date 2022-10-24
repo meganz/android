@@ -3,19 +3,24 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
+import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.exception.LocalStorageException
-import mega.privacy.android.domain.exception.UnKnownException
+import mega.privacy.android.domain.exception.UnknownException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import timber.log.Timber
 import java.io.IOException
+import java.util.Queue
 import javax.inject.Inject
 
 /**
@@ -24,22 +29,24 @@ import javax.inject.Inject
  * @property localStorageGateway [MegaLocalStorageGateway]
  * @property megaApiGateway [MegaApiGateway]
  * @property fileAttributeGateway [FileAttributeGateway]
+ * @property cameraUploadMediaGateway [CameraUploadMediaGateway]
  * @property cacheGateway [CacheGateway]
  * @property syncRecordTypeIntMapper [SyncRecordTypeIntMapper]
+ * @property mediaStoreFileTypeUriMapper [MediaStoreFileTypeUriMapper]
  * @property ioDispatcher CoroutineDispatcher
  */
 internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
     private val fileAttributeGateway: FileAttributeGateway,
+    private val cameraUploadMediaGateway: CameraUploadMediaGateway,
     private val cacheGateway: CacheGateway,
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
+    private val mediaStoreFileTypeUriMapper: MediaStoreFileTypeUriMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CameraUploadRepository {
 
-    override fun getInvalidHandle(): Long {
-        return megaApiGateway.getInvalidHandle()
-    }
+    override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
 
     override suspend fun getPrimarySyncHandle(): Long? = withContext(ioDispatcher) {
         localStorageGateway.getCamSyncHandle()
@@ -178,7 +185,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             throw LocalStorageException(e.message, e.cause)
         } catch (e: Exception) {
             Timber.e(e)
-            throw UnKnownException(e.message, e.cause)
+            throw UnknownException(e.message, e.cause)
         }
     }
 
@@ -250,6 +257,22 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun shouldClearSyncRecords() = withContext(ioDispatcher) {
         localStorageGateway.shouldClearSyncRecords()
+    }
+
+    override suspend fun getMediaQueue(
+        mediaStoreFileType: MediaStoreFileType,
+        parentPath: String?,
+        isVideo: Boolean,
+        selectionQuery: String?,
+    ): Queue<CameraUploadMedia> = withContext(ioDispatcher) {
+        val queue = cameraUploadMediaGateway.getMediaQueue(
+            mediaStoreFileTypeUriMapper(mediaStoreFileType),
+            parentPath,
+            isVideo,
+            selectionQuery
+        )
+        Timber.d("$mediaStoreFileType count from media store database: ${queue.size}")
+        queue
     }
 
     override suspend fun getMaxTimestamp(

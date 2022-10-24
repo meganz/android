@@ -82,6 +82,7 @@ import com.shockwave.pdfium.PdfiumCore;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -103,7 +104,6 @@ import mega.privacy.android.app.usecase.GetGlobalTransferUseCase.Result;
 import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.data.database.DatabaseHandler;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -182,6 +182,12 @@ public class UploadService extends Service {
         super.onCreate();
         Timber.d("onCreate");
 
+        mBuilder = new Notification.Builder(UploadService.this);
+        mBuilderCompat = new NotificationCompat.Builder(UploadService.this, NOTIFICATION_CHANNEL_UPLOAD_ID);
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        startForeground();
+
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
@@ -201,12 +207,6 @@ public class UploadService extends Service {
         if (pm != null) {
             wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaUploadServicePowerLock:");
         }
-
-        mBuilder = new Notification.Builder(UploadService.this);
-        mBuilderCompat = new NotificationCompat.Builder(UploadService.this, NOTIFICATION_CHANNEL_UPLOAD_ID);
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        startForeground();
 
         // delay 1 second to refresh the pause notification to prevent update is missed
         pauseBroadcastReceiver = new BroadcastReceiver() {
@@ -640,7 +640,7 @@ public class UploadService extends Service {
     }
 
     private void updateProgressNotification() {
-        Collection<MegaTransfer> transfers = mapProgressFileTransfers.values();
+        Collection<MegaTransfer> transfers = new ArrayList<>(mapProgressFileTransfers.values());
 
         UploadProgress up = getInProgressNotification(transfers);
         long total = up.total;

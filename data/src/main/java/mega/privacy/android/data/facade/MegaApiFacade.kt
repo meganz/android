@@ -440,8 +440,14 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.getUserAttribute(user, type, listener)
 
-    override suspend fun getRecentActions(): List<MegaRecentActionBucket> =
-        megaApi.recentActions
+    override fun getRecentActionsAsync(
+        days: Long,
+        maxNodes: Long,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getRecentActionsAsync(days, maxNodes, listener)
+
+    override fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket =
+        megaApi.copyBucket(bucket)
 
     override fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaError =
         megaApi.checkAccessErrorExtended(node, level)
@@ -472,4 +478,8 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.getUserAttribute(attributeIdentifier, listener)
     }
+
+    override fun getAccountAchievements(listener: MegaRequestListenerInterface?) =
+        megaApi.getAccountAchievements(listener)
+
 }

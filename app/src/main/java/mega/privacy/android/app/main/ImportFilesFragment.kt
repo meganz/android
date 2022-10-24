@@ -50,11 +50,11 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
 
     private fun setupObservers() {
         with(viewModel) {
-            filesInfo.observe(viewLifecycleOwner) { info: List<ShareInfo> ->
-                showFilesInfo(info)
+            filesInfo.observe(viewLifecycleOwner) { info: List<ShareInfo>? ->
+                info?.let { showFilesInfo(it) }
             }
-            textInfo.observe(viewLifecycleOwner) { info: ShareTextInfo ->
-                showImportingTextInfo(info)
+            textInfo.observe(viewLifecycleOwner) { info: ShareTextInfo? ->
+                info?.let { showImportingTextInfo(it) }
             }
         }
     }

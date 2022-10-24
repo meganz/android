@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer
 
 import android.animation.Animator
+import android.content.Context
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -20,6 +21,8 @@ import mega.privacy.android.app.utils.SimpleAnimatorListener
 
 /**
  * A view holder for audio player, implementing the UI logic of audio player.
+ *
+ * @property binding [FragmentAudioPlayerBinding]
  */
 class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
 
@@ -84,7 +87,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     private fun displayTrackAndArtist(
         trackName: TextView,
         artistName: TextView,
-        metadata: Metadata
+        metadata: Metadata,
     ) {
         setTrackNameBottomMargin(trackName, true)
         trackName.text = metadata.title
@@ -98,7 +101,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     private fun animateTrackAndArtist(
         textView: TextView,
         showing: Boolean,
-        listener: (() -> Unit)? = null
+        listener: (() -> Unit)? = null,
     ) {
         textView.alpha = if (showing) 0F else 1F
 
@@ -132,13 +135,16 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     /**
      * Setup playlist button.
      *
+     * @param context Context
      * @param playlistItems the playlist
      * @param openPlaylist the callback when playlist button is clicked
      */
-    fun setupPlaylistButton(playlistItems: List<PlaylistItem>?, openPlaylist: () -> Unit) {
-        if (playlistItems != null) {
-            togglePlaylistEnabled(playlistItems)
-        }
+    fun setupPlaylistButton(
+        context: Context,
+        playlistItems: List<PlaylistItem>?,
+        openPlaylist: () -> Unit,
+    ) {
+        togglePlaylistEnabled(context, playlistItems)
 
         playlist.setOnClickListener {
             openPlaylist()
@@ -148,11 +154,20 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     /**
      * Toggle the playlist button.
      *
+     * @param context Context
      * @param playlistItems the new playlist
      */
-    fun togglePlaylistEnabled(playlistItems: List<PlaylistItem>) {
-        playlist.isEnabled = playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE
-
+    fun togglePlaylistEnabled(context: Context, playlistItems: List<PlaylistItem>?) {
+        playlist.isEnabled = playlistItems?.run {
+            size > MediaPlayerService.SINGLE_PLAYLIST_SIZE
+        } ?: false
+        playlist.setColorFilter(context.getColor(
+            if (playlist.isEnabled) {
+                R.color.dark_grey_white
+            } else {
+                R.color.grey_050_grey_800
+            }
+        ))
         shuffle.isEnabled = playlist.isEnabled
     }
 
@@ -163,12 +178,5 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      */
     fun updateLoadingAnimation(@Player.State playbackState: Int) {
         binding.loading.isVisible = playbackState == Player.STATE_BUFFERING
-    }
-
-    /**
-     * Hide player controller.
-     */
-    fun hideController() {
-        binding.playerView.hideController()
     }
 }

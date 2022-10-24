@@ -1,6 +1,5 @@
 package mega.privacy.android.app.meeting
 
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import dagger.hilt.android.AndroidEntryPoint
 import android.app.Service
 import android.content.Intent
@@ -9,7 +8,6 @@ import mega.privacy.android.app.meeting.listeners.HangChatCallListener.OnCallHun
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener.OnCallOnHoldCallback
 import javax.inject.Inject
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.usecase.call.AnswerCallUseCase
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaApiAndroid
@@ -19,13 +17,11 @@ import timber.log.Timber
 import nz.mega.sdk.MegaChatCall
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.usecase.call.AnswerCallUseCase.AnswerCallResult
 import mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification
 import mega.privacy.android.app.utils.CallUtil.openMeetingInProgress
 import mega.privacy.android.app.utils.Constants
@@ -33,19 +29,20 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.AnswerChatCall
 import java.lang.IllegalArgumentException
 
 /**
  * Service which should be for call notifications.
  *
- * @property passcodeManagement [PasscodeManagement]
- * @property rtcAudioManagerGateway [RTCAudioManagerGateway]
- * @property answerCallUseCase [AnswerCallUseCase]
- * @property ioDispatcher [CoroutineDispatcher]
- * @property coroutineScope [CoroutineScope]
- * @property megaApi [MegaApiAndroid]
- * @property megaChatApi [MegaApiAndroid]
- * @property app [MegaApplication]
+ * @property passcodeManagement         [PasscodeManagement]
+ * @property rtcAudioManagerGateway     [RTCAudioManagerGateway]
+ * @property answerChatCall             [AnswerChatCall]
+ * @property ioDispatcher               [CoroutineDispatcher]
+ * @property coroutineScope             [CoroutineScope]
+ * @property megaApi                    [MegaApiAndroid]
+ * @property megaChatApi                [MegaApiAndroid]
+ * @property app                        [MegaApplication]
  */
 @AndroidEntryPoint
 class CallNotificationIntentService : Service(),
@@ -55,7 +52,7 @@ class CallNotificationIntentService : Service(),
     lateinit var passcodeManagement: PasscodeManagement
 
     @Inject
-    lateinit var answerCallUseCase: AnswerCallUseCase
+    lateinit var answerChatCall: AnswerChatCall
 
     @Inject
     lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
@@ -228,25 +225,30 @@ class CallNotificationIntentService : Service(),
      * @param chatId Chat ID
      */
     private fun answerCall(chatId: Long) {
-        answerCallUseCase.answerCall(chatId, false, isTraditionalCall, false)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { (resultChatId): AnswerCallResult, throwable: Throwable? ->
-                if (resultChatId != chatIdIncomingCall) return@subscribe
+        coroutineScope?.launch {
+            runCatching {
+                answerChatCall(chatId, false, isTraditionalCall, false)
+            }.onFailure { exception ->
+                Util.showSnackbar(app?.applicationContext,
+                    StringResourcesUtils.getString(R.string.call_error))
+                Timber.e(exception)
+                coroutineScope?.cancel()
 
-                if (throwable == null) {
+            }.onSuccess { resultAnswerCall ->
+                val resultChatId = resultAnswerCall.chatHandle
+                if (resultChatId != null) {
                     Timber.d("Incoming call answered")
-                    openMeetingInProgress(this,
+                    openMeetingInProgress(this@CallNotificationIntentService,
                         chatIdIncomingCall,
                         true,
                         passcodeManagement)
                     clearIncomingCallNotification(callIdIncomingCall)
                     stopSelf()
-                } else {
-                    Util.showSnackbar(getInstance().applicationContext,
-                        StringResourcesUtils.getString(R.string.call_error))
                 }
+
+                coroutineScope?.cancel()
             }
+        }
     }
 
     companion object {

@@ -1,10 +1,10 @@
-package mega.privacy.android.domain.entity
+package mega.privacy.android.domain.entity.node
 
 
 /**
- * Folder
+ * Folder Node
  */
-interface Folder {
+interface FolderNode : Node {
     /**
      * Is folder in the rubbish bin
      */
@@ -29,4 +29,14 @@ interface Folder {
      * Device
      */
     val device: String?
+
+    /**
+     * Number of child folders
+     */
+    val childFolderCount: Int
+
+    /**
+     * Number of child files
+     */
+    val childFileCount: Int
 }

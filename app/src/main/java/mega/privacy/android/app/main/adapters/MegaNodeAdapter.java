@@ -70,9 +70,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.data.model.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
@@ -89,8 +87,8 @@ import mega.privacy.android.app.main.ContactSharedFolderFragment;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
+import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
@@ -100,6 +98,9 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.SortOrder;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -208,7 +209,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         private void bind() {
             binding.setSortByHeaderViewModel(sortByViewModel);
 
-            int orderType = sortByViewModel.getOrder().getFirst();
+            SortOrder orderType = sortByViewModel.getOrder().getFirst();
 
             // Root of incoming shares tab, display sort options OTHERS
             if (type == INCOMING_SHARES_ADAPTER

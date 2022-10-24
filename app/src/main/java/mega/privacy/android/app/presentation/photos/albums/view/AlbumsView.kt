@@ -48,7 +48,10 @@ fun AlbumsView(
         columns = GridCells.Fixed(3),
         modifier = Modifier.fillMaxSize()
     ) {
-        items(items = albumsViewState.albums) { album ->
+        items(
+            items = albumsViewState.albums,
+            key = { it.id.toString() + it.coverPhoto?.id.toString() }
+        ) { album ->
             Box(
                 modifier = Modifier
                     .padding(10.dp)
