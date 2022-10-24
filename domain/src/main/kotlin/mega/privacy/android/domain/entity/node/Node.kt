@@ -50,5 +50,10 @@ sealed interface Node {
      * Is taken down
      */
     val isTakenDown: Boolean
+
+    /**
+     * Is the node an incoming share
+     */
+    val isIncomingShare: Boolean
 }
 
