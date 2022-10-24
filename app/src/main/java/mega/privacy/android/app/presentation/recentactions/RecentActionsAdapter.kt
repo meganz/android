@@ -15,6 +15,8 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemBucketBinding
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
+import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
+import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.presentation.recentactions.RecentActionsAdapter.RecentActionViewHolder
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
@@ -109,7 +111,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                 // folder name
                 binding.nameText.text =
                     when (item.parentFolderName) {
-                        CLOUD_DRIVE_FOLDER_NAME -> context.getString(R.string.section_cloud_drive)
+                        CLOUD_DRIVE_FOLDER_NAME -> context.getFormattedStringOrDefault(R.string.section_cloud_drive)
                         else -> item.parentFolderName
                     }
 
@@ -118,9 +120,11 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                     binding.secondLineText.visibility = View.GONE
                 } else {
                     val userAction = if (bucket.isUpdate) {
-                        context.getString(R.string.update_action_bucket, item.userName)
+                        context.getFormattedStringOrDefault(R.string.update_action_bucket,
+                            item.userName)
                     } else {
-                        context.getString(R.string.create_action_bucket, item.userName)
+                        context.getFormattedStringOrDefault(R.string.create_action_bucket,
+                            item.userName)
                     }
                     binding.secondLineText.visibility = View.VISIBLE
                     binding.secondLineText.text = formatUserAction(context, userAction)
@@ -188,9 +192,10 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                         binding.firstLineText.text = getMediaTitle(context, nodeList)
                         binding.thumbnailView.setImageResource(R.drawable.media)
                     } else {
-                        binding.firstLineText.text = context.getString(R.string.title_bucket,
-                            node.name,
-                            nodeList.size() - 1)
+                        binding.firstLineText.text =
+                            context.getFormattedStringOrDefault(R.string.title_bucket,
+                                node.name,
+                                nodeList.size() - 1)
                     }
                 }
 
@@ -303,20 +308,20 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
 
         val mediaTitle = when {
             numImages > 0 && numVideos == 0 -> {
-                context.resources.getQuantityString(R.plurals.title_media_bucket_only_images,
+                context.getQuantityStringOrDefault(R.plurals.title_media_bucket_only_images,
                     numImages,
                     numImages)
             }
             numImages == 0 && numVideos > 0 -> {
-                context.resources.getQuantityString(R.plurals.title_media_bucket_only_videos,
+                context.getQuantityStringOrDefault(R.plurals.title_media_bucket_only_videos,
                     numVideos,
                     numVideos)
             }
             else -> {
-                context.resources.getQuantityString(R.plurals.title_media_bucket_images_and_videos,
+                context.getQuantityStringOrDefault(R.plurals.title_media_bucket_images_and_videos,
                     numImages,
                     numImages) +
-                        context.resources.getQuantityString(R.plurals.title_media_bucket_images_and_videos_2,
+                        context.getQuantityStringOrDefault(R.plurals.title_media_bucket_images_and_videos_2,
                             numVideos,
                             numVideos)
             }
