@@ -973,12 +973,16 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         if (isPrimaryFolderMissing()) {
             Timber.w("The local primary folder is missing")
             setupPrimaryFolder()
-            if (!isSecondaryFolderEnabled()) return false
+            if (!isSecondaryFolderEnabled()) {
+                Timber.d("Waiting for user to login or to check the Camera Uploads attribute")
+                return false
+            }
         }
         // Setup the Secondary Folder if it is missing and Secondary Media Uploads is enabled
         if (isSecondaryFolderMissing() && isSecondaryFolderEnabled()) {
             Timber.w("The local secondary folder is missing")
             setupSecondaryFolder()
+            Timber.d("Waiting for user to login or to check the Camera Uploads attribute")
             return false
         }
         // If either Primary or Secondary Folder needs to be set up, then call
@@ -995,6 +999,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 secondaryFolderHandle,
                 setAttrUserListener,
             )
+            Timber.d("Waiting to setup Camera Uploads folders")
+
             return false
         }
 
