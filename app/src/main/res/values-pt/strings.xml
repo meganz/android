@@ -467,7 +467,7 @@
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Lixeira esvaziada com êxito</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Ocorreu um erro. Não foi possível esvaziar a lixeira</string>
+    <string name="rubbish_bin_no_emptied">Ocorreu um erro. Não foi possível esvaziar a Lixeira</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Você está prestes a cancelar a sua assinatura MEGA. Por favor, deixe-nos saber se há alguma coisa que podemos fazer para ajudar a mudar a sua mente.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -2142,7 +2142,7 @@
     <!-- success message when deleting all the versions of the account -->
     <string name="success_delete_versions">As versões de arquivos foram deletadas</string>
     <!-- error message when deleting all the versions of the account -->
-    <string name="error_delete_versions">Um erro ocorreu ao tentar deletar todas as versões anteriores dos arquivos. Tente novamente mais tarde.</string>
+    <string name="error_delete_versions">Ocorreu um erro ao tentar deletar todas as versões anteriores dos arquivos. Tente novamente mais tarde.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_title">Controle das versões de arquivos</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
@@ -2562,7 +2562,7 @@
     <!-- Message show when a user cannot put the call on hold -->
     <string name="call_error_call_on_hold">Não é possível colocar a chamada em espera.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Ocorreu um erro. Não foi possível abrir o arquivo com este aplicativo.</string>
+    <string name="error_open_file_with">Ocorreu um erro e não foi possível abrir o arquivo com este aplicativo.</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
     <string name="outgoing_call_starting">Chamando&#8230;</string>
     <!-- Content of a invalid meta message -->
@@ -2846,9 +2846,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Não foi possível processar o seu último pagamento. Por favor, acesse o MEGA usando um navegador em um computador para obter mais informações.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">A sua conta Business expirou</string>
+    <string name="expired_business_title">Account deactivated</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Não foi possível processar o seu pagamento. O seu acesso será somente leitura até que o problema seja corrigido usando um navegador em um computador.</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">A sua conta [B]expirou[/B]. Somente é possível visualizar os seus dados.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3478,15 +3478,15 @@
     <!-- Label for hold meeting -->
     <string name="meeting_hold">Em espera</string>
     <!-- General label for speaker -->
-    <string name="general_speaker">Viva-voz</string>
+    <string name="general_speaker">Som</string>
     <!-- General label for headphone-->
     <string name="general_headphone">Fones de ouvido</string>
     <!-- General label for headphone on-->
     <string name="general_headphone_on">Os fones de ouvido estão ativados</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">O viva-voz está ativado</string>
+    <string name="general_speaker_on">O som está ligado</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">O viva-voz está desativado</string>
+    <string name="general_speaker_off">O som está desligado</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">Finalizar</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -3750,7 +3750,7 @@
     <!-- Title of pop-up error message for taken down file -->
     <string name="error_file_not_available">O arquivo já não está disponível</string>
     <!-- Body of pop-up error message for taken down file. -->
-    <string name="error_takendown_file">Arquivo removido porque infringiu os nossos Termos de serviço.</string>
+    <string name="error_takendown_file">Arquivo removido por infringir os nossos Termos de serviço.</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
     <string name="error_download_takendown_file">Infração dos Termos de serviço</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
@@ -3804,7 +3804,7 @@
         <item quantity="other">%1$s e outros %2$d saíram</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
-    <string name="rubbish_bin_bottom_menu_option_delete">Apagar permanentemente</string>
+    <string name="rubbish_bin_bottom_menu_option_delete">Deletar permanentemente</string>
     <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
     <string name="rubbish_bin_delete_confirmation_dialog_button_delete">Deletar</string>
     <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
@@ -3874,17 +3874,17 @@
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">Copiar com um nome diferente</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">Usar está opção nos próximos %1$d conflitos</string>
+    <string name="file_apply_for_all">Usar esta opção nos próximos %1$d conflitos</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
-    <string name="warning_copy_and_merge">Combina a pasta já existente no destino com a pasta que você está copiando.</string>
+    <string name="warning_copy_and_merge">Combinar a pasta já existente no destino com a pasta que você está copiando.</string>
     <!-- Copy and merge action button for a name collision. -->
     <string name="copy_and_merge">Copiar e combinar</string>
     <!-- Informs about what is expected after choose the option move and merge for a name collision. -->
-    <string name="warning_move_and_merge">Combina a pasta já existente no destino com a pasta que você está movendo.</string>
+    <string name="warning_move_and_merge">Combinar a pasta já existente no destino com a pasta que você está movendo.</string>
     <!-- Move and merge action button for a name collision. -->
     <string name="move_and_merge">Mover e combinar</string>
     <!-- Informs about what is expected after choose the option upload and merge for a name collision. -->
-    <string name="warning_upload_and_merge">Combina a pasta já existente no destino com a pasta que você está enviando.</string>
+    <string name="warning_upload_and_merge">Combinar a pasta já existente no destino com a pasta que você está enviando.</string>
     <!-- Upload and merge action button for a name collision. -->
     <string name="upload_and_merge">Fazer upload e combinar</string>
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for file name collisions. -->
@@ -3920,13 +3920,13 @@
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
     <string name="calls_call_screen_dialog_description_only_you_in_the_call">A chamada terminará automaticamente em 2 minutos, a menos que você queira continuar.</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
-    <string name="calls_call_screen_button_to_end_call">Finalizar chamada agora</string>
+    <string name="calls_call_screen_button_to_end_call">Finalizar a chamada</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
     <string name="calls_call_screen_button_to_stay_alone_in_call">Permanecer na chamada</string>
     <!-- Report issue setting name-->
     <string name="settings_help_report_issue">Informar sobre um problema</string>
     <!-- Report issue fragment instructions-->
-    <string name="settings_help_report_issue_instructions">Seus comentários nos ajudam a melhorar o MEGA. Descreva claramente o problema que você encontrou. Quanto mais detalhes você fornecer, mais fácil será para nós resolvê-lo.</string>
+    <string name="settings_help_report_issue_instructions">O seus comentários nos ajudam a melhorar o MEGA. Descreva claramente o problema que você encontrou. Quanto mais detalhes você proporcionar, mais fácil será para nós resolvê-lo.</string>
     <!-- Hint text for the description field on the report issue screen-->
     <string name="settings_help_report_issue_description_label">Descreva o problema</string>
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
@@ -3938,7 +3938,7 @@
     <!-- Error message when submit issue failed-->
     <string name="settings_help_report_issue_error">Houve um problema. Por favor, tente novamente mais tarde. Se ainda não for possível enviar a incidência, entre em contato com %s para obter assistência.</string>
     <!-- Success message when submit issue succeeded-->
-    <string name="settings_help_report_issue_success">Recebemos as informações. Analisaremos o problema e retornaremos para você.</string>
+    <string name="settings_help_report_issue_success">Recebemos as informações. Vamos estudar o problema e entrar em contato novamente.</string>
     <!-- Message shown during log file upload-->
     <string name="settings_help_report_issue_uploading_log_file">Fazendo upload do arquivo de log</string>
     <!-- Message shown if user tries to leave report screen without submitting their report-->
@@ -4123,4 +4123,18 @@
     <string name="upgrade_account_successful_pro_3_yearly">Obrigado pela assinatura anual do Pro&#160;III</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Permitir adicionar participantes a usuários que não forem anfitriões</string>
+    <!-- Title of gif album. -->
+    <string name="photos_album_title_gif">GIFs</string>
+    <!-- Title of raw album. -->
+    <string name="photos_album_title_raw">RAW</string>
+    <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_title">Não há contatos</string>
+    <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_message">Você não tem contatos para adicionar a este chat. Se você quiser adicionar participantes, primeiro envie um convite para inclui-los na sua lista de contatos.</string>
+    <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_title">Todos os contatos foram adicionados</string>
+    <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_message">Você já adicionou todos os seus contatos a este chat. Se você quiser adicionar mais participantes, primeiro envie um convite para inclui-los na sua lista de contatos.</string>
+    <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
+    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
 </resources>

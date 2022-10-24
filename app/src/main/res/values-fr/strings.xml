@@ -499,7 +499,7 @@
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Clé de déchiffrement invalide</string>
     <!-- upload to. Then choose an Audio file -->
-    <string name="upload_to_audio">Sons</string>
+    <string name="upload_to_audio">Audio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Vidéo</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -2196,11 +2196,11 @@
     <!-- Used in chat list screen to indicate in a chat list item that the message was sent by me, followed by the message -->
     <string name="word_me">Moi&#160;:</string>
     <!-- Title of the button in the contact info screen to start an audio call -->
-    <string name="call_button">Appeler</string>
+    <string name="call_button">Faire un appel vocal</string>
     <!-- Title of the button in the contact info screen to send a message -->
-    <string name="message_button">Message</string>
+    <string name="message_button">Envoyer un message</string>
     <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="video_button">Vidéo</string>
+    <string name="video_button">Faire un appel vidéo</string>
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">Envoyer le lien à&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
@@ -2846,9 +2846,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Un problème est survenu lors de votre dernier paiement. Pour plus de précisions, veuillez accéder à MEGA en utilisant un navigateur pour ordinateur.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Votre compte d’entreprise est expiré</string>
+    <string name="expired_business_title">Account deactivated</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Un problème est survenu lors du traitement de votre paiement. MEGA sera en lecture seulement tant que ce problème n’aura pas été corrigé dans un navigateur pour ordinateur.</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Votre compte est actuellement [B]désactivé[/B]. Vous ne pouvez que parcourir vos données.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -4123,4 +4123,18 @@
     <string name="upgrade_account_successful_pro_3_yearly">Nous vous remercions pour votre abonnement annuel Pro&#160;III</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Permettre aux non-hôtes d’ajouter des participants</string>
+    <!-- Title of gif album. -->
+    <string name="photos_album_title_gif">GIF</string>
+    <!-- Title of raw album. -->
+    <string name="photos_album_title_raw">RAW</string>
+    <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_title">Vous n’avez aucun contact</string>
+    <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_message">Vous n’avez aucun contact à ajouter à cette conversation. Si vous voulez ajouter des participants, invitez-les d’abord dans votre liste de contacts.</string>
+    <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_title">Tous les contacts ont été ajoutés</string>
+    <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_message">Vous avez déjà ajouté tous vos contacts à cette conversation. Si vous voulez ajouter d’autres participants, invitez-les d’abord dans votre liste de contacts.</string>
+    <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
+    <string name="media_player_video_snackbar_screenshot_saved">L’image a été enregistrée dans la galerie de votre appareil</string>
 </resources>

@@ -1048,7 +1048,7 @@
     <!-- Label for the option of the sliding panel to edit the profile -->
     <string name="group_chat_edit_profile_label">Sửa trang cá nhân</string>
     <!-- Title of the section to leave a group content in the Contact Properties screen -->
-    <string name="title_properties_chat_leave_chat">Rời Nhóm Chát</string>
+    <string name="title_properties_chat_leave_chat">Rời Nhóm</string>
     <!-- Label for participants of a group chat -->
     <string name="participants_chat_label">Các Thành Viên</string>
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
@@ -1377,7 +1377,7 @@
     <!--  -->
     <string name="contact_is_me">Không có tác vụ nào khả thi, vì bạn tự chọn chính tên mình</string>
     <!-- Confirmation before deleting one attachment -->
-    <string name="confirmation_delete_one_attachment">Xóa mục đính kèm?</string>
+    <string name="confirmation_delete_one_attachment">Loại bỏ mục đính kèm?</string>
     <!-- Menu option -->
     <string name="general_view_with_revoke">Xem các tệp tin (%1$d đã xóa)</string>
     <!-- Error message when the attachment cannot be sent -->
@@ -1389,7 +1389,7 @@
     <!-- messages string in chat notification -->
     <string name="messages_chat_notification">tin nhắn</string>
     <!-- part of the string in incoming shared folder notification -->
-    <string name="incoming_folder_notification">Giá từ</string>
+    <string name="incoming_folder_notification">từ</string>
     <!-- title of incoming shared folder notification -->
     <string name="title_incoming_folder_notification">Thư mục chia sẻ mới</string>
     <!-- title of the notification for a new incoming contact request -->
@@ -1539,7 +1539,7 @@
     <!-- Title of dialog to evaluate the app -->
     <string name="title_evaluate_the_app_panel">Hài lòng với App MEGA cho Di Động?</string>
     <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Có, đánh dấu sao</string>
+    <string name="rate_the_app_panel">Có, đánh giá app</string>
     <!-- Label to show send feedback -->
     <string name="send_feedback_panel">Không, gửi phản hồi</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
@@ -2700,9 +2700,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Có vấn đề phát sinh với việc thanh toán gần đây. Xin truy cập MEGA bằng trình duyệt web trên máy tính để biết thêm thông tin.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Tài khoản doanh nghiệp đã hết hạn</string>
+    <string name="expired_business_title">Account deactivated</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Đã có vấn đề xảy ra với việc xử lý thanh toán gần đây. Tài khoản sẽ bị giới hạn chức năng cho đến khi việc thanh toán được thực hiện giải quyết trên phiên bản nền web.</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Tài khoản của bạn hiện đang bị [B]đình chỉ[/B]. Bạn chỉ có khả năng xem duyệt dữ liệu của mình.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3896,23 +3896,37 @@
     <!-- Hint that tap to unlock in video player page -->
     <string name="video_player_unlock_hint">Chạm để mở</string>
     <!-- Label that schedule a meeting -->
-    <string name="chat_schedule_meeting">Schedule meeting</string>
+    <string name="chat_schedule_meeting">Đặt hẹn cuộc họp</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly">Thank you for your Pro&#160;Lite monthly subscription</string>
+    <string name="upgrade_account_successful_pro_lite_monthly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;Lite hằng tháng</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly">Thank you for your Pro&#160;Lite yearly subscription</string>
+    <string name="upgrade_account_successful_pro_lite_yearly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;Lite thường niên</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly">Thank you for your Pro&#160;I monthly subscription</string>
+    <string name="upgrade_account_successful_pro_1_monthly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;I hằng tháng</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly">Thank you for your Pro&#160;I yearly subscription</string>
+    <string name="upgrade_account_successful_pro_1_yearly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;I thường niên</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly">Thank you for your Pro&#160;II monthly subscription</string>
+    <string name="upgrade_account_successful_pro_2_monthly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;II hằng tháng</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly">Thank you for your Pro&#160;II yearly subscription</string>
+    <string name="upgrade_account_successful_pro_2_yearly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;II thường niên</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly">Thank you for your Pro&#160;III monthly subscription</string>
+    <string name="upgrade_account_successful_pro_3_monthly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;III hằng tháng</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
-    <string name="upgrade_account_successful_pro_3_yearly">Thank you for your Pro&#160;III yearly subscription</string>
+    <string name="upgrade_account_successful_pro_3_yearly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;III thường niên</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Cho phép các thành viên không chủ trì mời thêm người</string>
+    <!-- Title of gif album. -->
+    <string name="photos_album_title_gif">GIFs</string>
+    <!-- Title of raw album. -->
+    <string name="photos_album_title_raw">RAW</string>
+    <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_title">Không có tên liên lạc nào</string>
+    <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_message">Bạn không có tên nào trong sổ liên lạc để thêm vào cuộc chát này. Nếu bạn muốn thêm thành viên, trước hết hãy thêm tên của họ vào sổ liên lạc.</string>
+    <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_title">Đã thêm tất cả các tên liên lạc</string>
+    <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_message">Bạn đã thêm tất cả các tên liên lạc đã có vào trong cuộc chát này rồi. Nếu bạn muốn thêm thành viên nữa, trước hết hãy mời thêm người vào sổ liên lạc của bạn.</string>
+    <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
+    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
 </resources>

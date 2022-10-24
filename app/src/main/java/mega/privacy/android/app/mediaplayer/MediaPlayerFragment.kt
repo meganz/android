@@ -420,6 +420,9 @@ class MediaPlayerFragment : Fragment() {
             } else {
                 delayHideToolbarCanceled = true
                 showToolbar()
+                if (viewModel.isLockUpdate.value) {
+                    delayHideToolbar()
+                }
             }
         }
         updateLoadingAnimation(mediaPlayerServiceGateway.getPlaybackState())
