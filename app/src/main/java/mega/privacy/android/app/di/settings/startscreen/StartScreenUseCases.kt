@@ -1,6 +1,5 @@
 package mega.privacy.android.app.di.settings.startscreen
 
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.EntryPoint
@@ -9,8 +8,6 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.app.presentation.settings.startscreen.StartScreenEventWrapper
 import mega.privacy.android.app.presentation.settings.startscreen.model.StartScreenOptionMapper
 import mega.privacy.android.app.presentation.settings.startscreen.model.mapStartScreenOption
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -42,15 +39,6 @@ abstract class StartScreenUseCases {
          */
         @Provides
         fun provideStartScreenOptionMapper(): StartScreenOptionMapper = ::mapStartScreenOption
-
-        //        TODO("Remove this injection once all code has been refactored to use monitor instead")
-        /**
-         * Provide live event bus
-         */
-        @Provides
-        fun provideLiveEventBus(): StartScreenEventWrapper =
-            LiveEventBus.get(EventConstants.EVENT_UPDATE_START_SCREEN, Int::class.java)::post
-
     }
 }
 
