@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -8,17 +8,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.app.data.repository.DefaultAvatarRepository
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.wrapper.AvatarWrapper
+import mega.privacy.android.data.wrapper.BitmapFactoryWrapper
 import nz.mega.sdk.MegaUser
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.di.TestWrapperModule
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
 import kotlin.test.assertTrue
@@ -26,7 +26,7 @@ import kotlin.test.fail
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalContracts
-class DefaultAvatarRepositoryTest {
+internal class DefaultAvatarRepositoryTest {
     companion object {
         private const val CURRENT_USER_EMAIL = "CURRENT_USER_EMAIL"
     }
@@ -41,6 +41,8 @@ class DefaultAvatarRepositoryTest {
         on { it.email }.thenReturn(CURRENT_USER_EMAIL)
     }
     private val sharedFlow = MutableSharedFlow<GlobalUpdate>()
+    private val avatarWrapper = mock<AvatarWrapper>()
+    private val bitmapFactoryWrapper = mock<BitmapFactoryWrapper>()
 
     @Before
     fun setUp() {
@@ -49,8 +51,8 @@ class DefaultAvatarRepositoryTest {
         whenever(megaApiGateway.globalUpdates).thenReturn(sharedFlow)
         underTest = DefaultAvatarRepository(
             megaApiGateway = megaApiGateway,
-            avatarWrapper = TestWrapperModule.avatarWrapper,
-            bitmapFactoryWrapper = TestWrapperModule.bitmapFactoryWrapper,
+            avatarWrapper = avatarWrapper,
+            bitmapFactoryWrapper = bitmapFactoryWrapper,
             cacheFolderGateway = cacheFolderGateway,
             sharingScope = TestScope(),
             ioDispatcher = UnconfinedTestDispatcher()

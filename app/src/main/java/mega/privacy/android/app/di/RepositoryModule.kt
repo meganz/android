@@ -5,14 +5,12 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.repository.DefaultAccountRepository
-import mega.privacy.android.app.data.repository.DefaultAvatarRepository
 import mega.privacy.android.app.data.repository.DefaultContactsRepository
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.app.data.repository.DefaultLoginRepository
 import mega.privacy.android.app.data.repository.DefaultPhotosRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.LoginRepository
@@ -48,10 +46,6 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindLoginRepository(repository: DefaultLoginRepository): LoginRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindAvatarRepository(repository: DefaultAvatarRepository): AvatarRepository
 
     @Binds
     abstract fun bindPhotosRepository(repository: DefaultPhotosRepository): PhotosRepository
