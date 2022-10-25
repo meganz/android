@@ -1014,7 +1014,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 Timber.d("Show SMS verification activity.")
                 intent = Intent(applicationContext, SMSVerificationActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.putExtra(LoginFragment.NAME_USER_LOCKED, true)
+                intent.putExtra(NAME_USER_LOCKED, true)
                 startActivity(intent)
             }
             WEAK_PROTECTION_ACCOUNT_BLOCK -> {
@@ -1515,6 +1515,11 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         private const val UPGRADE_ALERT_SHOWN = "UPGRADE_ALERT_SHOWN"
         private const val EVENT_PURCHASES_UPDATED = "EVENT_PURCHASES_UPDATED"
         private const val PURCHASE_TYPE = "PURCHASE_TYPE"
+
+        /**
+         * User account locked.
+         */
+        const val NAME_USER_LOCKED = "NAME_USER_LOCKED"
 
         /**
          * Method to display a simple Snackbar.
