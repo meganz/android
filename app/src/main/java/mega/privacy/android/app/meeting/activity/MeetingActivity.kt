@@ -198,6 +198,10 @@ class MeetingActivity : BaseActivity() {
 
     override fun onDestroy() {
         navController?.removeOnDestinationChangedListener(destinationChangedListener)
+        val currentFragment = getCurrentFragment()
+        if (currentFragment is InMeetingFragment) {
+            meetingViewModel.sendEnterCallEvent(false)
+        }
         super.onDestroy()
     }
 
@@ -404,7 +408,7 @@ class MeetingActivity : BaseActivity() {
 
         val currentFragment = getCurrentFragment()
         if (currentFragment is InMeetingFragment) {
-            currentFragment.sendEnterCallEvent()
+            meetingViewModel.sendEnterCallEvent(true)
         }
     }
 

@@ -4,6 +4,7 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWE
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REMOVE_CALL_NOTIFICATION;
 import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
 import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
@@ -129,6 +130,12 @@ public class CallService extends Service {
         }
     };
 
+    private final Observer<Boolean> isInMeetingObserver = isOpened -> {
+        isInMeeting = isOpened;
+        updateNotificationContent();
+    };
+
+
     public void onCreate() {
         super.onCreate();
         app = (MegaApplication) getApplication();
@@ -146,6 +153,7 @@ public class CallService extends Service {
         LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom.class).observeForever(titleMeetingChangeObserver);
         LiveEventBus.get(EVENT_REMOVE_CALL_NOTIFICATION, Long.class).observeForever(removeNotificationObserver);
         LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).observeForever(callAnsweredInAnotherClientObserver);
+        LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean.class).observeForever(isInMeetingObserver);
     }
 
     @Override
@@ -251,7 +259,7 @@ public class CallService extends Service {
     }
 
     private void showCallInProgressNotification() {
-        Timber.d("Showing the notification");
+        Timber.d("************** Showing the notification");
         int notificationId = getCurrentCallNotifId();
         if (notificationId == INVALID_CALL) return;
 
@@ -347,6 +355,7 @@ public class CallService extends Service {
         stopForeground(true);
         cancelNotification();
         currentChatId = newChatIdCall;
+        Timber.d("**************updateCall newChatIdCall "+newChatIdCall);
 
         if (callChangesObserver.getOpenCallChatId() != currentChatId) {
             callChangesObserver.setOpenCallChatId(currentChatId);
@@ -476,6 +485,7 @@ public class CallService extends Service {
         LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom.class).removeObserver(titleMeetingChangeObserver);
         LiveEventBus.get(EVENT_REMOVE_CALL_NOTIFICATION, Long.class).removeObserver(removeNotificationObserver);
         LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).removeObserver(callAnsweredInAnotherClientObserver);
+        LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean.class).removeObserver(isInMeetingObserver);
 
         cancelNotification();
         callChangesObserver.setOpenCallChatId(MEGACHAT_INVALID_HANDLE);
