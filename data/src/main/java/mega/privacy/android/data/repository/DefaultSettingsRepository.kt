@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -6,13 +6,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.extensions.isTypeWithParam
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
+import mega.privacy.android.data.extensions.isTypeWithParam
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -21,6 +20,7 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.CallsSoundNotifications
@@ -54,7 +54,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property cameraTimestampsPreferenceGateway
  */
 @ExperimentalContracts
-class DefaultSettingsRepository @Inject constructor(
+internal class DefaultSettingsRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
     private val apiFacade: MegaApiGateway,
@@ -69,14 +69,16 @@ class DefaultSettingsRepository @Inject constructor(
     private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway,
 ) : SettingsRepository {
     init {
-        initialisePreferences()
+        runBlocking {
+            initialisePreferences()
+        }
     }
 
-    private fun initialisePreferences() {
+    private suspend fun initialisePreferences() {
         if (databaseHandler.preferences == null) {
             Timber.w("databaseHandler.preferences is NULL")
             databaseHandler.setStorageAskAlways(true)
-            val defaultDownloadLocation = FileUtil.buildDefaultDownloadDir(context)
+            val defaultDownloadLocation = cacheFolderGateway.buildDefaultDownloadDir()
             defaultDownloadLocation.mkdirs()
             databaseHandler.setStorageDownloadLocation(defaultDownloadLocation.absolutePath)
         }
@@ -308,9 +310,8 @@ class DefaultSettingsRepository @Inject constructor(
         monitorFunction(key, defaultValue)
     }
 
-    override fun getLastContactPermissionDismissedTime(): Flow<Long> {
-        return chatPreferencesGateway.getLastContactPermissionRequestedTime()
-    }
+    override fun getLastContactPermissionDismissedTime(): Flow<Long> =
+        chatPreferencesGateway.getLastContactPermissionRequestedTime()
 
     override suspend fun setLastContactPermissionDismissedTime(time: Long) {
         chatPreferencesGateway.setLastContactPermissionRequestedTime(time)

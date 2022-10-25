@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.extensions
+package mega.privacy.android.data.extensions
 
 import nz.mega.sdk.MegaRequest
 import kotlin.contracts.ExperimentalContracts

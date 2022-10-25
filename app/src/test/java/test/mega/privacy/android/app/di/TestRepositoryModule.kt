@@ -12,7 +12,6 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.LoginRepository
-import mega.privacy.android.domain.repository.SettingsRepository
 import org.mockito.kotlin.mock
 
 @Module
@@ -21,9 +20,6 @@ import org.mockito.kotlin.mock
     components = [SingletonComponent::class]
 )
 object TestRepositoryModule {
-
-    @Provides
-    fun provideSettingsRepository(): SettingsRepository = mock()
 
     @Provides
     fun provideAccountRepository(): AccountRepository = mock()
