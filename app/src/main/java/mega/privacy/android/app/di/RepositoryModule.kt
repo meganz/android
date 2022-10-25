@@ -9,14 +9,11 @@ import mega.privacy.android.app.data.repository.DefaultContactsRepository
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.app.data.repository.DefaultLoginRepository
 import mega.privacy.android.app.data.repository.DefaultPhotosRepository
-import mega.privacy.android.app.data.repository.DefaultSettingsRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.PhotosRepository
-import mega.privacy.android.domain.repository.SettingsRepository
-import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
 /**
@@ -28,11 +25,6 @@ import kotlin.contracts.ExperimentalContracts
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
-
-    @ExperimentalContracts
-    @Singleton
-    @Binds
-    abstract fun bindSettingsRepository(repository: DefaultSettingsRepository): SettingsRepository
 
     @ExperimentalContracts
     @Binds
