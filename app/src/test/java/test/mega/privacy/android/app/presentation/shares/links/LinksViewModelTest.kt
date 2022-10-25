@@ -10,15 +10,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
@@ -361,8 +361,8 @@ class LinksViewModelTest {
 
     @Test
     fun `test that refresh nodes is called when receiving a node update`() = runTest {
-        val node = mock<MegaNode> {
-            on { this.handle }.thenReturn(987654321L)
+        val node = mock<Node> {
+            on { this.id }.thenReturn(NodeId(987654321L))
         }
         monitorNodeUpdates.emit(listOf(node))
         // initialization call + receiving a node update call

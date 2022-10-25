@@ -10,16 +10,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
@@ -445,9 +445,9 @@ class IncomingSharesViewModelTest {
     fun `test that if monitor node update returns the current node and node is not retrieved, redirect to root of incoming shares`() =
         runTest {
             val handle = 123456789L
-            val node = mock<MegaNode> {
-                on { this.handle }.thenReturn(handle)
-                on { this.isInShare }.thenReturn(true)
+            val node = mock<Node> {
+                on { this.id }.thenReturn(NodeId(handle))
+                on { this.isIncomingShare }.thenReturn(true)
             }
             whenever(getNodeByHandle(any())).thenReturn(null)
             whenever(authorizeNode(any())).thenReturn(null)
@@ -467,9 +467,9 @@ class IncomingSharesViewModelTest {
     fun `test that if monitor node update does not returns the current node, do not redirect to root of incoming shares`() =
         runTest {
             val handle = 123456789L
-            val node = mock<MegaNode> {
-                on { this.handle }.thenReturn(987654321L)
-                on { this.isInShare }.thenReturn(true)
+            val node = mock<Node> {
+                on { this.id }.thenReturn(NodeId(987654321L))
+                on { this.isIncomingShare }.thenReturn(true)
             }
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
 
@@ -484,8 +484,8 @@ class IncomingSharesViewModelTest {
 
     @Test
     fun `test that refresh nodes is called when receiving a node update`() = runTest {
-        val node = mock<MegaNode> {
-            on { this.handle }.thenReturn(987654321L)
+        val node = mock<Node> {
+            on { this.id }.thenReturn(NodeId(987654321L))
         }
         monitorNodeUpdates.emit(listOf(node))
         // initialization call + receiving a node update call

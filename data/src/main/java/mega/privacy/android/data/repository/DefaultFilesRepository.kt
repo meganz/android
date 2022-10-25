@@ -3,7 +3,9 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -100,11 +102,6 @@ internal class DefaultFilesRepository @Inject constructor(
                 continuation.failWithError(error)
             }
         }
-
-    override fun monitorNodeUpdates() =
-        megaApiGateway.globalUpdates
-            .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
-            .mapNotNull { it.nodeList?.toList() }
 
     override suspend fun getRootNode(): MegaNode? = withContext(ioDispatcher) {
         megaApiGateway.getRootNode()
@@ -290,6 +287,26 @@ internal class DefaultFilesRepository @Inject constructor(
                     }
             } ?: throw SynchronisationException("Non null node found be null when fetched from api")
         }
+    }
+
+    override fun monitorNodeUpdates(): Flow<List<Node>> {
+        return megaApiGateway.globalUpdates
+            .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
+            .mapNotNull {
+                it.nodeList?.map { megaNode ->
+                    nodeMapper(
+                        megaNode,
+                        cacheFolderGateway::getThumbnailCacheFilePath,
+                        megaApiGateway::hasVersion,
+                        megaApiGateway::getNumChildFolders,
+                        megaApiGateway::getNumChildFiles,
+                        fileTypeInfoMapper,
+                        megaApiGateway::isPendingShare,
+                        megaApiGateway::isInRubbish,
+                    )
+                }
+            }
+            .flowOn(ioDispatcher)
     }
 
 }

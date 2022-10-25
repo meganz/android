@@ -422,6 +422,7 @@ import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
+import mega.privacy.android.domain.entity.node.Node;
 import mega.privacy.android.domain.entity.transfer.TransferType;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import nz.mega.documentscanner.DocumentScannerActivity;
@@ -1505,7 +1506,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 smsVerificationFragment = (SMSVerificationFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.SMS_VERIFICATION.getTag());
             }
             mElevationCause = savedInstanceState.getInt("elevation", 0);
-            storageState = (StorageState)savedInstanceState.getSerializable("storageState");
+            storageState = (StorageState) savedInstanceState.getSerializable("storageState");
             isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
             comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", INVALID_VALUE);
             openLinkDialogIsShown = savedInstanceState.getBoolean(OPEN_LINK_DIALOG_SHOWN, false);
@@ -8692,7 +8693,7 @@ public class ManagerActivity extends TransfersManagementActivity
         // event informing about the storage state  during login, the ManagerActivity
         // wasn't active and for this reason the value is stored in the MegaApplication object.
         StorageState storageStateToCheck = (storageState != StorageState.Unknown) ?
-                storageState :  viewModel.getStorageState();
+                storageState : viewModel.getStorageState();
 
         checkStorageStatus(storageStateToCheck, onCreate);
     }
@@ -9862,7 +9863,7 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshSharesPageAdapter();
     }
 
-    private void onUpdateNodes(@NonNull List<MegaNode> updatedNodes) {
+    private void onUpdateNodes(@NonNull List<Node> updatedNodes) {
         dismissAlertDialogIfExists(statusDialog);
 
         viewModel.checkCameraUploadFolder(false, updatedNodes);
