@@ -109,9 +109,6 @@ class MegaNodeUtilFacade @Inject constructor(
     override fun isNodeInRubbishOrDeleted(handle: Long) =
         MegaNodeUtil.isNodeInRubbishOrDeleted(handle)
 
-    override fun getOutgoingOrIncomingParent(node: MegaNode) =
-        MegaNodeUtil.getOutgoingOrIncomingParent(node)
-
     override fun canMoveToRubbish(nodes: List<MegaNode?>) = MegaNodeUtil.canMoveToRubbish(nodes)
 
     override fun areAllFileNodesAndNotTakenDown(nodes: List<MegaNode>) =
