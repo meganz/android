@@ -55,7 +55,9 @@ class CheckMegaStandbyBucketInitializer : Initializer<Unit> {
             entryPoint.appScope().launch {
                 (context.getSystemService(Context.USAGE_STATS_SERVICE) as? UsageStatsManager)
                     ?.let { usageStatsManager ->
-                        Timber.d("getAppStandbyBucket(): ${usageStatsManager.appStandbyBucket}")
+                        val appStandbyBucket = runCatching { usageStatsManager.appStandbyBucket }
+                            .getOrDefault(UsageStatsManager.STANDBY_BUCKET_ACTIVE)
+                        Timber.d("getAppStandbyBucket(): $appStandbyBucket")
                     }
             }
         }
