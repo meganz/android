@@ -18,6 +18,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
+import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.SkuMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanMapper
@@ -26,6 +27,8 @@ import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.achievement.AchievementType
+import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NoLoggedInUserException
@@ -72,6 +75,7 @@ class DefaultAccountRepository @Inject constructor(
     private val currencyMapper: CurrencyMapper,
     private val skuMapper: SkuMapper,
     private val subscriptionPlanListMapper: SubscriptionPlanListMapper,
+    private val megaAchievementMapper: MegaAchievementMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -199,6 +203,27 @@ class DefaultAccountRepository @Inject constructor(
                         }
                     }
                 ))
+            }
+        }
+
+    override suspend fun getAccountAchievements(
+        achievementType: AchievementType,
+        awardIndex: Long,
+    ): MegaAchievement =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                megaApiGateway.getAccountAchievements(OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        if (error.errorCode == MegaError.API_OK) {
+                            continuation.resumeWith(Result.success(megaAchievementMapper(
+                                request.megaAchievementsDetails,
+                                achievementType,
+                                awardIndex
+                            )))
+                        } else {
+                            continuation.failWithError(error)
+                        }
+                    }))
             }
         }
 }

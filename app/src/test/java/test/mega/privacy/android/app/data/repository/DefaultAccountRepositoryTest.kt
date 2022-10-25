@@ -14,14 +14,18 @@ import mega.privacy.android.app.data.repository.DefaultAccountRepository
 import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
+import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.SkuMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanMapper
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.achievement.AchievementType
+import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.AccountRepository
+import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCurrency
 import nz.mega.sdk.MegaError
@@ -50,6 +54,7 @@ class DefaultAccountRepositoryTest {
     private val currencyMapper = mock<CurrencyMapper>()
     private val skuMapper = mock<SkuMapper>()
     private val subscriptionPlanListMapper = mock<SubscriptionPlanListMapper>()
+    private val megaAchievementMapper = mock<MegaAchievementMapper>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -92,6 +97,7 @@ class DefaultAccountRepositoryTest {
             currencyMapper = currencyMapper,
             skuMapper = skuMapper,
             subscriptionPlanListMapper = subscriptionPlanListMapper,
+            megaAchievementMapper = megaAchievementMapper,
         )
     }
 
@@ -211,4 +217,33 @@ class DefaultAccountRepositoryTest {
             }
             underTest.getSubscriptionPlans()
         }
+
+    @Test
+    fun `test that account achievement data is successfully returned`() = runTest {
+        val megaAchievementsDetails = mock<MegaAchievementsDetails>()
+        val megaAchievement = mock<MegaAchievement>()
+
+        whenever(megaAchievementMapper(megaAchievementsDetails,
+            AchievementType.INVALID_ACHIEVEMENT,
+            0L)).thenReturn(megaAchievement)
+
+        val megaApiJava = mock<MegaApiJava>()
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        val megaRequest = mock<MegaRequest> {
+            on { getMegaAchievementsDetails() }.thenReturn(megaAchievementsDetails)
+        }
+
+        whenever(megaApiGateway.getAccountAchievements(any())).thenAnswer {
+            ((it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                megaApiJava,
+                megaRequest,
+                megaError))
+        }
+
+        val actual = underTest.getAccountAchievements(AchievementType.INVALID_ACHIEVEMENT, 0L)
+        assertThat(actual).isSameInstanceAs(megaAchievement)
+    }
 }

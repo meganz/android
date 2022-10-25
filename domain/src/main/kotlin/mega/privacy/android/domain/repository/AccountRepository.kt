@@ -3,6 +3,8 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.achievement.AchievementType
+import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 
@@ -107,4 +109,14 @@ interface AccountRepository {
      * @return List of SubscriptionPlans
      */
     suspend fun getSubscriptionPlans(): List<SubscriptionPlan>
+
+    /**
+     * Get account achievements
+     *
+     * @return MegaAchievement
+     */
+    suspend fun getAccountAchievements(
+        achievementType: AchievementType,
+        awardIndex: Long,
+    ): MegaAchievement
 }
