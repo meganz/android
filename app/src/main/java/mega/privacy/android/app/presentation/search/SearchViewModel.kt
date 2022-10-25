@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.search
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -71,7 +70,7 @@ class SearchViewModel @Inject constructor(
     /**
      * Monitor global node updates
      */
-    var updateNodes: LiveData<Event<List<MegaNode>>> =
+    var updateNodes =
         monitorNodeUpdates()
             .also { Timber.d("onNodesUpdate") }
             .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
