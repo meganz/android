@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.protobuf.TombstoneProtos
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
-import java.io.IOException
 
 class GetTombstoneInfoInitializer : Initializer<Unit> {
 
@@ -45,28 +44,28 @@ class GetTombstoneInfoInitializer : Initializer<Unit> {
 
             // make it run in background thread
             entryPoint.appScope().launch {
-                Timber.d("getTombstoneInfo")
-                (context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager)?.let { activityManager ->
-                    val exitReasons = activityManager.getHistoricalProcessExitReasons(
-                        /* packageName = */null,
-                        /* pid = */0,
-                        /* maxNum = */3
-                    )
-                    exitReasons.forEach { exitReason ->
-                        if (exitReason.reason == ApplicationExitInfo.REASON_CRASH_NATIVE) {
-                            // Get the tombstone input stream.
-                            try {
+                try {
+                    Timber.d("getTombstoneInfo")
+                    (context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager)?.let { activityManager ->
+                        val exitReasons = activityManager.getHistoricalProcessExitReasons(
+                            /* packageName = */null,
+                            /* pid = */0,
+                            /* maxNum = */3
+                        )
+                        exitReasons.forEach { exitReason ->
+                            if (exitReason.reason == ApplicationExitInfo.REASON_CRASH_NATIVE) {
+                                // Get the tombstone input stream.
                                 exitReason.traceInputStream?.use {
                                     // The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
                                     val tombstone =
                                         TombstoneProtos.Tombstone.parseFrom(it)
                                     Timber.e("Tombstone Info $tombstone")
                                 }
-                            } catch (e: IOException) {
-                                Timber.e(e)
                             }
                         }
                     }
+                } catch (e: Exception) {
+                    Timber.e(e)
                 }
             }
         }
