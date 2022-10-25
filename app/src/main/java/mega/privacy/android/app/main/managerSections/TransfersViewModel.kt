@@ -78,19 +78,29 @@ class TransfersViewModel @Inject constructor(
      */
     fun setActiveTransfers(transfersInProgress: List<Int>) =
         viewModelScope.launch(ioDispatcher) {
-            activeTransfers.clear()
-            activeTransfers.addAll(
-                transfersInProgress.map { tag ->
-                    megaApiGateway.getTransfersByTag(tag)
-                }.filter { transfer ->
-                    transfer != null && !transfer.isStreamingTransfer && !transfer.isBackgroundTransfer()
-                }.filterNotNull()
-            )
-            activeTransfers.sortWith { t1: MegaTransfer, t2: MegaTransfer ->
-                t1.priority.compareTo(t2.priority)
-            }
-            _activeState.update {
-                ActiveTransfersState.TransfersUpdated(activeTransfers)
+            kotlin.runCatching {
+                activeTransfers.clear()
+                activeTransfers.addAll(
+                    transfersInProgress.map { tag ->
+                        megaApiGateway.getTransfersByTag(tag)
+                    }.filter { transfer ->
+                        transfer != null && !transfer.isStreamingTransfer && !transfer.isBackgroundTransfer()
+                    }.filterNotNull()
+                )
+                activeTransfers.sortWith { t1: MegaTransfer, t2: MegaTransfer ->
+                    t1.priority.compareTo(t2.priority)
+                }
+                _activeState.update {
+                    ActiveTransfersState.TransfersUpdated(activeTransfers)
+                }
+            }.onFailure { exception ->
+                if (exception is ConcurrentModificationException) {
+                    Timber.e("Exception setting transfers: ${exception.message}")
+                } else {
+                    Timber.e(exception.message)
+                }
+            }.onSuccess {
+                Timber.d("Active transfers correctly set.")
             }
         }
 
