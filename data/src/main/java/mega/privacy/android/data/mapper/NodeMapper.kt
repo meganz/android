@@ -70,6 +70,7 @@ internal suspend fun toNode(
         isFavourite = megaNode.isFavourite,
         isExported = megaNode.isExported,
         isTakenDown = megaNode.isTakenDown,
+        isIncomingShare = megaNode.isInShare,
     )
 }
 

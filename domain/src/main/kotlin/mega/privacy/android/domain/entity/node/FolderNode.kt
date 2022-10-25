@@ -11,11 +11,6 @@ interface FolderNode : Node {
     val isInRubbishBin: Boolean
 
     /**
-     * Is the folder an incoming share
-     */
-    val isIncomingShare: Boolean
-
-    /**
      * Is the folder an outgoing share
      */
     val isShared: Boolean

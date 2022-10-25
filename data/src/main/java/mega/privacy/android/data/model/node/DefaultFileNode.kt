@@ -18,4 +18,5 @@ internal data class DefaultFileNode(
     override val isFavourite: Boolean,
     override val isExported: Boolean,
     override val isTakenDown: Boolean,
+    override val isIncomingShare: Boolean,
 ) : FileNode
