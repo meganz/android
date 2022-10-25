@@ -285,17 +285,27 @@ class TransfersViewModel @Inject constructor(
                 }
 
             }
-            val index = completedTransfers.indexOfFirst { completedTransfer ->
-                completedTransfer?.let {
-                    areTheSameTransfer(transfer, it)
-                } ?: false
-            }
-            if (index != INVALID_POSITION) {
-                completedTransfers.removeAt(index)
-                _completedState.update {
-                    CompletedTransfersState.TransferRemovedUpdated(index,
-                        completedTransfers.toList())
+            kotlin.runCatching {
+                val index = completedTransfers.indexOfFirst { completedTransfer ->
+                    completedTransfer?.let {
+                        areTheSameTransfer(transfer, it)
+                    } ?: false
                 }
+                if (index != INVALID_POSITION) {
+                    completedTransfers.removeAt(index)
+                    _completedState.update {
+                        CompletedTransfersState.TransferRemovedUpdated(index,
+                            completedTransfers.toList())
+                    }
+                }
+            }.onFailure { exception ->
+                if (exception is ConcurrentModificationException) {
+                    Timber.e("Exception removing completed transfer: ${exception.message}")
+                } else {
+                    Timber.e(exception.message)
+                }
+            }.onSuccess {
+                Timber.d("Completed transfer correctly removed.")
             }
         }
 
