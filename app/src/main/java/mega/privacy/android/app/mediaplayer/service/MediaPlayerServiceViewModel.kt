@@ -9,6 +9,7 @@ import androidx.lifecycle.asFlow
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ShuffleOrder
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
@@ -17,7 +18,6 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -84,6 +84,9 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.data.qualifier.MegaApiFolder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_AUDIO
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
@@ -100,15 +103,16 @@ import java.io.File
 import java.util.Collections
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * A class containing audio player service logic, because using ViewModel in Service
  * is not the standard scenario, so this class is actually not a subclass of ViewModel.
  */
-class MediaPlayerServiceViewModel(
-    private val context: Context,
-    private val megaApi: MegaApiAndroid,
-    private val megaApiFolder: MegaApiAndroid,
+class MediaPlayerServiceViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
     private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
     private val getGlobalTransferUseCase: GetGlobalTransferUseCase,
@@ -616,15 +620,14 @@ class MediaPlayerServiceViewModel(
         }
     }
 
-    private fun filterByNodeName(name: String): Boolean {
-        val mime = MimeTypeList.typeForName(name)
-
-        return if (isAudioPlayer) {
-            mime.isAudio && !mime.isAudioNotSupported
-        } else {
-            mime.isVideo && mime.isVideoReproducible && !mime.isVideoNotSupported
+    private fun filterByNodeName(name: String): Boolean =
+        MimeTypeList.typeForName(name).let { mime ->
+            if (isAudioPlayer) {
+                mime.isAudio && !mime.isAudioNotSupported
+            } else {
+                mime.isVideo && mime.isVideoReproducible && !mime.isVideoNotSupported
+            }
         }
-    }
 
     private fun buildPlaylistFromOfflineNodes(intent: Intent, firstPlayHandle: Long) {
         val nodes = with(intent) {
@@ -866,12 +869,12 @@ class MediaPlayerServiceViewModel(
         }
     }
 
-    private fun mediaItemFromFile(file: File, handle: String): MediaItem {
-        return MediaItem.Builder()
+    private fun mediaItemFromFile(file: File, handle: String): MediaItem =
+        MediaItem.Builder()
             .setUri(getUriForFile(context, file))
             .setMediaId(handle)
             .build()
-    }
+
 
     private fun postPlayingThumbnail() {
         val thumbnail = playlistItemsMap[playingHandle.toString()]?.thumbnail ?: return
@@ -977,9 +980,8 @@ class MediaPlayerServiceViewModel(
         playlist.postValue(Pair(items, scrollPosition))
     }
 
-    override fun setCurrentPosition(currentPosition: Long) {
+    override fun setCurrentPosition(currentPosition: Long) =
         postPlaylistItems(currentPosition, false)
-    }
 
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
         if (items.isEmpty()) return
@@ -1137,6 +1139,7 @@ class MediaPlayerServiceViewModel(
     override fun getPlaylistItems() = playlist.value?.first
 
     override fun isAudioPlayer() = isAudioPlayer
+
     override fun setAudioPlayer(isAudioPlayer: Boolean) {
         this.isAudioPlayer = isAudioPlayer
     }
@@ -1152,9 +1155,7 @@ class MediaPlayerServiceViewModel(
         return backgroundPlayEnabled
     }
 
-    override fun shuffleEnabled(): Boolean {
-        return shuffleEnabled
-    }
+    override fun shuffleEnabled(): Boolean = shuffleEnabled
 
     override fun getShuffleOrder() = shuffleOrder
 
@@ -1236,13 +1237,9 @@ class MediaPlayerServiceViewModel(
 
     override fun isPaused() = paused
 
-    override fun getPlayingPosition(): Int {
-        return playingPosition
-    }
+    override fun getPlayingPosition(): Int = playingPosition
 
-    override fun scrollToPlayingPosition() {
-        postPlaylistItems(isScroll = true)
-    }
+    override fun scrollToPlayingPosition() = postPlaylistItems(isScroll = true)
 
     override fun isActionMode() = actionMode.value
 
