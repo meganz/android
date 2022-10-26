@@ -159,10 +159,40 @@ class FileTypeInfoMapperTest {
     }
 
     @Test
+    fun `test that a file with capital gif  extension is mapped correctly`() {
+        val expectedExtension = "GIF"
+        val expectedMimeType = "image/gif"
+        val node =
+            mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+
+        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+            GifFileTypeInfo(
+                type = expectedMimeType,
+                extension = expectedExtension
+            )
+        )
+    }
+
+    @Test
     fun `test that a file with webp extension is mapped correctly`() {
         val expectedExtension = "webp"
         val expectedMimeType = "image/webp"
         val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+
+        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+            GifFileTypeInfo(
+                type = expectedMimeType,
+                extension = expectedExtension
+            )
+        )
+    }
+
+    @Test
+    fun `test that a file with capital webp extension is mapped correctly`() {
+        val expectedExtension = "WEBP"
+        val expectedMimeType = "image/webp"
+        val node =
+            mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             GifFileTypeInfo(
@@ -189,6 +219,33 @@ class FileTypeInfoMapperTest {
             "srf", "srw", "x3f",
         ).forEach {
             val expectedExtension = it
+            whenever(node.name).thenReturn("withExtension.$expectedExtension")
+            assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+                RawFileTypeInfo(
+                    type = expectedMimeType,
+                    extension = expectedExtension
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `test that a file with capital raw extension is mapped correctly`() {
+        val expectedMimeType = "expected"
+        val node = mock<MegaNode>()
+        listOf(
+            //Raw
+            "3fr", "arw", "cr2",
+            "crw", "ciff", "cs1",
+            "dcr", "dng", "erf",
+            "iiq", "k25", "kdc",
+            "mef", "mos", "mrw",
+            "nef", "nrw", "orf",
+            "pef", "raf", "raw",
+            "rw2", "rwl", "sr2",
+            "srf", "srw", "x3f",
+        ).forEach {
+            val expectedExtension = it.uppercase()
             whenever(node.name).thenReturn("withExtension.$expectedExtension")
             assertThat(underTest(node) { expectedMimeType }).isEqualTo(
                 RawFileTypeInfo(

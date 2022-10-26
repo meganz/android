@@ -245,13 +245,20 @@ class AlbumDynamicContentFragment : Fragment() {
                     onClickListener = { _, i ->
                         albumsViewModel.setCurrentSort(Sort.values()[i])
                     },
-                    onDismissListener = {
-
-                    }
                 )
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
+    fun getCurrentAlbumTitle(): String {
+        val currentAlbum = albumsViewModel.state.value.currentAlbum
+        val currentUIAlbum =
+            albumsViewModel.state.value.albums.find { UIAlbum -> UIAlbum.id == currentAlbum }
+        return if (context != null && currentUIAlbum != null) {
+            currentUIAlbum.title(context!!)
+        } else {
+            getString(R.string.tab_title_album)
+        }
+    }
 }
