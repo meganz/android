@@ -10,10 +10,8 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
-import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.domain.entity.FavouriteFolderInfo
+import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FavouritesRepository
@@ -35,7 +33,6 @@ class DefaultFavouritesRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorNodeChangeFacade: MonitorNodeChangeFacade,
     private val nodeMapper: NodeMapper,
-    private val favouriteFolderInfoMapper: FavouriteFolderInfoMapper,
     private val cacheFolder: CacheFolderGateway,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
 ) : FavouritesRepository {
@@ -58,17 +55,6 @@ class DefaultFavouritesRepository @Inject constructor(
                 )
             }
             mapNodesToFavouriteInfo(handleList.getNodes())
-        }
-
-    override suspend fun getChildren(parentHandle: Long): FavouriteFolderInfo? =
-        withContext(ioDispatcher) {
-            megaApiGateway.getMegaNodeByHandle(parentHandle)?.let { parentNode ->
-                favouriteFolderInfoMapper(
-                    parentNode,
-                    mapNodesToFavouriteInfo(megaApiGateway.getChildrenByNode(parentNode)),
-                    parentHandle
-                )
-            }
         }
 
     override fun monitorNodeChange(): Flow<Boolean> = monitorNodeChangeFacade.getEvents()

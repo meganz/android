@@ -16,13 +16,6 @@ interface FavouritesRepository {
     suspend fun getAllFavorites(): List<Node>
 
     /**
-     * Get children nodes by node
-     * @param parentHandle the parent node handle
-     * @return FavouriteFolderInfo
-     */
-    suspend fun getChildren(parentHandle: Long): FavouriteFolderInfo?
-
-    /**
      * Monitor the node change
      * @return Flow<Boolean>
      */

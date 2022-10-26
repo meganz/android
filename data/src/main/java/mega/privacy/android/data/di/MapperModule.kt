@@ -13,7 +13,6 @@ import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
-import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
@@ -57,7 +56,6 @@ import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toEvent
-import mega.privacy.android.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toMediaStoreFileType
 import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
@@ -268,12 +266,6 @@ internal class MapperModule {
     fun provideFileTypeInfoMapper(mimeTypeMapper: MimeTypeMapper): FileTypeInfoMapper = { node ->
         getFileTypeInfo(node, mimeTypeMapper)
     }
-
-    /**
-     * Provide favourite folder info mapper
-     */
-    @Provides
-    fun provideFavouriteFolderInfoMapper(): FavouriteFolderInfoMapper = ::toFavouriteFolderInfo
 
     /**
      * Provide contact request mapper
