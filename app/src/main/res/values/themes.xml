@@ -143,4 +143,9 @@
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">@bool/isLightTheme</item>
         <item name="android:windowTranslucentNavigation">false</item>
     </style>
+
+    <style name="Theme.Mega.FullScreen.VideoPlayer" parent="Theme.Mega.FullScreen">
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
 </resources>

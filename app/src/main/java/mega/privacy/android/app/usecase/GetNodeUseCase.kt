@@ -5,22 +5,27 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
-import mega.privacy.android.app.usecase.exception.*
+import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
-import nz.mega.sdk.*
+import mega.privacy.android.data.qualifier.MegaApi
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatMessage
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaShare
 import java.io.File
 import javax.inject.Inject
 
@@ -39,7 +44,7 @@ class GetNodeUseCase @Inject constructor(
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val getChatMessageUseCase: GetChatMessageUseCase,
-    private val databaseHandler: DatabaseHandler,
+    private val databaseHandler: LegacyDatabaseHandler,
 ) {
 
     /**

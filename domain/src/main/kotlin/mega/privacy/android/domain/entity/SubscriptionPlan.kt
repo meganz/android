@@ -20,5 +20,5 @@ data class SubscriptionPlan(
     val transfer: Int,
     val amount: Int,
     val currency: Currency?,
-    val sku: String,
+    val sku: String?,
 )

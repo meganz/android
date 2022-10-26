@@ -2,7 +2,7 @@ package mega.privacy.android.app.myAccount.usecase
 
 import io.reactivex.rxjava3.core.Completable
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import nz.mega.sdk.MegaApiAndroid

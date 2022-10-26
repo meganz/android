@@ -15,6 +15,8 @@ class DefaultFormatSupportTicketTest {
     private val expectedAccountType = "expectedAccountType"
     private val expectedDescription = "expectedDescription"
     private val expectedLogFileName = "expectedLogFileName"
+    private val expectedDeviceSdkVersionInt = 31
+    private val expectedDeviceSdkVersionName = "Android 12"
 
     @Test
     fun `test that format matches if no logs are present`() {
@@ -40,6 +42,8 @@ class DefaultFormatSupportTicketTest {
             accountType = expectedAccountType,
             description = expectedDescription,
             logFileName = if (withLog) expectedLogFileName else null,
+            deviceSdkVersionInt = expectedDeviceSdkVersionInt,
+            deviceSdkVersionName = expectedDeviceSdkVersionName
         )
     }
 
@@ -65,6 +69,7 @@ class DefaultFormatSupportTicketTest {
                 
                 Device Information:
                 Device: $expectedDevice
+                Android Version: $expectedDeviceSdkVersionName - $expectedDeviceSdkVersionInt
                 Language: $expectedCurrentLanguage
             """.trimIndent()
 }

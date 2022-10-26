@@ -68,10 +68,11 @@ class ContactGroupsViewModel @Inject constructor(
      */
     fun getGroupChatRoom(
         contactsData: ArrayList<String>,
-        chatTitle: String?
+        chatTitle: String?,
+        allowAddParticipants: Boolean
     ): LiveData<Long> {
         val result = MutableLiveData<Long>()
-        getGroupChatRoomUseCase.getGroupChatRoomCreated(contactsData, chatTitle)
+        getGroupChatRoomUseCase.getGroupChatRoomCreated(contactsData, chatTitle, allowAddParticipants)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

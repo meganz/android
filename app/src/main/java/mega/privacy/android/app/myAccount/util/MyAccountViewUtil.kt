@@ -33,9 +33,9 @@ object MyAccountViewUtil {
      */
     fun MyAccountUsageContainerBinding.update(viewModel: MyAccountViewModel) {
         storageProgressBar.isVisible = true
-        businessStorageImage.isVisible = false
+        noPercentageStorageImage.isVisible = false
         transferProgressBar.isVisible = true
-        businessTransferImage.isVisible = false
+        noPercentageTransferImage.isVisible = false
 
         if (viewModel.getUsedStorage().isEmpty()) {
             storageProgressPercentage.isVisible = false
@@ -52,12 +52,12 @@ object MyAccountViewUtil {
                     usedStorage
                 )
 
-                setTextStyle( textAppearance =
-                    if (isStorageOverQuota) {
-                        R.style.TextAppearance_Mega_Body2_Medium_Red600Red300
-                    } else {
-                        R.style.TextAppearance_Mega_Body2_Medium_Accent
-                    }
+                setTextStyle(textAppearance =
+                if (isStorageOverQuota) {
+                    R.style.TextAppearance_Mega_Body2_Medium_Red600Red300
+                } else {
+                    R.style.TextAppearance_Mega_Body2_Medium_Accent
+                }
                 )
             }
 
@@ -122,22 +122,18 @@ object MyAccountViewUtil {
      *
      * @param viewModel MyAccountViewModel to check the data.
      */
-    fun MyAccountUsageContainerBinding.businessUpdate(viewModel: MyAccountViewModel) {
+    fun MyAccountUsageContainerBinding.updateBusinessOrProFlexi(viewModel: MyAccountViewModel) {
         storageProgressPercentage.isVisible = false
         storageProgressBar.isVisible = false
-        businessStorageImage.isVisible = true
+        noPercentageStorageImage.isVisible = true
 
-        storageProgress.text =
-            if (viewModel.getUsedStorage().isEmpty()) gettingInfo
-            else viewModel.getUsedStorage()
+        storageProgress.text = viewModel.getUsedStorage().ifEmpty { gettingInfo }
 
         transferProgressPercentage.isVisible = false
         transferProgressBar.isVisible = false
-        businessTransferImage.isVisible = true
+        noPercentageTransferImage.isVisible = true
 
-        transferProgress.text =
-            if (viewModel.getUsedTransfer().isEmpty()) gettingInfo
-            else viewModel.getUsedTransfer()
+        transferProgress.text = viewModel.getUsedTransfer().ifEmpty { gettingInfo }
 
         root.post { checkImagesOrProgressBarVisibility(false) }
     }
@@ -148,7 +144,10 @@ object MyAccountViewUtil {
      * @param viewModel MyAccountViewModel to check the data.
      * @param fragment Value from `ActiveFragment` enum indicating what is the active fragment.
      */
-    fun MyAccountPaymentInfoContainerBinding.update(viewModel: MyAccountViewModel, fragment: ActiveFragment): Boolean {
+    fun MyAccountPaymentInfoContainerBinding.update(
+        viewModel: MyAccountViewModel,
+        fragment: ActiveFragment,
+    ): Boolean {
         businessStatusText.isVisible = false
         val renewable = viewModel.hasRenewableSubscription()
 
@@ -190,6 +189,29 @@ object MyAccountViewUtil {
             renewable || expirable -> {
                 setRenewOrExpiryDate(viewModel, renewable, fragment)
             }
+        }
+    }
+
+    /**
+     * Updates the views related to payments for only Pro Flexi accounts.
+     *
+     * @param viewModel [MyAccountViewModel] to check the data.
+     */
+    fun MyAccountPaymentInfoContainerBinding.setRenewalDateForProFlexi(
+        viewModel: MyAccountViewModel,
+    ) {
+        businessStatusText.isVisible = false
+
+        renewExpiryText.apply {
+            isVisible = true
+            val renewalDate = TimeUtils.formatDate(
+                viewModel.getRenewTime(),
+                TimeUtils.DATE_MM_DD_YYYY_FORMAT
+            )
+            text = getString(R.string.account_info_renewal_date, renewalDate)
+                .formatColorTag(context, 'A', R.color.dark_grey_white)
+                .formatColorTag(context, 'B', R.color.dark_grey_white)
+                .toSpannedHtmlText()
         }
     }
 
@@ -275,7 +297,7 @@ object MyAccountViewUtil {
      *
      * @param isFreeAccount True if is a free account, false otherwise.
      */
-    private fun MyAccountUsageContainerBinding.checkImagesOrProgressBarVisibility(isFreeAccount: Boolean){
+    private fun MyAccountUsageContainerBinding.checkImagesOrProgressBarVisibility(isFreeAccount: Boolean) {
         val visible = when {
             isFreeAccount -> storageProgress.lineCount == 1 && storageLabel.lineCount == 1
             else -> storageProgress.lineCount == 1 && storageLabel.lineCount == 1

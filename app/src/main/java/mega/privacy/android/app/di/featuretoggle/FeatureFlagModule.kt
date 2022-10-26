@@ -8,6 +8,8 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoMap
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.data.featuretoggle.file.FileFeatureFlagValueProvider
+import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
@@ -30,6 +32,17 @@ abstract class FeatureFlagModule {
     @Binds
     abstract fun bindGetFeatureFlagValue(useCase: DefaultGetFeatureFlagValue): GetFeatureFlagValue
 
+    /**
+     * Provide feature flag value provider
+     *
+     */
+    @Binds
+    @IntoMap
+    @FeatureFlagPriorityKey(
+        implementingClass = FileFeatureFlagValueProvider::class,
+        priority = FeatureFlagValuePriority.ConfigurationFile
+    )
+    abstract fun provideFileFeatureFlagValueProvider(fileFeatureFlagValueProvider: FileFeatureFlagValueProvider): @JvmSuppressWildcards FeatureFlagValueProvider
 
     companion object {
         /**

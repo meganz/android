@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * Chat repository
@@ -14,11 +16,46 @@ interface ChatRepository {
     fun notifyChatLogout(): Flow<Boolean>
 
     /**
-     * Starts a chat conversation with the provided contacts.
+     * Update open invite setting.
      *
      * @param chatId   The Chat id.
-     * @param enabled True if is should create a group chat, false otherwise.
+     * @return True if non-hosts are allowed to add participants, false otherwise.
+     */
+    suspend fun setOpenInvite(chatId: Long): Boolean
+
+    /**
+     * Starts call.
+     *
+     * @param chatId   The Chat id.
+     * @param enabledVideo True for audio-video call, false for audio call
+     * @param enabledAudio True for starting a call with audio (mute disabled)
      * @return The chat conversation handle.
      */
-    suspend fun setOpenInvite(chatId: Long, enabled: Boolean): Long
+    suspend fun startChatCall(
+        chatId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+    ): ChatRequest
+
+    /**
+     * Answers call.
+     *
+     * @param chatId   The Chat id.
+     * @param enabledVideo True for audio-video call, false for audio call
+     * @param enabledAudio True for answering a call with audio (mute disabled)
+     * @param enabledSpeaker True speaker on. False speaker off.
+     * @return The chat conversation handle.
+     */
+    suspend fun answerChatCall(
+        chatId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+        enabledSpeaker: Boolean,
+    ): ChatRequest
+
+
+    /**
+     * Get chat files folder id if it exists
+     */
+    suspend fun getChatFilesFolderId(): NodeId?
 }

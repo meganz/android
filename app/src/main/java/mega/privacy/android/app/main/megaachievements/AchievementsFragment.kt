@@ -16,7 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.getBigFormattedStorageString
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.GetAchievementsListener
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants

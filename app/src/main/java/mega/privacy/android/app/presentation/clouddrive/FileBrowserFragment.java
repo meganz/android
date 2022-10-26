@@ -86,7 +86,6 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -97,7 +96,6 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
-import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.main.DrawerItem;
@@ -122,8 +120,6 @@ import timber.log.Timber;
 @AndroidEntryPoint
 public class FileBrowserFragment extends RotatableFragment {
 
-    @Inject
-    SortOrderManagement sortOrderManagement;
     @Inject
     TransfersManagement transfersManagement;
 
@@ -729,11 +725,11 @@ public class FileBrowserFragment extends RotatableFragment {
         if (parentHandleBrowser == -1 || parentHandleBrowser == megaApi.getRootNode().getHandle()) {
             Timber.w("After consulting... the parent keeps -1 or ROOTNODE: %s", parentHandleBrowser);
 
-            nodes = megaApi.getChildren(megaApi.getRootNode(), sortOrderManagement.getOrderCloud());
+            nodes = megaApi.getChildren(megaApi.getRootNode(), managerViewModel.getOrder());
             mediaHandle = megaApi.getRootNode().getHandle();
         } else {
             MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
-            nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+            nodes = megaApi.getChildren(parentNode, managerViewModel.getOrder());
             mediaHandle = parentHandleBrowser;
         }
     }
@@ -750,7 +746,7 @@ public class FileBrowserFragment extends RotatableFragment {
             Intent intent = ImageViewerActivity.getIntentForParentNode(
                     requireContext(),
                     megaApi.getParentNode(node).getHandle(),
-                    sortOrderManagement.getOrderCloud(),
+                    managerViewModel.getOrder(),
                     node.getHandle()
             );
             putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_FILE_BROWSER, adapter);
@@ -786,7 +782,7 @@ public class FileBrowserFragment extends RotatableFragment {
                 }
             }
 
-            mediaIntent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
+            mediaIntent.putExtra("orderGetChildren", managerViewModel.getOrder());
             mediaIntent.putExtra("adapterType", FILE_BROWSER_ADAPTER);
             putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_FILE_BROWSER, adapter);
 
@@ -962,7 +958,7 @@ public class FileBrowserFragment extends RotatableFragment {
                 mediaHandle = n.getHandle();
                 managerViewModel.setBrowserParentHandle(n.getHandle());
                 List<MegaNode> childNodes = megaApi.getChildren(n,
-                        sortOrderManagement.getOrderCloud());
+                        managerViewModel.getOrder());
                 if (fileBrowserViewModel.shouldEnterMDMode(childNodes)) {
                     showMediaDiscovery(Unit.INSTANCE);
                 } else {
@@ -1004,7 +1000,7 @@ public class FileBrowserFragment extends RotatableFragment {
         ((ManagerActivity) context).setToolbarTitle();
 
         adapter.setParentHandle(managerViewModel.getSafeBrowserParentHandle());
-        nodes = megaApi.getChildren(n, sortOrderManagement.getOrderCloud());
+        nodes = megaApi.getChildren(n, managerViewModel.getOrder());
         adapter.setNodes(nodes);
         recyclerView.scrollToPosition(0);
 
@@ -1189,7 +1185,7 @@ public class FileBrowserFragment extends RotatableFragment {
 
                     ((ManagerActivity) context).setToolbarTitle();
 
-                    nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+                    nodes = megaApi.getChildren(parentNode, managerViewModel.getOrder());
                     adapter.setNodes(nodes);
 
                     visibilityFastScroller();

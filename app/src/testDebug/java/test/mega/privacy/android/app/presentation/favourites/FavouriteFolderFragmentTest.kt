@@ -20,7 +20,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.model.Favourite
-import mega.privacy.android.domain.entity.FavouriteFolder
+import mega.privacy.android.domain.entity.NodeFolder
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import nz.mega.sdk.MegaNode
 import org.hamcrest.CoreMatchers.not
@@ -34,7 +34,6 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.di.TestWrapperModule
-import test.mega.privacy.android.app.di.FavouritesTestModule
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 
 @HiltAndroidTest
@@ -127,7 +126,7 @@ class FavouriteFolderFragmentTest {
         whenever(node.name).thenReturn("testName.txt")
         whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
         whenever(node.size).thenReturn(1000L)
-        val favouriteInfo = FavouriteFolder(
+        val favouriteInfo = NodeFolder(
             id = 123,
             name = node.name,
             label = node.label,
@@ -139,6 +138,11 @@ class FavouriteFolderFragmentTest {
             isFavourite = true,
             isExported = false,
             isTakenDown = false,
+            isInRubbishBin = false,
+            isIncomingShare = false,
+            isShared = false,
+            isPendingShare = false,
+            device = ""
         )
         val favourites = listOf(
             favouriteInfo

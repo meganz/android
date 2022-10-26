@@ -40,8 +40,6 @@ import mega.privacy.android.app.activities.settingsActivities.FileManagementPref
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA
-import mega.privacy.android.app.data.model.UserCredentials
-import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -86,7 +84,6 @@ import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.app.utils.Constants.CHAT_ID
-import mega.privacy.android.app.utils.Constants.TOS_COPYRIGHT_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.DISABLED_BUSINESS_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
 import mega.privacy.android.app.utils.Constants.EVENT_PSA
@@ -94,7 +91,6 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
-import mega.privacy.android.app.utils.Constants.TOS_NON_COPYRIGHT_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE
@@ -108,6 +104,8 @@ import mega.privacy.android.app.utils.Constants.RESUME_TRANSFERS_TYPE
 import mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE
 import mega.privacy.android.app.utils.Constants.SMS_VERIFICATION_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.Constants.TOS_COPYRIGHT_ACCOUNT_BLOCK
+import mega.privacy.android.app.utils.Constants.TOS_NON_COPYRIGHT_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.Constants.WEAK_PROTECTION_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.DBUtil
@@ -124,6 +122,9 @@ import mega.privacy.android.app.utils.billing.PaymentUtils.updatePricing
 import mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.model.UserCredentials
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.LogsType
 import mega.privacy.android.domain.entity.PurchaseType
 import nz.mega.sdk.MegaAccountDetails
@@ -168,7 +169,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     lateinit var megaChatApi: MegaChatApiAndroid
 
     @Inject
-    lateinit var dbH: DatabaseHandler
+    lateinit var dbH: LegacyDatabaseHandler
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
@@ -1399,7 +1400,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                         val account: Int
                         var color = R.color.red_600_red_300
                         val image: Int
-                        val purchaseText: Int
                         val activeSubscriptionSku =
                             if (myAccountInfo.activeSubscription != null) myAccountInfo.activeSubscription?.sku
                             else ""
@@ -1408,106 +1408,46 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                             PRO_I -> {
                                 account = R.string.pro1_account
                                 image = R.drawable.ic_pro_i_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_I_YEAR == activeSubscriptionSku) R.string.pro_i_yearly else R.string.pro_i_monthly
+                                purchaseMessage.text = StringResourcesUtils.getString(
+                                    if (BillingManagerImpl.SKU_PRO_I_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_1_yearly
+                                    else R.string.upgrade_account_successful_pro_1_monthly)
                             }
                             PRO_II -> {
                                 account = R.string.pro2_account
                                 image = R.drawable.ic_pro_ii_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_II_YEAR == activeSubscriptionSku) R.string.pro_ii_yearly else R.string.pro_ii_monthly
+                                purchaseMessage.text = StringResourcesUtils.getString(
+                                    if (BillingManagerImpl.SKU_PRO_II_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_2_yearly
+                                    else R.string.upgrade_account_successful_pro_2_monthly)
                             }
                             PRO_III -> {
                                 account = R.string.pro3_account
                                 image = R.drawable.ic_pro_iii_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_III_YEAR == activeSubscriptionSku) R.string.pro_iii_yearly else R.string.pro_iii_monthly
+                                purchaseMessage.text = StringResourcesUtils.getString(
+                                    if (BillingManagerImpl.SKU_PRO_III_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_3_yearly
+                                    else R.string.upgrade_account_successful_pro_3_monthly)
                             }
                             PRO_LITE -> {
                                 account = R.string.prolite_account
                                 color = R.color.orange_400_orange_300
                                 image = R.drawable.ic_lite_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.pro_lite_yearly else R.string.pro_lite_monthly
+                                purchaseMessage.text = StringResourcesUtils.getString(
+                                    if (BillingManagerImpl.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_lite_yearly
+                                    else R.string.upgrade_account_successful_pro_lite_monthly)
                             }
                             else -> {
-                                account = R.string.prolite_account
-                                color = R.color.orange_400_orange_300
-                                image = R.drawable.ic_lite_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.pro_lite_yearly else R.string.pro_lite_monthly
+                                Timber.w("Unexpected account subscription level")
+                                return@setOnShowListener
                             }
                         }
                         purchaseType.text = StringResourcesUtils.getString(account)
                         purchaseType.setTextColor(ContextCompat.getColor(this@BaseActivity, color))
                         purchaseImage.setImageResource(image)
-                        purchaseMessage.text =
-                            StringResourcesUtils.getString(R.string.successful_upgrade,
-                                StringResourcesUtils.getString(purchaseText))
                     }
                 }
             }
             else -> {
-                upgradeAlert = builder.setView(R.layout.dialog_purchase_success).create().apply {
-                    setOnShowListener {
-                        val purchaseType = findViewById<TextView>(R.id.purchase_type)
-                        val purchaseImage = findViewById<ImageView>(R.id.purchase_image)
-                        val purchaseMessage =
-                            findViewById<TextView>(R.id.purchase_message)
-                        if (purchaseType == null || purchaseImage == null || purchaseMessage == null) {
-                            return@setOnShowListener
-                        }
-
-                        val account: Int
-                        var color = R.color.red_600_red_300
-                        val image: Int
-                        val purchaseText: Int
-                        val activeSubscriptionSku =
-                            if (myAccountInfo.activeSubscription != null) myAccountInfo.activeSubscription?.sku
-                            else ""
-
-                        when (myAccountInfo.levelInventory) {
-                            PRO_I -> {
-                                account = R.string.pro1_account
-                                image = R.drawable.ic_pro_i_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_I_YEAR == activeSubscriptionSku) R.string.pro_i_yearly else R.string.pro_i_monthly
-                            }
-                            PRO_II -> {
-                                account = R.string.pro2_account
-                                image = R.drawable.ic_pro_ii_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_II_YEAR == activeSubscriptionSku) R.string.pro_ii_yearly else R.string.pro_ii_monthly
-                            }
-                            PRO_III -> {
-                                account = R.string.pro3_account
-                                image = R.drawable.ic_pro_iii_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_III_YEAR == activeSubscriptionSku) R.string.pro_iii_yearly else R.string.pro_iii_monthly
-                            }
-                            PRO_LITE -> {
-                                account = R.string.prolite_account
-                                color = R.color.orange_400_orange_300
-                                image = R.drawable.ic_lite_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.pro_lite_yearly else R.string.pro_lite_monthly
-                            }
-                            else -> {
-                                account = R.string.prolite_account
-                                color = R.color.orange_400_orange_300
-                                image = R.drawable.ic_lite_big_crest
-                                purchaseText =
-                                    if (BillingManagerImpl.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.pro_lite_yearly else R.string.pro_lite_monthly
-                            }
-                        }
-                        purchaseType.text = StringResourcesUtils.getString(account)
-                        purchaseType.setTextColor(ContextCompat.getColor(this@BaseActivity, color))
-                        purchaseImage.setImageResource(image)
-                        purchaseMessage.text =
-                            StringResourcesUtils.getString(R.string.successful_upgrade,
-                                StringResourcesUtils.getString(purchaseText))
-                    }
-                }
+                Timber.w("Unexpected PurchaseType")
+                return
             }
         }
 

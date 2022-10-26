@@ -15,14 +15,14 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity
 import mega.privacy.android.app.components.TwoLineCheckPreference
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.settings.chat.imagequality.SettingsChatImageQualityActivity

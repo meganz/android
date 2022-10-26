@@ -15,9 +15,9 @@ import mega.privacy.android.app.presentation.favourites.FavouriteFolderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
-import mega.privacy.android.app.presentation.mapper.FavouriteMapper
+import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
-import mega.privacy.android.domain.entity.FavouriteFolder
+import mega.privacy.android.domain.entity.NodeFolder
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import nz.mega.sdk.MegaNode
@@ -56,7 +56,7 @@ class FavouriteFolderViewModelTest {
 
     private val megaUtilWrapper = mock<MegaUtilWrapper>()
 
-    private val favourite = FavouriteFolder(
+    private val favourite = NodeFolder(
         id = megaNode.handle,
         name = megaNode.name,
         label = megaNode.label,
@@ -68,6 +68,11 @@ class FavouriteFolderViewModelTest {
         isFavourite = true,
         isExported = false,
         isTakenDown = false,
+        isInRubbishBin = false,
+        isIncomingShare = false,
+        isShared = false,
+        isPendingShare = false,
+        device = ""
     )
 
     private val list = listOf(favourite)

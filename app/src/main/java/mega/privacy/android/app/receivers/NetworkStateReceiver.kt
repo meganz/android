@@ -10,7 +10,7 @@ import android.os.Build
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.Util

@@ -34,6 +34,8 @@ class DefaultSubmitIssueTest {
         currentLanguage = "languageCode",
         description = "description",
         logFileName = "123-fileName.zip",
+        deviceSdkVersionInt = 31,
+        deviceSdkVersionName = "Android 12"
     )
 
     private val compressedLogs = File("path/to/${supportTicket.logFileName}")

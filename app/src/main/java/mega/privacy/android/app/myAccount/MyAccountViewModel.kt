@@ -22,7 +22,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
-import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -58,6 +57,7 @@ import mega.privacy.android.app.utils.Constants.FREE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.OPEN_SCAN_QR
+import mega.privacy.android.app.utils.Constants.PRO_FLEXI
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_REFRESH
 import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
@@ -69,6 +69,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -249,6 +250,8 @@ class MyAccountViewModel @Inject constructor(
     fun getAccountType(): Int = myAccountInfo.accountType
 
     fun isFreeAccount(): Boolean = getAccountType() == FREE
+
+    fun isProFlexiAccount(): Boolean = getAccountType() == PRO_FLEXI
 
     fun getUsedStorage(): String = myAccountInfo.usedFormatted
 

@@ -3,8 +3,10 @@ package mega.privacy.android.app.listeners;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_UPDATE_HISTORY_BY_RT;
 import static mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_OPEN_INVITE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
+import static nz.mega.sdk.MegaChatRoom.CHANGE_TYPE_OPEN_INVITE;
 import static nz.mega.sdk.MegaChatRoom.CHANGE_TYPE_TITLE;
 
 import android.content.Intent;
@@ -35,6 +37,10 @@ public class ChatRoomListener implements MegaChatRoomListenerInterface {
         if (chat.hasChanged(CHANGE_TYPE_TITLE)) {
             Timber.d("CHANGE_TYPE_TITLE for the chat: %s", chat.getChatId());
             LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom.class).post(chat);
+        }
+
+        if (chat.hasChanged(CHANGE_TYPE_OPEN_INVITE)) {
+            LiveEventBus.get(EVENT_CHAT_OPEN_INVITE, MegaChatRoom.class).post(chat);
         }
     }
 

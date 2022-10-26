@@ -5,7 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.utils.IncomingCallNotification
 import javax.inject.Inject

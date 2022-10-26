@@ -1,6 +1,6 @@
 package mega.privacy.android.app.domain.usecase
 
-import mega.privacy.android.app.domain.repository.FilesRepository
+import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
 import timber.log.Timber

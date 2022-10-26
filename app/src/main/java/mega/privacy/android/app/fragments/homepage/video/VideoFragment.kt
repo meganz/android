@@ -25,7 +25,7 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentVideoBinding
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -372,7 +372,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.loadVideo(true)
+            viewModel.onOrderChange(true)
         })
 
         sortByHeaderViewModel.listGridChangeEvent.observe(

@@ -3,9 +3,7 @@
 package mega.privacy.android.app.main.managerSections
 
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
-import android.text.Html
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
@@ -19,9 +17,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.R
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaNotificationsAdapter
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString

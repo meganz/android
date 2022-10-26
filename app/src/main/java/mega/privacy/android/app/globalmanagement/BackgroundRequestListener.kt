@@ -3,12 +3,12 @@ package mega.privacy.android.app.globalmanagement
 import android.app.Application
 import android.content.Intent
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.main.controllers.AccountController

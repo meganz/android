@@ -56,7 +56,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
@@ -403,7 +403,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
         Timber.d("deepBrowserTree value: %s", ((FileExplorerActivity) context).getDeepBrowserTree());
         setOptionsBarVisibility();
 
-        if (((FileExplorerActivity) context).shouldRestartSearch()) {
+        if (((FileExplorerActivity) context).getShouldRestartSearch()) {
             setWaitingForSearchedNodes(true);
             search(((FileExplorerActivity) context).getQuerySearch());
         }
@@ -553,7 +553,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
                 break;
             }
             case R.id.cancel_text: {
-                ((FileExplorerActivity) context).finishActivity();
+                ((FileExplorerActivity) context).finishAndRemoveTask();
                 break;
             }
         }

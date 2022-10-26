@@ -261,25 +261,29 @@ class MediaPlayerFragment : Fragment() {
                 }
             }
         } else {
-            val viewHolder = videoPlayerVH ?: return
-            videoPlayerView = viewHolder.binding.playerView
-            serviceGateway?.run {
-                setupPlayerView(this, viewHolder.binding.playerView, true)
+            videoPlayerVH?.let { viewHolder ->
+                videoPlayerView = viewHolder.binding.playerView
+                serviceGateway?.run {
+                    setupPlayerView(this, viewHolder.binding.playerView, true)
 
-                if (videoPlayerPausedForPlaylist) {
-                    setPlayWhenReady(true)
-                    videoPlayerPausedForPlaylist = false
+                    if (videoPlayerPausedForPlaylist) {
+                        setPlayWhenReady(true)
+                        videoPlayerPausedForPlaylist = false
+                    }
                 }
+                // we need setup control buttons again, because reset player would reset PlayerControlView
+                viewHolder.setupPlaylistButton(playerServiceViewModelGateway?.getPlaylistItems()) {
+                    (requireActivity() as MediaPlayerActivity).setDraggable(false)
+                    findNavController().navigate(R.id.action_player_to_playlist)
+                }
+                viewHolder.setupLockUI(viewModel.isLockUpdate.value) { isLock ->
+                    viewModel.updateLockStatus(isLock)
+                    if (isLock) {
+                        delayHideWhenLocked()
+                    }
+                }
+                initRepeatToggleButtonForVideo(viewHolder)
             }
-            // we need setup control buttons again, because reset player would reset PlayerControlView
-            viewHolder.setupPlaylistButton(playerServiceViewModelGateway?.getPlaylistItems()) {
-                (requireActivity() as MediaPlayerActivity).setDraggable(false)
-                findNavController().navigate(R.id.action_player_to_playlist)
-            }
-            viewHolder.setupLockUI(viewModel.isLockUpdate.value) { isLock ->
-                viewModel.updateLockStatus(isLock)
-            }
-            initRepeatToggleButtonForVideo(viewHolder)
         }
     }
 
@@ -338,6 +342,9 @@ class MediaPlayerFragment : Fragment() {
             } else {
                 delayHideToolbarCanceled = true
                 showToolbar()
+                if (viewModel.isLockUpdate.value) {
+                    delayHideToolbar()
+                }
             }
         }
         updateLoadingAnimation(mediaPlayerServiceGateway.getPlaybackState())
@@ -356,6 +363,15 @@ class MediaPlayerFragment : Fragment() {
             if (isResumed && !delayHideToolbarCanceled) {
                 hideToolbar()
 
+                videoPlayerVH?.hideController()
+            }
+        }
+    }
+
+    private fun delayHideWhenLocked() {
+        runDelay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS) {
+            if (viewModel.isLockUpdate.value) {
+                hideToolbar()
                 videoPlayerVH?.hideController()
             }
         }

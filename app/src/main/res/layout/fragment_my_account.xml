@@ -100,7 +100,7 @@
         <LinearLayout
             android:id="@+id/account_type_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="46dp"
             android:layout_marginStart="22dp"
             android:layout_marginEnd="22dp"
             android:background="@drawable/background_account_type"
@@ -109,7 +109,7 @@
             <RelativeLayout
                 android:id="@+id/account_type_principal_info"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
 
                 <ImageView
                     android:id="@+id/account_type_icon"

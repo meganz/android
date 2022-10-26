@@ -5,7 +5,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.domain.repository.TransfersRepository
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
 import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
 import mega.privacy.android.domain.repository.TransferRepository
@@ -25,32 +24,32 @@ import mega.privacy.android.domain.usecase.MonitorTransfersSize
 class TransfersModule {
 
     @Provides
-    fun provideAreTransfersPaused(transfersRepository: TransfersRepository):
+    fun provideAreTransfersPaused(transfersRepository: TransferRepository):
             AreTransfersPaused = AreTransfersPaused(transfersRepository::areTransfersPaused)
 
     @Provides
-    fun provideGetNumPendingDownloadsNonBackground(transfersRepository: TransfersRepository):
+    fun provideGetNumPendingDownloadsNonBackground(transfersRepository: TransferRepository):
             GetNumPendingDownloadsNonBackground =
         GetNumPendingDownloadsNonBackground(transfersRepository::getNumPendingDownloadsNonBackground)
 
     @Provides
-    fun provideGetNumPendingUploads(transfersRepository: TransfersRepository): GetNumPendingUploads =
+    fun provideGetNumPendingUploads(transfersRepository: TransferRepository): GetNumPendingUploads =
         GetNumPendingUploads(transfersRepository::getNumPendingUploads)
 
     @Provides
-    fun provideGetNumPendingTransfers(transfersRepository: TransfersRepository): GetNumPendingTransfers =
+    fun provideGetNumPendingTransfers(transfersRepository: TransferRepository): GetNumPendingTransfers =
         GetNumPendingTransfers(transfersRepository::getNumPendingTransfers)
 
     @Provides
-    fun provideIsCompletedTransfersEmpty(transfersRepository: TransfersRepository): IsCompletedTransfersEmpty =
+    fun provideIsCompletedTransfersEmpty(transfersRepository: TransferRepository): IsCompletedTransfersEmpty =
         IsCompletedTransfersEmpty(transfersRepository::isCompletedTransfersEmpty)
 
     @Provides
-    fun provideAreAllTransfersPaused(transfersRepository: TransfersRepository): AreAllTransfersPaused =
+    fun provideAreAllTransfersPaused(transfersRepository: TransferRepository): AreAllTransfersPaused =
         AreAllTransfersPaused(transfersRepository::areAllTransfersPaused)
 
     @Provides
-    fun provideAreAllUploadTransfersPaused(transfersRepository: TransfersRepository): AreAllUploadTransfersPaused =
+    fun provideAreAllUploadTransfersPaused(transfersRepository: TransferRepository): AreAllUploadTransfersPaused =
         AreAllUploadTransfersPaused(transfersRepository::areAllUploadTransfersPaused)
 
     /**

@@ -4,7 +4,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiAndroid

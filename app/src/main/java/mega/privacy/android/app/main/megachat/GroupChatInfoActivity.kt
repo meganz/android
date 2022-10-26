@@ -23,7 +23,11 @@ import android.widget.Button
 import android.widget.CheckedTextView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,10 +36,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.userWaitingForCall
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -52,6 +58,8 @@ import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatA
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.chat.groupInfo.GroupChatInfoViewModel
+import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.StartCallUseCase
@@ -90,6 +98,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -126,7 +135,11 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     @Inject
     lateinit var getCallUseCase: GetCallUseCase
 
+    @Inject
+    lateinit var chatManagement: ChatManagement
+
     lateinit var binding: ActivityGroupChatPropertiesBinding
+    private val viewModel by viewModels<GroupChatInfoViewModel>()
 
     var isChatOpen = false
     var chatLink: String? = null
@@ -231,6 +244,26 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             }
 
             dbH = getInstance().dbH
+
+            if (!isChatOpen) {
+                chatManagement.openChatRoom(chat!!.chatId)
+            }
+
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                    viewModel.state.collect { (_, error, enabled) ->
+                        if (error != null) {
+                            showSnackbar(StringResourcesUtils.getString(error))
+                            adapter?.updateAllowAddParticipants(getChatRoom().isOpenInvite)
+                        } else if (enabled != null) {
+                            adapter?.updateAllowAddParticipants(enabled)
+                            updateAdapterHeader()
+                            updateParticipants()
+                            invalidateOptionsMenu()
+                        }
+                    }
+                }
+            }
 
             binding = ActivityGroupChatPropertiesBinding.inflate(layoutInflater)
             setContentView(binding.root)
@@ -409,13 +442,13 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         // Inflate the menu items for use in the action bar
         val inflater = menuInflater
         inflater.inflate(R.menu.activity_group_chat_info, menu)
-        val addParticipantItem = menu.findItem(R.id.action_add_participants)
+        val addParticipantsMenuItem = menu.findItem(R.id.action_add_participants)
         val changeTitleItem = menu.findItem(R.id.action_rename)
         chat?.let { chatRoom ->
             chatRoom.ownPrivilege.let { permission ->
-                val visibility = permission == MegaChatRoom.PRIV_MODERATOR
-                addParticipantItem.isVisible = visibility
-                changeTitleItem.isVisible = visibility
+                changeTitleItem.isVisible = permission == MegaChatRoom.PRIV_MODERATOR
+                addParticipantsMenuItem.isVisible =
+                    permission == MegaChatRoom.PRIV_MODERATOR || chatRoom.isOpenInvite
             }
         }
 
@@ -435,6 +468,15 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     }
 
     /**
+     * Control when set open invite option is selected
+     */
+    fun setOpenInvite() {
+        chat?.let {
+            viewModel.onAllowAddParticipantsTap(it.chatId)
+        }
+    }
+
+    /**
      * Open add participants screen if has contacts
      */
     fun chooseAddParticipantDialog() {
@@ -444,8 +486,9 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         }
         if (megaApi.rootNode != null) {
             val contacts = megaApi.contacts
-            if (contacts.isNullOrEmpty()) {
-                showSnackbar(getString(R.string.no_contacts_invite))
+            if (contacts.isNullOrEmpty() || !contacts.any { it.visibility == VISIBILITY_VISIBLE }) {
+                val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
+                dialog.show(supportFragmentManager, dialog.tag)
             } else {
                 val intent = Intent(this, AddContactActivity::class.java)
                 intent.putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
@@ -1608,6 +1651,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     }
 
+    fun getChatRoom() = megaChatApi.getChatRoom(chatHandle)
+
     public override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         chat?.let {
@@ -1623,4 +1668,5 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         private const val MAX_LENGTH_CHAT_TITLE = 60
         private const val END_CALL_FOR_ALL_DIALOG = "isEndCallForAllDialogShown"
     }
+
 }

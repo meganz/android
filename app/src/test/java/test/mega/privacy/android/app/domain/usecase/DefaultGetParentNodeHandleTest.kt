@@ -3,7 +3,7 @@ package test.mega.privacy.android.app.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.repository.FilesRepository
+import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetParentNodeHandle
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.domain.usecase.GetParentNodeHandle

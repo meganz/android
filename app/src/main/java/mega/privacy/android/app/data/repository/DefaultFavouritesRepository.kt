@@ -3,18 +3,18 @@ package mega.privacy.android.app.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.extensions.failWithError
-import mega.privacy.android.app.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.mapper.FavouriteFolderInfoMapper
-import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
-import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
+import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
+import mega.privacy.android.data.mapper.NodeInfoMapper
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.entity.NodeInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FavouritesRepository
 import nz.mega.sdk.MegaError
@@ -34,13 +34,13 @@ class DefaultFavouritesRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorNodeChangeFacade: MonitorNodeChangeFacade,
-    private val favouriteInfoMapper: FavouriteInfoMapper,
+    private val nodeInfoMapper: NodeInfoMapper,
     private val favouriteFolderInfoMapper: FavouriteFolderInfoMapper,
     private val cacheFolder: CacheFolderGateway,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
 ) : FavouritesRepository {
 
-    override suspend fun getAllFavorites(): List<FavouriteInfo> =
+    override suspend fun getAllFavorites(): List<NodeInfo> =
         withContext(ioDispatcher) {
             val handleList = suspendCoroutine<MegaHandleList> { continuation ->
                 megaApiGateway.getFavourites(
@@ -98,13 +98,15 @@ class DefaultFavouritesRepository @Inject constructor(
      */
     private suspend fun mapNodesToFavouriteInfo(nodes: List<MegaNode>) =
         nodes.map { megaNode ->
-            favouriteInfoMapper(
+            nodeInfoMapper(
                 megaNode,
                 ::getThumbnailCacheFilePath,
                 megaApiGateway::hasVersion,
                 megaApiGateway::getNumChildFolders,
                 megaApiGateway::getNumChildFiles,
                 fileTypeInfoMapper,
+                megaApiGateway::isPendingShare,
+                megaApiGateway::isInRubbish,
             )
         }
 

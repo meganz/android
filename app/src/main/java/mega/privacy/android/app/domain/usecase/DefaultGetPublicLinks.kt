@@ -1,6 +1,6 @@
 package mega.privacy.android.app.domain.usecase
 
-import mega.privacy.android.app.domain.repository.FilesRepository
+import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import nz.mega.sdk.MegaApiJava

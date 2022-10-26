@@ -241,7 +241,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_below="@+id/add_contact_toolbar"
-		android:visibility="gone">
+		android:visibility="visible">
 
 		<LinearLayout
 			android:layout_width="match_parent"
@@ -327,8 +327,8 @@
 					<RelativeLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:layout_marginTop="15dp"
-						android:layout_marginBottom="15dp"
+						android:layout_marginTop="14dp"
+						android:layout_marginBottom="14dp"
 						android:layout_below="@+id/separator_ekr"
 						android:layout_marginLeft="16dp"
 						android:layout_marginRight="16dp">
@@ -337,8 +337,8 @@
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:layout_centerVertical="true"
-							android:textAppearance="?attr/textAppearanceSubtitle1"
-							android:text="@string/get_chat_link_option"/>
+							android:text="@string/get_chat_link_option"
+							android:textAppearance="?attr/textAppearanceSubtitle1" />
 
 						<CheckBox
 							android:id="@+id/get_chat_link_checkbox"
@@ -358,6 +358,34 @@
 						android:layout_marginRight="16dp"
 						android:background="@color/grey_012_white_012"
 						android:layout_alignParentBottom="true"/>
+
+				</RelativeLayout>
+
+				<RelativeLayout
+					android:id="@+id/allow_add_participants_layout"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content">
+
+					<androidx.appcompat.widget.SwitchCompat
+						android:id="@+id/allow_add_participants_switch"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_marginStart="16dp"
+						android:layout_marginTop="14dp"
+						android:layout_marginEnd="14dp"
+						android:layout_marginBottom="14dp"
+						android:checked="false"
+						android:text="@string/chat_group_chat_info_allow_non_host_participants_option"
+						android:textAppearance="?attr/textAppearanceSubtitle1" />
+
+					<View
+						android:id="@+id/separator_allow_participants_participants"
+						android:layout_width="match_parent"
+						android:layout_height="1dp"
+						android:layout_alignParentBottom="true"
+						android:layout_marginLeft="16dp"
+						android:layout_marginRight="16dp"
+						android:background="@color/grey_012_white_012" />
 
 				</RelativeLayout>
 

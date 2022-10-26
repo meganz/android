@@ -2700,9 +2700,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">您的上一笔付款未成功。请使用网络浏览器登录MEGA后获取详情。</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">您的企业帐户已到期</string>
+    <string name="expired_business_title">Account deactivated</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">处理您的付款时出现问题。在桌面网页浏览器中修复此问题前，MEGA仅限于查看。</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">您的帐户目前已被[B]暂停[/B]。您只能浏览您的数据。</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3915,4 +3915,18 @@
     <string name="upgrade_account_successful_pro_3_yearly">Thank you for your Pro&#160;III yearly subscription</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">允许非主持人添加参与者</string>
+    <!-- Title of gif album. -->
+    <string name="photos_album_title_gif">GIFs</string>
+    <!-- Title of raw album. -->
+    <string name="photos_album_title_raw">RAW</string>
+    <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_title">无联系人</string>
+    <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_message">您没有联系人可以添加到此聊天中。如果您想添加参与者，请先邀请他们成为您的联系人。</string>
+    <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_title">已添加所有联系人</string>
+    <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_message">您已将所有联系人添加到此聊天中。如果您想添加更多参与者，请先邀请他们成为您的联系人。</string>
+    <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
+    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
 </resources>

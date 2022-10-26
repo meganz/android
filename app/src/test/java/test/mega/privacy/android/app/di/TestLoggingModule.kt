@@ -4,11 +4,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
-import mega.privacy.android.app.data.gateway.LogWriterGateway
 import mega.privacy.android.app.di.LoggingModule
-import mega.privacy.android.app.logging.ChatLogger
-import mega.privacy.android.app.logging.SdkLogger
-import mega.privacy.android.app.presentation.logging.tree.LogFlowTree
+import mega.privacy.android.data.gateway.LogWriterGateway
+import mega.privacy.android.data.qualifier.ChatLogger
+import mega.privacy.android.data.qualifier.SdkLogger
 import mega.privacy.android.domain.usecase.CreateLogEntry
 import mega.privacy.android.domain.usecase.CreateTraceString
 import mega.privacy.android.domain.usecase.EnableLogAllToConsole
@@ -58,14 +57,6 @@ object TestLoggingModule {
 
     @Provides
     fun provideResetSdkLogger(): ResetSdkLogger = mock()
-
-    @SdkLogger
-    @Provides
-    fun provideSdkLogFlowTree(): LogFlowTree = mock()
-
-    @ChatLogger
-    @Provides
-    fun provideChatLogFlowTree(): LogFlowTree = mock()
 
     @Provides
     fun provideInitialiseLogging(): InitialiseLogging = mock()

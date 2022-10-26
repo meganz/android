@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.interfaces.SimpleSnackbarCallBack;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;

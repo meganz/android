@@ -25,7 +25,6 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -38,7 +37,6 @@ import mega.privacy.android.app.activities.settingsActivities.DownloadPreference
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY
 import mega.privacy.android.app.constants.SettingsConstants.KEY_2FA
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_APP_VERSION
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_CODE_LINK
@@ -75,8 +73,6 @@ import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivity
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY
-import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -366,12 +362,9 @@ class SettingsFragment :
             KEY_HIDE_RECENT_ACTIVITY -> {
                 val checked =
                     findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.isChecked
-                requireContext().getSharedPreferences(
-                    USER_INTERFACE_PREFERENCES,
-                    Context.MODE_PRIVATE
-                ).edit().putBoolean(HIDE_RECENT_ACTIVITY, checked == true).apply()
-                LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
-                    .post(checked)
+                checked?.let {
+                    viewModel.hideRecentActivity(checked)
+                }
             }
         }
         resetCounters(key)

@@ -11,7 +11,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
@@ -121,10 +121,7 @@ class AudioViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch {
-            sortOrder = getCloudSortOrder()
-            loadAudio(true)
-        }
+        fetchOrderAndLoadAudio(true)
 
         items.observeForever(loadFinishedObserver)
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
@@ -136,6 +133,25 @@ class AudioViewModel @Inject constructor(
                 loadAudio(true)
             }
         }
+    }
+
+    /**
+     * Fetch latest order & load audio
+     * @param forceUpdate
+     */
+    private fun fetchOrderAndLoadAudio(forceUpdate: Boolean) {
+        viewModelScope.launch {
+            sortOrder = getCloudSortOrder()
+            loadAudio(forceUpdate)
+        }
+    }
+
+    /**
+     * On SortOrder change
+     * @param forceUpdate
+     */
+    fun onOrderChange(forceUpdate: Boolean) {
+        fetchOrderAndLoadAudio(forceUpdate)
     }
 
     /**

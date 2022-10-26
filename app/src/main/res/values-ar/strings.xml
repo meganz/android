@@ -3065,9 +3065,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">حدثت مشكلة في الدفعة الأخيرة. يرجى الوصول إلى ميغا MEGA باستخدام متصفح سطح المكتب لمزيد من المعلومات.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">انتهت صلاحية حساب الأعمال الخاص بك</string>
+    <string name="expired_business_title">Account deactivated</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">حدثت مشكلة أثناء معالجة دفعتك. يقتصر ميغا MEGA على العرض فقط حتى يتم إصلاح هذه المشكلة في متصفح سطح المكتب.</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">حسابك [B]معلق[/B] حالياً. يمكنك فقط تصفح بياناتك.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -4435,4 +4435,18 @@
     <string name="upgrade_account_successful_pro_3_yearly">Thank you for your Pro&#160;III yearly subscription</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">السماح لغير المضيفين بإضافة مشاركين</string>
+    <!-- Title of gif album. -->
+    <string name="photos_album_title_gif">GIFs</string>
+    <!-- Title of raw album. -->
+    <string name="photos_album_title_raw">RAW</string>
+    <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_title">لا يوجد جهات اتصال</string>
+    <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_message">ليس لديك جهات اتصال لإضافتها إلى هذه المحادثة. إذا كنت ترغب في إضافة مشاركين، قم أولاً بدعوتهم إلى قائمة جهات الاتصال الخاصة بك.</string>
+    <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_title">تمت إضافة جميع جهات الاتصال</string>
+    <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_message">لقد أضفت بالفعل جميع جهات اتصالك إلى هذه المحادثة. إذا كنت ترغب في إضافة المزيد من المشاركين، قم أولاً بدعوتهم إلى قائمة جهات الاتصال الخاصة بك.</string>
+    <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
+    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
 </resources>

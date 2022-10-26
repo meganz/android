@@ -64,7 +64,7 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
                 if (context instanceof ManagerActivity) {
                     ((ManagerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
                 } else if (context instanceof FileExplorerActivity) {
-                    ((FileExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
+                    ((FileExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode());
                 } else if (context instanceof ChatExplorerActivity) {
                     ((ChatExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
                 } else if (context instanceof GroupChatInfoActivity) {
@@ -87,7 +87,7 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
                         intent.putExtra(CHAT_LINK_EXTRA, request.getText());
                         context.startActivity(intent);
                     } else if (context instanceof FileExplorerActivity) {
-                        ((FileExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
+                        ((FileExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode());
                     } else if (context instanceof ChatExplorerActivity) {
                         ((ChatExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
                     } else if (context instanceof GroupChatInfoActivity) {

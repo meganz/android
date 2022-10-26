@@ -15,7 +15,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemGalleryImageBinding
 import mega.privacy.android.app.databinding.ItemGalleryTitleBinding
 import mega.privacy.android.app.databinding.ItemGalleryVideoBinding
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.gallery.data.GalleryItem
@@ -61,8 +61,6 @@ class GalleryViewHolder(
             thumbnail.hierarchy.roundingParams = RoundingParams.fromCornersRadius(
                 (if (item.selected) itemSizeConfig.roundCornerRadius else 0).toFloat()
             )
-            val imagePadding = if (item.selected) itemSizeConfig.imageSelectedPadding else 0
-            thumbnail.setPadding(imagePadding, imagePadding, imagePadding, imagePadding)
             if (item.selected) {
                 thumbnail.background = ContextCompat.getDrawable(
                     thumbnail.context,

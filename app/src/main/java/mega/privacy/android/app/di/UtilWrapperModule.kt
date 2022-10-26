@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +13,7 @@ import dagger.hilt.android.components.FragmentComponent
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.AvatarUtil
@@ -29,7 +30,11 @@ import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnlineWrapper
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
+import mega.privacy.android.domain.usecase.DefaultMonitorBackupFolder
+import mega.privacy.android.domain.usecase.MonitorBackupFolder
 
 /**
  * Util wrapper module
@@ -39,104 +44,119 @@ import mega.privacy.android.app.utils.wrapper.TimeWrapper
  */
 @Module
 @InstallIn(FragmentComponent::class, SingletonComponent::class, ServiceComponent::class)
-class UtilWrapperModule {
-
-    @Provides
-    fun provideIsOnlineWrapper(): IsOnlineWrapper {
-        return object : IsOnlineWrapper {
-            override fun isOnline(context: Context): Boolean {
-                return Util.isOnline(context)
-            }
-        }
-    }
-
-    @Provides
-    fun provideIsOnWifiWrapper(): IsOnWifiWrapper {
-        return object : IsOnWifiWrapper {
-            override fun isOnWifi(context: Context): Boolean {
-                return Util.isOnWifi(context)
-            }
-        }
-    }
-
-    @Provides
-    fun provideGetFullPathFileWrapper(): GetFullPathFileWrapper {
-        return object : GetFullPathFileWrapper {
-            override fun getFullPathFromTreeUri(uri: Uri, context: Context): String? {
-                return FileUtil.getFullPathFromTreeUri(uri, context)
-            }
-        }
-    }
-
-    @Provides
-    fun provideGetDocumentFileWrapper(): GetDocumentFileWrapper {
-        return object : GetDocumentFileWrapper {
-            override fun getDocumentFileFromTreeUri(context: Context, uri: Uri): DocumentFile? {
-                return DocumentFile.fromTreeUri(context, uri)
-            }
-        }
-    }
-
-    @Provides
-    fun provideCameraUploadSyncManagerWrapper(): CameraUploadSyncManagerWrapper =
-        object : CameraUploadSyncManagerWrapper {}
-
-    @Provides
-    fun provideCameraUploadsServiceWrapper(): CameraUploadsServiceWrapper =
-        object : CameraUploadsServiceWrapper {}
-
-    @Provides
-    fun provideJobUtilWrapper(): JobUtilWrapper =
-        object : JobUtilWrapper {}
-
-    @Provides
-    fun providePermissionUtilWrapper(): PermissionUtilWrapper =
-        object : PermissionUtilWrapper {}
-
-    @Provides
-    fun provideFetchNodeWrapper(megaApiGateway: MegaApiGateway): FetchNodeWrapper =
-        FetchNodeWrapper(megaApiGateway::getMegaNodeByHandle)
-
-    @Provides
-    fun provideGetOfflineThumbnailFileWrapper(megaApiGateway: MegaApiGateway): GetOfflineThumbnailFileWrapper {
-        return object : GetOfflineThumbnailFileWrapper {
-            override fun getThumbnailFile(context: Context, node: MegaOffline) =
-                OfflineUtils.getThumbnailFile(context, node, megaApiGateway)
-
-            override fun getThumbnailFile(context: Context, handle: String) =
-                OfflineUtils.getThumbnailFile(context, handle, megaApiGateway)
-        }
-    }
+abstract class UtilWrapperModule {
 
     /**
-     * provide time manager
+     * Bind monitor backup folder
      */
-    @Provides
-    fun provideTimeWrapper() = object : TimeWrapper {
-        override val now: Long
-            get() = System.currentTimeMillis()
-
-        override val nanoTime: Long
-            get() = System.nanoTime()
-    }
+    @Binds
+    abstract fun bindMonitorBackupFolder(implementation: DefaultMonitorBackupFolder): MonitorBackupFolder
 
     /**
-     * provide Avatar Wrapper
+     * Bind mega node util wrapper
      */
-    @Provides
-    fun provideAvatarWrapper() = object : AvatarWrapper {
-        override fun getDominantColor(bimap: Bitmap): Int = AvatarUtil.getDominantColor(bimap)
+    @Binds
+    abstract fun bindMegaNodeUtilWrapper(implementation: MegaNodeUtilFacade): MegaNodeUtilWrapper
 
-        override fun getSpecificAvatarColor(typeColor: String): Int =
-            AvatarUtil.getSpecificAvatarColor(typeColor)
-    }
+    companion object{
+        @Provides
+        fun provideIsOnlineWrapper(): IsOnlineWrapper {
+            return object : IsOnlineWrapper {
+                override fun isOnline(context: Context): Boolean {
+                    return Util.isOnline(context)
+                }
+            }
+        }
 
-    /**
-     * provide Bitmap Factory Wrapper
-     */
-    @Provides
-    fun provideBitmapFactoryWrapper() = object : BitmapFactoryWrapper {
-        override fun decodeFile(pathName: String?, opts: BitmapFactory.Options): Bitmap? =
-            BitmapFactory.decodeFile(pathName, opts)
+        @Provides
+        fun provideIsOnWifiWrapper(): IsOnWifiWrapper {
+            return object : IsOnWifiWrapper {
+                override fun isOnWifi(context: Context): Boolean {
+                    return Util.isOnWifi(context)
+                }
+            }
+        }
+
+        @Provides
+        fun provideGetFullPathFileWrapper(): GetFullPathFileWrapper {
+            return object : GetFullPathFileWrapper {
+                override fun getFullPathFromTreeUri(uri: Uri, context: Context): String? {
+                    return FileUtil.getFullPathFromTreeUri(uri, context)
+                }
+            }
+        }
+
+        @Provides
+        fun provideGetDocumentFileWrapper(): GetDocumentFileWrapper {
+            return object : GetDocumentFileWrapper {
+                override fun getDocumentFileFromTreeUri(context: Context, uri: Uri): DocumentFile? {
+                    return DocumentFile.fromTreeUri(context, uri)
+                }
+            }
+        }
+
+        @Provides
+        fun provideCameraUploadSyncManagerWrapper(): CameraUploadSyncManagerWrapper =
+            object : CameraUploadSyncManagerWrapper {}
+
+        @Provides
+        fun provideCameraUploadsServiceWrapper(): CameraUploadsServiceWrapper =
+            object : CameraUploadsServiceWrapper {}
+
+        @Provides
+        fun provideJobUtilWrapper(): JobUtilWrapper =
+            object : JobUtilWrapper {}
+
+        @Provides
+        fun providePermissionUtilWrapper(): PermissionUtilWrapper =
+            object : PermissionUtilWrapper {}
+
+        @Provides
+        fun provideFetchNodeWrapper(megaApiGateway: MegaApiGateway): FetchNodeWrapper =
+            FetchNodeWrapper(megaApiGateway::getMegaNodeByHandle)
+
+        @Provides
+        fun provideGetOfflineThumbnailFileWrapper(megaApiGateway: MegaApiGateway): GetOfflineThumbnailFileWrapper {
+            return object : GetOfflineThumbnailFileWrapper {
+                override fun getThumbnailFile(context: Context, node: MegaOffline) =
+                    OfflineUtils.getThumbnailFile(context, node, megaApiGateway)
+
+                override fun getThumbnailFile(context: Context, handle: String) =
+                    OfflineUtils.getThumbnailFile(context, handle, megaApiGateway)
+            }
+        }
+
+        /**
+         * provide time manager
+         */
+        @Provides
+        fun provideTimeWrapper() = object : TimeWrapper {
+            override val now: Long
+                get() = System.currentTimeMillis()
+
+            override val nanoTime: Long
+                get() = System.nanoTime()
+        }
+
+        /**
+         * provide Avatar Wrapper
+         */
+        @Provides
+        fun provideAvatarWrapper() = object : AvatarWrapper {
+            override fun getDominantColor(bimap: Bitmap): Int = AvatarUtil.getDominantColor(bimap)
+
+            override fun getSpecificAvatarColor(typeColor: String): Int =
+                AvatarUtil.getSpecificAvatarColor(typeColor)
+        }
+
+        /**
+         * provide Bitmap Factory Wrapper
+         */
+        @Provides
+        fun provideBitmapFactoryWrapper() = object : BitmapFactoryWrapper {
+            override fun decodeFile(pathName: String?, opts: BitmapFactory.Options): Bitmap? =
+                BitmapFactory.decodeFile(pathName, opts)
+        }
+
     }
 }

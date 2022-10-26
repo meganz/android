@@ -68,9 +68,9 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
-import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
@@ -78,7 +78,6 @@ import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
-import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.ManagerActivity;
@@ -93,8 +92,6 @@ import timber.log.Timber;
 @AndroidEntryPoint
 public class RubbishBinFragment extends Fragment {
 
-    @Inject
-    SortOrderManagement sortOrderManagement;
     @Inject
     DatabaseHandler dbH;
 
@@ -308,18 +305,18 @@ public class RubbishBinFragment extends Fragment {
         if (managerViewModel.getState().getValue().getRubbishBinParentHandle() == -1L || managerViewModel.getState().getValue().getRubbishBinParentHandle() == megaApi.getRubbishNode().getHandle()) {
             Timber.d("Parent is the Rubbish: %s", managerViewModel.getState().getValue().getRubbishBinParentHandle());
 
-            nodes = megaApi.getChildren(megaApi.getRubbishNode(), sortOrderManagement.getOrderCloud());
+            nodes = megaApi.getChildren(megaApi.getRubbishNode(), managerViewModel.getOrder());
 
         } else {
             MegaNode parentNode = megaApi.getNodeByHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
 
             if (parentNode != null) {
                 Timber.d("The parent node is: %s", parentNode.getHandle());
-                nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+                nodes = megaApi.getChildren(parentNode, managerViewModel.getOrder());
 
                 ((ManagerActivity) context).supportInvalidateOptionsMenu();
             }
-            nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+            nodes = megaApi.getChildren(parentNode, managerViewModel.getOrder());
         }
 
         ((ManagerActivity) context).setToolbarTitle();
@@ -585,7 +582,7 @@ public class RubbishBinFragment extends Fragment {
                 ((ManagerActivity) context).supportInvalidateOptionsMenu();
 
                 adapter.setParentHandle(managerViewModel.getState().getValue().getRubbishBinParentHandle());
-                nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
+                nodes = megaApi.getChildren(nodes.get(position), managerViewModel.getOrder());
                 adapter.setNodes(nodes);
                 recyclerView.scrollToPosition(0);
 
@@ -661,7 +658,7 @@ public class RubbishBinFragment extends Fragment {
                     Intent intent = ImageViewerActivity.getIntentForParentNode(
                             requireContext(),
                             megaApi.getParentNode(nodes.get(position)).getHandle(),
-                            sortOrderManagement.getOrderCloud(),
+                            managerViewModel.getOrder(),
                             nodes.get(position).getHandle()
                     );
                     putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
@@ -899,7 +896,7 @@ public class RubbishBinFragment extends Fragment {
                 managerViewModel.setRubbishBinParentHandle(parentNode.getHandle());
 
                 ((ManagerActivity) context).setToolbarTitle();
-                nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+                nodes = megaApi.getChildren(parentNode, managerViewModel.getOrder());
                 adapter.setNodes(nodes);
 
                 int lastVisiblePosition = 0;

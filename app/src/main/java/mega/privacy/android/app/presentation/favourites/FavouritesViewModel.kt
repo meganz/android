@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
@@ -30,10 +30,10 @@ import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.FavouritePlaceholderItem
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
-import mega.privacy.android.app.presentation.mapper.FavouriteMapper
+import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
-import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.entity.NodeInfo
 import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.RemoveFavourites
@@ -440,7 +440,7 @@ class FavouritesViewModel @Inject constructor(
      * Build favourite source list
      * @param list List<FavouriteInfo>
      */
-    private suspend fun buildFavouriteSourceList(list: List<FavouriteInfo>) {
+    private suspend fun buildFavouriteSourceList(list: List<NodeInfo>) {
         if (favouriteSourceList.isNotEmpty()) {
             favouriteSourceList.clear()
         }

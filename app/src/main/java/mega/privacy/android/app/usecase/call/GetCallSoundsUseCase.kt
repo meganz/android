@@ -11,7 +11,6 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -20,14 +19,14 @@ import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS
 import mega.privacy.android.app.data.extensions.observeOnce
-import mega.privacy.android.app.data.preferences.CallsPreferencesDataStore
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
+import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatCall
@@ -48,6 +47,7 @@ class GetCallSoundsUseCase @Inject constructor(
     private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
     private val endCallUseCase: EndCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
+    private val callsPreferencesGateway: CallsPreferencesGateway,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) {
 
@@ -224,8 +224,7 @@ class GetCallSoundsUseCase @Inject constructor(
                 .subscribeBy(
                     onNext = { result ->
                         sharingScope.launch {
-                            CallsPreferencesDataStore(MegaApplication.getInstance().applicationContext,
-                                Dispatchers.IO)
+                            callsPreferencesGateway
                                 .getCallsSoundNotificationsPreference()
                                 .collectLatest { soundNotifications ->
                                     val isEnabled =

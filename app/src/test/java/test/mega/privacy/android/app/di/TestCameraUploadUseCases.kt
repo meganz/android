@@ -17,6 +17,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByFingerprintAndParentNode
 import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
+import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
+import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetRemoveGps
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
@@ -49,6 +51,8 @@ import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
+import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
+import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
@@ -185,10 +189,16 @@ object TestCameraUploadUseCases {
     fun provideCompressedVideoPending() = mock<CompressedVideoPending>()
 
     @Provides
+    fun provideGetGPSCoordinates() = mock<GetGPSCoordinates>()
+
+    @Provides
     fun provideIsChargingRequired() = mock<IsChargingRequired>()
 
     @Provides
     fun provideSaveSyncRecordsToDB() = mock<SaveSyncRecordsToDB>()
+
+    @Provides
+    fun provideGetPendingUploadList() = mock<GetPendingUploadList>()
 
     @Provides
     fun provideGetDefaultNodeHandle() = mock<GetDefaultNodeHandle>()
@@ -210,4 +220,10 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetUploadFolderHandle() = mock<GetUploadFolderHandle>()
+
+    @Provides
+    fun provideRestorePrimaryTimestamps() = mock<RestorePrimaryTimestamps>()
+
+    @Provides
+    fun provideRestoreSecondaryTimestamps() = mock<RestoreSecondaryTimestamps>()
 }

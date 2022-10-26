@@ -25,6 +25,7 @@ import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
+import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatAdapter.ViewHolderParticipantsHeader
 import mega.privacy.android.app.meeting.LockableBottomSheetBehavior
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
@@ -224,8 +225,14 @@ class BottomFloatingPanelViewHolder(
      * Init the visibility of `ShareLink` & `Invite` Button
      */
     fun updateShareAndInviteButton() {
+        floatingPanelView.dividerAllowAddParticipants.isVisible = inMeetingViewModel.isLinkVisible()
         floatingPanelView.shareLink.isVisible = inMeetingViewModel.isLinkVisible()
         floatingPanelView.invite.isVisible = inMeetingViewModel.isLinkVisible()
+        floatingPanelView.dividerParticipants.isVisible = inMeetingViewModel.isModerator()
+        floatingPanelView.allowAddParticipantsLayout.isVisible = inMeetingViewModel.isModerator()
+        floatingPanelView.allowAddParticipantsSwitch.isClickable = false
+        updateAllowAddParticipantsSwitch(inMeetingViewModel.isOpenInvite())
+
         floatingPanelView.guestShareLink.apply {
             isVisible = inMeetingViewModel.isGuestLinkVisible()
             text = inMeetingViewModel.getGuestLinkTitle()
@@ -236,6 +243,20 @@ class BottomFloatingPanelViewHolder(
                 0
             )
         }
+    }
+
+    /**
+     * Update allow add participant option
+     */
+    fun updateAllowAddParticipantsSwitch(enabled: Boolean) {
+        floatingPanelView.allowAddParticipantsSwitch.isChecked = enabled
+    }
+
+    /**
+     * Revert the switch status when set open invite update could not be completed.
+     */
+    fun checkErrorAllowAddParticipants() {
+        floatingPanelView.allowAddParticipantsSwitch.isChecked = inMeetingViewModel.isOpenInvite()
     }
 
     /**
@@ -400,6 +421,11 @@ class BottomFloatingPanelViewHolder(
 
             invite.setOnClickListener {
                 listener.onInviteParticipants()
+            }
+
+            allowAddParticipantsLayout.setOnClickListener {
+                updateAllowAddParticipantsSwitch(!floatingPanelView.allowAddParticipantsSwitch.isChecked)
+                listener.onAllowAddParticipants()
             }
         }
     }

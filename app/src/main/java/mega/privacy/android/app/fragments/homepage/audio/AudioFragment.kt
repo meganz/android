@@ -22,7 +22,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentAudioBinding
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.fragments.homepage.ActionModeCallback
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
@@ -190,7 +190,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.loadAudio(true)
+            viewModel.onOrderChange(true)
         })
 
         sortByHeaderViewModel.listGridChangeEvent.observe(

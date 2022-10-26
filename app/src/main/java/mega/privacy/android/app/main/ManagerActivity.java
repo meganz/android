@@ -19,7 +19,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HO
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_MY_BACKUPS_FOLDER_CHANGED;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
@@ -35,6 +34,7 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOG
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
 import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
+import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
 import static mega.privacy.android.app.main.FileInfoActivity.NODE_HANDLE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
@@ -76,9 +76,6 @@ import static mega.privacy.android.app.utils.CallUtil.setCallMenuItem;
 import static mega.privacy.android.app.utils.CallUtil.showCallLayout;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationInACall;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationOpenCamera;
-import static mega.privacy.android.app.utils.CameraUploadUtil.backupTimestampsAndFolderHandle;
-import static mega.privacy.android.app.utils.CameraUploadUtil.disableCameraUploadSettingProcess;
-import static mega.privacy.android.app.utils.CameraUploadUtil.disableMediaUploadProcess;
 import static mega.privacy.android.app.utils.CameraUploadUtil.getPrimaryFolderHandle;
 import static mega.privacy.android.app.utils.CameraUploadUtil.getSecondaryFolderHandle;
 import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
@@ -114,7 +111,6 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TE
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
-import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbish;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog;
@@ -134,7 +130,6 @@ import static mega.privacy.android.app.utils.Util.checkTakePicture;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.getSizeStringGBBased;
-import static mega.privacy.android.app.utils.Util.getVersion;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
 import static mega.privacy.android.app.utils.Util.hideKeyboardView;
 import static mega.privacy.android.app.utils.Util.isOnline;
@@ -154,7 +149,6 @@ import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED;
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
@@ -280,10 +274,11 @@ import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
+import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
@@ -299,7 +294,7 @@ import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
-import mega.privacy.android.app.data.model.UserCredentials;
+import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
@@ -315,7 +310,6 @@ import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
-import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
@@ -335,7 +329,7 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment;
-import mega.privacy.android.app.main.managerSections.InboxFragment;
+import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.main.managerSections.NotificationsFragment;
 import mega.privacy.android.app.main.managerSections.TransfersFragment;
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment;
@@ -522,8 +516,6 @@ public class ManagerActivity extends TransfersManagementActivity
     @Inject
     CookieDialogHandler cookieDialogHandler;
     @Inject
-    SortOrderManagement sortOrderManagement;
-    @Inject
     MyAccountInfo myAccountInfo;
     @Inject
     InviteContactUseCase inviteContactUseCase;
@@ -554,6 +546,8 @@ public class ManagerActivity extends TransfersManagementActivity
     LegacyLoggingSettings loggingSettings;
     @Inject
     ActivityLifecycleHandler activityLifecycleHandler;
+    @Inject
+    MegaNodeUtilWrapper megaNodeUtilWrapper;
 
     public ArrayList<Integer> transfersInProgress;
     public MegaTransferData transferData;
@@ -620,8 +614,8 @@ public class ManagerActivity extends TransfersManagementActivity
     boolean newAccount = false;
     public boolean newCreationAccount;
 
-    private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
-    private int storageStateFromBroadcast = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
+    private StorageState storageState = StorageState.Unknown; //Default value
+    private StorageState storageStateFromBroadcast = StorageState.Unknown; //Default value
     private boolean showStorageAlertWithDelay;
 
     private boolean isStorageStatusDialogShown = false;
@@ -710,6 +704,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private EmojiTextView nVDisplayName;
     TextView nVEmail;
     TextView businessLabel;
+    private TextView proFlexiLabel;
     RoundedImageView nVPictureProfile;
     TextView spaceTV;
     ProgressBar usedSpacePB;
@@ -881,12 +876,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     };
 
-    private final Observer<Boolean> fileBackupChangedObserver = change -> {
-        if (change) {
-            getMyBackupsFolder();
-        }
-    };
-
     private boolean isBusinessGraceAlertShown;
     private AlertDialog businessGraceAlert;
     private boolean isBusinessCUAlertShown;
@@ -976,10 +965,15 @@ public class ManagerActivity extends TransfersManagementActivity
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
                 if (ACTION_STORAGE_STATE_CHANGED.equals(intent.getAction())) {
-                    storageStateFromBroadcast = intent.getIntExtra(EXTRA_STORAGE_STATE, MegaApiJava.STORAGE_STATE_UNKNOWN);
+                    Bundle extras = intent.getExtras();
+                    if (extras != null && extras.containsKey(EXTRA_STORAGE_STATE)) {
+                        storageStateFromBroadcast = (StorageState) extras.getSerializable(EXTRA_STORAGE_STATE);
+                    } else {
+                        storageStateFromBroadcast = StorageState.Unknown;
+                    }
                     if (!showStorageAlertWithDelay) {
-                        checkStorageStatus(storageStateFromBroadcast != MegaApiJava.STORAGE_STATE_UNKNOWN ?
-                                storageStateFromBroadcast : app.getStorageState(), false);
+                        checkStorageStatus(storageStateFromBroadcast != StorageState.Unknown ?
+                                storageStateFromBroadcast : viewModel.getStorageState(), false);
                     }
                     updateAccountDetailsVisibleInfo();
                     return;
@@ -1132,7 +1126,7 @@ public class ManagerActivity extends TransfersManagementActivity
             ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
                             ? parentNode
                             : megaApi.getRootNode(),
-                    sortOrderManagement.getOrderCloud());
+                    viewModel.getOrder());
 
             fileBrowserFragment.setNodes(nodes);
             fileBrowserFragment.getRecyclerView().invalidate();
@@ -1335,7 +1329,7 @@ public class ManagerActivity extends TransfersManagementActivity
             getSupportFragmentManager().putFragment(outState, FragmentTag.SMS_VERIFICATION.getTag(), smsVerificationFragment);
         }
         outState.putInt("elevation", mElevationCause);
-        outState.putInt("storageState", storageState);
+        outState.putSerializable("storageState", storageState);
         outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
         outState.putInt("comesFromNotificationDeepBrowserTreeIncoming", comesFromNotificationDeepBrowserTreeIncoming);
 
@@ -1512,7 +1506,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 smsVerificationFragment = (SMSVerificationFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.SMS_VERIFICATION.getTag());
             }
             mElevationCause = savedInstanceState.getInt("elevation", 0);
-            storageState = savedInstanceState.getInt("storageState", MegaApiJava.STORAGE_STATE_UNKNOWN);
+            storageState = (StorageState)savedInstanceState.getSerializable("storageState");
             isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
             comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", INVALID_VALUE);
             openLinkDialogIsShown = savedInstanceState.getBoolean(OPEN_LINK_DIALOG_SHOWN, false);
@@ -1601,8 +1595,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).observeForever(finishObserver);
 
-        LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).observeForever(fileBackupChangedObserver);
-
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
         cC = new ContactController(this);
@@ -1637,7 +1629,6 @@ public class ManagerActivity extends TransfersManagementActivity
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        float density = getResources().getDisplayMetrics().density;
 
         initFileBackupManager();
 
@@ -1703,7 +1694,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         observePsa();
 
-        getMyBackupsFolder();
+        megaNodeUtilWrapper.observeBackupFolder();
 
         //Set toolbar
         abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
@@ -1742,7 +1733,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
             @Override
             public void onDrawerOpened(@NonNull View drawerView) {
-                refreshDrawerInfo(storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN);
+                refreshDrawerInfo(storageState == StorageState.Unknown);
 
                 // Sync the account info after changing account information settings to keep the data the same
                 updateAccountDetailsVisibleInfo();
@@ -1872,6 +1863,8 @@ public class ManagerActivity extends TransfersManagementActivity
 
         businessLabel = findViewById(R.id.business_label);
         businessLabel.setVisibility(View.GONE);
+
+        proFlexiLabel = findViewById(R.id.pro_flexi_label);
 
         fragmentContainer = findViewById(R.id.fragment_container);
         spaceTV = (TextView) findViewById(R.id.navigation_drawer_space);
@@ -2641,6 +2634,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
             updateInboxSectionVisibility(managerState.getHasInboxChildren());
+            stopUploadProcessAndSendBroadcast(managerState.getShouldStopCameraUpload(), managerState.getShouldSendCameraBroadcastEvent());
             return Unit.INSTANCE;
         });
     }
@@ -2760,12 +2754,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    /**
-     * Retrieves the My Backups node by calling MegaApiJava.getUserAttribute(USER_ATTR_MY_BACKUPS_FOLDER, listener)
-     */
-    private void getMyBackupsFolder() {
-        megaApi.getUserAttribute(USER_ATTR_MY_BACKUPS_FOLDER, this);
-    }
 
     /**
      * Proceeds to enable CU action.
@@ -3584,7 +3572,6 @@ public class ManagerActivity extends TransfersManagementActivity
         unregisterReceiver(transferFinishReceiver);
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
         LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
-        LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).removeObserver(fileBackupChangedObserver);
         LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
 
         destroyPayments();
@@ -3689,8 +3676,8 @@ public class ManagerActivity extends TransfersManagementActivity
     private void showGlobalAlertDialogsIfNeeded() {
         if (showStorageAlertWithDelay) {
             showStorageAlertWithDelay = false;
-            checkStorageStatus(storageStateFromBroadcast != MegaApiJava.STORAGE_STATE_UNKNOWN ?
-                    storageStateFromBroadcast : app.getStorageState(), false);
+            checkStorageStatus(storageStateFromBroadcast != StorageState.Unknown ?
+                    storageStateFromBroadcast : viewModel.getStorageState(), false);
         }
 
         if (!firstTimeAfterInstallation) {
@@ -5823,68 +5810,17 @@ public class ManagerActivity extends TransfersManagementActivity
             LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
         }
 
-        checkCameraUploadFolder(true, null);
+        viewModel.checkCameraUploadFolder(true, null);
         refreshRubbishBin();
         setToolbarTitle();
     }
 
-    /**
-     * After nodes on Cloud Drive changed or some nodes are moved to rubbish bin,
-     * need to check CU and MU folders' status.
-     *
-     * @param shouldDisable If CU or MU folder is deleted by current client, then CU should be disabled. Otherwise not.
-     * @param updatedNodes  Nodes which have changed.
-     */
-    private void checkCameraUploadFolder(boolean shouldDisable, List<MegaNode> updatedNodes) {
-        // Get CU and MU folder hanlde from local setting.
-        long primaryHandle = getPrimaryFolderHandle();
-        long secondaryHandle = getSecondaryFolderHandle();
-
-        if (updatedNodes != null) {
-            List<Long> handles = new ArrayList<>();
-            for (MegaNode node : updatedNodes) {
-                handles.add(node.getHandle());
-            }
-            // If CU and MU folder don't change then return.
-            if (!handles.contains(primaryHandle) && !handles.contains(secondaryHandle)) {
-                Timber.d("Updated nodes don't include CU/MU, return.");
-                return;
-            }
+    private void stopUploadProcessAndSendBroadcast(boolean shouldStopUpload, boolean shouldSendBroadCastEvent) {
+        if (shouldStopUpload) {
+            fireStopCameraUploadJob(app);
         }
-
-        MegaPreferences prefs = dbH.getPreferences();
-        boolean isSecondaryEnabled = false;
-        if (prefs != null) {
-            isSecondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
-        }
-
-        // Check if CU and MU folder are moved to rubbish bin.
-        boolean isPrimaryFolderInRubbish = isNodeInRubbish(primaryHandle);
-        boolean isSecondaryFolderInRubbish = isSecondaryEnabled && isNodeInRubbish(secondaryHandle);
-
-        // If only MU folder is in rubbish bin.
-        if (isSecondaryFolderInRubbish && !isPrimaryFolderInRubbish) {
-            Timber.d("MU folder is deleted, backup settings and disable MU.");
-            if (shouldDisable) {
-                // Back up timestamps and disabled MU upload.
-                backupTimestampsAndFolderHandle();
-                disableMediaUploadProcess();
-            } else {
-                // Just stop the upload process.
-                fireStopCameraUploadJob(app);
-            }
-        } else if (isPrimaryFolderInRubbish) {
-            // If CU folder is in rubbish bin.
-            Timber.d("CU folder is deleted, backup settings and disable CU.");
-            if (shouldDisable) {
-                // Disable both CU and MU.
-                backupTimestampsAndFolderHandle();
-                disableCameraUploadSettingProcess(false);
-                sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
-            } else {
-                // Just stop the upload process.
-                fireStopCameraUploadJob(app);
-            }
+        if (shouldSendBroadCastEvent) {
+            sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
         }
     }
 
@@ -5893,10 +5829,10 @@ public class ManagerActivity extends TransfersManagementActivity
         if (rubbishBinFragment != null) {
             ArrayList<MegaNode> nodes;
             if (viewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
-                nodes = megaApi.getChildren(megaApi.getRubbishNode(), sortOrderManagement.getOrderCloud());
+                nodes = megaApi.getChildren(megaApi.getRubbishNode(), viewModel.getOrder());
             } else {
                 nodes = megaApi.getChildren(megaApi.getNodeByHandle(viewModel.getState().getValue().getRubbishBinParentHandle()),
-                        sortOrderManagement.getOrderCloud());
+                        viewModel.getOrder());
             }
 
             rubbishBinFragment.hideMultipleSelect();
@@ -7626,21 +7562,28 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             } else {
                 businessLabel.setVisibility(View.GONE);
-                upgradeAccount.setVisibility(View.VISIBLE);
+                if (myAccountInfo.getAccountType() == PRO_FLEXI) {
+                    upgradeAccount.setVisibility(View.GONE);
+                    proFlexiLabel.setVisibility(View.VISIBLE);
+                } else {
+                    upgradeAccount.setVisibility(View.VISIBLE);
+                    proFlexiLabel.setVisibility(View.GONE);
+                }
+
                 if (settingsSeparator != null) {
                     settingsSeparator.setVisibility(View.GONE);
                 }
 
                 String textToShow = String.format(getResources().getString(R.string.used_space), myAccountInfo.getUsedFormatted(), myAccountInfo.getTotalFormatted());
                 String colorString = ColorUtils.getThemeColorHexString(this, R.attr.colorSecondary);
-                switch (storageState) {
-                    case MegaApiJava.STORAGE_STATE_GREEN:
+                switch (viewModel.getStorageState()) {
+                    case Green:
                         break;
-                    case MegaApiJava.STORAGE_STATE_ORANGE:
+                    case Orange:
                         colorString = ColorUtils.getColorHexString(this, R.color.amber_600_amber_300);
                         break;
-                    case MegaApiJava.STORAGE_STATE_RED:
-                    case MegaApiJava.STORAGE_STATE_PAYWALL:
+                    case Red:
+                    case PayWall:
                         colorString = ColorUtils.getColorHexString(this, R.color.red_600_red_300);
                         break;
                 }
@@ -7662,7 +7605,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 long usedSpace = myAccountInfo.getUsedStorage();
                 Timber.d("Progress: %d, Used space: %d", progress, usedSpace);
                 usedSpacePB.setProgress(progress);
-                if (progress >= 0 && usedSpace >= 0) {
+                if (myAccountInfo.getAccountType() != PRO_FLEXI && progress >= 0 && usedSpace >= 0) {
                     usedSpaceLayout.setVisibility(View.VISIBLE);
                 } else {
                     usedSpaceLayout.setVisibility(View.GONE);
@@ -7676,13 +7619,13 @@ public class ManagerActivity extends TransfersManagementActivity
 
         int resId = R.drawable.custom_progress_bar_horizontal_ok;
         switch (storageState) {
-            case MegaApiJava.STORAGE_STATE_GREEN:
+            case Green:
                 break;
-            case MegaApiJava.STORAGE_STATE_ORANGE:
+            case Orange:
                 resId = R.drawable.custom_progress_bar_horizontal_warning;
                 break;
-            case MegaApiJava.STORAGE_STATE_RED:
-            case MegaApiJava.STORAGE_STATE_PAYWALL:
+            case Red:
+            case PayWall:
                 resId = R.drawable.custom_progress_bar_horizontal_exceed;
                 break;
         }
@@ -7705,12 +7648,12 @@ public class ManagerActivity extends TransfersManagementActivity
         if (isCloudAdded()) {
             ArrayList<MegaNode> nodes;
             if (viewModel.getState().getValue().getBrowserParentHandle() == -1) {
-                nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+                nodes = megaApi.getChildren(parentNode, viewModel.getOrder());
             } else {
                 parentNode = megaApi.getNodeByHandle(viewModel.getState().getValue().getBrowserParentHandle());
                 if (parentNode == null) return;
 
-                nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+                nodes = megaApi.getChildren(parentNode, viewModel.getOrder());
             }
             Timber.d("Nodes: %s", nodes.size());
             if (comesFromNotificationChildNodeHandleList == null) {
@@ -8292,7 +8235,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
                                 ? parentNode
                                 : megaApi.getRootNode(),
-                        sortOrderManagement.getOrderCloud());
+                        viewModel.getOrder());
 
                 fileBrowserFragment.setNodes(nodes);
                 fileBrowserFragment.getRecyclerView().invalidate();
@@ -8410,8 +8353,9 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (!isEKR) {
                         chatLink = intent.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false);
                     }
+                    boolean allowAddParticipants = intent.getBooleanExtra(ALLOW_ADD_PARTICIPANTS, false);
 
-                    createGroupChat(peers, chatTitle, chatLink, isEKR);
+                    createGroupChat(peers, chatTitle, chatLink, isEKR, allowAddParticipants);
                 }
             }
         } else if (requestCode == REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
@@ -8518,7 +8462,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
             if (isCloudAdded()) {
                 ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(viewModel.getState().getValue().getBrowserParentHandle()),
-                        sortOrderManagement.getOrderCloud());
+                        viewModel.getOrder());
                 fileBrowserFragment.setNodes(nodes);
                 fileBrowserFragment.getRecyclerView().invalidate();
             }
@@ -8529,22 +8473,23 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    public void createGroupChat(MegaChatPeerList peers, String chatTitle, boolean chatLink, boolean isEKR) {
+    public void createGroupChat(MegaChatPeerList peers, String chatTitle, boolean chatLink, boolean isEKR, boolean allowAddParticipants) {
 
         Timber.d("Create group chat with participants: %s", peers.size());
 
         if (isEKR) {
-            megaChatApi.createChat(true, peers, chatTitle, this);
+            megaChatApi.createGroupChat(peers, chatTitle, false, false, allowAddParticipants, this);
         } else {
             if (chatLink) {
                 if (chatTitle != null && !chatTitle.isEmpty()) {
                     CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
-                    megaChatApi.createPublicChat(peers, chatTitle, listener);
+                    megaChatApi.createPublicChat(peers, chatTitle, false, false, allowAddParticipants, listener);
+
                 } else {
                     showAlert(this, getString(R.string.message_error_set_title_get_link), null);
                 }
             } else {
-                megaChatApi.createPublicChat(peers, chatTitle, this);
+                megaChatApi.createPublicChat(peers, chatTitle, false, false, allowAddParticipants, this);
             }
         }
     }
@@ -8747,8 +8692,8 @@ public class ManagerActivity extends TransfersManagementActivity
         // If the current storage state is not initialized is because the app received the
         // event informing about the storage state  during login, the ManagerActivity
         // wasn't active and for this reason the value is stored in the MegaApplication object.
-        int storageStateToCheck = (storageState != MegaApiJava.STORAGE_STATE_UNKNOWN) ?
-                storageState : app.getStorageState();
+        StorageState storageStateToCheck = (storageState != StorageState.Unknown) ?
+                storageState :  viewModel.getStorageState();
 
         checkStorageStatus(storageStateToCheck, onCreate);
     }
@@ -8759,10 +8704,10 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param newStorageState Storage state to check.
      * @param onCreate        Flag to indicate if the method was called from "onCreate" or not.
      */
-    private void checkStorageStatus(int newStorageState, boolean onCreate) {
+    private void checkStorageStatus(StorageState newStorageState, boolean onCreate) {
         Intent intent = new Intent(this, UploadService.class);
         switch (newStorageState) {
-            case MegaApiJava.STORAGE_STATE_GREEN:
+            case Green:
                 Timber.d("STORAGE STATE GREEN");
 
                 intent.setAction(ACTION_STORAGE_STATE_CHANGED);
@@ -8785,7 +8730,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 fireCameraUploadJob(ManagerActivity.this, false);
                 break;
 
-            case MegaApiJava.STORAGE_STATE_ORANGE:
+            case Orange:
                 Timber.w("STORAGE STATE ORANGE");
 
                 intent.setAction(ACTION_STORAGE_STATE_CHANGED);
@@ -8801,7 +8746,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (onCreate && isStorageStatusDialogShown) {
                     isStorageStatusDialogShown = false;
                     showStorageAlmostFullDialog();
-                } else if (newStorageState > storageState) {
+                } else if (newStorageState.ordinal() > storageState.ordinal()) {
                     showStorageAlmostFullDialog();
                 }
                 storageState = newStorageState;
@@ -8809,17 +8754,17 @@ public class ManagerActivity extends TransfersManagementActivity
                 fireCameraUploadJob(ManagerActivity.this, false);
                 break;
 
-            case MegaApiJava.STORAGE_STATE_RED:
+            case Red:
                 Timber.w("STORAGE STATE RED");
                 if (onCreate && isStorageStatusDialogShown) {
                     isStorageStatusDialogShown = false;
                     showStorageFullDialog();
-                } else if (newStorageState > storageState) {
+                } else if (newStorageState.ordinal() > storageState.ordinal()) {
                     showStorageFullDialog();
                 }
                 break;
 
-            case MegaApiJava.STORAGE_STATE_PAYWALL:
+            case PayWall:
                 Timber.w("STORAGE STATE PAYWALL");
                 break;
 
@@ -8828,7 +8773,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         storageState = newStorageState;
-        app.setStorageState(storageState);
     }
 
     /**
@@ -8836,7 +8780,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void showStorageAlmostFullDialog() {
         Timber.d("showStorageAlmostFullDialog");
-        showStorageStatusDialog(MegaApiJava.STORAGE_STATE_ORANGE, false, false);
+        showStorageStatusDialog(StorageState.Orange, false, false);
     }
 
     /**
@@ -8844,7 +8788,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void showStorageFullDialog() {
         Timber.d("showStorageFullDialog");
-        showStorageStatusDialog(MegaApiJava.STORAGE_STATE_RED, false, false);
+        showStorageStatusDialog(StorageState.Red, false, false);
     }
 
     /**
@@ -8855,7 +8799,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public void showOverquotaAlert(boolean preWarning) {
         Timber.d("preWarning: %s", preWarning);
         showStorageStatusDialog(
-                preWarning ? MegaApiJava.STORAGE_STATE_ORANGE : MegaApiJava.STORAGE_STATE_RED,
+                preWarning ? StorageState.Orange : StorageState.Red,
                 true, preWarning);
     }
 
@@ -8900,7 +8844,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param overquotaAlert Flag to indicate that is an overquota alert or not.
      * @param preWarning     Flag to indicate if is a pre-overquota alert or not.
      */
-    private void showStorageStatusDialog(int storageState, boolean overquotaAlert, boolean preWarning) {
+    private void showStorageStatusDialog(StorageState storageState, boolean overquotaAlert, boolean preWarning) {
         Timber.d("showStorageStatusDialog");
 
         if (myAccountInfo.getAccountType() == -1) {
@@ -8934,22 +8878,22 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         switch (storageState) {
-            case MegaApiJava.STORAGE_STATE_GREEN:
+            case Green:
                 Timber.d("STORAGE STATE GREEN");
                 return;
 
-            case MegaApiJava.STORAGE_STATE_ORANGE:
+            case Orange:
                 image.setImageResource(R.drawable.ic_storage_almost_full);
                 text.setText(String.format(getString(R.string.text_almost_full_warning), storageString, transferString));
                 break;
 
-            case MegaApiJava.STORAGE_STATE_RED:
+            case Red:
                 image.setImageResource(R.drawable.ic_storage_full);
                 text.setText(String.format(getString(R.string.text_storage_full_warning), storageString, transferString));
                 break;
 
             default:
-                Timber.w("STORAGE STATE INVALID VALUE: %d", storageState);
+                Timber.w("STORAGE STATE INVALID VALUE: %d", storageState.ordinal());
                 return;
         }
 
@@ -9009,9 +8953,9 @@ public class ManagerActivity extends TransfersManagementActivity
             case MegaAccountDetails.ACCOUNT_TYPE_PROIII:
                 Timber.d("Show storage status dialog for USER PRO III");
                 if (!overquotaAlert) {
-                    if (storageState == MegaApiJava.STORAGE_STATE_ORANGE) {
+                    if (storageState == StorageState.Orange) {
                         text.setText(getString(R.string.text_almost_full_warning_pro3_account));
-                    } else if (storageState == MegaApiJava.STORAGE_STATE_RED) {
+                    } else if (storageState == StorageState.Red) {
                         text.setText(getString(R.string.text_storage_full_warning_pro3_account));
                     }
                 }
@@ -9026,9 +8970,9 @@ public class ManagerActivity extends TransfersManagementActivity
             case MegaAccountDetails.ACCOUNT_TYPE_PROII:
                 Timber.d("Show storage status dialog for USER PRO");
                 if (!overquotaAlert) {
-                    if (storageState == MegaApiJava.STORAGE_STATE_ORANGE) {
+                    if (storageState == StorageState.Orange) {
                         text.setText(String.format(getString(R.string.text_almost_full_warning_pro_account), storageString, transferString));
-                    } else if (storageState == MegaApiJava.STORAGE_STATE_RED) {
+                    } else if (storageState == StorageState.Red) {
                         text.setText(String.format(getString(R.string.text_storage_full_warning_pro_account), storageString, transferString));
                     }
                 }
@@ -9438,11 +9382,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             } else if (request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS) {
                 MegaApplication.setDisableFileVersions(request.getFlag());
-            } else if (request.getParamType() == USER_ATTR_MY_BACKUPS_FOLDER) {
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    Timber.d("requesting myBackupHandle");
-                    MegaNodeUtil.myBackupHandle = request.getNodeHandle();
-                }
             }
         } else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {
             Timber.d("TYPE_GET_CANCEL_LINK");
@@ -9927,7 +9866,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private void onUpdateNodes(@NonNull List<MegaNode> updatedNodes) {
         dismissAlertDialogIfExists(statusDialog);
 
-        checkCameraUploadFolder(false, updatedNodes);
+        viewModel.checkCameraUploadFolder(false, updatedNodes);
 
         LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
 
@@ -10011,7 +9950,7 @@ public class ManagerActivity extends TransfersManagementActivity
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setMessage(getResources().getQuantityString(R.plurals.cancel_selected_transfers, selectedTransfers.size()))
                 .setPositiveButton(R.string.button_continue, (dialog, which) -> {
-                    for (MegaTransfer transfer: selectedTransfers) {
+                    for (MegaTransfer transfer : selectedTransfers) {
                         megaApi.cancelTransfer(transfer, new OptionalMegaRequestListenerInterface() {
                             @Override
                             public void onRequestFinish(@NonNull MegaApiJava api,
@@ -11070,10 +11009,6 @@ public class ManagerActivity extends TransfersManagementActivity
             refreshFragment(FragmentTag.INBOX.getTag());
             selectDrawerItem(DrawerItem.INBOX);
         }
-    }
-
-    public int getStorageState() {
-        return storageState;
     }
 
     /**

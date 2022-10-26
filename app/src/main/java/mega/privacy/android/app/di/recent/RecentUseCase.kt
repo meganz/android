@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.domain.repository.RecentActionsRepository
+import mega.privacy.android.data.repository.RecentActionsRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetRecentActionNodes
 import mega.privacy.android.app.domain.usecase.DefaultUpdateRecentAction
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes

@@ -1,7 +1,7 @@
 package mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.app.data.model.GlobalUpdate
+import mega.privacy.android.data.model.GlobalUpdate
 
 /**
  * Monitor global updates for the current logged in user

@@ -23,20 +23,23 @@ class DefaultUpdateCameraUploadTimeStamp @Inject constructor(
             SyncTimeStamp.PRIMARY_PHOTO -> {
                 val timeStampPrimary = timestamp ?: cameraUploadRepository.getMaxTimestamp(
                     false,
-                    SyncRecordType.TYPE_PHOTO.value)
+                    SyncRecordType.TYPE_PHOTO
+                )
                 updateTimeStamp(timeStampPrimary, timestampType)
             }
             SyncTimeStamp.PRIMARY_VIDEO -> {
                 val timeStampPrimaryVideo = timestamp ?: cameraUploadRepository.getMaxTimestamp(
                     false,
-                    SyncRecordType.TYPE_VIDEO.value)
+                    SyncRecordType.TYPE_VIDEO
+                )
                 updateTimeStamp(timeStampPrimaryVideo, timestampType)
             }
             SyncTimeStamp.SECONDARY_PHOTO -> {
                 if (isSecondaryFolderEnabled()) {
                     val timeStampSecondary = timestamp ?: cameraUploadRepository.getMaxTimestamp(
                         true,
-                        SyncRecordType.TYPE_PHOTO.value)
+                        SyncRecordType.TYPE_PHOTO
+                    )
                     updateTimeStamp(timeStampSecondary, timestampType)
                 }
             }
@@ -45,7 +48,8 @@ class DefaultUpdateCameraUploadTimeStamp @Inject constructor(
                     val timeStampSecondaryVideo =
                         timestamp ?: cameraUploadRepository.getMaxTimestamp(
                             true,
-                            SyncRecordType.TYPE_VIDEO.value)
+                            SyncRecordType.TYPE_VIDEO
+                        )
                     updateTimeStamp(timeStampSecondaryVideo, timestampType)
                 }
             }
@@ -56,7 +60,8 @@ class DefaultUpdateCameraUploadTimeStamp @Inject constructor(
         newTimeStamp: Long,
         timestampType: SyncTimeStamp,
     ) {
-        val currentTimeStamp = cameraUploadRepository.getSyncTimeStamp(timestampType)
+        val currentTimeStamp =
+            cameraUploadRepository.getSyncTimeStamp(timestampType)?.toLongOrNull() ?: 0L
         if (newTimeStamp > currentTimeStamp) {
             cameraUploadRepository.setSyncTimeStamp(newTimeStamp, timestampType)
         }

@@ -666,19 +666,6 @@ object MegaNodeUtil {
     }
 
     /**
-     * This method is to detect whether the node exist and in rubbish bean
-     * @param handle node's handle to be detected
-     * @return whether the node is in rubbish
-     */
-    @JvmStatic
-    fun isNodeInRubbish(handle: Long): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
-        val node = megaApi.getNodeByHandle(handle)
-
-        return node != null && megaApi.isInRubbish(node)
-    }
-
-    /**
      * This method is to detect whether the node has been deleted completely
      * or in rubbish bin
      * @param handle node's handle to be detected

@@ -3,7 +3,7 @@ package mega.privacy.android.app.utils
 import android.content.Context
 import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.app.di.EntryPointsModule
 import java.io.File
 

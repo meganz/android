@@ -5,12 +5,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.mapper.FavouriteInfoMapper
-import mega.privacy.android.app.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.app.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
-import mega.privacy.android.domain.entity.FavouriteFolder
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
+import mega.privacy.android.data.mapper.NodeInfoMapper
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.domain.entity.NodeFolder
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.FavouritesRepository
@@ -41,7 +41,7 @@ class DefaultFavouritesRepositoryTest {
         on { label }.thenReturn(MegaNode.NODE_LBL_RED)
     }
 
-    private val favouriteInfo = FavouriteFolder(
+    private val favouriteInfo = NodeFolder(
         id = 0,
         name = node.name,
         label = node.label,
@@ -53,11 +53,16 @@ class DefaultFavouritesRepositoryTest {
         isFavourite = true,
         isExported = false,
         isTakenDown = false,
+        isInRubbishBin = false,
+        isIncomingShare = false,
+        isShared = false,
+        isPendingShare = false,
+        device = null,
     )
 
-    private val favouriteInfoMapper: FavouriteInfoMapper = { _, _, _, _, _, _ -> favouriteInfo }
+    private val nodeInfoMapper: NodeInfoMapper = { _, _, _, _, _, _, _, _ -> favouriteInfo }
 
-    private val favouriteFolderInfoMapper = ::toFavouriteFolderInfo
+    private val favouriteFolderInfoMapper = mock<FavouriteFolderInfoMapper>()
 
 
     @Before
@@ -66,7 +71,7 @@ class DefaultFavouritesRepositoryTest {
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             monitorNodeChangeFacade = MonitorNodeChangeFacade(),
-            favouriteInfoMapper = favouriteInfoMapper,
+            nodeInfoMapper = nodeInfoMapper,
             favouriteFolderInfoMapper = favouriteFolderInfoMapper,
             cacheFolder = mock(),
             fileTypeInfoMapper = fileTypeInfoMapper
@@ -139,19 +144,24 @@ class DefaultFavouritesRepositoryTest {
             on { name }.thenReturn(expectedParentName)
             on { parentHandle }.thenReturn(expectedParentNodeHandle)
         }
-
-        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(parentNode)
-        whenever(megaApiGateway.getChildrenByNode(parentNode)).thenReturn(arrayListOf(node))
-
-
-        val actual = underTest.getChildren(expectedParentHandle)
-
         val favouriteFolderInfo = FavouriteFolderInfo(
             children = listOf(favouriteInfo),
             name = parentNode.name,
             currentHandle = expectedParentHandle,
             parentHandle = parentNode.parentHandle
         )
+
+        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(parentNode)
+        whenever(megaApiGateway.getChildrenByNode(parentNode)).thenReturn(arrayListOf(node))
+        whenever(
+            favouriteFolderInfoMapper(
+                parentNode,
+                listOf(favouriteInfo),
+                expectedParentHandle,
+            )
+        ).thenReturn(favouriteFolderInfo)
+
+        val actual = underTest.getChildren(expectedParentHandle)
 
         assertThat(actual?.children?.get(0)).isSameInstanceAs(favouriteFolderInfo.children[0])
         assertThat(actual?.currentHandle).isEqualTo(favouriteFolderInfo.currentHandle)

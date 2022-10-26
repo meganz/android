@@ -22,9 +22,9 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.R
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity

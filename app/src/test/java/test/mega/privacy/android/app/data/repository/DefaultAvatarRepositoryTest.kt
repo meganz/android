@@ -8,10 +8,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.gateway.CacheFolderGateway
-import mega.privacy.android.app.data.gateway.api.MegaApiGateway
-import mega.privacy.android.app.data.model.GlobalUpdate
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.app.data.repository.DefaultAvatarRepository
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import nz.mega.sdk.MegaUser
 import org.junit.Before
 import org.junit.Test

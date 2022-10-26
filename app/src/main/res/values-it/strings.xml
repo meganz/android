@@ -826,7 +826,7 @@
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Devi effettuare l’accesso per portare a termine questa azione.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">Hai bisogno di effettuare il login per completare il cambiamento della tua email. Per favore, effettua nuovamente il login con il tuo indirizzo email corrente e poi clicca di nuovo sul link di conferma.</string>
+    <string name="change_email_not_logged_in">Hai bisogno di effettuare il login per completare il cambiamento della tua email. Per favore, effettua nuovamente il login con il tuo indirizzo email corrente e poi tocca di nuovo sul link di conferma.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Congratulazioni, il tuo nuovo indirizzo email per questo account MEGA è: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
@@ -934,7 +934,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">In attesa della conferma dell’email</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Per favore, controlla la tua email e poi clicca sul link per confermare il tuo account.</string>
+    <string name="confirm_email_explanation">Per favore, controlla la tua email e poi tocca sul link per confermare il tuo account.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">1 oggetto</item>
@@ -1120,9 +1120,9 @@
     <!-- chat message when a participant left a group chat -->
     <string name="message_participant_left_group_chat">[A]%1$s[/A][B] ha abbandonato la chat di gruppo[/B]</string>
     <!-- chat message alert when the message have to been manually -->
-    <string name="manual_retry_alert">Messaggio non inviato. Clicca per opzioni</string>
+    <string name="manual_retry_alert">Messaggio non inviato. Tocca per opzioni</string>
     <!-- Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused. -->
-    <string name="manual_resume_alert">I trasferimenti sono stati messi in pausa. Clicca per riprenderli.</string>
+    <string name="manual_resume_alert">I trasferimenti sono stati messi in pausa. Tocca per riprenderli.</string>
     <!-- message shown when the status of the user coudn’t be changed -->
     <string name="changing_status_error">Errore. Il tuo stato non è stato cambiato</string>
     <!-- message shown when a chat has not been created -->
@@ -1343,7 +1343,7 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s è già stato invitato. Consulta le tue richieste in sospeso.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">Se hai scritto male il tuo indirizzo email, correggilo e poi clicca su [A]Reinvia[A].</string>
+    <string name="confirm_email_misspelled">Se hai scritto male il tuo indirizzo email, correggilo e poi tocca su [A]Reinvia[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Reinvia</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -1894,7 +1894,7 @@
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Chiamata in arrivo</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
-    <string name="notification_enable_display">I pop-up in background di MEGA sono disabilitati.\nClicca per cambiare le impostazioni.</string>
+    <string name="notification_enable_display">I pop-up in background di MEGA sono disabilitati.\nTocca per cambiare le impostazioni.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="one">%1$s messaggio non letto</item>
@@ -2108,7 +2108,7 @@
     <!-- Subtitle of chat screen when the chat is archived -->
     <string name="archived_chat">Chat archiviata</string>
     <!-- Title of the layout to join a group call from the chat screen -->
-    <string name="join_call_layout">Clicca per unirti alla chiamata</string>
+    <string name="join_call_layout">Tocca per unirti alla chiamata</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
     <string name="invite_contacts">Invita contatti</string>
     <!-- Label shown when the user wants to share something with other contacts -->
@@ -2148,7 +2148,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Attiva o disattiva le versioni dei file per il tuo account.\nDisabilitare le versioni dei file non esclude che i tuoi contatti creino nuove versioni nelle cartelle condivise.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Clicca, inserisci nome o email</string>
+    <string name="type_mail">Tocca, inserisci nome o email</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Aggiungere %s ai tuoi contatti?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2690,9 +2690,9 @@
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Chiamata in corso</string>
     <!-- Title of the layout to join a group call from the chat screen. -->
-    <string name="join_call_layout_in_group_call">Clicca per unirti alla chiamata di gruppo corrente.</string>
+    <string name="join_call_layout_in_group_call">Tocca per unirti alla chiamata di gruppo corrente.</string>
     <!-- Title of the layout to return to a call -->
-    <string name="call_in_progress_layout">Clicca per ritornare alla chiamata</string>
+    <string name="call_in_progress_layout">Tocca per tornare alla chiamata</string>
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A] [B]si è unito alla chat di gruppo.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
@@ -2750,7 +2750,7 @@
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">Versione ripristinata con successo.</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
-    <string name="recording_less_than_second">Tieni premuto per registrare</string>
+    <string name="recording_less_than_second">Tocca e tieni premuto per registrare</string>
     <!-- label shown when slide to cancel a voice messages -->
     <string name="slide_to_cancel">Scorri per annullare</string>
     <!-- Error message when trying to play a voice message that it is not available -->
@@ -2846,9 +2846,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">È stato riscontrato un errore con il tuo ultimo pagamento. Per favore, accedi a MEGA utilizzando un browser web per maggiori informazioni.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Il tuo account Business è scaduto</string>
+    <string name="expired_business_title">Account deactivated</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">C’è stato un problema nel processo del tuo ultimo pagamento. MEGA è limitato alla visualizzazione finché questo problema non sarà aggiustato su un browser desktop.</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Il tuo account è [B]sospeso[/B] al momento. Puoi solo sfogliare tra i tuoi dati.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3512,7 +3512,7 @@
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">Ti hanno invitato ad un meeting.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
-    <string name="paste_meeting_link_guest_instruction">Clicca sul link del meeting che ti è stato inviato o incollalo qui</string>
+    <string name="paste_meeting_link_guest_instruction">Tocca sul link del meeting che ti è stato inviato o incollalo qui</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Il meeting è terminato</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -3530,7 +3530,7 @@
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">Invita più partecipanti al meeting. Fai swipe up per invitare.</string>
     <!-- the content of tips when the user enters recent chat page first time-->
-    <string name="tip_create_meeting">Clicca per creare un nuovo meeting</string>
+    <string name="tip_create_meeting">Tocca per creare un nuovo meeting</string>
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">Imposta velocemente un meeting MEGA con la nostra nuova feature dei meeting criptati</string>
     <!-- the content of snack bar when the user be the new moderator-->
@@ -3538,7 +3538,7 @@
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Link del meeting copiato.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
-    <string name="join_meeting_layout_in_group_call">Clicca per unirti al meeting corrente.</string>
+    <string name="join_meeting_layout_in_group_call">Tocca per unirti al meeting corrente.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">Meeting MEGA</string>
     <!-- Content of fourth tour screen -->
@@ -4102,25 +4102,39 @@
     <!-- Hint the screen is locked in video player page -->
     <string name="video_player_locked_hint">Lo schermo è bloccato</string>
     <!-- Hint that tap to unlock in video player page -->
-    <string name="video_player_unlock_hint">Clicca per sbloccare</string>
+    <string name="video_player_unlock_hint">Tocca per sbloccare</string>
     <!-- Label that schedule a meeting -->
     <string name="chat_schedule_meeting">Programma meeting</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly">Thank you for your Pro&#160;Lite monthly subscription</string>
+    <string name="upgrade_account_successful_pro_lite_monthly">Grazie per il tuo abbonamento mensile Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly">Thank you for your Pro&#160;Lite yearly subscription</string>
+    <string name="upgrade_account_successful_pro_lite_yearly">Grazie per il tuo abbonamento annuale Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly">Thank you for your Pro&#160;I monthly subscription</string>
+    <string name="upgrade_account_successful_pro_1_monthly">Grazie per il tuo abbonamento mensile Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly">Thank you for your Pro&#160;I yearly subscription</string>
+    <string name="upgrade_account_successful_pro_1_yearly">Grazie per il tuo abbonamento annuale Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly">Thank you for your Pro&#160;II monthly subscription</string>
+    <string name="upgrade_account_successful_pro_2_monthly">Grazie per il tuo abbonamento mensile Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly">Thank you for your Pro&#160;II yearly subscription</string>
+    <string name="upgrade_account_successful_pro_2_yearly">Grazie per il tuo abbonamento annuale Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly">Thank you for your Pro&#160;III monthly subscription</string>
+    <string name="upgrade_account_successful_pro_3_monthly">Grazie per il tuo abbonamento mensile Pro&#160;III</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
-    <string name="upgrade_account_successful_pro_3_yearly">Thank you for your Pro&#160;III yearly subscription</string>
+    <string name="upgrade_account_successful_pro_3_yearly">Grazie per il tuo abbonamento annuale Pro&#160;III</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Permetti a chi non è host di aggiungere partecipanti</string>
+    <!-- Title of gif album. -->
+    <string name="photos_album_title_gif">GIFs</string>
+    <!-- Title of raw album. -->
+    <string name="photos_album_title_raw">RAW</string>
+    <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_title">Nessun contatto</string>
+    <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_message">Non hai contatti da poter aggiungere a questa chat. Se vuoi aggiungere partecipanti, prima invitali ad unirsi alla tua Rubrica.</string>
+    <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_title">Tutti i contatti aggiunti</string>
+    <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
+    <string name="chat_add_participants_no_contacts_left_to_add_message">Hai già aggiunto tutti i tuoi contatti a questa chat. Se vuoi aggiungere più partecipanti, prima invitali ad unirsi alla tua Rubrica.</string>
+    <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
+    <string name="media_player_video_snackbar_screenshot_saved">Immagine salvata nella tua galleria</string>
 </resources>

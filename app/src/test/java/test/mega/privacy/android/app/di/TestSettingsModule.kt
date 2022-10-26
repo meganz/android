@@ -24,9 +24,9 @@ import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.GetSupportEmail
 import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
-import mega.privacy.android.domain.usecase.IsHideRecentActivityEnabled
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
+import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import org.mockito.kotlin.any
@@ -63,8 +64,8 @@ object TestSettingsModule {
         mock<FetchMultiFactorAuthSetting> { on { invoke() }.thenReturn(emptyFlow()) }
     val getAccountDetails =
         mock<GetAccountDetails> { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
-    val shouldHideRecentActivity =
-        mock<IsHideRecentActivityEnabled> { on { invoke() }.thenReturn(emptyFlow()) }
+    val monitorHideRecentActivity =
+        mock<MonitorHideRecentActivity> { on { invoke() }.thenReturn(emptyFlow()) }
     val getChatImageQuality = mock<GetChatImageQuality> { on { invoke() }.thenReturn(emptyFlow()) }
     val setChatImageQuality = mock<SetChatImageQuality>()
     val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
@@ -112,10 +113,11 @@ object TestSettingsModule {
     @Provides
     fun provideGetStartScreen(): MonitorStartScreenPreference = monitorStartScreenPreference
 
+    @Provides
+    fun provideMonitorHideRecentActivity(): MonitorHideRecentActivity = monitorHideRecentActivity
 
     @Provides
-    fun provideShouldHideRecentActivity(): IsHideRecentActivityEnabled =
-        shouldHideRecentActivity
+    fun provideSetHideRecentActivity(): SetHideRecentActivity = mock()
 
     @Provides
     fun provideToggleAutoAcceptQRLinks(): ToggleAutoAcceptQRLinks =
@@ -207,4 +209,5 @@ object TestSettingsModule {
     @Provides
     @ElementsIntoSet
     fun providePreferenceResourceSet(): Set<@JvmSuppressWildcards PreferenceResource> = setOf()
+
 }

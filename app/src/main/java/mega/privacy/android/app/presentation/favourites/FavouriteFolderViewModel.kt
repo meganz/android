@@ -25,10 +25,10 @@ import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
 import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
-import mega.privacy.android.app.presentation.mapper.FavouriteMapper
+import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.FavouriteInfo
+import mega.privacy.android.domain.entity.NodeInfo
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import javax.inject.Inject
 
@@ -111,7 +111,7 @@ class FavouriteFolderViewModel @Inject constructor(
 
     private suspend fun getData(
         name: String,
-        children: List<FavouriteInfo>,
+        children: List<NodeInfo>,
         folderInfo: FavouriteFolderInfo
     ): ChildrenNodesLoadState {
         return withContext(ioDispatcher) {

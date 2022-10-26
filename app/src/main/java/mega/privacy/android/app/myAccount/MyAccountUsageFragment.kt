@@ -15,16 +15,21 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMyAccountUsageBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
-import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.ActiveFragment
+import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
+import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.setRenewalDateForProFlexi
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.StyleUtils.setTextStyle
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
+/**
+ * Fragment for my account usage
+ */
 @AndroidEntryPoint
 class MyAccountUsageFragment : Fragment(), Scrollable {
 
@@ -114,7 +119,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
     private fun setupAccountDetails() {
         if (megaApi.isBusinessAccount) {
-            usageBinding.businessUpdate(viewModel)
+            usageBinding.updateBusinessOrProFlexi(viewModel)
             paymentAlertBinding.businessUpdate(
                 megaApi,
                 viewModel,
@@ -122,6 +127,9 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 ActiveFragment.MY_ACCOUNT_USAGE
             )
             paymentAlertBinding.root.isVisible = true
+        } else if (viewModel.isProFlexiAccount()) {
+            usageBinding.updateBusinessOrProFlexi(viewModel)
+            paymentAlertBinding.setRenewalDateForProFlexi(viewModel)
         } else {
             usageBinding.update(viewModel)
             paymentAlertBinding.root.isVisible = paymentAlertBinding.update(

@@ -11,7 +11,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
@@ -118,10 +118,7 @@ class VideoViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch {
-            sortOrder = getCloudSortOrder()
-            loadVideo(true)
-        }
+        fetchOrderAndLoadVideo(true)
 
         items.observeForever(loadFinishedObserver)
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
@@ -133,6 +130,25 @@ class VideoViewModel @Inject constructor(
                 loadVideo(true)
             }
         }
+    }
+
+    /**
+     * Fetch latest order & load video
+     * @param forceUpdate
+     */
+    private fun fetchOrderAndLoadVideo(forceUpdate: Boolean) {
+        viewModelScope.launch {
+            sortOrder = getCloudSortOrder()
+            loadVideo(forceUpdate)
+        }
+    }
+
+    /**
+     * On SortOrder change
+     * @param forceUpdate
+     */
+    fun onOrderChange(forceUpdate: Boolean) {
+        fetchOrderAndLoadVideo(forceUpdate)
     }
 
     /**

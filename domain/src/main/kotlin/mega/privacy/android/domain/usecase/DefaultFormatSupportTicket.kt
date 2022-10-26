@@ -25,6 +25,7 @@ class DefaultFormatSupportTicket @Inject constructor() : FormatSupportTicket {
             
             Device Information:
             Device: ${ticket.device}
+            Android Version: ${ticket.deviceSdkVersionName} - ${ticket.deviceSdkVersionInt}
             Language: ${ticket.currentLanguage}
         """.trimIndent()
     }
