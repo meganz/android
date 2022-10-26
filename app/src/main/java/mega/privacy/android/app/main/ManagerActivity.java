@@ -360,6 +360,7 @@ import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment;
 import mega.privacy.android.app.presentation.photos.PhotosFragment;
+import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment;
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
@@ -3926,7 +3927,13 @@ public class ManagerActivity extends TransfersManagementActivity
             case PHOTOS: {
                 aB.setSubtitle(null);
                 if (isInAlbumContent) {
-                    aB.setTitle(getString(R.string.title_favourites_album));
+                    if (albumContentFragment instanceof AlbumDynamicContentFragment) {
+                        String title = ((AlbumDynamicContentFragment) albumContentFragment)
+                                .getCurrentAlbumTitle();
+                        aB.setTitle(title);
+                    } else {
+                        aB.setTitle(getString(R.string.title_favourites_album));
+                    }
                 } else if (isInFilterPage) {
                     aB.setTitle(getString(R.string.photos_action_filter));
                 } else if (getPhotosFragment() != null && photosFragment.shouldUpdateTitle()) {

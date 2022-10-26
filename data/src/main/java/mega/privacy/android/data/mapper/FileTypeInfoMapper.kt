@@ -49,13 +49,13 @@ private fun getFileTypeInfoForExtension(
     mimeType.startsWith("web/url") -> {
         UrlFileTypeInfo
     }
-    extension.isGifExtension() -> {
+    extension.lowercase().isGifExtension() -> {
         GifFileTypeInfo(
             type = mimeType,
             extension = extension,
         )
     }
-    extension.isRawExtension() -> {
+    extension.lowercase().isRawExtension() -> {
         RawFileTypeInfo(
             type = mimeType,
             extension = extension,
