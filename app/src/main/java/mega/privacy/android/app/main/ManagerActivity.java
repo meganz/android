@@ -9875,8 +9875,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         viewModel.checkCameraUploadFolder(false, updatedNodes);
 
-        LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
-
         // Invalidate the menu will collapse/expand the search view and set the query text to ""
         // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
         // text changed to "" for once)
