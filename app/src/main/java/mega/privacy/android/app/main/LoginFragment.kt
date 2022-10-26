@@ -44,6 +44,7 @@ import mega.privacy.android.app.MegaApplication.Companion.setHeartBeatAlive
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.FragmentLoginBinding
 import mega.privacy.android.app.listeners.ChatLogoutListener
@@ -388,175 +389,12 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
         binding.pin2faErrorLogin.isVisible = false
 
-        binding.pinFirstLogin.apply {
-            setOnLongClickListener {
-                pinLongClick = true
-                it.requestFocus()
-            }
-            onFocusChangeListener = View.OnFocusChangeListener { _: View?, hasFocus: Boolean ->
-                if (hasFocus) this.setText("")
-            }
-            doAfterTextChanged {
-                if (this.length() != 0) {
-                    binding.pinSecondLogin.apply {
-                        requestFocus()
-                        isCursorVisible = true
-                    }
-                    if (isFirstTime && !pinLongClick) {
-                        binding.pinSecondLogin.setText("")
-                        binding.pinThirdLogin.setText("")
-                        binding.pinFourthLogin.setText("")
-                        binding.pinFifthLogin.setText("")
-                        binding.pinSixthLogin.setText("")
-                    } else if (pinLongClick) {
-                        pasteClipboard()
-                    } else {
-                        allowVerify()
-                    }
-                } else if (isErrorShown) {
-                    hideError()
-                }
-            }
-        }
-
-        binding.pinSecondLogin.apply {
-            setOnLongClickListener {
-                pinLongClick = true
-                this.requestFocus()
-            }
-            onFocusChangeListener = View.OnFocusChangeListener { _: View?, hasFocus: Boolean ->
-                if (hasFocus) this.setText("")
-            }
-            doAfterTextChanged {
-                if (this.length() != 0) {
-                    binding.pinThirdLogin.apply {
-                        requestFocus()
-                        isCursorVisible = true
-                    }
-                    if (isFirstTime && !pinLongClick) {
-                        binding.pinThirdLogin.setText("")
-                        binding.pinFourthLogin.setText("")
-                        binding.pinFifthLogin.setText("")
-                        binding.pinSixthLogin.setText("")
-                    } else if (pinLongClick) {
-                        pasteClipboard()
-                    } else {
-                        allowVerify()
-                    }
-                } else if (isErrorShown) {
-                    hideError()
-                }
-            }
-        }
-
-        binding.pinThirdLogin.apply {
-            setOnLongClickListener {
-                pinLongClick = true
-                this.requestFocus()
-            }
-            onFocusChangeListener = View.OnFocusChangeListener { _: View?, hasFocus: Boolean ->
-                if (hasFocus) this.setText("")
-            }
-            doAfterTextChanged {
-                if (this.length() != 0) {
-                    binding.pinFourthLogin.apply {
-                        requestFocus()
-                        isCursorVisible = true
-                    }
-                    if (isFirstTime && !pinLongClick) {
-                        binding.pinFourthLogin.setText("")
-                        binding.pinFifthLogin.setText("")
-                        binding.pinSixthLogin.setText("")
-                    } else if (pinLongClick) {
-                        pasteClipboard()
-                    } else {
-                        allowVerify()
-                    }
-                } else if (isErrorShown) {
-                    hideError()
-                }
-            }
-        }
-
-        binding.pinFourthLogin.apply {
-            setOnLongClickListener {
-                pinLongClick = true
-                this.requestFocus()
-            }
-            onFocusChangeListener = View.OnFocusChangeListener { _: View?, hasFocus: Boolean ->
-                if (hasFocus) this.setText("")
-            }
-            doAfterTextChanged {
-                if (this.length() != 0) {
-                    binding.pinFifthLogin.apply {
-                        requestFocus()
-                        isCursorVisible = true
-                    }
-                    if (isFirstTime && !pinLongClick) {
-                        binding.pinFifthLogin.setText("")
-                        binding.pinSixthLogin.setText("")
-                    } else if (pinLongClick) {
-                        pasteClipboard()
-                    } else {
-                        allowVerify()
-                    }
-                } else if (isErrorShown) {
-                    hideError()
-                }
-            }
-        }
-
-        binding.pinFifthLogin.apply {
-            setOnLongClickListener {
-                pinLongClick = true
-                this.requestFocus()
-            }
-            onFocusChangeListener = View.OnFocusChangeListener { _: View?, hasFocus: Boolean ->
-                if (hasFocus) this.setText("")
-            }
-            doAfterTextChanged {
-                if (this.length() != 0) {
-                    binding.pinSixthLogin.apply {
-                        requestFocus()
-                        isCursorVisible = true
-                    }
-                    if (isFirstTime && !pinLongClick) {
-                        binding.pinSixthLogin.setText("")
-                    } else if (pinLongClick) {
-                        pasteClipboard()
-                    } else {
-                        allowVerify()
-                    }
-                } else {
-                    if (isErrorShown) {
-                        hideError()
-                    }
-                }
-            }
-        }
-
-        binding.pinSixthLogin.apply {
-            setOnLongClickListener {
-                pinLongClick = true
-                this.requestFocus()
-            }
-            onFocusChangeListener = View.OnFocusChangeListener { _: View?, hasFocus: Boolean ->
-                if (hasFocus) this.setText("")
-            }
-            doAfterTextChanged {
-                if (this.length() != 0) {
-                    this.isCursorVisible = true
-                    Util.hideKeyboard(requireActivity() as LoginActivity, 0)
-                    if (pinLongClick) {
-                        pasteClipboard()
-                    } else {
-                        allowVerify()
-                    }
-                } else if (isErrorShown) {
-                    hideError()
-                }
-            }
-        }
+        addEditTextPintListeners(binding.pinFirstLogin)
+        addEditTextPintListeners(binding.pinSecondLogin)
+        addEditTextPintListeners(binding.pinThirdLogin)
+        addEditTextPintListeners(binding.pinFourthLogin)
+        addEditTextPintListeners(binding.pinFifthLogin)
+        addEditTextPintListeners(binding.pinSixthLogin)
 
         requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
 
@@ -568,6 +406,77 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
         if (passwdTemp != null && emailTemp != null) {
             submitFormConfirmAccount()
+        }
+    }
+
+    /**
+     * Adds long click, focus change, and after text change listeners to the 2FA fields.
+     *
+     * @param editTextPIN The field.
+     */
+    private fun addEditTextPintListeners(editTextPIN: EditTextPIN) {
+        editTextPIN.apply {
+            setOnLongClickListener {
+                pinLongClick = true
+                requestFocus()
+                return@setOnLongClickListener false
+            }
+            onFocusChangeListener = View.OnFocusChangeListener { _: View?, hasFocus: Boolean ->
+                if (hasFocus) setText("")
+            }
+            doAfterTextChanged {
+                if (length() != 0) {
+                    requestEditTextPinFocus(
+                        when (id) {
+                            R.id.pin_first_login -> binding.pinSecondLogin
+                            R.id.pin_second_login -> binding.pinThirdLogin
+                            R.id.pin_third_login -> binding.pinFourthLogin
+                            R.id.pin_fourth_login -> binding.pinFifthLogin
+                            else -> binding.pinSixthLogin
+                        }
+                    )
+
+                    if (id == R.id.pin_sixth_login) hideKeyboard()
+
+                    when {
+                        areAllFieldsFilled() -> verify2FA()
+                        isFirstTime && !pinLongClick -> clear2FAFields(id)
+                        pinLongClick -> pasteClipboard()
+                    }
+                } else if (isErrorShown) {
+                    hideError()
+                }
+            }
+        }
+    }
+
+    /**
+     * Clears 2FA fields depending on the current field focus.
+     *
+     * @param fieldId Current field id.
+     */
+    private fun clear2FAFields(fieldId: Int) {
+        if (fieldId == R.id.pin_sixth_login) return
+        binding.pinSixthLogin.setText("")
+        if (fieldId == R.id.pin_fifth_login) return
+        binding.pinFifthLogin.setText("")
+        if (fieldId == R.id.pin_fourth_login) return
+        binding.pinFourthLogin.setText("")
+        if (fieldId == R.id.pin_third_login) return
+        binding.pinThirdLogin.setText("")
+        if (fieldId == R.id.pin_second_login) return
+        binding.pinSecondLogin.setText("")
+    }
+
+    /**
+     * Requests the focus for 2FA fields.
+     *
+     * @param editTextPIN The field.
+     */
+    private fun requestEditTextPinFocus(editTextPIN: EditTextPIN) {
+        editTextPIN.apply {
+            requestFocus()
+            isCursorVisible = true
         }
     }
 
@@ -903,33 +812,33 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             R.color.red_600_red_300))
     }
 
-    /**
-     * Allows to verify typed 2FA.
-     */
-    private fun allowVerify() {
-        Timber.d("permitVerify")
-        if (binding.pinFirstLogin.length() == 1 && binding.pinSecondLogin.length() == 1
-            && binding.pinThirdLogin.length() == 1 && binding.pinFourthLogin.length() == 1
-            && binding.pinFifthLogin.length() == 1 && binding.pinSixthLogin.length() == 1
-        ) {
-            Util.hideKeyboard(requireActivity() as LoginActivity, 0)
-            if (sb.isNotEmpty()) {
-                sb.delete(0, sb.length)
-            }
-            sb.append(binding.pinFirstLogin.text)
-            sb.append(binding.pinSecondLogin.text)
-            sb.append(binding.pinThirdLogin.text)
-            sb.append(binding.pinFourthLogin.text)
-            sb.append(binding.pinFifthLogin.text)
-            sb.append(binding.pinSixthLogin.text)
-            pin = sb.toString()
 
-            if (!isErrorShown) {
-                Timber.d("Login with factor login")
-                binding.progressbarVerify2fa.isVisible = true
-                isLoggingIn = true
-                megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this)
-            }
+    private fun areAllFieldsFilled(): Boolean =
+        binding.pinFirstLogin.length() == 1 && binding.pinSecondLogin.length() == 1
+                && binding.pinThirdLogin.length() == 1 && binding.pinFourthLogin.length() == 1
+                && binding.pinFifthLogin.length() == 1 && binding.pinSixthLogin.length() == 1
+
+    /**
+     * Verifies if the typed 2FA is correct.
+     */
+    private fun verify2FA() {
+        Util.hideKeyboard(requireActivity() as LoginActivity, 0)
+        if (sb.isNotEmpty()) {
+            sb.delete(0, sb.length)
+        }
+        sb.append(binding.pinFirstLogin.text)
+        sb.append(binding.pinSecondLogin.text)
+        sb.append(binding.pinThirdLogin.text)
+        sb.append(binding.pinFourthLogin.text)
+        sb.append(binding.pinFifthLogin.text)
+        sb.append(binding.pinSixthLogin.text)
+        pin = sb.toString()
+
+        if (!isErrorShown) {
+            Timber.d("Login with factor login")
+            binding.progressbarVerify2fa.isVisible = true
+            isLoggingIn = true
+            megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this)
         }
     }
 
@@ -2124,9 +2033,9 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         pinLongClick = false
         val clipboard =
             requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clipData = clipboard.primaryClip
-        if (clipData != null) {
-            val code = clipData.getItemAt(0).text.toString()
+
+        clipboard.primaryClip?.let {
+            val code = it.getItemAt(0).text.toString()
             Timber.d("code: %s", code)
             if (code.length == 6) {
                 var areDigits = true
