@@ -1,10 +1,13 @@
 package mega.privacy.android.domain.usecase
 
+import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.repository.FavouritesRepository
+import mega.privacy.android.domain.repository.FileRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -15,20 +18,19 @@ import kotlin.test.assertTrue
 class DefaultGetAllFavoritesTest {
     lateinit var underTest: GetAllFavorites
     private val favouritesRepository = mock<FavouritesRepository>()
+    private val fileRepository = mock<FileRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetAllFavorites(favouritesRepository)
-        whenever(favouritesRepository.monitorNodeChange()).thenReturn(flowOf(false))
+        underTest = DefaultGetAllFavorites(favouritesRepository, fileRepository)
+        whenever(fileRepository.monitorNodeUpdates()).thenReturn(mock())
     }
 
     @Test
     fun `test that favourites is not empty`() {
         runTest {
             val list = mock<List<Node>>()
-            whenever(favouritesRepository.getAllFavorites()).thenReturn(
-                list
-            )
+            whenever(favouritesRepository.getAllFavorites()).thenReturn(list)
             underTest().collect {
                 assertTrue(it.isNotEmpty())
             }
@@ -44,4 +46,12 @@ class DefaultGetAllFavoritesTest {
             }
         }
     }
+
+    @Test
+    fun `test that favourites returns result of getAllFavorites when a node update occur`() =
+        runTest {
+            whenever(favouritesRepository.getAllFavorites()).thenReturn(emptyList())
+            whenever(fileRepository.monitorNodeUpdates()).thenReturn(flowOf(mock()))
+            Truth.assertThat(underTest().count()).isEqualTo(2)
+        }
 }
