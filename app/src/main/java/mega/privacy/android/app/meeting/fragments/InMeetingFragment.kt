@@ -726,14 +726,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         // Keep screen on
         meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
-        sendEnterCallEvent()
     }
-
-    fun sendEnterCallEvent() = LiveEventBus.get(
-        EVENT_ENTER_IN_MEETING,
-        Boolean::class.java
-    ).post(true)
 
     /**
      * Observe the Orientation changes and Update the layout for landscape and portrait screen
