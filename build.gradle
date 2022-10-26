@@ -87,7 +87,7 @@ ext {
     daggerVersion = "2.24"
     datastoreVersion = '1.0.0'
     espressoVersion = '3.4.0'
-    exoPlayerVersion = '2.16.0'
+    exoPlayerVersion = '2.18.1'
     firebaseBom = '29.0.4'
     fragmentKtxVersion = '1.2.5'
     fragmentTestingVersion = '1.4.1'
