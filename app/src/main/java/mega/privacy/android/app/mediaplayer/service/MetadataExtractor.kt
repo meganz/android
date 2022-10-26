@@ -1,7 +1,7 @@
 package mega.privacy.android.app.mediaplayer.service
 
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.TracksInfo
+import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.metadata.id3.TextInformationFrame
 
@@ -12,13 +12,13 @@ class MetadataExtractor(
     private val callback: (String?, String?, String?) -> Unit
 ) : Player.Listener {
 
-    override fun onTracksInfoChanged(tracksInfo: TracksInfo) {
-        super.onTracksInfoChanged(tracksInfo)
+    override fun onTracksChanged(tracksInfo: Tracks) {
+        super.onTracksChanged(tracksInfo)
 
 
-        for (trackGroupInfo in tracksInfo.trackGroupInfos) {
-            for (i in 0 until trackGroupInfo.trackGroup.length) {
-                val metadata = trackGroupInfo.trackGroup.getFormat(i).metadata ?: continue
+        for (trackGroupInfo in tracksInfo.groups) {
+            for (i in 0 until trackGroupInfo.length) {
+                val metadata = trackGroupInfo.mediaTrackGroup.getFormat(i).metadata ?: continue
 
                 extractMetadata(metadata)
                 return
