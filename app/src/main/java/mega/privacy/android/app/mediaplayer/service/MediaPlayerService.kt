@@ -271,10 +271,11 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                 if (MediaPlayerActivity.isAudioPlayer(intent)) {
                     createPlayerControlNotification()
                 }
-
-                if (viewModelGateway.buildPlayerSource(intent)) {
-                    if (viewModelGateway.isAudioPlayer()) {
-                        MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                lifecycleScope.launch {
+                    if (viewModelGateway.buildPlayerSource(intent)) {
+                        if (viewModelGateway.isAudioPlayer()) {
+                            MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                        }
                     }
                 }
             }
