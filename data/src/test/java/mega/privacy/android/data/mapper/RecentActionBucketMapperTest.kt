@@ -51,7 +51,12 @@ class RecentActionBucketMapperTest {
             isPendingShare = { false },
         )
         assertThat(actual).isInstanceOf(RecentActionBucket::class.java)
-        assertThat(actual.nodes.size).isEqualTo(10)
+        assertThat(actual.timestamp).isEqualTo(recentActionBucket.timestamp)
+        assertThat(actual.userEmail).isEqualTo(recentActionBucket.userEmail)
+        assertThat(actual.parentHandle).isEqualTo(recentActionBucket.parentHandle)
+        assertThat(actual.isUpdate).isEqualTo(recentActionBucket.isUpdate)
+        assertThat(actual.isMedia).isEqualTo(recentActionBucket.isMedia)
+        assertThat(actual.nodes.size).isEqualTo(megaNodeList.size())
     }
 
     private fun getMockNode(
