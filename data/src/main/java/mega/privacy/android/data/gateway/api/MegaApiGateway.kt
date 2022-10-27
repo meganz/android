@@ -588,6 +588,14 @@ interface MegaApiGateway {
     ): List<MegaNode>
 
     /**
+     * Get children nodes by megaNodeList
+     * @param parent parent node
+     * @param order order for the returned list
+     * @return children nodes list
+     */
+    suspend fun getChildren(parent: MegaNode, order: Int, ): List<MegaNode>
+
+    /**
      * Get a list with all public links
      *
      * @return List of MegaNode objects that are shared with everyone via public link
@@ -796,4 +804,86 @@ interface MegaApiGateway {
      * @param listener : MegaRequestListenerInterface
      */
     fun getAccountAchievements(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Returns a MegaNode that can be downloaded with any instance of MegaApi
+     *
+     * @param node MegaNode to authorize
+     * @return Authorized node, or NULL if the node can't be authorized
+     */
+    suspend fun authorizeNode(node: MegaNode): MegaNode?
+
+    /**
+     * Returns a URL to a node in the local HTTP proxy server
+     *
+     * @param node Node to generate the local HTTP link
+     * @return URL to the node in the local HTTP proxy server, otherwise NULL
+     */
+    suspend fun httpServerGetLocalLink(node: MegaNode): String?
+
+    /**
+     * Check if the HTTP proxy server is running
+     *
+     * @return 0 if the server is not running. Otherwise the port in which it's listening to
+     */
+    suspend fun httpServerIsRunning(): Int
+
+    /**
+     * Start an HTTP proxy server in specified port
+     *
+     * @return True if the server is ready, false if the initialization failed
+     */
+    suspend fun httpServerStart(): Boolean
+
+    /**
+     * Stop the HTTP proxy server
+     */
+    suspend fun httpServerStop()
+
+    /**
+     * Set the maximum buffer size for the internal buffer
+     *
+     * @param bufferSize Maximum buffer size (in bytes) or a number <= 0 to use the
+     *                   internal default value
+     */
+    suspend fun httpServerSetMaxBufferSize(bufferSize: Int)
+
+    /**
+     * Get a list with all public links
+     *
+     * @param order Sorting order to use
+     * @return List of MegaNode objects that are shared with everyone via public link
+     */
+    suspend fun getPublicLinks(order: Int): List<MegaNode>
+
+    /**
+     * Get a list with all inbound sharings
+     *
+     * @param order Sorting order to use
+     * @return List of MegaNode objects that other users are sharing with this account
+     */
+    suspend fun getInShares(order: Int): List<MegaNode>
+
+    /**
+     * Get a list with all inbound sharings from one MegaUser
+     *
+     * @param user MegaUser sharing folders with this account
+     * @return List of MegaNode objects that this user is sharing with this account
+     */
+    suspend fun getInShares(user: MegaUser): List<MegaNode>
+
+    /**
+     * Get a list with all active and pending outbound sharings
+     *
+     * @param order Sorting order to use
+     * @return List of MegaShare objects
+     */
+    suspend fun getOutShares(order: Int): List<MegaShare>
+
+    /**
+     * Returns the rubbish node of the account.
+     *
+     * @return Rubbish node of the account.
+     */
+    suspend fun getRubbishNode(): MegaNode
 }
