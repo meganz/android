@@ -4,7 +4,7 @@ import mega.privacy.android.domain.entity.RecentActionBucket
 import nz.mega.sdk.MegaRecentActionBucket
 
 /**
- * The mapper class for converting the data entity to FavouriteInfo
+ * The mapper class for converting [MegaRecentActionBucket] to [RecentActionBucket]
  */
 typealias RecentActionBucketMapper = @JvmSuppressWildcards suspend (
     @JvmSuppressWildcards MegaRecentActionBucket,
