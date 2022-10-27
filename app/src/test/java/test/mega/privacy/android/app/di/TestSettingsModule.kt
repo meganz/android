@@ -61,7 +61,7 @@ object TestSettingsModule {
     val fetchAutoAcceptQRLinks =
         mock<FetchAutoAcceptQRLinks> { onBlocking { invoke() }.thenReturn(false) }
     val fetchMultiFactorAuthSetting =
-        mock<FetchMultiFactorAuthSetting> { on { invoke() }.thenReturn(emptyFlow()) }
+        mock<FetchMultiFactorAuthSetting> { onBlocking { invoke() }.thenReturn(false) }
     val getAccountDetails =
         mock<GetAccountDetails> { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
     val monitorHideRecentActivity =

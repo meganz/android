@@ -9,7 +9,6 @@ import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.DefaultCanDeleteAccount
-import mega.privacy.android.domain.usecase.DefaultFetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.DefaultIsChatLoggedIn
 import mega.privacy.android.domain.usecase.DefaultMonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.DefaultMonitorHideRecentActivity
@@ -55,15 +54,16 @@ abstract class SettingsUseCases {
     abstract fun bindIsChatLoggedIn(useCase: DefaultIsChatLoggedIn): IsChatLoggedIn
 
     @Binds
-    abstract fun bindFetchMultiFactorAuthSetting(useCase: DefaultFetchMultiFactorAuthSetting): FetchMultiFactorAuthSetting
-
-    @Binds
     abstract fun bindMonitorAutoAcceptQRLinks(implementation: DefaultMonitorAutoAcceptQRLinks): MonitorAutoAcceptQRLinks
 
     @Binds
     abstract fun bindMonitorHideRecentActivity(implementation: DefaultMonitorHideRecentActivity): MonitorHideRecentActivity
 
     companion object {
+        @Provides
+        fun provideFetchMultiFactorAuthSetting(accountRepository: AccountRepository): FetchMultiFactorAuthSetting =
+            FetchMultiFactorAuthSetting(accountRepository::isMultiFactorAuthEnabled)
+
         @Provides
         fun providePutStringPreference(settingsRepository: SettingsRepository): PutPreference<String> =
             PutPreference(settingsRepository::setStringPreference)

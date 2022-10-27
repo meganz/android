@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.data.facade.AccountInfoWrapper
-import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.data.extensions.failWithError
@@ -65,7 +64,6 @@ class DefaultAccountRepository @Inject constructor(
     private val myAccountInfoFacade: AccountInfoWrapper,
     private val megaApiGateway: MegaApiGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
-    private val monitorMultiFactorAuth: MonitorMultiFactorAuth,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val userUpdateMapper: UserUpdateMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
@@ -128,9 +126,6 @@ class DefaultAccountRepository @Inject constructor(
             } else continuation.failWithError(error)
         }
     }
-
-    override fun monitorMultiFactorAuthChanges() =
-        monitorMultiFactorAuth.getEvents()
 
     override suspend fun requestDeleteAccountLink() = withContext<Unit>(ioDispatcher) {
         suspendCoroutine { continuation ->
