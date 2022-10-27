@@ -111,7 +111,7 @@ class MediaPlayerFacade @Inject constructor(
                     }
                 })
                 addAnalyticsListener(object :
-                    EventLogger(trackSelector, "MediaPlayer") {
+                    EventLogger("MediaPlayer") {
                     override fun logd(msg: String) {
                         Timber.d(msg)
                     }
