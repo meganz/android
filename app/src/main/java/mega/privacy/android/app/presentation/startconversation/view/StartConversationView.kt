@@ -136,7 +136,7 @@ fun StartConversationView(
 
                         header = defaultAvatarContent
 
-                        item(key = defaultAvatarContent) {
+                        item(key = contactsList[0].handle.hashCode()) {
                             HeaderItem(text = defaultAvatarContent)
                         }
                     }
@@ -155,7 +155,7 @@ fun StartConversationView(
                     if (header != defaultAvatarContent) {
                         header = defaultAvatarContent
 
-                        item(key = defaultAvatarContent) {
+                        item(key = contact.handle.hashCode()) {
                             HeaderItem(text = defaultAvatarContent)
                         }
                     }
