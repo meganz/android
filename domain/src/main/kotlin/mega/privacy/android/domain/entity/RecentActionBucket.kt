@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.node.Node
 /**
  * RecentActionBucket
  *
- * @property timeStamp
+ * @property timestamp
  * @property userEmail
  * @property parentHandle
  * @property isUpdate
@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.node.Node
  * @property nodes
  */
 data class RecentActionBucket(
-    val timeStamp: Long,
+    val timestamp: Long,
     val userEmail: String,
     val parentHandle: Long,
     val isUpdate: Boolean,

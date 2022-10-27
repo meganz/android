@@ -26,7 +26,7 @@ internal suspend fun toRecentActionBucket(
     fileTypeInfoMapper: FileTypeInfoMapper,
     isPendingShare: MapPendingShare,
     isInRubbish: MapInRubbish,
-) = RecentActionBucket(timeStamp = megaRecentActionBucket.timestamp,
+) = RecentActionBucket(timestamp = megaRecentActionBucket.timestamp,
     userEmail = megaRecentActionBucket.userEmail,
     parentHandle = megaRecentActionBucket.parentHandle,
     isUpdate = megaRecentActionBucket.isUpdate,
