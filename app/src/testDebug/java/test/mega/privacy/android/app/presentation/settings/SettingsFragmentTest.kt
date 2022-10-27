@@ -26,7 +26,6 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
@@ -383,7 +382,9 @@ class SettingsFragmentTest {
     @Test
     fun test_that_2FA_updates_toggle_the_switch() {
         whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
-        whenever(TestSettingsModule.fetchMultiFactorAuthSetting()).thenReturn(flowOf(true))
+        runBlocking {
+            whenever(TestSettingsModule.fetchMultiFactorAuthSetting()).thenReturn(true)
+        }
         val scenario = launchFragmentInHiltContainer<SettingsFragment>()
         scenario?.moveToState(Lifecycle.State.CREATED)
         scenario?.moveToState(Lifecycle.State.STARTED)

@@ -59,7 +59,7 @@ class SettingsViewModel @Inject constructor(
     private val monitorHideRecentActivity: MonitorHideRecentActivity,
     private val setHideRecentActivity: SetHideRecentActivity,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
-    fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
+    private val fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
     monitorConnectivity: MonitorConnectivity,
     private val requestAccountDeletion: RequestAccountDeletion,
     private val isChatLoggedIn: IsChatLoggedIn,
@@ -128,7 +128,7 @@ class SettingsViewModel @Inject constructor(
                 }.map { enabled ->
                     { state: SettingsState -> state.copy(autoAcceptChecked = enabled) }
                 },
-                fetchMultiFactorAuthSetting()
+                flowOf(fetchMultiFactorAuthSetting())
                     .map { enabled ->
                         { state: SettingsState -> state.copy(multiFactorAuthChecked = enabled) }
                     },
@@ -167,6 +167,14 @@ class SettingsViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun refreshMultiFactorAuthSetting() {
+        viewModelScope.launch {
+            state.update {
+                it.copy(multiFactorAuthChecked = fetchMultiFactorAuthSetting())
+            }
+        }
     }
 
     private fun updateAccountState(userAccount: UserAccount) =
