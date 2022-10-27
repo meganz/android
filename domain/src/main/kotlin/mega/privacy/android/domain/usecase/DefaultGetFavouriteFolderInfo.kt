@@ -17,6 +17,7 @@ import javax.inject.Inject
  */
 class DefaultGetFavouriteFolderInfo @Inject constructor(
     private val fileRepository: FileRepository,
+    private val addNodeType: AddNodeType,
 ) : GetFavouriteFolderInfo {
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -32,6 +33,7 @@ class DefaultGetFavouriteFolderInfo @Inject constructor(
         val parent = fileRepository.getNodeById(NodeId(parentHandle)) as? FolderNode
             ?: throw ParentNotAFolderException("Attempted to fetch favourite folder info for node: $parentHandle")
         val children = fileRepository.getNodeChildren(parent)
+            .map { addNodeType(it) }
         return FavouriteFolderInfo(
             children = children,
             name = parent.name,

@@ -19,6 +19,7 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMa
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import nz.mega.sdk.MegaNode
 import org.junit.After
@@ -56,7 +57,7 @@ class FavouriteFolderViewModelTest {
 
     private val megaUtilWrapper = mock<MegaUtilWrapper>()
 
-    private val favourite = mock<Node>()
+    private val favourite = mock<TypedNode>()
 
     private val list = listOf(favourite)
     private val rootHandle: Long = -1

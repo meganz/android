@@ -28,11 +28,12 @@ import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.FavouritePlaceholderItem
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
+import mega.privacy.android.app.presentation.favourites.model.id
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -437,19 +438,20 @@ class FavouritesViewModel @Inject constructor(
      * Build favourite source list
      * @param list List<FavouriteInfo>
      */
-    private suspend fun buildFavouriteSourceList(list: List<Node>) {
+    private suspend fun buildFavouriteSourceList(list: List<TypedNode>) {
         if (favouriteSourceList.isNotEmpty()) {
             favouriteSourceList.clear()
         }
         favouriteSourceList.addAll(
             list.mapNotNull { favouriteInfo ->
-                val node = fetchNode(favouriteInfo.id.id) ?: return@mapNotNull null
+                val nodeId = favouriteInfo.id ?: return@mapNotNull null
+                val node = fetchNode(nodeId.id) ?: return@mapNotNull null
                 favouriteMapper(
                     node,
                     favouriteInfo,
                     megaUtilWrapper.availableOffline(
                         context,
-                        favouriteInfo.id.id
+                        nodeId.id
                     ),
                     stringUtilWrapper
                 ) { name ->

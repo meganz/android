@@ -22,9 +22,14 @@ class DefaultGetFavouriteFolderInfoTest {
 
     private val fileRepository = mock<FileRepository>()
 
+    private val addNodeType = mock<AddNodeType>()
+
     @Before
     fun setUp() {
-        underTest = DefaultGetFavouriteFolderInfo(fileRepository = fileRepository)
+        underTest = DefaultGetFavouriteFolderInfo(
+            fileRepository = fileRepository,
+            addNodeType = addNodeType
+        )
         whenever(fileRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
     }
 
