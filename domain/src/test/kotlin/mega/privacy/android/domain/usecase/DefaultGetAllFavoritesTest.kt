@@ -6,10 +6,12 @@ import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FileRepository
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.test.assertTrue
@@ -18,19 +20,33 @@ import kotlin.test.assertTrue
 class DefaultGetAllFavoritesTest {
     lateinit var underTest: GetAllFavorites
     private val favouritesRepository = mock<FavouritesRepository>()
-    private val fileRepository = mock<FileRepository>()
+
+    private val addNodeType = mock<AddNodeType> {
+        val typedNode = mock<TypedNode>()
+        onBlocking { invoke(any()) }.thenReturn(typedNode)
+    }
+
+    private val fileRepository = mock<FileRepository> {
+        on { monitorNodeUpdates() }.thenReturn(flowOf(
+            emptyList()))
+    }
 
     @Before
     fun setUp() {
-        underTest = DefaultGetAllFavorites(favouritesRepository, fileRepository)
-        whenever(fileRepository.monitorNodeUpdates()).thenReturn(mock())
+        underTest = DefaultGetAllFavorites(
+            favouritesRepository = favouritesRepository,
+            fileRepository = fileRepository,
+            addNodeType = addNodeType,
+        )
     }
 
     @Test
     fun `test that favourites is not empty`() {
         runTest {
-            val list = mock<List<Node>>()
-            whenever(favouritesRepository.getAllFavorites()).thenReturn(list)
+            val list = listOf(mock<Node>())
+            whenever(favouritesRepository.getAllFavorites()).thenReturn(
+                list
+            )
             underTest().collect {
                 assertTrue(it.isNotEmpty())
             }

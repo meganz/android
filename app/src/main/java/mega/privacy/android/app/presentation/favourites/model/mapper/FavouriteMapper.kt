@@ -9,11 +9,11 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import nz.mega.sdk.MegaNode
 
 /**
@@ -21,7 +21,7 @@ import nz.mega.sdk.MegaNode
  */
 typealias FavouriteMapper = (
     @JvmSuppressWildcards MegaNode,
-    @JvmSuppressWildcards Node,
+    @JvmSuppressWildcards TypedNode,
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards StringUtilWrapper,
     @JvmSuppressWildcards (String) -> Int,
@@ -37,19 +37,19 @@ typealias FavouriteMapper = (
  */
 internal fun toFavourite(
     node: MegaNode,
-    nodeInfo: Node,
+    nodeInfo: TypedNode,
     isAvailableOffline: Boolean,
     stringUtil: StringUtilWrapper,
     getFileIcon: (String) -> Int = { 0 },
 ) = when (nodeInfo) {
-    is FolderNode -> {
+    is TypedFolderNode -> {
         nodeInfo.createFolder(
             node,
             getFolderInfo(nodeInfo, stringUtil),
             isAvailableOffline,
         )
     }
-    is FileNode -> {
+    is TypedFileNode -> {
         nodeInfo.createFile(
             node,
             getFileInfo(nodeInfo, stringUtil),
@@ -67,7 +67,7 @@ internal fun toFavourite(
  * @param isAvailableOffline whether is available for offline
  * @return FavouriteFolder
  */
-private fun FolderNode.createFolder(
+private fun TypedFolderNode.createFolder(
     node: MegaNode,
     folderInfo: String,
     isAvailableOffline: Boolean,
@@ -96,7 +96,7 @@ private fun FolderNode.createFolder(
  * @param getFileIcon getFileIcon
  * @return FavouriteFile
  */
-private fun FileNode.createFile(
+private fun TypedFileNode.createFile(
     node: MegaNode,
     fileInfo: String,
     isAvailableOffline: Boolean,
@@ -135,7 +135,7 @@ private fun FileTypeInfo.hasThumbnail(): Boolean = when (this) {
  * @param stringUtil StringUtilWrapper
  * @return file info
  */
-private fun getFileInfo(favouriteInfo: FileNode, stringUtil: StringUtilWrapper) =
+private fun getFileInfo(favouriteInfo: TypedFileNode, stringUtil: StringUtilWrapper) =
     String.format(
         "%s · %s",
         stringUtil.getSizeString(favouriteInfo.size),
@@ -148,5 +148,5 @@ private fun getFileInfo(favouriteInfo: FileNode, stringUtil: StringUtilWrapper) 
  * @param stringUtil StringUtilWrapper
  * @return folder info
  */
-private fun getFolderInfo(favouriteInfo: FolderNode, stringUtil: StringUtilWrapper) =
+private fun getFolderInfo(favouriteInfo: TypedFolderNode, stringUtil: StringUtilWrapper) =
     stringUtil.getFolderInfo(favouriteInfo.childFolderCount, favouriteInfo.childFileCount)
