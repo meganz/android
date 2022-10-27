@@ -821,7 +821,7 @@ private String lastCommitMessage() {
  * @return true if triggered branch is 'develop', otherwise return false.
  */
 private boolean isOnDevelopBranch() {
-    return env.gitlabSourceBranch != null && env.gitlabSourceBranch == "develop"
+    return true //env.gitlabSourceBranch != null && env.gitlabSourceBranch == "develop"
 }
 
 /**
