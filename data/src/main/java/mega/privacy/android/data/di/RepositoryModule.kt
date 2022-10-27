@@ -10,6 +10,7 @@ import mega.privacy.android.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
 import mega.privacy.android.data.repository.DefaultEnvironmentRepository
+import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultFilesRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
@@ -33,6 +34,7 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
+import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
@@ -126,4 +128,7 @@ internal abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindSettingsRepository(repository: DefaultSettingsRepository): SettingsRepository
+
+    @Binds
+    abstract fun bindFavouritesRepository(repository: DefaultFavouritesRepository): FavouritesRepository
 }

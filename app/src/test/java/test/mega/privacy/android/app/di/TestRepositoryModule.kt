@@ -9,7 +9,6 @@ import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumsRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import org.mockito.kotlin.mock
 
@@ -25,9 +24,6 @@ object TestRepositoryModule {
 
     @Provides
     fun provideCameraUploadRepository(): CameraUploadRepository = mock()
-
-    @Provides
-    fun bindFavouritesRepository(): FavouritesRepository = mock()
 
     @Provides
     fun bindAlbumsRepository(): AlbumsRepository = mock()
