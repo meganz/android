@@ -104,6 +104,11 @@ interface AccountRepository {
     suspend fun getSubscriptionPlans(): List<SubscriptionPlan>
 
     /**
+     * Returns if accounts achievements enabled
+     */
+    suspend fun isAccountAchievementsEnabled(): Boolean
+
+    /**
      * Get account achievements
      *
      * @return MegaAchievement

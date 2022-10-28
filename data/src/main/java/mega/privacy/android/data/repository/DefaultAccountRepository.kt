@@ -201,6 +201,10 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
 
+    override suspend fun isAccountAchievementsEnabled(): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.isAccountAchievementsEnabled()
+    }
+
     override suspend fun getAccountAchievements(
         achievementType: AchievementType,
         awardIndex: Long,
