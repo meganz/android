@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.facade.AccountInfoFacade
-import mega.privacy.android.app.data.facade.AccountInfoWrapper
+import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -6,17 +6,16 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.facade.AccountInfoWrapper
+import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.app.data.repository.DefaultAccountRepository
-import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.SkuMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanMapper
+import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
@@ -96,6 +95,7 @@ class DefaultAccountRepositoryTest {
             skuMapper = skuMapper,
             subscriptionPlanListMapper = subscriptionPlanListMapper,
             megaAchievementMapper = megaAchievementMapper,
+            dbHandler = mock()
         )
     }
 

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.facade
+package mega.privacy.android.data.facade
 
 /**
  * Account info wrapper to create an interface to Account information functionality
