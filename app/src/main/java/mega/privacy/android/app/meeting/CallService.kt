@@ -191,6 +191,37 @@ class CallService : Service() {
     }
 
     /**
+     * Method to create Pending intent for return to a call
+     *
+     * @param call MegaChatCall
+     * @param requestCode RequestCode
+     * @return The pending intent to return to a call.
+     */
+    private fun getPendingIntent(call: MegaChatCall, requestCode: Int): PendingIntent? {
+        var intentCall: PendingIntent? = null
+        if (call.status == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && call.isRinging) {
+            intentCall =
+                CallUtil.getPendingIntentMeetingRinging(this,
+                    currentChatId,
+                    requestCode)
+        } else if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+            intentCall = if (isInMeeting) {
+                PendingIntent.getBroadcast(this,
+                    0,
+                    Intent(""),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            } else {
+                CallUtil.getPendingIntentMeetingInProgress(this,
+                    currentChatId,
+                    requestCode,
+                    megaApi.isEphemeralPlusPlus)
+            }
+        }
+
+        return intentCall
+    }
+
+    /**
      * Update the content of the notification
      */
     private fun updateNotificationContent() {
@@ -198,67 +229,62 @@ class CallService : Service() {
         megaChatApi.getChatRoom(currentChatId)?.let { chat ->
             megaChatApi.getChatCall(currentChatId)?.let { call ->
                 val notificationId = CallUtil.getCallNotificationId(call.callId)
-                var contentText: String? = ""
-                var intentCall: PendingIntent? = null
+                val pendingIntent: PendingIntent? = getPendingIntent(call, notificationId + 1)
 
-                if (call.status == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && call.isRinging) {
-                    contentText =
+                val contentText =
+                    if (call.status == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && call.isRinging)
                         StringResourcesUtils.getString(R.string.title_notification_incoming_call)
-                    intentCall =
-                        CallUtil.getPendingIntentMeetingRinging(this,
-                            currentChatId,
-                            notificationId + 1)
-
-                } else if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                    contentText = if (call.isOnHold) {
+                    else if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS && call.isOnHold)
                         StringResourcesUtils.getString(R.string.call_on_hold)
-                    } else {
+                    else if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS && !call.isOnHold)
                         StringResourcesUtils.getString(R.string.title_notification_call_in_progress)
-                    }
-
-                    intentCall = if (isInMeeting) {
-                        PendingIntent.getBroadcast(this,
-                            0,
-                            Intent(""),
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                    } else {
-                        CallUtil.getPendingIntentMeetingInProgress(this,
-                            currentChatId,
-                            notificationId + 1,
-                            megaApi.isEphemeralPlusPlus)
-                    }
-                }
+                    else ""
 
                 val title = ChatUtil.getTitleChat(chat)
-                var largeIcon: Bitmap? = null
-                if (chat.isGroup) {
-                    largeIcon = createDefaultAvatar(MEGACHAT_INVALID_HANDLE, title)
-                }
+
+                val largeIcon: Bitmap =
+                    if (chat.isGroup)
+                        createDefaultAvatar(MEGACHAT_INVALID_HANDLE, title)
+                    else
+                        setProfileContactAvatar(chat.getPeerHandle(0),
+                            title,
+                            ChatController(this@CallService).getParticipantEmail(chat.getPeerHandle(
+                                0)))
+
+                val actionIcon = R.drawable.ic_phone_white
+                val actionPendingIntent = getPendingIntent(call, notificationId + 1)
+                val actionTitle =
+                    StringResourcesUtils.getString(R.string.button_notification_call_in_progress)
 
                 val newNotification: Notification? =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        mBuilderCompatO?.mActions?.clear()
                         mBuilderCompatO?.apply {
                             setContentTitle(title)
-                            setContentIntent(intentCall)
+                            setContentIntent(pendingIntent)
+                            setLargeIcon(largeIcon)
+                            addAction(actionIcon,
+                                actionTitle,
+                                actionPendingIntent)
 
                             if (!TextUtil.isTextEmpty(contentText))
                                 setContentText(contentText)
-
-                            if (largeIcon != null)
-                                setLargeIcon(largeIcon)
                         }
 
                         mBuilderCompatO?.build()
                     } else {
+                        mBuilderCompat?.mActions?.clear()
+
                         mBuilderCompat?.apply {
                             setContentTitle(title)
-                            setContentIntent(intentCall)
+                            setContentIntent(pendingIntent)
+                            setLargeIcon(largeIcon)
+                            addAction(actionIcon,
+                                actionTitle,
+                                actionPendingIntent)
 
                             if (!TextUtil.isTextEmpty(contentText))
                                 setContentText(contentText)
-
-                            if (largeIcon != null)
-                                setLargeIcon(largeIcon)
                         }
 
                         mBuilderCompat?.build()
@@ -275,97 +301,78 @@ class CallService : Service() {
     private fun showCallInProgressNotification() {
         Timber.d("Showing the notification")
         val notificationId = currentCallNotificationId
-        if (notificationId == Constants.INVALID_CALL) return
+        if (notificationId == Constants.INVALID_CALL)
+            return
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(notificationChannelId,
-                Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT)
-
-            channel.apply {
-                setShowBadge(true)
-                setSound(null, null)
-            }
-
-            mNotificationManager =
-                this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            mNotificationManager?.createNotificationChannel(channel)
-            mBuilderCompatO = NotificationCompat.Builder(this, notificationChannelId)
-            mBuilderCompatO?.apply {
-                setSmallIcon(R.drawable.ic_stat_notify)
-                setAutoCancel(false) // Only use the action as indicator.
-                addAction(R.drawable.ic_phone_white,
-                    StringResourcesUtils.getString(R.string.button_notification_call_in_progress),
-                    null)
-                setOngoing(false).color = ContextCompat.getColor(this@CallService,
-                    R.color.red_600_red_300)
-            }
-
-            val chat = megaChatApi.getChatRoom(currentChatId)
-            if (chat != null) {
+        megaChatApi.getChatRoom(currentChatId)?.let { chat ->
+            megaChatApi.getChatCall(currentChatId)?.let { call ->
                 val title = ChatUtil.getTitleChat(chat)
-
-                mBuilderCompatO?.apply {
-                    if (chat.isGroup) {
-                        setLargeIcon(createDefaultAvatar(MEGACHAT_INVALID_HANDLE, title))
-                    } else {
-                        setLargeIcon(setProfileContactAvatar(chat.getPeerHandle(0),
+                val colorNotification = ContextCompat.getColor(this@CallService,
+                    R.color.red_600_red_300)
+                val smallIcon = R.drawable.ic_stat_notify
+                val largeIcon: Bitmap =
+                    if (chat.isGroup)
+                        createDefaultAvatar(MEGACHAT_INVALID_HANDLE, title)
+                    else
+                        setProfileContactAvatar(chat.getPeerHandle(0),
                             title,
                             ChatController(this@CallService).getParticipantEmail(chat.getPeerHandle(
-                                0))))
+                                0)))
+                val actionIcon = R.drawable.ic_phone_white
+                val actionPendingIntent = getPendingIntent(call, notificationId + 1)
+                val actionTitle =
+                    StringResourcesUtils.getString(R.string.button_notification_call_in_progress)
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val channel = NotificationChannel(notificationChannelId,
+                        Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME,
+                        NotificationManager.IMPORTANCE_DEFAULT)
+
+                    channel.apply {
+                        setShowBadge(true)
+                        setSound(null, null)
                     }
-                    setContentTitle(title)
-                }
 
-                updateNotificationContent()
-            } else {
-                mBuilderCompatO?.apply {
-                    setContentTitle(StringResourcesUtils.getString(R.string.title_notification_call_in_progress))
-                    setContentText(StringResourcesUtils.getString(R.string.action_notification_call_in_progress))
-                }
+                    mNotificationManager =
+                        this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                    mNotificationManager?.createNotificationChannel(channel)
+                    mBuilderCompatO = NotificationCompat.Builder(this, notificationChannelId)
 
-                startForeground(notificationId, mBuilderCompatO?.build())
-            }
-        } else {
-            mBuilderCompat = NotificationCompat.Builder(this, notificationChannelId)
-            mNotificationManager =
-                this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-            mBuilderCompat?.apply {
-                setSmallIcon(R.drawable.ic_stat_notify)
-                setAutoCancel(false)
-                addAction(R.drawable.ic_phone_white,
-                    StringResourcesUtils.getString(R.string.button_notification_call_in_progress),
-                    null)
-                setOngoing(false)
-                color = ContextCompat.getColor(this@CallService,
-                    R.color.red_600_red_300)
-            }
-
-            val chat = megaChatApi.getChatRoom(currentChatId)
-            if (chat != null) {
-                val title = ChatUtil.getTitleChat(chat)
-
-                mBuilderCompat?.apply {
-                    if (chat.isGroup) {
-                        setLargeIcon(createDefaultAvatar(MEGACHAT_INVALID_HANDLE, title))
-                    } else {
-                        setLargeIcon(setProfileContactAvatar(chat.getPeerHandle(0),
-                            title,
-                            ChatController(this@CallService).getParticipantEmail(chat.getPeerHandle(
-                                0))))
+                    mBuilderCompatO?.apply {
+                        setSmallIcon(smallIcon)
+                        setAutoCancel(false)
+                        addAction(actionIcon,
+                            actionTitle,
+                            actionPendingIntent)
+                        setOngoing(false)
+                        color = colorNotification
                     }
-                    setContentTitle(title)
-                }
 
+                    mBuilderCompatO?.apply {
+                        setLargeIcon(largeIcon)
+                        setContentTitle(title)
+                    }
+                } else {
+                    mBuilderCompat = NotificationCompat.Builder(this, notificationChannelId)
+                    mNotificationManager =
+                        this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+                    mBuilderCompat?.apply {
+                        setSmallIcon(smallIcon)
+                        setAutoCancel(false)
+                        addAction(actionIcon,
+                            actionTitle,
+                            actionPendingIntent)
+                        setOngoing(false)
+                        color = colorNotification
+                    }
+
+                    mBuilderCompat?.apply {
+                        setLargeIcon(largeIcon)
+                        setContentTitle(title)
+                    }
+                }
                 updateNotificationContent()
-            } else {
-                mBuilderCompat?.apply {
-                    setContentTitle(StringResourcesUtils.getString(R.string.title_notification_call_in_progress))
-                    setContentText(StringResourcesUtils.getString(R.string.action_notification_call_in_progress))
-                }
-
-                startForeground(notificationId, mBuilderCompat?.build())
             }
         }
     }
