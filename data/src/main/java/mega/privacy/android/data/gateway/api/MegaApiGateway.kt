@@ -799,6 +799,11 @@ interface MegaApiGateway {
     fun getUserAttribute(attributeIdentifier: Int, listener: MegaRequestListenerInterface)
 
     /**
+     * Returns if accounts achievements enabled
+     */
+    suspend fun isAccountAchievementsEnabled(): Boolean
+
+    /**
      * Get account achievements
      *
      * @param listener : MegaRequestListenerInterface

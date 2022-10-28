@@ -478,6 +478,8 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.getUserAttribute(attributeIdentifier, listener)
     }
 
+    override suspend fun isAccountAchievementsEnabled(): Boolean = megaApi.isAchievementsEnabled
+
     override fun getAccountAchievements(listener: MegaRequestListenerInterface?) =
         megaApi.getAccountAchievements(listener)
 
