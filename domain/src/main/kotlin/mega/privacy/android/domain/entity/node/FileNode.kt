@@ -25,4 +25,9 @@ interface FileNode : Node {
      * Thumbnail path
      */
     val thumbnailPath: String?
+
+    /**
+     * duration if file type is video
+     */
+    val duration: Int?
 }

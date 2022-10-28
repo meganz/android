@@ -27,6 +27,7 @@ import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodMapper
+import mega.privacy.android.data.mapper.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.RecentActionsMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderMapper
@@ -65,6 +66,7 @@ import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toOnlineStatus
 import mega.privacy.android.data.mapper.toPaymentMethodType
+import mega.privacy.android.data.mapper.toRecentActionBucket
 import mega.privacy.android.data.mapper.toRecentActionBucketList
 import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toSortOrder
@@ -336,5 +338,11 @@ internal class MapperModule {
      */
     @Provides
     fun provideRecentActionsMapper(): RecentActionsMapper = ::toRecentActionBucketList
+
+    /**
+     * Provide [RecentActionBucketMapper] mapper
+     */
+    @Provides
+    fun provideRecentActionBucketMapper(): RecentActionBucketMapper = ::toRecentActionBucket
 
 }

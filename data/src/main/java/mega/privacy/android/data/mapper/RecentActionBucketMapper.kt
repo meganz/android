@@ -26,12 +26,13 @@ internal suspend fun toRecentActionBucket(
     fileTypeInfoMapper: FileTypeInfoMapper,
     isPendingShare: MapPendingShare,
     isInRubbish: MapInRubbish,
-) = RecentActionBucket(timestamp = megaRecentActionBucket.timestamp,
+) = RecentActionBucket(
+    timestamp = megaRecentActionBucket.timestamp,
     userEmail = megaRecentActionBucket.userEmail,
     parentHandle = megaRecentActionBucket.parentHandle,
     isUpdate = megaRecentActionBucket.isUpdate,
     isMedia = megaRecentActionBucket.isMedia,
-    nodes = (1..megaRecentActionBucket.nodes.size()).map {
+    nodes = (0 until megaRecentActionBucket.nodes.size()).map {
         toNode(
             megaRecentActionBucket.nodes.get(it),
             thumbnailPath,
@@ -42,5 +43,5 @@ internal suspend fun toRecentActionBucket(
             isPendingShare,
             isInRubbish,
         )
-    }
+    },
 )

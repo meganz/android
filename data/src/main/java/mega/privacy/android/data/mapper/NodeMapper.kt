@@ -71,7 +71,6 @@ internal suspend fun toNode(
         isExported = megaNode.isExported,
         isTakenDown = megaNode.isTakenDown,
         isIncomingShare = megaNode.isInShare,
+        duration = megaNode.duration
     )
 }
-
-

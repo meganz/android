@@ -3,16 +3,20 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.RecentActionsMapper
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.data.mapper.RecentActionBucketMapper
+import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.repository.RecentActionsRepository
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequest
+import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
 /**
@@ -20,37 +24,55 @@ import kotlin.coroutines.suspendCoroutine
  */
 internal class DefaultRecentActionsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
-    private val recentActionsMapper: RecentActionsMapper,
+    private val cacheFolderGateway: CacheFolderGateway,
+    private val recentActionBucketMapper: RecentActionBucketMapper,
+    private val fileTypeInfoMapper: FileTypeInfoMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : RecentActionsRepository {
 
-    override suspend fun getRecentActions() =
+    override suspend fun getRecentActions() = withContext(ioDispatcher) {
+        runCatching {
+            val megaRecentActions = getMegaRecentAction()
+            val list = (0 until megaRecentActions.size()).map {
+                recentActionBucketMapper.invoke(
+                    copyRecentActionBucket(megaRecentActions.get(it)),
+                    cacheFolderGateway::getThumbnailCacheFilePath,
+                    megaApiGateway::hasVersion,
+                    megaApiGateway::getNumChildFolders,
+                    megaApiGateway::getNumChildFiles,
+                    fileTypeInfoMapper,
+                    megaApiGateway::isPendingShare,
+                    megaApiGateway::isInRubbish,
+                )
+            }
+            return@withContext list
+        }.onFailure {
+            Timber.e(it)
+        }
+        return@withContext emptyList<RecentActionBucket>()
+    }
+
+    private suspend fun getMegaRecentAction() =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 megaApiGateway.getRecentActionsAsync(DAYS, MAX_NODES,
                     OptionalMegaRequestListenerInterface(
-                        onRequestFinish = onGetRecentActionsAsyncFinish(continuation)
+                        onRequestFinish = { request: MegaRequest, error: MegaError ->
+                            if (error.errorCode == MegaChatError.ERROR_OK) {
+                                continuation.resumeWith(Result.success(request.recentActions))
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
                     ))
             }
         }
 
-    private fun onGetRecentActionsAsyncFinish(continuation: Continuation<List<MegaRecentActionBucket>>) =
-        { request: MegaRequest, error: MegaError ->
-            if (error.errorCode == MegaChatError.ERROR_OK) {
-                val recentActionsList = recentActionsMapper(
-                    request.recentActions,
-                    ::provideRecentActionBucket)
-
-                continuation.resumeWith(Result.success(recentActionsList))
-            } else {
-                continuation.failWithError(error)
-            }
-        }
 
     /**
      * Provide the [MegaRecentActionBucket] required copy.
      */
-    private fun provideRecentActionBucket(recentActionBucket: MegaRecentActionBucket) =
+    private fun copyRecentActionBucket(recentActionBucket: MegaRecentActionBucket) =
         megaApiGateway.copyBucket(recentActionBucket)
 
     companion object {

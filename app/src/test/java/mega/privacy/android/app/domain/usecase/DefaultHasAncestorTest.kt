@@ -8,7 +8,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.HasAncestor
 import nz.mega.sdk.MegaNode
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
@@ -52,7 +51,7 @@ class DefaultHasAncestorTest {
     }
 
     @Test
-    fun `test that false is returned if the target node is null`() = runTest{
+    fun `test that false is returned if the target node is null`() = runTest {
         filesRepository.stub {
             onBlocking { getNodeByHandle(targetNode.id) }.thenReturn(null)
         }
@@ -79,11 +78,19 @@ class DefaultHasAncestorTest {
         }
 
     @Test
-    fun `test that true is returned if distant ancestor is the ancestor`() = runTest{
+    fun `test that true is returned if distant ancestor is the ancestor`() = runTest {
         val ancestor = NodeId(targetNode.id + 1)
         val directParentId = ancestor.id + 1
         val megaNode = mock<MegaNode> { on { parentHandle }.thenReturn(directParentId) }
-        val directParent = mock<MegaNode> { on { parentHandle }.thenReturn(directParentId, directParentId, directParentId, directParentId, ancestor.id) }
+        val directParent = mock<MegaNode> {
+            on { parentHandle }.thenReturn(
+                directParentId,
+                directParentId,
+                directParentId,
+                directParentId,
+                ancestor.id,
+            )
+        }
         val ancestorNode = mock<MegaNode> { on { handle }.thenReturn(ancestor.id) }
 
         filesRepository.stub {

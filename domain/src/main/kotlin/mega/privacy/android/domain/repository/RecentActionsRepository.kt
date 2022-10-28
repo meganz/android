@@ -1,6 +1,7 @@
-package mega.privacy.android.data.repository
+package mega.privacy.android.domain.repository
 
-import nz.mega.sdk.MegaRecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionBucket
+
 
 /**
  * Recent actions repository
@@ -15,5 +16,5 @@ interface RecentActionsRepository {
      *
      * @return a list of recent actions.
      */
-    suspend fun getRecentActions(): List<MegaRecentActionBucket>
+    suspend fun getRecentActions(): List<RecentActionBucket>
 }

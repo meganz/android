@@ -1,14 +1,10 @@
-package test.mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.DefaultUpdateRecentAction
-import mega.privacy.android.app.domain.usecase.GetRecentActions
-import mega.privacy.android.app.domain.usecase.UpdateRecentAction
-import mega.privacy.android.app.domain.usecase.isSameBucket
-import nz.mega.sdk.MegaRecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionBucket
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -33,7 +29,7 @@ class DefaultUpdateRecentActionTest {
         timestamp: Long,
         parentHandle: Long,
         userEmail: String,
-    ): MegaRecentActionBucket =
+    ): RecentActionBucket =
         mock {
             on { this.isMedia }.thenReturn(isMedia)
             on { this.isUpdate }.thenReturn(isUpdate)
@@ -103,6 +99,4 @@ class DefaultUpdateRecentActionTest {
 
             assertThat(underTest.invoke(current, cachedActionList)).isEqualTo(null)
         }
-
-
 }

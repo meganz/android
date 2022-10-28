@@ -13,21 +13,22 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.app.domain.usecase.GetRecentActions
+import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.app.domain.usecase.IsPendingShare
 import mega.privacy.android.app.presentation.recentactions.RecentActionsViewModel
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
+import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaNodeList
-import nz.mega.sdk.MegaRecentActionBucket
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -67,17 +68,12 @@ class RecentActionsViewModelTest {
     }
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
-    private val megaNode: MegaNode = mock {
-        on { handle }.thenReturn(123)
+    private val node: Node = mock {
+        on { id }.thenReturn(NodeId(123))
     }
 
-    private val megaNodeList: MegaNodeList = mock {
-        on { size() }.thenReturn(1)
-        on { get(0) }.thenReturn(megaNode)
-    }
-
-    private val megaRecentActionBucket = mock<MegaRecentActionBucket> {
-        on { this.nodes }.thenReturn(megaNodeList)
+    private val megaRecentActionBucket = mock<RecentActionBucket> {
+        on { this.nodes }.thenReturn(listOf(node))
         on { this.parentHandle }.thenReturn(321)
         on { this.isMedia }.thenReturn(false)
         on { this.timestamp }.thenReturn(0L)
@@ -85,8 +81,8 @@ class RecentActionsViewModelTest {
         on { this.isUpdate }.thenReturn(false)
     }
 
-    private val megaRecentActionBucket2 = mock<MegaRecentActionBucket> {
-        on { this.nodes }.thenReturn(megaNodeList)
+    private val megaRecentActionBucket2 = mock<RecentActionBucket> {
+        on { this.nodes }.thenReturn(listOf(node))
         on { this.parentHandle }.thenReturn(111)
         on { this.isMedia }.thenReturn(false)
         on { this.timestamp }.thenReturn(0L)
@@ -94,8 +90,8 @@ class RecentActionsViewModelTest {
         on { this.isUpdate }.thenReturn(false)
     }
 
-    private val megaRecentActionBucket3 = mock<MegaRecentActionBucket> {
-        on { this.nodes }.thenReturn(megaNodeList)
+    private val megaRecentActionBucket3 = mock<RecentActionBucket> {
+        on { this.nodes }.thenReturn(listOf(node))
         on { this.parentHandle }.thenReturn(111)
         on { this.isMedia }.thenReturn(false)
         on { this.timestamp }.thenReturn(1L)
