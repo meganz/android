@@ -38,14 +38,6 @@ class DefaultLoginRepository @Inject constructor(
     override suspend fun initMegaChat(session: String) =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                if (isLoginAlreadyRunning()) {
-                    Timber.w("Init chat not allowed as other login is already running.")
-                    continuation.resumeWith(Result.failure(LoginAlreadyRunningException()))
-                    return@suspendCoroutine
-                }
-
-                startLoginProcess()
-
                 var state = megaChatApiGateway.initState
 
                 if (state == MegaChatApi.INIT_NOT_DONE || state == MegaChatApi.INIT_ERROR) {
@@ -57,7 +49,6 @@ class DefaultLoginRepository @Inject constructor(
                             val exception = ChatNotInitializedException()
                             Timber.e("Init chat error: ${exception.message}. Logout...")
                             megaChatApiGateway.logout()
-                            finishLoginProcess()
                             continuation.resumeWith(Result.failure(exception))
                             return@suspendCoroutine
                         }
@@ -73,7 +64,6 @@ class DefaultLoginRepository @Inject constructor(
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 Timber.d("Fast login allowed.")
-                startLoginProcess()
                 megaApiGateway.fastLogin(
                     session,
                     OptionalMegaRequestListenerInterface(
@@ -91,7 +81,6 @@ class DefaultLoginRepository @Inject constructor(
                 continuation.resumeWith(Result.success(Unit))
             } else {
                 Timber.e("Fast login error: ${error.errorString}")
-                finishLoginProcess()
                 continuation.failWithError(error)
             }
         }
@@ -110,8 +99,6 @@ class DefaultLoginRepository @Inject constructor(
 
     private fun onFetchNodesFinish(continuation: Continuation<Unit>) =
         { _: MegaRequest, error: MegaError ->
-            finishLoginProcess()
-
             if (error.errorCode == MegaError.API_OK) {
                 Timber.d("Fetch nodes success")
                 continuation.resumeWith(Result.success(Unit))
@@ -121,26 +108,13 @@ class DefaultLoginRepository @Inject constructor(
             }
         }
 
-    /**
-     * Checks if there is a login already running.
-     *
-     * @return True if there is a login already running, false otherwise.
-     */
-    private fun isLoginAlreadyRunning(): Boolean = MegaApplication.isLoggingIn
+    override fun isLoginAlreadyRunning(): Boolean = MegaApplication.isLoggingIn
 
-    /**
-     * Sets isLoggingIn flag to true for starting the login process and not allowing a new one
-     * while this is in progress.
-     */
-    private fun startLoginProcess() {
+    override fun startLoginProcess() {
         MegaApplication.isLoggingIn = true
     }
 
-    /**
-     * Sets isLoggingIn flag to false for finishing the login process and allowing a new one
-     * when required.
-     */
-    private fun finishLoginProcess() {
+    override fun finishLoginProcess() {
         MegaApplication.isLoggingIn = false
     }
 }

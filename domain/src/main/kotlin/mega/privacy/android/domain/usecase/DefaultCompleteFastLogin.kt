@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase
 
+import mega.privacy.android.domain.exception.LoginAlreadyRunningException
 import mega.privacy.android.domain.repository.LoginRepository
 import javax.inject.Inject
 
@@ -13,15 +14,27 @@ class DefaultCompleteFastLogin @Inject constructor(
 ) : CompleteFastLogin {
 
     override suspend fun invoke(session: String) {
-        kotlin.runCatching { loginRepository.initMegaChat(session) }
-            .onFailure { exception -> throw exception }
+        if (loginRepository.isLoginAlreadyRunning()) {
+            throw LoginAlreadyRunningException()
+        }
+
+        loginRepository.startLoginProcess()
+
+        runCatching { loginRepository.initMegaChat(session) }
+            .onFailure { exception -> finishWithException(exception) }
             .onSuccess {
-                kotlin.runCatching { loginRepository.fastLogin(session) }
-                    .onFailure { exception -> throw exception }
+                runCatching { loginRepository.fastLogin(session) }
+                    .onFailure { exception -> finishWithException(exception) }
                     .onSuccess {
-                        kotlin.runCatching { loginRepository.fetchNodes() }
-                            .onFailure { exception -> throw exception }
+                        runCatching { loginRepository.fetchNodes() }
+                            .onFailure { exception -> finishWithException(exception) }
+                            .onSuccess { loginRepository.finishLoginProcess() }
                     }
             }
+    }
+
+    private fun finishWithException(exception: Throwable) {
+        loginRepository.finishLoginProcess()
+        throw  exception
     }
 }
