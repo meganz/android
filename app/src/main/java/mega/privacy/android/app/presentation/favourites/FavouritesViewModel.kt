@@ -28,7 +28,6 @@ import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.FavouritePlaceholderItem
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
-import mega.privacy.android.app.presentation.favourites.model.id
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
@@ -444,7 +443,7 @@ class FavouritesViewModel @Inject constructor(
         }
         favouriteSourceList.addAll(
             list.mapNotNull { favouriteInfo ->
-                val nodeId = favouriteInfo.id ?: return@mapNotNull null
+                val nodeId = favouriteInfo.id
                 val node = fetchNode(nodeId.id) ?: return@mapNotNull null
                 favouriteMapper(
                     node,

@@ -5,8 +5,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FileRepository
 import org.junit.Before
@@ -43,7 +43,7 @@ class DefaultGetAllFavoritesTest {
     @Test
     fun `test that favourites is not empty`() {
         runTest {
-            val list = listOf(mock<Node>())
+            val list = listOf(mock<UnTypedNode>())
             whenever(favouritesRepository.getAllFavorites()).thenReturn(
                 list
             )
