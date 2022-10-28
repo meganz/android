@@ -1,15 +1,14 @@
-package test.mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
-import mega.privacy.android.app.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.FavouritesRepository
 import nz.mega.sdk.MegaApiJava
@@ -39,7 +38,7 @@ class DefaultFavouritesRepositoryTest {
         on { label }.thenReturn(MegaNode.NODE_LBL_RED)
     }
 
-    private val favouriteInfo = mock<Node>()
+    private val favouriteInfo = mock<UnTypedNode>()
 
     private val nodeMapper: NodeMapper = { _, _, _, _, _, _, _, _ -> favouriteInfo }
 
@@ -48,7 +47,6 @@ class DefaultFavouritesRepositoryTest {
         underTest = DefaultFavouritesRepository(
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
-            monitorNodeChangeFacade = MonitorNodeChangeFacade(),
             nodeMapper = nodeMapper,
             cacheFolder = mock(),
             fileTypeInfoMapper = fileTypeInfoMapper

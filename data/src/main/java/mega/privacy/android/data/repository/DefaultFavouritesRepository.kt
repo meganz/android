@@ -1,15 +1,13 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.gateway.MonitorNodeChangeFacade
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
+import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.domain.entity.node.Node
@@ -26,12 +24,10 @@ import kotlin.coroutines.suspendCoroutine
  * The repository implementation class regarding favourites
  * @param megaApiGateway MegaApiGateway
  * @param ioDispatcher IODispatcher
- * @param monitorNodeChangeFacade MonitorNodeChangeFacade
  */
-class DefaultFavouritesRepository @Inject constructor(
+internal class DefaultFavouritesRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val monitorNodeChangeFacade: MonitorNodeChangeFacade,
     private val nodeMapper: NodeMapper,
     private val cacheFolder: CacheFolderGateway,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
@@ -56,8 +52,6 @@ class DefaultFavouritesRepository @Inject constructor(
             }
             mapNodesToFavouriteInfo(handleList.getNodes())
         }
-
-    override fun monitorNodeChange(): Flow<Boolean> = monitorNodeChangeFacade.getEvents()
 
     override suspend fun removeFavourites(handles: List<Long>) {
         withContext(ioDispatcher) {
@@ -102,7 +96,7 @@ class DefaultFavouritesRepository @Inject constructor(
      * @return thumbnail cache file path
      */
     private fun getThumbnailCacheFilePath(megaNode: MegaNode) =
-        cacheFolder.getCacheFolder(CacheFolderManager.THUMBNAIL_FOLDER)?.let { thumbnail ->
+        cacheFolder.getCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.let { thumbnail ->
             "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
         }
 }

@@ -1,7 +1,5 @@
 package mega.privacy.android.domain.repository
 
-import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.entity.node.Node
 
 /**
@@ -14,12 +12,6 @@ interface FavouritesRepository {
      * @return List<FavouriteInfo>
      */
     suspend fun getAllFavorites(): List<Node>
-
-    /**
-     * Monitor the node change
-     * @return Flow<Boolean>
-     */
-    fun monitorNodeChange(): Flow<Boolean>
 
     /**
      * Removing favourites

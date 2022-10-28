@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity
 
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
  * The entity for favourite folder info
@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.node.Node
  * @param parentHandle parent node handle of current folder node
  */
 data class FavouriteFolderInfo(
-    val children: List<Node>,
+    val children: List<TypedNode>,
     val name: String,
     val currentHandle: Long,
     val parentHandle: Long,

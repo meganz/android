@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.filterIsInstance
@@ -6,16 +6,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.data.facade.AccountInfoWrapper
-import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.DBUtil
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.isType
+import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
@@ -49,7 +48,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property myAccountInfoFacade
  * @property megaApiGateway
  * @property megaChatApiGateway
- * @property monitorMultiFactorAuth
  * @property ioDispatcher
  * @property userUpdateMapper
  * @property localStorageGateway
@@ -61,11 +59,11 @@ import kotlin.coroutines.suspendCoroutine
  * @property subscriptionPlanListMapper
  */
 @ExperimentalContracts
-class DefaultAccountRepository @Inject constructor(
+internal class DefaultAccountRepository @Inject constructor(
     private val myAccountInfoFacade: AccountInfoWrapper,
     private val megaApiGateway: MegaApiGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
-    private val monitorMultiFactorAuth: MonitorMultiFactorAuth,
+    private val dbHandler: DatabaseHandler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val userUpdateMapper: UserUpdateMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
@@ -92,7 +90,7 @@ class DefaultAccountRepository @Inject constructor(
     override fun isAccountDataStale(): Boolean =
         databaseEntryIsStale() || storageCapacityUsedIsBlank()
 
-    private fun databaseEntryIsStale() = DBUtil.callToAccountDetails().also {
+    private fun databaseEntryIsStale() = dbHandler.callToAccountDetails().also {
         Timber.d("Check the last call to getAccountDetails")
     }
 
@@ -128,9 +126,6 @@ class DefaultAccountRepository @Inject constructor(
             } else continuation.failWithError(error)
         }
     }
-
-    override fun monitorMultiFactorAuthChanges() =
-        monitorMultiFactorAuth.getEvents()
 
     override suspend fun requestDeleteAccountLink() = withContext<Unit>(ioDispatcher) {
         suspendCoroutine { continuation ->
@@ -205,6 +200,10 @@ class DefaultAccountRepository @Inject constructor(
                 ))
             }
         }
+
+    override suspend fun isAccountAchievementsEnabled(): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.isAccountAchievementsEnabled()
+    }
 
     override suspend fun getAccountAchievements(
         achievementType: AchievementType,

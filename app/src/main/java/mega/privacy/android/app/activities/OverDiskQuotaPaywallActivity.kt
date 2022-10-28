@@ -18,12 +18,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.DBUtil.callToAccountDetails
 import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
 import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.TimeUtils.getHumanizedTimeMs
@@ -60,7 +58,7 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
             IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_USER_DATA))
 
         // Request storage details only if is not already requested recently
-        if (callToAccountDetails()) {
+        if (dbH.callToAccountDetails()) {
             megaApi.getSpecificAccountDetails(true, false, false)
         }
 

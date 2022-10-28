@@ -348,7 +348,7 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
      */
     fun refreshAccountInfo() {
         //Check if the call is recently
-        if (DBUtil.callToAccountDetails() || myAccountInfo.usedFormatted.trim().isEmpty()) {
+        if (dbH.callToAccountDetails() || myAccountInfo.usedFormatted.trim().isEmpty()) {
             Timber.d("megaApi.getAccountDetails SEND")
             askForAccountDetails()
         }

@@ -53,13 +53,6 @@ interface AccountRepository {
     suspend fun isMultiFactorAuthEnabled(): Boolean
 
     /**
-     * Monitor multi factor auth changes
-     *
-     * @return a flow that emits changes to the multi-factor auth enabled state
-     */
-    fun monitorMultiFactorAuthChanges(): Flow<Boolean>
-
-    /**
      * Request delete account link
      *
      * Sends a delete account link to the user's email address
@@ -109,6 +102,11 @@ interface AccountRepository {
      * @return List of SubscriptionPlans
      */
     suspend fun getSubscriptionPlans(): List<SubscriptionPlan>
+
+    /**
+     * Returns if accounts achievements enabled
+     */
+    suspend fun isAccountAchievementsEnabled(): Boolean
 
     /**
      * Get account achievements

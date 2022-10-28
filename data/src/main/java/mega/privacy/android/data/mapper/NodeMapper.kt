@@ -4,6 +4,8 @@ import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import nz.mega.sdk.MegaNode
 
 /**
@@ -18,7 +20,7 @@ typealias NodeMapper = @JvmSuppressWildcards suspend (
     @JvmSuppressWildcards FileTypeInfoMapper,
     @JvmSuppressWildcards MapPendingShare,
     @JvmSuppressWildcards MapInRubbish,
-) -> @JvmSuppressWildcards Node
+) -> @JvmSuppressWildcards UnTypedNode
 
 internal typealias MapThumbnail = suspend (MegaNode) -> String?
 internal typealias MapHasVersion = suspend (MegaNode) -> Boolean

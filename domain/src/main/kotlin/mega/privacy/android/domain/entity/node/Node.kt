@@ -4,7 +4,7 @@ package mega.privacy.android.domain.entity.node
 /**
  * Node
  */
-sealed interface Node {
+interface Node {
 
     /**
      * Id
