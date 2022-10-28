@@ -309,7 +309,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             }
         }
 
-        binding.buttonLoginLogin.apply {
+        binding.buttonLogin.apply {
             text = requireContext().getFormattedStringOrDefault(R.string.login_text)
             setOnClickListener {
                 Timber.d("Click on button_login_login")
@@ -361,7 +361,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             (requireActivity() as LoginActivity).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT)
         }
 
-        binding.loginLoginLayout.isVisible = true
+        binding.loginLayout.isVisible = true
         binding.loginCreateAccountLayout.isVisible = true
         binding.loginLoggingInLayout.isVisible = false
         binding.loginGeneratingKeysText.isVisible = false
@@ -758,7 +758,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         (requireActivity() as LoginActivity).hideAB()
         binding.login2fa.isVisible = false
         binding.loginLoggingInLayout.isVisible = false
-        binding.loginLoginLayout.isVisible = true
+        binding.loginLayout.isVisible = true
         confirmLogoutDialog?.dismiss()
         binding.loginCreateAccountLayout.isVisible = true
         binding.loginQuerySignupLinkText.isVisible = false
@@ -813,6 +813,11 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     }
 
 
+    /**
+     * Checks if all the 2FA fields are filled.
+     *
+     * @return True if all fields are already filled, false otherwise.
+     */
     private fun areAllFieldsFilled(): Boolean =
         binding.pinFirstLogin.length() == 1 && binding.pinSecondLogin.length() == 1
                 && binding.pinThirdLogin.length() == 1 && binding.pinFourthLogin.length() == 1
@@ -850,7 +855,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         val credentials = dbH.credentials ?: return
         lastEmail = credentials.email
         gSession = credentials.session
-        binding.loginLoginLayout.isVisible = false
+        binding.loginLayout.isVisible = false
         binding.loginCreateAccountLayout.isVisible = false
         binding.loginQuerySignupLinkText.isVisible = false
         binding.loginConfirmAccountText.isVisible = false
@@ -873,7 +878,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
         lastEmail = credentials.email
         gSession = credentials.session
-        binding.loginLoginLayout.isVisible = false
+        binding.loginLayout.isVisible = false
         binding.loginCreateAccountLayout.isVisible = false
         binding.loginQuerySignupLinkText.isVisible = false
         binding.loginConfirmAccountText.isVisible = false
@@ -916,7 +921,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
         if (!Util.isOnline(requireActivity())) {
             binding.loginLoggingInLayout.isVisible = false
-            binding.loginLoginLayout.isVisible = true
+            binding.loginLayout.isVisible = true
             confirmLogoutDialog?.dismiss()
             binding.loginCreateAccountLayout.isVisible = true
             binding.loginQuerySignupLinkText.isVisible = false
@@ -930,7 +935,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 R.string.error_server_connection_problem))
             return
         }
-        binding.loginLoginLayout.isVisible = false
+        binding.loginLayout.isVisible = false
         binding.loginCreateAccountLayout.isVisible = false
         binding.loginLoggingInLayout.isVisible = true
         binding.loginGeneratingKeysText.isVisible = true
@@ -959,7 +964,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
         if (!Util.isOnline(requireActivity())) {
             binding.loginLoggingInLayout.isVisible = false
-            binding.loginLoginLayout.isVisible = true
+            binding.loginLayout.isVisible = true
             confirmLogoutDialog?.dismiss()
             binding.loginCreateAccountLayout.isVisible = true
             binding.loginQuerySignupLinkText.isVisible = false
@@ -973,7 +978,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 R.string.error_server_connection_problem))
             return
         }
-        binding.loginLoginLayout.isVisible = false
+        binding.loginLayout.isVisible = false
         binding.loginCreateAccountLayout.isVisible = false
         binding.loginLoggingInLayout.isVisible = true
         binding.loginGeneratingKeysText.isVisible = true
@@ -1009,7 +1014,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 return
             }
 
-            binding.loginLoginLayout.isVisible = false
+            binding.loginLayout.isVisible = false
             binding.loginCreateAccountLayout.isVisible = false
             binding.loginLoggingInLayout.isVisible = true
             binding.loginGeneratingKeysText.isVisible = true
@@ -1029,7 +1034,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      * Returns to login form page.
      */
     private fun backToLoginForm() {
-        binding.loginLoginLayout.isVisible = true
+        binding.loginLayout.isVisible = true
         confirmLogoutDialog?.dismiss()
         binding.loginCreateAccountLayout.isVisible = true
         binding.loginLoggingInLayout.isVisible = false
@@ -1066,7 +1071,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         Timber.d("onKeysGeneratedLogin")
         if (!Util.isOnline(requireActivity())) {
             binding.loginLoggingInLayout.isVisible = false
-            binding.loginLoginLayout.isVisible = true
+            binding.loginLayout.isVisible = true
             confirmLogoutDialog?.dismiss()
             binding.loginCreateAccountLayout.isVisible = true
             binding.loginQuerySignupLinkText.isVisible = false
@@ -1166,7 +1171,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     private fun disableLoginButton() {
         Timber.d("Disable login button")
         //disable login button
-        binding.buttonLoginLogin.isEnabled = false
+        binding.buttonLogin.isEnabled = false
         //display login info
         binding.pbLoginInProgress.isVisible = true
         binding.textLoginTip.apply {
@@ -1180,7 +1185,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      */
     private fun enableLoginButton() {
         Timber.d("Enable login button")
-        binding.buttonLoginLogin.isEnabled = true
+        binding.buttonLogin.isEnabled = true
         binding.pbLoginInProgress.isVisible = false
         binding.textLoginTip.isVisible = false
     }
@@ -1197,7 +1202,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 R.string.error_server_connection_problem))
             return
         }
-        binding.loginLoginLayout.isVisible = false
+        binding.loginLayout.isVisible = false
         binding.loginCreateAccountLayout.isVisible = false
         binding.loginLoggingInLayout.isVisible = true
         binding.loginGeneratingKeysText.isVisible = false
@@ -1220,7 +1225,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         confirmLink = intent.getStringExtra(Constants.EXTRA_CONFIRMATION)
         binding.loginTextView.text = requireContext()
             .getFormattedStringOrDefault(R.string.login_confirm_account)
-        binding.buttonLoginLogin.text =
+        binding.buttonLogin.text =
             requireContext().getFormattedStringOrDefault(R.string.login_confirm_account)
         updateConfirmEmail(confirmLink)
     }
@@ -1470,7 +1475,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                     Timber.d("require 2fa")
                     is2FAEnabled = true
                     (requireActivity() as LoginActivity).showAB(binding.toolbarLogin)
-                    binding.loginLoginLayout.isVisible = false
+                    binding.loginLayout.isVisible = false
                     binding.loginCreateAccountLayout.isVisible = false
                     binding.loginLoggingInLayout.isVisible = false
                     binding.loginGeneratingKeysText.isVisible = false
@@ -1536,7 +1541,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                     binding.login2fa.isVisible = false
                     (requireActivity() as LoginActivity).hideAB()
                 }
-                binding.loginLoginLayout.isVisible = false
+                binding.loginLayout.isVisible = false
                 binding.loginLoggingInLayout.isVisible = true
                 binding.loginProgressBar.isVisible = true
                 binding.loginFetchingNodesBar.isVisible = false
@@ -1641,7 +1646,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 Timber.e("Error fetch nodes: %s", error.errorCode)
 
                 binding.loginLoggingInLayout.isVisible = false
-                binding.loginLoginLayout.isVisible = true
+                binding.loginLayout.isVisible = true
                 confirmLogoutDialog?.dismiss()
                 binding.loginCreateAccountLayout.isVisible = true
                 binding.loginGeneratingKeysText.isVisible = false
@@ -1673,7 +1678,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             }
         } else if (request.type == MegaRequest.TYPE_QUERY_SIGNUP_LINK) {
             Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK")
-            binding.loginLoginLayout.isVisible = true
+            binding.loginLayout.isVisible = true
             confirmLogoutDialog?.dismiss()
             binding.buttonForgotPass.isInvisible = true
             binding.loginCreateAccountLayout.isVisible = true
@@ -1692,7 +1697,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                     binding.loginProgressBar.isVisible = false
                     binding.loginTextView.text =
                         requireContext().getFormattedStringOrDefault(R.string.login_to_mega)
-                    binding.buttonLoginLogin.text =
+                    binding.buttonLogin.text =
                         requireContext().getFormattedStringOrDefault(R.string.login_text)
                     confirmLink = null
                     (requireActivity() as LoginActivity).showSnackbar(requireContext().getFormattedStringOrDefault(
@@ -1721,7 +1726,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 Timber.d("fastConfirm finished - OK")
                 onKeysGeneratedLogin(lastEmail, lastPassword)
             } else {
-                binding.loginLoginLayout.isVisible = true
+                binding.loginLayout.isVisible = true
                 confirmLogoutDialog?.dismiss()
                 binding.loginCreateAccountLayout.isVisible = true
                 binding.loginLoggingInLayout.isVisible = false
@@ -1954,7 +1959,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             return -1
         }
         //login is in process
-        val onLoginPage = binding.loginLoginLayout.isVisible
+        val onLoginPage = binding.loginLayout.isVisible
         val on2faPage = binding.login2fa.isVisible
         return if ((isLoggingIn || LoginActivity.isFetchingNodes) && !onLoginPage && !on2faPage) {
             showConfirmLogoutDialog()

@@ -143,7 +143,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
     private AppBarLayout aBL;
 
     private ScrollView scrollView;
-    private LinearLayout loginLogin;
+    private LinearLayout loginLayout;
     private LinearLayout loginCreateAccount;
     private LinearLayout loginLoggingIn;
     private TextView queryingSignupLinkText;
@@ -264,7 +264,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
         checkLogin();
         UserCredentials credentials = dbH.getCredentials();
         if (credentials == null) {
-            loginLogin.setVisibility(View.VISIBLE);
+            loginLayout.setVisibility(View.VISIBLE);
             loginCreateAccount.setVisibility(View.INVISIBLE);
             loginLoggingIn.setVisibility(View.GONE);
             generatingKeysText.setVisibility(View.GONE);
@@ -288,7 +288,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
                 if (!MegaApplication.isLoggingIn()) {
                     MegaApplication.setLoggingIn(true);
-                    loginLogin.setVisibility(View.GONE);
+                    loginLayout.setVisibility(View.GONE);
                     loginCreateAccount.setVisibility(View.GONE);
                     queryingSignupLinkText.setVisibility(View.GONE);
                     confirmingAccountText.setVisibility(View.GONE);
@@ -448,7 +448,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
         et_password.setOnFocusChangeListener((v, hasFocus) -> setPasswordToggle(et_password_layout, hasFocus));
 
 
-        bLoginLol = findViewById(R.id.button_login_login);
+        bLoginLol = findViewById(R.id.button_login);
         bLoginLol.setText(getString(R.string.login_text));
 
         bLoginLol.setOnClickListener(this);
@@ -462,7 +462,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
         bRegisterLol.setOnClickListener(this);
 
-        loginLogin = findViewById(R.id.login_login_layout);
+        loginLayout = findViewById(R.id.login_layout);
         loginLoggingIn = findViewById(R.id.login_logging_in_layout);
         loginProgressBar = findViewById(R.id.login_progress_bar);
         loginFetchNodesProgressBar = findViewById(R.id.login_fetching_nodes_bar);
@@ -1082,7 +1082,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.button_login_login: {
+            case R.id.button_login: {
                 onLoginClick(v);
                 break;
             }
@@ -1204,7 +1204,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
         if (!isOnline(this)) {
             loginLoggingIn.setVisibility(View.GONE);
-            loginLogin.setVisibility(View.VISIBLE);
+            loginLayout.setVisibility(View.VISIBLE);
             loginCreateAccount.setVisibility(View.INVISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1220,7 +1220,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
             return;
         }
 
-        loginLogin.setVisibility(View.GONE);
+        loginLayout.setVisibility(View.GONE);
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
         generatingKeysText.setVisibility(View.VISIBLE);
@@ -1250,7 +1250,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
         if (!isOnline(this)) {
             loginLoggingIn.setVisibility(View.GONE);
-            loginLogin.setVisibility(View.VISIBLE);
+            loginLayout.setVisibility(View.VISIBLE);
             loginCreateAccount.setVisibility(View.INVISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1369,7 +1369,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
                 } else if (e.getErrorCode() == MegaError.API_EMFAREQUIRED) {
                     is2FAEnabled = true;
                     showAB(tB);
-                    loginLogin.setVisibility(View.GONE);
+                    loginLayout.setVisibility(View.GONE);
                     loginCreateAccount.setVisibility(View.GONE);
                     loginLoggingIn.setVisibility(View.GONE);
                     generatingKeysText.setVisibility(View.GONE);
@@ -1391,7 +1391,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
                 if (!is2FAEnabled) {
                     loginLoggingIn.setVisibility(View.GONE);
-                    loginLogin.setVisibility(View.VISIBLE);
+                    loginLayout.setVisibility(View.VISIBLE);
                     loginCreateAccount.setVisibility(View.INVISIBLE);
                     queryingSignupLinkText.setVisibility(View.GONE);
                     confirmingAccountText.setVisibility(View.GONE);
@@ -1447,7 +1447,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
             if (e.getErrorCode() != MegaError.API_OK) {
 
                 loginLoggingIn.setVisibility(View.GONE);
-                loginLogin.setVisibility(View.VISIBLE);
+                loginLayout.setVisibility(View.VISIBLE);
                 loginCreateAccount.setVisibility(View.INVISIBLE);
                 generatingKeysText.setVisibility(View.GONE);
                 loggingInText.setVisibility(View.GONE);
