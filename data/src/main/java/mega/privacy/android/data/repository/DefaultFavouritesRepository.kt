@@ -10,7 +10,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.NodeMapper
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FavouritesRepository
 import nz.mega.sdk.MegaError
@@ -33,7 +33,7 @@ internal class DefaultFavouritesRepository @Inject constructor(
     private val fileTypeInfoMapper: FileTypeInfoMapper,
 ) : FavouritesRepository {
 
-    override suspend fun getAllFavorites(): List<Node> =
+    override suspend fun getAllFavorites(): List<UnTypedNode> =
         withContext(ioDispatcher) {
             val handleList = suspendCoroutine<MegaHandleList> { continuation ->
                 megaApiGateway.getFavourites(
