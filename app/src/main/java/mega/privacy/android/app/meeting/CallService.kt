@@ -258,7 +258,7 @@ class CallService : Service() {
 
                 val newNotification: Notification? =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        mBuilderCompatO?.mActions?.clear()
+                        mBuilderCompatO?.clearActions()
                         mBuilderCompatO?.apply {
                             setContentTitle(title)
                             setContentIntent(pendingIntent)
@@ -273,8 +273,7 @@ class CallService : Service() {
 
                         mBuilderCompatO?.build()
                     } else {
-                        mBuilderCompat?.mActions?.clear()
-
+                        mBuilderCompat?.clearActions()
                         mBuilderCompat?.apply {
                             setContentTitle(title)
                             setContentIntent(pendingIntent)
