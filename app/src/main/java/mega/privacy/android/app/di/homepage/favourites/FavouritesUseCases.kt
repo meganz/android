@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.domain.usecase.DefaultHasAncestor
+import mega.privacy.android.domain.usecase.DefaultHasAncestor
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.DefaultAddNodeType
@@ -46,6 +46,9 @@ abstract class FavouritesUseCases {
     abstract fun bindGetFolderType(implementation: DefaultGetFolderType): GetFolderType
 
     @Binds
+    abstract fun bindGetDeviceType(implementation: DefaultGetDeviceType): GetDeviceType
+
+    @Binds
     abstract fun bindHasAncestor(implementation: DefaultHasAncestor): HasAncestor
 
 
@@ -56,8 +59,5 @@ abstract class FavouritesUseCases {
         @Provides
         fun provideRemoveFavourites(favouritesRepository: FavouritesRepository): RemoveFavourites =
             RemoveFavourites(favouritesRepository::removeFavourites)
-
-        @Provides
-        fun provideGetDeviceType(): GetDeviceType = DefaultGetDeviceType()
     }
 }
