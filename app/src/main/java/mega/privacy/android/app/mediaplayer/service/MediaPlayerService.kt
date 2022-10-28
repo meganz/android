@@ -18,7 +18,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -441,7 +441,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     override fun getPlaybackState() = mediaPlayerGateway.getPlaybackState()
 
     override fun setupPlayerView(
-        playerView: PlayerView,
+        playerView: StyledPlayerView,
         useController: Boolean,
         controllerShowTimeoutMs: Int,
         controllerHideOnTouch: Boolean,
