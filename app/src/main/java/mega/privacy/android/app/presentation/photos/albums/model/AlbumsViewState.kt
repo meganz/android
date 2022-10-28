@@ -5,13 +5,13 @@ import mega.privacy.android.domain.entity.photos.Album
 
 /**
  * @property albums
- * @property currentAlbum
+ * @property currentAlbumId
  * @property selectedPhotoIds
  * @property currentSort
  */
 data class AlbumsViewState(
     val albums: List<UIAlbum> = emptyList(),
-    val currentAlbum: Album? = null,
+    val currentAlbumId: Album? = null,
     val selectedPhotoIds: MutableSet<Long> = mutableSetOf(),
     val currentSort: Sort = Sort.NEWEST,
 )

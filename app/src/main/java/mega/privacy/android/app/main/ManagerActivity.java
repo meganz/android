@@ -6010,9 +6010,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 isInAlbumContent = false;
 
                 backToDrawerItem(bottomNavigationCurrentItem);
-                if (photosFragment == null) {
-                    backToDrawerItem(bottomNavigationCurrentItem);
-                } else {
+                if (photosFragment != null) {
                     photosFragment.switchToAlbum();
                 }
             } else if (isInFilterPage) {
