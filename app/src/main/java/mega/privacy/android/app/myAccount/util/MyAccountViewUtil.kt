@@ -208,9 +208,9 @@ object MyAccountViewUtil {
                 viewModel.getRenewTime(),
                 TimeUtils.DATE_MM_DD_YYYY_FORMAT
             )
-            text = getString(R.string.account_info_renewal_date, renewalDate)
-                .formatColorTag(context, 'A', R.color.dark_grey_white)
-                .formatColorTag(context, 'B', R.color.dark_grey_white)
+            text = getString(R.string.account_info_renews_on, renewalDate)
+                .formatColorTag(context, 'A', R.color.grey_500_grey_400)
+                .formatColorTag(context, 'B', R.color.grey_087_white)
                 .toSpannedHtmlText()
         }
     }
