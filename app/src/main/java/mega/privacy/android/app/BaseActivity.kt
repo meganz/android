@@ -40,7 +40,6 @@ import mega.privacy.android.app.activities.settingsActivities.FileManagementPref
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA
-import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -108,7 +107,6 @@ import mega.privacy.android.app.utils.Constants.TOS_COPYRIGHT_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.TOS_NON_COPYRIGHT_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.Constants.WEAK_PROTECTION_ACCOUNT_BLOCK
-import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
@@ -125,6 +123,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.LogsType
 import mega.privacy.android.domain.entity.PurchaseType
 import nz.mega.sdk.MegaAccountDetails
@@ -910,7 +909,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
         //Check if the call is recently
         Timber.d("Check the last call to getAccountDetails")
-        if (DBUtil.callToAccountDetails()) {
+        if (dbH.callToAccountDetails()) {
             Timber.d("megaApi.getAccountDetails SEND")
             app?.askForAccountDetails()
         }

@@ -11,15 +11,10 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Base64
 import dagger.hilt.android.EntryPointAccessors.fromApplication
-import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
-import mega.privacy.android.data.mapper.StorageStateIntMapper
-import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.app.di.LegacyLoggingEntryPoint
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
-import mega.privacy.android.data.model.ChatSettings
-import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.app.main.megachat.PendingMessageSingle
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.Backup
@@ -36,10 +31,15 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.contacts.MegaContactGetter.MegaContact
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
+import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
+import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.MegaPreferences
+import mega.privacy.android.data.model.UserCredentials
+import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncStatus
@@ -4469,6 +4469,28 @@ class SqliteDatabaseHandler(
 
     override val isCompletedTransfersEmpty: Boolean
         get() = completedTransfers.isEmpty()
+
+    override fun callToAccountDetails(): Boolean {
+        val attributes = attributes ?: run {
+            Timber.d("Attributes is NULL - API call getAccountDetails")
+            return true
+        }
+        val oldTimestamp = attributes.accountDetailsTimeStamp
+        return if (oldTimestamp.isNullOrBlank().not()) {
+            val timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp)
+            Timber.d("Last call made: %d min ago", timestampMinDifference)
+            if (timestampMinDifference > Constants.ACCOUNT_DETAILS_MIN_DIFFERENCE) {
+                Timber.d("API call getAccountDetails")
+                true
+            } else {
+                Timber.d("NOT call getAccountDetails")
+                false
+            }
+        } else {
+            Timber.d("Not valid value - API call getAccountDetails")
+            true
+        }
+    }
 
     /**
      * Get the index of a column in a cursor.

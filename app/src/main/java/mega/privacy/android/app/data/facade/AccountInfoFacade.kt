@@ -6,6 +6,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.data.facade.AccountInfoWrapper
 import javax.inject.Inject
 
 /**
