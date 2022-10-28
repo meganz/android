@@ -21,25 +21,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@id/exo_play"
+            android:id="@id/exo_play_pause"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:background="@null"
-            android:src="@drawable/media_player_play"
             app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
             app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
             app:tint="@color/white" />
-
-        <ImageButton
-            android:id="@id/exo_pause"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:background="@null"
-            android:src="@drawable/media_player_pause"
-            app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
-            app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
-            app:tint="@color/white"
-            tools:visibility="invisible" />
 
         <ImageButton
             android:id="@id/exo_prev"
