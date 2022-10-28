@@ -5,7 +5,6 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.repository.DefaultAccountRepository
-import mega.privacy.android.data.repository.DefaultAlbumsRepository
 import mega.privacy.android.data.repository.DefaultAvatarRepository
 import mega.privacy.android.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
@@ -30,7 +29,6 @@ import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.repository.AlbumsRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
@@ -106,9 +104,6 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindCameraUploadRepository(repository: DefaultCameraUploadRepository): CameraUploadRepository
-
-    @Binds
-    abstract fun bindAlbumsRepository(repository: DefaultAlbumsRepository): AlbumsRepository
 
     @Binds
     abstract fun bindGlobalUpdatesRepository(repository: DefaultGlobalStatesRepository): GlobalStatesRepository
