@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.FileTypeInfo
 /**
  * File node
  */
-interface FileNode : Node {
+interface FileNode : UnTypedNode {
     /**
      * Size
      */
