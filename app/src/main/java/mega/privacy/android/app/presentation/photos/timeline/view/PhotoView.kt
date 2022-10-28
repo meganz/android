@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.photos.timeline.view
 
-import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -37,6 +36,7 @@ import coil.request.ImageRequest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.view.isDownloadPreview
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.photos.Photo
 
@@ -221,12 +221,6 @@ fun PhotoImageView(
             .aspectRatio(1f)
     )
 }
-
-private fun isDownloadPreview(
-    configuration: Configuration,
-    currentZoomLevel: ZoomLevel,
-) = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-        && currentZoomLevel.portrait == ZoomLevel.Grid_1.portrait
 
 
 

@@ -313,7 +313,7 @@ class PhotosFragment : Fragment() {
     @Composable
     private fun timelineView(timelineViewState: TimelineViewState) = TimelineView(
         timelineViewState = timelineViewState,
-        downloadPhotoCover = photosViewModel::downloadPhoto,
+        photoDownload = photosViewModel::downloadPhoto,
         lazyGridState = lazyGridState,
         onTextButtonClick = this::enableCameraUploadClick,
         onFABClick = this::openFilterFragment,
