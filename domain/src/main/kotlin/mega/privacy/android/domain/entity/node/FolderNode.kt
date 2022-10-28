@@ -4,7 +4,7 @@ package mega.privacy.android.domain.entity.node
 /**
  * Folder Node
  */
-interface FolderNode : Node {
+interface FolderNode : UnTypedNode {
     /**
      * Is folder in the rubbish bin
      */

@@ -6,11 +6,18 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import javax.inject.Inject
 
+/**
+ * Default add node type
+ *
+ * @property getFolderType
+ */
 class DefaultAddNodeType @Inject constructor(private val getFolderType: GetFolderType) :
     AddNodeType {
     override suspend fun invoke(node: Node): TypedNode {
+        require(node is UnTypedNode) //Temporary check until refactor is complete
         return when (node) {
             is FileNode -> DefaultTypedFileNode(node)
             is FolderNode -> DefaultTypedFolderNode(node, getFolderType(node))

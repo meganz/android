@@ -1,3 +1,6 @@
 package mega.privacy.android.domain.entity.node
 
-sealed interface TypedNode
+/**
+ * Typed node - Node interface used by the presentation layer
+ */
+sealed interface TypedNode : Node
