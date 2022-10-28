@@ -271,7 +271,7 @@ class AlbumDynamicContentFragment : Fragment() {
         val currentUIAlbum =
             albumsViewModel.state.value.albums.find { UIAlbum -> UIAlbum.id == currentAlbum }
         return if (context != null && currentUIAlbum != null) {
-            currentUIAlbum.title(context!!)
+            currentUIAlbum.title(requireContext())
         } else {
             getString(R.string.tab_title_album)
         }
