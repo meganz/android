@@ -34,18 +34,14 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.model.DateCard
-import mega.privacy.android.domain.entity.photos.Photo
 
 @Composable
 fun CardListView(
     state: LazyGridState,
     dateCards: List<DateCard>,
-    downloadPhotoCover: suspend (
-        isPreview: Boolean,
-        photo: Photo,
-        callback: (success: Boolean) -> Unit,
-    ) -> Unit,
+    photoDownload: PhotoDownload,
     onCardClick: (DateCard) -> Unit,
 ) {
     val spanCount =
@@ -81,7 +77,7 @@ fun CardListView(
 
                     val imageState = produceState<String?>(initialValue = null) {
 
-                        downloadPhotoCover(
+                        photoDownload(
                             true,
                             dateCard.photo,
                         ) { downloadSuccess ->
