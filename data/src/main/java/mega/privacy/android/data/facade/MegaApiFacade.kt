@@ -26,6 +26,8 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSetElementList
+import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -506,4 +508,8 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getOutShares(order: Int): List<MegaShare> = megaApi.getOutShares(order)
 
     override suspend fun getRubbishNode(): MegaNode = megaApi.rubbishNode
+
+    override suspend fun getSets(): MegaSetList = megaApi.sets
+
+    override suspend fun getSetElements(sid: Long): MegaSetElementList = megaApi.getSetElements(sid)
 }
