@@ -109,7 +109,7 @@ private fun String.isUnMappedMimeType(extension: String) =
 private fun String.isVideoMimeType(extension: String) =
     startsWith("video/") || extension == "vob"
 
-private fun String.isGifExtension() = (this == "gif") || (this == "webp")
+private fun String.isGifExtension() = this == "gif"
 
 private fun String.isRawExtension() = this in rawExtensions
 
