@@ -135,6 +135,9 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
+    fun getAlbumPhotosCount() =
+        _state.value.albums.find { it.id == _state.value.currentAlbumId }?.count ?: 0
+
     fun removeFavourites() {
         viewModelScope.launch {
             removeFavourites(selectedPhotoIds.toList())
