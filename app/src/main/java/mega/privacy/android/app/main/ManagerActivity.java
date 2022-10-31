@@ -1520,8 +1520,10 @@ public class ManagerActivity extends TransfersManagementActivity
             isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
             isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false);
             isInAlbumContent = savedInstanceState.getBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, false);
+            if (isInAlbumContent){
+                albumContentFragment = getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.ALBUM_CONTENT.getTag());
+            }
             isInFilterPage = savedInstanceState.getBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, false);
-
 
             nodeAttacher.restoreState(savedInstanceState);
             nodeSaver.restoreState(savedInstanceState);
