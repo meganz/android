@@ -31,7 +31,7 @@ class DefaultCompleteFastLoginTest {
     @Test
     fun `test that LoginAlreadyRunningException is thrown if a login process is already running`() =
         runTest {
-            whenever(loginRepository.isLoginAlreadyRunning()).thenAnswer { throw LoginAlreadyRunningException() }
+            whenever(loginRepository.isLoginAlreadyRunning()).thenReturn(true)
             assertThrows(LoginAlreadyRunningException::class.java) {
                 runBlocking { underTest(session) }
             }
