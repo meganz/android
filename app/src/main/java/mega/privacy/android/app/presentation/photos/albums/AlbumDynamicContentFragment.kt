@@ -266,6 +266,9 @@ class AlbumDynamicContentFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    /**
+     * Get current page title
+     */
     fun getCurrentAlbumTitle(): String {
         val currentAlbum = albumsViewModel.state.value.currentAlbumId
         val currentUIAlbum =
