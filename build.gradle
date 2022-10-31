@@ -12,8 +12,8 @@ buildscript {
     ext.jacocoVersion = '0.8.8'
     ext.paparazziVersion = "1.0.0"
     repositories {
-        jcenter()
         google()
+        jcenter()
         maven { url 'https://developer.huawei.com/repo/' }
     }
     dependencies {
@@ -36,9 +36,9 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
         google()
         mavenCentral()
+        jcenter()
         maven {
             url "https://jitpack.io"
         }
