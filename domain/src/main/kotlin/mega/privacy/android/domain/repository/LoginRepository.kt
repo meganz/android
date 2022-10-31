@@ -6,9 +6,11 @@ package mega.privacy.android.domain.repository
 interface LoginRepository {
 
     /**
-     * True if there is no login already in progress, false otherwise.
+     * Initializes megaChat API.
+     *
+     * @param session Required account session.
      */
-    var allowBackgroundLogin: Boolean
+    suspend fun initMegaChat(session: String)
 
     /**
      * Performs a fast login given a session.
@@ -23,9 +25,21 @@ interface LoginRepository {
     suspend fun fetchNodes()
 
     /**
-     * Initializes megaChat API.
+     * Checks if there is a login already running.
      *
-     * @param session Required account session.
+     * @return True if there is a login already running, false otherwise.
      */
-    suspend fun initMegaChat(session: String)
+    fun isLoginAlreadyRunning(): Boolean
+
+    /**
+     * Sets isLoggingIn flag to true for starting the login process and not allowing a new one
+     * while this is in progress.
+     */
+    fun startLoginProcess()
+
+    /**
+     * Sets isLoggingIn flag to false for finishing the login process and allowing a new one
+     * when required.
+     */
+    fun finishLoginProcess()
 }
