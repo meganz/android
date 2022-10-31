@@ -12,8 +12,8 @@ interface GetTypedNodesFromFolder {
     /**
      * Get Photos from a folder by  its id
      *
-     * @param folderNodeId NodeId
+     * @param folderId NodeId
      * @return Photos in the folder
      */
-    operator fun invoke(folderNodeId: NodeId): Flow<List<TypedNode>>
+    operator fun invoke(folderId: NodeId): Flow<List<TypedNode>>
 }
