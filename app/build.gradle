@@ -311,9 +311,6 @@ dependencies {
 
     // Hilt
     implementation "com.google.dagger:hilt-android:$hiltVersion"
-    implementation "androidx.compose.ui:ui:$composeVersion"
-    implementation "androidx.compose.material:material:$composeVersion"
-    implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
     implementation 'androidx.camera:camera-view:1.0.0-alpha26'
     implementation 'androidx.camera:camera-lifecycle:1.0.0'
     implementation 'androidx.preference:preference:1.2.0'
@@ -410,12 +407,14 @@ dependencies {
     implementation "com.jakewharton.timber:timber:$timberVersion"
 
     // Compose
+    implementation platform("androidx.compose:compose-bom:$composeBomVersion")
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.material:material'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
     implementation "androidx.compose.compiler:compiler:$composeCompilerVersion"
     implementation "androidx.activity:activity-compose:$activityComposeVersion"
-    implementation "androidx.compose.material:material:$composeVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$viewModelComposeVersion"
-    debugImplementation "androidx.compose.ui:ui-tooling:$composeVersion"
-    implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
+    debugImplementation 'androidx.compose.ui:ui-tooling'
 
     // accompanist compose
     // pager
@@ -454,8 +453,9 @@ dependencies {
     }
     testImplementation "androidx.work:work-testing:$workVersion"
     testImplementation "androidx.room:room-testing:$roomVersion"
-    testImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
+    testImplementation 'androidx.compose.ui:ui-test-junit4'
 
+    androidTestImplementation platform("androidx.compose:compose-bom:$composeBomVersion")
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
@@ -468,20 +468,19 @@ dependencies {
         exclude module: "protobuf-lite"
     }
     androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
 
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     kaptTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     debugImplementation "androidx.fragment:fragment-testing:$fragmentTestingVersion"
-    debugImplementation "androidx.compose.ui:ui-tooling:$composeVersion"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:$composeVersion"
+    debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
     // Live Data testing
     testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
 
     //QA
     qaImplementation 'com.google.firebase:firebase-appdistribution:16.0.0-beta03'
-    qaImplementation "androidx.compose.ui:ui-test-manifest:$composeVersion"
+    qaImplementation 'androidx.compose.ui:ui-test-manifest'
 
     implementation "com.google.auto.value:auto-value-annotations:$autovalueAnnotationVersion"
     kapt "com.google.auto.value:auto-value:$autovalueVersion"

@@ -80,7 +80,7 @@ ext {
     cardViewVersion = '1.0.0'
     coilVersion = '2.1.0'
     composeCompilerVersion = '1.3.2'
-    composeVersion = '1.2.1'
+    composeBomVersion = '2022.10.00'
     constraintLayoutVersion = '2.1.1'
     coroutinesVersion = "1.6.0"
     coroutineTestVersion = '1.6.0'
