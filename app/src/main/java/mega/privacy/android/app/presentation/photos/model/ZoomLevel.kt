@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.timeline.model
+package mega.privacy.android.app.presentation.photos.model
 
 enum class ZoomLevel(val portrait: Int, val landscape: Int) {
 

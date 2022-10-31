@@ -43,7 +43,7 @@ import coil.request.ImageRequest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
-import mega.privacy.android.app.presentation.photos.timeline.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.presentation.theme.grey_alpha_032
