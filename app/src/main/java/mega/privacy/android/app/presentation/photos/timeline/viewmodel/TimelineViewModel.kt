@@ -19,9 +19,9 @@ import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.model.Sort
-import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
-import mega.privacy.android.app.presentation.photos.timeline.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.photos.Photo

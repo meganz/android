@@ -49,9 +49,11 @@ import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
-import mega.privacy.android.app.presentation.photos.timeline.model.DateCard
-import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
+import mega.privacy.android.app.presentation.photos.view.CardListView
+import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.presentation.theme.AndroidTheme
 

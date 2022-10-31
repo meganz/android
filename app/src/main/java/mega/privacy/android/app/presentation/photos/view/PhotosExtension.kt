@@ -10,7 +10,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.timeline.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 
 internal fun Modifier.isSelected(isSelected: Boolean): Modifier = composed {
     if (isSelected) Modifier

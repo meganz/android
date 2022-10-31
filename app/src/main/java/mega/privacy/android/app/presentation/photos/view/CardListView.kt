@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.timeline.view
+package mega.privacy.android.app.presentation.photos.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -34,12 +34,12 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.app.presentation.photos.timeline.model.DateCard
 
 @Composable
 fun CardListView(
-    state: LazyGridState,
+    state: LazyGridState = LazyGridState(),
     dateCards: List<DateCard>,
     photoDownload: PhotoDownload,
     onCardClick: (DateCard) -> Unit,
