@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.timeline.model
+package mega.privacy.android.app.presentation.photos.model
 
 import mega.privacy.android.domain.entity.photos.Photo
 

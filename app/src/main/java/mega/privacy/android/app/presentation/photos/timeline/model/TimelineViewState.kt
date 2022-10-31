@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.photos.timeline.model
 
+import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.domain.entity.photos.Photo
 
 /**

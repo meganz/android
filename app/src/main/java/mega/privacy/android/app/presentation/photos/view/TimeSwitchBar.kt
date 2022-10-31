@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.timeline.view
+package mega.privacy.android.app.presentation.photos.view
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -18,16 +18,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 
 @Composable
 fun TimeSwitchBar(
-    timeBarTabs: List<TimeBarTab> = listOf(),
+    timeBarTabs: List<TimeBarTab> = TimeBarTab.values().asList(),
     selectedTimeBarTab: TimeBarTab = TimeBarTab.All,
     onTimeBarTabSelected: (TimeBarTab) -> Unit = {},
     isVisible: () -> Boolean = { true },

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
@@ -24,14 +25,11 @@ import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
 import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
-import mega.privacy.android.app.presentation.favourites.model.id
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import javax.inject.Inject
 
@@ -115,21 +113,20 @@ class FavouriteFolderViewModel @Inject constructor(
     private suspend fun getData(
         name: String,
         children: List<TypedNode>,
-        folderInfo: FavouriteFolderInfo,
+        folderInfo: FavouriteFolderInfo
     ): ChildrenNodesLoadState {
         return withContext(ioDispatcher) {
             ChildrenNodesLoadState.Success(
                 title = name,
                 children = children.mapNotNull { favouriteInfo ->
-                    val nodeId = favouriteInfo.id ?: return@mapNotNull null
-                    val node = fetchNode(nodeId.id) ?: return@mapNotNull null
+                    val node = fetchNode(favouriteInfo.id.id) ?: return@mapNotNull null
                     FavouriteListItem(
                         favourite = favouriteMapper(
                             node,
                             favouriteInfo,
                             megaUtilWrapper.availableOffline(
                                 context,
-                                nodeId.id
+                                favouriteInfo.id.id
                             ),
                             stringUtilWrapper
                         ) { name ->
@@ -142,6 +139,7 @@ class FavouriteFolderViewModel @Inject constructor(
             )
         }
     }
+
 
     /**
      * Back to previous level page

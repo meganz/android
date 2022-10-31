@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.UnTypedNode
 
 /**
  * File repository
@@ -47,7 +48,7 @@ interface FileRepository {
      * @param folderNode
      * @return
      */
-    suspend fun getNodeChildren(folderNode: FolderNode): List<Node>
+    suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode>
 
     /**
      * Monitor node updates
