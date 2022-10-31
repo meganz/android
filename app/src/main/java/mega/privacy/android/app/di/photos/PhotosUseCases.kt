@@ -18,6 +18,7 @@ import mega.privacy.android.domain.usecase.DefaultFilterGIF
 import mega.privacy.android.domain.usecase.DefaultFilterRAW
 import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumsMap
+import mega.privacy.android.domain.usecase.DefaultGetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.DefaultGetPreview
 import mega.privacy.android.domain.usecase.DefaultGetThumbnail
 import mega.privacy.android.domain.usecase.DefaultGetTimelinePhotos
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.FilterGIF
 import mega.privacy.android.domain.usecase.FilterRAW
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
+import mega.privacy.android.domain.usecase.GetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.GetTimelinePhotos
@@ -86,6 +88,9 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindGetDefaultAlbumsMap(useCase: DefaultGetDefaultAlbumsMap): GetDefaultAlbumsMap
+
+    @Binds
+    abstract fun bindGetTypedNodesFromFolder(useCase: DefaultGetTypedNodesFromFolder): GetTypedNodesFromFolder
 
     companion object {
         @Provides
