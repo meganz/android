@@ -1,0 +1,71 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/cab_menu_download"
+        android:icon="@drawable/ic_download_white"
+        android:orderInCategory="120"
+        android:title="@string/general_save_to_device"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/cab_menu_share_link"
+        android:icon="@drawable/ic_link_white"
+        android:orderInCategory="160"
+        android:title="@{@plurals/get_links(one)}"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/cab_menu_send_to_chat"
+        android:icon="@drawable/ic_send_to_contact"
+        android:orderInCategory="171"
+        android:title="@string/context_send_file_to_chat"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/cab_menu_share_out"
+        android:icon="@drawable/ic_social_share_white"
+        android:orderInCategory="190"
+        android:title="@string/general_share"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/cab_menu_select_all"
+        android:orderInCategory="100"
+        android:title="@string/action_select_all"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_clear_selection"
+        android:orderInCategory="110"
+        android:title="@string/action_unselect_all"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_move"
+        android:icon="@drawable/ic_move_white"
+        android:orderInCategory="200"
+        android:title="@string/context_move"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_copy"
+        android:icon="@drawable/ic_copy_white"
+        android:orderInCategory="210"
+        android:title="@string/context_copy"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_trash"
+        android:icon="@drawable/ic_close_white"
+        android:orderInCategory="230"
+        android:title="@string/context_move_to_trash"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never" />
+</menu>
