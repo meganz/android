@@ -20,6 +20,11 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.VideoMapper
+import mega.privacy.android.domain.entity.GifFileTypeInfo
+import mega.privacy.android.domain.entity.RawFileTypeInfo
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -88,6 +93,25 @@ class DefaultPhotosRepository @Inject constructor(
         val images = async { mapMegaNodesToImages(searchImages()) }
         val videos = async { mapMegaNodesToVideos(searchVideos()) }
         images.await() + videos.await()
+    }
+
+    override suspend fun getPhotoFromNodeID(nodeId: NodeId): Photo? = withContext(ioDispatcher) {
+        megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.id)
+            ?.let { megaNode ->
+                megaNode to fileTypeInfoMapper(megaNode)
+            }?.let { (megaNode, fileType) ->
+                when (fileType) {
+                    is StaticImageFileTypeInfo, is GifFileTypeInfo, is RawFileTypeInfo -> {
+                        mapMegaNodeToImage(megaNode)
+                    }
+                    is VideoFileTypeInfo -> {
+                        mapMegaNodeToVideo(megaNode)
+                    }
+                    else -> {
+                        null
+                    }
+                }
+            }
     }
 
     private suspend fun searchImages(): List<MegaNode> = withContext(ioDispatcher) {
