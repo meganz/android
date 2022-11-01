@@ -21,7 +21,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -53,12 +52,13 @@ class DefaultAlbumRepositoryTest {
     fun `test that addPhotosToAlbum invokes the createSetElement api function for each photoID`() =
         runTest {
             val testAlbumId = AlbumId(1L)
-            val testPhoto = listOf(NodeId(1L), NodeId(2L))
+            val testPhotos = listOf(NodeId(1L), NodeId(2L))
 
-            underTest.addPhotosToAlbum(albumID = testAlbumId, photosIDs = testPhoto)
+            underTest.addPhotosToAlbum(albumID = testAlbumId, photosIDs = testPhotos)
 
-            verify(megaApiGateway).createSetElement(testAlbumId.id, testPhoto[0].id)
-            verify(megaApiGateway).createSetElement(testAlbumId.id, testPhoto[1].id)
+            for (photo in testPhotos) {
+                verify(megaApiGateway).createSetElement(testAlbumId.id, photo.id)
+            }
         }
 
     @Test
