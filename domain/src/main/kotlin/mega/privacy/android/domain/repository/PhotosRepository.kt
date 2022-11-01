@@ -51,4 +51,9 @@ interface PhotosRepository {
      * Get photo with [nodeId]
      */
     suspend fun getPhotoFromNodeID(nodeId: NodeId): Photo?
+
+    /**
+     * Get Photos from a folder
+     */
+    suspend fun getPhotosByFolderId(id: Long): List<Photo>
 }
