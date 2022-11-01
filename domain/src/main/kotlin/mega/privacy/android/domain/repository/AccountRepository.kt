@@ -117,4 +117,11 @@ interface AccountRepository {
         achievementType: AchievementType,
         awardIndex: Long,
     ): MegaAchievement
+
+    /**
+     * Get account details time stamp
+     *
+     * @return the latest account detail time stamp
+     */
+    suspend fun getAccountDetailsTimeStampInSeconds(): String?
 }
