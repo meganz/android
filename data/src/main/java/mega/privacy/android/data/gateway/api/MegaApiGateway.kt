@@ -895,6 +895,22 @@ interface MegaApiGateway {
     suspend fun getRubbishNode(): MegaNode
 
     /**
+     * Create a new MegaSet item
+     *
+     * @param name the name of the set
+     * @param listener [MegaRequestListenerInterface]
+     */
+    suspend fun createSet(name: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Create a new element for the set
+     *
+     * @param sid the ID of the set
+     * @param node the node handle of the node which will be assigned as the set's new element
+     */
+    suspend fun createSetElement(sid: Long, node: Long)
+
+    /**
      * Get a list of all Sets available for current user.
      * The response value is stored as a MegaSetList.
      * You take the ownership of the returned value
