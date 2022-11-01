@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.repository.DefaultAccountRepository
+import mega.privacy.android.data.repository.DefaultAlbumRepository
 import mega.privacy.android.data.repository.DefaultAvatarRepository
 import mega.privacy.android.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
@@ -30,6 +31,7 @@ import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
@@ -55,6 +57,9 @@ import kotlin.contracts.ExperimentalContracts
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class RepositoryModule {
+    @Binds
+    abstract fun bindAlbumRepository(repository: DefaultAlbumRepository): AlbumRepository
+
     @Binds
     abstract fun bindContactsRepository(repository: DefaultContactsRepository): ContactsRepository
 
