@@ -69,7 +69,7 @@ class DefaultAlbumRepositoryTest {
 
             underTest.addPhotosToAlbum(albumID = testAlbumId, photosIDs = testPhoto)
 
-            verifyNoInteractions(megaApiGateway)
+            verify(megaApiGateway, never()).createSetElement(any(), any())
         }
 
     @Test
