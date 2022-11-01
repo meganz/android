@@ -4577,7 +4577,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                     if (mediaDiscoveryFragment == null) {
                         selectDrawerItemCloudDrive();
-                        mediaDiscoveryFragment = fileBrowserFragment.showMediaDiscovery(Unit.INSTANCE);
+                        mediaDiscoveryFragment = fileBrowserFragment.showMediaDiscovery();
                     } else {
                         refreshFragment(FragmentTag.MEDIA_DISCOVERY.getTag());
                     }
