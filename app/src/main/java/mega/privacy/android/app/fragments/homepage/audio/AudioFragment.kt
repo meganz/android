@@ -190,7 +190,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.onOrderChange(true, order = it.first)
+            viewModel.onOrderChange()
         })
 
         sortByHeaderViewModel.listGridChangeEvent.observe(
