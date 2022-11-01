@@ -10,11 +10,32 @@ import mega.privacy.android.domain.entity.set.UserSet
 interface AlbumRepository {
     /**
      * Get all user sets
+     *
+     * @return a list of UserSet
      */
     suspend fun getAllUserSets(): List<UserSet>
 
     /**
      * Get album element ids
+     *
+     * @param albumId the id of the album which elements we want to get
+     *
+     * @return a list of node id's
      */
     suspend fun getAlbumElementIDs(albumId: AlbumId): List<NodeId>
+
+    /**
+     * Create an album
+     *
+     * @param name the name of the album
+     */
+    suspend fun createAlbum(name: String)
+
+    /**
+     * Add photos to an album
+     *
+     * @param albumID the id of the album which we want to put the photos in
+     * @param photosIDs the photos' node handles
+     */
+    suspend fun addPhotosToAlbum(albumID: AlbumId, photosIDs: List<NodeId>)
 }
