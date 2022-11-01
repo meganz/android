@@ -121,10 +121,7 @@ class AudioViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch {
-            sortOrder = getCloudSortOrder()
-            loadAudio(true)
-        }
+        fetchOrderAndLoadAudio()
 
         items.observeForever(loadFinishedObserver)
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
@@ -140,12 +137,16 @@ class AudioViewModel @Inject constructor(
 
     /**
      * On SortOrder change
-     * @param forceUpdate
-     * @param order
      */
-    fun onOrderChange(forceUpdate: Boolean, order: SortOrder) {
-        sortOrder = order
-        loadAudio(forceUpdate)
+    fun onOrderChange() {
+        fetchOrderAndLoadAudio()
+    }
+
+    private fun fetchOrderAndLoadAudio() {
+        viewModelScope.launch {
+            sortOrder = getCloudSortOrder()
+            loadAudio(true)
+        }
     }
 
     /**
