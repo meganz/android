@@ -2638,6 +2638,16 @@ public class ManagerActivity extends TransfersManagementActivity
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
             updateInboxSectionVisibility(managerState.getHasInboxChildren());
             stopUploadProcessAndSendBroadcast(managerState.getShouldStopCameraUpload(), managerState.getShouldSendCameraBroadcastEvent());
+            if (managerState.getNodeUpdateReceived()) {
+                // Invalidate the menu will collapse/expand the search view and set the query text to ""
+                // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
+                // text changed to "" for once)
+                if (drawerItem != DrawerItem.HOMEPAGE) {
+                    setToolbarTitle();
+                    supportInvalidateOptionsMenu();
+                }
+                viewModel.nodeUpdateHandled();  
+            }
             return Unit.INSTANCE;
         });
     }
@@ -9875,14 +9885,6 @@ public class ManagerActivity extends TransfersManagementActivity
         dismissAlertDialogIfExists(statusDialog);
 
         viewModel.checkCameraUploadFolder(false, updatedNodes);
-
-        // Invalidate the menu will collapse/expand the search view and set the query text to ""
-        // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
-        // text changed to "" for once)
-        if (drawerItem == DrawerItem.HOMEPAGE) return;
-
-        setToolbarTitle();
-        supportInvalidateOptionsMenu();
     }
 
     public void updateContactRequests(List<ContactRequest> requests) {

@@ -27,8 +27,8 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
@@ -138,6 +138,9 @@ class ManagerViewModelTest {
             assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
             assertThat(initial.transfersTab).isEqualTo(TransfersTab.NONE)
             assertThat(initial.isFirstLogin).isFalse()
+            assertThat(initial.shouldSendCameraBroadcastEvent).isFalse()
+            assertThat(initial.shouldStopCameraUpload).isFalse()
+            assertThat(initial.nodeUpdateReceived).isFalse()
         }
     }
 
@@ -459,5 +462,37 @@ class ManagerViewModelTest {
         whenever(getCloudSortOrder()).thenReturn(order)
         whenever(sortOrderIntMapper(order)).thenReturn(expected)
         assertThat(underTest.getOrder()).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that updateToolbarTitle is true when a node update occurs`() = runTest {
+        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+        setUnderTest()
+
+        underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isFalse()
+            runCatching {
+                underTest.updateNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+            }.onSuccess {
+                assertThat(awaitItem()).isTrue()
+            }
+        }
+    }
+
+    @Test
+    fun `test that updateToolbarTitle is set when calling setUpdateToolbar`() = runTest {
+        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
+        setUnderTest()
+
+        underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isFalse()
+            runCatching {
+                underTest.updateNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+            }.onSuccess {
+                assertThat(awaitItem()).isTrue()
+            }
+            underTest.nodeUpdateHandled()
+            assertThat(awaitItem()).isFalse()
+        }
     }
 }

@@ -65,7 +65,6 @@ import javax.inject.Inject
  * @param getRubbishBinChildrenNode Fetch the rubbish bin nodes
  * @param getBrowserChildrenNode Fetch the browser nodes
  * @param monitorContactRequestUpdates
- * @param getUploadFolderHandle
  * @param getInboxNode
  * @param getRootFolder Fetch the root node
  * @param getNumUnreadUserAlerts
@@ -185,6 +184,7 @@ class ManagerViewModel @Inject constructor(
             .filterNotNull()
             .onEach {
                 checkItemForInbox(it)
+                onReceiveNodeUpdate(true)
             }
             .map { Event(it) }
             .asLiveData()
@@ -300,6 +300,21 @@ class ManagerViewModel @Inject constructor(
         _state.update { it.copy(transfersTab = tab) }
     }
 
+    /**
+     * Notify that the node update has been handled by the UI
+     */
+    fun nodeUpdateHandled() {
+        onReceiveNodeUpdate(false)
+    }
+
+    /**
+     * Set the ui one-off event when a node update is received
+     *
+     * @param update true if a node update has been received
+     */
+    private fun onReceiveNodeUpdate(update: Boolean) = viewModelScope.launch {
+        _state.update { it.copy(nodeUpdateReceived = update) }
+    }
 
     private val numUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
 
