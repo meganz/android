@@ -42,4 +42,6 @@ internal class AndroidDeviceGateway @Inject constructor(
     override suspend fun getSdkVersionInt() = Build.VERSION.SDK_INT
 
     override suspend fun getSdkVersionName(): String = "Android ${Build.VERSION.RELEASE}"
+
+    override fun getCurrentTimeInMillis(): Long = System.currentTimeMillis()
 }

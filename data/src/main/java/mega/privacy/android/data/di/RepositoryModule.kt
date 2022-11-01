@@ -24,6 +24,7 @@ import mega.privacy.android.data.repository.DefaultSettingsRepository
 import mega.privacy.android.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.data.repository.DefaultSupportRepository
+import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
@@ -46,6 +47,7 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
+import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
@@ -132,4 +134,7 @@ internal abstract class RepositoryModule {
     @ExperimentalContracts
     @Binds
     abstract fun bindAccountRepository(repository: DefaultAccountRepository): AccountRepository
+
+    @Binds
+    abstract fun bindTimeSystemRepository(repository: DefaultTimeSystemRepository): TimeSystemRepository
 }

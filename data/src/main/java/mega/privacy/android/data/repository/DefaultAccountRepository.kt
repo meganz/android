@@ -225,4 +225,9 @@ internal class DefaultAccountRepository @Inject constructor(
                     }))
             }
         }
+
+    override suspend fun getAccountDetailsTimeStampInSeconds(): String? =
+        withContext(ioDispatcher) {
+            dbHandler.attributes?.accountDetailsTimeStamp
+        }
 }
