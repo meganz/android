@@ -35,7 +35,7 @@ interface AlbumRepository {
      * Add photos to an album
      *
      * @param albumID the id of the album which we want to put the photos in
-     * @param photosIDs the photos' node handles
+     * @param photoIDs the photos' node handles
      */
-    suspend fun addPhotosToAlbum(albumID: AlbumId, photosIDs: List<NodeId>)
+    suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>)
 }

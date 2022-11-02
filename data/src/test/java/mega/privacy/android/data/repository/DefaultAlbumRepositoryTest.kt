@@ -54,7 +54,7 @@ class DefaultAlbumRepositoryTest {
             val testAlbumId = AlbumId(1L)
             val testPhotos = listOf(NodeId(1L), NodeId(2L))
 
-            underTest.addPhotosToAlbum(albumID = testAlbumId, photosIDs = testPhotos)
+            underTest.addPhotosToAlbum(albumID = testAlbumId, photoIDs = testPhotos)
 
             for (photo in testPhotos) {
                 verify(megaApiGateway).createSetElement(testAlbumId.id, photo.id)
@@ -67,7 +67,7 @@ class DefaultAlbumRepositoryTest {
             val testAlbumId = AlbumId(1L)
             val testPhoto = emptyList<NodeId>()
 
-            underTest.addPhotosToAlbum(albumID = testAlbumId, photosIDs = testPhoto)
+            underTest.addPhotosToAlbum(albumID = testAlbumId, photoIDs = testPhoto)
 
             verify(megaApiGateway, never()).createSetElement(any(), any())
         }

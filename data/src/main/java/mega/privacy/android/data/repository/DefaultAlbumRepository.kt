@@ -10,7 +10,6 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AlbumRepository
-import nz.mega.sdk.MegaError
 import javax.inject.Inject
 
 /**
@@ -25,15 +24,7 @@ internal class DefaultAlbumRepository @Inject constructor(
     override suspend fun createAlbum(name: String) = withContext(ioDispatcher) {
         megaApiGateway.createSet(
             name,
-            OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    if (error.errorCode == MegaError.API_OK) {
-                        val newSet = request.megaSet
-                    } else {
-                        // ToDo
-                    }
-                }
-            )
+            OptionalMegaRequestListenerInterface()
         )
     }
 
@@ -54,12 +45,10 @@ internal class DefaultAlbumRepository @Inject constructor(
             }
         }
 
-    override suspend fun addPhotosToAlbum(albumID: AlbumId, photosIDs: List<NodeId>) =
+    override suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>) =
         withContext(ioDispatcher) {
-            if (photosIDs.isNotEmpty()) {
-                for (photoID in photosIDs) {
-                    megaApiGateway.createSetElement(albumID.id, photoID.id)
-                }
+            for (photoID in photoIDs) {
+                megaApiGateway.createSetElement(albumID.id, photoID.id)
             }
         }
 }
