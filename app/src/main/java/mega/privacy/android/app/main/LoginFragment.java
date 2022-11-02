@@ -1116,12 +1116,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
 
+            //Don't allow background login.
+            MegaApplication.setLoggingIn(true);
+
             ChatUtil.initMegaChatApi(gSession, new ChatLogoutListener(requireActivity(), loggingSettings));
 
             disableLoginButton();
-
-            // Primitive type directly set value, atomic operation. Don't allow background login.
-            loginRepository.setAllowBackgroundLogin(false);
 
             megaApi.fastLogin(gSession, this);
 
@@ -1789,7 +1789,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
         Timber.d("onRequestFinish: %s,error code: %d", request.getRequestString(), error.getErrorCode());
         if (request.getType() == MegaRequest.TYPE_LOGIN) {
-            loginRepository.setAllowBackgroundLogin(true);
+            MegaApplication.setLoggingIn(true);
 
             //cancel login process by press back.
             if (!MegaApplication.isLoggingIn()) {

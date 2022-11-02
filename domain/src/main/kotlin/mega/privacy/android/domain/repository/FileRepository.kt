@@ -1,10 +1,12 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.UnTypedNode
 
 /**
  * File repository
@@ -46,5 +48,12 @@ interface FileRepository {
      * @param folderNode
      * @return
      */
-    suspend fun getNodeChildren(folderNode: FolderNode): List<Node>
+    suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode>
+
+    /**
+     * Monitor node updates
+     *
+     * @return a flow of all global node updates
+     */
+    fun monitorNodeUpdates(): Flow<List<Node>>
 }

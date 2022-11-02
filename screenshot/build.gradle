@@ -41,9 +41,10 @@ android {
 
 dependencies {
     implementation project(":presentation")
-    implementation "androidx.compose.ui:ui:$composeVersion"
-    implementation "androidx.compose.material:material:$composeVersion"
-    implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
+    implementation platform("androidx.compose:compose-bom:$composeBomVersion")
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.material:material'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
     implementation("androidx.compose.compiler:compiler") {
         version {
             strictly("$composeCompilerVersion")
@@ -58,6 +59,6 @@ dependencies {
 
     testImplementation "com.google.testparameterinjector:test-parameter-injector:1.8"
     kaptTest "com.airbnb.android:showkase-processor:$showkaseVersion"
-    debugImplementation "androidx.compose.ui:ui-tooling:$composeVersion"
-    debugImplementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+    debugImplementation 'androidx.compose.ui:ui-tooling-preview'
 }

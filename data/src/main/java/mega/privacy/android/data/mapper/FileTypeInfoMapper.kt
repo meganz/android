@@ -49,13 +49,13 @@ private fun getFileTypeInfoForExtension(
     mimeType.startsWith("web/url") -> {
         UrlFileTypeInfo
     }
-    extension.isGifExtension() -> {
+    extension.lowercase().isGifExtension() -> {
         GifFileTypeInfo(
             type = mimeType,
             extension = extension,
         )
     }
-    extension.isRawExtension() -> {
+    extension.lowercase().isRawExtension() -> {
         RawFileTypeInfo(
             type = mimeType,
             extension = extension,
@@ -109,7 +109,7 @@ private fun String.isUnMappedMimeType(extension: String) =
 private fun String.isVideoMimeType(extension: String) =
     startsWith("video/") || extension == "vob"
 
-private fun String.isGifExtension() = (this == "gif") || (this == "webp")
+private fun String.isGifExtension() = this == "gif"
 
 private fun String.isRawExtension() = this in rawExtensions
 

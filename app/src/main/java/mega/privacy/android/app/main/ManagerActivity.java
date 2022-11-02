@@ -360,6 +360,7 @@ import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment;
 import mega.privacy.android.app.presentation.photos.PhotosFragment;
+import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment;
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
@@ -422,6 +423,7 @@ import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
+import mega.privacy.android.domain.entity.node.Node;
 import mega.privacy.android.domain.entity.transfer.TransferType;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import nz.mega.documentscanner.DocumentScannerActivity;
@@ -1505,7 +1507,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 smsVerificationFragment = (SMSVerificationFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.SMS_VERIFICATION.getTag());
             }
             mElevationCause = savedInstanceState.getInt("elevation", 0);
-            storageState = (StorageState)savedInstanceState.getSerializable("storageState");
+            storageState = (StorageState) savedInstanceState.getSerializable("storageState");
             isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
             comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", INVALID_VALUE);
             openLinkDialogIsShown = savedInstanceState.getBoolean(OPEN_LINK_DIALOG_SHOWN, false);
@@ -1518,8 +1520,10 @@ public class ManagerActivity extends TransfersManagementActivity
             isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
             isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false);
             isInAlbumContent = savedInstanceState.getBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, false);
+            if (isInAlbumContent){
+                albumContentFragment = getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.ALBUM_CONTENT.getTag());
+            }
             isInFilterPage = savedInstanceState.getBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, false);
-
 
             nodeAttacher.restoreState(savedInstanceState);
             nodeSaver.restoreState(savedInstanceState);
@@ -2634,6 +2638,16 @@ public class ManagerActivity extends TransfersManagementActivity
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
             updateInboxSectionVisibility(managerState.getHasInboxChildren());
             stopUploadProcessAndSendBroadcast(managerState.getShouldStopCameraUpload(), managerState.getShouldSendCameraBroadcastEvent());
+            if (managerState.getNodeUpdateReceived()) {
+                // Invalidate the menu will collapse/expand the search view and set the query text to ""
+                // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
+                // text changed to "" for once)
+                if (drawerItem != DrawerItem.HOMEPAGE) {
+                    setToolbarTitle();
+                    supportInvalidateOptionsMenu();
+                }
+                viewModel.nodeUpdateHandled();  
+            }
             return Unit.INSTANCE;
         });
     }
@@ -3925,7 +3939,13 @@ public class ManagerActivity extends TransfersManagementActivity
             case PHOTOS: {
                 aB.setSubtitle(null);
                 if (isInAlbumContent) {
-                    aB.setTitle(getString(R.string.title_favourites_album));
+                    if (albumContentFragment instanceof AlbumDynamicContentFragment) {
+                        String title = ((AlbumDynamicContentFragment) albumContentFragment)
+                                .getCurrentAlbumTitle();
+                        aB.setTitle(title);
+                    } else {
+                        aB.setTitle(getString(R.string.title_favourites_album));
+                    }
                 } else if (isInFilterPage) {
                     aB.setTitle(getString(R.string.photos_action_filter));
                 } else if (getPhotosFragment() != null && photosFragment.shouldUpdateTitle()) {
@@ -4567,7 +4587,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                     if (mediaDiscoveryFragment == null) {
                         selectDrawerItemCloudDrive();
-                        mediaDiscoveryFragment = fileBrowserFragment.showMediaDiscovery(Unit.INSTANCE);
+                        mediaDiscoveryFragment = fileBrowserFragment.showMediaDiscovery();
                     } else {
                         refreshFragment(FragmentTag.MEDIA_DISCOVERY.getTag());
                     }
@@ -6002,9 +6022,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 isInAlbumContent = false;
 
                 backToDrawerItem(bottomNavigationCurrentItem);
-                if (photosFragment == null) {
-                    backToDrawerItem(bottomNavigationCurrentItem);
-                } else {
+                if (photosFragment != null) {
                     photosFragment.switchToAlbum();
                 }
             } else if (isInFilterPage) {
@@ -8692,7 +8710,7 @@ public class ManagerActivity extends TransfersManagementActivity
         // event informing about the storage state  during login, the ManagerActivity
         // wasn't active and for this reason the value is stored in the MegaApplication object.
         StorageState storageStateToCheck = (storageState != StorageState.Unknown) ?
-                storageState :  viewModel.getStorageState();
+                storageState : viewModel.getStorageState();
 
         checkStorageStatus(storageStateToCheck, onCreate);
     }
@@ -9523,6 +9541,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                     if (isCloudAdded()) {
+                        viewModel.setBrowserParentHandle(folderNode.getHandle());
                         fileBrowserFragment.setFolderInfoNavigation(folderNode);
                     }
                 } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
@@ -9862,20 +9881,10 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshSharesPageAdapter();
     }
 
-    private void onUpdateNodes(@NonNull List<MegaNode> updatedNodes) {
+    private void onUpdateNodes(@NonNull List<Node> updatedNodes) {
         dismissAlertDialogIfExists(statusDialog);
 
         viewModel.checkCameraUploadFolder(false, updatedNodes);
-
-        LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
-
-        // Invalidate the menu will collapse/expand the search view and set the query text to ""
-        // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
-        // text changed to "" for once)
-        if (drawerItem == DrawerItem.HOMEPAGE) return;
-
-        setToolbarTitle();
-        supportInvalidateOptionsMenu();
     }
 
     public void updateContactRequests(List<ContactRequest> requests) {

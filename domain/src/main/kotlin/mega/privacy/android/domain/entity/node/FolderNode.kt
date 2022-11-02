@@ -4,16 +4,11 @@ package mega.privacy.android.domain.entity.node
 /**
  * Folder Node
  */
-interface FolderNode : Node {
+interface FolderNode : UnTypedNode {
     /**
      * Is folder in the rubbish bin
      */
     val isInRubbishBin: Boolean
-
-    /**
-     * Is the folder an incoming share
-     */
-    val isIncomingShare: Boolean
 
     /**
      * Is the folder an outgoing share

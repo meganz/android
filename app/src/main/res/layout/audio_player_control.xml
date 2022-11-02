@@ -70,7 +70,7 @@
         android:gravity="center"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Variant"
-        app:layout_constraintBottom_toTopOf="@id/exo_play"
+        app:layout_constraintBottom_toTopOf="@id/exo_play_pause"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Two Fingers" />
@@ -115,20 +115,11 @@
         app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
     <ImageButton
-        android:id="@id/exo_play"
+        android:id="@id/exo_play_pause"
+        style="@style/ExoStyledControls.Button.Center.PlayPause"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@null"
-        android:src="@drawable/media_player_play"
-        app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
-        app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
-
-    <ImageButton
-        android:id="@id/exo_pause"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:background="@null"
-        android:src="@drawable/media_player_pause"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
 
@@ -159,12 +150,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/exo_prev"
         app:layout_constraintStart_toStartOf="@id/exo_prev"
-        tools:src="@drawable/exo_controls_shuffle_on" />
+        tools:src="@drawable/exo_styled_controls_shuffle_on" />
 
     <ImageButton
         android:id="@id/exo_repeat_toggle"
         style="@style/AudioPlayerButton"
-        android:src="@drawable/exo_controls_repeat_all"
+        android:src="@drawable/exo_styled_controls_repeat_all"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

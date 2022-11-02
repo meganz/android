@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMa
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import nz.mega.sdk.MegaNode
@@ -86,7 +87,7 @@ class FavouritesViewModelTest {
         whenever(node.isFolder).thenReturn(true)
         whenever(node.isInShare).thenReturn(true)
         whenever(node.name).thenReturn("testName.txt")
-        val favourite = mock<Node>()
+        val favourite = mock<TypedNode>()
         val list = listOf(favourite)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getAllFavorites()).thenReturn(

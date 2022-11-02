@@ -13,7 +13,6 @@ import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
-import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
@@ -42,6 +41,7 @@ import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
+import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.getFileTypeInfo
@@ -57,7 +57,6 @@ import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toEvent
-import mega.privacy.android.data.mapper.toFavouriteFolderInfo
 import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toMediaStoreFileType
 import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
@@ -77,6 +76,7 @@ import mega.privacy.android.data.mapper.toSyncRecordTypeInt
 import mega.privacy.android.data.mapper.toTransferEventModel
 import mega.privacy.android.data.mapper.toTransferModel
 import mega.privacy.android.data.mapper.toUserAlert
+import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
 import mega.privacy.android.domain.entity.Currency
@@ -270,12 +270,6 @@ internal class MapperModule {
     }
 
     /**
-     * Provide favourite folder info mapper
-     */
-    @Provides
-    fun provideFavouriteFolderInfoMapper(): FavouriteFolderInfoMapper = ::toFavouriteFolderInfo
-
-    /**
      * Provide contact request mapper
      */
     @Provides
@@ -345,4 +339,9 @@ internal class MapperModule {
     @Provides
     fun provideRecentActionsMapper(): RecentActionsMapper = ::toRecentActionBucketList
 
+    /**
+     * Provide [UserSetMapper] mapper
+     */
+    @Provides
+    fun provideUserSetMapper(): UserSetMapper = ::toUserSet
 }

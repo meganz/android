@@ -41,6 +41,7 @@ class AlbumContentActionModeCallback(
             }
             R.id.cab_menu_select_all -> {
                 fragment.actionSelectAll()
+                item.isVisible = false
             }
             R.id.cab_menu_clear_selection -> {
                 fragment.actionClearSelection()
@@ -57,6 +58,7 @@ class AlbumContentActionModeCallback(
             if (currentAlbum != Album.FavouriteAlbum) {
                 menu.findItem(R.id.cab_menu_remove_favourites)?.isVisible = false
             }
+            menu.findItem(R.id.cab_menu_select_all)?.isVisible = !fragment.checkSelectAll()
         }
     }
 

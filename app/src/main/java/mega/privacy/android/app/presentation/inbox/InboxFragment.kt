@@ -158,7 +158,7 @@ class InboxFragment : RotatableFragment() {
             EventObserver { showSortByPanel() })
 
         viewModel.updateNodes.observe(viewLifecycleOwner,
-            EventObserver<List<MegaNode?>> {
+            EventObserver {
                 hideMultipleSelect()
                 refresh()
             }

@@ -13,10 +13,6 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
 import com.anggrayudi.storage.extension.toInt
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.imagepipeline.core.ImagePipelineConfig
-import com.facebook.imagepipeline.memory.PoolConfig
-import com.facebook.imagepipeline.memory.PoolFactory
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -49,13 +45,10 @@ import mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache
 import mega.privacy.android.app.utils.ChangeApiServerUtil
 import mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFromValue
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ContextUtils.getAvailableMemory
 import mega.privacy.android.app.utils.DBUtil
-import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams.get
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.usecase.InitialiseLogging
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -78,7 +71,6 @@ import javax.inject.Inject
  * @property passcodeManagement
  * @property crashReporter
  * @property performanceReporter
- * @property initialiseLoggingUseCase
  * @property getCallSoundsUseCase
  * @property workerFactory
  * @property themeModeState
@@ -93,7 +85,6 @@ import javax.inject.Inject
  * @property globalChatListener
  * @property localIpAddress
  * @property isEsid
- * @property storageState
  * @property monitorStorageStateEvent
  */
 @HiltAndroidApp
@@ -127,9 +118,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
 
     @Inject
     lateinit var performanceReporter: PerformanceReporter
-
-    @Inject
-    lateinit var initialiseLoggingUseCase: InitialiseLogging
 
     @Inject
     lateinit var getCallSoundsUseCase: GetCallSoundsUseCase
@@ -236,7 +224,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         // clear the cache files stored in the external cache folder.
         clearPublicCache(this)
         ContextUtils.initialize(applicationContext)
-        initFresco()
     }
 
     /**
@@ -295,21 +282,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     override fun getWorkManagerConfiguration(): Configuration = Configuration.Builder()
         .setWorkerFactory(workerFactory)
         .build()
-
-    /**
-     * Initialize Fresco library
-     */
-    private fun initFresco() {
-        val poolFactory = PoolFactory(
-            PoolConfig.newBuilder()
-                .setNativeMemoryChunkPoolParams(get(getAvailableMemory()))
-                .build()
-        )
-        Fresco.initialize(this, ImagePipelineConfig.newBuilder(this)
-            .setPoolFactory(poolFactory)
-            .setDownsampleEnabled(true)
-            .build())
-    }
 
     /**
      * Ask for full account info
@@ -376,7 +348,7 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
      */
     fun refreshAccountInfo() {
         //Check if the call is recently
-        if (DBUtil.callToAccountDetails() || myAccountInfo.usedFormatted.trim().isEmpty()) {
+        if (dbH.callToAccountDetails() || myAccountInfo.usedFormatted.trim().isEmpty()) {
             Timber.d("megaApi.getAccountDetails SEND")
             askForAccountDetails()
         }

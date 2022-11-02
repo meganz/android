@@ -4,7 +4,7 @@ package mega.privacy.android.domain.entity.node
 /**
  * Node
  */
-sealed interface Node {
+interface Node {
 
     /**
      * Id
@@ -50,5 +50,10 @@ sealed interface Node {
      * Is taken down
      */
     val isTakenDown: Boolean
+
+    /**
+     * Is the node an incoming share
+     */
+    val isIncomingShare: Boolean
 }
 

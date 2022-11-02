@@ -4,53 +4,65 @@ import android.content.Context
 import android.os.Build
 import android.text.Html
 import android.text.Spanned
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import androidx.fragment.app.Fragment
-import androidx.navigation.NavOptions
-import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemBucketBinding
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
-import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections.Companion.actionHomepageToRecentBucket
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
+import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.presentation.recentactions.RecentActionsAdapter.RecentActionViewHolder
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
+import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
-import mega.privacy.android.app.utils.MegaNodeUtil.getOutgoingOrIncomingParent
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Adapter to display a list of recent actions
  *
- * @property context
- * @property fragment
  */
-class RecentActionsAdapter(private val context: Context, private val fragment: Fragment) :
-    RecyclerView.Adapter<RecentActionViewHolder>(), SectionTitleProvider,
-    DragThumbnailGetter {
+class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentActionViewHolder>(),
+    SectionTitleProvider, DragThumbnailGetter {
 
-    private val megaApi: MegaApiAndroid = getInstance().megaApi
-    private val outMetrics: DisplayMetrics = context.resources.displayMetrics
+    companion object {
+        /**
+         * Cloud drive folder name
+         */
+        private const val CLOUD_DRIVE_FOLDER_NAME = "Cloud Drive"
+    }
 
     private var recentActionItems: List<RecentActionItemType>? = null
+
+    /**
+     * Lambda function to be invoked when an item is clicked with
+     *
+     * Parameters:
+     * RecentActionItemType.Item: the item clicked
+     * Int the position of the item in the list
+     */
+    private var onItemClickListener: ((RecentActionItemType.Item, Int) -> Unit)? = null
+
+    /**
+     * Lambda function to be invoked when a three dots button is clicked
+     *
+     * Parameters:
+     * MegaNode: the node associated with the three dots
+     */
+    private var onThreeDotsClickListener: ((MegaNode) -> Unit)? = null
 
     /**
      * The Homepage bottom sheet has a calculated background for elevation, while the
@@ -59,21 +71,21 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
      *
      * @return the header's background color value
      */
-    private val headerColor: Int by lazy {
-        val elevationPx = Util.dp2px(HomepageFragment.BOTTOM_SHEET_ELEVATION,
-            context.resources.displayMetrics)
-        getColorForElevation(context, elevationPx.toFloat())
-    }
+    private var headerColor: Int = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentActionViewHolder {
-        Timber.d("onCreateViewHolder")
         val binding = ItemBucketBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
+        val elevationPx = Util.dp2px(HomepageFragment.BOTTOM_SHEET_ELEVATION)
+        headerColor = getColorForElevation(parent.context, elevationPx.toFloat())
+
         return RecentActionViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: RecentActionViewHolder, position: Int) = with(holder) {
-        Timber.d("Position: %s", position)
         val item = getItemAtPosition(position) ?: return
+
+        val context = holder.itemView.context
 
         when (item) {
             is RecentActionItemType.Header -> {
@@ -81,80 +93,71 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
                 binding.itemBucketLayout.visibility = View.GONE
                 binding.headerLayout.visibility = View.VISIBLE
                 binding.headerLayout.setBackgroundColor(headerColor)
-                binding.headerText.text = TimeUtils.formatBucketDate(context, item.timestamp)
+                binding.headerText.text = TimeUtils.formatBucketDate(item.timestamp)
             }
 
             is RecentActionItemType.Item -> {
                 Timber.d("onBindViewHolder: TYPE_BUCKET")
                 binding.itemBucketLayout.visibility = View.VISIBLE
                 binding.itemBucketLayout.setOnClickListener {
-                    // If only one element in the bucket
-                    if (item.bucket.nodes.size() == 1) {
-                        (fragment as RecentActionsFragment).openFile(
-                            holder.bindingAdapterPosition,
-                            item.bucket.nodes[0])
-                    }
-                    // If more element in the bucket
-                    else {
-                        (fragment as RecentActionsFragment).viewModel.select(item.bucket)
-
-                        val currentDestination = findNavController(it).currentDestination
-                        if (currentDestination != null && currentDestination.id == R.id.homepageFragment) {
-                            findNavController(it).navigate(actionHomepageToRecentBucket(),
-                                NavOptions.Builder().build())
-                        }
-                    }
+                    onItemClickListener?.invoke(item, holder.bindingAdapterPosition)
                 }
                 binding.headerLayout.visibility = View.GONE
 
                 val bucket = item.bucket
                 val nodeList = bucket.nodes
-                if (nodeList == null || nodeList.size() == 0) return
-                val node = nodeList[0] ?: return
-                val parentNode: MegaNode =
-                    megaApi.getNodeByHandle(bucket.parentHandle) ?: return
+                val node = nodeList[0]
+
+                // folder name
                 binding.nameText.text =
-                    if (parentNode.name == "Cloud Drive") {
-                        context.getString(R.string.section_cloud_drive)
-                    } else {
-                        parentNode.name ?: ""
+                    when (item.parentFolderName) {
+                        CLOUD_DRIVE_FOLDER_NAME -> context.getFormattedStringOrDefault(R.string.section_cloud_drive)
+                        else -> item.parentFolderName
                     }
 
-                if (bucket.userEmail == megaApi.myEmail) {
+                // owner description
+                if (item.currentUserIsOwner) {
                     binding.secondLineText.visibility = View.GONE
                 } else {
                     val userAction = if (bucket.isUpdate) {
-                        context.getString(R.string.update_action_bucket, item.userName)
+                        context.getFormattedStringOrDefault(R.string.update_action_bucket,
+                            item.userName)
                     } else {
-                        context.getString(R.string.create_action_bucket, item.userName)
+                        context.getFormattedStringOrDefault(R.string.create_action_bucket,
+                            item.userName)
                     }
                     binding.secondLineText.visibility = View.VISIBLE
-                    binding.secondLineText.text = formatUserAction(userAction)
+                    binding.secondLineText.text = formatUserAction(context, userAction)
                 }
-                val parentRootNode = getOutgoingOrIncomingParent(parentNode)
-                when {
-                    parentRootNode == null -> {
+
+                // shares icon
+                when (item.parentFolderSharesType) {
+                    RecentActionsSharesType.NONE -> {
                         binding.sharedImage.visibility = View.GONE
                     }
 
-                    parentRootNode.isInShare -> {
+                    RecentActionsSharesType.INCOMING_SHARES -> {
                         binding.sharedImage.visibility = View.VISIBLE
                         binding.sharedImage.setImageResource(R.drawable.ic_folder_incoming_list)
                     }
 
-                    parentRootNode.isOutShare || megaApi.isPendingShare(parentRootNode) -> {
+                    RecentActionsSharesType.OUTGOING_SHARES,
+                    RecentActionsSharesType.PENDING_OUTGOING_SHARES,
+                    -> {
                         binding.sharedImage.visibility = View.VISIBLE
                         binding.sharedImage.setImageResource(R.drawable.ic_folder_outgoing_list)
                     }
                 }
 
+                // time
                 binding.timeText.text = TimeUtils.formatTime(item.timestamp)
-                binding.thumbnailView.visibility = View.VISIBLE
 
+                // thumbnail
+                binding.thumbnailView.visibility = View.VISIBLE
                 val params = binding.thumbnailView.layoutParams as RelativeLayout.LayoutParams
-                params.height = Util.dp2px(48f, outMetrics)
+                params.height = Util.dp2px(48f)
                 params.width = params.height
-                val margin = Util.dp2px(12f, outMetrics)
+                val margin = Util.dp2px(12f)
                 params.setMargins(margin, margin, margin, 0)
                 binding.thumbnailView.layoutParams = params
                 binding.thumbnailView.setImageResource(MimeTypeList.typeForName(node.name).iconResourceId)
@@ -163,15 +166,7 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
                 if (nodeList.size() == 1) {
                     binding.threeDots.visibility = View.VISIBLE
                     binding.threeDots.setOnClickListener {
-                        if (!Util.isOnline(context)) {
-                            (context as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
-                                context.getString(
-                                    R.string.error_server_connection_problem),
-                                -1)
-                        } else {
-                            (context as ManagerActivity).showNodeOptionsPanel(node,
-                                NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
-                        }
+                        onThreeDotsClickListener?.invoke(node)
                     }
                     binding.firstLineText.text = node.name
                     if (node.label != MegaNode.NODE_LBL_UNKNOWN) {
@@ -194,12 +189,13 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
                     binding.imgFavourite.visibility = View.GONE
 
                     if (bucket.isMedia) {
-                        binding.firstLineText.text = getMediaTitle(nodeList)
+                        binding.firstLineText.text = getMediaTitle(context, nodeList)
                         binding.thumbnailView.setImageResource(R.drawable.media)
                     } else {
-                        binding.firstLineText.text = context.getString(R.string.title_bucket,
-                            node.name,
-                            nodeList.size() - 1)
+                        binding.firstLineText.text =
+                            context.getFormattedStringOrDefault(R.string.title_bucket,
+                                node.name,
+                                nodeList.size() - 1)
                     }
                 }
 
@@ -240,7 +236,7 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
     override fun getSectionTitle(position: Int): String {
         return if (recentActionItems.isNullOrEmpty() || position < 0 || position >= itemCount)
             ""
-        else TimeUtils.formatBucketDate(context, recentActionItems!![position].timestamp)
+        else TimeUtils.formatBucketDate(recentActionItems!![position].timestamp)
     }
 
     /**
@@ -254,12 +250,31 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
     }
 
     /**
+     * Set the on item click listener
+     *
+     * @param listener function to trigger
+     */
+    fun setOnItemClickListener(listener: (RecentActionItemType.Item, Int) -> Unit) {
+        onItemClickListener = listener
+    }
+
+    /**
+     * Set the on three dots click listener
+     *
+     * @param listener function to trigger
+     */
+    fun setOnThreeDotsClickListener(listener: (MegaNode) -> Unit) {
+        onThreeDotsClickListener = listener
+    }
+
+    /**
      * Format the user action with decoration
      *
+     * @param context
      * @param userAction the string to decorate
      * @return spanned string with decoration
      */
-    private fun formatUserAction(userAction: String): Spanned {
+    private fun formatUserAction(context: Context, userAction: String): Spanned {
         val formattedUserAction = try {
             userAction
                 .replace("[A]",
@@ -280,10 +295,11 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
     /**
      * Format the title in case there are multiple nodes in one recent action item
      *
+     * @param context
      * @param nodeList list of nodes contained in the recent action item
      * @return a string corresponding to the title
      */
-    private fun getMediaTitle(nodeList: MegaNodeList): String {
+    private fun getMediaTitle(context: Context, nodeList: MegaNodeList): String {
         val partition = (0 until nodeList.size())
             .map { nodeList[it] }
             .partition { MimeTypeList.typeForName(it.name).isImage }
@@ -292,20 +308,20 @@ class RecentActionsAdapter(private val context: Context, private val fragment: F
 
         val mediaTitle = when {
             numImages > 0 && numVideos == 0 -> {
-                context.resources.getQuantityString(R.plurals.title_media_bucket_only_images,
+                context.getQuantityStringOrDefault(R.plurals.title_media_bucket_only_images,
                     numImages,
                     numImages)
             }
             numImages == 0 && numVideos > 0 -> {
-                context.resources.getQuantityString(R.plurals.title_media_bucket_only_videos,
+                context.getQuantityStringOrDefault(R.plurals.title_media_bucket_only_videos,
                     numVideos,
                     numVideos)
             }
             else -> {
-                context.resources.getQuantityString(R.plurals.title_media_bucket_images_and_videos,
+                context.getQuantityStringOrDefault(R.plurals.title_media_bucket_images_and_videos,
                     numImages,
                     numImages) +
-                        context.resources.getQuantityString(R.plurals.title_media_bucket_images_and_videos_2,
+                        context.getQuantityStringOrDefault(R.plurals.title_media_bucket_images_and_videos_2,
                             numVideos,
                             numVideos)
             }

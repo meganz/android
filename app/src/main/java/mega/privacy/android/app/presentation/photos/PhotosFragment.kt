@@ -51,8 +51,8 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
-import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.photos.timeline.view.EmptyState
@@ -313,7 +313,7 @@ class PhotosFragment : Fragment() {
     @Composable
     private fun timelineView(timelineViewState: TimelineViewState) = TimelineView(
         timelineViewState = timelineViewState,
-        downloadPhotoCover = photosViewModel::downloadPhoto,
+        photoDownload = photosViewModel::downloadPhoto,
         lazyGridState = lazyGridState,
         onTextButtonClick = this::enableCameraUploadClick,
         onFABClick = this::openFilterFragment,
@@ -613,5 +613,10 @@ class PhotosFragment : Fragment() {
 
             Timber.d("CU Upload Progress: Pending: {$pending}, Progress: {$progress}")
         }
+    }
+
+    override fun onDestroy() {
+        requireContext().unregisterReceiver(cuUpdateReceiver)
+        super.onDestroy()
     }
 }

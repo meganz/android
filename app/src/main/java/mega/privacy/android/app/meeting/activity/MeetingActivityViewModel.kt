@@ -22,6 +22,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
@@ -189,6 +190,16 @@ class MeetingActivityViewModel @Inject constructor(
                 }
             }
         }
+
+    /**
+     * Send event that in Meeting fragment is visible or not
+     *
+     * @param isVisible True if the fragment it visible, false otherwise.
+     */
+    fun sendEnterCallEvent(isVisible: Boolean) = LiveEventBus.get(
+        EventConstants.EVENT_ENTER_IN_MEETING,
+        Boolean::class.java
+    ).post(isVisible)
 
     init {
         LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean::class.java)

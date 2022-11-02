@@ -297,6 +297,13 @@ interface DatabaseHandler {
     fun findContactByEmail(mail: String?): MegaContactDB?
 
     /**
+     * Call to account details
+     *
+     * refer [mega.privacy.android.app.utils.DBUtil.callToAccountDetails]
+     */
+    fun callToAccountDetails(): Boolean
+
+    /**
      * Is completed transfers empty
      */
     val isCompletedTransfersEmpty: Boolean

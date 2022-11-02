@@ -28,25 +28,15 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@id/exo_play"
-        style="@style/AudioPlayerButton"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:src="@drawable/ic_player_mini_play"
+        android:id="@id/exo_play_pause"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:background="@null"
+        app:layout_constraintEnd_toEndOf="@id/play_pause_placeholder"
+        app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
         app:tint="@color/grey_060_white_060" />
-
-    <ImageButton
-        android:id="@id/exo_pause"
-        style="@style/AudioPlayerButton"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:src="@drawable/ic_player_mini_pause"
-        app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
-        app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
-        app:tint="@color/grey_060_white_060"
-        tools:visibility="invisible" />
 
     <TextView
         android:id="@+id/track_name"

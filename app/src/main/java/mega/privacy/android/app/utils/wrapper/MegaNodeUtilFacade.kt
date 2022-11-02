@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.res.Resources
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.saver.AutoPlayInfo
@@ -15,11 +16,15 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,9 +41,14 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun observeBackupFolder() {
         scope.launch(ioDispatcher) {
-            monitorBackupFolder().collectLatest {
-                MegaNodeUtil.myBackupHandle = it.id
-            }
+            monitorBackupFolder()
+                .catch {
+                    Timber.e(it, "Unable to get backup folder")
+                    emit(NodeId(MegaApiJava.INVALID_HANDLE)) //Use the sdk value in the wrapper
+                }
+                .collectLatest {
+                    MegaNodeUtil.myBackupHandle = it.id
+                }
         }
     }
 
@@ -108,9 +118,6 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun isNodeInRubbishOrDeleted(handle: Long) =
         MegaNodeUtil.isNodeInRubbishOrDeleted(handle)
-
-    override fun getOutgoingOrIncomingParent(node: MegaNode) =
-        MegaNodeUtil.getOutgoingOrIncomingParent(node)
 
     override fun canMoveToRubbish(nodes: List<MegaNode?>) = MegaNodeUtil.canMoveToRubbish(nodes)
 

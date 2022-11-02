@@ -35,10 +35,11 @@ import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -64,7 +65,6 @@ import javax.inject.Inject
  * @param getRubbishBinChildrenNode Fetch the rubbish bin nodes
  * @param getBrowserChildrenNode Fetch the browser nodes
  * @param monitorContactRequestUpdates
- * @param getUploadFolderHandle
  * @param getInboxNode
  * @param getRootFolder Fetch the root node
  * @param getNumUnreadUserAlerts
@@ -178,21 +178,22 @@ class ManagerViewModel @Inject constructor(
     /**
      * Monitor global node updates and dispatch to observers
      */
-    val updateNodes: LiveData<Event<List<MegaNode>>> =
+    val updateNodes =
         _updateNodes
             .also { Timber.d("onNodesUpdate") }
             .filterNotNull()
             .onEach {
                 checkItemForInbox(it)
+                onReceiveNodeUpdate(true)
             }
             .map { Event(it) }
             .asLiveData()
 
 
-    private fun checkItemForInbox(updatedNodes: List<MegaNode>) {
+    private fun checkItemForInbox(updatedNodes: List<Node>) {
         //Verify is it is a new item to the inbox
         inboxNode?.let { node ->
-            updatedNodes.find { node.handle == it.parentHandle }
+            updatedNodes.find { node.handle == it.parentId.id }
                 ?.run { updateInboxSectionVisibility() }
         }
     }
@@ -299,6 +300,21 @@ class ManagerViewModel @Inject constructor(
         _state.update { it.copy(transfersTab = tab) }
     }
 
+    /**
+     * Notify that the node update has been handled by the UI
+     */
+    fun nodeUpdateHandled() {
+        onReceiveNodeUpdate(false)
+    }
+
+    /**
+     * Set the ui one-off event when a node update is received
+     *
+     * @param update true if a node update has been received
+     */
+    private fun onReceiveNodeUpdate(update: Boolean) = viewModelScope.launch {
+        _state.update { it.copy(nodeUpdateReceived = update) }
+    }
 
     private val numUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
 
@@ -375,12 +391,12 @@ class ManagerViewModel @Inject constructor(
      * @param shouldDisable If CU or MU folder is deleted by current client, then CU should be disabled. Otherwise not.
      * @param updatedNodes  Nodes which have changed.
      */
-    fun checkCameraUploadFolder(shouldDisable: Boolean, updatedNodes: List<MegaNode>?) {
+    fun checkCameraUploadFolder(shouldDisable: Boolean, updatedNodes: List<Node>?) {
         viewModelScope.launch {
             val primaryHandle = getPrimarySyncHandle()
             val secondaryHandle = getSecondarySyncHandle()
             updatedNodes?.let {
-                val nodeMap = it.associateBy { node -> node.handle }
+                val nodeMap = it.associateBy { node -> node.id.id }
                 // If CU and MU folder don't change then return.
                 if (!nodeMap.containsKey(primaryHandle) && !nodeMap.containsKey(secondaryHandle)) {
                     Timber.d("Updated nodes don't include CU/MU, return.")
