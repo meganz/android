@@ -124,9 +124,4 @@ interface AccountRepository {
      * @return the latest account detail time stamp
      */
     suspend fun getAccountDetailsTimeStampInSeconds(): String?
-
-    /**
-     * Sets the Authentication Token used to identify the User Account
-     */
-    suspend fun setAccountAuth()
 }

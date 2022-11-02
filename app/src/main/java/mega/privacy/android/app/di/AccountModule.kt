@@ -14,7 +14,6 @@ import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnections
-import mega.privacy.android.domain.usecase.SetAccountAuth
 
 /**
  * Account module.
@@ -61,15 +60,11 @@ abstract class AccountModule {
         fun provideIsBusinessAccountActive(accountRepository: AccountRepository): IsBusinessAccountActive =
             IsBusinessAccountActive(accountRepository::isBusinessAccountActive)
 
+        /**
+         * Provides the Use Case [GetAccountAchievements]
+         */
         @Provides
         fun provideGetAccountAchievements(accountRepository: AccountRepository): GetAccountAchievements =
             GetAccountAchievements(accountRepository::getAccountAchievements)
-
-        /**
-         * Provides the Use Case [SetAccountAuth]
-         */
-        @Provides
-        fun provideSetAccountAuth(accountRepository: AccountRepository): SetAccountAuth =
-            SetAccountAuth(accountRepository::setAccountAuth)
     }
 }

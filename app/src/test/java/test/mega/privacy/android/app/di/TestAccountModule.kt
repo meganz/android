@@ -9,7 +9,6 @@ import mega.privacy.android.app.di.AccountModule
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.RetryPendingConnections
-import mega.privacy.android.domain.usecase.SetAccountAuth
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -28,7 +27,6 @@ object TestAccountModule {
     private val isBusinessAccountActive = mock<IsBusinessAccountActive> {
         on { runBlocking { invoke() } }.thenReturn(false)
     }
-    private val setAccountAuth = mock<SetAccountAuth>()
 
     @Provides
     fun bindGetSession() = getSession
@@ -38,7 +36,4 @@ object TestAccountModule {
 
     @Provides
     fun bindIsBusinessAccountActive() = isBusinessAccountActive
-
-    @Provides
-    fun bindSetAccountAuth() = setAccountAuth
 }

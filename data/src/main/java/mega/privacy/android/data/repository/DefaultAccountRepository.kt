@@ -233,8 +233,4 @@ internal class DefaultAccountRepository @Inject constructor(
         withContext(ioDispatcher) {
             dbHandler.attributes?.accountDetailsTimeStamp
         }
-
-    override suspend fun setAccountAuth() = withContext(ioDispatcher) {
-        megaApiFolderGateway.accountAuth = megaApiGateway.accountAuth
-    }
 }

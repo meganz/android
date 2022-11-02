@@ -114,7 +114,6 @@ import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.RootNodeExists
-import mega.privacy.android.domain.usecase.SetAccountAuth
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
@@ -489,12 +488,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var getSession: GetSession
-
-    /**
-     * Set Account Auth
-     */
-    @Inject
-    lateinit var setAccountAuth: SetAccountAuth
 
     /**
      * Root Node Exists
@@ -1253,8 +1246,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         runCatching { completeFastLogin(getSession().orEmpty()) }
             .fold(
                 onSuccess = {
-                    Timber.d("Complete Fast Login procedure successful. Calling setAccountAuth and starting CameraUploadsService")
-                    setAccountAuth()
+                    Timber.d("Complete Fast Login procedure successful. Start CameraUploadsService")
                     // Get cookies settings after login
                     MegaApplication.getInstance().checkEnabledCookies()
                     startWorker()
