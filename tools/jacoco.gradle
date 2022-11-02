@@ -5,8 +5,6 @@ private static boolean isAndroidModule(Project project) {
 }
 
 afterEvaluate { project ->
-    def projectName = project.name
-    System.out.println("project name = " + project.name)
     if (isAndroidModule(project)) {
         setupAndroidReporting()
     } else {
@@ -73,7 +71,6 @@ def setupAndroidReporting() {
                 sourcePath = "${productFlavorName}/${buildTypeName}"
             }
             def testTaskName = "test${sourceName.capitalize()}UnitTest"
-            System.out.println("Task -> $testTaskName")
 
             // Create coverage task of form 'testFlavorTypeCoverage' depending on 'testFlavorTypeUnitTest'
             task "${testTaskName}Coverage"(type: JacocoReport, dependsOn: "$testTaskName") {
