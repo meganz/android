@@ -799,7 +799,6 @@ public final class ChatAdvancedNotificationBuilder {
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(chatIdCallToAnswer);
         int notificationId = getCallNotificationId(callToAnswer.getCallId());
         boolean shouldVibrate = !participatingInACall();
-        boolean shouldSound = !participatingInACall();
 
         PendingIntent intentIgnore = getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.IGNORE, notificationId);
         PendingIntent callScreen = getPendingIntentMeetingRinging(context, callToAnswer.getChatid(), notificationId + ONE_REQUEST_NEEDED);
@@ -900,8 +899,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setAutoCancel(false)
                     .setDeleteIntent(intentIgnore)
                     .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
-                    .setPriority(NotificationManager.IMPORTANCE_HIGH)
-                    .setSilent(!shouldSound);
+                    .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
             notifyCall(notificationId, notificationBuilderO.build());
 
@@ -921,8 +919,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setDeleteIntent(intentIgnore)
                     .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setPriority(Notification.PRIORITY_HIGH)
-                    .setVibrate(shouldVibrate ? patternIncomingCall : noVibrationPattern)
-                    .setSilent(!shouldSound);
+                    .setVibrate(shouldVibrate ? patternIncomingCall : noVibrationPattern);
 
             notifyCall(notificationId, notificationBuilder.build());
         }
