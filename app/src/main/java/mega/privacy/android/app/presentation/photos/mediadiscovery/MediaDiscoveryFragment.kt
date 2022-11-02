@@ -52,7 +52,7 @@ class MediaDiscoveryFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun getInstance(mediaHandle: Long): MediaDiscoveryFragment {
+        fun getNewInstance(mediaHandle: Long): MediaDiscoveryFragment {
             val fragment = MediaDiscoveryFragment()
             val args = Bundle()
             args.putLong(INTENT_KEY_CURRENT_FOLDER_ID, mediaHandle)

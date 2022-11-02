@@ -14,6 +14,11 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
     /**
+     * New MediaDiscovery toggle
+     */
+    NewMediaDiscovery("Enable new mediaDiscovery feature", false),
+
+    /**
      * User albums toggle
      */
     UserAlbums("Enable user albums feature", false),
