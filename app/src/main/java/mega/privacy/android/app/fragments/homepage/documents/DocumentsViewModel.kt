@@ -119,10 +119,7 @@ class DocumentsViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch {
-            sortOrder = getCloudSortOrder()
-            loadDocuments(true)
-        }
+        fetchOrderAndLoadDocuments()
 
         items.observeForever(loadFinishedObserver)
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
@@ -138,12 +135,16 @@ class DocumentsViewModel @Inject constructor(
 
     /**
      * On SortOrder change
-     * @param forceUpdate
-     * @param order
      */
-    fun onOrderChange(forceUpdate: Boolean, order: SortOrder) {
-        sortOrder = order
-        loadDocuments(forceUpdate)
+    fun onOrderChange() {
+        fetchOrderAndLoadDocuments()
+    }
+
+    private fun fetchOrderAndLoadDocuments() {
+        viewModelScope.launch {
+            sortOrder = getCloudSortOrder()
+            loadDocuments(true)
+        }
     }
 
     /**

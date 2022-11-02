@@ -12,7 +12,7 @@ typealias SortOrderIntMapper = (@JvmSuppressWildcards SortOrder) -> @JvmSuppress
 /**
  * Map [SortOrder] to [Int]
  */
-internal fun sortOrderToInt(sortOrder: SortOrder) = when (sortOrder) {
+fun sortOrderToInt(sortOrder: SortOrder) = when (sortOrder) {
     SortOrder.ORDER_NONE -> MegaApiJava.ORDER_NONE
     SortOrder.ORDER_DEFAULT_ASC -> MegaApiJava.ORDER_DEFAULT_ASC
     SortOrder.ORDER_DEFAULT_DESC -> MegaApiJava.ORDER_DEFAULT_DESC

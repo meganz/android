@@ -1,7 +1,5 @@
 package mega.privacy.android.domain.usecase
 
-import kotlinx.coroutines.flow.Flow
-
 /**
  * Fetch multi factor auth setting
  *
@@ -12,5 +10,5 @@ fun interface FetchMultiFactorAuthSetting {
      *
      * @return
      */
-    operator fun invoke(): Flow<Boolean>
+    suspend operator fun invoke(): Boolean
 }

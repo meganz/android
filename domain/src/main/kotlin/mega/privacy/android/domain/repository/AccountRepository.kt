@@ -53,13 +53,6 @@ interface AccountRepository {
     suspend fun isMultiFactorAuthEnabled(): Boolean
 
     /**
-     * Monitor multi factor auth changes
-     *
-     * @return a flow that emits changes to the multi-factor auth enabled state
-     */
-    fun monitorMultiFactorAuthChanges(): Flow<Boolean>
-
-    /**
      * Request delete account link
      *
      * Sends a delete account link to the user's email address
@@ -111,6 +104,11 @@ interface AccountRepository {
     suspend fun getSubscriptionPlans(): List<SubscriptionPlan>
 
     /**
+     * Returns if accounts achievements enabled
+     */
+    suspend fun isAccountAchievementsEnabled(): Boolean
+
+    /**
      * Get account achievements
      *
      * @return MegaAchievement
@@ -119,4 +117,11 @@ interface AccountRepository {
         achievementType: AchievementType,
         awardIndex: Long,
     ): MegaAchievement
+
+    /**
+     * Get account details time stamp
+     *
+     * @return the latest account detail time stamp
+     */
+    suspend fun getAccountDetailsTimeStampInSeconds(): String?
 }

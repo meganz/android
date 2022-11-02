@@ -11,6 +11,8 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSetElementList
+import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -799,6 +801,11 @@ interface MegaApiGateway {
     fun getUserAttribute(attributeIdentifier: Int, listener: MegaRequestListenerInterface)
 
     /**
+     * Returns if accounts achievements enabled
+     */
+    suspend fun isAccountAchievementsEnabled(): Boolean
+
+    /**
      * Get account achievements
      *
      * @param listener : MegaRequestListenerInterface
@@ -886,4 +893,38 @@ interface MegaApiGateway {
      * @return Rubbish node of the account.
      */
     suspend fun getRubbishNode(): MegaNode
+
+    /**
+     * Create a new MegaSet item
+     *
+     * @param name the name of the set
+     * @param listener [MegaRequestListenerInterface]
+     */
+    suspend fun createSet(name: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Create a new element for the set
+     *
+     * @param sid the ID of the set
+     * @param node the node handle of the node which will be assigned as the set's new element
+     */
+    suspend fun createSetElement(sid: Long, node: Long)
+
+    /**
+     * Get a list of all Sets available for current user.
+     * The response value is stored as a MegaSetList.
+     * You take the ownership of the returned value
+     *
+     * @return list of Sets
+     */
+    suspend fun getSets(): MegaSetList
+
+    /**
+     * Get all Elements in the Set with given id, for current user.
+     * The response value is stored as a MegaSetElementList.
+     *
+     * @param sid the id of the Set owning the Elements
+     * @return all Elements in that Set, or null if not found or none added
+     */
+    suspend fun getSetElements(sid: Long): MegaSetElementList
 }

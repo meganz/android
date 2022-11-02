@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.exception.SynchronisationException
@@ -269,7 +270,7 @@ internal class DefaultFilesRepository @Inject constructor(
         }
     }
 
-    override suspend fun getNodeChildren(folderNode: FolderNode): List<Node> {
+    override suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode> {
         return withContext(ioDispatcher) {
             megaApiGateway.getMegaNodeByHandle(folderNode.id.id)?.let { parent ->
                 megaApiGateway.getChildrenByNode(parent)

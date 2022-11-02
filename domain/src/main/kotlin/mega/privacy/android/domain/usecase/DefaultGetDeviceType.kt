@@ -2,8 +2,12 @@ package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.DeviceType
 import mega.privacy.android.domain.entity.node.FolderNode
+import javax.inject.Inject
 
-class DefaultGetDeviceType : GetDeviceType {
+/**
+ * Default get device type
+ */
+class DefaultGetDeviceType @Inject constructor() : GetDeviceType {
     override suspend fun invoke(folder: FolderNode): DeviceType {
         return when {
             winRegex.containsMatchIn(folder.name) -> DeviceType.Windows

@@ -26,7 +26,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -69,7 +69,7 @@ class MediaPlayerFragment : Fragment() {
 
     private var delayHideToolbarCanceled = false
 
-    private var videoPlayerView: PlayerView? = null
+    private var videoPlayerView: StyledPlayerView? = null
 
     private var isAudioPlayer = false
 
@@ -400,7 +400,7 @@ class MediaPlayerFragment : Fragment() {
 
     private fun setupPlayerView(
         mediaPlayerServiceGateway: MediaPlayerServiceGateway,
-        playerView: PlayerView,
+        playerView: StyledPlayerView,
         isVideoPlayer: Boolean,
     ) {
         mediaPlayerServiceGateway.setupPlayerView(
@@ -409,17 +409,19 @@ class MediaPlayerFragment : Fragment() {
             controllerHideOnTouch = isVideoPlayer,
             showShuffleButton = !isVideoPlayer,
         )
-        playerView.setControllerVisibilityListener { visibility ->
-            if (visibility == View.VISIBLE && !toolbarVisible) {
-                playerView.hideController()
-            }
-        }
+
         playerView.setOnClickListener {
             if (toolbarVisible) {
                 hideToolbar()
+                if (isVideoPlayer()) {
+                    playerView.hideController()
+                }
             } else {
                 delayHideToolbarCanceled = true
                 showToolbar()
+                if (isVideoPlayer()) {
+                    playerView.showController()
+                }
                 if (viewModel.isLockUpdate.value) {
                     delayHideToolbar()
                 }
@@ -440,7 +442,6 @@ class MediaPlayerFragment : Fragment() {
         runDelay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS) {
             if (isResumed && !delayHideToolbarCanceled) {
                 hideToolbar()
-
                 videoPlayerVH?.hideController()
             }
         }

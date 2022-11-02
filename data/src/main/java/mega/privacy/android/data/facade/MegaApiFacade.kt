@@ -26,6 +26,8 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSetElementList
+import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -478,6 +480,8 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.getUserAttribute(attributeIdentifier, listener)
     }
 
+    override suspend fun isAccountAchievementsEnabled(): Boolean = megaApi.isAchievementsEnabled
+
     override fun getAccountAchievements(listener: MegaRequestListenerInterface?) =
         megaApi.getAccountAchievements(listener)
 
@@ -504,4 +508,14 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getOutShares(order: Int): List<MegaShare> = megaApi.getOutShares(order)
 
     override suspend fun getRubbishNode(): MegaNode = megaApi.rubbishNode
+
+    override suspend fun createSet(name: String, listener: MegaRequestListenerInterface) =
+        megaApi.createSet(name, listener)
+
+    override suspend fun createSetElement(sid: Long, node: Long) =
+        megaApi.createSetElement(sid, node)
+
+    override suspend fun getSets(): MegaSetList = megaApi.sets
+
+    override suspend fun getSetElements(sid: Long): MegaSetElementList = megaApi.getSetElements(sid)
 }

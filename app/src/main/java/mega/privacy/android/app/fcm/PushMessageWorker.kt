@@ -18,10 +18,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.domain.exception.LoginAlreadyRunningException
-import mega.privacy.android.domain.usecase.FastLogin
-import mega.privacy.android.domain.usecase.FetchNodes
+import mega.privacy.android.domain.usecase.CompleteFastLogin
 import mega.privacy.android.domain.usecase.GetSession
-import mega.privacy.android.domain.usecase.InitMegaChat
 import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.RootNodeExists
@@ -30,14 +28,12 @@ import timber.log.Timber
 /**
  * Worker class to manage push notifications.
  *
- * @property getSession                 Required for checking credentials.
- * @property rootNodeExists                 Required for checking if it is logged in.
- * @property fastLogin                      Required for performing fast login.
- * @property fetchNodes                     Required for fetching nodes.
- * @property initMegaChat                   Required for initializing megaChat.
- * @property pushReceived                   Required for notifying received pushes.
- * @property retryPendingConnections        Required for retrying pending connections.
- * @property pushMessageMapper              [PushMessageMapper].
+ * @property getSession              Required for checking credentials.
+ * @property rootNodeExists          Required for checking if it is logged in.
+ * @property completeFastLogin       Required for performing a complete login process with an existing session.
+ * @property pushReceived            Required for notifying received pushes.
+ * @property retryPendingConnections Required for retrying pending connections.
+ * @property pushMessageMapper       [PushMessageMapper].
  */
 @HiltWorker
 class PushMessageWorker @AssistedInject constructor(
@@ -45,9 +41,7 @@ class PushMessageWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val getSession: GetSession,
     private val rootNodeExists: RootNodeExists,
-    private val fastLogin: FastLogin,
-    private val fetchNodes: FetchNodes,
-    private val initMegaChat: InitMegaChat,
+    private val completeFastLogin: CompleteFastLogin,
     private val pushReceived: PushReceived,
     private val retryPendingConnections: RetryPendingConnections,
     private val pushMessageMapper: PushMessageMapper,
@@ -64,16 +58,7 @@ class PushMessageWorker @AssistedInject constructor(
             if (!rootNodeExists()) {
                 Timber.d("Needs fast login")
 
-                kotlin.runCatching { initMegaChat(session) }
-                    .fold(
-                        { Timber.d("Init chat success.") },
-                        { error ->
-                            Timber.e("Init chat error: $error")
-                            return@withContext Result.failure()
-                        }
-                    )
-
-                kotlin.runCatching { fastLogin(session) }
+                kotlin.runCatching { completeFastLogin(session) }
                     .fold(
                         { Timber.d("Fast login success.") },
                         { error ->
@@ -84,15 +69,6 @@ class PushMessageWorker @AssistedInject constructor(
                                 Timber.e("Fast login error: $error")
                                 return@withContext Result.failure()
                             }
-                        }
-                    )
-
-                kotlin.runCatching { fetchNodes() }
-                    .fold(
-                        { Timber.d("Fetch nodes success.") },
-                        { error ->
-                            Timber.e("Fetch nodes error: $error")
-                            return@withContext Result.failure()
                         }
                     )
             } else {
@@ -109,7 +85,7 @@ class PushMessageWorker @AssistedInject constructor(
                                 .generateChatNotification(request)
                         },
                         { error ->
-                            Timber.e("Push received error. ", error)
+                            Timber.e("Push received error: ${error.message}")
                             return@withContext Result.failure()
                         }
                     )

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
@@ -36,6 +37,7 @@ import mega.privacy.android.app.presentation.photos.albums.view.EmptyView
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.presentation.theme.AndroidTheme
@@ -70,7 +72,7 @@ class AlbumDynamicContentFragment : Fragment() {
         super.onCreate(savedInstanceState)
         managerActivity = activity as ManagerActivity
         actionModeCallback =
-            AlbumContentActionModeCallback(this, albumsViewModel.state.value.currentAlbum)
+            AlbumContentActionModeCallback(this, albumsViewModel.state.value.currentAlbumId)
     }
 
     override fun onCreateView(
@@ -120,7 +122,7 @@ class AlbumDynamicContentFragment : Fragment() {
                         actionMode?.title = state.selectedPhotoIds.size.toString()
                     }
                     menu?.let { menu ->
-                        state.currentAlbum?.let { album ->
+                        state.currentAlbumId?.let { album ->
                             val photos = state.albums.getAlbumPhotos(album)
                             menu.findItem(R.id.action_menu_sort_by)?.isVisible =
                                 photos.isNotEmpty()
@@ -142,7 +144,7 @@ class AlbumDynamicContentFragment : Fragment() {
         }
 
         val photos = remember(uiState.albums, uiState.currentSort) {
-            uiState.currentAlbum?.let { album ->
+            uiState.currentAlbumId?.let { album ->
                 val sourcePhotos = uiState.albums.getAlbumPhotos(album)
                 if (uiState.currentSort == Sort.NEWEST) {
                     sourcePhotos.sortedByDescending { it.modificationTime }
@@ -162,12 +164,25 @@ class AlbumDynamicContentFragment : Fragment() {
                 selectedPhotoIds = uiState.selectedPhotoIds
             )
         } else {
-            EmptyView()
+            when (uiState.currentAlbumId) {
+                Album.FavouriteAlbum -> EmptyView()
+                Album.GifAlbum -> Back()
+                Album.RawAlbum -> Back()
+                is Album.UserAlbum -> Back()
+                null -> Back()
+            }
+        }
+    }
+
+    @Composable
+    private fun Back() {
+        SideEffect {
+            managerActivity.onBackPressedDispatcher.onBackPressed()
         }
     }
 
     private fun openPhoto(photo: Photo) {
-        albumsViewModel.state.value.currentAlbum?.let { album ->
+        albumsViewModel.state.value.currentAlbumId?.let { album ->
             val albumPhotosHandles =
                 albumsViewModel.state.value.albums.getAlbumPhotos(album).map { photo ->
                     photo.id
@@ -230,7 +245,7 @@ class AlbumDynamicContentFragment : Fragment() {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        albumsViewModel.state.value.currentAlbum?.let { album ->
+        albumsViewModel.state.value.currentAlbumId?.let { album ->
             val photos = albumsViewModel.state.value.albums.getAlbumPhotos(album)
             menu.findItem(R.id.action_menu_sort_by)?.isVisible = photos.isNotEmpty()
         }
@@ -251,12 +266,15 @@ class AlbumDynamicContentFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    /**
+     * Get current page title
+     */
     fun getCurrentAlbumTitle(): String {
-        val currentAlbum = albumsViewModel.state.value.currentAlbum
+        val currentAlbum = albumsViewModel.state.value.currentAlbumId
         val currentUIAlbum =
             albumsViewModel.state.value.albums.find { UIAlbum -> UIAlbum.id == currentAlbum }
         return if (context != null && currentUIAlbum != null) {
-            currentUIAlbum.title(context!!)
+            currentUIAlbum.title(requireContext())
         } else {
             getString(R.string.tab_title_album)
         }

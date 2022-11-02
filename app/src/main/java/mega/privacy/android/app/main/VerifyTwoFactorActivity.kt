@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main
 
+import android.app.Activity
 import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
@@ -11,13 +12,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.EditTextPIN
-import mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED
 import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.controllers.AccountController
@@ -471,7 +470,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                 if (!request.flag) {
                     // Send live event to notify.
                     Timber.d("Pin correct: Two-Factor Authentication disabled")
-                    LiveEventBus.get(EVENT_2FA_UPDATED, Boolean::class.java).post(false)
+                    setResult(Activity.RESULT_OK)
                     showAlert(R.string.label_2fa_disabled, INVALID_VALUE)
                 } else {
                     Timber.w("Disable 2fa failed.")

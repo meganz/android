@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.settings
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
@@ -14,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentResultListener
 import androidx.fragment.app.viewModels
@@ -89,6 +91,13 @@ class SettingsFragment :
     private var numberOfClicksSDK = 0
 
     private val viewModel: SettingsViewModel by viewModels()
+
+    private val twoFactorAuthenticationLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                viewModel.refreshMultiFactorAuthSetting()
+            }
+        }
 
     private var playerServiceViewModelGateway: PlayerServiceViewModelGateway? = null
     private val mediaServiceConnection: ServiceConnection = object : ServiceConnection {
@@ -277,12 +286,12 @@ class SettingsFragment :
                 )
             )
             KEY_2FA -> if (viewModel.uiState.value.multiFactorAuthChecked) {
-                val intent = Intent(context, VerifyTwoFactorActivity::class.java)
-                intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, Constants.DISABLE_2FA)
-                startActivity(intent)
+                twoFactorAuthenticationLauncher.launch(Intent(context, VerifyTwoFactorActivity::class.java).apply {
+                    putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, Constants.DISABLE_2FA)
+                })
             } else {
-                val intent = Intent(context, TwoFactorAuthenticationActivity::class.java)
-                startActivity(intent)
+                twoFactorAuthenticationLauncher.launch(Intent(context,
+                    TwoFactorAuthenticationActivity::class.java))
             }
             KEY_QR_CODE_AUTO_ACCEPT -> {
                 viewModel.toggleAutoAcceptPreference()

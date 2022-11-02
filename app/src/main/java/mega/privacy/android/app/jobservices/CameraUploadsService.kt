@@ -183,6 +183,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         const val EXTRA_IGNORE_ATTR_CHECK = "EXTRA_IGNORE_ATTR_CHECK"
 
         /**
+         * Primary sync handle successfully set
+         */
+        const val EXTRA_PRIMARY_SYNC_SUCCESS = "EXTRA_PRIMARY_SYNC_SUCCESS"
+
+        /**
          * Camera Uploads Cache Folder
          */
         const val CU_CACHE_FOLDER = "cu"
@@ -645,6 +650,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         if (intent != null) {
             ignoreAttr = intent.getBooleanExtra(EXTRA_IGNORE_ATTR_CHECK, false)
+            isPrimaryHandleSynced = intent.getBooleanExtra(EXTRA_PRIMARY_SYNC_SUCCESS, false)
         }
 
         Timber.d("Start Service - Create Coroutine")
@@ -1334,27 +1340,21 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * Callback when getting CU folder handle from CU attributes completes.
+     * Callback when getting Primary folder handle from Primary attributes completes.
      *
-     * @param handle      CU folder handle stored in CU attributes.
-     * @param errorCode   Used to get error code to see if the request is successful.
-     * @param shouldStart If should start CU process.
+     * @param handle      Primary folder handle stored in Primary attributes.
+     * @param shouldStart If should start worker for camera upload.
      */
-    fun onGetPrimaryFolderAttribute(handle: Long, errorCode: Int, shouldStart: Boolean) {
-        if (errorCode == MegaError.API_OK || errorCode == MegaError.API_ENOENT) {
-            isPrimaryHandleSynced = true
-            coroutineScope?.launch {
-                if (getPrimarySyncHandle() != handle) {
-                    setPrimarySyncHandle(handle)
-                }
-                if (shouldStart) {
-                    Timber.d("On Get Primary - Start Coroutine")
-                    startWorker()
-                }
+    fun onGetPrimaryFolderAttribute(handle: Long, shouldStart: Boolean) {
+        isPrimaryHandleSynced = true
+        coroutineScope?.launch {
+            if (getPrimarySyncHandle() != handle) {
+                setPrimarySyncHandle(handle)
             }
-        } else {
-            Timber.w("On Get Primary - Failed")
-            endService()
+            if (shouldStart) {
+                Timber.d("On Get Primary - Start Coroutine")
+                startWorker()
+            }
         }
     }
 
@@ -1362,21 +1362,15 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * Callback when getting MU folder handle from CU attributes completes.
      *
      * @param handle    MU folder handle stored in CU attributes.
-     * @param errorCode Used to get error code to see if the request is successful.
      */
-    fun onGetSecondaryFolderAttribute(handle: Long, errorCode: Int) {
-        if (errorCode == MegaError.API_OK || errorCode == MegaError.API_ENOENT) {
-            coroutineScope?.launch {
-                if (getSecondarySyncHandle() != handle) {
-                    setSecondarySyncHandle(handle)
-                }
-                // Start upload now - unlike in onGetPrimaryFolderAttribute where it needs to wait for getting Media Uploads folder handle to complete
-                Timber.d("On Get Secondary - Start Coroutine")
-                startWorker()
+    fun onGetSecondaryFolderAttribute(handle: Long) {
+        coroutineScope?.launch {
+            if (getSecondarySyncHandle() != handle) {
+                setSecondarySyncHandle(handle)
             }
-        } else {
-            Timber.w("On Get Secondary - Failed")
-            endService()
+            // Start upload now - unlike in onGetPrimaryFolderAttribute where it needs to wait for getting Media Uploads folder handle to complete
+            Timber.d("On Get Secondary - Start Coroutine")
+            startWorker()
         }
     }
 

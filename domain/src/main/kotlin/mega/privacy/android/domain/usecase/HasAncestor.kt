@@ -9,9 +9,9 @@ fun interface HasAncestor {
     /**
      * Invoke
      *
-     * @param targetNode
+     * @param targetNodeId
      * @param ancestorId
      * @return true if node id appears in the history of the target node else false
      */
-    suspend operator fun invoke(targetNode: NodeId, ancestorId: NodeId): Boolean
+    suspend operator fun invoke(targetNodeId: NodeId, ancestorId: NodeId): Boolean
 }

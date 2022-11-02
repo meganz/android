@@ -62,7 +62,7 @@ class MediaViewModel @Inject constructor(
 
     var mZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
 
-    fun getOrder() = runBlocking { sortOrderIntMapper(getCameraSortOrder()) }
+    fun getOrder() = runBlocking { getCameraSortOrder() }
 
     var currentHandle: Long? = null
 

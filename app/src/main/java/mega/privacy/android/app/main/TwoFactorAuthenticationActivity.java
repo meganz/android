@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main;
 
-import static mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.utils.Constants.ACTION_RECOVERY_KEY_EXPORTED;
 import static mega.privacy.android.app.utils.Constants.ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT;
@@ -9,6 +8,7 @@ import static mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
@@ -592,7 +592,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     }
 
     void update2FASetting() {
-        LiveEventBus.get(EVENT_2FA_UPDATED, Boolean.class).post(true);
+        setResult(Activity.RESULT_OK);
     }
 
     void pasteClipboard() {

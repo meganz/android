@@ -90,6 +90,8 @@ import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_AUDIO
@@ -121,6 +123,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getGlobalTransferUseCase: GetGlobalTransferUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val sortOrderIntMapper: SortOrderIntMapper,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
@@ -337,10 +340,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                             INVALID_HANDLE
                         )
-                        val order = intent.getIntExtra(
-                            INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                            ORDER_DEFAULT_ASC
-                        )
+                        val order = getSortOrderFromIntent(intent)
 
                         if (isInRootLinksLevel(type, parentHandle)) {
                             playlistTitle.postValue(
@@ -455,10 +455,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                             INVALID_HANDLE
                         )
-                        val order = intent.getIntExtra(
-                            INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                            ORDER_DEFAULT_ASC
-                        )
+                        val order = getSortOrderFromIntent(intent)
 
                         (if (parentHandle == INVALID_HANDLE) {
                             megaApiFolder.getRootNode()
@@ -703,13 +700,28 @@ class MediaPlayerServiceViewModel @Inject constructor(
         intent: Intent,
         firstPlayHandle: Long,
     ) {
-        val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
+        val order = getSortOrderFromIntent(intent)
         val children = megaApi.getChildren(parent, order)
         buildPlaylistFromNodes(type, children, firstPlayHandle)
     }
 
+    private fun getSortOrderFromIntent(intent: Intent): Int {
+        val order =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getSerializableExtra(
+                    INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                    SortOrder::class.java) ?: SortOrder.ORDER_DEFAULT_ASC
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getSerializableExtra(
+                    INTENT_EXTRA_KEY_ORDER_GET_CHILDREN) as SortOrder?
+                    ?: SortOrder.ORDER_DEFAULT_ASC
+            }
+        return sortOrderIntMapper(order)
+    }
+
     private suspend fun buildPlaylistForAudio(type: Int, intent: Intent, firstPlayHandle: Long) {
-        val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
+        val order = getSortOrderFromIntent(intent)
         cancelToken = initNewSearch()
         buildPlaylistFromNodes(
             type = type,
@@ -722,7 +734,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     }
 
     private suspend fun buildPlaylistForVideos(type: Int, intent: Intent, firstPlayHandle: Long) {
-        val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
+        val order = getSortOrderFromIntent(intent)
         cancelToken = initNewSearch()
         buildPlaylistFromNodes(
             type = type,

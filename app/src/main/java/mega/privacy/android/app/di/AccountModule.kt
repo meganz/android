@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.DefaultGetAccountDetails
 import mega.privacy.android.domain.usecase.DefaultMonitorUserUpdates
@@ -42,5 +43,9 @@ abstract class AccountModule {
         @Provides
         fun provideIsBusinessAccountActive(accountRepository: AccountRepository): IsBusinessAccountActive =
             IsBusinessAccountActive(accountRepository::isBusinessAccountActive)
+
+        @Provides
+        fun provideGetAccountAchievements(accountRepository: AccountRepository): GetAccountAchievements =
+            GetAccountAchievements(accountRepository::getAccountAchievements)
     }
 }

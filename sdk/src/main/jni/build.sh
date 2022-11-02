@@ -41,7 +41,7 @@ if [ ! -d "${JAVA_HOME}" ]; then
     exit 1
 fi
 
-#This is only for support to build using Mac M1. Please remove this once NDK provides support to M1.
+#This is only for support to build using Mac with Apple Silicon. Please remove this once NDK provides support to M1.
 if [[ `uname -m` == 'arm64' ]]; then
     NDK_BUILD="arch -x86_64 ${NDK_ROOT}/ndk-build"
 else
@@ -50,6 +50,7 @@ fi
 
 BASE_PATH=`pwd`
 LIBDIR=${BASE_PATH}/../obj/local/armeabi
+TARGET_LIB_DIR=../jniLibs
 JAVA_OUTPUT_PATH=${BASE_PATH}/../java
 APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
 API_LEVEL=`echo ${APP_PLATFORM} | cut -d'-' -f2`
@@ -144,11 +145,11 @@ PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/pdfium-
 PDFVIEWER_SHA1="9c346de2fcf328c65c7047f03357a049dc55b403"
 
 EXOPLAYER=ExoPlayer
-EXOPLAYER_VERSION=2.16.0
+EXOPLAYER_VERSION=2.18.1
 EXOPLAYER_SOURCE_FILE=ExoPlayer-r${EXOPLAYER_VERSION}.zip
 EXOPLAYER_SOURCE_FOLDER=ExoPlayer-r${EXOPLAYER_VERSION}
 EXOPLAYER_DOWNLOAD_URL=https://github.com/google/ExoPlayer/archive/r${EXOPLAYER_VERSION}.zip
-EXOPLAYER_SHA1="8e1fe0e78761f372455c909ce19a50a6d7b0e183"
+EXOPLAYER_SHA1="01761adc1cf3dc88032539432f58303ce8a5eb02"
 FFMPEG_VERSION=4.2
 FFMPEG_EXT_LIBRARY=exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
 FLAC_VERSION=1.3.2
@@ -375,10 +376,15 @@ if [ "$1" == "clean" ]; then
     rm -rf ../obj/local/x86_64
     
     echo "* Deleting libraries"
-    rm -rf ../libs/armeabi-v7a
-    rm -rf ../libs/arm64-v8a
-    rm -rf ../libs/x86
-    rm -rf ../libs/x86_64
+    rm -rf ${TARGET_LIB_DIR}/armeabi-v7a
+    rm -rf ${TARGET_LIB_DIR}/arm64-v8a
+    rm -rf ${TARGET_LIB_DIR}/x86
+    rm -rf ${TARGET_LIB_DIR}/x86_64
+
+    rm -rf ${TARGET_LIB_DIR}/armeabi-v7a
+    rm -rf ${TARGET_LIB_DIR}/arm64-v8a
+    rm -rf ${TARGET_LIB_DIR}/x86
+    rm -rf ${TARGET_LIB_DIR}/x86_64
     rm -rf ${EXOPLAYER}/${FFMPEG_EXT_LIBRARY}
     rm -rf ${EXOPLAYER}/${FLAC_EXT_LIBRARY}
 
@@ -692,32 +698,32 @@ rm -rf ../tmpLibs
 mkdir ../tmpLibs
 if [ -n "`echo ${BUILD_ARCHS} | grep -w x86`" ]; then
     echo "* Running ndk-build x86"
-    ${NDK_BUILD} -j${JOBS} APP_ABI=x86 &>> ${LOG_FILE}
-    mv ../libs/x86 ../tmpLibs/
+    ${NDK_BUILD} NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=x86 &>> ${LOG_FILE}
+    mv ${TARGET_LIB_DIR}/x86 ../tmpLibs/
     echo "* ndk-build finished for x86"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w armeabi-v7a`" ]; then
     echo "* Running ndk-build arm 32bits"
-    ${NDK_BUILD} -j${JOBS} APP_ABI=armeabi-v7a &>> ${LOG_FILE}
-    mv ../libs/armeabi-v7a ../tmpLibs/
+    ${NDK_BUILD} NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=armeabi-v7a &>> ${LOG_FILE}
+    mv ${TARGET_LIB_DIR}/armeabi-v7a ../tmpLibs/
     echo "* ndk-build finished for arm 32bits"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w x86_64`" ]; then
     echo "* Running ndk-build x86_64"
-    ${NDK_BUILD} -j${JOBS} APP_ABI=x86_64 &>> ${LOG_FILE}
-    mv ../libs/x86_64 ../tmpLibs/
+    ${NDK_BUILD} NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=x86_64 &>> ${LOG_FILE}
+    mv ${TARGET_LIB_DIR}/x86_64 ../tmpLibs/
     echo "* ndk-build finished for x86_64"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w arm64-v8a`" ]; then
     echo "* Running ndk-build arm 64bits"
-    ${NDK_BUILD} -j${JOBS} APP_ABI=arm64-v8a &>> ${LOG_FILE}
+    ${NDK_BUILD} NDK_LIBS_OUT=${TARGET_LIB_DIR} -j${JOBS} APP_ABI=arm64-v8a &>> ${LOG_FILE}
     echo "* ndk-build finished for arm 64bits"
-    mv ../libs/arm64-v8a ../tmpLibs/
+    mv ${TARGET_LIB_DIR}/arm64-v8a ../tmpLibs/
 fi
-mv ../tmpLibs/* ../libs/
-rmdir ../tmpLibs/
+mv ../tmpLibs/* ${TARGET_LIB_DIR}
+rm -fr ../tmpLibs/
 
 echo "* Task finished OK"
