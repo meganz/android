@@ -21,8 +21,7 @@ import mega.privacy.android.app.presentation.favourites.FavouriteFolderFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import nz.mega.sdk.MegaNode
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matcher
@@ -127,7 +126,7 @@ class FavouriteFolderFragmentTest {
         whenever(node.name).thenReturn("testName.txt")
         whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
         whenever(node.size).thenReturn(1000L)
-        val favouriteInfo = mock<FolderNode>()
+        val favouriteInfo = mock<TypedFolderNode>()
         val favourites = listOf(
             favouriteInfo
         )

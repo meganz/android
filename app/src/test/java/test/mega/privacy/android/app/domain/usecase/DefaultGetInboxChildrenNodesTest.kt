@@ -10,6 +10,7 @@ import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import nz.mega.sdk.MegaNode
@@ -90,7 +91,7 @@ class DefaultGetInboxChildrenNodesTest {
     @Test
     fun `test that whenever a node update occurs, the use case to retrieve the inbox children nodes is called`() =
         runTest {
-            val testNodeUpdates = List(5) { mock<MegaNode>() }
+            val testNodeUpdates = List(5) { mock<Node>() }
             val testInboxNode = mock<MegaNode>()
 
             whenever(monitorNodeUpdates()).thenReturn(flowOf(testNodeUpdates))

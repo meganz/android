@@ -11,6 +11,9 @@ import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -42,7 +45,7 @@ class FavouriteMapperTest {
             on { isInShare }.thenReturn(expectedIsShared)
         }
 
-        val favouriteInfo = mock<FolderNode> {
+        val favouriteInfo = mock<TypedFolderNode> {
             on { id }.thenReturn(NodeId(expectedHandle))
             on { name }.thenReturn(expectedName)
             on { label }.thenReturn(expectedLabel)
@@ -126,7 +129,7 @@ class FavouriteMapperTest {
             on { isVideo() }.thenReturn(false)
         }
 
-        val favouriteInfo = mock<FileNode> {
+        val favouriteInfo = mock<TypedFileNode> {
             on { id }.thenReturn(NodeId(expectedHandle))
             on { name }.thenReturn(expectedName)
             on { size }.thenReturn(expectedSize)

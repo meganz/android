@@ -301,7 +301,6 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
-import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
@@ -360,6 +359,7 @@ import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment;
 import mega.privacy.android.app.presentation.photos.PhotosFragment;
+import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment;
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
@@ -422,6 +422,7 @@ import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
+import mega.privacy.android.domain.entity.node.Node;
 import mega.privacy.android.domain.entity.transfer.TransferType;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import nz.mega.documentscanner.DocumentScannerActivity;
@@ -770,7 +771,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private TurnOnNotificationsFragment turnOnNotificationsFragment;
     private PermissionsFragment permissionsFragment;
     private SMSVerificationFragment smsVerificationFragment;
-    private MediaDiscoveryFragment mediaDiscoveryFragment;
+    private Fragment mediaDiscoveryFragment;
 
     private boolean mStopped = true;
     private int bottomItemBeforeOpenFullscreenOffline = INVALID_VALUE;
@@ -1362,7 +1363,7 @@ public class ManagerActivity extends TransfersManagementActivity
         outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog));
 
         outState.putBoolean(STATE_KEY_IS_IN_MD_MODE, isInMDMode);
-        mediaDiscoveryFragment = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
+        mediaDiscoveryFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
         if (mediaDiscoveryFragment != null) {
             getSupportFragmentManager().putFragment(outState, FragmentTag.MEDIA_DISCOVERY.getTag(), mediaDiscoveryFragment);
         }
@@ -1435,11 +1436,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     updateUserAlerts(userAlerts);
                     return null;
                 }));
-        viewModel.getUpdateNodes().observe(this,
-                new EventObserver<>(nodes -> {
-                    onUpdateNodes(nodes);
-                    return null;
-                }));
         viewModel.getUpdateContactsRequests().observe(this,
                 new EventObserver<>(contactRequests -> {
                     updateContactRequests(contactRequests);
@@ -1505,7 +1501,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 smsVerificationFragment = (SMSVerificationFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.SMS_VERIFICATION.getTag());
             }
             mElevationCause = savedInstanceState.getInt("elevation", 0);
-            storageState = (StorageState)savedInstanceState.getSerializable("storageState");
+            storageState = (StorageState) savedInstanceState.getSerializable("storageState");
             isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
             comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", INVALID_VALUE);
             openLinkDialogIsShown = savedInstanceState.getBoolean(OPEN_LINK_DIALOG_SHOWN, false);
@@ -1517,9 +1513,14 @@ public class ManagerActivity extends TransfersManagementActivity
             linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
             isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
             isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false);
+            if (isInMDMode) {
+                mediaDiscoveryFragment = getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.MEDIA_DISCOVERY.getTag());
+            }
             isInAlbumContent = savedInstanceState.getBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, false);
+            if (isInAlbumContent){
+                albumContentFragment = getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.ALBUM_CONTENT.getTag());
+            }
             isInFilterPage = savedInstanceState.getBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, false);
-
 
             nodeAttacher.restoreState(savedInstanceState);
             nodeSaver.restoreState(savedInstanceState);
@@ -2634,6 +2635,16 @@ public class ManagerActivity extends TransfersManagementActivity
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
             updateInboxSectionVisibility(managerState.getHasInboxChildren());
             stopUploadProcessAndSendBroadcast(managerState.getShouldStopCameraUpload(), managerState.getShouldSendCameraBroadcastEvent());
+            if (managerState.getNodeUpdateReceived()) {
+                // Invalidate the menu will collapse/expand the search view and set the query text to ""
+                // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
+                // text changed to "" for once)
+                if (drawerItem != DrawerItem.HOMEPAGE) {
+                    setToolbarTitle();
+                    supportInvalidateOptionsMenu();
+                }
+                viewModel.nodeUpdateHandled();  
+            }
             return Unit.INSTANCE;
         });
     }
@@ -3602,7 +3613,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void skipToMediaDiscoveryFragment(Fragment f, Long mediaHandle) {
-        mediaDiscoveryFragment = (MediaDiscoveryFragment) f;
+        mediaDiscoveryFragment = f;
         replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
         viewModel.onMediaDiscoveryOpened(mediaHandle);
         isInMDMode = true;
@@ -3624,10 +3635,6 @@ public class ManagerActivity extends TransfersManagementActivity
         isInFilterPage = true;
         viewModel.setIsFirstNavigationLevel(false);
         showHideBottomNavigationView(true);
-    }
-
-    public void changeMDMode(boolean targetMDMode) {
-        isInMDMode = targetMDMode;
     }
 
     void replaceFragment(Fragment f, String fTag) {
@@ -3925,7 +3932,13 @@ public class ManagerActivity extends TransfersManagementActivity
             case PHOTOS: {
                 aB.setSubtitle(null);
                 if (isInAlbumContent) {
-                    aB.setTitle(getString(R.string.title_favourites_album));
+                    if (albumContentFragment instanceof AlbumDynamicContentFragment) {
+                        String title = ((AlbumDynamicContentFragment) albumContentFragment)
+                                .getCurrentAlbumTitle();
+                        aB.setTitle(title);
+                    } else {
+                        aB.setTitle(getString(R.string.title_favourites_album));
+                    }
                 } else if (isInFilterPage) {
                     aB.setTitle(getString(R.string.photos_action_filter));
                 } else if (getPhotosFragment() != null && photosFragment.shouldUpdateTitle()) {
@@ -4562,18 +4575,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         switch (item) {
             case CLOUD_DRIVE: {
-                if (isInMDPage()) {
-                    mediaDiscoveryFragment = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
-
-                    if (mediaDiscoveryFragment == null) {
-                        selectDrawerItemCloudDrive();
-                        mediaDiscoveryFragment = fileBrowserFragment.showMediaDiscovery(Unit.INSTANCE);
-                    } else {
-                        refreshFragment(FragmentTag.MEDIA_DISCOVERY.getTag());
-                    }
-
-                    replaceFragment(mediaDiscoveryFragment, FragmentTag.MEDIA_DISCOVERY.getTag());
-                } else {
+                if (!isInMDMode) {
                     selectDrawerItemCloudDrive();
                 }
 
@@ -5942,7 +5944,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
             if (isInMDMode) {
-                changeMDMode(false);
+                isInMDMode = false;
                 backToDrawerItem(bottomNavigationCurrentItem);
             } else {
                 if (!isCloudAdded() || fileBrowserFragment.onBackPressed() == 0) {
@@ -6002,9 +6004,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 isInAlbumContent = false;
 
                 backToDrawerItem(bottomNavigationCurrentItem);
-                if (photosFragment == null) {
-                    backToDrawerItem(bottomNavigationCurrentItem);
-                } else {
+                if (photosFragment != null) {
                     photosFragment.switchToAlbum();
                 }
             } else if (isInFilterPage) {
@@ -6147,7 +6147,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case R.id.bottom_navigation_item_cloud_drive: {
                 if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                     if (isInMDMode) {
-                        changeMDMode(false);
+                        isInMDMode = false;
                     }
                     MegaNode rootNode = megaApi.getRootNode();
                     if (rootNode == null) {
@@ -8692,7 +8692,7 @@ public class ManagerActivity extends TransfersManagementActivity
         // event informing about the storage state  during login, the ManagerActivity
         // wasn't active and for this reason the value is stored in the MegaApplication object.
         StorageState storageStateToCheck = (storageState != StorageState.Unknown) ?
-                storageState :  viewModel.getStorageState();
+                storageState : viewModel.getStorageState();
 
         checkStorageStatus(storageStateToCheck, onCreate);
     }
@@ -9523,6 +9523,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                     if (isCloudAdded()) {
+                        viewModel.setBrowserParentHandle(folderNode.getHandle());
                         fileBrowserFragment.setFolderInfoNavigation(folderNode);
                     }
                 } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
@@ -9860,22 +9861,6 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshLinks();
 
         refreshSharesPageAdapter();
-    }
-
-    private void onUpdateNodes(@NonNull List<MegaNode> updatedNodes) {
-        dismissAlertDialogIfExists(statusDialog);
-
-        viewModel.checkCameraUploadFolder(false, updatedNodes);
-
-        LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
-
-        // Invalidate the menu will collapse/expand the search view and set the query text to ""
-        // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
-        // text changed to "" for once)
-        if (drawerItem == DrawerItem.HOMEPAGE) return;
-
-        setToolbarTitle();
-        supportInvalidateOptionsMenu();
     }
 
     public void updateContactRequests(List<ContactRequest> requests) {
@@ -11145,7 +11130,7 @@ public class ManagerActivity extends TransfersManagementActivity
         return permissionsFragment = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
     }
 
-    public MediaDiscoveryFragment getMDFragment() {
+    public Fragment getMDFragment() {
         return mediaDiscoveryFragment;
     }
 

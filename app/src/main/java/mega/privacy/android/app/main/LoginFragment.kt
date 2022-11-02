@@ -897,8 +897,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 ChatLogoutListener(requireActivity(), loggingSettings))
             disableLoginButton()
 
-            // Primitive type directly set value, atomic operation. Don't allow background login.
-            loginRepository.allowBackgroundLogin = false
             megaApi.fastLogin(gSession, this)
 
             if (intentReceived?.action == Constants.ACTION_REFRESH_API_SERVER) {
@@ -1455,8 +1453,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         }
         Timber.d("onRequestFinish: %s,error code: %d", request.requestString, error.errorCode)
         if (request.type == MegaRequest.TYPE_LOGIN) {
-            loginRepository.allowBackgroundLogin = true
-
             //cancel login process by press back.
             if (!isLoggingIn) {
                 Timber.w("Terminate login process when login")

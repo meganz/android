@@ -325,7 +325,7 @@ interface PlayerServiceViewModelGateway {
      * @param intent intent received from onStartCommand
      * @return if there is no error
      */
-    fun buildPlayerSource(intent: Intent?): Boolean
+    suspend fun buildPlayerSource(intent: Intent?): Boolean
 
     /**
      * Cancel search token

@@ -5,22 +5,33 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.FavouritesRepository
+import mega.privacy.android.domain.repository.FileRepository
 import javax.inject.Inject
 
+
 /**
- * The use case implementation class to get favourites
- * @param repository FavouritesRepository
+
+ * Default get all favorites
+ *
+ * @property favouritesRepository
+ * @property fileRepository
+ * @property addNodeType
  */
-class DefaultGetAllFavorites @Inject constructor(private val repository: FavouritesRepository) :
-    GetAllFavorites {
+class DefaultGetAllFavorites @Inject constructor(
+    private val favouritesRepository: FavouritesRepository,
+    private val fileRepository: FileRepository,
+    private val addNodeType: AddNodeType,
+) : GetAllFavorites {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun invoke(): Flow<List<Node>> =
+    override fun invoke(): Flow<List<TypedNode>> =
         flow {
-            emit(repository.getAllFavorites())
-            emitAll(repository.monitorNodeChange().mapLatest { repository.getAllFavorites() })
+            emit(favouritesRepository.getAllFavorites())
+            emitAll(fileRepository.monitorNodeUpdates()
+                .mapLatest { favouritesRepository.getAllFavorites() })
+        }.mapLatest { list ->
+            list.map { addNodeType(it) }
         }
-
 }

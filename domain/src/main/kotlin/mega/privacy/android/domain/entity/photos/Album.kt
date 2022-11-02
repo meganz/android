@@ -1,4 +1,5 @@
 package mega.privacy.android.domain.entity.photos
+
 /**
  * Entity album
  *
@@ -25,6 +26,7 @@ sealed interface Album {
      *
      * @property id
      * @property title
+     * @property cover
      */
-    data class UserAlbum(val id: Long, val title: String) : Album
+    data class UserAlbum(val id: AlbumId, val title: String, val cover: Photo?) : Album
 }

@@ -14,8 +14,6 @@ import androidx.work.WorkManager;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import mega.privacy.android.data.database.DatabaseHandler;
-import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.CancelCameraUploadWorker;
@@ -23,6 +21,8 @@ import mega.privacy.android.app.jobservices.StartCameraUploadWorker;
 import mega.privacy.android.app.jobservices.StopCameraUploadWorker;
 import mega.privacy.android.app.jobservices.SyncHeartbeatCameraUploadWorker;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.domain.entity.StorageState;
 import timber.log.Timber;
 
@@ -45,6 +45,8 @@ public class JobUtil {
 
     public static final String SHOULD_IGNORE_ATTRIBUTES = "SHOULD_IGNORE_ATTRIBUTES";
 
+    public static final String IS_PRIMARY_HANDLE_SYNC_DONE = "IS_PRIMARY_HANDLE_SYNC_DONE";
+
     /**
      * Worker tags
      */
@@ -59,6 +61,8 @@ public class JobUtil {
     private static final String STOP_CAMERA_UPLOAD_TAG = "STOP_CAMERA_UPLOAD_TAG";
 
     private static final String CANCEL_UPLOADS_TAG = "CANCEL_UPLOADS_TAG";
+
+    private static final String HANDLE_ATTRIBUTES_TAG = "HANDLE_ATTRIBUTES_TAG";
 
     /**
      * Schedule job of camera upload
@@ -128,7 +132,7 @@ public class JobUtil {
      * @param context From which the action is done.
      * @return The result of the job
      */
-    public static synchronized int fireCameraUploadJob(Context context, boolean shouldIgnoreAttributes) {
+    public static synchronized int fireCameraUploadJob(Context context, boolean shouldIgnoreAttributes, boolean isPrimaryHandleSyncDone) {
         if (isCameraUploadDisabled()) {
             Timber.d("Firing CameraUpload request failed as CameraUpload not enabled");
             return START_JOB_FAILED_NOT_ENABLED;
@@ -138,13 +142,24 @@ public class JobUtil {
         OneTimeWorkRequest cameraUploadWorkRequest =
                 new OneTimeWorkRequest.Builder(StartCameraUploadWorker.class)
                         .addTag(SINGLE_CAMERA_UPLOAD_TAG)
-                        .setInputData(new Data.Builder().putBoolean(SHOULD_IGNORE_ATTRIBUTES, shouldIgnoreAttributes).build())
+                        .setInputData(new Data.Builder()
+                                .putBoolean(SHOULD_IGNORE_ATTRIBUTES, shouldIgnoreAttributes)
+                                .putBoolean(IS_PRIMARY_HANDLE_SYNC_DONE, isPrimaryHandleSyncDone)
+                                .build())
                         .build();
 
         WorkManager.getInstance(context)
                 .enqueueUniqueWork(SINGLE_CAMERA_UPLOAD_TAG, ExistingWorkPolicy.KEEP, cameraUploadWorkRequest);
         Timber.d("Single CameraUpload Work Status: %s", WorkManager.getInstance(context).getWorkInfosByTag(SINGLE_CAMERA_UPLOAD_TAG));
         return START_JOB_SUCCEED;
+    }
+
+    /**
+     * Fire a one time work request of camera upload to upload immediately;
+     * Simplified function with default primary handle sync done parameter
+     */
+    public static synchronized int fireCameraUploadJob(Context context, boolean shouldIgnoreAttributes) {
+        return fireCameraUploadJob(context, shouldIgnoreAttributes, false);
     }
 
     /**

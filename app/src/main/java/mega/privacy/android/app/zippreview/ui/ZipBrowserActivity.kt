@@ -528,7 +528,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             val hiltEntryPoint =
                 EntryPointAccessors.fromApplication(context, CrashReporterEntryPoint::class.java)
 
-            (context as Activity?)?.run {
+            (context as? Activity)?.run {
                 // Log the Activity name that opens ZipBrowserActivity
                 hiltEntryPoint.crashReporter().log("Activity name is $localClassName")
             }
