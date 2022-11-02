@@ -92,13 +92,13 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.usecase.ClearSyncRecords
+import mega.privacy.android.domain.usecase.CompleteFastLogin
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
-import mega.privacy.android.domain.usecase.FastLogin
-import mega.privacy.android.domain.usecase.FetchNodes
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetRemoveGps
@@ -108,7 +108,6 @@ import mega.privacy.android.domain.usecase.GetVideoQuality
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.HasPreferences
-import mega.privacy.android.domain.usecase.InitMegaChat
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
@@ -480,10 +479,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var ioDispatcher: CoroutineDispatcher
 
     /**
-     * Fast Login
+     *
      */
     @Inject
-    lateinit var fastLogin: FastLogin
+    lateinit var completeFastLogin: CompleteFastLogin
 
     /**
      * Get Session
@@ -498,28 +497,22 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var setAccountAuth: SetAccountAuth
 
     /**
-     * Fetch Nodes
-     */
-    @Inject
-    lateinit var fetchNodes: FetchNodes
-
-    /**
      * Root Node Exists
      */
     @Inject
     lateinit var rootNodeExists: RootNodeExists
 
     /**
-     * Init Mega Chat
-     */
-    @Inject
-    lateinit var initMegaChat: InitMegaChat
-
-    /**
      * Is Node In Rubbish
      */
     @Inject
     lateinit var isNodeInRubbish: IsNodeInRubbish
+
+    /**
+     * Login Repository
+     */
+    @Inject
+    lateinit var loginRepository: LoginRepository
 
     /**
      * Coroutine Scope for camera upload work
@@ -936,15 +929,15 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
 
     /**
-     * Checks if the user is logged in through [rootNodeExists] and [MegaApplication.isLoggingIn]
+     * Checks if the user is logged in through [rootNodeExists] and [LoginRepository.isLoginAlreadyRunning]
      *
      * @return true if the user is logged in, and false if otherwise
      */
     private suspend fun isUserLoggedIn(): Boolean =
-        (rootNodeExists() || MegaApplication.isLoggingIn).also {
+        (rootNodeExists() || loginRepository.isLoginAlreadyRunning()).also {
             if (!it) {
-                Timber.w("The Root Node is null. Wait for the user to login")
-                handleUserNotLoggedIn()
+                Timber.w("The Root Node is null. Wait for the user to perform the Complete Fast Login procedure")
+                performCompleteFastLogin()
             }
         }
 
@@ -1252,53 +1245,26 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * Executes certain behavior after performing a Fast Login behavior
+     * When the user is not logged in, perform a Complete Fast Login procedure
      */
-    private suspend fun handleFastLogin() {
-        runCatching { fastLogin(getSession().orEmpty()) }.fold(
-            onSuccess = {
-                Timber.d("Fast login successful. Calling setAccountAuth")
-                setAccountAuth()
-
-                Timber.d("Set account auth successful. Calling fetchNodes")
-                runCatching { fetchNodes() }.fold(
-                    onSuccess = {
-                        Timber.d("Fetch nodes successful")
-                        MegaApplication.isLoggingIn = false
-                        Timber.d("Start CameraUploadsService after successfully fetching the nodes")
-                        startWorker()
-                    },
-                    onFailure = { error ->
-                        Timber.e("Fetch nodes unsuccessful with error $error")
-                        MegaApplication.isLoggingIn = false
-                        endService()
-                    },
-                )
-                // Get cookies settings after login.
-                MegaApplication.getInstance().checkEnabledCookies()
-            },
-            onFailure = { error ->
-                Timber.d("Fast login unsuccessful with error $error")
-                MegaApplication.isLoggingIn = false
-                endService()
-            },
-        )
-    }
-
-    /**
-     * Executes certain behavior when the user is not logged in
-     */
-    private suspend fun handleUserNotLoggedIn() {
+    private suspend fun performCompleteFastLogin() {
         running = true
-        MegaApplication.isLoggingIn = true
 
-        handleFastLogin()
-
-        runCatching { initMegaChat(getSession().orEmpty()) }.fold(
-            onSuccess = { Timber.d("MEGA Chat initialization successful") },
-            onFailure = { Timber.e("MEGA Chat initialization unsuccessful with error $it") },
-        )
-        Timber.d("Waiting for the user to log in")
+        runCatching { completeFastLogin(getSession().orEmpty()) }
+            .fold(
+                onSuccess = {
+                    Timber.d("Complete Fast Login procedure successful. Calling setAccountAuth and starting CameraUploadsService")
+                    setAccountAuth()
+                    // Get cookies settings after login
+                    MegaApplication.getInstance().checkEnabledCookies()
+                    startWorker()
+                },
+                onFailure = { error ->
+                    Timber.e("Complete Fast Login procedure unsuccessful with error $error")
+                    endService()
+                },
+            )
+        Timber.d("Waiting for the user to complete the Fast Login procedure")
     }
 
     /**
