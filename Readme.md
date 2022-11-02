@@ -85,7 +85,7 @@ Default macOS path:  `export JAVA_HOME="/Applications/Android Studio.app/Content
 
 ### 6. Download WEBRTC files
 
-1. Download the link https://mega.nz/file/A4pxxQoJ#OoAuL0SKIGuWkw6iSrSPHRMF0-Ri7BSF64IDeIWq-qs, uncompress it and put the folder `webrtc` in the path `app/src/main/jni/megachat/`.Be mindful that the download link of webrtc may varies over time, please keep it in line with the one written in build.sh
+1. Download the link https://mega.nz/file/A4pxxQoJ#OoAuL0SKIGuWkw6iSrSPHRMF0-Ri7BSF64IDeIWq-qs, uncompress it and put the folder `webrtc` in the path `sdk/src/main/jni/megachat/`.Be mindful that the download link of webrtc may varies over time, please keep it in line with the one written in build.sh
 
 ### 7. Prerequisites of running the build script
 
@@ -129,7 +129,7 @@ You have to tick checkbox 'Show Package Details' to display this specific versio
 
 ### 8. Running the Build Script
 
-Build SDK by running `./build.sh all` at `app/src/main/jni/`. You could also run `./build.sh clean` to clean the previous configuration. **IMPORTANT:** check that the build process finished successfully, it should finish with the **Task finished OK** message. Otherwise, modify `LOG_FILE` variable in `build.sh` from `/dev/null` to a certain text file and run `./build.sh all` again for viewing the build errors.
+Build SDK by running `./build.sh all` at `sdk/src/main/jni/`. You could also run `./build.sh clean` to clean the previous configuration. **IMPORTANT:** check that the build process finished successfully, it should finish with the **Task finished OK** message. Otherwise, modify `LOG_FILE` variable in `build.sh` from `/dev/null` to a certain text file and run `./build.sh all` again for viewing the build errors.
 
 In case of an error (seen in the log file mentioned) due to licenses not accepted, you can read and accept the licenses with the sdkmanager command-line tool (if you downloaded them)
 
