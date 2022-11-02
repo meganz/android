@@ -301,7 +301,6 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
-import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
@@ -772,7 +771,7 @@ public class ManagerActivity extends TransfersManagementActivity
     private TurnOnNotificationsFragment turnOnNotificationsFragment;
     private PermissionsFragment permissionsFragment;
     private SMSVerificationFragment smsVerificationFragment;
-    private MediaDiscoveryFragment mediaDiscoveryFragment;
+    private Fragment mediaDiscoveryFragment;
 
     private boolean mStopped = true;
     private int bottomItemBeforeOpenFullscreenOffline = INVALID_VALUE;
@@ -1364,7 +1363,7 @@ public class ManagerActivity extends TransfersManagementActivity
         outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog));
 
         outState.putBoolean(STATE_KEY_IS_IN_MD_MODE, isInMDMode);
-        mediaDiscoveryFragment = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
+        mediaDiscoveryFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
         if (mediaDiscoveryFragment != null) {
             getSupportFragmentManager().putFragment(outState, FragmentTag.MEDIA_DISCOVERY.getTag(), mediaDiscoveryFragment);
         }
@@ -1435,11 +1434,6 @@ public class ManagerActivity extends TransfersManagementActivity
         viewModel.getUpdateUserAlerts().observe(this,
                 new EventObserver<>(userAlerts -> {
                     updateUserAlerts(userAlerts);
-                    return null;
-                }));
-        viewModel.getUpdateNodes().observe(this,
-                new EventObserver<>(nodes -> {
-                    onUpdateNodes(nodes);
                     return null;
                 }));
         viewModel.getUpdateContactsRequests().observe(this,
@@ -1519,6 +1513,9 @@ public class ManagerActivity extends TransfersManagementActivity
             linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
             isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
             isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false);
+            if (isInMDMode) {
+                mediaDiscoveryFragment = getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.MEDIA_DISCOVERY.getTag());
+            }
             isInAlbumContent = savedInstanceState.getBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, false);
             if (isInAlbumContent){
                 albumContentFragment = getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.ALBUM_CONTENT.getTag());
@@ -3616,7 +3613,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void skipToMediaDiscoveryFragment(Fragment f, Long mediaHandle) {
-        mediaDiscoveryFragment = (MediaDiscoveryFragment) f;
+        mediaDiscoveryFragment = f;
         replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
         viewModel.onMediaDiscoveryOpened(mediaHandle);
         isInMDMode = true;
@@ -3638,10 +3635,6 @@ public class ManagerActivity extends TransfersManagementActivity
         isInFilterPage = true;
         viewModel.setIsFirstNavigationLevel(false);
         showHideBottomNavigationView(true);
-    }
-
-    public void changeMDMode(boolean targetMDMode) {
-        isInMDMode = targetMDMode;
     }
 
     void replaceFragment(Fragment f, String fTag) {
@@ -4582,18 +4575,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         switch (item) {
             case CLOUD_DRIVE: {
-                if (isInMDPage()) {
-                    mediaDiscoveryFragment = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
-
-                    if (mediaDiscoveryFragment == null) {
-                        selectDrawerItemCloudDrive();
-                        mediaDiscoveryFragment = fileBrowserFragment.showMediaDiscovery();
-                    } else {
-                        refreshFragment(FragmentTag.MEDIA_DISCOVERY.getTag());
-                    }
-
-                    replaceFragment(mediaDiscoveryFragment, FragmentTag.MEDIA_DISCOVERY.getTag());
-                } else {
+                if (!isInMDMode) {
                     selectDrawerItemCloudDrive();
                 }
 
@@ -5962,7 +5944,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
             if (isInMDMode) {
-                changeMDMode(false);
+                isInMDMode = false;
                 backToDrawerItem(bottomNavigationCurrentItem);
             } else {
                 if (!isCloudAdded() || fileBrowserFragment.onBackPressed() == 0) {
@@ -6165,7 +6147,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case R.id.bottom_navigation_item_cloud_drive: {
                 if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                     if (isInMDMode) {
-                        changeMDMode(false);
+                        isInMDMode = false;
                     }
                     MegaNode rootNode = megaApi.getRootNode();
                     if (rootNode == null) {
@@ -9881,12 +9863,6 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshSharesPageAdapter();
     }
 
-    private void onUpdateNodes(@NonNull List<Node> updatedNodes) {
-        dismissAlertDialogIfExists(statusDialog);
-
-        viewModel.checkCameraUploadFolder(false, updatedNodes);
-    }
-
     public void updateContactRequests(List<ContactRequest> requests) {
         Timber.d("onContactRequestsUpdate");
 
@@ -11154,7 +11130,7 @@ public class ManagerActivity extends TransfersManagementActivity
         return permissionsFragment = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
     }
 
-    public MediaDiscoveryFragment getMDFragment() {
+    public Fragment getMDFragment() {
         return mediaDiscoveryFragment;
     }
 

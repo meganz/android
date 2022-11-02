@@ -12,10 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -124,6 +122,13 @@ class ManagerViewModel @Inject constructor(
     )
 
     init {
+        viewModelScope.launch {
+            monitorNodeUpdates().collect {
+                checkItemForInbox(it)
+                onReceiveNodeUpdate(true)
+                checkCameraUploadFolder(false, it)
+            }
+        }
         viewModelScope.launch(ioDispatcher) {
             isFirstLogin.map {
                 { state: ManagerState -> state.copy(isFirstLogin = it) }
@@ -145,7 +150,6 @@ class ManagerViewModel @Inject constructor(
      */
     private val _updateNodes = monitorNodeUpdates()
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-
 
     /**
      * Monitor contact requests
@@ -174,21 +178,6 @@ class ManagerViewModel @Inject constructor(
             .mapNotNull { it.userAlerts?.toList() }
             .map { Event(it) }
             .asLiveData()
-
-    /**
-     * Monitor global node updates and dispatch to observers
-     */
-    val updateNodes =
-        _updateNodes
-            .also { Timber.d("onNodesUpdate") }
-            .filterNotNull()
-            .onEach {
-                checkItemForInbox(it)
-                onReceiveNodeUpdate(true)
-            }
-            .map { Event(it) }
-            .asLiveData()
-
 
     private fun checkItemForInbox(updatedNodes: List<Node>) {
         //Verify is it is a new item to the inbox
