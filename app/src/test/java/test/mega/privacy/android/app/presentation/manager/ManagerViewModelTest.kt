@@ -23,7 +23,6 @@ import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
@@ -47,6 +46,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
@@ -54,7 +54,7 @@ class ManagerViewModelTest {
     private lateinit var underTest: ManagerViewModel
 
     private val monitorGlobalUpdates = mock<MonitorGlobalUpdates>()
-    private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
+    private val monitorNodeUpdates = FakeMonitorUpdates()
     private val getRubbishBinNodeByHandle = mock<GetRubbishBinChildrenNode>()
     private val getBrowserNodeByHandle = mock<GetBrowserChildrenNode>()
     private val getRootFolder = mock<GetRootFolder>()
@@ -256,14 +256,6 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that node updates live data is not set when no updates triggered from use case`() =
-        runTest {
-            setUnderTest()
-
-            underTest.updateNodes.test().assertNoValue()
-        }
-
-    @Test
     fun `test that contact request updates live data is not set when no updates triggered from use case`() =
         runTest {
             setUnderTest()
@@ -272,29 +264,17 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that node updates live data is set when node updates triggered from use case`() =
-        runTest {
-            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
-
-            setUnderTest()
-
-            runCatching {
-                underTest.updateNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-            }.onSuccess { result ->
-                result.assertValue { it.getContentIfNotHandled()?.size == 1 }
-            }
-        }
-
-    @Test
     fun `test that rubbish bin node updates live data is set when node updates triggered from use case`() =
         runTest {
-            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
             whenever(getRubbishBinNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
 
             setUnderTest()
 
             runCatching {
-                underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                val result =
+                    underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                monitorNodeUpdates.emit(listOf(mock()))
+                result
             }.onSuccess { result ->
                 result.assertValue { it.getContentIfNotHandled()?.size == 2 }
             }
@@ -303,7 +283,6 @@ class ManagerViewModelTest {
     @Test
     fun `test that rubbish bin node updates live data is not set when get rubbish bin node returns a null list`() =
         runTest {
-            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
             whenever(getRubbishBinNodeByHandle(any())).thenReturn(null)
 
             setUnderTest()
@@ -318,13 +297,15 @@ class ManagerViewModelTest {
     @Test
     fun `test that browser node updates live data is set when node updates triggered from use case`() =
         runTest {
-            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
             whenever(getBrowserNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
 
             setUnderTest()
 
             runCatching {
-                underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                val result =
+                    underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                monitorNodeUpdates.emit(listOf(mock()))
+                result
             }.onSuccess { result ->
                 result.assertValue { it.getContentIfNotHandled()?.size == 2 }
             }
@@ -333,13 +314,15 @@ class ManagerViewModelTest {
     @Test
     fun `test that browser node updates live data is not set when get browser node returns a null list`() =
         runTest {
-            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
             whenever(getBrowserNodeByHandle(any())).thenReturn(null)
 
             setUnderTest()
 
             runCatching {
-                underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                val result =
+                    underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                monitorNodeUpdates.emit(listOf(mock()))
+                result
             }.onSuccess { result ->
                 result.assertNoValue()
             }
@@ -462,31 +445,23 @@ class ManagerViewModelTest {
 
     @Test
     fun `test that updateToolbarTitle is true when a node update occurs`() = runTest {
-        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
         setUnderTest()
 
         underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
-            runCatching {
-                underTest.updateNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-            }.onSuccess {
-                assertThat(awaitItem()).isTrue()
-            }
+            monitorNodeUpdates.emit(listOf(mock()))
+            assertThat(awaitItem()).isTrue()
         }
     }
 
     @Test
     fun `test that updateToolbarTitle is set when calling setUpdateToolbar`() = runTest {
-        whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
         setUnderTest()
 
         underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
-            runCatching {
-                underTest.updateNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-            }.onSuccess {
-                assertThat(awaitItem()).isTrue()
-            }
+            monitorNodeUpdates.emit(listOf(mock()))
+            assertThat(awaitItem()).isTrue()
             underTest.nodeUpdateHandled()
             assertThat(awaitItem()).isFalse()
         }

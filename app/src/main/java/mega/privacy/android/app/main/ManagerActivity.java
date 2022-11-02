@@ -1437,11 +1437,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     updateUserAlerts(userAlerts);
                     return null;
                 }));
-        viewModel.getUpdateNodes().observe(this,
-                new EventObserver<>(nodes -> {
-                    onUpdateNodes(nodes);
-                    return null;
-                }));
         viewModel.getUpdateContactsRequests().observe(this,
                 new EventObserver<>(contactRequests -> {
                     updateContactRequests(contactRequests);
@@ -9867,12 +9862,6 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshLinks();
 
         refreshSharesPageAdapter();
-    }
-
-    private void onUpdateNodes(@NonNull List<Node> updatedNodes) {
-        dismissAlertDialogIfExists(statusDialog);
-
-        viewModel.checkCameraUploadFolder(false, updatedNodes);
     }
 
     public void updateContactRequests(List<ContactRequest> requests) {
