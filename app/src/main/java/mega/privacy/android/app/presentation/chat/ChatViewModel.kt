@@ -3,23 +3,24 @@ package mega.privacy.android.app.presentation.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.objects.PasscodeManagement
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.CameraGateway
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.chat.model.ChatState
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
-import kotlinx.coroutines.flow.update
-import mega.privacy.android.app.R
-import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.presentation.chat.model.ChatState
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.AnswerChatCall
 import mega.privacy.android.domain.usecase.MonitorConnectivity
@@ -69,6 +70,12 @@ class ChatViewModel @Inject constructor(
      * @return the latest [StorageState]
      */
     fun getStorageState(): StorageState = monitorStorageStateEvent.getState()
+
+    /**
+     * Monitor connectivity event
+     */
+    val monitorConnectivityEvent =
+        monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly)
 
     val isConnected =
         monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false).value
