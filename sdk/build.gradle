@@ -22,6 +22,17 @@ android {
         }
     }
 
+    sourceSets {
+        main {
+            java {
+                srcDirs += 'src/main/jni/mega/sdk/bindings/java'
+                srcDirs += 'src/main/jni/megachat/sdk/bindings/java'
+
+                exclude '**/MegaApiSwing.java'
+            }
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -37,6 +48,9 @@ android {
 }
 
 dependencies {
+
+    implementation "androidx.exifinterface:exifinterface:$exifinterfaceVersion"
+
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"

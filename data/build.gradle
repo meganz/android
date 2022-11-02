@@ -22,17 +22,6 @@ android {
         consumerProguardFiles "consumer-rules.pro"
     }
 
-    sourceSets {
-        main {
-            java {
-                srcDirs += '../sdk/src/main/jni/mega/sdk/bindings/java'
-                srcDirs += '../sdk/src/main/jni/megachat/sdk/bindings/java'
-
-                exclude '**/MegaApiSwing.java'
-            }
-        }
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -78,7 +67,7 @@ dependencies {
     kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     implementation "com.google.dagger:hilt-android:$hiltVersion"
-    implementation 'androidx.exifinterface:exifinterface:1.3.0'
+    implementation "androidx.exifinterface:exifinterface:$exifinterfaceVersion"
     implementation "androidx.datastore:datastore-preferences:$datastoreVersion"
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
 
