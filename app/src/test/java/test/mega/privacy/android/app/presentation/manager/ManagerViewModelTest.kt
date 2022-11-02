@@ -40,7 +40,6 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
 import org.junit.Rule
@@ -105,7 +104,6 @@ class ManagerViewModelTest {
             getSecondarySyncHandle = getSecondarySyncHandle,
             checkCameraUpload = checkCameraUpload,
             getCloudSortOrder = getCloudSortOrder,
-            sortOrderIntMapper = sortOrderIntMapper,
         )
     }
 
@@ -457,10 +455,8 @@ class ManagerViewModelTest {
     @Test
     fun `test that get order returns cloud sort order`() = runTest {
         setUnderTest()
-        val order = SortOrder.ORDER_MODIFICATION_DESC
-        val expected = MegaApiJava.ORDER_MODIFICATION_DESC
-        whenever(getCloudSortOrder()).thenReturn(order)
-        whenever(sortOrderIntMapper(order)).thenReturn(expected)
+        val expected = SortOrder.ORDER_MODIFICATION_DESC
+        whenever(getCloudSortOrder()).thenReturn(expected)
         assertThat(underTest.getOrder()).isEqualTo(expected)
     }
 

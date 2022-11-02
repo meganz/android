@@ -18,14 +18,14 @@ import java.util.Stack;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.MegaPreferences;
+import mega.privacy.android.domain.entity.SortOrder;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
@@ -47,7 +47,7 @@ public class ContactFileBaseFragment extends RotatableFragment {
     protected long parentHandle = -1;
     protected Stack<Integer> lastPositionStack;
     protected ArrayList<MegaNode> contactNodes;
-    protected int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+    protected SortOrder orderGetChildren = SortOrder.ORDER_DEFAULT_ASC;
 
     protected MegaPreferences prefs = null;
     protected String downloadLocationDefaultPath;
