@@ -828,7 +828,7 @@
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">請輸入新密碼</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
-    <string name="recovery_link_expired">這個復原連結已失效，請再試一次。</string>
+    <string name="recovery_link_expired">這個復原連結已過期，請再試一次。</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
     <string name="text_reset_pass_logged_in">您的還原金鑰將用於重設您的密碼。請輸入您的新密碼。</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
@@ -866,7 +866,7 @@
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">編輯</string>
     <!-- Alert Dialog to get link -->
-    <string name="title_set_expiry_date">設定有效日期</string>
+    <string name="title_set_expiry_date">設定到期日期</string>
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">設定密碼保護</string>
     <!-- Subtitle of the dialog to get link -->
@@ -1443,7 +1443,7 @@
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">還剩%1$d天</string>
     <!-- State to indicate an achievement has expired -->
-    <string name="expired_label">過期</string>
+    <string name="expired_label">已過期</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">不使用HTTP</string>
     <!-- subtitle of the advanced setting to choose the use of https -->
@@ -1473,7 +1473,7 @@
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">您已經收到%1$s的儲存空間，這是免費的註冊獎勵喔。</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">獎勵將在%1$d天到期</string>
+    <string name="expiration_date_for_achievements">獎勵將在%1$d天過期</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">共享資料夾</item>
@@ -1668,8 +1668,6 @@
     <string name="pass_strong">強</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">正在通話中</string>
-    <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">點擊返回通話</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">返回通話</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2700,9 +2698,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">您最近一次的付款發生問題。請使用電腦版瀏覽器登入MEGA以查看更多訊息。</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account deactivated</string>
+    <string name="expired_business_title">帳戶已停用</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
+    <string name="expired_admin_business_text">由於付款失敗，您的商業帳戶已被停用。您將無法存取儲存在您帳戶中的資料。若要付款並重新啟用您的訂閱，請透過網頁瀏覽器登入MEGA進行。</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">您的帳戶目前[B]暫停使用[/B]。您只能瀏覽您的資料。</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3234,7 +3232,7 @@
     <!-- Section name for the “Groups” section. Preferably one word. -->
     <string name="section_groups">群組</string>
     <!-- Text informing links management is only available for single items. -->
-    <string name="warning_get_links">“各別傳送解密金鑰”、“設定有效日期”或“設定密碼保護”等選項僅適用於單個項目。</string>
+    <string name="warning_get_links">「各別傳送解密金鑰」、「設定到期日期」或「設定密碼保護」等選項僅適用於單個項目。</string>
     <!-- Action which allows to copy all the links showed in the list. -->
     <string name="action_copy_all">複製全部</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
@@ -3610,7 +3608,7 @@
     <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
     <string name="account_info_renews_on">[B]%s[/B][A]更新[/A]</string>
     <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
-    <string name="account_info_expires_on">[B]%s[/B][A]到期[/A]</string>
+    <string name="account_info_expires_on">[A]到期日期[/A][B]%s[/B]</string>
     <!-- Title of favourite category. -->
     <string name="favourites_category_title">收藏</string>
     <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
@@ -3892,7 +3890,7 @@
     <!-- Used in chat screen to indicate last message sent by me -->
     <string name="chat_last_message_sender_me">我</string>
     <!-- Hint the screen is locked in video player page -->
-    <string name="video_player_locked_hint">螢幕被鎖定</string>
+    <string name="video_player_locked_hint">螢幕已被鎖定</string>
     <!-- Hint that tap to unlock in video player page -->
     <string name="video_player_unlock_hint">點按即可解鎖</string>
     <!-- Label that schedule a meeting -->
@@ -3929,4 +3927,6 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">您已經將所有聯絡人加入此對話。如果您想加入更多與會者，請先邀請他們成為您的聯絡人。</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">截圖已儲存到您裝置的相簿</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]續訂日期：[/A][B]%s[/B]</string>
 </resources>

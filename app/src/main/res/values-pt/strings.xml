@@ -1742,8 +1742,6 @@
     <string name="pass_strong">Segura</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">Chamada em curso</string>
-    <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">Pressione para voltar à chamada</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Voltar à chamada</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2846,9 +2844,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Não foi possível processar o seu último pagamento. Por favor, acesse o MEGA usando um navegador em um computador para obter mais informações.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account deactivated</string>
+    <string name="expired_business_title">Conta desativada</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
+    <string name="expired_admin_business_text">A sua conta Business foi desativada porque o pagamento falhou, e já não será possível acessar os dados armazenados na sua conta. Para fazer o pagamento e assim reativar a sua assinatura, faça login no MEGA por meio de um navegador.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">A sua conta [B]expirou[/B]. Somente é possível visualizar os seus dados.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -4136,5 +4134,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">Você já adicionou todos os seus contatos a este chat. Se você quiser adicionar mais participantes, primeiro envie um convite para inclui-los na sua lista de contatos.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
+    <string name="media_player_video_snackbar_screenshot_saved">Imagem salva na galeria do seu dispositivo</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]Data da renovação:[/A] [B]%s[/B]</string>
 </resources>
