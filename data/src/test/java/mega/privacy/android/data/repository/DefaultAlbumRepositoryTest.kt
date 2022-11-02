@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.UserSetMapper
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.repository.AlbumRepository
@@ -16,7 +17,10 @@ import nz.mega.sdk.MegaSetList
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -34,6 +38,39 @@ class DefaultAlbumRepositoryTest {
             ioDispatcher = UnconfinedTestDispatcher(),
         )
     }
+
+    @Test
+    fun `test that createAlbum invokes the createSet api function`() = runTest {
+        val testName = "Album 1"
+
+        underTest.createAlbum(name = testName)
+
+        verify(megaApiGateway).createSet(eq(testName), any())
+    }
+
+    @Test
+    fun `test that addPhotosToAlbum invokes the createSetElement api function for each photoID`() =
+        runTest {
+            val testAlbumId = AlbumId(1L)
+            val testPhotos = listOf(NodeId(1L), NodeId(2L))
+
+            underTest.addPhotosToAlbum(albumID = testAlbumId, photoIDs = testPhotos)
+
+            for (photo in testPhotos) {
+                verify(megaApiGateway).createSetElement(testAlbumId.id, photo.id)
+            }
+        }
+
+    @Test
+    fun `test that addPhotosToAlbum does not invokes the createSetElement api function if the photos list is empty`() =
+        runTest {
+            val testAlbumId = AlbumId(1L)
+            val testPhoto = emptyList<NodeId>()
+
+            underTest.addPhotosToAlbum(albumID = testAlbumId, photoIDs = testPhoto)
+
+            verify(megaApiGateway, never()).createSetElement(any(), any())
+        }
 
     @Test
     fun `test that getUserSets returns a single value if only one set exists`() = runTest {
