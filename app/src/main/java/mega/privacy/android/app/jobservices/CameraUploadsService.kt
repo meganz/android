@@ -478,7 +478,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var ioDispatcher: CoroutineDispatcher
 
     /**
-     *
+     * Complete Fast Login
      */
     @Inject
     lateinit var completeFastLogin: CompleteFastLogin
@@ -752,11 +752,23 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun startWorker() {
         runCatching {
-            if (canRunCameraUploads()) startCameraUploads()
+            if (canRunCameraUploads()) {
+                hideLocalFolderPathNotifications()
+                startCameraUploads()
+            } else handleFailedConditions()
         }.onFailure { exception ->
             Timber.e("Calling startWorker() failed with exception $exception")
             endService()
         }
+    }
+
+    /**
+     * Instructs [notificationManager] to hide the Primary and/or Secondary Folder
+     * notifications if they exist
+     */
+    private suspend fun hideLocalFolderPathNotifications() {
+        if (hasLocalPrimaryFolder()) notificationManager?.cancel(LOCAL_FOLDER_REMINDER_PRIMARY)
+        if (hasLocalSecondaryFolder()) notificationManager?.cancel(LOCAL_FOLDER_REMINDER_SECONDARY)
     }
 
     /**
@@ -789,16 +801,58 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 hasCameraUploadsUserAttribute() && areFoldersEstablished()
 
     /**
+     * If there is at least one condition that failed in [canRunCameraUploads], this function checks each
+     * condition and executes certain behavior should the condition fail
+     */
+    private suspend fun handleFailedConditions() {
+        val hasLocalPrimaryFolder = hasLocalPrimaryFolder()
+        val hasLocalSecondaryFolder = hasLocalSecondaryFolder()
+
+        booleanArrayOf(
+            userCredentialsExist(),
+            preferencesExist(),
+            cameraUploadsSyncEnabled(),
+            isUserOnline(),
+            isDeviceAboveBatteryLevel(),
+            hasCameraUploadsLocalPath(),
+            isWifiConstraintSatisfied(),
+            hasLocalPrimaryFolder,
+            hasLocalSecondaryFolder,
+            // Any condition that fails in the Boolean Array will cause the Service to end
+        ).also { array -> if (array.contains(false)) endService() }
+
+        // If any of the if-statements return false, immediately call return to stop the
+        // function from evaluating other statements
+        if (!hasLocalPrimaryFolder) {
+            handleLocalPrimaryFolderDisabled()
+            return
+        }
+        if (!hasLocalSecondaryFolder) {
+            handleLocalSecondaryFolderDisabled()
+            return
+        }
+        if (!isUserLoggedIn()) {
+            performCompleteFastLogin()
+            return
+        }
+        if (!hasCameraUploadsUserAttribute()) {
+            handleMissingCameraUploadsUserAttribute()
+            return
+        }
+        if (!areFoldersEstablished()) {
+            establishFolders()
+            return
+        }
+    }
+
+    /**
      * Checks if the User Credentials from [hasCredentials] exist
      *
      * @return true if it exists, and false if otherwise
      */
     private suspend fun userCredentialsExist(): Boolean =
         hasCredentials().also {
-            if (!it) {
-                Timber.w("There are no user credentials")
-                endService()
-            }
+            if (!it) Timber.w("There are no user credentials")
         }
 
     /**
@@ -808,10 +862,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun preferencesExist(): Boolean =
         hasPreferences().also {
-            if (!it) {
-                Timber.w("Preferences not defined, so not enabled")
-                endService()
-            }
+            if (!it) Timber.w("Preferences not defined, so not enabled")
         }
 
     /**
@@ -821,10 +872,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun cameraUploadsSyncEnabled(): Boolean =
         isCameraUploadSyncEnabled().also {
-            if (!it) {
-                Timber.w("Camera Upload sync disabled")
-                endService()
-            }
+            if (!it) Timber.w("Camera Upload sync disabled")
         }
 
     /**
@@ -834,10 +882,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private fun isUserOnline(): Boolean =
         Util.isOnline(applicationContext).also {
-            if (!it) {
-                Timber.w("User is not online")
-                endService()
-            }
+            if (!it) Timber.w("User is not online")
         }
 
     /**
@@ -847,11 +892,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private fun isDeviceAboveBatteryLevel(): Boolean =
         isDeviceNotLowOnBattery(batteryIntent).also {
-            if (!it) {
-                Timber.w("Device is low on battery")
-                endService()
-            }
-            return it
+            if (!it) Timber.w("Device is low on battery")
         }
 
     /**
@@ -861,10 +902,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun hasCameraUploadsLocalPath(): Boolean =
         !localPath().isNullOrBlank().also {
-            if (!it) {
-                Timber.w("Camera Uploads local path is empty")
-                endService()
-            }
+            if (!it) Timber.w("Camera Uploads local path is empty")
         }
 
     /**
@@ -874,10 +912,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun isWifiConstraintSatisfied(): Boolean =
         !isWifiNotSatisfied().also {
-            if (!it) {
-                Timber.w("Cannot start, Wi-Fi required")
-                endService()
-            }
+            if (!it) Timber.w("Cannot start, Wi-Fi required")
         }
 
     /**
@@ -887,11 +922,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun hasLocalPrimaryFolder(): Boolean =
         isLocalPrimaryFolderSet().also {
-            if (!it) {
-                Timber.w("Local Primary Folder is not set")
-                handleLocalPrimaryFolderDisabled()
-                endService()
-            } else notificationManager?.cancel(LOCAL_FOLDER_REMINDER_PRIMARY)
+            if (!it) Timber.w("Local Primary Folder is not set")
         }
 
     /**
@@ -901,11 +932,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun hasLocalSecondaryFolder(): Boolean =
         isLocalSecondaryFolderSet().also {
-            if (!it) {
-                Timber.w("Local Secondary Folder is not set")
-                handleLocalSecondaryFolderDisabled()
-                endService()
-            } else notificationManager?.cancel(LOCAL_FOLDER_REMINDER_SECONDARY)
+            if (!it) Timber.w("Local Secondary Folder is not set")
         }
 
     /**
@@ -915,10 +942,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun isUserLoggedIn(): Boolean =
         (rootNodeExists() || loginRepository.isLoginAlreadyRunning()).also {
-            if (!it) {
-                Timber.w("The Root Node is null. Wait for the user to perform the Complete Fast Login procedure")
-                performCompleteFastLogin()
-            }
+            if (!it) Timber.w("The Root Node is null. Wait for the user to perform the Complete Fast Login procedure")
         }
 
     /**
@@ -930,40 +954,72 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         // Prevent checking while the app is alive, because it has been handled by a global event
         Timber.d("ignoreAttr value is $ignoreAttr")
         (ignoreAttr || isPrimaryHandleSynced).also {
-            if (!it) {
-                Timber.w("The Camera Uploads user attribute is missing. Wait for the user attribute")
-                handleMissingCameraUploadsUserAttribute()
-            }
+            if (!it) Timber.w("The Camera Uploads user attribute is missing. Wait for the user attribute")
             return it
         }
     }
 
     /**
-     * Checks whether the folders are established
+     * Checks whether both Primary and Secondary Folders are established
      *
-     * @return true if the folders are established, and false if otherwise
+     * @return true if the Primary Folder exists and the Secondary Folder option disabled, or
+     * if the Primary Folder exists and the Secondary Folder option enabled with the folder also existing.
+     *
+     * false if both conditions are not met
      */
-    private suspend fun areFoldersEstablished(): Boolean {
-        // Checks if either Primary or Secondary Folder should be set up
+    private suspend fun areFoldersEstablished(): Boolean =
+        (isPrimaryFolderEstablished() && !isSecondaryFolderEnabled()) ||
+                (isPrimaryFolderEstablished() && (isSecondaryFolderEnabled() && isSecondaryFolderEstablished()))
+
+    /**
+     * Checks whether the Primary Folder is established
+     *
+     * @return true if the Primary Folder handle is a valid handle, and false if otherwise
+     */
+    private suspend fun isPrimaryFolderEstablished(): Boolean {
+        val isPrimaryFolderInRubbish = isNodeInRubbish(getPrimarySyncHandle())
+        return !isPrimaryFolderInRubbish || (isPrimaryFolderInRubbish && (getDefaultNodeHandle(
+            getString(R.string.section_photo_sync)) != MegaApiJava.INVALID_HANDLE))
+    }
+
+    /**
+     * Checks whether the Secondary Folder is established
+     *
+     * @return true if the Secondary Folder handle is a valid handle, and false if otherwise
+     */
+    private suspend fun isSecondaryFolderEstablished(): Boolean {
+        val isSecondaryFolderInRubbish = isNodeInRubbish(getSecondaryFolderHandle())
+        return !isSecondaryFolderInRubbish || (isSecondaryFolderInRubbish && (getDefaultNodeHandle(
+            getString(R.string.section_secondary_media_uploads)) != MegaApiJava.INVALID_HANDLE))
+    }
+
+    /**
+     * When the Primary Folder and Secondary Folder (if enabled) does not exist, this function will establish
+     * the folders
+     */
+    private suspend fun establishFolders() {
+        // Check if either Primary or Secondary Folder should be set up
         val shouldSetupFolders =
-            isPrimaryFolderMissing() || (isSecondaryFolderMissing() && isSecondaryFolderEnabled())
+            !isPrimaryFolderEstablished() || (isSecondaryFolderEnabled() && !isSecondaryFolderEstablished())
 
         // Setup the Primary Folder if it is missing
-        if (isPrimaryFolderMissing()) {
+        if (!isPrimaryFolderEstablished()) {
             Timber.w("The local primary folder is missing")
             setupPrimaryFolder()
             if (!isSecondaryFolderEnabled()) {
                 Timber.d("Waiting for user to login or to check the Camera Uploads attribute")
-                return false
+                return
             }
         }
-        // Setup the Secondary Folder if it is missing and Secondary Media Uploads is enabled
-        if (isSecondaryFolderMissing() && isSecondaryFolderEnabled()) {
+
+        // If Secondary Media Uploads is enabled, setup the Secondary Folder if it is missing
+        if (isSecondaryFolderEnabled() && !isSecondaryFolderEstablished()) {
             Timber.w("The local secondary folder is missing")
             setupSecondaryFolder()
             Timber.d("Waiting for user to login or to check the Camera Uploads attribute")
-            return false
+            return
         }
+
         // If either Primary or Secondary Folder needs to be set up, then call
         // the API to setup both Folders for Camera Uploads
         if (shouldSetupFolders) {
@@ -979,11 +1035,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 setAttrUserListener,
             )
             Timber.d("Waiting to setup Camera Uploads folders")
-
-            return false
         }
-
-        return true
     }
 
     private suspend fun startCameraUploads() {
@@ -1282,30 +1334,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             notificationManager?.notify(notificationId, notification)
         }
     }
-
-    /**
-     * Checks whether the Primary Folder is missing
-     *
-     * @return true if the Primary Folder handle is invalid, and false if otherwise
-     */
-    private suspend fun isPrimaryFolderMissing(): Boolean =
-        if (isNodeInRubbish(getPrimarySyncHandle())) {
-            getDefaultNodeHandle(getString(R.string.section_photo_sync)) == MegaApiJava.INVALID_HANDLE
-        } else {
-            false
-        }
-
-    /**
-     * Checks whether the Secondary Folder is missing
-     *
-     * @return true if the Secondary Folder handle is invalid, and false if otherwise
-     */
-    private suspend fun isSecondaryFolderMissing(): Boolean =
-        if (isNodeInRubbish(getSecondarySyncHandle())) {
-            getDefaultNodeHandle(getString(R.string.section_secondary_media_uploads)) == MegaApiJava.INVALID_HANDLE
-        } else {
-            false
-        }
 
     /**
      * Gets the Primary Folder handle
