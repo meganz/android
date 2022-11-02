@@ -754,6 +754,8 @@ public class UploadService extends Service {
             }
 
             if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+                transfersManagement.checkScanningTransferOnFinish(transfer);
+
                 if (!transfer.isFolderTransfer()) {
                     AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, error);
                     addCompletedTransfer(completedTransfer, dbH);
