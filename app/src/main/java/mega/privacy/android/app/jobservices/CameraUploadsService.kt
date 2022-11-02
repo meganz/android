@@ -1243,20 +1243,19 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private suspend fun performCompleteFastLogin() {
         running = true
 
-        runCatching { completeFastLogin(getSession().orEmpty()) }
-            .fold(
-                onSuccess = {
-                    Timber.d("Complete Fast Login procedure successful. Start CameraUploadsService")
-                    // Get cookies settings after login
-                    MegaApplication.getInstance().checkEnabledCookies()
-                    startWorker()
-                },
-                onFailure = { error ->
-                    Timber.e("Complete Fast Login procedure unsuccessful with error $error")
-                    endService()
-                },
-            )
         Timber.d("Waiting for the user to complete the Fast Login procedure")
+
+        runCatching {
+            runCatching { completeFastLogin(getSession().orEmpty()) }
+                .onFailure { error ->
+                    Timber.e("Complete Fast Login procedure unsuccessful with error $error")
+                    throw error
+                }
+            Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
+            MegaApplication.getInstance().checkEnabledCookies()
+            Timber.d("Start CameraUploadsService")
+            startWorker()
+        }.onFailure { endService() }
     }
 
     /**
