@@ -539,7 +539,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     @Override
     public void showConfirmationEnableLogsKarere() {
         if (loginFragment != null) {
-            loginFragment.numberOfClicksKarere = 0;
+            loginFragment.setNumberOfClicksKarere(0);
         }
 
         super.showConfirmationEnableLogsKarere();
@@ -548,7 +548,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
     @Override
     public void showConfirmationEnableLogsSDK() {
         if (loginFragment != null) {
-            loginFragment.numberOfClicksSDK = 0;
+            loginFragment.setNumberOfClicksSDK(0);
         }
 
         super.showConfirmationEnableLogsSDK();
