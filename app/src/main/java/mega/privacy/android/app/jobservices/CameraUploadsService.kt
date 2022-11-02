@@ -106,7 +106,6 @@ import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoQuality
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
-import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
@@ -253,12 +252,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var isSecondaryFolderEnabled: IsSecondaryFolderEnabled
-
-    /**
-     * HasCredentials
-     */
-    @Inject
-    lateinit var hasCredentials: HasCredentials
 
     /**
      * HasPreferences
@@ -776,7 +769,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      *
      * The following conditions should be satisfied in order:
      *
-     * 1. The User Credentials exist - [userCredentialsExist],
+     * 1. The User Session exists - [getSession],
      * 2. The Preferences exist - [preferencesExist],
      * 3. The Camera Uploads sync is enabled - [cameraUploadsSyncEnabled],
      * 4. The User is online - [isUserOnline],
@@ -794,14 +787,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * is unsatisfied
      */
     private suspend fun canRunCameraUploads(): Boolean =
-        userCredentialsExist() && preferencesExist() && cameraUploadsSyncEnabled() &&
+        sessionExists() && preferencesExist() && cameraUploadsSyncEnabled() &&
                 isUserOnline() && isDeviceAboveBatteryLevel() &&
                 hasCameraUploadsLocalPath() && isWifiConstraintSatisfied() &&
                 hasLocalPrimaryFolder() && hasLocalSecondaryFolder() && isUserLoggedIn() &&
                 hasCameraUploadsUserAttribute() && areFoldersEstablished()
 
     /**
-     * If there is at least one condition that failed in [canRunCameraUploads], this function checks each
+     * If at least one condition failed in [canRunCameraUploads], this function checks each
      * condition and executes certain behavior should the condition fail
      */
     private suspend fun handleFailedConditions() {
@@ -809,26 +802,31 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         val hasLocalSecondaryFolder = hasLocalSecondaryFolder()
 
         booleanArrayOf(
-            userCredentialsExist(),
+            sessionExists(),
             preferencesExist(),
             cameraUploadsSyncEnabled(),
             isUserOnline(),
             isDeviceAboveBatteryLevel(),
             hasCameraUploadsLocalPath(),
             isWifiConstraintSatisfied(),
-            hasLocalPrimaryFolder,
-            hasLocalSecondaryFolder,
-            // Any condition that fails in the Boolean Array will cause the Service to end
-        ).also { array -> if (array.contains(false)) endService() }
+        ).also { array ->
+            // Any false Boolean found in the Array will cause the Service to end and exit the function
+            if (array.contains(false)) {
+                endService()
+                return
+            }
+        }
 
         // If any of the if-statements return false, immediately call return to stop the
         // function from evaluating other statements
         if (!hasLocalPrimaryFolder) {
             handleLocalPrimaryFolderDisabled()
+            endService()
             return
         }
         if (!hasLocalSecondaryFolder) {
             handleLocalSecondaryFolderDisabled()
+            endService()
             return
         }
         if (!isUserLoggedIn()) {
@@ -846,13 +844,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * Checks if the User Credentials from [hasCredentials] exist
+     * Checks if the Session from [getSession] exists
      *
-     * @return true if it exists, and false if otherwise
+     * @return true if the Session exists by having a non-null or non-empty [String], and false if otherwise
      */
-    private suspend fun userCredentialsExist(): Boolean =
-        hasCredentials().also {
-            if (!it) Timber.w("There are no user credentials")
+    private suspend fun sessionExists(): Boolean =
+        getSession().orEmpty().isNotBlank().also {
+            if (!it) Timber.w("No session currently exists")
         }
 
     /**
