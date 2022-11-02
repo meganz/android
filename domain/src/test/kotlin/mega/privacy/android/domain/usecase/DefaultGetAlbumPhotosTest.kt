@@ -19,7 +19,7 @@ import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetUserAlbumsTest {
+class DefaultGetAlbumPhotosTest {
     private lateinit var underTest: GetAlbumPhotos
 
     private val albumRepository = mock<AlbumRepository>()
