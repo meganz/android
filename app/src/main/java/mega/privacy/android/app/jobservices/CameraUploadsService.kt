@@ -754,20 +754,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         runCatching {
             if (canRunCameraUploads()) startCameraUploads()
         }.onFailure { exception ->
-            Timber.e(exception)
-            releaseLocks()
-            if (isOverQuota) {
-                showStorageOverQuotaNotification()
-            }
-            canceled = true
-            running = false
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                stopForeground(STOP_FOREGROUND_REMOVE)
-            } else {
-                @Suppress("DEPRECATION")
-                stopForeground(true)
-            }
-            cancelNotification()
+            Timber.e("Calling startWorker() failed with exception $exception")
             endService()
         }
     }
