@@ -31,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -105,7 +106,7 @@ class FileBrowserFragment : RotatableFragment() {
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
 
-    private val managerViewModel by viewModels<ManagerViewModel>()
+    private val managerViewModel by activityViewModels<ManagerViewModel>()
     private val fileBrowserViewModel by viewModels<FileBrowserViewModel>()
 
     private var aB: ActionBar? = null
@@ -1079,7 +1080,7 @@ class FileBrowserFragment : RotatableFragment() {
                     adapter?.setNodes(_nodes)
                     visibilityFastScroller()
                     var lastVisiblePosition = 0
-                    lastPositionStack?.pop()?.let {
+                    lastPositionStack?.takeIf { it.isNotEmpty() }?.pop()?.let {
                         lastVisiblePosition = it
                         Timber.d("Pop of the stack $lastVisiblePosition position")
                     }
