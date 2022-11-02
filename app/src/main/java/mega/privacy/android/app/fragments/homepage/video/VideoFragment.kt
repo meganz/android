@@ -60,7 +60,6 @@ import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.displayMetrics
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -88,9 +87,6 @@ class VideoFragment : Fragment(), HomepageSearchable {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
-
-    @Inject
-    lateinit var sortOrderIntMapper: SortOrderIntMapper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -406,7 +402,8 @@ class VideoFragment : Fragment(), HomepageSearchable {
         }
 
         intent.putExtra(INTENT_EXTRA_KEY_POSITION, index)
-        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrderIntMapper(sortByHeaderViewModel.cloudSortOrder.value))
+        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+            sortByHeaderViewModel.cloudSortOrder.value)
         intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
         intent.putExtra(INTENT_EXTRA_KEY_HANDLE, file.handle)
 

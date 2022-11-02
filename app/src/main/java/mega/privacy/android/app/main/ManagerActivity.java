@@ -416,6 +416,7 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
+import mega.privacy.android.data.mapper.SortOrderIntMapperKt;
 import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.data.model.UserCredentials;
@@ -1126,7 +1127,7 @@ public class ManagerActivity extends TransfersManagementActivity
             ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
                             ? parentNode
                             : megaApi.getRootNode(),
-                    viewModel.getOrder());
+                    SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
 
             fileBrowserFragment.setNodes(nodes);
             fileBrowserFragment.getRecyclerView().invalidate();
@@ -5830,10 +5831,10 @@ public class ManagerActivity extends TransfersManagementActivity
         if (rubbishBinFragment != null) {
             ArrayList<MegaNode> nodes;
             if (viewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
-                nodes = megaApi.getChildren(megaApi.getRubbishNode(), viewModel.getOrder());
+                nodes = megaApi.getChildren(megaApi.getRubbishNode(), SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
             } else {
                 nodes = megaApi.getChildren(megaApi.getNodeByHandle(viewModel.getState().getValue().getRubbishBinParentHandle()),
-                        viewModel.getOrder());
+                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
             }
 
             rubbishBinFragment.hideMultipleSelect();
@@ -7647,12 +7648,12 @@ public class ManagerActivity extends TransfersManagementActivity
         if (isCloudAdded()) {
             ArrayList<MegaNode> nodes;
             if (viewModel.getState().getValue().getBrowserParentHandle() == -1) {
-                nodes = megaApi.getChildren(parentNode, viewModel.getOrder());
+                nodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
             } else {
                 parentNode = megaApi.getNodeByHandle(viewModel.getState().getValue().getBrowserParentHandle());
                 if (parentNode == null) return;
 
-                nodes = megaApi.getChildren(parentNode, viewModel.getOrder());
+                nodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
             }
             Timber.d("Nodes: %s", nodes.size());
             if (comesFromNotificationChildNodeHandleList == null) {
@@ -8234,7 +8235,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
                                 ? parentNode
                                 : megaApi.getRootNode(),
-                        viewModel.getOrder());
+                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
 
                 fileBrowserFragment.setNodes(nodes);
                 fileBrowserFragment.getRecyclerView().invalidate();
@@ -8461,7 +8462,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
             if (isCloudAdded()) {
                 ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(viewModel.getState().getValue().getBrowserParentHandle()),
-                        viewModel.getOrder());
+                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
                 fileBrowserFragment.setNodes(nodes);
                 fileBrowserFragment.getRecyclerView().invalidate();
             }
