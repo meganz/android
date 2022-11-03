@@ -28,6 +28,7 @@ class DefaultGetUserAlbums @Inject constructor(
                     id = AlbumId(set.id),
                     title = set.name,
                     cover = photo,
+                    modificationTime = set.modificationTime,
                 )
             }
         emit(userAlbums)

@@ -4068,13 +4068,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     checkCurrentStorageStatus(false);
                 } else {
                     Timber.w("showOnlineMode - Root is NULL");
-                    if (getApplicationContext() != null) {
-                        if (MegaApplication.getOpenChatId() != MEGACHAT_INVALID_HANDLE) {
-                            Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG);
-                            sendBroadcast(intent);
-                        } else {
-                            showConfirmationConnect();
-                        }
+                    if (MegaApplication.getOpenChatId() == MEGACHAT_INVALID_HANDLE) {
+                        showConfirmationConnect();
                     }
                 }
             }

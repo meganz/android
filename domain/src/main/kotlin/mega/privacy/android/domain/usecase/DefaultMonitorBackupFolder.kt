@@ -18,14 +18,14 @@ class DefaultMonitorBackupFolder @Inject constructor(
     private val fileRepository: FileRepository,
     private val monitorUserUpdates: MonitorUserUpdates,
 ) : MonitorBackupFolder {
-    override fun invoke(): Flow<NodeId> {
+    override fun invoke(): Flow<Result<NodeId>> {
         return flow {
-            emit(fileRepository.getBackupFolderId())
+            emit(kotlin.runCatching { fileRepository.getBackupFolderId() })
             emitAll(
                 monitorUserUpdates()
                     .filter { it == UserChanges.MyBackupsFolder }
                     .map {
-                        fileRepository.getBackupFolderId()
+                        kotlin.runCatching { fileRepository.getBackupFolderId() }
                     }
             )
         }

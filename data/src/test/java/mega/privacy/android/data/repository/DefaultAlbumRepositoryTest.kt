@@ -141,11 +141,14 @@ class DefaultAlbumRepositoryTest {
         id: Long,
         name: String,
         cover: Long?,
+        modificationTime: Long,
     ): UserSet = object : UserSet {
         override val id: Long = id
 
         override val name: String = name
 
         override val cover: Long? = cover
+
+        override val modificationTime: Long = modificationTime
     }
 }

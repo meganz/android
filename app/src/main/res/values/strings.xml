@@ -4033,4 +4033,8 @@
     <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]Renewal date:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">Enter album name</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">New album</string>
 </resources>

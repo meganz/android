@@ -332,11 +332,14 @@ class PhotosFragment : Fragment() {
 
 
     @Composable
-    private fun albumsView(albumsViewState: AlbumsViewState) = AlbumsView(
-        albumsViewState = albumsViewState,
-        openAlbum = this::openAlbum,
-        downloadPhoto = photosViewModel::downloadPhoto
-    )
+    private fun albumsView(albumsViewState: AlbumsViewState) =
+        AlbumsView(
+            albumsViewState = albumsViewState,
+            openAlbum = this::openAlbum,
+            downloadPhoto = photosViewModel::downloadPhoto,
+        ) {
+            getFeatureFlag(AppFeatures.UserAlbums)
+        }
 
     @Composable
     private fun enableCUView(timelineViewState: TimelineViewState) = EnableCU(
