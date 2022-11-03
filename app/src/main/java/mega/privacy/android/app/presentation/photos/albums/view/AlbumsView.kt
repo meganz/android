@@ -71,11 +71,15 @@ fun AlbumsView(
     albumsViewState: AlbumsViewState,
     openAlbum: (album: UIAlbum) -> Unit,
     downloadPhoto: PhotoDownload,
-    userAlbumsEnabled: Boolean,
+    isUserAlbumsEnabled: suspend () -> Boolean,
 ) {
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     val grids = 3.takeIf { isPortrait } ?: 4
     val openDialog = rememberSaveable { mutableStateOf(false) }
+
+    val displayFAB by produceState(initialValue = false) {
+        value = isUserAlbumsEnabled()
+    }
 
     LazyVerticalGrid(
         contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp),
@@ -149,7 +153,7 @@ fun AlbumsView(
         }
     }
 
-    if (userAlbumsEnabled) {
+    if (displayFAB) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomEnd,
@@ -169,13 +173,14 @@ fun AlbumsView(
                 )
             }
         }
+
+        if (openDialog.value) {
+            CreateNewAlbumDialog(
+                onDismissRequest = { openDialog.value = false }
+            )
+        }
     }
 
-    if (openDialog.value) {
-        CreateNewAlbumDialog(
-            onDismissRequest = { openDialog.value = false }
-        )
-    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)

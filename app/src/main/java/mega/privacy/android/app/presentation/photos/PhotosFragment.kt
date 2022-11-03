@@ -267,11 +267,6 @@ class PhotosFragment : Fragment() {
         val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
         val albumsViewState by albumsViewModel.state.collectAsStateWithLifecycle()
 
-        var userAlbumsEnabled = false
-        activity?.lifecycleScope?.launch {
-            userAlbumsEnabled = getFeatureFlag(AppFeatures.UserAlbums)
-        }
-
         if (!this::pagerState.isInitialized) {
             pagerState =
                 if (managerActivity.fromAlbumContent)
@@ -309,9 +304,7 @@ class PhotosFragment : Fragment() {
             pagerState = pagerState,
             onTabSelected = this::onTabSelected,
             timelineView = { timelineView(timelineViewState = timelineViewState) },
-            albumsView = {
-                albumsView(albumsViewState = albumsViewState, userAlbumsEnabled = userAlbumsEnabled)
-            },
+            albumsView = { albumsView(albumsViewState = albumsViewState) },
             timelineViewState = timelineViewState,
         )
     }
@@ -339,13 +332,14 @@ class PhotosFragment : Fragment() {
 
 
     @Composable
-    private fun albumsView(albumsViewState: AlbumsViewState, userAlbumsEnabled: Boolean) =
+    private fun albumsView(albumsViewState: AlbumsViewState) =
         AlbumsView(
             albumsViewState = albumsViewState,
             openAlbum = this::openAlbum,
             downloadPhoto = photosViewModel::downloadPhoto,
-            userAlbumsEnabled = userAlbumsEnabled,
-        )
+        ) {
+            getFeatureFlag(AppFeatures.UserAlbums)
+        }
 
     @Composable
     private fun enableCUView(timelineViewState: TimelineViewState) = EnableCU(
