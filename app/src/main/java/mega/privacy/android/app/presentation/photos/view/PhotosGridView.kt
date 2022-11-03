@@ -44,6 +44,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_DAY
+import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH
+import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH_WITH_DAY
+import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_YEAR_WITH_MONTH
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.presentation.theme.grey_alpha_032
@@ -54,20 +58,15 @@ import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
 
-const val DATE_FORMAT_YEAR_WITH_MONTH = "yyyy"
-const val DATE_FORMAT_MONTH = "LLLL"
-const val DATE_FORMAT_DAY = "dd"
-const val DATE_FORMAT_MONTH_WITH_DAY = "MMMM"
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun PhotosGridView(
     currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
-    downloadPhoto: PhotoDownload,
+    photoDownland: PhotoDownload,
     lazyGridState: LazyGridState = rememberLazyGridState(),
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
-    selectedPhotoIds: MutableSet<Long>,
+    selectedPhotoIds: Set<Long>,
     uiPhotoList: List<UIPhoto>,
 ) {
 
@@ -119,7 +118,7 @@ internal fun PhotosGridView(
                             PhotoView(
                                 photo = item.photo,
                                 isPreview = isDownloadPreview(configuration, currentZoomLevel),
-                                downloadPhoto = downloadPhoto
+                                downloadPhoto = photoDownland
                             )
                         }
                     )
