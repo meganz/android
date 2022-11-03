@@ -47,7 +47,6 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -63,6 +62,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.grey_alpha_054
+import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_054
 
@@ -209,9 +209,9 @@ fun CreateNewAlbumDialog(
 
                     val textFieldColors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent,
-                        cursorColor = colorResource(id = R.color.teal_300),
-                        focusedIndicatorColor = colorResource(id = R.color.teal_300),
-                        unfocusedIndicatorColor = colorResource(id = R.color.teal_300),
+                        cursorColor = teal_300,
+                        focusedIndicatorColor = teal_300,
+                        unfocusedIndicatorColor = teal_300,
                     )
 
                     val interactionSource = remember { MutableInteractionSource() }
@@ -282,7 +282,7 @@ fun CreateNewAlbumDialog(
                         ) {
                             Text(
                                 stringResource(id = R.string.general_cancel),
-                                color = colorResource(id = R.color.teal_300)
+                                color = teal_300
                             )
                         }
                         Button(
@@ -301,7 +301,7 @@ fun CreateNewAlbumDialog(
                         ) {
                             Text(
                                 text = stringResource(id = R.string.general_create),
-                                color = colorResource(id = R.color.teal_300)
+                                color = teal_300
                             )
                         }
                     }
