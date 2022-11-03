@@ -188,7 +188,7 @@ class FileBrowserFragment : RotatableFragment() {
                 }
                 R.id.cab_menu_rename -> {
                     if (documents?.size == 1) {
-                        (context as? ManagerActivity)?.showRenameDialog(documents[0])
+                        (activity as? ManagerActivity)?.showRenameDialog(documents[0])
                     }
                     clearSelections()
                     hideMultipleSelect()
@@ -196,14 +196,14 @@ class FileBrowserFragment : RotatableFragment() {
                 R.id.cab_menu_copy -> {
                     documents?.map { it.handle }?.let {
                         handleList.addAll(it)
-                        val nC = NodeController(context)
+                        val nC = NodeController(activity)
                         nC.chooseLocationToCopyNodes(handleList)
                     }
                     clearSelections()
                     hideMultipleSelect()
                 }
                 R.id.cab_menu_move -> {
-                    val nC = NodeController(context)
+                    val nC = NodeController(activity)
                     documents?.map { it.handle }?.let {
                         handleList.addAll(it)
                         nC.chooseLocationToMoveNodes(handleList)
@@ -215,7 +215,7 @@ class FileBrowserFragment : RotatableFragment() {
                     documents?.filter { it.isFolder }
                         ?.map { it.handle }?.let {
                             handleList.addAll(it)
-                            val nC = NodeController(context)
+                            val nC = NodeController(activity)
                             fileBackupManager?.let { backupManager ->
                                 if (!backupManager.shareBackupFolderInMenu(
                                         nC,
@@ -864,7 +864,7 @@ class FileBrowserFragment : RotatableFragment() {
             Timber.d("itemClick:isFile:otherOption")
 
             val managerActivity = activity as? ManagerActivity ?: return
-            onNodeTapped(requireContext(),
+            onNodeTapped(requireActivity(),
                 node,
                 { saveNode: MegaNode? -> (activity as? ManagerActivity)?.saveNodeByTap(saveNode) },
                 managerActivity,
