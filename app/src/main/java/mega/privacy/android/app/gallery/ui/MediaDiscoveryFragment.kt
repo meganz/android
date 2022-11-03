@@ -77,6 +77,7 @@ import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -133,7 +134,7 @@ class MediaDiscoveryFragment : Fragment(), GestureScaleListener.GestureScaleCall
     /**
      * Current order.
      */
-    private var order = 0
+    private var order = SortOrder.ORDER_NONE
 
     companion object {
         @JvmStatic

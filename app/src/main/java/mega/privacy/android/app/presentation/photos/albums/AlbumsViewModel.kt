@@ -46,8 +46,6 @@ class AlbumsViewModel @Inject constructor(
     val state = _state.asStateFlow()
     private var currentNodeJob: Job? = null
 
-    internal val selectedPhotoIds = mutableSetOf<Long>()
-
     private suspend fun getSystemAlbums(): Map<Album, PhotoPredicate> {
         val albums = getDefaultAlbumsMap()
         return if (getFeatureFlag(AppFeatures.DynamicAlbum)) {
@@ -104,20 +102,20 @@ class AlbumsViewModel @Inject constructor(
     }
 
     fun togglePhotoSelection(id: Long) {
+        val selectedPhotoIds = _state.value.selectedPhotoIds.toMutableSet()
         if (id in selectedPhotoIds) {
             selectedPhotoIds.remove(id)
         } else {
             selectedPhotoIds.add(id)
         }
         _state.update {
-            it.copy(selectedPhotoIds = selectedPhotoIds.toMutableSet())
+            it.copy(selectedPhotoIds = selectedPhotoIds)
         }
     }
 
     fun clearSelectedPhotos() {
-        selectedPhotoIds.clear()
         _state.update {
-            it.copy(selectedPhotoIds = selectedPhotoIds.toMutableSet())
+            it.copy(selectedPhotoIds = emptySet())
         }
     }
 
@@ -127,10 +125,8 @@ class AlbumsViewModel @Inject constructor(
                 _state.value.albums.getAlbumPhotos(album).map { photo ->
                     photo.id
                 }
-            selectedPhotoIds.clear()
-            selectedPhotoIds.addAll(albumPhotosHandles)
             _state.update {
-                it.copy(selectedPhotoIds = selectedPhotoIds.toMutableSet())
+                it.copy(selectedPhotoIds = albumPhotosHandles.toMutableSet())
             }
         }
     }
@@ -140,16 +136,15 @@ class AlbumsViewModel @Inject constructor(
 
     fun removeFavourites() {
         viewModelScope.launch {
-            removeFavourites(selectedPhotoIds.toList())
+            removeFavourites(_state.value.selectedPhotoIds.toList())
         }
-        selectedPhotoIds.clear()
         _state.update {
-            it.copy(selectedPhotoIds = selectedPhotoIds.toMutableSet())
+            it.copy(selectedPhotoIds = emptySet())
         }
     }
 
     suspend fun getSelectedNodes() =
-        getNodeListByIds(selectedPhotoIds.toList())
+        getNodeListByIds(_state.value.selectedPhotoIds.toList())
 
     fun setCurrentSort(sort: Sort) {
         _state.update {

@@ -32,7 +32,7 @@ internal class DefaultAlbumRepository @Inject constructor(
         val setList = megaApiGateway.getSets()
         (0 until setList.size()).map {
             with(setList.get(it)) {
-                userSetMapper(id(), name(), cover())
+                userSetMapper(id(), name(), cover(), ts())
             }
         }
     }

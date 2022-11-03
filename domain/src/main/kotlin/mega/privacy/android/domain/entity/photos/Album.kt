@@ -27,6 +27,12 @@ sealed interface Album {
      * @property id
      * @property title
      * @property cover
+     * @property modificationTime
      */
-    data class UserAlbum(val id: AlbumId, val title: String, val cover: Photo?) : Album
+    data class UserAlbum(
+        val id: AlbumId,
+        val title: String,
+        val cover: Photo?,
+        val modificationTime: Long,
+    ) : Album
 }

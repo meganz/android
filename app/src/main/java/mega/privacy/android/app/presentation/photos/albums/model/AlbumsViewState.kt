@@ -12,6 +12,6 @@ import mega.privacy.android.domain.entity.photos.Album
 data class AlbumsViewState(
     val albums: List<UIAlbum> = emptyList(),
     val currentAlbumId: Album? = null,
-    val selectedPhotoIds: MutableSet<Long> = mutableSetOf(),
+    val selectedPhotoIds: Set<Long> = emptySet(),
     val currentSort: Sort = Sort.NEWEST,
 )
