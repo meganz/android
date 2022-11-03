@@ -200,7 +200,7 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     fun onClick(photo: Photo) {
-        if (albumsViewModel.selectedPhotoIds.isEmpty()) {
+        if (albumsViewModel.state.value.selectedPhotoIds.isEmpty()) {
             openPhoto(photo)
         } else {
             if (actionMode != null) {
@@ -227,7 +227,7 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun handleActionMode(photo: Photo) {
-        if (albumsViewModel.selectedPhotoIds.isEmpty()) {
+        if (albumsViewModel.state.value.selectedPhotoIds.isEmpty()) {
             if (actionMode == null) {
                 enterActionMode()
             }
