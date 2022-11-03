@@ -10,6 +10,7 @@ import static mega.privacy.android.app.utils.Constants.RESULT;
 import static mega.privacy.android.app.utils.Constants.URL_E2EE;
 import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
+import static mega.privacy.android.app.utils.Util.changeActionBarElevation;
 import static mega.privacy.android.app.utils.Util.getScaleH;
 import static mega.privacy.android.app.utils.Util.getScaleW;
 import static mega.privacy.android.app.utils.Util.isOnline;
@@ -53,11 +54,11 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
-import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.domain.qualifier.ApplicationScope;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -65,8 +66,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import timber.log.Timber;
 
-
-@SuppressLint("NewApi")
 @AndroidEntryPoint
 public class ChangePasswordActivity extends PasscodeActivity implements OnClickListener, MegaRequestListenerInterface {
 
@@ -96,15 +95,11 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
     private ImageView newPassword2Error;
     private Button changePasswordButton;
     private LinearLayout generalContainer;
-    private TextView title;
     private String linkToReset;
     private String mk;
 
     // TOP for 'terms of password'
     private CheckBox chkTOP;
-
-    private ActionBar aB;
-    Toolbar tB;
 
     private LinearLayout containerPasswdElements;
     private ImageView firstShape;
@@ -118,7 +113,6 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
 
     private InputMethodManager imm;
 
-    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -134,8 +128,6 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
 
         scaleW = getScaleW(outMetrics, density);
         scaleH = getScaleH(outMetrics, density);
-
-        TextView title = findViewById(R.id.title_change_pass);
 
         passwdValid = false;
 
@@ -267,8 +259,20 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
         progress.setCancelable(false);
         progress.setCanceledOnTouchOutside(false);
 
-        tB = findViewById(R.id.toolbar);
-        hideAB();
+        Toolbar tB = findViewById(R.id.change_password_toolbar);
+        setSupportActionBar(tB);
+        ActionBar aB = getSupportActionBar();
+        if (aB != null) {
+            aB.setTitle(getString(R.string.my_account_change_password));
+            aB.setHomeButtonEnabled(true);
+            aB.setDisplayHomeAsUpEnabled(true);
+        } else {
+            Timber.w("Action Bar is null");
+        }
+
+        var scrollView = findViewById(R.id.change_password_scroll_view);
+        scrollView.setOnScrollChangeListener((view, scrollX, scrollY, oldScrollX, oldScrollY) ->
+                changeActionBarElevation(this, findViewById(R.id.app_bar_layout_change_password), scrollView.canScrollVertically(-1)));
 
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
@@ -290,7 +294,9 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
                         showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
                     }
 
-                    title.setText(getString(R.string.title_enter_new_password));
+                    if (aB != null) {
+                        aB.setTitle(getString(R.string.title_enter_new_password));
+                    }
                 }
                 if (getIntent().getAction().equals(ACTION_RESET_PASS_FROM_PARK_ACCOUNT)) {
                     changePassword = false;
@@ -302,7 +308,9 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
                     }
                     mk = null;
 
-                    title.setText(getString(R.string.title_enter_new_password));
+                    if (aB != null) {
+                        aB.setTitle(getString(R.string.title_enter_new_password));
+                    }
                 }
             }
         }
@@ -766,12 +774,6 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
 
     public void showSnackbar(String s) {
         showSnackbar(generalContainer, s);
-    }
-
-    void hideAB() {
-        if (aB != null) {
-            aB.hide();
-        }
     }
 
     private boolean checkFirstPasswordField() {
