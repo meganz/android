@@ -54,7 +54,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.shareNodes
 import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -76,11 +75,6 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
-    /**
-     * SortOrderIntMapper
-     */
-    @Inject
-    lateinit var sortOrderIntMapper: SortOrderIntMapper
 
     /**
      * Number of items in the adapter
@@ -332,7 +326,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                 intent = getIntentForParentNode(
                     requireContext(),
                     parentHandle,
-                    sortOrderIntMapper(sortOrder),
+                    sortOrder,
                     node.handle
                 )
                 launchIntent(intent, true, position)

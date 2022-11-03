@@ -57,13 +57,11 @@ import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.displayMetrics
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -91,9 +89,6 @@ class AudioFragment : Fragment(), HomepageSearchable {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
-
-    @Inject
-    lateinit var sortOrderIntMapper: SortOrderIntMapper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -154,7 +149,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
     }
 
     private fun doIfOnline(operation: () -> Unit) {
-        if (Util.isOnline(context)) {
+        if (viewModel.isConnected) {
             operation()
         } else {
             callManager {
@@ -249,7 +244,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
         intent.putExtra(INTENT_EXTRA_KEY_POSITION, index)
         intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-            sortOrderIntMapper(sortByHeaderViewModel.cloudSortOrder.value))
+            sortByHeaderViewModel.cloudSortOrder.value)
         intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
         intent.putExtra(INTENT_EXTRA_KEY_HANDLE, file.handle)
 

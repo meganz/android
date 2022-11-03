@@ -88,6 +88,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.shareNodes
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaApiAndroid
@@ -109,6 +110,12 @@ class FileBrowserFragment : RotatableFragment() {
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    /**
+     * SortOrderIntMapper
+     */
+    @Inject
+    lateinit var sortOrderIntMapper: SortOrderIntMapper
 
     private val managerViewModel by activityViewModels<ManagerViewModel>()
     private val fileBrowserViewModel by viewModels<FileBrowserViewModel>()
@@ -616,11 +623,13 @@ class FileBrowserFragment : RotatableFragment() {
         val parentHandleBrowser = managerViewModel.getSafeBrowserParentHandle()
         if (parentHandleBrowser == -1L || parentHandleBrowser == megaApi.rootNode.handle) {
             Timber.w("After consulting... the parent keeps -1 or ROOTNODE: %s", parentHandleBrowser)
-            _nodes = megaApi.getChildren(megaApi.rootNode, managerViewModel.getOrder())
+            _nodes = megaApi.getChildren(megaApi.rootNode,
+                sortOrderIntMapper(managerViewModel.getOrder()))
             mediaHandle = megaApi.rootNode.handle
         } else {
             val parentNode = megaApi.getNodeByHandle(parentHandleBrowser)
-            _nodes = megaApi.getChildren(parentNode, managerViewModel.getOrder())
+            _nodes =
+                megaApi.getChildren(parentNode, sortOrderIntMapper(managerViewModel.getOrder()))
             mediaHandle = parentHandleBrowser
         }
     }
@@ -879,7 +888,7 @@ class FileBrowserFragment : RotatableFragment() {
                 mediaHandle = clickedNode.handle
                 managerViewModel.setBrowserParentHandle(clickedNode.handle)
                 val childNodes: List<MegaNode> = megaApi.getChildren(clickedNode,
-                    managerViewModel.getOrder())
+                    sortOrderIntMapper(managerViewModel.getOrder()))
                 if (fileBrowserViewModel.shouldEnterMDMode(childNodes)) {
                     showMediaDiscovery()
                 } else {
@@ -921,7 +930,7 @@ class FileBrowserFragment : RotatableFragment() {
         (activity as? ManagerActivity)?.supportInvalidateOptionsMenu()
         (activity as? ManagerActivity)?.setToolbarTitle()
         adapter?.parentHandle = managerViewModel.getSafeBrowserParentHandle()
-        _nodes = megaApi.getChildren(n, managerViewModel.getOrder())
+        _nodes = megaApi.getChildren(n, sortOrderIntMapper(managerViewModel.getOrder()))
         adapter?.setNodes(_nodes)
         recyclerView?.scrollToPosition(0)
         visibilityFastScroller()
@@ -1083,7 +1092,8 @@ class FileBrowserFragment : RotatableFragment() {
                     managerViewModel.setBrowserParentHandle(parentNode.handle)
                     managerActivity.supportInvalidateOptionsMenu()
                     managerActivity.setToolbarTitle()
-                    _nodes = megaApi.getChildren(parentNode, managerViewModel.getOrder())
+                    _nodes = megaApi.getChildren(parentNode,
+                        sortOrderIntMapper(managerViewModel.getOrder()))
                     adapter?.setNodes(_nodes)
                     visibilityFastScroller()
                     var lastVisiblePosition = 0

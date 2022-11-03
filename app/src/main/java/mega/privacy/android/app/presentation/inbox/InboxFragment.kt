@@ -57,6 +57,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNodes
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -77,6 +78,12 @@ class InboxFragment : RotatableFragment() {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
+
+    /**
+     * SortOrderIntMapper
+     */
+    @Inject
+    lateinit var sortOrderIntMapper: SortOrderIntMapper
 
     /**
      * [Boolean] referenced from [ManagerActivity]
@@ -172,14 +179,14 @@ class InboxFragment : RotatableFragment() {
             if (megaApi.inboxNode != null) {
                 Timber.d("InboxNode != null")
                 inboxNode = megaApi.inboxNode
-                nodes = megaApi.getChildren(inboxNode, viewModel.getOrder())
+                nodes = megaApi.getChildren(inboxNode, sortOrderIntMapper(viewModel.getOrder()))
             }
         } else {
             Timber.d("Parent Handle: %d", parentHandleInbox)
             val parentNode = megaApi.getNodeByHandle(parentHandleInbox)
             if (parentNode != null) {
                 logParentNodeHandle(parentNode)
-                nodes = megaApi.getChildren(parentNode, viewModel.getOrder())
+                nodes = megaApi.getChildren(parentNode, sortOrderIntMapper(viewModel.getOrder()))
             }
         }
         (requireActivity() as ManagerActivity).invalidateOptionsMenu()
@@ -489,12 +496,13 @@ class InboxFragment : RotatableFragment() {
 
         inboxNode?.let {
             if (parentHandleInbox == -1L || parentHandleInbox == it.handle) {
-                nodes = megaApi.getChildren(it, viewModel.getOrder())
+                nodes = megaApi.getChildren(it, sortOrderIntMapper(viewModel.getOrder()))
             } else {
                 val parentNode = megaApi.getNodeByHandle(parentHandleInbox)
                 if (parentNode != null) {
                     logParentNodeHandle(parentNode)
-                    nodes = megaApi.getChildren(parentNode, viewModel.getOrder())
+                    nodes =
+                        megaApi.getChildren(parentNode, sortOrderIntMapper(viewModel.getOrder()))
                 }
             }
         }
@@ -734,7 +742,7 @@ class InboxFragment : RotatableFragment() {
                     (requireActivity() as ManagerActivity).parentHandleInbox = it[position].handle
                 }
                 nodes = megaApi.getChildren((nodes ?: return)[position],
-                    viewModel.getOrder())
+                    sortOrderIntMapper(viewModel.getOrder()))
                 adapter?.setNodes(nodes)
                 setContent()
                 recyclerView?.scrollToPosition(0)
@@ -786,7 +794,7 @@ class InboxFragment : RotatableFragment() {
                 (requireActivity() as ManagerActivity).invalidateOptionsMenu()
                 (requireActivity() as ManagerActivity).parentHandleInbox = parentNode.handle
                 (requireActivity() as ManagerActivity).setToolbarTitle()
-                nodes = megaApi.getChildren(parentNode, viewModel.getOrder())
+                nodes = megaApi.getChildren(parentNode, sortOrderIntMapper(viewModel.getOrder()))
                 setNodes(nodes)
 
                 var lastVisiblePosition = 0

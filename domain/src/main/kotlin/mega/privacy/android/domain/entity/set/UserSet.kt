@@ -19,4 +19,9 @@ interface UserSet {
      * The Set cover
      */
     val cover: Long?
+
+    /**
+     * The Set modification time
+     */
+    val modificationTime: Long
 }

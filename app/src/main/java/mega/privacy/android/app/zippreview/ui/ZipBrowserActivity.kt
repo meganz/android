@@ -55,6 +55,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.getScreenHeight
 import mega.privacy.android.app.zippreview.domain.FileType
 import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
@@ -322,7 +323,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             putExtra(INTENT_EXTRA_KEY_POSITION, position)
             putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L)
             putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.absolutePath)
-            putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, MegaApiJava.ORDER_DEFAULT_ASC)
+            putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, SortOrder.ORDER_DEFAULT_ASC)
             DragToExitSupport.putThumbnailLocation(
                 mediaIntent,
                 recyclerView,

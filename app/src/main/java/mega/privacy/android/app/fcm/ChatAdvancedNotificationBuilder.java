@@ -204,6 +204,9 @@ public final class ChatAdvancedNotificationBuilder {
 
     private void notifyCall(int id, Notification notification) {
         callsNotificationIds.add(id);
+        if (notificationManager == null) {
+            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        }
         notificationManager.notify(id, notification);
     }
 
@@ -783,7 +786,7 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     /**
-     * Method for showing the incoming call notification, when exists another call in progress exists.
+     * Method to show the incoming call notification, when there is another call in progress.
      *
      * @param callToAnswer   The call that is being received.
      * @param callInProgress The current call in progress.
@@ -901,6 +904,7 @@ public final class ChatAdvancedNotificationBuilder {
             notifyCall(notificationId, notificationBuilderO.build());
 
         } else {
+            long[] noVibrationPattern = new long[]{0L};
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
@@ -913,20 +917,9 @@ public final class ChatAdvancedNotificationBuilder {
                     .setAutoCancel(false)
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setDeleteIntent(intentIgnore)
-                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-
-            if (shouldVibrate) {
-                notificationBuilder.setVibrate(patternIncomingCall);
-            } else {
-                notificationBuilder.setDefaults(Notification.DEFAULT_SOUND)
-                        .setVibrate(new long[]{0L});
-            }
-
-            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-
-            if (notificationManager == null) {
-                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            }
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
+                    .setPriority(Notification.PRIORITY_HIGH)
+                    .setVibrate(shouldVibrate ? patternIncomingCall : noVibrationPattern);
 
             notifyCall(notificationId, notificationBuilder.build());
         }
@@ -1034,13 +1027,8 @@ public final class ChatAdvancedNotificationBuilder {
                     .setDeleteIntent(intentIgnore)
                     .setVibrate(pattern)
                     .setSound(defaultSoundUri)
-                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-
-            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-
-            if (notificationManager == null) {
-                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            }
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
+                    .setPriority(Notification.PRIORITY_HIGH);
 
             Timber.w("Notify incoming call");
             notifyCall(notificationId, notificationBuilder.build());

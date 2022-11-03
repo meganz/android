@@ -11,20 +11,6 @@ fun TimelineViewModel.updateZoomLevel(newZoomLevel: ZoomLevel) {
     }
 }
 
-fun TimelineViewModel.updateSelectedTimeBarState(
-    selectedTimeBarTab: TimeBarTab,
-    startIndex: Int = 0,
-    startOffset: Int = 0,
-) {
-    _state.update {
-        it.copy(
-            selectedTimeBarTab = selectedTimeBarTab,
-            scrollStartIndex = startIndex,
-            scrollStartOffset = startOffset
-        )
-    }
-}
-
 fun TimelineViewModel.zoomIn() {
     if (_state.value.currentZoomLevel == ZoomLevel.values()[ZoomLevel.values().first().ordinal]) {
         return

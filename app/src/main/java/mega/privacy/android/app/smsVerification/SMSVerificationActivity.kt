@@ -109,7 +109,7 @@ class SMSVerificationActivity : PasscodeActivity(), View.OnClickListener,
         container = findViewById(R.id.scroller_container)
         val intent = intent
         if (intent != null) {
-            isUserLocked = intent.getBooleanExtra(LoginFragment.NAME_USER_LOCKED, false)
+            isUserLocked = intent.getBooleanExtra(NAME_USER_LOCKED, false)
         }
         Timber.d("Is user locked %s", isUserLocked)
 
@@ -446,7 +446,7 @@ class SMSVerificationActivity : PasscodeActivity(), View.OnClickListener,
                     val intent = Intent(this, SMSVerificationReceiveTxtActivity::class.java)
                     intent.putExtra(SELECTED_COUNTRY_CODE, selectedDialCode)
                     intent.putExtra(ENTERED_PHONE_NUMBER, enteredPhoneNumber)
-                    intent.putExtra(LoginFragment.NAME_USER_LOCKED, isUserLocked)
+                    intent.putExtra(NAME_USER_LOCKED, isUserLocked)
                     @Suppress("Deprecation")
                     startActivityForResult(intent, Constants.REQUEST_CODE_VERIFY_CODE)
                 }

@@ -61,8 +61,6 @@ import mega.privacy.android.app.presentation.photos.timeline.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.timeline.view.TimelineView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getCurrentSort
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onCardClick
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onTimeBarTabSelected
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUploadVideos
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseCellularConnection
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCurrentSort
@@ -332,11 +330,14 @@ class PhotosFragment : Fragment() {
 
 
     @Composable
-    private fun albumsView(albumsViewState: AlbumsViewState) = AlbumsView(
-        albumsViewState = albumsViewState,
-        openAlbum = this::openAlbum,
-        downloadPhoto = photosViewModel::downloadPhoto
-    )
+    private fun albumsView(albumsViewState: AlbumsViewState) =
+        AlbumsView(
+            albumsViewState = albumsViewState,
+            openAlbum = this::openAlbum,
+            downloadPhoto = photosViewModel::downloadPhoto,
+        ) {
+            getFeatureFlag(AppFeatures.UserAlbums)
+        }
 
     @Composable
     private fun enableCUView(timelineViewState: TimelineViewState) = EnableCU(

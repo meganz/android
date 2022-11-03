@@ -294,11 +294,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
     override fun onResume() {
         super.onResume()
-
-        if (transfersManagement.shouldShowScanningTransfersDialog()) {
-            showScanningTransfersDialog()
-        }
-
         updateTransfersWidget()
     }
 

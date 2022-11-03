@@ -11,10 +11,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.inbox.InboxViewModel
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import nz.mega.sdk.MegaApiJava
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,7 +29,6 @@ class InboxViewModelTest {
 
     private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
-    private val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -48,7 +45,6 @@ class InboxViewModelTest {
         underTest = InboxViewModel(
             monitorNodeUpdates = monitorNodeUpdates,
             getCloudSortOrder = getCloudSortOrder,
-            sortOrderIntMapper = sortOrderIntMapper,
         )
     }
 
@@ -77,10 +73,8 @@ class InboxViewModelTest {
     @Test
     fun `test that get order returns cloud sort order`() = runTest {
         setupUnderTest()
-        val order = SortOrder.ORDER_SIZE_DESC
-        val expected = MegaApiJava.ORDER_SIZE_DESC
-        whenever(getCloudSortOrder()).thenReturn(order)
-        whenever(sortOrderIntMapper(order)).thenReturn(expected)
+        val expected = SortOrder.ORDER_SIZE_DESC
+        whenever(getCloudSortOrder()).thenReturn(expected)
         assertThat(underTest.getOrder()).isEqualTo(expected)
     }
 }

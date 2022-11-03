@@ -33,7 +33,6 @@ import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.ContactRequest
@@ -73,7 +72,6 @@ import javax.inject.Inject
  * @param monitorMyAvatarFile
  * @param monitorStorageStateEvent monitor global storage state changes
  * @param getCloudSortOrder
- * @param sortOrderIntMapper
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -95,7 +93,6 @@ class ManagerViewModel @Inject constructor(
     private val getSecondarySyncHandle: GetSecondarySyncHandle,
     private val checkCameraUpload: CheckCameraUpload,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val sortOrderIntMapper: SortOrderIntMapper,
 ) : ViewModel() {
 
     /**
@@ -370,7 +367,7 @@ class ManagerViewModel @Inject constructor(
     /**
      * Get Cloud Sort Order
      */
-    fun getOrder() = runBlocking { sortOrderIntMapper(getCloudSortOrder()) }
+    fun getOrder() = runBlocking { getCloudSortOrder() }
 
 
     /**
