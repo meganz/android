@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.chat.recent.RecentChatsViewModel
 import mega.privacy.android.app.presentation.chat.recent.RecentChatsViewModel.Companion.DURATION_TO_SHOW_REQUEST_ACCESS_AGAIN
 import mega.privacy.android.domain.usecase.GetLastContactPermissionDismissedTime
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.SetLastContactPermissionDismissedTime
 import org.junit.After
 import org.junit.Before
@@ -29,6 +30,9 @@ internal class RecentChatsViewModelTest {
         mock<SetLastContactPermissionDismissedTime>()
     private val getLastContactPermissionDismissedTime =
         mock<GetLastContactPermissionDismissedTime>()
+
+    private val monitorConnectivity =
+        mock<MonitorConnectivity>()
 
     @Before
     fun setUp() {
@@ -48,7 +52,8 @@ internal class RecentChatsViewModelTest {
             setLastContactPermissionDismissedTime = setLastContactPermissionDismissedTime,
             getLastContactPermissionDismissedTime = getLastContactPermissionDismissedTime,
             ioDispatcher = UnconfinedTestDispatcher(),
-            timeWrapper = TestWrapperModule.timeWrapper
+            timeWrapper = TestWrapperModule.timeWrapper,
+            monitorConnectivity = monitorConnectivity,
         )
 
         underTest.state.test {
@@ -67,7 +72,8 @@ internal class RecentChatsViewModelTest {
                 setLastContactPermissionDismissedTime = setLastContactPermissionDismissedTime,
                 getLastContactPermissionDismissedTime = getLastContactPermissionDismissedTime,
                 ioDispatcher = UnconfinedTestDispatcher(),
-                timeWrapper = TestWrapperModule.timeWrapper
+                timeWrapper = TestWrapperModule.timeWrapper,
+                monitorConnectivity = monitorConnectivity,
             )
 
             underTest.state.test {
@@ -86,7 +92,8 @@ internal class RecentChatsViewModelTest {
                 setLastContactPermissionDismissedTime = setLastContactPermissionDismissedTime,
                 getLastContactPermissionDismissedTime = getLastContactPermissionDismissedTime,
                 ioDispatcher = UnconfinedTestDispatcher(),
-                timeWrapper = TestWrapperModule.timeWrapper
+                timeWrapper = TestWrapperModule.timeWrapper,
+                monitorConnectivity = monitorConnectivity,
             )
 
             underTest.state.test {

@@ -24,7 +24,6 @@ import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
-import mega.privacy.android.app.utils.wrapper.IsOnlineWrapper
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
@@ -57,14 +56,6 @@ abstract class UtilWrapperModule {
     abstract fun bindMegaNodeUtilWrapper(implementation: MegaNodeUtilFacade): MegaNodeUtilWrapper
 
     companion object{
-        @Provides
-        fun provideIsOnlineWrapper(): IsOnlineWrapper {
-            return object : IsOnlineWrapper {
-                override fun isOnline(context: Context): Boolean {
-                    return Util.isOnline(context)
-                }
-            }
-        }
 
         @Provides
         fun provideIsOnWifiWrapper(): IsOnWifiWrapper {
