@@ -7,6 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.DefaultGetAccountAchievements
 import mega.privacy.android.domain.usecase.DefaultGetAccountDetails
 import mega.privacy.android.domain.usecase.DefaultMonitorUserUpdates
 import mega.privacy.android.domain.usecase.GetAccountDetails
@@ -31,6 +32,9 @@ abstract class AccountModule {
     @Binds
     abstract fun bindGetAccountDetails(useCase: DefaultGetAccountDetails): GetAccountDetails
 
+    @Binds
+    abstract fun provideGetAccountAchievements(implementation: DefaultGetAccountAchievements): GetAccountAchievements
+
     companion object {
         @Provides
         fun provideGetSession(accountRepository: AccountRepository): GetSession =
@@ -43,9 +47,5 @@ abstract class AccountModule {
         @Provides
         fun provideIsBusinessAccountActive(accountRepository: AccountRepository): IsBusinessAccountActive =
             IsBusinessAccountActive(accountRepository::isBusinessAccountActive)
-
-        @Provides
-        fun provideGetAccountAchievements(accountRepository: AccountRepository): GetAccountAchievements =
-            GetAccountAchievements(accountRepository::getAccountAchievements)
     }
 }
