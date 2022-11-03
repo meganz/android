@@ -135,7 +135,7 @@ class FileBrowserFragment : RotatableFragment() {
     private var density = 0f
     private var outMetrics: DisplayMetrics? = null
     private var display: Display? = null
-    private var _nodes = mutableListOf<MegaNode>()
+    private var _nodes = mutableListOf<MegaNode?>()
     private var actionMode: ActionMode? = null
     private var mLayoutManager: LinearLayoutManager? = null
     private var gridLayoutManager: CustomizedGridLayoutManager? = null
@@ -912,7 +912,7 @@ class FileBrowserFragment : RotatableFragment() {
                 }
             } else {
                 //Is file
-                openFile(_nodes[position], position)
+                _nodes[position]?.let { openFile(it, position) }
             }
         }
     }
@@ -1129,7 +1129,7 @@ class FileBrowserFragment : RotatableFragment() {
     }
 
     @Suppress("DEPRECATION")
-    fun setNodes(nodes: MutableList<MegaNode>) {
+    fun setNodes(nodes: MutableList<MegaNode?>) {
         Timber.d("Nodes size: ${nodes.size}")
         visibilityFastScroller()
         this._nodes = nodes
@@ -1231,8 +1231,10 @@ class FileBrowserFragment : RotatableFragment() {
     }
 
     private fun updateNode(handle: Long) {
-        val index = _nodes.indexOfFirst { it.handle == handle }
-        _nodes[index] = megaApi.getNodeByHandle(handle)
+        val index = _nodes.indexOfFirst { it?.handle == handle }.takeUnless { it == -1 }
+        if (index != null) {
+            _nodes[index] = megaApi.getNodeByHandle(handle)
+        }
     }
 
     /**
@@ -1334,7 +1336,7 @@ class FileBrowserFragment : RotatableFragment() {
      *
      * @return the list of selected nodes
      */
-    val nodeList: List<MegaNode>
+    val nodeList: List<MegaNode?>
         get() = _nodes
 
     fun showMediaDiscovery() {
@@ -1375,9 +1377,9 @@ class FileBrowserFragment : RotatableFragment() {
     /**
      * When user tap View in Folder option from Recents tab, animate the node once view is loaded
      */
-    fun animateNode(nodes: List<MegaNode>) {
+    fun animateNode(nodes: List<MegaNode?>) {
         val node = (activity as? ManagerActivity)?.viewInFolderNode
-        nodePosition = nodes.indexOfFirst { it.handle == node?.handle }.coerceAtLeast(0)
+        nodePosition = nodes.indexOfFirst { it?.handle == node?.handle }.coerceAtLeast(0)
 
         //Scroll the position to the 3rd position before of the target position.
         recyclerView?.scrollToPosition(nodePosition - 3)
