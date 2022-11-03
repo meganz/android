@@ -1231,8 +1231,10 @@ class FileBrowserFragment : RotatableFragment() {
     }
 
     private fun updateNode(handle: Long) {
-        val index = _nodes.indexOfFirst { it?.handle == handle }
-        _nodes[index] = megaApi.getNodeByHandle(handle)
+        val index = _nodes.indexOfFirst { it?.handle == handle }.takeUnless { it == -1 }
+        if (index != null) {
+            _nodes[index] = megaApi.getNodeByHandle(handle)
+        }
     }
 
     /**
