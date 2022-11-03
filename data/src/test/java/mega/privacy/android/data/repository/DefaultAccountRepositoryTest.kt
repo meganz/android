@@ -11,7 +11,6 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
-import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.mapper.SkuMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanMapper
@@ -47,7 +46,6 @@ class DefaultAccountRepositoryTest {
     private val accountInfoWrapper =
         mock<AccountInfoWrapper> { on { accountTypeString }.thenReturn("") }
     private val megaApiGateway = mock<MegaApiGateway>()
-    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val userAccountMapper = ::UserAccount
     private val accountTypeMapper = mock<AccountTypeMapper>()
     private val subscriptionPlanMapper = mock<SubscriptionPlanMapper>()
@@ -86,7 +84,6 @@ class DefaultAccountRepositoryTest {
         underTest = DefaultAccountRepository(
             myAccountInfoFacade = accountInfoWrapper,
             megaApiGateway = megaApiGateway,
-            megaApiFolderGateway = megaApiFolderGateway,
             megaChatApiGateway = mock(),
             ioDispatcher = UnconfinedTestDispatcher(),
             userUpdateMapper = { UserUpdate(emptyMap()) },

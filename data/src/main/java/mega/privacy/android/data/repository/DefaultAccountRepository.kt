@@ -12,7 +12,6 @@ import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.isType
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -48,7 +47,6 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @property myAccountInfoFacade
  * @property megaApiGateway
- * @property megaApiFolderGateway
  * @property megaChatApiGateway
  * @property ioDispatcher
  * @property userUpdateMapper
@@ -64,7 +62,6 @@ import kotlin.coroutines.suspendCoroutine
 internal class DefaultAccountRepository @Inject constructor(
     private val myAccountInfoFacade: AccountInfoWrapper,
     private val megaApiGateway: MegaApiGateway,
-    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val dbHandler: DatabaseHandler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
