@@ -13,8 +13,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
-import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
+import mega.privacy.android.app.presentation.photos.albums.model.mapper.toUIAlbum
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.photos.Album
@@ -38,7 +37,7 @@ class AlbumsViewModelTest {
     private lateinit var underTest: AlbumsViewModel
 
     private val getDefaultAlbumPhotos = mock<GetDefaultAlbumPhotos>()
-    private val uiAlbumMapper = mock<UIAlbumMapper>()
+    private val uiAlbumMapper = ::toUIAlbum
     private val getFeatureFlag =
         mock<GetFeatureFlagValue> { onBlocking { invoke(any()) }.thenReturn(true) }
     private val getDefaultAlbumsMap = mock<GetDefaultAlbumsMap>()
@@ -48,17 +47,6 @@ class AlbumsViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
-
-        whenever(uiAlbumMapper(any(), any())).thenAnswer {
-            val photos = it.arguments[0] as List<Photo>
-            UIAlbum(
-                id = it.arguments[1] as Album,
-                title = { _ -> "" },
-                count = photos.size,
-                coverPhoto = photos.maxByOrNull { it.modificationTime },
-                photos = photos
-            )
-        }
 
         underTest = AlbumsViewModel(
             getDefaultAlbumPhotos = getDefaultAlbumPhotos,
