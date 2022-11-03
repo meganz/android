@@ -8,6 +8,7 @@ import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.photos.PhotosUseCases
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
+import mega.privacy.android.domain.usecase.GetPhotosByFolderId
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -22,5 +23,8 @@ object TestPhotosUseCases {
 
     @Provides
     fun provideGetDefaultAlbumsMap(): GetDefaultAlbumsMap = mock()
+
+    @Provides
+    fun provideGetPhotosByFolderId(): GetPhotosByFolderId = mock()
 
 }
