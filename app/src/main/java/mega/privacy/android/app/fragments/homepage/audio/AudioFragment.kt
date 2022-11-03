@@ -57,7 +57,6 @@ import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.Util.showSnackbar
@@ -150,7 +149,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
     }
 
     private fun doIfOnline(operation: () -> Unit) {
-        if (Util.isOnline(context)) {
+        if (viewModel.isConnected) {
             operation()
         } else {
             callManager {
