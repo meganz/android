@@ -1,299 +1,233 @@
-package mega.privacy.android.app;
+package mega.privacy.android.app
 
-import static mega.privacy.android.app.utils.Constants.EMAIL;
-import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.changeViewElevation;
-import static mega.privacy.android.app.utils.Util.dp2px;
-import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import android.os.Bundle
+import android.view.MenuItem
+import android.view.View
+import android.widget.RelativeLayout
+import androidx.core.view.isVisible
+import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.databinding.ActivityAuthenticityCredentialsBinding
+import mega.privacy.android.app.listeners.GetAttrUserListener
+import mega.privacy.android.app.listeners.VerifyCredentialsListener
+import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
+import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.ContactUtil
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.dp2px
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaUser
+import org.jetbrains.anko.configuration
+import org.jetbrains.anko.portrait
+import timber.log.Timber
+import javax.inject.Inject
 
-import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.TextView;
+/**
+ * Authenticity Credentials Activity.
+ *
+ * @property passCodeFacade [PasscodeCheck]
+ */
+@AndroidEntryPoint
+class AuthenticityCredentialsActivity : BaseActivity() {
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
+    @Inject
+    lateinit var passCodeFacade: PasscodeCheck
 
-import java.util.ArrayList;
+    private lateinit var binding: ActivityAuthenticityCredentialsBinding
 
-import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.listeners.GetAttrUserListener;
-import mega.privacy.android.app.listeners.VerifyCredentialsListener;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaUser;
-import timber.log.Timber;
+    private val verifyCredentialsListener by lazy { VerifyCredentialsListener(this@AuthenticityCredentialsActivity) }
+    private lateinit var contact: MegaUser
+    private var contactCredentialsString: String? = null
 
-public class AuthenticityCredentialsActivity extends PasscodeActivity {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    private static final String CONTACT_CREDENTIALS = "CONTACT_CREDENTIALS";
-    private static final int LENGTH_CREDENTIALS_LIST = 10;
-    private static final int LENGTH_CREDENTIALS_CHARACTERS = 4;
+        binding = ActivityAuthenticityCredentialsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-    //Landscape layout params
-    private static final int MARGIN_TOP_NAME = 12;
-    private static final int MARGIN_RIGHT_CONTACT_CREDENTIALS = 188;
-    private static final int MARGIN_TOP_CONTACT_CREDENTIALS = 16;
-    private static final int MARGIN_TOP_BOTTOM_BUTTON_AND_MY_CREDENTIALS = 20;
-    private static final int MARGIN_TOP_EXPLANATION = 18;
-    private static final int MARGIN_LEFT_EXPLANATION_AND_MY_CREDENTIALS = 72;
-    private static final int MARGIN_RIGHT_EXPLANATION_AND_MY_CREDENTIALS = 123;
+        setupData(savedInstanceState)
+        setupView()
+    }
 
-    private VerifyCredentialsListener verifyCredentialsListener;
-
-    private MegaUser contact;
-    private String contactCredentials;
-
-    private ActionBar aB;
-
-    private LinearLayout authenticityCredentialsLayout;
-    private ScrollView scrollView;
-
-    private TextView contactCredentials00;
-    private TextView contactCredentials01;
-    private TextView contactCredentials02;
-    private TextView contactCredentials03;
-    private TextView contactCredentials04;
-    private TextView contactCredentials10;
-    private TextView contactCredentials11;
-    private TextView contactCredentials12;
-    private TextView contactCredentials13;
-    private TextView contactCredentials14;
-
-    private Button credentialsButton;
-
-    private TextView myCredentials00;
-    private TextView myCredentials01;
-    private TextView myCredentials02;
-    private TextView myCredentials03;
-    private TextView myCredentials04;
-    private TextView myCredentials10;
-    private TextView myCredentials11;
-    private TextView myCredentials12;
-    private TextView myCredentials13;
-    private TextView myCredentials14;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (getIntent() == null || getIntent().getExtras() == null) {
-            Timber.e("Cannot init view, Intent is null");
-            finish();
-        }
-
-        String email = getIntent().getExtras().getString(EMAIL);
-        if (isTextEmpty(email)) {
-            Timber.e("Cannot init view, contact' email is empty");
-            finish();
-        }
-
-        contact = megaApi.getContact(email);
-        if (contact == null) {
-            Timber.e("Cannot init view, contact is null");
-            finish();
+    private fun setupData(savedInstanceState: Bundle?) {
+        intent.extras?.getString(Constants.EMAIL).let {
+            if (it.isNullOrEmpty()) {
+                Timber.e("Cannot init view, contact' email is empty")
+                finish()
+            } else {
+                megaApi.getContact(it).let { user ->
+                    if (user == null) {
+                        Timber.e("Cannot init view, contact is null")
+                        finish()
+                    } else {
+                        contact = user
+                    }
+                }
+            }
         }
 
         if (savedInstanceState != null) {
-            contactCredentials = savedInstanceState.getString(CONTACT_CREDENTIALS);
+            contactCredentialsString = savedInstanceState.getString(CONTACT_CREDENTIALS)
+        }
+    }
+
+    private fun setupView() = with(binding) {
+        setSupportActionBar(binding.credentialsToolbar)
+
+        supportActionBar?.apply {
+            elevation = 0f
+            setHomeButtonEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+            title = getFormattedStringOrDefault(R.string.authenticity_credentials_label)
         }
 
-        setContentView(R.layout.activity_authenticity_credentials);
-
-        Toolbar tB = findViewById(R.id.credentials_toolbar);
-        setSupportActionBar(tB);
-        aB = getSupportActionBar();
-        if (aB == null) {
-            Timber.e("Cannot init view, ActionBar is null");
-            finish();
+        credentialsScrollview.setOnScrollChangeListener { _: View?, _: Int, _: Int, _: Int, _: Int ->
+            Util.changeViewElevation(supportActionBar,
+                credentialsScrollview.canScrollVertically(-1),
+                outMetrics)
         }
 
-        aB.setElevation(0);
-        aB.setHomeButtonEnabled(true);
-        aB.setDisplayHomeAsUpEnabled(true);
-        tB.setTitle(getString(R.string.authenticity_credentials_label));
-        setTitle(getString(R.string.authenticity_credentials_label));
-
-        authenticityCredentialsLayout = findViewById(R.id.authenticity_credentials_layout);
-        scrollView = findViewById(R.id.credentials_scrollview);
-        scrollView.setOnScrollChangeListener((view, scrollX, scrollY, oldScrollX, oldScrollY) ->
-                changeViewElevation(aB, scrollView.canScrollVertically(-1), getOutMetrics()));
-
-        boolean isPortrait = isScreenInPortrait(this);
+        val isPortrait = configuration.portrait
 
         if (!isPortrait) {
-            RelativeLayout contactCredentialsLayout = findViewById(R.id.contact_credentials_layout);
-            RelativeLayout.LayoutParams contactCredentialsLayoutParams = (RelativeLayout.LayoutParams) contactCredentialsLayout.getLayoutParams();
-            contactCredentialsLayoutParams.topMargin = dp2px(MARGIN_TOP_NAME, getOutMetrics());
-            contactCredentialsLayout.setLayoutParams(contactCredentialsLayoutParams);
+            with(contactCredentialsLayout) {
+                val params = layoutParams as RelativeLayout.LayoutParams
+                params.topMargin = dp2px(MARGIN_TOP_NAME)
+                layoutParams = params
+            }
         }
 
-        TextView contactName = findViewById(R.id.contact_credentials_name);
-        contactName.setText(getString(R.string.label_contact_credentials, getContactNameDB(contact.getHandle())));
-        TextView contactEmail = findViewById(R.id.contact_credentials_email);
-        contactEmail.setText(email);
+        contactCredentialsName.text = getFormattedStringOrDefault(
+            R.string.label_contact_credentials,
+            ContactUtil.getContactNameDB(contact.handle))
 
-        contactCredentials00 = findViewById(R.id.contact_credentials_0_0);
-        contactCredentials01 = findViewById(R.id.contact_credentials_0_1);
-        contactCredentials02 = findViewById(R.id.contact_credentials_0_2);
-        contactCredentials03 = findViewById(R.id.contact_credentials_0_3);
-        contactCredentials04 = findViewById(R.id.contact_credentials_0_4);
+        contactCredentialsEmail.text = contact.email
+
 
         if (isPortrait) {
-            contactCredentials10 = findViewById(R.id.contact_credentials_1_0);
-            contactCredentials11 = findViewById(R.id.contact_credentials_1_1);
-            contactCredentials12 = findViewById(R.id.contact_credentials_1_2);
-            contactCredentials13 = findViewById(R.id.contact_credentials_1_3);
-            contactCredentials14 = findViewById(R.id.contact_credentials_1_4);
-
-            findViewById(R.id.contact_credentials_row).setVisibility(View.VISIBLE);
+            contactCredentialsRow.isVisible = true
         } else {
-            TableLayout contactCredentialsTable = findViewById(R.id.contact_credentials);
-            RelativeLayout.LayoutParams tabParams = (RelativeLayout.LayoutParams) contactCredentialsTable.getLayoutParams();
-            tabParams.topMargin = dp2px(MARGIN_TOP_CONTACT_CREDENTIALS, getOutMetrics());
-            tabParams.rightMargin = dp2px(MARGIN_RIGHT_CONTACT_CREDENTIALS, getOutMetrics());
-            contactCredentialsTable.setLayoutParams(tabParams);
+            with(contactCredentials) {
+                val params = layoutParams as RelativeLayout.LayoutParams
+                params.topMargin = dp2px(MARGIN_TOP_CONTACT_CREDENTIALS)
+                params.rightMargin = dp2px(MARGIN_RIGHT_CONTACT_CREDENTIALS)
+                layoutParams = params
 
-            contactCredentials10 = findViewById(R.id.contact_credentials_0_5);
-            contactCredentials10.setVisibility(View.VISIBLE);
-            contactCredentialsTable.setColumnStretchable(5, true);
-            contactCredentials11 = findViewById(R.id.contact_credentials_0_6);
-            contactCredentials11.setVisibility(View.VISIBLE);
-            contactCredentialsTable.setColumnStretchable(6, true);
-            contactCredentials12 = findViewById(R.id.contact_credentials_0_7);
-            contactCredentials12.setVisibility(View.VISIBLE);
-            contactCredentialsTable.setColumnStretchable(7, true);
-            contactCredentials13 = findViewById(R.id.contact_credentials_0_8);
-            contactCredentials13.setVisibility(View.VISIBLE);
-            contactCredentialsTable.setColumnStretchable(8, true);
-            contactCredentials14 = findViewById(R.id.contact_credentials_0_9);
-            contactCredentials14.setVisibility(View.VISIBLE);
-            contactCredentialsTable.setColumnStretchable(9, true);
+                contactCredentials10.isVisible = true
+                setColumnStretchable(5, true)
+                contactCredentials11.isVisible = true
+                setColumnStretchable(6, true)
+                contactCredentials12.isVisible = true
+                setColumnStretchable(7, true)
+                contactCredentials13.isVisible = true
+                setColumnStretchable(8, true)
+                contactCredentials14.isVisible = true
+                setColumnStretchable(9, true)
+            }
 
-            findViewById(R.id.contact_credentials_row).setVisibility(View.GONE);
+            contactCredentialsRow.isVisible = false
         }
 
-        if (isTextEmpty(contactCredentials)) {
-            megaApi.getUserCredentials(contact, new GetAttrUserListener(this));
+        if (contactCredentialsString.isNullOrEmpty()) {
+            megaApi.getUserCredentials(contact,
+                GetAttrUserListener(this@AuthenticityCredentialsActivity))
         }
 
-        int marginTopBottomButtonAndMyCredentials = dp2px(MARGIN_TOP_BOTTOM_BUTTON_AND_MY_CREDENTIALS, getOutMetrics());
-        int marginLeftExplanationAndMyCredentials = dp2px(MARGIN_LEFT_EXPLANATION_AND_MY_CREDENTIALS, getOutMetrics());
-        int marginRightExplanationAndMyCredentials = dp2px(MARGIN_RIGHT_EXPLANATION_AND_MY_CREDENTIALS, getOutMetrics());
+        val marginTopBottomButtonAndMyCredentials =
+            dp2px(MARGIN_TOP_BOTTOM_BUTTON_AND_MY_CREDENTIALS)
+        val marginLeftExplanationAndMyCredentials =
+            dp2px(MARGIN_LEFT_EXPLANATION_AND_MY_CREDENTIALS)
+        val marginRightExplanationAndMyCredentials =
+            dp2px(MARGIN_RIGHT_EXPLANATION_AND_MY_CREDENTIALS)
 
-        credentialsButton = findViewById(R.id.credentials_button);
-        updateButtonText();
 
-        if (!isPortrait) {
-            RelativeLayout.LayoutParams buttonParams = (RelativeLayout.LayoutParams) credentialsButton.getLayoutParams();
-            buttonParams.topMargin = buttonParams.bottomMargin = marginTopBottomButtonAndMyCredentials;
-            credentialsButton.setLayoutParams(buttonParams);
+        updateButtonText()
 
-            TextView explanation = findViewById(R.id.credentials_explanation);
-            RelativeLayout.LayoutParams explanationParams = (RelativeLayout.LayoutParams) explanation.getLayoutParams();
-            explanationParams.topMargin = dp2px(MARGIN_TOP_EXPLANATION, getOutMetrics());
-            explanationParams.leftMargin = marginLeftExplanationAndMyCredentials;
-            explanationParams.rightMargin = marginRightExplanationAndMyCredentials;
-            explanation.setLayoutParams(explanationParams);
-        }
+        with(credentialsButton) {
+            if (!isPortrait) {
+                val params = layoutParams as RelativeLayout.LayoutParams
+                params.bottomMargin = marginTopBottomButtonAndMyCredentials
+                params.topMargin = params.bottomMargin
+                layoutParams = params
 
-        verifyCredentialsListener = new VerifyCredentialsListener(this);
-        credentialsButton.setOnClickListener(v -> {
-            if (verifyCredentialsListener.isVerifyingCredentials()) {
-                showSnackbar(getString(R.string.already_verifying_credentials));
-            } else {
-                credentialsButton.setAlpha(0.5f);
-
-                if (megaApi.areCredentialsVerified(contact)) {
-                    megaApi.resetCredentials(contact, verifyCredentialsListener);
-                } else {
-                    megaApi.verifyCredentials(contact, verifyCredentialsListener);
+                with(credentialsExplanation) {
+                    val explanationParams = layoutParams as RelativeLayout.LayoutParams
+                    explanationParams.topMargin = dp2px(MARGIN_TOP_EXPLANATION)
+                    explanationParams.leftMargin = marginLeftExplanationAndMyCredentials
+                    explanationParams.rightMargin = marginRightExplanationAndMyCredentials
+                    layoutParams = explanationParams
                 }
             }
-        });
 
-        myCredentials00 = findViewById(R.id.my_credentials_0_0);
-        myCredentials01 = findViewById(R.id.my_credentials_0_1);
-        myCredentials02 = findViewById(R.id.my_credentials_0_2);
-        myCredentials03 = findViewById(R.id.my_credentials_0_3);
-        myCredentials04 = findViewById(R.id.my_credentials_0_4);
+            setOnClickListener {
+                if (verifyCredentialsListener.isVerifyingCredentials()) {
+                    showSnackbar(getFormattedStringOrDefault(R.string.already_verifying_credentials))
+                } else {
+                    alpha = 0.5f
 
-        if (isPortrait) {
-            myCredentials10 = findViewById(R.id.my_credentials_1_0);
-            myCredentials11 = findViewById(R.id.my_credentials_1_1);
-            myCredentials12 = findViewById(R.id.my_credentials_1_2);
-            myCredentials13 = findViewById(R.id.my_credentials_1_3);
-            myCredentials14 = findViewById(R.id.my_credentials_1_4);
-        } else {
-            RelativeLayout myCredentialsContainer = findViewById(R.id.my_credentials_container);
-            RelativeLayout.LayoutParams myCredentialsParams = (RelativeLayout.LayoutParams) myCredentialsContainer.getLayoutParams();
-            myCredentialsParams.leftMargin = marginLeftExplanationAndMyCredentials;
-            myCredentialsParams.topMargin = myCredentialsParams.bottomMargin = marginTopBottomButtonAndMyCredentials;
-            myCredentialsParams.rightMargin = marginRightExplanationAndMyCredentials;
-            myCredentialsContainer.setLayoutParams(myCredentialsParams);
-
-            TableLayout myCredentialsTable = findViewById(R.id.my_credentials);
-
-            myCredentials10 = findViewById(R.id.my_credentials_0_5);
-            myCredentials10.setVisibility(View.VISIBLE);
-            myCredentialsTable.setColumnStretchable(5, true);
-            myCredentials11 = findViewById(R.id.my_credentials_0_6);
-            myCredentials11.setVisibility(View.VISIBLE);
-            myCredentialsTable.setColumnStretchable(6, true);
-            myCredentials12 = findViewById(R.id.my_credentials_0_7);
-            myCredentials12.setVisibility(View.VISIBLE);
-            myCredentialsTable.setColumnStretchable(7, true);
-            myCredentials13 = findViewById(R.id.my_credentials_0_8);
-            myCredentials13.setVisibility(View.VISIBLE);
-            myCredentialsTable.setColumnStretchable(8, true);
-            myCredentials14 = findViewById(R.id.my_credentials_0_9);
-            myCredentials14.setVisibility(View.VISIBLE);
-            myCredentialsTable.setColumnStretchable(9, true);
-
-            findViewById(R.id.my_credentials_row).setVisibility(View.GONE);
+                    if (megaApi.areCredentialsVerified(contact)) {
+                        megaApi.resetCredentials(contact, verifyCredentialsListener)
+                    } else {
+                        megaApi.verifyCredentials(contact, verifyCredentialsListener)
+                    }
+                }
+            }
         }
 
-        setMyCredentials();
-    }
+        if (!isPortrait) {
+            with(myCredentialsContainer) {
+                val params = layoutParams as RelativeLayout.LayoutParams
+                params.leftMargin = marginLeftExplanationAndMyCredentials
+                params.bottomMargin = marginTopBottomButtonAndMyCredentials
+                params.topMargin = params.bottomMargin
+                params.rightMargin = marginRightExplanationAndMyCredentials
+                layoutParams = params
+            }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (verifyCredentialsListener != null) {
-            megaApi.removeRequestListener(verifyCredentialsListener);
+
+            with(myCredentials) {
+                myCredentials10.isVisible = true
+                setColumnStretchable(5, true)
+                myCredentials11.isVisible = true
+                setColumnStretchable(6, true)
+                myCredentials12.isVisible = true
+                setColumnStretchable(7, true)
+                myCredentials13.isVisible = true
+                setColumnStretchable(8, true)
+                myCredentials14.isVisible = true
+                setColumnStretchable(9, true)
+            }
+
+            myCredentialsRow.isVisible = false
         }
+
+        setMyCredentials()
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putString(CONTACT_CREDENTIALS, contactCredentials);
-
-        super.onSaveInstanceState(outState);
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(CONTACT_CREDENTIALS, contactCredentialsString)
+        super.onSaveInstanceState(outState)
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            onBackPressedDispatcher.onBackPressed()
         }
 
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item)
     }
 
     /**
      * Updates the text of the button depending on if the contact' credentials are verified or not.
      */
-    private void updateButtonText() {
-        credentialsButton.setText(megaApi.areCredentialsVerified(contact) ? R.string.action_reset : R.string.general_verify);
-        credentialsButton.setAlpha(verifyCredentialsListener != null && verifyCredentialsListener.isVerifyingCredentials() ? 0.5f : 1f);
+    private fun updateButtonText() = with(binding.credentialsButton) {
+        text = getFormattedStringOrDefault(
+            if (megaApi.areCredentialsVerified(contact)) R.string.action_reset
+            else R.string.general_verify)
+
+        alpha = if (verifyCredentialsListener.isVerifyingCredentials()) 0.5f else 1f
     }
 
     /**
@@ -303,42 +237,40 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
      * @param request MegaRequest that contains the results of the request
      * @param e       MegaError that contains the error result of the request
      */
-    public void finishVerifyCredentialsAction(MegaRequest request, MegaError e) {
-        if (request.getNodeHandle() != contact.getHandle()) return;
+    fun finishVerifyCredentialsAction(request: MegaRequest, e: MegaError) {
+        if (request.nodeHandle != contact.handle) return
 
-        if (e.getErrorCode() == MegaError.API_OK) {
-            updateButtonText();
-
+        if (e.errorCode == MegaError.API_OK) {
+            updateButtonText()
             if (megaApi.areCredentialsVerified(contact)) {
-                showSnackbar(getString(R.string.label_verified));
+                showSnackbar(getString(R.string.label_verified))
             }
-
-            return;
+            return
         }
 
-        showSnackbar(getTranslatedErrorString(e));
+        showSnackbar(StringResourcesUtils.getTranslatedErrorString(e))
     }
 
     /**
      * Sets the credentials of the current logged in account in the view.
      */
-    private void setMyCredentials() {
-        ArrayList<String> myCredentialsList = getCredentialsList(megaApi.getMyCredentials());
-        if (myCredentialsList.size() != 10) {
-            Timber.w("Error, my credentials are wrong");
-            return;
+    private fun setMyCredentials() = with(binding) {
+        val myCredentialsList = getCredentialsList(megaApi.myCredentials)
+        if (myCredentialsList.size != 10) {
+            Timber.w("Error, my credentials are wrong")
+            return
         }
 
-        myCredentials00.setText(myCredentialsList.get(0));
-        myCredentials01.setText(myCredentialsList.get(1));
-        myCredentials02.setText(myCredentialsList.get(2));
-        myCredentials03.setText(myCredentialsList.get(3));
-        myCredentials04.setText(myCredentialsList.get(4));
-        myCredentials10.setText(myCredentialsList.get(5));
-        myCredentials11.setText(myCredentialsList.get(6));
-        myCredentials12.setText(myCredentialsList.get(7));
-        myCredentials13.setText(myCredentialsList.get(8));
-        myCredentials14.setText(myCredentialsList.get(9));
+        myCredentials00.text = myCredentialsList[0]
+        myCredentials01.text = myCredentialsList[1]
+        myCredentials02.text = myCredentialsList[2]
+        myCredentials03.text = myCredentialsList[3]
+        myCredentials04.text = myCredentialsList[4]
+        myCredentials10.text = myCredentialsList[5]
+        myCredentials11.text = myCredentialsList[6]
+        myCredentials12.text = myCredentialsList[7]
+        myCredentials13.text = myCredentialsList[8]
+        myCredentials14.text = myCredentialsList[9]
     }
 
     /**
@@ -346,23 +278,23 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
      *
      * @param contactCredentials String that contains the contact's credentials
      */
-    private void setContactCredentials(String contactCredentials) {
-        ArrayList<String> contactCredentialsList = getCredentialsList(contactCredentials);
-        if (contactCredentialsList.size() != 10) {
-            Timber.w("Error, the contact's credentials are wrong");
-            return;
+    private fun setContactCredentials(contactCredentials: String) = with(binding) {
+        val contactCredentialsList = getCredentialsList(contactCredentials)
+        if (contactCredentialsList.size != 10) {
+            Timber.w("Error, the contact's credentials are wrong")
+            return
         }
 
-        contactCredentials00.setText(contactCredentialsList.get(0));
-        contactCredentials01.setText(contactCredentialsList.get(1));
-        contactCredentials02.setText(contactCredentialsList.get(2));
-        contactCredentials03.setText(contactCredentialsList.get(3));
-        contactCredentials04.setText(contactCredentialsList.get(4));
-        contactCredentials10.setText(contactCredentialsList.get(5));
-        contactCredentials11.setText(contactCredentialsList.get(6));
-        contactCredentials12.setText(contactCredentialsList.get(7));
-        contactCredentials13.setText(contactCredentialsList.get(8));
-        contactCredentials14.setText(contactCredentialsList.get(9));
+        contactCredentials00.text = contactCredentialsList[0]
+        contactCredentials01.text = contactCredentialsList[1]
+        contactCredentials02.text = contactCredentialsList[2]
+        contactCredentials03.text = contactCredentialsList[3]
+        contactCredentials04.text = contactCredentialsList[4]
+        contactCredentials10.text = contactCredentialsList[5]
+        contactCredentials11.text = contactCredentialsList[6]
+        contactCredentials12.text = contactCredentialsList[7]
+        contactCredentials13.text = contactCredentialsList[8]
+        contactCredentials14.text = contactCredentialsList[9]
     }
 
     /**
@@ -372,13 +304,12 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
      * @param request MegaRequest that contains the results of the request
      * @param e       MegaError that contains the error result of the request
      */
-    public void setContactCredentials(MegaRequest request, MegaError e) {
-        if (e.getErrorCode() == MegaError.API_OK && request.getFlag()) {
-            setContactCredentials(request.getPassword());
-            return;
+    fun setContactCredentials(request: MegaRequest, e: MegaError) {
+        if (e.errorCode == MegaError.API_OK && request.flag) {
+            setContactCredentials(request.password)
+            return
         }
-
-        showSnackbar(getTranslatedErrorString(e));
+        showSnackbar(StringResourcesUtils.getTranslatedErrorString(e))
     }
 
     /**
@@ -387,21 +318,22 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
      * @param credentials String that contains the credentials
      * @return An ArrayList of Strings containing the credentials divided in 10.
      */
-    private ArrayList<String> getCredentialsList(String credentials) {
-        ArrayList<String> credentialsList = new ArrayList<>();
+    private fun getCredentialsList(credentials: String?): ArrayList<String> {
+        val credentialsList = ArrayList<String>()
 
-        if (isTextEmpty(credentials)) {
-            Timber.w("Error getting credentials list");
-            return credentialsList;
+        if (credentials.isNullOrEmpty()) {
+            Timber.w("Error getting credentials list")
+            return credentialsList
         }
 
-        int index = 0;
-        for (int i = 0; i < LENGTH_CREDENTIALS_LIST; i++) {
-            credentialsList.add(credentials.substring(index, index + LENGTH_CREDENTIALS_CHARACTERS));
-            index += LENGTH_CREDENTIALS_CHARACTERS;
+        var index = 0
+
+        for (i in 0 until LENGTH_CREDENTIALS_LIST) {
+            credentialsList.add(credentials.substring(index, index + LENGTH_CREDENTIALS_CHARACTERS))
+            index += LENGTH_CREDENTIALS_CHARACTERS
         }
 
-        return credentialsList;
+        return credentialsList
     }
 
     /**
@@ -409,7 +341,22 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
      *
      * @param s String that contains the message to show in the Snackbar.
      */
-    private void showSnackbar(String s) {
-        showSnackbar(authenticityCredentialsLayout, s);
+    private fun showSnackbar(s: String) {
+        showSnackbar(binding.authenticityCredentialsLayout, s)
+    }
+
+    companion object {
+        private const val CONTACT_CREDENTIALS = "CONTACT_CREDENTIALS"
+        private const val LENGTH_CREDENTIALS_LIST = 10
+        private const val LENGTH_CREDENTIALS_CHARACTERS = 4
+
+        //Landscape layout params
+        private const val MARGIN_TOP_NAME = 12F
+        private const val MARGIN_RIGHT_CONTACT_CREDENTIALS = 188F
+        private const val MARGIN_TOP_CONTACT_CREDENTIALS = 16F
+        private const val MARGIN_TOP_BOTTOM_BUTTON_AND_MY_CREDENTIALS = 20F
+        private const val MARGIN_TOP_EXPLANATION = 18F
+        private const val MARGIN_LEFT_EXPLANATION_AND_MY_CREDENTIALS = 72F
+        private const val MARGIN_RIGHT_EXPLANATION_AND_MY_CREDENTIALS = 123F
     }
 }
