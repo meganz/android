@@ -51,11 +51,14 @@ class DefaultGetUserAlbumsTest {
         id: Long = 0L,
         name: String = "",
         cover: Long? = null,
+        modificationTime: Long = 0L,
     ): UserSet = object : UserSet {
         override val id: Long = id
 
         override val name: String = name
 
         override val cover: Long? = cover
+
+        override val modificationTime: Long = modificationTime
     }
 }
