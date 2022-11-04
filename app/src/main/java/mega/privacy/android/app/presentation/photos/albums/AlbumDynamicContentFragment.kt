@@ -7,10 +7,11 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
@@ -176,8 +177,10 @@ class AlbumDynamicContentFragment : Fragment() {
 
     @Composable
     private fun Back() {
-        SideEffect {
-            managerActivity.onBackPressedDispatcher.onBackPressed()
+        val onBackPressedDispatcher =
+            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+        LaunchedEffect(key1 = true) {
+            onBackPressedDispatcher?.onBackPressed()
         }
     }
 
