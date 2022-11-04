@@ -14,15 +14,19 @@ import org.mockito.kotlin.whenever
 class DefaultGetAccountDetailsTest {
     private lateinit var underTest: GetAccountDetails
     private val accountRepository = mock<AccountRepository>()
+    private val isDatabaseEntryStale = mock<IsDatabaseEntryStale>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetAccountDetails(accountsRepository = accountRepository)
+        underTest = DefaultGetAccountDetails(
+            accountsRepository = accountRepository,
+            isDatabaseEntryStale = isDatabaseEntryStale
+        )
     }
 
     @Test
     fun `test that account details are refreshed if stale`() = runTest {
-        whenever(accountRepository.isAccountDataStale()).thenReturn(true)
+        whenever(accountRepository.storageCapacityUsedIsBlank()).thenReturn(true)
         underTest(false)
 
         verify(accountRepository).requestAccount()
@@ -30,7 +34,8 @@ class DefaultGetAccountDetailsTest {
 
     @Test
     fun `test that account details are refreshed if forced`() = runTest {
-        whenever(accountRepository.isAccountDataStale()).thenReturn(false)
+        whenever(accountRepository.storageCapacityUsedIsBlank()).thenReturn(false)
+        whenever(isDatabaseEntryStale()).thenReturn(false)
         underTest(true)
 
         verify(accountRepository).requestAccount()
@@ -38,7 +43,8 @@ class DefaultGetAccountDetailsTest {
 
     @Test
     fun `test that account details are not refreshed if not stale or forced`() = runTest {
-        whenever(accountRepository.isAccountDataStale()).thenReturn(false)
+        whenever(accountRepository.storageCapacityUsedIsBlank()).thenReturn(false)
+        whenever(isDatabaseEntryStale()).thenReturn(false)
         underTest(false)
 
         verify(accountRepository, never()).requestAccount()

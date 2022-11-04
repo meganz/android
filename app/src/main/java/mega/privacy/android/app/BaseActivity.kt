@@ -29,12 +29,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
@@ -126,6 +128,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.LogsType
 import mega.privacy.android.domain.entity.PurchaseType
+import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -178,6 +181,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
     @Inject
     lateinit var loggingSettings: LegacyLoggingSettings
+
+    @Inject
+    lateinit var isDatabaseEntryStale: IsDatabaseEntryStale
 
     @JvmField
     var composite = CompositeDisposable()
@@ -909,9 +915,11 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
         //Check if the call is recently
         Timber.d("Check the last call to getAccountDetails")
-        if (dbH.callToAccountDetails()) {
-            Timber.d("megaApi.getAccountDetails SEND")
-            app?.askForAccountDetails()
+        lifecycleScope.launch {
+            if (isDatabaseEntryStale()) {
+                Timber.d("megaApi.getAccountDetails SEND")
+                app?.askForAccountDetails()
+            }
         }
     }
 
