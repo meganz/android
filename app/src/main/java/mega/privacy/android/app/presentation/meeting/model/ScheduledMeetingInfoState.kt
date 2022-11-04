@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.model
 
+import mega.privacy.android.app.meeting.list.MeetingItem
+import mega.privacy.android.app.meeting.list.adapter.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.ContactItem
 
 /**
@@ -15,6 +17,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  */
 data class ScheduledMeetingInfoState(
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
+    val scheduledMeeting: ScheduledMeetingItem? = ScheduledMeetingItem(),
     val contactItemList: List<ContactItem> = emptyList(),
     val emptyViewVisible: Boolean = true,
     val buttonsVisible: Boolean = true,

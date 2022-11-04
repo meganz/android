@@ -9,22 +9,34 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
+import mega.privacy.android.presentation.controls.CollapsedSearchAppBar
+import mega.privacy.android.presentation.controls.ExpandedSearchAppBar
+import mega.privacy.android.presentation.controls.SearchWidgetState
 import mega.privacy.android.presentation.theme.AndroidTheme
 
 @Composable
@@ -41,17 +53,14 @@ fun ScheduledMeetingInfoView(
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
-            /*SearchAppBar(
-                searchWidgetState = state.searchWidgetState,
-                typedSearch = state.typedSearch,
-                onSearchTextChange = { typedSearch -> onSearchTextChange(typedSearch) },
-                onCloseClicked = onCloseSearchClicked,
+            ScheduledMeetingInfoAppBar(
+                uiState = state,
+                onEditClicked = onEditClicked,
+                onAddParticipantsClicked = onAddParticipantsClicked,
                 onBackPressed = onBackPressed,
-                onSearchClicked = onSearchClicked,
-                elevation = !firstItemVisible,
-                titleId = R.string.group_chat_start_conversation_label,
-                hintId = R.string.hint_action_search
-            )*/
+                elevation = false,
+                titleId = R.string.general_info
+            )
         }
     ) { paddingValues ->
         LazyColumn(state = listState,
@@ -94,7 +103,58 @@ fun ScheduledMeetingInfoView(
             }
         }
     }
+}
 
+
+@Composable
+fun ScheduledMeetingInfoAppBar(
+    uiState: ScheduledMeetingInfoState,
+    onEditClicked: () -> Unit,
+    onAddParticipantsClicked: () -> Unit,
+    onBackPressed: () -> Unit,
+    elevation: Boolean,
+    titleId: Int,
+) {
+    val iconColor = if (MaterialTheme.colors.isLight) Color.Black else Color.White
+    TopAppBar(
+        title = {
+            Text(text = stringResource(id = titleId),
+                style = MaterialTheme.typography.subtitle1,
+                fontWeight = FontWeight.Medium)
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackPressed) {
+                Icon(imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back button",
+                    tint = iconColor)
+            }
+        },
+        actions = {
+            uiState.scheduledMeeting?.let { scheduledMeeting ->
+                if (scheduledMeeting.isHost || scheduledMeeting.isAllowAddParticipants) {
+                    IconButton(onClick = { onAddParticipantsClicked() }) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.add_participants),
+                            contentDescription = "Add participants Icon",
+                            tint = iconColor
+                        )
+                    }
+                }
+
+                if (scheduledMeeting.isHost) {
+                    IconButton(onClick = { onEditClicked() }) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_scheduled_meeting_edit),
+                            contentDescription = "Edit Icon",
+                            tint = iconColor
+                        )
+                    }
+                }
+            }
+        },
+        backgroundColor = MaterialTheme.colors.surface,
+        elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp
+    )
 }
 
 @Composable
