@@ -162,20 +162,22 @@ class MediaDiscoveryViewModel @Inject constructor(
         when (dateCard) {
             is DateCard.YearsCard -> {
                 updateSelectedTimeBarState(TimeBarTab.Months,
-                    _state.value.monthsCardList.toMutableList().indexOfFirst {
+                    _state.value.monthsCardList.indexOfFirst {
                         it.photo.modificationTime == dateCard.photo.modificationTime
                     })
             }
             is DateCard.MonthsCard -> {
                 updateSelectedTimeBarState(TimeBarTab.Days,
-                    _state.value.daysCardList.toMutableList()
-                        .indexOfFirst { it.photo.modificationTime == dateCard.photo.modificationTime })
+                    _state.value.daysCardList.indexOfFirst {
+                        it.photo.modificationTime == dateCard.photo.modificationTime
+                    })
             }
             is DateCard.DaysCard -> {
                 updateSelectedTimeBarState(
                     TimeBarTab.All,
-                    _state.value.uiPhotoList.toMutableList()
-                        .indexOfFirst { it.key == dateCard.photo.id.toString() }
+                    _state.value.uiPhotoList.indexOfFirst {
+                        it.key == dateCard.photo.id.toString()
+                    }
                 )
             }
         }
@@ -192,6 +194,27 @@ class MediaDiscoveryViewModel @Inject constructor(
                 scrollStartIndex = startIndex,
                 scrollStartOffset = startOffset
             )
+        }
+    }
+
+    fun zoomIn() {
+        if (_state.value.currentZoomLevel == ZoomLevel.values().first()
+        ) {
+            return
+        }
+        _state.update {
+            it.copy(currentZoomLevel = ZoomLevel.values()[_state.value.currentZoomLevel.ordinal - 1])
+        }
+    }
+
+    fun zoomOut() {
+        if (_state.value.currentZoomLevel == ZoomLevel.values().last()
+        ) {
+            return
+        }
+
+        _state.update {
+            it.copy(currentZoomLevel = ZoomLevel.values()[_state.value.currentZoomLevel.ordinal + 1])
         }
     }
 }
