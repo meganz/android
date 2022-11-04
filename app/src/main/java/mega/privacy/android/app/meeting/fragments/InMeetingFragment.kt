@@ -41,6 +41,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
@@ -49,7 +50,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANG
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
 import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.constants.EventConstants.EVENT_ERROR_STARTING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
@@ -62,7 +62,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
@@ -119,6 +118,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -1048,7 +1048,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        sharedModel.notificationNetworkState.observe(viewLifecycleOwner) { haveConnection ->
+        viewLifecycleOwner.collectFlow(sharedModel.monitorConnectivityEvent) { haveConnection ->
             inMeetingViewModel.updateNetworkStatus(haveConnection)
         }
 
