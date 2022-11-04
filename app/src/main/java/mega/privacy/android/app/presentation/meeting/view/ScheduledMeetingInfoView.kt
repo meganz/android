@@ -1,8 +1,11 @@
 package mega.privacy.android.app.presentation.meeting.view
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.AppBarDefaults
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -29,15 +33,30 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.chat.view.GroupChatAvatar
+import mega.privacy.android.app.presentation.contact.ContactAvatar
+import mega.privacy.android.app.presentation.contact.ContactStatus
+import mega.privacy.android.app.presentation.contact.getLastSeenString
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
+import mega.privacy.android.app.presentation.search.view.EmptySearchView
+import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.presentation.controls.CollapsedSearchAppBar
 import mega.privacy.android.presentation.controls.ExpandedSearchAppBar
+import mega.privacy.android.presentation.controls.MarqueeText
 import mega.privacy.android.presentation.controls.SearchWidgetState
 import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.presentation.theme.black
+import mega.privacy.android.presentation.theme.grey_alpha_012
+import mega.privacy.android.presentation.theme.grey_alpha_033
+import mega.privacy.android.presentation.theme.grey_alpha_054
+import mega.privacy.android.presentation.theme.white
+import mega.privacy.android.presentation.theme.white_alpha_012
+import mega.privacy.android.presentation.theme.white_alpha_054
 
 @Composable
 fun ScheduledMeetingInfoView(
@@ -65,6 +84,8 @@ fun ScheduledMeetingInfoView(
     ) { paddingValues ->
         LazyColumn(state = listState,
             modifier = Modifier.padding(paddingValues)) {
+            item(key = "Scheduled meeting title") { ScheduledMeetingTitleView(uiState = state) }
+
 
             state.apply {
                 items(buttons) { button ->
@@ -104,7 +125,6 @@ fun ScheduledMeetingInfoView(
         }
     }
 }
-
 
 @Composable
 fun ScheduledMeetingInfoAppBar(
@@ -155,6 +175,43 @@ fun ScheduledMeetingInfoAppBar(
         backgroundColor = MaterialTheme.colors.surface,
         elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp
     )
+}
+
+@Composable
+private fun ScheduledMeetingTitleView(uiState: ScheduledMeetingInfoState) {
+    Column {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            uiState.scheduledMeeting?.let { scheduledMeetingItem ->
+                Box {
+                    GroupChatAvatar(firstUser = scheduledMeetingItem.firstUser,
+                        lastUser = scheduledMeetingItem.lastUser,
+                        titleChat = scheduledMeetingItem.title)
+                }
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = scheduledMeetingItem.title,
+                            style = MaterialTheme.typography.subtitle1,
+                            color = if (MaterialTheme.colors.isLight) black else white,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis)
+                    }
+                    Text(text = scheduledMeetingItem.date,
+                        style = MaterialTheme.typography.subtitle2,
+                        color = grey_alpha_033,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis)
+                }
+            }
+        }
+
+        Divider(
+            color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
+            thickness = 1.dp)
+    }
 }
 
 @Composable

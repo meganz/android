@@ -17,11 +17,11 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupUser
  * @property lastUser                   Last user of the chat
  */
 data class ScheduledMeetingItem constructor(
-    val chatId: Long? = -1,
-    val id: Long? = -1,
+    val chatId: Long = -1,
+    val id: Long = -1,
     val title: String = "Photos Sprint #1",
     val description: String = "description",
-    val date: String? = "8 Aud 2022·10:00-11:00",
+    val date: String = "8 Aud 2022·10:00-11:00",
     val isHost: Boolean = true,
     val isAllowAddParticipants: Boolean = true,
     val firstUser: ContactGroupUser? = null,
