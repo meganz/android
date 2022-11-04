@@ -37,6 +37,7 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDi
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
@@ -134,7 +135,10 @@ class MediaDiscoveryFragment : Fragment() {
                         actionMode?.title = state.selectedPhotoIds.size.toString()
                     }
                     menu?.let {
-                        handleMenuIcons(isShowing = state.selectedTimeBarTab == TimeBarTab.All)
+                        handleMenuIconsVisibility(isShowing = state.selectedTimeBarTab == TimeBarTab.All)
+                        if (state.selectedTimeBarTab == TimeBarTab.All) {
+                            handleZoomMenuEnableStatus()
+                        }
                     }
                 }
             }
@@ -256,18 +260,27 @@ class MediaDiscoveryFragment : Fragment() {
         inflater.inflate(R.menu.fragment_media_discovery_toolbar, menu)
         super.onCreateOptionsMenu(menu, inflater)
         this.menu = menu
+        handleMenuIconsVisibility(
+            isShowing = mediaDiscoveryViewModel.state.value.selectedTimeBarTab == TimeBarTab.All
+        )
     }
 
-    private fun handleMenuIcons(isShowing: Boolean) {
+    private fun handleMenuIconsVisibility(isShowing: Boolean) {
         this.menu?.apply {
             findItem(R.id.action_zoom_in)?.isVisible = isShowing
             findItem(R.id.action_zoom_out)?.isVisible = isShowing
-            findItem(R.id.action_photos_sortby)?.isVisible = isShowing
+            findItem(R.id.action_menu_sort_by)?.isVisible = isShowing
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.action_zoom_in -> {
+                mediaDiscoveryViewModel.zoomIn()
+            }
+            R.id.action_zoom_out -> {
+                mediaDiscoveryViewModel.zoomOut()
+            }
             R.id.action_menu_sort_by -> {
                 showSortByDialog(
                     context = managerActivity,
@@ -279,6 +292,25 @@ class MediaDiscoveryFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun handleZoomMenuEnableStatus() {
+        val isZoomInValid =
+            mediaDiscoveryViewModel.state.value.currentZoomLevel != ZoomLevel.values()
+                .first()
+        val isZoomOutValid =
+            mediaDiscoveryViewModel.state.value.currentZoomLevel != ZoomLevel.values()
+                .last()
+        this.menu?.let { menu ->
+            menu.findItem(R.id.action_zoom_in)?.let {
+                it.isEnabled = isZoomInValid
+                it.icon?.alpha = if (isZoomInValid) 255 else 125
+            }
+            menu.findItem(R.id.action_zoom_out)?.let {
+                it.isEnabled = isZoomOutValid
+                it.icon?.alpha = if (isZoomOutValid) 255 else 125
+            }
+        }
     }
 }
 
