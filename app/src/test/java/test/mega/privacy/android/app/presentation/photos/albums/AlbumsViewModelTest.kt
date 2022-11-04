@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
+import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
@@ -49,6 +50,7 @@ class AlbumsViewModelTest {
     private val getDefaultAlbumsMap = mock<GetDefaultAlbumsMap>()
     private val removeFavourites = mock<RemoveFavourites>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
+    private val createAlbum = mock<CreateAlbum>()
 
     @Before
     fun setUp() {
@@ -63,6 +65,7 @@ class AlbumsViewModelTest {
             getFeatureFlag = getFeatureFlag,
             removeFavourites = removeFavourites,
             getNodeListByIds = getNodeListByIds,
+            createAlbum = createAlbum,
             defaultDispatcher = UnconfinedTestDispatcher(),
         )
     }

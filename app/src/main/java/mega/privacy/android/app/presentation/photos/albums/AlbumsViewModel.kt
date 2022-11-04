@@ -23,10 +23,12 @@ import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
+import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
@@ -49,6 +51,7 @@ class AlbumsViewModel @Inject constructor(
     private var getFeatureFlag: GetFeatureFlagValue,
     private val removeFavourites: RemoveFavourites,
     private val getNodeListByIds: GetNodeListByIds,
+    private val createAlbum: CreateAlbum,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -162,6 +165,16 @@ class AlbumsViewModel @Inject constructor(
 
         systemAlbums + updatedUserAlbums
     }
+
+    /**
+     * Create a new album
+     *
+     * @param name the name of the album
+     */
+    fun createNewAlbum(name: String) = viewModelScope.launch {
+        createAlbum(name)
+    }
+
 
     private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? =
         albums.find { uiAlbum -> uiAlbum.id == _state.value.currentAlbumId }?.id
