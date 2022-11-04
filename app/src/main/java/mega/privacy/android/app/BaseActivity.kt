@@ -48,7 +48,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.LoginActivity
-import mega.privacy.android.app.main.LoginFragment
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.middlelayer.iab.BillingManager
@@ -1114,10 +1113,14 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     /**
      * Launches an intent to navigate to Login screen.
      */
-    protected fun navigateToLogin() {
+    protected fun navigateToLogin(isNewTask: Boolean = false) {
         val intent = Intent(this, LoginActivity::class.java)
         intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        if (isNewTask) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        } else {
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
         startActivity(intent)
     }
 

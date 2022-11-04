@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
@@ -70,6 +71,7 @@ class ManagerViewModelTest {
     private val getSecondarySyncHandle = mock<GetSecondarySyncHandle>()
     private val checkCameraUpload = mock<CheckCameraUpload>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
+    private val monitorConnectivity = mock<MonitorConnectivity>()
     private val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     @get:Rule
@@ -104,6 +106,7 @@ class ManagerViewModelTest {
             getSecondarySyncHandle = getSecondarySyncHandle,
             checkCameraUpload = checkCameraUpload,
             getCloudSortOrder = getCloudSortOrder,
+            monitorConnectivity = monitorConnectivity
         )
     }
 

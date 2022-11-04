@@ -132,7 +132,6 @@ import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.getSizeStringGBBased;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
 import static mega.privacy.android.app.utils.Util.hideKeyboardView;
-import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.isTablet;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
@@ -1030,30 +1029,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     };
 
-    private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Timber.d("Network broadcast received!");
-            int actionType;
-
-            if (intent != null) {
-                actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
-
-                if (actionType == GO_OFFLINE) {
-                    //stop cu process
-                    fireStopCameraUploadJob(ManagerActivity.this);
-                    showOfflineMode();
-                    LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean.class).post(false);
-                } else if (actionType == GO_ONLINE) {
-                    showOnlineMode();
-                    LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean.class).post(true);
-                } else if (actionType == START_RECONNECTION) {
-                    refreshSession();
-                }
-            }
-        }
-    };
-
     private BroadcastReceiver contactUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1557,9 +1532,6 @@ public class ManagerActivity extends TransfersManagementActivity
         filter.addAction(ACTION_STORAGE_STATE_CHANGED);
         registerReceiver(updateMyAccountReceiver, filter);
 
-        registerReceiver(networkReceiver,
-                new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
-
         registerReceiver(receiverCUAttrChanged,
                 new IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE));
 
@@ -1756,7 +1728,7 @@ public class ManagerActivity extends TransfersManagementActivity
              * @param refreshStorageInfo Parameter to indicate if refresh the storage info.
              */
             private void refreshDrawerInfo(boolean refreshStorageInfo) {
-                if (!isOnline(managerActivity) || megaApi == null || megaApi.getRootNode() == null) {
+                if (!viewModel.isConnected() || megaApi == null || megaApi.getRootNode() == null) {
                     disableNavigationViewLayout();
                 } else {
                     resetNavigationViewLayout();
@@ -2011,7 +1983,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         }
 
-        if (!isOnline(this)) {
+        if (!viewModel.isConnected()) {
             Timber.d("No network -> SHOW OFFLINE MODE");
 
             if (drawerItem == null) {
@@ -2645,6 +2617,19 @@ public class ManagerActivity extends TransfersManagementActivity
                     supportInvalidateOptionsMenu();
                 }
                 viewModel.nodeUpdateHandled();  
+            }
+            return Unit.INSTANCE;
+        });
+
+        ViewExtensionsKt.collectFlow(this, viewModel.getMonitorConnectivityEvent(), Lifecycle.State.STARTED, isConnected -> {
+            if (isConnected) {
+                showOnlineMode();
+                LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean.class).post(true);
+            } else {
+                //stop cu process
+                fireStopCameraUploadJob(ManagerActivity.this);
+                showOfflineMode();
+                LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean.class).post(false);
             }
             return Unit.INSTANCE;
         });
@@ -3574,7 +3559,6 @@ public class ManagerActivity extends TransfersManagementActivity
         unregisterReceiver(chatRoomMuteUpdateReceiver);
         unregisterReceiver(contactUpdateReceiver);
         unregisterReceiver(updateMyAccountReceiver);
-        unregisterReceiver(networkReceiver);
         unregisterReceiver(receiverUpdateOrder);
         unregisterReceiver(chatArchivedReceiver);
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
@@ -5298,7 +5282,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         setCallMenuItem(returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
 
-        if (isOnline(this)) {
+        if (viewModel.isConnected()) {
             switch (drawerItem) {
                 case CLOUD_DRIVE:
                     if (!isInMDMode) {
@@ -5438,7 +5422,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (searchExpand && openSearchView) {
             openSearchView();
         } else if (!searchExpand) {
-            if (isOnline(this)) {
+            if (viewModel.isConnected()) {
                 if (fullscreenOfflineFragment.getItemCount() > 0
                         && !fullscreenOfflineFragment.searchMode() && searchMenuItem != null) {
                     searchMenuItem.setVisible(true);
@@ -6925,7 +6909,7 @@ public class ManagerActivity extends TransfersManagementActivity
     @Override
     public void createFolder(@NotNull String title) {
         Timber.d("createFolder");
-        if (!isOnline(this)) {
+        if (!viewModel.isConnected()) {
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
@@ -7305,7 +7289,7 @@ public class ManagerActivity extends TransfersManagementActivity
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> {
                     if (finalNode != null) {
-                        if (!isOnline(managerActivity)) {
+                        if (!viewModel.isConnected()) {
                             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                             return;
                         }
@@ -7833,7 +7817,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case R.id.navigation_drawer_account_section:
             case R.id.my_account_section: {
-                if (isOnline(this) && megaApi.getRootNode() != null) {
+                if (viewModel.isConnected() && megaApi.getRootNode() != null) {
                     showMyAccount();
                 }
                 break;
@@ -8424,7 +8408,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }
         } else if (requestCode == REQUEST_CODE_DELETE_VERSIONS_HISTORY && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
+            if (!viewModel.isConnected()) {
                 Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 return;
             }
@@ -8579,7 +8563,7 @@ public class ManagerActivity extends TransfersManagementActivity
     void resetNavigationViewMenu(Menu menu) {
         Timber.d("resetNavigationViewMenu()");
 
-        if (!isOnline(this) || megaApi == null || megaApi.getRootNode() == null) {
+        if (!viewModel.isConnected() || megaApi == null || megaApi.getRootNode() == null) {
             disableNavigationViewMenu(menu);
             return;
         }
@@ -10572,7 +10556,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void setCallBadge() {
-        if (!isOnline(this) || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall())) {
+        if (!viewModel.isConnected() || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall())) {
             callBadge.setVisibility(View.GONE);
             return;
         }
@@ -10950,7 +10934,7 @@ public class ManagerActivity extends TransfersManagementActivity
         } else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
             MegaNode node = megaApi.getNodeByHandle(Long.parseLong(transfer.getNodeHandle()));
             if (node == null) {
-                showSnackbar(SNACKBAR_TYPE, getString(!isOnline(this) ? R.string.error_server_connection_problem
+                showSnackbar(SNACKBAR_TYPE, getString(!viewModel.isConnected() ? R.string.error_server_connection_problem
                         : R.string.warning_folder_not_exists), MEGACHAT_INVALID_HANDLE);
                 return;
             }
