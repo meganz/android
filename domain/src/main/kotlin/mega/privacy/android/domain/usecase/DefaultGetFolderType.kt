@@ -48,5 +48,5 @@ class DefaultGetFolderType @Inject constructor(
         ?.let { hasAncestor(nodeId, it) } ?: false
 
     private fun isDeviceFolder(folder: FolderNode) =
-        folder.device != null
+        !folder.device.isNullOrEmpty()
 }
