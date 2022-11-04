@@ -36,7 +36,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.Continuation
@@ -87,14 +86,7 @@ internal class DefaultAccountRepository @Inject constructor(
         )
     }
 
-    override fun isAccountDataStale(): Boolean =
-        databaseEntryIsStale() || storageCapacityUsedIsBlank()
-
-    private fun databaseEntryIsStale() = dbHandler.callToAccountDetails().also {
-        Timber.d("Check the last call to getAccountDetails")
-    }
-
-    private fun storageCapacityUsedIsBlank() =
+    override fun storageCapacityUsedIsBlank() =
         myAccountInfoFacade.storageCapacityUsedAsFormattedString.isBlank()
 
     override fun requestAccount() = myAccountInfoFacade.requestAccountDetails()
