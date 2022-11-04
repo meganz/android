@@ -10,28 +10,41 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.facebook.drawee.drawable.ScalingUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.internal.ViewUtils.dpToPx
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingDetailBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.setImageRequestFromUri
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Meeting list bottom sheet dialog fragment that displays meeting options
  */
+@AndroidEntryPoint
 class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+
+    @Inject
+    lateinit var getFeatureFlag: GetFeatureFlagValue
 
     companion object {
         private const val TAG = "MeetingListBottomSheetDialogFragment"
         private const val CHAT_ID = "CHAT_ID"
+        private const val SCHEDULED_MEETING_ID = "SCHEDULED_MEETING_ID"
 
         fun newInstance(chatId: Long): MeetingListBottomSheetDialogFragment =
             MeetingListBottomSheetDialogFragment().apply {
@@ -42,10 +55,17 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private lateinit var binding: BottomSheetMeetingDetailBinding
+
     private val chatId by lazy {
         arguments?.getLong(CHAT_ID,
             MEGACHAT_INVALID_HANDLE) ?: MEGACHAT_INVALID_HANDLE
     }
+
+    private val scheduledMeetingId by lazy {
+        arguments?.getLong(SCHEDULED_MEETING_ID,
+            MEGACHAT_INVALID_HANDLE) ?: MEGACHAT_INVALID_HANDLE
+    }
+
     private val viewModel by viewModels<MeetingListViewModel>({ requireParentFragment() })
 
     override fun onCreateView(
@@ -104,11 +124,21 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.btnInfo.setOnClickListener {
-            val intent = Intent(context, GroupChatInfoActivity::class.java).apply {
-                putExtra(Constants.HANDLE, chatId)
-                putExtra(Constants.ACTION_CHAT_OPEN, true)
+            activity?.lifecycleScope?.launch {
+                val scheduleMeetingEnabled = getFeatureFlag(AppFeatures.ScheduleMeeting)
+                val intent = if (scheduleMeetingEnabled) {
+                    Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
+                        putExtra(Constants.HANDLE, chatId)
+                    }
+                } else {
+                    Intent(context, GroupChatInfoActivity::class.java).apply {
+                        putExtra(Constants.HANDLE, chatId)
+                        putExtra(Constants.ACTION_CHAT_OPEN, true)
+                    }
+                }
+                activity?.startActivity(intent)
             }
-            activity?.startActivity(intent)
+
             dismissAllowingStateLoss()
         }
 
