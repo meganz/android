@@ -198,7 +198,8 @@ interface MegaApiGateway {
     /**
      * Get the fingerprint of a file by path
      *
-     * @param filePath
+     * @param filePath file path
+     * @return fingerprint
      */
     suspend fun getFingerprint(filePath: String): String?
 

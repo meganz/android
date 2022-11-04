@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import mega.privacy.android.app.di.GetTypedNodeModule
 import mega.privacy.android.app.di.MapperModule
 import mega.privacy.android.app.di.MegaUtilModule
 import mega.privacy.android.app.di.homepage.favourites.FavouritesUseCases
@@ -34,7 +35,7 @@ import org.mockito.kotlin.mock
 @TestInstallIn(
     components = [SingletonComponent::class],
     replaces = [FavouritesUseCases::class, MegaUtilModule::class, OpenFileModule::class,
-        MapperModule::class, SortOrderUseCases::class, PhotosUseCases::class]
+        MapperModule::class, SortOrderUseCases::class, PhotosUseCases::class, GetTypedNodeModule::class]
 )
 object FavouritesTestModule {
     val getAllFavourites = mock<GetAllFavorites>()

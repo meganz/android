@@ -39,18 +39,6 @@ abstract class FavouritesUseCases {
     @Binds
     abstract fun bindGetFavouriteFolderInfo(useCase: DefaultGetFavouriteFolderInfo): GetFavouriteFolderInfo
 
-    @Binds
-    abstract fun bindAddNodeType(implementation: DefaultAddNodeType): AddNodeType
-
-    @Binds
-    abstract fun bindGetFolderType(implementation: DefaultGetFolderType): GetFolderType
-
-    @Binds
-    abstract fun bindGetDeviceType(implementation: DefaultGetDeviceType): GetDeviceType
-
-    @Binds
-    abstract fun bindHasAncestor(implementation: DefaultHasAncestor): HasAncestor
-
 
     companion object {
         /**
