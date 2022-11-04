@@ -829,9 +829,10 @@ private boolean isOnDevelopBranch() {
  * @return true if build is triggered by 'deliver_appStore' command. Otherwise return false.
  */
 private boolean triggeredByDeliverAppStore() {
-    return isOnDevelopBranch() &&
-            env.gitlabTriggerPhrase != null &&
-            env.gitlabTriggerPhrase == "deliver_internal"
+    return true
+//    return isOnDevelopBranch() &&
+//            env.gitlabTriggerPhrase != null &&
+//            env.gitlabTriggerPhrase == "deliver_internal"
 }
 
 /**
@@ -839,9 +840,10 @@ private boolean triggeredByDeliverAppStore() {
  * @return true if build is triggered by 'upload_symbol' command. Otherwise return false.
  */
 private boolean triggeredByUploadSymbol() {
-    return isOnDevelopBranch() &&
-            env.gitlabTriggerPhrase != null &&
-            env.gitlabTriggerPhrase == "upload_symbol"
+    return true
+//    return isOnDevelopBranch() &&
+//            env.gitlabTriggerPhrase != null &&
+//            env.gitlabTriggerPhrase == "upload_symbol"
 }
 
 private void deleteAllFilesExcept(String folder, String except) {
