@@ -19,7 +19,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HO
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
@@ -2624,12 +2623,10 @@ public class ManagerActivity extends TransfersManagementActivity
         ViewExtensionsKt.collectFlow(this, viewModel.getMonitorConnectivityEvent(), Lifecycle.State.STARTED, isConnected -> {
             if (isConnected) {
                 showOnlineMode();
-                LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean.class).post(true);
             } else {
                 //stop cu process
                 fireStopCameraUploadJob(ManagerActivity.this);
                 showOfflineMode();
-                LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean.class).post(false);
             }
             return Unit.INSTANCE;
         });
