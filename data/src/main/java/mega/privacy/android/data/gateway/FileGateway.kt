@@ -1,5 +1,7 @@
 package mega.privacy.android.data.gateway
 
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import java.io.File
 import java.io.IOException
 
@@ -36,4 +38,12 @@ interface FileGateway {
      *
      */
     suspend fun buildDefaultDownloadDir(): File
+
+    /**
+     * Get the local folder path
+     *
+     * @param typedFileNode [TypedFileNode]
+     * @return folder path or null
+     */
+    suspend fun getLocalFilePath(typedFileNode: TypedFileNode?): String?
 }
