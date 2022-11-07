@@ -83,7 +83,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             val contactList = getVisibleContacts()
             _state.update {
                 it.copy(
-                    contactItemList = contactList
+                    participantItemList = contactList
                 )
             }
             getContactsData(contactList)
@@ -93,11 +93,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private suspend fun getContactsData(contactList: List<ContactItem>) {
         contactList.forEach { contactItem ->
             val contactData = getContactData(contactItem)
-            _state.value.contactItemList.apply {
+            _state.value.participantItemList.apply {
                 findItemByHandle(contactItem.handle)?.apply {
                     toMutableList().apply {
                         replaceIfExists(copy(contactData = contactData))
-                        _state.update { it.copy(contactItemList = this.sortList()) }
+                        _state.update { it.copy(participantItemList = this.sortList()) }
                     }
                 }
             }
@@ -107,8 +107,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun observeContactUpdates() {
         viewModelScope.launch {
             monitorContactUpdates().collectLatest { userUpdates ->
-                val contactList = applyContactUpdates(_state.value.contactItemList, userUpdates)
-                _state.update { it.copy(contactItemList = contactList) }
+                val contactList = applyContactUpdates(_state.value.participantItemList, userUpdates)
+                _state.update { it.copy(participantItemList = contactList) }
             }
         }
     }
@@ -116,11 +116,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun observeLastGreenUpdates() {
         viewModelScope.launch {
             monitorLastGreenUpdates().collectLatest { (handle, lastGreen) ->
-                _state.value.contactItemList.apply {
+                _state.value.participantItemList.apply {
                     findItemByHandle(handle)?.apply {
                         toMutableList().apply {
                             replaceIfExists(copy(lastSeen = lastGreen))
-                            _state.update { it.copy(contactItemList = this.sortList()) }
+                            _state.update { it.copy(participantItemList = this.sortList()) }
                         }
                     }
                 }
@@ -135,11 +135,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     requestLastGreen(userHandle)
                 }
 
-                _state.value.contactItemList.apply {
+                _state.value.participantItemList.apply {
                     findItemByHandle(userHandle)?.apply {
                         toMutableList().apply {
                             replaceIfExists(copy(status = status))
-                            _state.update { it.copy(contactItemList = this.sortList()) }
+                            _state.update { it.copy(participantItemList = this.sortList()) }
                         }
                     }
                 }
@@ -150,8 +150,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun observeNewContacts() {
         viewModelScope.launch {
             monitorContactRequestUpdates().collectLatest { newContacts ->
-                val contactList = addNewContacts(_state.value.contactItemList, newContacts)
-                _state.update { it.copy(contactItemList = contactList.sortList()) }
+                val contactList = addNewContacts(_state.value.participantItemList, newContacts)
+                _state.update { it.copy(participantItemList = contactList.sortList()) }
             }
         }
     }
@@ -189,6 +189,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         } else {
             _state.update { it.copy(error = R.string.check_internet_connection_error) }
         }
+    }
+
+    /**
+     * Open bottom panel option of a participant.
+     */
+    fun onParticipantTap(contactItem: ContactItem) {
+
     }
 
     /**

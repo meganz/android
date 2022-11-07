@@ -70,6 +70,7 @@ class ScheduledMeetingInfoActivity : ComponentActivity() {
                 onAddParticipantsClicked = viewModel::onAddParticipantsTap,
                 onSeeMoreClicked = viewModel::onSeeMoreTap,
                 onLeaveGroupClicked = viewModel::onLeaveGroupTap,
+                onParticipantClicked = viewModel::onParticipantTap,
                 onBackPressed = { finish() },
             )
         }

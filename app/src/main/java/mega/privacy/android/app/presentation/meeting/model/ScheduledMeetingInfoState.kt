@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  *
  * @property buttons                                    List of available action buttons.
  * @property scheduledMeeting                           Current scheduled meeting item.
- * @property contactItemList                            List of [ContactItem].
+ * @property participantItemList                        List of [ContactItem].
  * @property seeMoreVisible                             True if see more option is visible, false otherwise.
  * @property enabledMeetingLinkOption                   True if is enabled the meeting link option, false otherwise.
  * @property enabledChatNotificationsOption             True if is enabled the chat notifications option, false otherwise.
@@ -19,7 +19,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 data class ScheduledMeetingInfoState(
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
     val scheduledMeeting: ScheduledMeetingItem = ScheduledMeetingItem(),
-    val contactItemList: List<ContactItem> = emptyList(),
+    val participantItemList: List<ContactItem> = emptyList(),
     val seeMoreVisible: Boolean = true,
     val enabledMeetingLinkOption: Boolean = true,
     val enabledChatNotificationsOption: Boolean = true,

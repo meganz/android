@@ -1,9 +1,15 @@
 package mega.privacy.android.app.meeting.list.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import mega.privacy.android.app.contacts.group.data.ContactGroupUser
+import com.google.firebase.crashlytics.internal.model.CrashlyticsReport
+import mega.privacy.android.app.contacts.group.data.GroupChatParticipant
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.chat.ChatPermissions
+import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.user.UserVisibility
 
 /**
  * Meeting item
@@ -26,18 +32,30 @@ data class ScheduledMeetingItem constructor(
     val date: String = "8 Aud 2022 · 10:00-11:00",
     val isHost: Boolean = true,
     val isAllowAddParticipants: Boolean = true,
-    val firstUser: ContactGroupUser? = ContactGroupUser(-1,
-        "firstuser@mega.nz",
-        "A",
-        null,
-        AvatarUtil.getSpecificAvatarColor(
-            Constants.AVATAR_PRIMARY_COLOR)),
-    val lastUser: ContactGroupUser? = ContactGroupUser(-1,
-        "lastUser@mega.nz",
-        "B",
-        null,
-        AvatarUtil.getSpecificAvatarColor(
-            Constants.AVATAR_PRIMARY_COLOR)),
+    val firstUser: GroupChatParticipant? = GroupChatParticipant(
+        user = ContactItem(handle = -1,
+            email = "first@mega.nz",
+            ContactData(fullName = "First", alias = null, avatarUri = null),
+            defaultAvatarColor = Constants.AVATAR_PRIMARY_COLOR,
+            visibility = UserVisibility.Visible,
+            timestamp = -1,
+            areCredentialsVerified = false,
+            status = UserStatus.Online,
+            lastSeen = null),
+        permissions = ChatPermissions.Host
+    ),
+    val lastUser: GroupChatParticipant? = GroupChatParticipant(
+        user = ContactItem(handle = -1,
+            email = "last@mega.nz",
+            ContactData(fullName = "Last", alias = null, avatarUri = null),
+            defaultAvatarColor = Constants.AVATAR_PRIMARY_COLOR,
+            visibility = UserVisibility.Visible,
+            timestamp = -1,
+            areCredentialsVerified = false,
+            status = UserStatus.Online,
+            lastSeen = null),
+        permissions = ChatPermissions.Host
+    ),
 ) {
 
     /**
