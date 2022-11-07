@@ -167,10 +167,10 @@ class MediaDiscoveryFragment : Fragment() {
                 CardListView(dateCards = dateCards, uiState = uiState)
             }
 
-
-            TimeSwitchBar(uiState = uiState)
+            if (uiState.selectedPhotoIds.isEmpty()) {
+                TimeSwitchBar(uiState = uiState)
+            }
         }
-
     }
 
     @Composable
