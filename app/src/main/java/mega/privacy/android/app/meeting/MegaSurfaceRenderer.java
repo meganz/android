@@ -44,7 +44,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     private PorterDuffXfermode modesrcin;
     private int surfaceWidth = 0;
     private int surfaceHeight = 0;
-    private static final int CORNER_RADIUS = 20;
+    private static final int CORNER_RADIUS = 8;
     private static final int VISIBLE = 255;
 
     // the bitmap used for drawing.
