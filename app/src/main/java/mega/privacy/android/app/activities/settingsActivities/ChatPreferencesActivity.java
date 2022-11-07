@@ -1,14 +1,9 @@
 package mega.privacy.android.app.activities.settingsActivities;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE;
-import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
-import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
 import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
-import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
 import static mega.privacy.android.app.utils.Constants.MAX_AUTOAWAY_TIMEOUT;
 
 import android.content.BroadcastReceiver;
@@ -38,23 +33,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
 
     private SettingsChatFragment sttChat;
     private AlertDialog newFolderDialog;
-
-    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Timber.d("Network broadcast received!");
-            if (intent == null || intent.getAction() == null || sttChat == null)
-                return;
-
-            int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_VALUE);
-
-            if (actionType == GO_OFFLINE) {
-                sttChat.setOnlineOptions(false);
-            } else if (actionType == GO_ONLINE) {
-                sttChat.setOnlineOptions(true);
-            }
-        }
-    };
 
     private final BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -99,9 +77,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
         binding.toolbarSettings.setTitle(StringResourcesUtils.getString(R.string.section_chat));
         sttChat = new SettingsChatFragment();
         replaceFragment(sttChat);
-
-        registerReceiver(networkReceiver,
-                new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
 
         registerReceiver(richLinksUpdateReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
@@ -225,7 +200,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(networkReceiver);
         unregisterReceiver(richLinksUpdateReceiver);
         unregisterReceiver(chatRoomMuteUpdateReceiver);
         unregisterReceiver(signalPresenceReceiver);
