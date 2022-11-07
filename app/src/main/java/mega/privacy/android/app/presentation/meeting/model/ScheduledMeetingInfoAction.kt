@@ -34,4 +34,9 @@ enum class ScheduledMeetingInfoAction {
      * Manage Chat history.
      */
     ManageChatHistory,
+
+    /**
+     * Encrypted key rotation.
+     */
+    EnableEncryptedKeyRotation,
 }

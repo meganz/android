@@ -29,6 +29,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.setImageRequestFromUri
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import timber.log.Timber
 import javax.inject.Inject
 
 /**

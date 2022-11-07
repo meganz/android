@@ -56,7 +56,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val addNewContacts: AddNewContacts,
     private val requestLastGreen: RequestLastGreen,
-    monitorConnectivity: MonitorConnectivity
+    monitorConnectivity: MonitorConnectivity,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
@@ -159,65 +159,97 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
 
 
     /**
-     * Starts a conversation if there is internet connection, shows an error if not.
+     * Edit scheduled meeting if there is internet connection, shows an error if not.
      */
     fun onEditTap() {
         if (isConnected.value) {
-            Timber.d("***************** onEditTap")
+            Timber.d("Edit scheduled meeting")
         } else {
             _state.update { it.copy(error = R.string.check_internet_connection_error) }
         }
     }
 
     /**
-     * Starts a conversation if there is internet connection, shows an error if not.
+     * Add participants to the chat room if there is internet connection, shows an error if not.
      */
     fun onAddParticipantsTap() {
         if (isConnected.value) {
-            Timber.d("***************** onAddParticipantsTap")
+            Timber.d("Add participants to the chat room")
         } else {
             _state.update { it.copy(error = R.string.check_internet_connection_error) }
         }
     }
 
     /**
-     * Starts a conversation if there is internet connection, shows an error if not.
+     * Create or removed meeting link if there is internet connection, shows an error if not.
      */
     fun onMeetingLinkTap() {
-        Timber.d("***************** onMeetingLinkTap")
+        if (isConnected.value) {
+            Timber.d("Add participants to the chat room")
+        } else {
+            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+        }
     }
 
     /**
-     * Starts a conversation if there is internet connection, shows an error if not.
+     * Share meeting link if there is internet connection, shows an error if not.
      */
     fun onShareMeetingLinkTap() {
-        Timber.d("***************** onShareMeetingLinkTap")
+        if (isConnected.value) {
+            Timber.d("Add participants to the chat room")
+        } else {
+            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+        }
     }
 
     /**
-     * Starts a conversation if there is internet connection, shows an error if not.
+     * Enable or disable chat notifications if there is internet connection, shows an error if not.
      */
     fun onChatNotificationsTap() {
-        Timber.d("***************** onChatNotificationsTap")
+        if (isConnected.value) {
+            Timber.d("Add participants to the chat room")
+        } else {
+            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+        }
     }
 
     /**
-     * Starts a conversation if there is internet connection, shows an error if not.
+     * Enable or disable the option Allow non-host add participants to the chat room if there is internet connection, shows an error if not.
      */
     fun onAllowAddParticipantsTap() {
-        Timber.d("***************** onAllowAddParticipantsTap")
-    }
-    /**
-     * Starts a conversation if there is internet connection, shows an error if not.
-     */
-    fun onSharedFilesTap() {
-        Timber.d("***************** onSharedFilesTap")
-    }
-    /**
-     * Starts a conversation if there is internet connection, shows an error if not.
-     */
-    fun onManageChatHistoryTap() {
-        Timber.d("***************** onManageChatHistoryTap")
+        if (isConnected.value) {
+            Timber.d("Allow non host add participants to the chat room")
+        } else {
+            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+        }
     }
 
+    /**
+     * Show shared files in the chat room.
+     */
+    fun onSharedFilesTap() {
+        Timber.d("Show shared files in the chat room")
+    }
+
+    /**
+     * Manage chat history if there is internet connection, shows an error if not.
+     */
+    fun onManageChatHistoryTap() {
+        if (isConnected.value) {
+            Timber.d("Manage chat history")
+        } else {
+            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+        }
+    }
+
+    /**
+     * Enable encrypted key rotation if there is internet connection, shows an error if not.
+     */
+    fun onEnableEncryptedKeyRotationTap() {
+        if (isConnected.value) {
+            Timber.d("Enable Encrypted Key Rotation")
+        } else {
+            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+        }
+    }
 }

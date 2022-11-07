@@ -40,15 +40,15 @@ class ScheduledMeetingInfoActivity : ComponentActivity() {
 
     private val viewModel by viewModels<ScheduledMeetingInfoViewModel>()
 
+    /**
+     * Perform Activity initialization
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { state ->
-                    if (state.error != null) {
-                    } else if (state.result != null) {
-                    }
+                viewModel.state.collect {
                 }
             }
         }
@@ -62,7 +62,7 @@ class ScheduledMeetingInfoActivity : ComponentActivity() {
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsState()
 
-        AndroidTheme(isDark = themeMode.isDarkMode()) {
+        AndroidTheme(isDark = isDark) {
             mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView(
                 state = uiState,
                 onButtonClicked = ::onActionTap,
@@ -75,12 +75,13 @@ class ScheduledMeetingInfoActivity : ComponentActivity() {
 
     private fun onActionTap(action: ScheduledMeetingInfoAction) {
         when (action) {
-            ScheduledMeetingInfoAction.MeetingLink -> viewModel::onMeetingLinkTap
-            ScheduledMeetingInfoAction.ShareMeetingLink -> viewModel::onShareMeetingLinkTap
-            ScheduledMeetingInfoAction.ChatNotifications -> viewModel::onChatNotificationsTap
-            ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> viewModel::onAllowAddParticipantsTap
-            ScheduledMeetingInfoAction.ShareFiles -> viewModel::onSharedFilesTap
-            ScheduledMeetingInfoAction.ManageChatHistory -> viewModel::onManageChatHistoryTap
+            ScheduledMeetingInfoAction.MeetingLink -> viewModel.onMeetingLinkTap()
+            ScheduledMeetingInfoAction.ShareMeetingLink -> viewModel.onShareMeetingLinkTap()
+            ScheduledMeetingInfoAction.ChatNotifications -> viewModel.onChatNotificationsTap()
+            ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> viewModel.onAllowAddParticipantsTap()
+            ScheduledMeetingInfoAction.ShareFiles -> viewModel.onSharedFilesTap()
+            ScheduledMeetingInfoAction.ManageChatHistory -> viewModel.onManageChatHistoryTap()
+            ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> viewModel.onEnableEncryptedKeyRotationTap()
         }
     }
 
