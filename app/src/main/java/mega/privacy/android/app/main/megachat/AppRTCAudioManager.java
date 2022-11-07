@@ -590,9 +590,7 @@ public class AppRTCAudioManager {
         // Do initial selection of audio device. This setting can later be changed
         // either by adding/removing a BT or wired headset or by covering/uncovering
         // the proximity sensor.
-        if (!participatingInACall()) {
-            speakerElements(statusSpeaker);
-        }
+        speakerElements(statusSpeaker);
 
         // Register receiver for broadcast intents related to adding/removing a
         // wired headset.

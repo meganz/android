@@ -20,11 +20,10 @@ interface AccountRepository {
     suspend fun getUserAccount(): UserAccount
 
     /**
-     * Is account data stale
+     * Storage capacity used is blank
      *
-     * @return true if account data is stale. else false
      */
-    fun isAccountDataStale(): Boolean
+    fun storageCapacityUsedIsBlank(): Boolean
 
     /**
      * Request account
@@ -117,4 +116,11 @@ interface AccountRepository {
         achievementType: AchievementType,
         awardIndex: Long,
     ): MegaAchievement
+
+    /**
+     * Get account details time stamp
+     *
+     * @return the latest account detail time stamp
+     */
+    suspend fun getAccountDetailsTimeStampInSeconds(): String?
 }

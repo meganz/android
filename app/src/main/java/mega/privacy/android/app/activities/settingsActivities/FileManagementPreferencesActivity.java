@@ -10,11 +10,8 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDAT
 import static mega.privacy.android.app.constants.BroadcastConstants.CACHE_SIZE;
 import static mega.privacy.android.app.constants.BroadcastConstants.DAYS_COUNT;
 import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_SIZE;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
-import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
-import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
 import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
 import static mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS;
 import static mega.privacy.android.app.utils.Util.getScaleW;
@@ -143,22 +140,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         }
     };
 
-    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttFileManagement == null)
-                return;
-
-            int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_VALUE);
-
-            if (actionType == GO_OFFLINE) {
-                sttFileManagement.setOnlineOptions(false);
-            } else if (actionType == GO_ONLINE) {
-                sttFileManagement.setOnlineOptions(true);
-            }
-        }
-    };
-
     private final BroadcastReceiver updateRBSchedulerReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -203,9 +184,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         registerReceiver(offlineSizeUpdateReceiver,
                 new IntentFilter(ACTION_UPDATE_OFFLINE_SIZE_SETTING));
 
-        registerReceiver(networkReceiver,
-                new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
-
         registerReceiver(updateMyAccountReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
 
@@ -240,7 +218,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         unregisterReceiver(cacheSizeUpdateReceiver);
         unregisterReceiver(offlineSizeUpdateReceiver);
-        unregisterReceiver(networkReceiver);
         unregisterReceiver(updateMyAccountReceiver);
         unregisterReceiver(updateCUSettingsReceiver);
         unregisterReceiver(resetVersionInfoReceiver);

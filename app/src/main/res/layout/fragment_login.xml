@@ -13,7 +13,7 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/login_login_layout"
+            android:id="@+id/login_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -105,7 +105,7 @@
                 </RelativeLayout>
 
                 <Button
-                    android:id="@+id/button_login_login"
+                    android:id="@+id/button_login"
                     style="?attr/materialButtonStyle"
                     android:layout_marginStart="3dp"
                     android:layout_marginTop="24dp"

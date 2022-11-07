@@ -12,10 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,7 +33,6 @@ import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.ContactRequest
@@ -45,6 +42,7 @@ import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
@@ -65,7 +63,6 @@ import javax.inject.Inject
  * @param getRubbishBinChildrenNode Fetch the rubbish bin nodes
  * @param getBrowserChildrenNode Fetch the browser nodes
  * @param monitorContactRequestUpdates
- * @param getUploadFolderHandle
  * @param getInboxNode
  * @param getRootFolder Fetch the root node
  * @param getNumUnreadUserAlerts
@@ -76,7 +73,6 @@ import javax.inject.Inject
  * @param monitorMyAvatarFile
  * @param monitorStorageStateEvent monitor global storage state changes
  * @param getCloudSortOrder
- * @param sortOrderIntMapper
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -98,7 +94,7 @@ class ManagerViewModel @Inject constructor(
     private val getSecondarySyncHandle: GetSecondarySyncHandle,
     private val checkCameraUpload: CheckCameraUpload,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val sortOrderIntMapper: SortOrderIntMapper,
+    private val monitorConnectivity: MonitorConnectivity,
 ) : ViewModel() {
 
     /**
@@ -118,6 +114,18 @@ class ManagerViewModel @Inject constructor(
      */
     private var inboxNode: MegaNode? = null
 
+    /**
+     * Monitor connectivity event
+     */
+    val monitorConnectivityEvent =
+        monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly)
+
+    /**
+     * Is network connected
+     */
+    val isConnected: Boolean
+        get() = monitorConnectivity().value
+
     private val isFirstLogin = savedStateHandle.getStateFlow(
         viewModelScope,
         isFirstLoginKey,
@@ -125,6 +133,13 @@ class ManagerViewModel @Inject constructor(
     )
 
     init {
+        viewModelScope.launch {
+            monitorNodeUpdates().collect {
+                checkItemForInbox(it)
+                onReceiveNodeUpdate(true)
+                checkCameraUploadFolder(false, it)
+            }
+        }
         viewModelScope.launch(ioDispatcher) {
             isFirstLogin.map {
                 { state: ManagerState -> state.copy(isFirstLogin = it) }
@@ -146,7 +161,6 @@ class ManagerViewModel @Inject constructor(
      */
     private val _updateNodes = monitorNodeUpdates()
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-
 
     /**
      * Monitor contact requests
@@ -175,20 +189,6 @@ class ManagerViewModel @Inject constructor(
             .mapNotNull { it.userAlerts?.toList() }
             .map { Event(it) }
             .asLiveData()
-
-    /**
-     * Monitor global node updates and dispatch to observers
-     */
-    val updateNodes =
-        _updateNodes
-            .also { Timber.d("onNodesUpdate") }
-            .filterNotNull()
-            .onEach {
-                checkItemForInbox(it)
-            }
-            .map { Event(it) }
-            .asLiveData()
-
 
     private fun checkItemForInbox(updatedNodes: List<Node>) {
         //Verify is it is a new item to the inbox
@@ -300,6 +300,21 @@ class ManagerViewModel @Inject constructor(
         _state.update { it.copy(transfersTab = tab) }
     }
 
+    /**
+     * Notify that the node update has been handled by the UI
+     */
+    fun nodeUpdateHandled() {
+        onReceiveNodeUpdate(false)
+    }
+
+    /**
+     * Set the ui one-off event when a node update is received
+     *
+     * @param update true if a node update has been received
+     */
+    private fun onReceiveNodeUpdate(update: Boolean) = viewModelScope.launch {
+        _state.update { it.copy(nodeUpdateReceived = update) }
+    }
 
     private val numUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
 
@@ -366,7 +381,7 @@ class ManagerViewModel @Inject constructor(
     /**
      * Get Cloud Sort Order
      */
-    fun getOrder() = runBlocking { sortOrderIntMapper(getCloudSortOrder()) }
+    fun getOrder() = runBlocking { getCloudSortOrder() }
 
 
     /**

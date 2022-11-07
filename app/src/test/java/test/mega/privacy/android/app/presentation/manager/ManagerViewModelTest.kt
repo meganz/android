@@ -23,12 +23,11 @@ import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
-import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
@@ -36,11 +35,11 @@ import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.Before
 import org.junit.Rule
@@ -48,6 +47,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
@@ -55,7 +55,7 @@ class ManagerViewModelTest {
     private lateinit var underTest: ManagerViewModel
 
     private val monitorGlobalUpdates = mock<MonitorGlobalUpdates>()
-    private val monitorNodeUpdates = mock<MonitorNodeUpdates>()
+    private val monitorNodeUpdates = FakeMonitorUpdates()
     private val getRubbishBinNodeByHandle = mock<GetRubbishBinChildrenNode>()
     private val getBrowserNodeByHandle = mock<GetBrowserChildrenNode>()
     private val getRootFolder = mock<GetRootFolder>()
@@ -71,6 +71,7 @@ class ManagerViewModelTest {
     private val getSecondarySyncHandle = mock<GetSecondarySyncHandle>()
     private val checkCameraUpload = mock<CheckCameraUpload>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
+    private val monitorConnectivity = mock<MonitorConnectivity>()
     private val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     @get:Rule
@@ -105,7 +106,7 @@ class ManagerViewModelTest {
             getSecondarySyncHandle = getSecondarySyncHandle,
             checkCameraUpload = checkCameraUpload,
             getCloudSortOrder = getCloudSortOrder,
-            sortOrderIntMapper = sortOrderIntMapper,
+            monitorConnectivity = monitorConnectivity
         )
     }
 
@@ -138,6 +139,9 @@ class ManagerViewModelTest {
             assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
             assertThat(initial.transfersTab).isEqualTo(TransfersTab.NONE)
             assertThat(initial.isFirstLogin).isFalse()
+            assertThat(initial.shouldSendCameraBroadcastEvent).isFalse()
+            assertThat(initial.shouldStopCameraUpload).isFalse()
+            assertThat(initial.nodeUpdateReceived).isFalse()
         }
     }
 
@@ -255,14 +259,6 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that node updates live data is not set when no updates triggered from use case`() =
-        runTest {
-            setUnderTest()
-
-            underTest.updateNodes.test().assertNoValue()
-        }
-
-    @Test
     fun `test that contact request updates live data is not set when no updates triggered from use case`() =
         runTest {
             setUnderTest()
@@ -271,29 +267,17 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that node updates live data is set when node updates triggered from use case`() =
-        runTest {
-            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
-
-            setUnderTest()
-
-            runCatching {
-                underTest.updateNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-            }.onSuccess { result ->
-                result.assertValue { it.getContentIfNotHandled()?.size == 1 }
-            }
-        }
-
-    @Test
     fun `test that rubbish bin node updates live data is set when node updates triggered from use case`() =
         runTest {
-            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
             whenever(getRubbishBinNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
 
             setUnderTest()
 
             runCatching {
-                underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                val result =
+                    underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                monitorNodeUpdates.emit(listOf(mock()))
+                result
             }.onSuccess { result ->
                 result.assertValue { it.getContentIfNotHandled()?.size == 2 }
             }
@@ -302,7 +286,6 @@ class ManagerViewModelTest {
     @Test
     fun `test that rubbish bin node updates live data is not set when get rubbish bin node returns a null list`() =
         runTest {
-            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
             whenever(getRubbishBinNodeByHandle(any())).thenReturn(null)
 
             setUnderTest()
@@ -317,13 +300,15 @@ class ManagerViewModelTest {
     @Test
     fun `test that browser node updates live data is set when node updates triggered from use case`() =
         runTest {
-            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
             whenever(getBrowserNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
 
             setUnderTest()
 
             runCatching {
-                underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                val result =
+                    underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                monitorNodeUpdates.emit(listOf(mock()))
+                result
             }.onSuccess { result ->
                 result.assertValue { it.getContentIfNotHandled()?.size == 2 }
             }
@@ -332,13 +317,15 @@ class ManagerViewModelTest {
     @Test
     fun `test that browser node updates live data is not set when get browser node returns a null list`() =
         runTest {
-            whenever(monitorNodeUpdates()).thenReturn(flowOf(listOf(mock())))
             whenever(getBrowserNodeByHandle(any())).thenReturn(null)
 
             setUnderTest()
 
             runCatching {
-                underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                val result =
+                    underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                monitorNodeUpdates.emit(listOf(mock()))
+                result
             }.onSuccess { result ->
                 result.assertNoValue()
             }
@@ -454,10 +441,32 @@ class ManagerViewModelTest {
     @Test
     fun `test that get order returns cloud sort order`() = runTest {
         setUnderTest()
-        val order = SortOrder.ORDER_MODIFICATION_DESC
-        val expected = MegaApiJava.ORDER_MODIFICATION_DESC
-        whenever(getCloudSortOrder()).thenReturn(order)
-        whenever(sortOrderIntMapper(order)).thenReturn(expected)
+        val expected = SortOrder.ORDER_MODIFICATION_DESC
+        whenever(getCloudSortOrder()).thenReturn(expected)
         assertThat(underTest.getOrder()).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that updateToolbarTitle is true when a node update occurs`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isFalse()
+            monitorNodeUpdates.emit(listOf(mock()))
+            assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that updateToolbarTitle is set when calling setUpdateToolbar`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isFalse()
+            monitorNodeUpdates.emit(listOf(mock()))
+            assertThat(awaitItem()).isTrue()
+            underTest.nodeUpdateHandled()
+            assertThat(awaitItem()).isFalse()
+        }
     }
 }

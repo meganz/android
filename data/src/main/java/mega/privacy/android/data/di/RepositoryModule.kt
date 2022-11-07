@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.repository.DefaultAccountRepository
+import mega.privacy.android.data.repository.DefaultAlbumRepository
 import mega.privacy.android.data.repository.DefaultAvatarRepository
 import mega.privacy.android.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
@@ -16,6 +17,7 @@ import mega.privacy.android.data.repository.DefaultFilesRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
 import mega.privacy.android.data.repository.DefaultGlobalStatesRepository
 import mega.privacy.android.data.repository.DefaultImageRepository
+import mega.privacy.android.data.repository.DefaultMediaPlayerRepository
 import mega.privacy.android.data.repository.DefaultNetworkRepository
 import mega.privacy.android.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.data.repository.DefaultPushesRepository
@@ -24,11 +26,13 @@ import mega.privacy.android.data.repository.DefaultSettingsRepository
 import mega.privacy.android.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.data.repository.DefaultSupportRepository
+import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
@@ -39,6 +43,7 @@ import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PushesRepository
@@ -46,6 +51,7 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
+import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
@@ -53,6 +59,9 @@ import kotlin.contracts.ExperimentalContracts
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class RepositoryModule {
+    @Binds
+    abstract fun bindAlbumRepository(repository: DefaultAlbumRepository): AlbumRepository
+
     @Binds
     abstract fun bindContactsRepository(repository: DefaultContactsRepository): ContactsRepository
 
@@ -132,4 +141,10 @@ internal abstract class RepositoryModule {
     @ExperimentalContracts
     @Binds
     abstract fun bindAccountRepository(repository: DefaultAccountRepository): AccountRepository
+
+    @Binds
+    abstract fun bindTimeSystemRepository(repository: DefaultTimeSystemRepository): TimeSystemRepository
+
+    @Binds
+    abstract fun bindMediaPlayerRepository(repository: DefaultMediaPlayerRepository): MediaPlayerRepository
 }

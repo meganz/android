@@ -10,5 +10,5 @@ fun interface MonitorBackupFolder {
     /**
      * Return a flow of the latest backup folder id
      */
-    operator fun invoke(): Flow<NodeId>
+    operator fun invoke(): Flow<Result<NodeId>>
 }

@@ -27,7 +27,12 @@ interface FileNode : UnTypedNode {
     val thumbnailPath: String?
 
     /**
-     * duration if file type is video
+     * Fingerprint
      */
-    val duration: Int?
+    val fingerprint: String?
+
+    /**
+     * Duration
+     */
+    val duration: Int
 }

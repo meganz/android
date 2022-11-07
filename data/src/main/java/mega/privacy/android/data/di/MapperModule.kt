@@ -42,6 +42,7 @@ import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
+import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.getFileTypeInfo
@@ -77,6 +78,7 @@ import mega.privacy.android.data.mapper.toSyncRecordTypeInt
 import mega.privacy.android.data.mapper.toTransferEventModel
 import mega.privacy.android.data.mapper.toTransferModel
 import mega.privacy.android.data.mapper.toUserAlert
+import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
 import mega.privacy.android.domain.entity.Currency
@@ -339,6 +341,11 @@ internal class MapperModule {
     @Provides
     fun provideRecentActionsMapper(): RecentActionsMapper = ::toRecentActionBucketList
 
+    /**
+     * Provide [UserSetMapper] mapper
+     */
+    @Provides
+    fun provideUserSetMapper(): UserSetMapper = ::toUserSet
     /**
      * Provide [RecentActionBucketMapper] mapper
      */

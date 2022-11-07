@@ -7,10 +7,11 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
@@ -176,8 +177,10 @@ class AlbumDynamicContentFragment : Fragment() {
 
     @Composable
     private fun Back() {
-        SideEffect {
-            managerActivity.onBackPressedDispatcher.onBackPressed()
+        val onBackPressedDispatcher =
+            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+        LaunchedEffect(key1 = true) {
+            onBackPressedDispatcher?.onBackPressed()
         }
     }
 
@@ -200,7 +203,7 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     fun onClick(photo: Photo) {
-        if (albumsViewModel.selectedPhotoIds.isEmpty()) {
+        if (albumsViewModel.state.value.selectedPhotoIds.isEmpty()) {
             openPhoto(photo)
         } else {
             if (actionMode != null) {
@@ -227,7 +230,7 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun handleActionMode(photo: Photo) {
-        if (albumsViewModel.selectedPhotoIds.isEmpty()) {
+        if (albumsViewModel.state.value.selectedPhotoIds.isEmpty()) {
             if (actionMode == null) {
                 enterActionMode()
             }
@@ -266,12 +269,15 @@ class AlbumDynamicContentFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    /**
+     * Get current page title
+     */
     fun getCurrentAlbumTitle(): String {
         val currentAlbum = albumsViewModel.state.value.currentAlbumId
         val currentUIAlbum =
             albumsViewModel.state.value.albums.find { UIAlbum -> UIAlbum.id == currentAlbum }
         return if (context != null && currentUIAlbum != null) {
-            currentUIAlbum.title(context!!)
+            currentUIAlbum.title(requireContext())
         } else {
             getString(R.string.tab_title_album)
         }

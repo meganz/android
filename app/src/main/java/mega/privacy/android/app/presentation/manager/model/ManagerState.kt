@@ -13,6 +13,7 @@ package mega.privacy.android.app.presentation.manager.model
  * @param hasInboxChildren whether any nodes for Inbox
  * @param shouldStopCameraUpload camera upload should be stopped or not
  * @param shouldSendCameraBroadcastEvent broadcast event should be sent or not
+ * @param nodeUpdateReceived one-off event to notify UI that a node update occurred
  */
 data class ManagerState(
     val browserParentHandle: Long = -1L,
@@ -25,4 +26,5 @@ data class ManagerState(
     val hasInboxChildren: Boolean = false,
     val shouldStopCameraUpload: Boolean = false,
     val shouldSendCameraBroadcastEvent: Boolean = false,
+    val nodeUpdateReceived: Boolean = false,
 )

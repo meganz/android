@@ -16,7 +16,9 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -27,7 +29,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
-import mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.AddContactActivity
@@ -52,6 +53,7 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.usecase.AnswerChatCall
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRequest
@@ -76,7 +78,8 @@ class MeetingActivityViewModel @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val chatManagement: ChatManagement,
     private val cameraGateway: CameraGateway,
-    private val megaChatApiGateway: MegaChatApiGateway
+    private val megaChatApiGateway: MegaChatApiGateway,
+    monitorConnectivity: MonitorConnectivity,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
@@ -112,15 +115,11 @@ class MeetingActivityViewModel @Inject constructor(
     private val _recordAudioPermissionCheck = MutableLiveData<Boolean>()
     val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
 
-    // Network State
-    private val _notificationNetworkState = MutableLiveData<Boolean>()
-
-    // Observe this property to get online/offline notification. true: online / false: offline
-    val notificationNetworkState: LiveData<Boolean> = _notificationNetworkState
-
-    private val notificationNetworkStateObserver = Observer<Boolean> {
-        _notificationNetworkState.value = it
-    }
+    /**
+     * Monitor connectivity event
+     */
+    val monitorConnectivityEvent =
+        monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly)
 
     var isChatOpen: Boolean = false
 
@@ -202,9 +201,6 @@ class MeetingActivityViewModel @Inject constructor(
     ).post(isVisible)
 
     init {
-        LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean::class.java)
-            .observeForever(notificationNetworkStateObserver)
-
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .observeForever(audioOutputStateObserver)
 
@@ -640,10 +636,6 @@ class MeetingActivityViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .removeObserver(audioOutputStateObserver)
-
-        // Remove observer on network state
-        LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean::class.java)
-            .removeObserver(notificationNetworkStateObserver)
 
         LiveEventBus.get(
             EVENT_CHAT_TITLE_CHANGE, MegaChatRoom::class.java

@@ -51,8 +51,8 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
-import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.photos.timeline.view.EmptyState
@@ -61,8 +61,6 @@ import mega.privacy.android.app.presentation.photos.timeline.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.timeline.view.TimelineView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getCurrentSort
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onCardClick
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onTimeBarTabSelected
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUploadVideos
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseCellularConnection
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCurrentSort
@@ -332,11 +330,14 @@ class PhotosFragment : Fragment() {
 
 
     @Composable
-    private fun albumsView(albumsViewState: AlbumsViewState) = AlbumsView(
-        albumsViewState = albumsViewState,
-        openAlbum = this::openAlbum,
-        downloadPhoto = photosViewModel::downloadPhoto
-    )
+    private fun albumsView(albumsViewState: AlbumsViewState) =
+        AlbumsView(
+            albumsViewState = albumsViewState,
+            openAlbum = this::openAlbum,
+            downloadPhoto = photosViewModel::downloadPhoto,
+        ) {
+            getFeatureFlag(AppFeatures.UserAlbums)
+        }
 
     @Composable
     private fun enableCUView(timelineViewState: TimelineViewState) = EnableCU(
@@ -613,5 +614,10 @@ class PhotosFragment : Fragment() {
 
             Timber.d("CU Upload Progress: Pending: {$pending}, Progress: {$progress}")
         }
+    }
+
+    override fun onDestroy() {
+        requireContext().unregisterReceiver(cuUpdateReceiver)
+        super.onDestroy()
     }
 }

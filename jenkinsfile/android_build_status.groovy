@@ -144,7 +144,7 @@ pipeline {
         ANDROID_HOME = "/opt/buildtools/android-sdk"
 
         // PATH for necessary commands
-        PATH = "/opt/buildtools/android-sdk/cmake/3.10.2.4988404/bin:/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:$PATH"
+        PATH = "/opt/buildtools/android-sdk/cmake/3.22.1/bin:/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:/opt/buildtools/android-sdk/build-tools/30.0.3:$PATH"
 
         // Jenkins build log will be saved in this file.
         CONSOLE_LOG_FILE = "console.txt"
@@ -179,21 +179,21 @@ pipeline {
                     if (BUILD_STEP == "Unit Test") {
                         def appUnitTestSummary = unitTestSummaryWithArchiveLink(
                                 "app/build/test-results/testGmsDebugUnitTest",
-                                "app/build/reports",
+                                "app/build/reports/tests/testGmsDebugUnitTest",
                                 APP_UNIT_TEST_REPORT_ARCHIVE
                         )
                         unitTestResult += "<br>App Unit Test: ${appUnitTestSummary}"
 
                         def domainUnitTestSummary = unitTestSummaryWithArchiveLink(
                                 "domain/build/test-results/test",
-                                "domain/build/reports",
+                                "domain/build/reports/tests/test",
                                 DOMAIN_UNIT_TEST_REPORT_ARCHIVE
                         )
                         unitTestResult += "<br>Domain Unit Test: ${domainUnitTestSummary}"
 
                         def dataUnitTestSummary = unitTestSummaryWithArchiveLink(
                                 "data/build/test-results/testDebugUnitTest",
-                                "data/build/reports",
+                                "data/build/reports/tests/testDebugUnitTest",
                                 DATA_UNIT_TEST_REPORT_ARCHIVE
                         )
                         unitTestResult += "<br>Data Unit Test: ${dataUnitTestSummary}"
@@ -472,9 +472,9 @@ pipeline {
                         APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
                         DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
                         DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
-                        APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports", "app_unit_test_result.zip")
-                        DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports", "domain_unit_test_result.zip")
-                        DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports", "data_unit_test_result.zip")
+                        APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports/tests/testGmsDebugUnitTest", "app_unit_test_result.zip")
+                        DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports/tests/test", "domain_unit_test_result.zip")
+                        DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testGmsDebugUnitTest", "data_unit_test_result.zip")
                     }
                 }
             }
@@ -722,7 +722,10 @@ def archiveUnitTestReport(String reportPath, String targetFileName) {
     if (fileExists(WORKSPACE + "/" + reportPath)) {
         sh """
             cd ${WORKSPACE}
-            zip -r ${targetFileName} ${reportPath}/* 
+            cd ${reportPath}
+            zip -r ${targetFileName} * 
+            cd ${WORKSPACE}
+            cp ${reportPath}/${targetFileName} ${targetFileName}
         """
         return true
     } else {

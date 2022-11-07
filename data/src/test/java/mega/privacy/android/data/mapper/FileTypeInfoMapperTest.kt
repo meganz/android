@@ -174,35 +174,6 @@ class FileTypeInfoMapperTest {
     }
 
     @Test
-    fun `test that a file with webp extension is mapped correctly`() {
-        val expectedExtension = "webp"
-        val expectedMimeType = "image/webp"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
-
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
-            GifFileTypeInfo(
-                type = expectedMimeType,
-                extension = expectedExtension
-            )
-        )
-    }
-
-    @Test
-    fun `test that a file with capital webp extension is mapped correctly`() {
-        val expectedExtension = "WEBP"
-        val expectedMimeType = "image/webp"
-        val node =
-            mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
-
-        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
-            GifFileTypeInfo(
-                type = expectedMimeType,
-                extension = expectedExtension
-            )
-        )
-    }
-
-    @Test
     fun `test that a file with raw extension is mapped correctly`() {
         val expectedMimeType = "expected"
         val node = mock<MegaNode>()

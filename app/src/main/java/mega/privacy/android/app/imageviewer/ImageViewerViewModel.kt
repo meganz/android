@@ -54,6 +54,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.AreTransfersPaused
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -223,7 +224,7 @@ class ImageViewerViewModel @Inject constructor(
 
     fun retrieveImagesFromParent(
         parentNodeHandle: Long,
-        childOrder: Int? = null,
+        childOrder: SortOrder? = null,
         currentNodeHandle: Long? = null,
     ) {
         getImageHandlesUseCase.get(parentNodeHandle = parentNodeHandle, sortOrder = childOrder)
