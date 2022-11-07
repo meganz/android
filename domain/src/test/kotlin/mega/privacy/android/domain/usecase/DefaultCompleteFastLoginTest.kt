@@ -21,11 +21,15 @@ class DefaultCompleteFastLoginTest {
     private lateinit var underTest: CompleteFastLogin
 
     private val loginRepository = mock<LoginRepository>()
+    private val initialiseMegaChat = mock<InitialiseMegaChat>()
     private val session = "User session"
 
     @Before
     fun setUp() {
-        underTest = DefaultCompleteFastLogin(loginRepository)
+        underTest = DefaultCompleteFastLogin(
+            loginRepository = loginRepository,
+            initialiseMegaChat = initialiseMegaChat
+        )
     }
 
     @Test
@@ -47,7 +51,7 @@ class DefaultCompleteFastLoginTest {
 
     @Test
     fun `test that login is finished if initMegaChat request finish with an error`() = runTest {
-        whenever(loginRepository.initMegaChat(session)).thenAnswer { throw ChatNotInitializedException() }
+        whenever(initialiseMegaChat(session)).thenAnswer { throw ChatNotInitializedException() }
         assertThrows(ChatNotInitializedException::class.java) {
             runBlocking { underTest(session) }
         }
