@@ -14,6 +14,7 @@ import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
@@ -29,11 +30,14 @@ import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NoLoggedInUserException
 import mega.privacy.android.domain.exception.NotMasterBusinessAccountException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
@@ -173,10 +177,27 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun getSession(): String? =
         localStorageGateway.getUserCredentials()?.session
 
-    override fun retryPendingConnections(disconnect: Boolean) {
-        megaApiGateway.retryPendingConnections()
-        megaChatApiGateway.retryPendingConnections(disconnect)
-    }
+    override suspend fun retryPendingConnections(disconnect: Boolean) =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaApiGateway.retryPendingConnections()
+                megaChatApiGateway.retryPendingConnections(
+                    disconnect = disconnect,
+                    listener = OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = { request, error ->
+                            if (request.type == MegaChatRequest.TYPE_RETRY_PENDING_CONNECTIONS) {
+                                when (error.errorCode) {
+                                    MegaChatError.ERROR_OK -> continuation.resumeWith(Result.success(Unit))
+                                    MegaChatError.ERROR_ACCESS -> continuation.resumeWith(Result.failure(
+                                        ChatNotInitializedException()))
+                                    else -> continuation.failWithError(error)
+                                }
+                            }
+                        }
+                    )
+                )
+            }
+        }
 
     override suspend fun isBusinessAccountActive(): Boolean = withContext(ioDispatcher) {
         megaApiGateway.isBusinessAccountActive()

@@ -59,8 +59,10 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.pushReceived(beep, listener)
 
-    override fun retryPendingConnections(disconnect: Boolean) =
-        chatApi.retryPendingConnections(disconnect, null)
+    override fun retryPendingConnections(
+        disconnect: Boolean,
+        listener: MegaChatRequestListenerInterface?
+    ) = chatApi.retryPendingConnections(disconnect, listener)
 
     override val chatUpdates: Flow<ChatUpdate>
         get() = callbackFlow {
