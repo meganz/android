@@ -901,7 +901,7 @@ interface MegaApiGateway {
      * @param name the name of the set
      * @param listener [MegaRequestListenerInterface]
      */
-    suspend fun createSet(name: String, listener: MegaRequestListenerInterface)
+    fun createSet(name: String, listener: MegaRequestListenerInterface)
 
     /**
      * Create a new element for the set

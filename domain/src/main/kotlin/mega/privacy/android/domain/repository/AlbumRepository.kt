@@ -29,7 +29,7 @@ interface AlbumRepository {
      *
      * @param name the name of the album
      */
-    suspend fun createAlbum(name: String)
+    suspend fun createAlbum(name: String): UserSet
 
     /**
      * Add photos to an album
