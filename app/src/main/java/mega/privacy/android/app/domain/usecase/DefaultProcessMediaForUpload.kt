@@ -76,9 +76,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
         list.joinAll()
         // Reset backup state as active.
         cameraUploadSyncManagerWrapper.updatePrimaryFolderBackupState(BackupState.ACTIVE)
-        if (secondaryEnabled) {
-            cameraUploadSyncManagerWrapper.updateSecondaryFolderBackupState(BackupState.ACTIVE)
-        }
+        cameraUploadSyncManagerWrapper.updateSecondaryFolderBackupState(BackupState.ACTIVE)
     }
 
     private fun CoroutineScope.preparePrimaryPhotos(

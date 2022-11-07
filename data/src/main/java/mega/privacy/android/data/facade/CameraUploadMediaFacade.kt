@@ -123,6 +123,8 @@ internal class CameraUploadMediaFacade @Inject constructor(
                 }
             } catch (exception: Exception) {
                 Timber.e(exception)
+            } finally {
+                cursor.close()
             }
         }
     }
