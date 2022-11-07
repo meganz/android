@@ -24,7 +24,7 @@ DO_CLEANUP = true
  */
 ARCHIVE_FOLDER = "archive"
 NATIVE_SYMBOL_FILE = "symbols.zip"
-ARTIFACTORY_BASE_URL = 'https://artifactory.developers.mega.co.nz/artifactory/android-mega/release'
+ARTIFACTORY_BASE_URL = 'https://artifactory.developers.mega.co.nz/artifactory/android-mega/internal'
 ARTIFACTORY_BUILD_INFO = "buildinfo.txt"
 
 /**
