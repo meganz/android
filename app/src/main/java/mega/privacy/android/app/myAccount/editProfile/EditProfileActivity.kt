@@ -47,6 +47,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
+import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_LAND
 import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_PORT
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
@@ -255,7 +256,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     }
 
     private fun allowNameAndEmailEdition() {
-        val permitEditNameAndEmail = !megaApi.isBusinessAccount || megaApi.isMasterBusinessAccount
+        val permitEditNameAndEmail =
+            !(megaApi.isBusinessAccount && myAccountInfo.accountType == BUSINESS) || megaApi.isMasterBusinessAccount
         binding.changeName.isVisible = permitEditNameAndEmail
         binding.changeNameSeparator.separator.isVisible = permitEditNameAndEmail
         binding.changeEmail.isVisible = permitEditNameAndEmail

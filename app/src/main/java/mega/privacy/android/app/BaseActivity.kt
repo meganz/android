@@ -48,7 +48,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.LoginActivity
-import mega.privacy.android.app.main.LoginFragment
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.middlelayer.iab.BillingManager
@@ -82,6 +81,7 @@ import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
+import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.DISABLED_BUSINESS_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
@@ -214,7 +214,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * True if is a business account and is expired.
      */
     protected val isBusinessExpired: Boolean
-        get() = megaApi.isBusinessAccount && megaApi.businessStatus == MegaApiJava.BUSINESS_STATUS_EXPIRED
+        get() = megaApi.isBusinessAccount &&
+                myAccountInfo.accountType == BUSINESS &&
+                megaApi.businessStatus == MegaApiJava.BUSINESS_STATUS_EXPIRED
 
     /**
      * Get snackbar instance
