@@ -63,14 +63,8 @@ pipeline {
                 if (hasGitLabMergeRequest()) {
                     String link = uploadFileToGitLab(CONSOLE_LOG_FILE)
 
-                    def message = ""
-                    if (triggeredByDeliverAppStore()) {
-                        message = releaseFailureMessage("<br/>") +
-                                "<br/>Build Log:\t${link}"
-                    } else if (triggeredByUploadSymbol()) {
-                        message = uploadSymbolFailureMessage("<br/>") +
-                                "<br/>Build Log:\t${link}"
-                    }
+                    def message = releaseFailureMessage("<br/>") +
+                            "<br/>Build Log:\t${link}"
                     sendToMR(message)
                 } else {
                     slackSend color: 'danger', message: releaseFailureMessage("\n")
@@ -86,31 +80,19 @@ pipeline {
                     downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
                     String link = uploadFileToGitLab(CONSOLE_LOG_FILE)
 
-                    if (triggeredByDeliverAppStore()) {
-                        def message = releaseSuccessMessage("<br/>") +
+                    def message = releaseSuccessMessage("<br/>") +
                                 "<br/>Build Log:\t${link}"
                         sendToMR(message)
 
                         sendToMR(getBuildVersionInfo())
 
                         slackSend color: "good", message: releaseSuccessMessage("\n")
-                    } else if (triggeredByUploadSymbol()) {
-                        def message = uploadSymbolSuccessMessage("<br/>") +
-                                "<br/>Build Log:\t${link}"
-                        sendToMR(message)
-
-                        slackSend color: "good", message: uploadSymbolSuccessMessage("\n")
-                    }
-
                 }
             }
         }
     }
     stages {
         stage('Preparation') {
-            when {
-                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Preparation'
@@ -132,9 +114,6 @@ pipeline {
             }
         }
         stage('Fetch SDK Submodules') {
-            when {
-                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Fetch SDK Submodules'
@@ -161,9 +140,6 @@ pipeline {
             }
         }
         stage('Select SDK Version') {
-            when {
-                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Select SDK Version'
@@ -178,9 +154,6 @@ pipeline {
         }
 
         stage('Download Dependency Lib for SDK') {
-            when {
-                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Download Dependency Lib for SDK'
@@ -211,9 +184,6 @@ pipeline {
             }
         }
         stage('Build SDK') {
-            when {
-                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Build SDK'
@@ -229,9 +199,6 @@ pipeline {
             }
         }
         stage('Build GMS APK') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Build GMS APK'
@@ -240,9 +207,6 @@ pipeline {
             }
         }
         stage('Sign GMS APK') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Sign GMS APK'
@@ -271,9 +235,6 @@ pipeline {
         }
 
         stage('Build HMS APK') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Build HMS APK'
@@ -283,9 +244,6 @@ pipeline {
         }
 
         stage('Sign HMS APK') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Sign HMS APK'
@@ -314,9 +272,6 @@ pipeline {
         }
 
         stage('Build GMS AAB') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Build GMS AAB'
@@ -326,9 +281,6 @@ pipeline {
         }
 
         stage('Sign GMS AAB') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Sign GMS AAB'
@@ -354,9 +306,6 @@ pipeline {
             }
         }
         stage('Build HMS AAB') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Build HMS AAB'
@@ -365,9 +314,6 @@ pipeline {
             }
         }
         stage('Sign HMS AAB') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Sign HMS AAB'
@@ -394,9 +340,6 @@ pipeline {
             }
         }
         stage('Upload Firebase Crashlytics symbol files') {
-            when {
-                expression { triggeredByUploadSymbol() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Upload Firebase Crashlytics symbol files'
@@ -408,9 +351,6 @@ pipeline {
             }
         }
         stage('Collect native symbol files') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Collect native symbol files'
@@ -439,9 +379,6 @@ pipeline {
             }
         }
         stage('Archive files') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Archive files'
@@ -490,9 +427,6 @@ pipeline {
             }
         }
         stage('Deploy to Google Play Internal') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
             steps {
                 script {
                     BUILD_STEP = 'Deploy to Google Play Internal'
@@ -544,19 +478,6 @@ private String releaseFailureMessage(String lineBreak) {
         message += "${lineBreak}Trigger Reason: MR comment (${gitlabTriggerPhrase})"
     }
     return message
-}
-
-/**
- * compose the success message of "upload_symbol" command, which might be used for Slack or GitLab MR.
- * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
- * while GitLab MR uses "<br/>".
- * @return The success message to be sent
- */
-private String uploadSymbolFailureMessage(String lineBreak) {
-    return ":x: Android Firebase Crashlytics symbol upload Failed!" +
-            "${lineBreak}Branch:\t${gitlabSourceBranch}" +
-            "${lineBreak}Author:\t${gitlabUserName}" +
-            "${lineBreak}Commit:\t${GIT_COMMIT}"
 }
 
 /**
@@ -647,22 +568,6 @@ private void sendToMR(String message) {
  */
 private String releaseSuccessMessage(String lineBreak) {
     return ":rocket: Android Release uploaded to Google Play Internal channel successfully!" +
-            "${lineBreak}Version:\t${readAppVersion1()}" +
-            "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
-            "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
-            "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
-            "${lineBreak}Author:\t${gitlabUserName}" +
-            "${lineBreak}Commit:\t${GIT_COMMIT}"
-}
-
-/**
- * compose the success message of "upload_symbol" command, which might be used for Slack or GitLab MR.
- * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
- * while GitLab MR uses "<br/>".
- * @return The success message to be sent
- */
-private String uploadSymbolSuccessMessage(String lineBreak) {
-    return ":rocket: Firebase Crashlytics symbol uploaded successfully!" +
             "${lineBreak}Version:\t${readAppVersion1()}" +
             "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
@@ -822,28 +727,6 @@ private String lastCommitMessage() {
  */
 private boolean isOnDevelopBranch() {
     return true //env.gitlabSourceBranch != null && env.gitlabSourceBranch == "develop"
-}
-
-/**
- * Check if build is triggered by 'deliver_appStore' command.
- * @return true if build is triggered by 'deliver_appStore' command. Otherwise return false.
- */
-private boolean triggeredByDeliverAppStore() {
-    return true
-//    return isOnDevelopBranch() &&
-//            env.gitlabTriggerPhrase != null &&
-//            env.gitlabTriggerPhrase == "deliver_internal"
-}
-
-/**
- * Check if build is triggered by 'upload_symbol' command.
- * @return true if build is triggered by 'upload_symbol' command. Otherwise return false.
- */
-private boolean triggeredByUploadSymbol() {
-    return true
-//    return isOnDevelopBranch() &&
-//            env.gitlabTriggerPhrase != null &&
-//            env.gitlabTriggerPhrase == "upload_symbol"
 }
 
 private void deleteAllFilesExcept(String folder, String except) {
