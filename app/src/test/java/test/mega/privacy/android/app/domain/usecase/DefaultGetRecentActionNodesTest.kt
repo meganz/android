@@ -6,8 +6,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultGetRecentActionNodes
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetThumbnail
 import org.junit.Before
 import org.junit.Test
@@ -24,7 +24,7 @@ class DefaultGetRecentActionNodesTest {
         onBlocking { invoke(any()) }.thenReturn(null)
     }
     private val nodes = (0L..5L).map { value ->
-        mock<FileNode> {
+        mock<TypedFileNode> {
             on { id }.thenReturn(NodeId(value))
         }
     }

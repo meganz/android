@@ -7,8 +7,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetThumbnail
 import nz.mega.sdk.MegaNodeList
@@ -25,12 +24,12 @@ class DefaultGetRecentActionNodes @Inject constructor(
 ) : GetRecentActionNodes {
 
     /**
-     * Transform a List of [Node] into a list of [NodeItem]
+     * Transform a List of [TypedFileNode] into a list of [NodeItem]
      *
      * @param nodes the nodes to convert
      * @return a list of node item resulting from the conversion
      */
-    override suspend fun invoke(nodes: List<Node>): List<NodeItem> =
+    override suspend fun invoke(nodes: List<TypedFileNode>): List<NodeItem> =
         withContext(ioDispatcher) {
             List(nodes.size) { nodes[it] }
                 .map { node ->
@@ -43,25 +42,21 @@ class DefaultGetRecentActionNodes @Inject constructor(
         }
 
     /**
-     * Create a single [NodeItem] from [Node]
+     * Create a single [NodeItem] from [TypedFileNode]
      *
      * @param node
      * @return the corresponding [NodeItem], null if an error occurred
      */
-    private suspend fun createNodeItem(node: Node): NodeItem? =
+    private suspend fun createNodeItem(node: TypedFileNode): NodeItem? =
         runCatching {
-            if (node is FileNode) {
-                val megaNode = getNodeByHandle.invoke(node.id.id)
-                NodeItem(
-                    node = megaNode,
-                    thumbnail = getThumbnail(node.id.id),
-                    index = -1,
-                    isVideo = node.type is VideoFileTypeInfo,
-                    modifiedDate = node.modificationTime.toString(),
-                )
-            } else {
-                return@runCatching null
-            }
+            val megaNode = getNodeByHandle.invoke(node.id.id)
+            NodeItem(
+                node = megaNode,
+                thumbnail = getThumbnail(node.id.id),
+                index = -1,
+                isVideo = node.type is VideoFileTypeInfo,
+                modifiedDate = node.modificationTime.toString(),
+            )
         }.onFailure {
             Timber.e(it)
         }.getOrNull()

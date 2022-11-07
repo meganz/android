@@ -8,7 +8,7 @@ import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.RecentActionBucketMapper
-import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -65,7 +65,7 @@ class DefaultRecentActionsRepositoryTest {
         val request = mock<MegaRequest> { on { recentActions }.thenReturn(bucketList) }
         val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
 
-        val recentActionBucket = RecentActionBucket(
+        val recentActionBucket = RecentActionBucketUnTyped(
             isMedia = true,
             isUpdate = true,
             timestamp = 0L,

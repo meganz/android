@@ -8,7 +8,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.RecentActionBucketMapper
-import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import nz.mega.sdk.MegaChatError
@@ -49,7 +49,7 @@ internal class DefaultRecentActionsRepository @Inject constructor(
         }.onFailure {
             Timber.e(it)
         }
-        return@withContext emptyList<RecentActionBucket>()
+        return@withContext emptyList<RecentActionBucketUnTyped>()
     }
 
     private suspend fun getMegaRecentAction() =

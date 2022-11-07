@@ -13,7 +13,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.app.domain.usecase.IsPendingShare
 import mega.privacy.android.app.presentation.recentactions.RecentActionsViewModel
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
@@ -22,9 +21,10 @@ import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
@@ -68,7 +68,7 @@ class RecentActionsViewModelTest {
     }
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
-    private val node: Node = mock {
+    private val node: TypedFileNode = mock {
         on { id }.thenReturn(NodeId(123))
     }
 
