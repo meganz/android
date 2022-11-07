@@ -177,7 +177,10 @@ class RecentActionsViewModel @Inject constructor(
         return recentItemList
     }
 
-    suspend fun getMegaNode(handle:Long) = getNodeByHandle(handle)
+    /**
+     * get a MegaNode by id
+     */
+    suspend fun getMegaNode(handle: Long) = getNodeByHandle(handle)
 
     /**
      * Retrieve the parent folder shares type of a node

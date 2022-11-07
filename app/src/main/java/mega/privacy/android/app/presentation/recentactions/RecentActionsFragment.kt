@@ -132,8 +132,7 @@ class RecentActionsFragment : Fragment() {
             if (item.bucket.nodes.size == 1) {
                 lifecycleScope.launch {
                     val node = item.bucket.nodes[0]
-                    val megaNode = viewModel.getMegaNode(node.id.id)
-                    megaNode?.let {
+                    viewModel.getMegaNode(node.id.id)?.let {
                         openFile(position, it)
                     }
                 }
