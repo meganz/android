@@ -5,6 +5,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import mega.privacy.android.app.sync.BackupState
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
@@ -73,6 +74,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
                     secondaryEnabled)
             )
         }
+        yield()
         list.joinAll()
         // Reset backup state as active.
         cameraUploadSyncManagerWrapper.updatePrimaryFolderBackupState(BackupState.ACTIVE)
