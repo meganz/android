@@ -62,6 +62,8 @@ import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.grey_alpha_012
 import mega.privacy.android.presentation.theme.grey_alpha_033
 import mega.privacy.android.presentation.theme.grey_alpha_054
+import mega.privacy.android.presentation.theme.red_300
+import mega.privacy.android.presentation.theme.red_600
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_012
 import mega.privacy.android.presentation.theme.white_alpha_054
@@ -72,6 +74,8 @@ fun ScheduledMeetingInfoView(
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
     onEditClicked: () -> Unit,
     onAddParticipantsClicked: () -> Unit,
+    onSeeMoreClicked: () -> Unit,
+    onLeaveGroupClicked: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -81,7 +85,7 @@ fun ScheduledMeetingInfoView(
         scaffoldState = scaffoldState,
         topBar = {
             ScheduledMeetingInfoAppBar(
-                uiState = state,
+                state = state,
                 onEditClicked = onEditClicked,
                 onAddParticipantsClicked = onAddParticipantsClicked,
                 onBackPressed = onBackPressed,
@@ -105,31 +109,22 @@ fun ScheduledMeetingInfoView(
 
                 when {
                     contactsList.isNotEmpty() -> {
-                        item(key = "Participants") { ParticipantsHeader() }
+                        item(key = "Participants") { ParticipantsHeader(state = state) }
 
-                        /* val defaultAvatarContent = contactsList[0].getAvatarFirstLetter()
+                        item(key = "Add participants") {
+                            AddParticipantsButton(state = state,
+                                onAddParticipantsClicked = onAddParticipantsClicked)
+                        }
 
-                         header = defaultAvatarContent
+                        item(key = "See more participants") {
+                            SeeMoreParticipantsButton(onSeeMoreClicked = onSeeMoreClicked)
+                        }
 
-                         item(key = contactsList[0].handle.hashCode()) {
-                             HeaderItem(text = defaultAvatarContent)
-                         }*/
-                    }
-                }
-
-                /*contactsList.forEach { contact ->
-                    val defaultAvatarContent = contact.getAvatarFirstLetter()
-
-                    if (header != defaultAvatarContent) {
-                        header = defaultAvatarContent
-
-                        item(key = contact.handle.hashCode()) {
-                            HeaderItem(text = defaultAvatarContent)
+                        item(key = "Leave group") {
+                            LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
                         }
                     }
-
-                    item(key = contact.handle) { ContactItemView(contact) { onContactClicked(contact) } }
-                }*/
+                }
             }
         }
     }
@@ -137,7 +132,7 @@ fun ScheduledMeetingInfoView(
 
 @Composable
 fun ScheduledMeetingInfoAppBar(
-    uiState: ScheduledMeetingInfoState,
+    state: ScheduledMeetingInfoState,
     onEditClicked: () -> Unit,
     onAddParticipantsClicked: () -> Unit,
     onBackPressed: () -> Unit,
@@ -159,7 +154,7 @@ fun ScheduledMeetingInfoAppBar(
             }
         },
         actions = {
-            if (uiState.scheduledMeeting.isHost || uiState.scheduledMeeting.isAllowAddParticipants) {
+            if (state.scheduledMeeting.isHost || state.scheduledMeeting.isAllowAddParticipants) {
                 IconButton(onClick = { onAddParticipantsClicked() }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.add_participants),
@@ -169,7 +164,7 @@ fun ScheduledMeetingInfoAppBar(
                 }
             }
 
-            if (uiState.scheduledMeeting.isHost) {
+            if (state.scheduledMeeting.isHost) {
                 IconButton(onClick = { onEditClicked() }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_scheduled_meeting_edit),
@@ -313,7 +308,7 @@ fun SeveralParticipantsAvatar(
         Box(contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(28.dp)
-                .border(width = 2.dp, color = Color.White, shape = CircleShape)
+                .border(width = 1.dp, color = Color.White, shape = CircleShape)
                 .clip(CircleShape)
                 .align(Alignment.TopStart)
                 .background(color = Color(firstUser.avatarColor),
@@ -330,13 +325,79 @@ fun SeveralParticipantsAvatar(
 }
 
 @Composable
-private fun ParticipantsHeader() {
+private fun ParticipantsHeader(state: ScheduledMeetingInfoState) {
     Text(modifier = Modifier.padding(start = 16.dp,
-        top = 16.dp,
+        top = 17.dp,
         end = 16.dp,
-        bottom = 8.dp),
-        text = stringResource(id = R.string.participants_chat_label),
-        style = MaterialTheme.typography.body2)
+        bottom = 24.dp),
+        text = stringResource(id = R.string.participants_number, state.contactItemList.size),
+        style = MaterialTheme.typography.body2,
+        fontWeight = FontWeight.Medium,
+        color = if (MaterialTheme.colors.isLight) black else white)
+}
+
+@Composable
+private fun AddParticipantsButton(
+    state: ScheduledMeetingInfoState,
+    onAddParticipantsClicked: () -> Unit,
+) {
+    if (state.scheduledMeeting.isHost || state.scheduledMeeting.isAllowAddParticipants) {
+        Row(modifier = Modifier
+            .padding(bottom = 18.dp)
+            .clickable { onAddParticipantsClicked() }
+            .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically) {
+            Icon(modifier = Modifier.padding(start = 24.dp, end = 24.dp),
+                imageVector = ImageVector.vectorResource(id = R.drawable.add_participants),
+                contentDescription = "Add participants Icon",
+                tint = MaterialTheme.colors.secondary)
+
+            Text(modifier = Modifier.padding(end = 16.dp),
+                style = MaterialTheme.typography.button,
+                text = stringResource(id = R.string.add_participants_menu_item),
+                color = MaterialTheme.colors.secondary)
+        }
+        divider(withStartPadding = true)
+    }
+}
+
+@Composable
+private fun SeeMoreParticipantsButton(
+    onSeeMoreClicked: () -> Unit,
+) {
+    Row(modifier = Modifier
+        .padding(top = 16.dp, bottom = 24.dp)
+        .clickable { onSeeMoreClicked() }
+        .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically) {
+        Icon(modifier = Modifier.padding(start = 24.dp, end = 24.dp),
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_chevron_down),
+            contentDescription = "See more Icon",
+            tint = MaterialTheme.colors.secondary)
+
+        Text(modifier = Modifier.padding(end = 16.dp),
+            style = MaterialTheme.typography.button,
+            text = stringResource(id = R.string.add_participants_menu_item),
+            color = MaterialTheme.colors.secondary)
+    }
+}
+
+@Composable
+private fun LeaveGroupButton(
+    onLeaveGroupClicked: () -> Unit,
+) {
+    divider(withStartPadding = false)
+    Row(modifier = Modifier
+        .clickable { onLeaveGroupClicked() }
+        .padding(top = 36.dp, bottom = 18.dp)
+        .fillMaxWidth()
+        .wrapContentSize(Alignment.Center),
+        verticalAlignment = Alignment.CenterVertically) {
+        Text(textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.button,
+            text = stringResource(id = R.string.title_properties_chat_leave_chat),
+            color = if (MaterialTheme.colors.isLight) red_600 else red_300)
+    }
 }
 
 @Composable
@@ -422,21 +483,6 @@ fun divider(withStartPadding: Boolean) {
 }
 
 @Composable
-private fun InviteContactsButton(onInviteContactsClicked: () -> Unit) {
-    Row(modifier = Modifier
-        .clickable { onInviteContactsClicked() }
-        .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically) {
-        Icon(modifier = Modifier.padding(horizontal = 26.dp, vertical = 18.dp),
-            painter = painterResource(id = R.drawable.ic_invite_contacts),
-            contentDescription = stringResource(id = R.string.invite_contacts) + "icon",
-            tint = MaterialTheme.colors.secondary)
-
-        ActionText(actionText = R.string.invite_contacts)
-    }
-}
-
-@Composable
 private fun ActionOption(
     action: ScheduledMeetingInfoAction,
     isEnabled: Boolean,
@@ -509,9 +555,9 @@ fun PreviewActionButton() {
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkInviteContactsButton")
 @Composable
-fun PreviewInviteContactsButton() {
+fun PreviewAddParticipantsButton() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        InviteContactsButton(onInviteContactsClicked = {})
+        AddParticipantsButton(state = ScheduledMeetingInfoState(), onAddParticipantsClicked = {})
     }
 }
 
@@ -525,6 +571,8 @@ fun PreviewScheduledMeetingInfoView() {
             onButtonClicked = {},
             onEditClicked = {},
             onAddParticipantsClicked = {},
+            onSeeMoreClicked = {},
+            onLeaveGroupClicked = {},
             onBackPressed = {}
         )
     }

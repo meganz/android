@@ -83,8 +83,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             val contactList = getVisibleContacts()
             _state.update {
                 it.copy(
-                    contactItemList = contactList,
-                    emptyViewVisible = contactList.isEmpty(),
+                    contactItemList = contactList
                 )
             }
             getContactsData(contactList)
@@ -167,6 +166,18 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         } else {
             _state.update { it.copy(error = R.string.check_internet_connection_error) }
         }
+    }
+
+    /**
+     * See more participants in the list.
+     */
+    fun onSeeMoreTap() {
+    }
+
+    /**
+     * Leave group chat.
+     */
+    fun onLeaveGroupTap() {
     }
 
     /**

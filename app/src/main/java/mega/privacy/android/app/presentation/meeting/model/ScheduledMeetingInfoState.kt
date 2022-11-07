@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property buttons                                    List of available action buttons.
  * @property scheduledMeeting                           Current scheduled meeting item.
  * @property contactItemList                            List of [ContactItem].
- * @property emptyViewVisible                           True if the empty view is visible, false otherwise.
+ * @property seeMoreVisible                             True if see more option is visible, false otherwise.
  * @property enabledMeetingLinkOption                   True if is enabled the meeting link option, false otherwise.
  * @property enabledChatNotificationsOption             True if is enabled the chat notifications option, false otherwise.
  * @property enabledAllowNonHostAddParticipantsOption   True if is enabled the allow non-host participants option, false otherwise.
@@ -20,7 +20,7 @@ data class ScheduledMeetingInfoState(
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
     val scheduledMeeting: ScheduledMeetingItem = ScheduledMeetingItem(),
     val contactItemList: List<ContactItem> = emptyList(),
-    val emptyViewVisible: Boolean = true,
+    val seeMoreVisible: Boolean = true,
     val enabledMeetingLinkOption: Boolean = true,
     val enabledChatNotificationsOption: Boolean = true,
     val enabledAllowNonHostAddParticipantsOption: Boolean = true,
