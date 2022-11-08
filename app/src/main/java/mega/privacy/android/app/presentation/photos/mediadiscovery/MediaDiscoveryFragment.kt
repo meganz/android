@@ -61,6 +61,7 @@ class MediaDiscoveryFragment : Fragment() {
     lateinit var getThemeMode: GetThemeMode
     internal lateinit var managerActivity: ManagerActivity
     private var menu: Menu? = null
+    lateinit var lazyGridState: LazyGridState
 
     // Action mode
     private var actionMode: ActionMode? = null
@@ -151,6 +152,18 @@ class MediaDiscoveryFragment : Fragment() {
     ) {
         val uiState by viewModel.state.collectAsStateWithLifecycle()
 
+        lazyGridState =
+            rememberSaveable(
+                uiState.scrollStartIndex,
+                uiState.scrollStartOffset,
+                saver = LazyGridState.Saver,
+            ) {
+                LazyGridState(
+                    uiState.scrollStartIndex,
+                    uiState.scrollStartOffset,
+                )
+            }
+
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomEnd,
@@ -164,7 +177,7 @@ class MediaDiscoveryFragment : Fragment() {
                     TimeBarTab.Days -> uiState.daysCardList
                     else -> uiState.daysCardList
                 }
-                CardListView(dateCards = dateCards, uiState = uiState)
+                CardListView(dateCards = dateCards)
             }
 
             if (uiState.selectedPhotoIds.isEmpty()) {
@@ -176,27 +189,18 @@ class MediaDiscoveryFragment : Fragment() {
     @Composable
     fun CardListView(
         dateCards: List<DateCard>,
-        uiState: MediaDiscoveryViewState,
     ) = CardListView(
         dateCards = dateCards,
         photoDownload = photosViewModel::downloadPhoto,
         onCardClick = mediaDiscoveryViewModel::onCardClick,
-        state = rememberSaveable(
-            uiState.scrollStartIndex,
-            uiState.scrollStartOffset,
-            saver = LazyGridState.Saver
-        ) {
-            LazyGridState(
-                uiState.scrollStartIndex,
-                uiState.scrollStartOffset
-            )
-        }
+        state = lazyGridState,
     )
 
     @Composable
     fun PhotosGridView(uiState: MediaDiscoveryViewState) = PhotosGridView(
         currentZoomLevel = uiState.currentZoomLevel,
         photoDownland = photosViewModel::downloadPhoto,
+        lazyGridState = lazyGridState,
         onClick = this::onClick,
         onLongPress = this::onLongPress,
         selectedPhotoIds = mediaDiscoveryViewModel.state.value.selectedPhotoIds,

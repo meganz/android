@@ -153,9 +153,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     }
 
     fun onTimeBarTabSelected(timeBarTab: TimeBarTab) {
-        _state.update {
-            it.copy(selectedTimeBarTab = timeBarTab)
-        }
+        updateSelectedTimeBarState(selectedTimeBarTab = timeBarTab)
     }
 
     fun onCardClick(dateCard: DateCard) {
@@ -173,11 +171,13 @@ class MediaDiscoveryViewModel @Inject constructor(
                     })
             }
             is DateCard.DaysCard -> {
+                val photosList = _state.value.uiPhotoList
+                val photo = photosList.find {
+                    it.key == dateCard.photo.id.toString()
+                }
                 updateSelectedTimeBarState(
                     TimeBarTab.All,
-                    _state.value.uiPhotoList.indexOfFirst {
-                        it.key == dateCard.photo.id.toString()
-                    }
+                    photosList.indexOf(photo),
                 )
             }
         }
