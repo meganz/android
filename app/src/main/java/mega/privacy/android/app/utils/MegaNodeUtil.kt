@@ -1226,7 +1226,7 @@ object MegaNodeUtil {
 
             val inCloudDrive = topAncestor.handle == megaApi.rootNode.handle
                     || topAncestor.handle == megaApi.rubbishNode.handle
-                    || topAncestor.handle == megaApi.inboxNode.handle
+            val inBackups = topAncestor.handle == megaApi.inboxNode.handle
 
             val location = when {
                 fromIncomingShare -> {
@@ -1246,6 +1246,19 @@ object MegaNodeUtil {
                     if (topAncestor.handle == parent.handle) {
                         getTranslatedNameForParentNode(megaApi, topAncestor)
                     } else {
+                        getString(
+                            R.string.location_label, parent.name,
+                            getTranslatedNameForParentNode(megaApi, topAncestor)
+                        )
+                    }
+                }
+                inBackups -> {
+                    if (node.parentHandle == myBackupHandle) {
+                        // If the Node's parent handle is the same with the My Backups handle,
+                        // only display the name of the Root Node
+                        getTranslatedNameForParentNode(megaApi, topAncestor)
+                    } else {
+                        // Otherwise, include the names of both the Parent and Root Nodes
                         getString(
                             R.string.location_label, parent.name,
                             getTranslatedNameForParentNode(megaApi, topAncestor)

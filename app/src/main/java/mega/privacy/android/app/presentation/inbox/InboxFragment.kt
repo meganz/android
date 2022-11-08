@@ -25,11 +25,15 @@ import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -57,7 +61,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNodes
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -80,14 +83,7 @@ class InboxFragment : RotatableFragment() {
     lateinit var megaApi: MegaApiAndroid
 
     /**
-     * SortOrderIntMapper
-     */
-    @Inject
-    lateinit var sortOrderIntMapper: SortOrderIntMapper
-
-    /**
-     * [Boolean] referenced from [ManagerActivity]
-     *
+     * [Boolean] value referenced from [ManagerActivity]
      *
      * If "true", the contents are displayed in a List View-like manner
      * If "false", the contents are displayed in a Grid View-like manner
@@ -96,23 +92,13 @@ class InboxFragment : RotatableFragment() {
         get() = (requireActivity() as ManagerActivity).isList
 
     /**
-     * [Long] referenced from [ManagerActivity] that returns the Parent Handle
-     * of the Inbox Node
+     * Retrieves the UI state from [InboxViewModel]
+     *
+     * @return the UI State
      */
-    private val parentHandleInbox: Long
-        get() = (requireActivity() as ManagerActivity).parentHandleInbox
+    private fun state() = viewModel.state.value
 
-    /**
-     * Returns the number of items found in [MegaNodeAdapter]
-     */
-    val itemCount: Int
-        get() = adapter?.itemCount ?: 0
-
-    /**
-     * [RecyclerView] of this Fragment, which has a reference to [ManagerActivity]
-     */
-    var recyclerView: RecyclerView? = null
-
+    private var recyclerView: RecyclerView? = null
     private var linearLayoutManager: LinearLayoutManager? = null
     private var gridLayoutManager: CustomizedGridLayoutManager? = null
     private var emptyFolderImageView: ImageView? = null
@@ -121,8 +107,6 @@ class InboxFragment : RotatableFragment() {
     private var emptyFolderContentGroup: Group? = null
 
     private var adapter: MegaNodeAdapter? = null
-    private var inboxNode: MegaNode? = null
-    private var nodes: ArrayList<MegaNode>? = null
     private var lastPositionStack: Stack<Int>? = null
     private var actionMode: ActionMode? = null
 
@@ -164,31 +148,10 @@ class InboxFragment : RotatableFragment() {
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
             EventObserver { showSortByPanel() })
 
-        viewModel.updateNodes.observe(viewLifecycleOwner,
-            EventObserver {
-                hideMultipleSelect()
-                refresh()
-            }
-        )
-
         val display = requireActivity().windowManager.defaultDisplay
         val outMetrics = DisplayMetrics()
         display.getMetrics(outMetrics)
-        if (parentHandleInbox == -1L || parentHandleInbox == megaApi.inboxNode.handle) {
-            Timber.w("Parent Handle == -1")
-            if (megaApi.inboxNode != null) {
-                Timber.d("InboxNode != null")
-                inboxNode = megaApi.inboxNode
-                nodes = megaApi.getChildren(inboxNode, sortOrderIntMapper(viewModel.getOrder()))
-            }
-        } else {
-            Timber.d("Parent Handle: %d", parentHandleInbox)
-            val parentNode = megaApi.getNodeByHandle(parentHandleInbox)
-            if (parentNode != null) {
-                logParentNodeHandle(parentNode)
-                nodes = megaApi.getChildren(parentNode, sortOrderIntMapper(viewModel.getOrder()))
-            }
-        }
+
         (requireActivity() as ManagerActivity).invalidateOptionsMenu()
         (requireActivity() as ManagerActivity).setToolbarTitle()
         return if (isList) {
@@ -222,20 +185,19 @@ class InboxFragment : RotatableFragment() {
             if (adapter == null) {
                 adapter = MegaNodeAdapter(requireActivity(),
                     this,
-                    nodes,
-                    parentHandleInbox,
+                    emptyList(),
+                    state().currentParentNodeId.id,
                     recyclerView,
                     Constants.INBOX_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
                     sortByHeaderViewModel)
             } else {
-                adapter?.parentHandle = parentHandleInbox
                 adapter?.setListFragment(recyclerView)
                 adapter?.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
             }
             adapter?.isMultipleSelect = false
             recyclerView?.adapter = adapter
-            setNodes(nodes)
+            observeUiState()
             v
         } else {
             Timber.d("InboxFragment is on a GridView")
@@ -260,15 +222,14 @@ class InboxFragment : RotatableFragment() {
             if (adapter == null) {
                 adapter = MegaNodeAdapter(requireActivity(),
                     this,
-                    nodes,
-                    parentHandleInbox,
+                    emptyList(),
+                    state().currentParentNodeId.id,
                     recyclerView,
                     Constants.INBOX_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
                     sortByHeaderViewModel)
             } else {
                 adapter?.let {
-                    it.parentHandle = parentHandleInbox
                     it.setListFragment(recyclerView)
                     it.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
                 }
@@ -278,8 +239,7 @@ class InboxFragment : RotatableFragment() {
                 adapter?.getSpanSizeLookup(it.spanCount)
             }
             recyclerView?.adapter = adapter
-            setNodes(nodes)
-            setContent()
+            observeUiState()
             v
         }
     }
@@ -420,7 +380,7 @@ class InboxFragment : RotatableFragment() {
             val copy = menu.findItem(R.id.cab_menu_copy)
 
             if (selectedNodes.isNotEmpty()) {
-                selectAll.isVisible = selectedNodes.size != itemCount
+                selectAll.isVisible = selectedNodes.size != getNodeCount()
                 unselectAll.title = getString(R.string.action_unselect_all)
                 unselectAll.isVisible = true
                 showDownload = areAllNotTakenDown
@@ -442,15 +402,52 @@ class InboxFragment : RotatableFragment() {
     }
 
     /**
-     * Logs the Parent Node Handle
-     *
-     * @param parentNode The Parent Node
+     * Observes changes to the UI State from [InboxViewModel]
      */
-    private fun logParentNodeHandle(parentNode: MegaNode) =
-        Timber.d("Parent Node Handle: %s", parentNode.handle)
+    private fun observeUiState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    // Instruct the Adapter to update the list of Nodes being displayed
+                    Timber.d("Node Count from ViewModel is ${it.nodes.size}")
+                    setNodes(it.nodes)
+
+                    // Whenever a Node Update occurs, instruct the Fragment to hide the Multiple
+                    // Item selection and instruct the ViewModel that it has been handled
+                    if (it.hideMultipleItemSelection) {
+                        viewModel.hideMultipleItemSelectionHandled()
+                        hideMultipleSelect()
+                    }
+
+                    // If the user wants to exit the Inbox screen, instruct the ViewModel that
+                    // it has been handled, and execute the behavior
+                    if (it.shouldExitInbox) {
+                        viewModel.exitInboxHandled()
+                        (requireActivity() as ManagerActivity).exitInboxScreen()
+                    }
+
+                    // Whenever the User performs a Back Press navigation, execute the behavior and
+                    // instruct the ViewModel that it has been handled
+                    if (it.triggerBackPress) {
+                        viewModel.triggerBackPressHandled()
+                        onBackPressedHandled()
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Invalidates [recyclerView]
+     *
+     * This function is used by [ManagerActivity.refreshInboxList]
+     */
+    fun invalidateRecyclerView() = recyclerView?.invalidate()
 
     /**
      * Selects all items from [MegaNodeAdapter]
+     *
+     * This function is also used by [ManagerActivity.onOptionsItemSelected]
      */
     fun selectAll() {
         adapter?.let {
@@ -475,6 +472,8 @@ class InboxFragment : RotatableFragment() {
 
     /**
      * Checks the Scrolling Behavior
+     *
+     * This function is also used by [ManagerActivity.checkScrollElevation]
      */
     fun checkScroll() {
         recyclerView?.let {
@@ -489,25 +488,11 @@ class InboxFragment : RotatableFragment() {
     }
 
     /**
-     * Refresh the contents of the Fragment
+     * Refreshes the list of Nodes displayed
+     *
+     * This function is used by [ManagerActivity.refreshInboxFragment] and [ManagerActivity.onNodesInboxUpdate]
      */
-    fun refresh() {
-        Timber.d("refresh()")
-
-        inboxNode?.let {
-            if (parentHandleInbox == -1L || parentHandleInbox == it.handle) {
-                nodes = megaApi.getChildren(it, sortOrderIntMapper(viewModel.getOrder()))
-            } else {
-                val parentNode = megaApi.getNodeByHandle(parentHandleInbox)
-                if (parentNode != null) {
-                    logParentNodeHandle(parentNode)
-                    nodes =
-                        megaApi.getChildren(parentNode, sortOrderIntMapper(viewModel.getOrder()))
-                }
-            }
-        }
-        setNodes(nodes)
-    }
+    fun refreshNodes() = viewModel.refreshInboxNodes()
 
     /**
      * Opens the file
@@ -706,51 +691,72 @@ class InboxFragment : RotatableFragment() {
     }
 
     /**
-     * Handles the Item Click behavior
+     * When a Node from [MegaNodeAdapter] is selected, handle the behavior here
+     *
+     * @param nodePosition The selected Node position
      */
-    fun itemClick(position: Int) {
+    fun onNodeSelected(nodePosition: Int) {
         Timber.d("itemClick()")
+        // Perform the following actions when Multi Select is enabled
         if (adapter?.isMultipleSelect == true) {
             Timber.d("Multi Select is Enabled")
-            adapter?.toggleSelection(position)
+            adapter?.toggleSelection(nodePosition)
             val selectedNodes = adapter?.selectedNodes ?: emptyList()
             if (selectedNodes.isNotEmpty()) updateActionModeTitle()
         } else {
-            if (nodes?.get(position)?.isFolder == true) {
-                var lastFirstVisiblePosition: Int
-                if (isList) {
-                    lastFirstVisiblePosition =
-                        linearLayoutManager?.findFirstCompletelyVisibleItemPosition()
-                            ?: RecyclerView.NO_POSITION
-                } else {
-                    lastFirstVisiblePosition =
-                        (recyclerView as NewGridRecyclerView?)?.findFirstCompletelyVisibleItemPosition()
-                            ?: RecyclerView.NO_POSITION
-                    if (lastFirstVisiblePosition == -1) {
-                        Timber.d("Completely -1 then find just visible position")
-                        lastFirstVisiblePosition =
-                            (recyclerView as NewGridRecyclerView?)?.findFirstVisibleItemPosition()
-                                ?: RecyclerView.NO_POSITION
-                    }
-                }
-                Timber.d("Push to stack %d position", lastFirstVisiblePosition)
-                lastPositionStack?.push(lastFirstVisiblePosition)
-                (requireActivity() as ManagerActivity).invalidateOptionsMenu()
-                (requireActivity() as ManagerActivity).setToolbarTitle()
+            adapter?.getItem(nodePosition)?.let { selectedNode ->
+                // When the selected Node is a Folder, perform the following actions
+                if (selectedNode.isFolder) {
+                    // Update the last position stack
+                    pushLastPositionStack()
 
-                nodes?.let {
-                    (requireActivity() as ManagerActivity).parentHandleInbox = it[position].handle
+                    // Update to the new current Parent ID in the ViewModel and update the list of Inbox Nodes
+                    with(viewModel) {
+                        updateCurrentParentNodeId(selectedNode.handle)
+                        refreshInboxNodes()
+                    }
+                    // Notify ManagerActivity on the updated current Parent ID. Invalidate the Options
+                    // Menu and set the new Toolbar Title
+                    with(requireActivity() as ManagerActivity) {
+                        parentHandleInbox = selectedNode.handle
+                        invalidateOptionsMenu()
+                        setToolbarTitle()
+                    }
+
+                    // Update the RecyclerView scrolling behavior
+                    recyclerView?.scrollToPosition(0)
+                    checkScroll()
+                } else {
+                    // For non-Folder typed Nodes, simply open the file
+                    openFile(selectedNode, nodePosition)
                 }
-                nodes = megaApi.getChildren((nodes ?: return)[position],
-                    sortOrderIntMapper(viewModel.getOrder()))
-                adapter?.setNodes(nodes)
-                setContent()
-                recyclerView?.scrollToPosition(0)
-                checkScroll()
-            } else {
-                openFile((nodes ?: return)[position], position)
             }
         }
+    }
+
+    /**
+     * When a Folder-type Node is selected, push the last position stack in order
+     * to add one level in the Node navigation hierarchy
+     */
+    private fun pushLastPositionStack() {
+        var lastFirstVisiblePosition: Int
+        if (isList) {
+            lastFirstVisiblePosition =
+                linearLayoutManager?.findFirstCompletelyVisibleItemPosition()
+                    ?: RecyclerView.NO_POSITION
+        } else {
+            lastFirstVisiblePosition =
+                (recyclerView as NewGridRecyclerView?)?.findFirstCompletelyVisibleItemPosition()
+                    ?: RecyclerView.NO_POSITION
+            if (lastFirstVisiblePosition == -1) {
+                Timber.d("Completely -1 then find just visible position")
+                lastFirstVisiblePosition =
+                    (recyclerView as NewGridRecyclerView?)?.findFirstVisibleItemPosition()
+                        ?: RecyclerView.NO_POSITION
+            }
+        }
+        Timber.d("Push to stack %d position", lastFirstVisiblePosition)
+        lastPositionStack?.push(lastFirstVisiblePosition)
     }
 
     /**
@@ -761,7 +767,9 @@ class InboxFragment : RotatableFragment() {
     }
 
     /**
-     * Disable selection
+     * Hides the Multiple Selection option
+     *
+     * This function is also used by [ManagerActivity.onNodesInboxUpdate] and [MegaNodeAdapter.hideMultipleSelect]
      */
     fun hideMultipleSelect() {
         Timber.d("hideMultipleSelect()")
@@ -770,68 +778,98 @@ class InboxFragment : RotatableFragment() {
     }
 
     /**
-     * onBackPressed behavior
+     * onBackPressed behavior that has reference to [ManagerActivity]
+     *
+     * @return an Integer to be used by [ManagerActivity]
+     *
+     * Returning 0 means that [ManagerActivity] will go back to a previous Dashboard item. Otherwise,
+     * [ManagerActivity] will not do anything
      */
     fun onBackPressed(): Int {
         Timber.d("onBackPressed()")
+
         if (adapter == null) {
             return 0
         }
-        return if ((requireActivity() as ManagerActivity).comesFromNotifications &&
-            (requireActivity() as ManagerActivity).comesFromNotificationHandle == parentHandleInbox
-        ) {
-            (requireActivity() as ManagerActivity).comesFromNotifications = false
-            (requireActivity() as ManagerActivity).comesFromNotificationHandle = -1
-            (requireActivity() as ManagerActivity).selectDrawerItem(DrawerItem.NOTIFICATIONS)
-            (requireActivity() as ManagerActivity).parentHandleInbox =
-                (requireActivity() as ManagerActivity).comesFromNotificationHandleSaved
-            (requireActivity() as ManagerActivity).comesFromNotificationHandleSaved = -1
-            2
-        } else {
-            val parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandleInbox))
-            if (parentNode != null) {
-                logParentNodeHandle(parentNode)
-                (requireActivity() as ManagerActivity).invalidateOptionsMenu()
-                (requireActivity() as ManagerActivity).parentHandleInbox = parentNode.handle
-                (requireActivity() as ManagerActivity).setToolbarTitle()
-                nodes = megaApi.getChildren(parentNode, sortOrderIntMapper(viewModel.getOrder()))
-                setNodes(nodes)
-
-                var lastVisiblePosition = 0
-                lastPositionStack?.let {
-                    if (!it.empty()) {
-                        lastVisiblePosition = it.pop()
-                        Timber.d("Pop of the stack %d position", lastVisiblePosition)
-                    }
-                }
-                Timber.d("Scroll to %d position", lastVisiblePosition)
-                if (lastVisiblePosition >= 0) {
-                    if (isList) {
-                        linearLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                    } else {
-                        gridLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                    }
-                }
-                2
+        with(requireActivity() as ManagerActivity) {
+            // Handle behavior if the Inbox is accessed through a Notification
+            if (comesFromNotifications && comesFromNotificationHandle == state().currentParentNodeId.id) {
+                comesFromNotifications = false
+                comesFromNotificationHandle = -1
+                selectDrawerItem(DrawerItem.NOTIFICATIONS)
+                parentHandleInbox = comesFromNotificationHandleSaved
+                comesFromNotificationHandleSaved = -1
+                return 2
             } else {
-                0
+                // Otherwise, instruct the ViewModel to handle the Back Press
+                this@InboxFragment.viewModel.handleBackPress()
+                return 2
             }
         }
     }
 
     /**
-     * Sets the content to [MegaNodeAdapter]
-     *
-     * @param nodes The content to be displayed
+     * Executes certain behavior when a Back Press is handled
      */
-    fun setNodes(nodes: ArrayList<MegaNode>?) {
-        Timber.d("setNodes()")
-        this.nodes = nodes
+    private fun onBackPressedHandled() {
+        // Notify ManagerActivity to update the current Parent Node ID and to set the
+        // new Toolbar Title
+        with(requireActivity() as ManagerActivity) {
+            invalidateOptionsMenu()
+            parentHandleInbox = state().currentParentNodeId.id
+            setToolbarTitle()
+        }
+
+        // Pop the last position stack
+        popLastPositionStack()
+    }
+
+    /**
+     * When a Back Press is handled, pop the last position stack in order to subtract one level
+     * in the Node navigation hierarchy
+     */
+    private fun popLastPositionStack() {
+        var lastVisiblePosition = 0
+
+        lastPositionStack?.let {
+            if (it.isNotEmpty()) {
+                lastVisiblePosition = it.pop()
+                Timber.d("Moved to new position $lastVisiblePosition after popping the stack")
+            }
+        }
+
+        Timber.d("Scroll to position $lastVisiblePosition")
+        if (lastVisiblePosition >= 0) {
+            if (isList) {
+                linearLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+            } else {
+                gridLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+            }
+        }
+    }
+
+    /**
+     * Sets the list of Nodes to [MegaNodeAdapter]
+     *
+     * @param nodes The list of Nodes to display
+     */
+    private fun setNodes(nodes: List<MegaNode>) {
+        Timber.d("Call setNodes() with Node Size ${nodes.size}")
         adapter?.let {
-            it.setNodes(nodes)
+            // The list must be converted into a MutableList, as MegaNodeAdapter is written in Java
+            it.setNodes(nodes.toMutableList())
             setContent()
         }
     }
+
+    /**
+     * Returns the total number of Nodes from [MegaNodeAdapter]
+     *
+     * This function is also used by [ManagerActivity.onCreateOptionsMenu]
+     *
+     * @return the total number or Nodes, or 0 if [MegaNodeAdapter] is null
+     */
+    fun getNodeCount(): Int = adapter?.itemCount ?: 0
 
     /**
      * Sets all content of the feature.
@@ -839,12 +877,12 @@ class InboxFragment : RotatableFragment() {
      * If no nodes are available, empty folder information will be displayed. Otherwise, it will
      * display all available nodes.
      */
-    fun setContent() {
+    private fun setContent() {
         Timber.d("setContent()")
-        if (itemCount == 0) {
+        if (getNodeCount() == 0) {
             recyclerView?.visibility = View.GONE
             emptyFolderContentGroup?.visibility = View.VISIBLE
-            if (megaApi.inboxNode.handle == parentHandleInbox || parentHandleInbox == -1L) {
+            if (viewModel.isCurrentlyOnBackupFolderLevel()) {
                 setEmptyFolderTextContent(getString(R.string.backups_empty_state_title),
                     getString(R.string.backups_empty_state_body))
                 emptyFolderImageView?.setImageResource(

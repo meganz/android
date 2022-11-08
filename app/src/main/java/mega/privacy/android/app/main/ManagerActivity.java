@@ -421,7 +421,6 @@ import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
-import mega.privacy.android.domain.entity.node.Node;
 import mega.privacy.android.domain.entity.transfer.TransferType;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import nz.mega.documentscanner.DocumentScannerActivity;
@@ -1006,7 +1005,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             if (intent.getBooleanExtra(IS_CLOUD_ORDER, true)) {
-                refreshCloudOrder(intent.getIntExtra(NEW_ORDER, ORDER_DEFAULT_ASC));
+                refreshCloudOrder();
             } else {
                 refreshOthersOrder();
             }
@@ -3858,7 +3857,8 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case INBOX: {
                 aB.setSubtitle(null);
-                if (viewModel.getState().getValue().getInboxParentHandle() == megaApi.getInboxNode().getHandle() || viewModel.getState().getValue().getInboxParentHandle() == -1) {
+                // Set the corresponding title and first navigation level ff the current Inbox Parent ID is equal to the My Backups Folder ID or -1
+                if (viewModel.getState().getValue().getInboxParentHandle() == MegaNodeUtil.myBackupHandle || viewModel.getState().getValue().getInboxParentHandle() == -1) {
                     aB.setTitle(getResources().getString(R.string.home_side_menu_backups_title));
                     viewModel.setIsFirstNavigationLevel(true);
                 } else {
@@ -5311,7 +5311,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 case INBOX:
                     moreMenuItem.setVisible(false);
 
-                    if (getInboxFragment() != null && inboxFragment.getItemCount() > 0) {
+                    if (getInboxFragment() != null && inboxFragment.getNodeCount() > 0) {
                         searchMenuItem.setVisible(true);
                     }
                     break;
@@ -5822,20 +5822,9 @@ public class ManagerActivity extends TransfersManagementActivity
     /**
      * Refreshes the contents of InboxFragment once a sorting method has been selected
      */
-    private void refreshInboxFragment(int order) {
+    private void refreshInboxFragment() {
         if (inboxFragment != null) {
-            MegaNode inboxParentNode;
-
-            if (viewModel.getState().getValue().getInboxParentHandle() == -1) {
-                inboxParentNode = megaApi.getInboxNode();
-            } else {
-                inboxParentNode = megaApi.getNodeByHandle(viewModel.getState().getValue().getInboxParentHandle());
-            }
-
-            if (inboxParentNode != null) {
-                inboxFragment.setNodes(megaApi.getChildren(inboxParentNode, order));
-                inboxFragment.getRecyclerView().invalidate();
-            }
+            inboxFragment.refreshNodes();
         }
     }
 
@@ -6070,6 +6059,13 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             updateHomepageFabPosition();
         }
+    }
+
+    /**
+     * Exit the Inbox Screen
+     */
+    public void exitInboxScreen() {
+        backToDrawerItem(bottomNavigationCurrentItem);
     }
 
     public void backToDrawerItem(int item) {
@@ -7648,7 +7644,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    public void refreshCloudOrder(int order) {
+    public void refreshCloudOrder() {
         // Refresh Cloud Fragment
         refreshCloudDrive();
 
@@ -7656,7 +7652,7 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshRubbishBin();
 
         // Refresh Inbox Fragment
-        refreshInboxFragment(order);
+        refreshInboxFragment();
 
         onNodesSharedUpdate();
 
@@ -9799,7 +9795,7 @@ public class ManagerActivity extends TransfersManagementActivity
         inboxFragment = (InboxFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
         if (inboxFragment != null) {
             inboxFragment.hideMultipleSelect();
-            inboxFragment.refresh();
+            inboxFragment.refreshNodes();
         }
     }
 
@@ -9826,7 +9822,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public void refreshInboxList() {
         inboxFragment = (InboxFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
         if (inboxFragment != null) {
-            inboxFragment.getRecyclerView().invalidate();
+            inboxFragment.invalidateRecyclerView();
         }
     }
 

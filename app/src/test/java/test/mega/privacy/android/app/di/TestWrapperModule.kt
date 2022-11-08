@@ -2,6 +2,9 @@ package test.mega.privacy.android.app.di
 
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.android.components.FragmentComponent
+import dagger.hilt.android.components.ServiceComponent
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.UtilWrapperModule
@@ -17,11 +20,12 @@ import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
+import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import org.mockito.kotlin.mock
 
 @Module
 @TestInstallIn(
-    components = [SingletonComponent::class],
+    components = [FragmentComponent::class, ViewModelComponent::class, SingletonComponent::class, ServiceComponent::class],
     replaces = [UtilWrapperModule::class]
 )
 object TestWrapperModule {
@@ -37,6 +41,7 @@ object TestWrapperModule {
     val fetchNodeWrapper = mock<FetchNodeWrapper>()
     val timeWrapper = mock<TimeWrapper>()
     val avatarWrapper = mock<AvatarWrapper>()
+    val monitorBackupFolder = mock<MonitorBackupFolder>()
 
     @Provides
     fun provideIsOnWifiWrapper(): IsOnWifiWrapper = isOnWifiWrapper
@@ -74,6 +79,9 @@ object TestWrapperModule {
 
     @Provides
     fun provideAvatarWrapper(): AvatarWrapper = avatarWrapper
+
+    @Provides
+    fun provideMonitorBackupFolder(): MonitorBackupFolder = monitorBackupFolder
 
     @Provides
     fun provideMegaNodeUtilWrapper(): MegaNodeUtilWrapper = mock()

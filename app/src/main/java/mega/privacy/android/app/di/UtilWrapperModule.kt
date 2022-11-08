@@ -10,6 +10,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.FragmentComponent
 import dagger.hilt.android.components.ServiceComponent
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
@@ -40,7 +41,10 @@ import mega.privacy.android.domain.usecase.MonitorBackupFolder
  * need to be removed during the refactoring process.
  */
 @Module
-@InstallIn(FragmentComponent::class, SingletonComponent::class, ServiceComponent::class)
+@InstallIn(FragmentComponent::class,
+    ViewModelComponent::class,
+    SingletonComponent::class,
+    ServiceComponent::class)
 abstract class UtilWrapperModule {
 
     /**
@@ -55,7 +59,7 @@ abstract class UtilWrapperModule {
     @Binds
     abstract fun bindMegaNodeUtilWrapper(implementation: MegaNodeUtilFacade): MegaNodeUtilWrapper
 
-    companion object{
+    companion object {
 
         @Provides
         fun provideIsOnWifiWrapper(): IsOnWifiWrapper {
