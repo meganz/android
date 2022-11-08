@@ -76,10 +76,10 @@ class DefaultAlbumRepositoryTest {
             )
         }
 
-        val testNewAlbum = underTest.createAlbum(testName)
+        val actualNewAlbum = underTest.createAlbum(testName)
 
-        assertEquals(testNewAlbum.id, userSet.id)
-        assertEquals(testNewAlbum.name, testName)
+        assertEquals(actualNewAlbum.id, userSet.id)
+        assertEquals(actualNewAlbum.name, testName)
     }
 
     @Test

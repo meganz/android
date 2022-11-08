@@ -26,19 +26,23 @@ internal class DefaultAlbumRepository @Inject constructor(
 ) : AlbumRepository {
 
     override suspend fun createAlbum(name: String): UserSet = withContext(ioDispatcher) {
-        val newSet = suspendCoroutine { continuation ->
+        suspendCoroutine { continuation ->
             megaApiGateway.createSet(
                 name,
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = { request, error ->
                         if (error.errorCode == MegaError.API_OK) {
                             val newSet = request.megaSet
-                            continuation.resumeWith(Result.success(userSetMapper(
-                                newSet.id(),
-                                newSet.name(),
-                                newSet.cover(),
-                                newSet.ts()
-                            )))
+                            continuation.resumeWith(
+                                Result.success(
+                                    userSetMapper(
+                                        newSet.id(),
+                                        newSet.name(),
+                                        newSet.cover(),
+                                        newSet.ts()
+                                    )
+                                )
+                            )
                         } else {
                             Timber.e("Error creating new album: ${error.errorString}")
                             continuation.failWithError(error)
@@ -47,7 +51,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                 )
             )
         }
-        newSet
     }
 
     override suspend fun getAllUserSets(): List<UserSet> = withContext(ioDispatcher) {

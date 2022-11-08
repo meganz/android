@@ -16,16 +16,14 @@ class DefaultCreateAlbum @Inject constructor(
 ) : CreateAlbum {
     override suspend fun invoke(name: String): Album.UserAlbum {
         val newUserSet = albumRepository.createAlbum(name)
-        val coverPhoto = if (newUserSet.cover == null) {
-            null
-        } else {
-            photosRepository.getPhotoFromNodeID(NodeId(newUserSet.cover!!))
+        val coverPhoto = newUserSet.cover?.let {
+            photosRepository.getPhotoFromNodeID(NodeId(it))
         }
         return Album.UserAlbum(
             id = AlbumId(newUserSet.id),
             title = newUserSet.name,
             cover = coverPhoto,
-            modificationTime = newUserSet.modificationTime
+            modificationTime = newUserSet.modificationTime,
         )
     }
 }

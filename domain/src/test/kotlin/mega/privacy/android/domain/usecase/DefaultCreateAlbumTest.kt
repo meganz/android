@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.PhotosRepository
@@ -10,7 +9,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
@@ -31,36 +29,23 @@ class DefaultCreateAlbumTest {
     }
 
     @Test
-    fun `test that a UserAlbum object is returned`() = runTest {
-        val userSet = createUserSet()
-
-        whenever(albumRepository.createAlbum(any())).thenReturn(
-            userSet
-        )
-
-        underTest(testName)
-
-        verify(albumRepository).createAlbum(testName)
-    }
-
-    @Test
     fun `test that the UserAlbum returned has the same name as the given argument`() = runTest {
-        val userSet = createUserSet(name = testName)
+        val expectedUserSet = createUserSet(name = testName)
 
         whenever(albumRepository.createAlbum(any())).thenReturn(
-            userSet
+            expectedUserSet
         )
 
-        val newAlbum = underTest(testName)
+        val actualNewAlbum = underTest(testName)
 
-        assertEquals(testName, newAlbum.title)
+        assertEquals(testName, actualNewAlbum.title)
     }
 
     private fun createUserSet(
         id: Long = 1L,
         name: String = "NewAlbum",
         cover: Long = 10L,
-        modifactionTime: Long = 2L,
+        modificationTime: Long = 2L,
     ): UserSet = object : UserSet {
         override val id: Long = id
 
@@ -68,6 +53,6 @@ class DefaultCreateAlbumTest {
 
         override val cover: Long = cover
 
-        override val modificationTime: Long = modifactionTime
+        override val modificationTime: Long = modificationTime
     }
 }
