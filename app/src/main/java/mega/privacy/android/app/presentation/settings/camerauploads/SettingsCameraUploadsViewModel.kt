@@ -4,13 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import javax.inject.Inject
@@ -25,6 +28,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
     private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
     private val restoreSecondaryTimestamps: RestoreSecondaryTimestamps,
+    private val monitorConnectivity: MonitorConnectivity,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -33,6 +37,18 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * State of Settings Camera Uploads
      */
     val state: StateFlow<SettingsCameraUploadsState> = _state.asStateFlow()
+
+    /**
+     * Monitor connectivity event
+     */
+    val monitorConnectivityEvent =
+        monitorConnectivity().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
+    /**
+     * Is connected
+     */
+    val isConnected: Boolean
+        get() = monitorConnectivity().value
 
     /**
      * Checks whether Camera Uploads can be enabled and handles the Status accordingly, as
@@ -85,7 +101,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * If the handle matches the previous secondary folder's handle, restore the time stamp from stamps
      * if not clean the sync record from previous primary folder
      */
-    fun restoreSecondaryTimestampsAndSyncRecordProcess(){
+    fun restoreSecondaryTimestampsAndSyncRecordProcess() {
         viewModelScope.launch {
             restoreSecondaryTimestamps()
         }
