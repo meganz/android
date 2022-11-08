@@ -244,7 +244,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.getFavouritesByConditions(order = it.first)
+            viewModel.onOrderChange(order = it.first)
         })
 
         sortByHeaderViewModel.listGridChangeEvent.observe(
