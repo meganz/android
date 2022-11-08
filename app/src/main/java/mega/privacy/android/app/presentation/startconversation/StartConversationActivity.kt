@@ -92,6 +92,7 @@ class StartConversationActivity : ComponentActivity() {
         }
 
         viewModel.setFromChat(intent.getBooleanExtra(FROM_CHAT, false))
+
         setContent { StartConversationView() }
     }
 

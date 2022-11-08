@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -30,6 +31,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,13 +65,11 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.presentation.theme.AndroidTheme
 import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.grey_alpha_012
-import mega.privacy.android.presentation.theme.grey_alpha_033
 import mega.privacy.android.presentation.theme.grey_alpha_054
 import mega.privacy.android.presentation.theme.red_300
 import mega.privacy.android.presentation.theme.red_600
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_012
-import mega.privacy.android.presentation.theme.white_alpha_033
 import mega.privacy.android.presentation.theme.white_alpha_054
 
 @Composable
@@ -79,9 +81,11 @@ fun ScheduledMeetingInfoView(
     onSeeMoreClicked: () -> Unit,
     onLeaveGroupClicked: () -> Unit,
     onParticipantClicked: (ContactItem) -> Unit,
+    onScrollChange: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
 ) {
     val listState = rememberLazyListState()
+    val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
@@ -92,7 +96,8 @@ fun ScheduledMeetingInfoView(
                 onEditClicked = onEditClicked,
                 onAddParticipantsClicked = onAddParticipantsClicked,
                 onBackPressed = onBackPressed,
-                titleId = R.string.general_info
+                titleId = R.string.general_info,
+                elevation = !firstItemVisible
             )
         }
     ) { paddingValues ->
@@ -156,6 +161,8 @@ fun ScheduledMeetingInfoView(
             }
         }
     }
+
+    onScrollChange(!firstItemVisible)
 }
 
 @Composable
@@ -165,6 +172,7 @@ private fun ScheduledMeetingInfoAppBar(
     onAddParticipantsClicked: () -> Unit,
     onBackPressed: () -> Unit,
     titleId: Int,
+    elevation: Boolean,
 ) {
     val iconColor = if (MaterialTheme.colors.isLight) Color.Black else Color.White
     TopAppBar(
@@ -202,7 +210,7 @@ private fun ScheduledMeetingInfoAppBar(
             }
         },
         backgroundColor = MaterialTheme.colors.surface,
-        elevation = 0.dp
+        elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp
     )
 }
 
@@ -230,7 +238,7 @@ private fun ScheduledMeetingTitleView(uiState: ScheduledMeetingInfoState) {
                 }
                 Text(text = uiState.scheduledMeeting.date,
                     style = MaterialTheme.typography.subtitle2,
-                    color = if (MaterialTheme.colors.isLight) grey_alpha_033 else white_alpha_033,
+                    color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis)
             }
@@ -483,7 +491,7 @@ private fun SeeMoreParticipantsButton(
 
             Text(modifier = Modifier.padding(end = 16.dp),
                 style = MaterialTheme.typography.button,
-                text = stringResource(id = R.string.add_participants_menu_item),
+                text = stringResource(id = R.string.meetings_scheduled_meeting_info_see_more_participants_label),
                 color = MaterialTheme.colors.secondary)
         }
     }
@@ -502,7 +510,7 @@ private fun LeaveGroupButton(
         verticalAlignment = Alignment.CenterVertically) {
         Text(textAlign = TextAlign.Center,
             style = MaterialTheme.typography.button,
-            text = stringResource(id = R.string.title_properties_chat_leave_chat),
+            text = stringResource(id = R.string.meetings_scheduled_meeting_info_leave_group_label),
             color = if (MaterialTheme.colors.isLight) red_600 else red_300)
     }
 }
@@ -608,7 +616,8 @@ fun PreviewScheduledMeetingInfoView() {
             onSeeMoreClicked = {},
             onLeaveGroupClicked = {},
             onParticipantClicked = {},
-            onBackPressed = {}
+            onBackPressed = {},
+            onScrollChange = {},
         )
     }
 }

@@ -29,7 +29,7 @@ data class ScheduledMeetingItem constructor(
     val id: Long = -1,
     val title: String = "Photos Sprint #1",
     val description: String = "description",
-    val date: String = "8 Aud 2022 · 10:00-11:00",
+    val date: String = "8 Aug 2022 · 10:00-11:00",
     val isHost: Boolean = true,
     val isAllowAddParticipants: Boolean = true,
     val firstUser: GroupChatParticipant? = GroupChatParticipant(

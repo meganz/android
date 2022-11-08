@@ -22,7 +22,6 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.presentation.theme.AndroidTheme
 import javax.inject.Inject
 
-
 /**
  * Activity which shows scheduled meeting info screen.
  *
@@ -72,8 +71,13 @@ class ScheduledMeetingInfoActivity : ComponentActivity() {
                 onLeaveGroupClicked = viewModel::onLeaveGroupTap,
                 onParticipantClicked = viewModel::onParticipantTap,
                 onBackPressed = { finish() },
+                onScrollChange = { scrolled -> onScrollChange(scrolled, isDark) },
             )
         }
+    }
+
+    private fun onScrollChange(scrolled: Boolean, isDark: Boolean) {
+
     }
 
     private fun onActionTap(action: ScheduledMeetingInfoAction) {
