@@ -7,13 +7,12 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.security.PasscodeCheck
@@ -71,16 +70,8 @@ class ScheduledMeetingInfoActivity : ComponentActivity() {
                 onLeaveGroupClicked = viewModel::onLeaveGroupTap,
                 onParticipantClicked = viewModel::onParticipantTap,
                 onBackPressed = { finish() },
-                onScrollChange = { scrolled -> onScrollChange(scrolled, isDark) },
+                onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
             )
-        }
-    }
-
-    private fun onScrollChange(scrolled: Boolean, isDark: Boolean) {
-        window?.statusBarColor = when {
-            scrolled && isDark -> ContextCompat.getColor(this, R.color.action_mode_background)
-            isDark -> ContextCompat.getColor(this, R.color.dark_grey)
-            else -> ContextCompat.getColor(this, android.R.color.white)
         }
     }
 
