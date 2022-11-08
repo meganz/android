@@ -16,7 +16,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * New MediaDiscovery toggle
      */
-    NewMediaDiscovery("Enable new mediaDiscovery feature", true),
+    NewMediaDiscovery("Enable new mediaDiscovery feature", false),
 
     /**
      * User albums toggle
