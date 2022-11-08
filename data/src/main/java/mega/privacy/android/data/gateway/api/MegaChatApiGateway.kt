@@ -74,8 +74,9 @@ interface MegaChatApiGateway {
      * Refreshes DNS servers and retries pending connections.
      *
      * @param disconnect True if should disconnect, false otherwise.
+     * @param listener Listener
      */
-    fun retryPendingConnections(disconnect: Boolean)
+    fun retryPendingConnections(disconnect: Boolean, listener: MegaChatRequestListenerInterface?)
 
     /**
      * Chat updates.

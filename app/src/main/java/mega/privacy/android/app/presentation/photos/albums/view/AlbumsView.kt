@@ -94,7 +94,6 @@ fun AlbumsView(
         ) { album ->
             Box(
                 modifier = Modifier
-                    .padding(10.dp)
                     .clickable {
                         openAlbum(album)
                     }
