@@ -171,10 +171,9 @@ class MediaDiscoveryViewModel @Inject constructor(
                     })
             }
             is DateCard.DaysCard -> {
-                val photosList = _state.value.uiPhotoList
                 updateSelectedTimeBarState(
                     TimeBarTab.All,
-                    photosList.indexOfFirst {
+                    _state.value.uiPhotoList.indexOfFirst {
                         it.key == dateCard.photo.id.toString()
                     },
                 )
