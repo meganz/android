@@ -2,11 +2,12 @@ package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
+import javax.inject.Inject
 
 /**
  * Default map favourite sort order
  */
-class DefaultMapFavouriteSortOrder : MapFavouriteSortOrder {
+class DefaultMapFavouriteSortOrder @Inject constructor() : MapFavouriteSortOrder {
     override fun invoke(sortOrder: SortOrder) = when (sortOrder) {
         SortOrder.ORDER_DEFAULT_ASC -> FavouriteSortOrder.Name(false)
         SortOrder.ORDER_DEFAULT_DESC -> FavouriteSortOrder.Name(true)
