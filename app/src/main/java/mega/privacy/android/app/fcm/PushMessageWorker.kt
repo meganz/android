@@ -78,17 +78,16 @@ class PushMessageWorker @AssistedInject constructor(
                     )
             } else {
                 kotlin.runCatching { retryPendingConnections(disconnect = false) }
-                    .onFailure { error ->
+                    .recoverCatching { error ->
                         if (error is ChatNotInitializedException) {
                             Timber.d("chat engine not ready. try to initialise megachat.")
-                            kotlin.runCatching { initialiseMegaChat(session) }
-                                .onFailure { exception ->
-                                    Timber.e("Initialise MEGAChat failed: $exception")
-                                    return@withContext Result.failure()
-                                }
+                            initialiseMegaChat(session)
                         } else {
                             Timber.w(error)
                         }
+                    }.onFailure { error ->
+                        Timber.e("Initialise MEGAChat failed: $error")
+                        return@withContext Result.failure()
                     }
             }
 

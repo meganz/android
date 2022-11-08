@@ -8,6 +8,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
@@ -21,10 +23,13 @@ import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
+import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.AccountRepository
 import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaCurrency
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaPricing
@@ -46,6 +51,7 @@ class DefaultAccountRepositoryTest {
     private val accountInfoWrapper =
         mock<AccountInfoWrapper> { on { accountTypeString }.thenReturn("") }
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val userAccountMapper = ::UserAccount
     private val accountTypeMapper = mock<AccountTypeMapper>()
     private val subscriptionPlanMapper = mock<SubscriptionPlanMapper>()
@@ -84,7 +90,7 @@ class DefaultAccountRepositoryTest {
         underTest = DefaultAccountRepository(
             myAccountInfoFacade = accountInfoWrapper,
             megaApiGateway = megaApiGateway,
-            megaChatApiGateway = mock(),
+            megaChatApiGateway = megaChatApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             userUpdateMapper = { UserUpdate(emptyMap()) },
             localStorageGateway = mock(),
@@ -244,4 +250,74 @@ class DefaultAccountRepositoryTest {
         val actual = underTest.getAccountAchievements(AchievementType.INVALID_ACHIEVEMENT, 0L)
         assertThat(actual).isSameInstanceAs(megaAchievement)
     }
+
+    @Test
+    fun `test that retryPendingConnections returns success when MegaChatApi returns ERROR_OK`() =
+        runTest {
+
+            val megaError = mock<MegaChatError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
+            }
+
+            val megaRequest = mock<MegaChatRequest> {
+                on { type }.thenReturn(MegaChatRequest.TYPE_RETRY_PENDING_CONNECTIONS)
+            }
+
+            whenever(megaChatApiGateway.retryPendingConnections(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.retryPendingConnections(false)
+        }
+
+    @Test(expected = ChatNotInitializedException::class)
+    fun `test that retryPendingConnections finishes with ChatNotInitializedException when MegaChatApi returns ERROR_ACCESS`() =
+        runTest {
+
+            val megaError = mock<MegaChatError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_ACCESS)
+            }
+
+            val megaRequest = mock<MegaChatRequest> {
+                on { type }.thenReturn(MegaChatRequest.TYPE_RETRY_PENDING_CONNECTIONS)
+            }
+
+            whenever(megaChatApiGateway.retryPendingConnections(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.retryPendingConnections(false)
+        }
+
+    @Test(expected = MegaException::class)
+    fun `test that retryPendingConnections finishes with general MegaException when MegaChatApi returns errors other than ERROR_ACCESS or ERROR_OK`() =
+        runTest {
+
+            val megaError = mock<MegaChatError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_NOENT)
+            }
+
+            val megaRequest = mock<MegaChatRequest> {
+                on { type }.thenReturn(MegaChatRequest.TYPE_RETRY_PENDING_CONNECTIONS)
+            }
+
+            whenever(megaChatApiGateway.retryPendingConnections(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.retryPendingConnections(false)
+        }
+
 }
