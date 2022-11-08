@@ -18,7 +18,9 @@ data class ImageResult constructor(
     var fullSizeUri: Uri? = null,
     var transferTag: Int? = null,
     var isVideo: Boolean = false,
-    var isFullyLoaded: Boolean = false
+    var isFullyLoaded: Boolean = false,
+    var totalBytes: Long? = null,
+    var transferredBytes: Long? = null,
 ) {
 
     /**

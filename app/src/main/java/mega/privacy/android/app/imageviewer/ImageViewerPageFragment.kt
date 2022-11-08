@@ -170,6 +170,14 @@ class ImageViewerPageFragment : Fragment() {
                 }
             }
 
+            imageResult.transferredBytes?.let { transferred ->
+                imageResult.totalBytes?.let { total ->
+                    if (total != 0L && transferred != 0L) {
+                        val progressPercentage = ((transferred * 1.0 / total) * 100).toInt()
+                        binding.progress.progress = progressPercentage
+                    }
+                }
+            }
             if (imageResult.isFullyLoaded) binding.progress.hide()
         }
 
