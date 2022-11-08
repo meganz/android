@@ -5,7 +5,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.yield
 import mega.privacy.android.app.sync.BackupState
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
@@ -45,8 +44,8 @@ class DefaultProcessMediaForUpload @Inject constructor(
     ) {
         val mediaStoreTypes = getSyncFileUploadUris().mapNotNull(mediaStoreFileTypeMapper)
         val secondaryEnabled = isSecondaryFolderEnabled()
-        val list = mutableListOf<Job>()
         coroutineScope {
+            val list = mutableListOf<Job>()
             list.add(
                 preparePrimaryPhotos(mediaStoreTypes,
                     primaryUploadNode,
@@ -73,12 +72,11 @@ class DefaultProcessMediaForUpload @Inject constructor(
                     tempRoot,
                     secondaryEnabled)
             )
+            list.joinAll()
+            // Reset backup state as active.
+            cameraUploadSyncManagerWrapper.updatePrimaryFolderBackupState(BackupState.ACTIVE)
+            cameraUploadSyncManagerWrapper.updateSecondaryFolderBackupState(BackupState.ACTIVE)
         }
-        yield()
-        list.joinAll()
-        // Reset backup state as active.
-        cameraUploadSyncManagerWrapper.updatePrimaryFolderBackupState(BackupState.ACTIVE)
-        cameraUploadSyncManagerWrapper.updateSecondaryFolderBackupState(BackupState.ACTIVE)
     }
 
     private fun CoroutineScope.preparePrimaryPhotos(
