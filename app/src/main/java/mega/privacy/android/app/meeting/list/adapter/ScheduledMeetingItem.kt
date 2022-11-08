@@ -1,9 +1,7 @@
 package mega.privacy.android.app.meeting.list.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import com.google.firebase.crashlytics.internal.model.CrashlyticsReport
 import mega.privacy.android.app.contacts.group.data.GroupChatParticipant
-import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.ChatPermissions
 import mega.privacy.android.domain.entity.contacts.ContactData
@@ -73,6 +71,9 @@ data class ScheduledMeetingItem constructor(
     fun isSingleMeeting(): Boolean =
         lastUser == null
 
+    /**
+     * ScheduledMeetingItem DiffCallback
+     */
     class DiffCallback : DiffUtil.ItemCallback<ScheduledMeetingItem>() {
         override fun areItemsTheSame(
             oldItem: ScheduledMeetingItem,

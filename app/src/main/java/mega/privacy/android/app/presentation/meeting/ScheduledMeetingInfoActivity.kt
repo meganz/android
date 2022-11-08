@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.meeting
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,11 +7,13 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.security.PasscodeCheck
@@ -77,7 +77,11 @@ class ScheduledMeetingInfoActivity : ComponentActivity() {
     }
 
     private fun onScrollChange(scrolled: Boolean, isDark: Boolean) {
-
+        window?.statusBarColor = when {
+            scrolled && isDark -> ContextCompat.getColor(this, R.color.action_mode_background)
+            isDark -> ContextCompat.getColor(this, R.color.dark_grey)
+            else -> ContextCompat.getColor(this, android.R.color.white)
+        }
     }
 
     private fun onActionTap(action: ScheduledMeetingInfoAction) {
@@ -90,18 +94,5 @@ class ScheduledMeetingInfoActivity : ComponentActivity() {
             ScheduledMeetingInfoAction.ManageChatHistory -> viewModel.onManageChatHistoryTap()
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> viewModel.onEnableEncryptedKeyRotationTap()
         }
-    }
-
-    companion object {
-
-        /**
-         * Gets an [Intent] to open this screen from Chat.
-         *
-         * @param context Required [Context].
-         * @return The [Intent].
-         */
-        @JvmStatic
-        fun getChatIntent(context: Context): Intent =
-            Intent(context, ScheduledMeetingInfoActivity::class.java)
     }
 }

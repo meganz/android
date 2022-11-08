@@ -66,16 +66,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     init {
-        observeStateChanges()
         getContacts()
         observeContactUpdates()
         observeLastGreenUpdates()
         observeOnlineStatusUpdates()
         observeNewContacts()
-    }
-
-    private fun observeStateChanges() {
-
     }
 
     private fun getContacts() {
@@ -164,7 +159,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         if (isConnected.value) {
             Timber.d("Edit scheduled meeting")
         } else {
-            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+            showError()
         }
     }
 
@@ -187,7 +182,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         if (isConnected.value) {
             Timber.d("Add participants to the chat room")
         } else {
-            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+            showError()
         }
     }
 
@@ -195,7 +190,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Open bottom panel option of a participant.
      */
     fun onParticipantTap(contactItem: ContactItem) {
-
+        Timber.d("Participant ${contactItem.handle} clicked")
     }
 
     /**
@@ -205,7 +200,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         if (isConnected.value) {
             Timber.d("Add participants to the chat room")
         } else {
-            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+            showError()
         }
     }
 
@@ -216,7 +211,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         if (isConnected.value) {
             Timber.d("Add participants to the chat room")
         } else {
-            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+            showError()
         }
     }
 
@@ -227,7 +222,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         if (isConnected.value) {
             Timber.d("Add participants to the chat room")
         } else {
-            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+            showError()
         }
     }
 
@@ -238,7 +233,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         if (isConnected.value) {
             Timber.d("Allow non host add participants to the chat room")
         } else {
-            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+            showError()
         }
     }
 
@@ -256,7 +251,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         if (isConnected.value) {
             Timber.d("Manage chat history")
         } else {
-            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+            showError()
         }
     }
 
@@ -267,7 +262,14 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         if (isConnected.value) {
             Timber.d("Enable Encrypted Key Rotation")
         } else {
-            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+            showError()
         }
+    }
+
+    /**
+     * Add error when there is no internet connection
+     */
+    private fun showError() {
+        _state.update { it.copy(error = R.string.check_internet_connection_error) }
     }
 }

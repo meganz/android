@@ -29,7 +29,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.setImageRequestFromUri
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -58,11 +57,6 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private val chatId by lazy {
         arguments?.getLong(CHAT_ID,
-            MEGACHAT_INVALID_HANDLE) ?: MEGACHAT_INVALID_HANDLE
-    }
-
-    private val scheduledMeetingId by lazy {
-        arguments?.getLong(SCHEDULED_MEETING_ID,
             MEGACHAT_INVALID_HANDLE) ?: MEGACHAT_INVALID_HANDLE
     }
 

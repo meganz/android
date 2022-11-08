@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.extensions
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 
-
 internal val ScheduledMeetingInfoAction.title: Int
     get() = when (this) {
         ScheduledMeetingInfoAction.MeetingLink -> R.string.meeting_link
