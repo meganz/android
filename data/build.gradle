@@ -8,6 +8,18 @@ plugins {
 apply plugin: 'jacoco'
 apply from: "$project.rootDir/tools/jacoco.gradle"
 
+/**
+ * Check whether we should use prebuilt SDK or local sdk module
+ *
+ * @return false if environment variable "USE_REMOTE_SDK" is false. Otherwise return true.
+ */
+boolean shouldUsePrebuiltSdk() {
+    return false
+    //FIXME uncomment this method once prebuilt sdk feature is ready
+    /*String useRemoteSdk = System.getenv("USE_REMOTE_SDK")
+    return useRemoteSdk == null || useRemoteSdk != "false"*/
+}
+
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVerion
@@ -59,7 +71,14 @@ android {
 
 dependencies {
     implementation project(':domain')
-    implementation project(':sdk')
+
+    if (shouldUsePrebuiltSdk()) {
+        println("[data] use remote pre-built SDK")
+        implementation "nz.mega.sdk:sdk:$megaSdkVersion"
+    } else {
+        println("[data] use local SDK")
+        implementation project(':sdk')
+    }
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     implementation "com.google.code.gson:gson:$gsonVersion"
@@ -100,3 +119,4 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
 }
+

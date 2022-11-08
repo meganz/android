@@ -8,7 +8,6 @@ import android.os.Bundle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_DISABLE_MEDIA_UPLOADS_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_UI_SETTING
@@ -19,12 +18,8 @@ import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_
 import mega.privacy.android.app.constants.BroadcastConstants.PRIMARY_HANDLE
 import mega.privacy.android.app.constants.BroadcastConstants.SECONDARY_FOLDER
 import mega.privacy.android.app.fragments.settingsFragments.SettingsCameraUploadsFragment
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED
 import mega.privacy.android.app.utils.Constants.EXTRA_NODE_HANDLE
-import mega.privacy.android.app.utils.Constants.GO_OFFLINE
-import mega.privacy.android.app.utils.Constants.GO_ONLINE
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 
@@ -34,26 +29,6 @@ import timber.log.Timber
 class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
 
     private var settingsFragment: SettingsCameraUploadsFragment? = null
-
-    private val networkReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent == null || intent.action == null || settingsFragment == null) {
-                return
-            }
-
-            settingsFragment?.let {
-                val actionType = intent.getIntExtra(ACTION_TYPE, INVALID_VALUE)
-
-                if (actionType == GO_OFFLINE) {
-                    Timber.d("Offline Network Broadcast Event Received")
-                    it.setOnlineOptions(false)
-                } else if (actionType == GO_ONLINE) {
-                    Timber.d("Online Network Broadcast Event Received")
-                    it.setOnlineOptions(true)
-                }
-            }
-        }
-    }
 
     private val updateCameraUploadsSettingsReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -161,7 +136,6 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
             replaceFragment(it)
         }
 
-        registerReceiver(networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE))
         registerReceiver(cameraUploadsDestinationReceiver,
             IntentFilter(ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING))
         registerReceiver(receiverCameraUploadsAttrChanged,
@@ -184,7 +158,6 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
      */
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(networkReceiver)
         unregisterReceiver(cameraUploadsDestinationReceiver)
         unregisterReceiver(enableDisableCameraUploadsReceiver)
         unregisterReceiver(updateCameraUploadsSettingsReceiver)

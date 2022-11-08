@@ -17,6 +17,7 @@ import mega.privacy.android.data.repository.DefaultFilesRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
 import mega.privacy.android.data.repository.DefaultGlobalStatesRepository
 import mega.privacy.android.data.repository.DefaultImageRepository
+import mega.privacy.android.data.repository.DefaultMediaPlayerRepository
 import mega.privacy.android.data.repository.DefaultNetworkRepository
 import mega.privacy.android.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.data.repository.DefaultPushesRepository
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PushesRepository
@@ -142,4 +144,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindTimeSystemRepository(repository: DefaultTimeSystemRepository): TimeSystemRepository
+
+    @Binds
+    abstract fun bindMediaPlayerRepository(repository: DefaultMediaPlayerRepository): MediaPlayerRepository
 }

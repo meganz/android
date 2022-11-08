@@ -10,6 +10,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.CreateAlbum
+import mega.privacy.android.domain.usecase.DefaultCreateAlbum
 import mega.privacy.android.domain.usecase.DefaultDownloadPreview
 import mega.privacy.android.domain.usecase.DefaultDownloadThumbnail
 import mega.privacy.android.domain.usecase.DefaultEnablePhotosCameraUpload
@@ -99,13 +100,12 @@ abstract class PhotosUseCases {
     @Binds
     abstract fun bindGetPhotosByFolderId(useCase: DefaultGetPhotosByFolderId): GetPhotosByFolderId
 
+    @Binds
+    abstract fun bindCreateAlbum(useCase: DefaultCreateAlbum): CreateAlbum
+
     companion object {
         @Provides
         fun providesIsCameraSyncPreferenceEnabled(settingsRepository: SettingsRepository): IsCameraSyncPreferenceEnabled =
             IsCameraSyncPreferenceEnabled(settingsRepository::isCameraSyncPreferenceEnabled)
-
-        @Provides
-        fun providesCreateAlbum(albumRepository: AlbumRepository): CreateAlbum =
-            CreateAlbum(albumRepository::createAlbum)
     }
 }

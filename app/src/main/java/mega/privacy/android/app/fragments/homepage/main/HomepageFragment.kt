@@ -5,10 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -22,6 +19,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -34,9 +33,9 @@ import com.zhpan.bannerview.constants.IndicatorGravity
 import com.zhpan.bannerview.utils.BannerUtils
 import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
@@ -48,17 +47,13 @@ import mega.privacy.android.app.presentation.startconversation.StartConversation
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_HOMEPAGE_VISIBILITY
-import mega.privacy.android.app.utils.Constants.GO_OFFLINE
-import mega.privacy.android.app.utils.Constants.GO_ONLINE
 import mega.privacy.android.app.utils.Constants.REQUEST_CREATE_CHAT
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaBanner
@@ -128,20 +123,6 @@ class HomepageFragment : Fragment() {
 
     var isFabExpanded = false
 
-    /** The broadcast receiver for network connectivity.
-     *  Switch the UI appearance between offline and online status
-     */
-    private val networkReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent == null) return
-
-            when (intent.getIntExtra(ACTION_TYPE, -1)) {
-                GO_OFFLINE -> showOfflineMode()
-                GO_ONLINE -> showOnlineMode()
-            }
-        }
-    }
-
     /** The click listener for clicking on the file category buttons.
      *  Clicking to navigate to corresponding fragments */
     private val categoryClickListener = OnClickListener {
@@ -203,21 +184,24 @@ class HomepageFragment : Fragment() {
 
         (activity as? ManagerActivity)?.adjustTransferWidgetPositionInHomepage()
 
-        requireContext().registerReceiver(
-            networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
-        )
-
         if (savedInstanceState?.getBoolean(START_SCREEN_DIALOG_SHOWN, false) == true) {
             showChooseStartScreenDialog()
+        }
+        viewLifecycleOwner.lifecycleScope.launch { 
+            viewModel.isConnected.flowWithLifecycle(
+                viewLifecycleOwner.lifecycle
+            ).collect { isConnected ->
+                if (isConnected) {
+                    showOnlineMode()
+                } else {
+                    showOfflineMode()
+                }
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
-
-        if (!isOnline(context)) {
-            showOfflineMode()
-        }
 
         // Retrieve the banners from the server again, for the banners are possibly varied
         // while the app is on the background
@@ -234,7 +218,6 @@ class HomepageFragment : Fragment() {
         super.onDestroyView()
 
         tabsChildren.clear()
-        requireContext().unregisterReceiver(networkReceiver)
 
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .removeObserver(homepageVisibilityChangeObserver)
@@ -634,7 +617,7 @@ class HomepageFragment : Fragment() {
      * @param operation the operation to be executed if online
      */
     private fun doIfOnline(showSnackBar: Boolean, operation: () -> Unit) {
-        if (isOnline(context) && !viewModel.isRootNodeNull()) {
+        if (viewModel.isConnected.value && !viewModel.isRootNodeNull()) {
             operation()
         } else if (showSnackBar) {
             (activity as ManagerActivity).showSnackbar(

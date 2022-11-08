@@ -12,14 +12,11 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
-internal fun groupPhotosByDay(photos: List<Photo>, currentSort: Sort) =
-    photos
+internal fun groupPhotosByDay(sortedPhotos: List<Photo>) =
+    sortedPhotos
         .groupBy { it.modificationTime.toLocalDate().toEpochDay() }
         .map { (_, photosList) ->
-            if (currentSort == Sort.OLDEST)
-                photosList.minByOrNull { it.modificationTime }!! to photosList.size
-            else
-                photosList.maxByOrNull { it.modificationTime }!! to photosList.size
+            photosList.first() to photosList.size
         }
         .toMap()
 

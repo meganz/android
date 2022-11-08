@@ -20,11 +20,10 @@ interface AccountRepository {
     suspend fun getUserAccount(): UserAccount
 
     /**
-     * Is account data stale
+     * Storage capacity used is blank
      *
-     * @return true if account data is stale. else false
      */
-    fun isAccountDataStale(): Boolean
+    fun storageCapacityUsedIsBlank(): Boolean
 
     /**
      * Request account
@@ -86,7 +85,7 @@ interface AccountRepository {
      *
      * @param disconnect True if should disconnect megaChatApi, false otherwise.
      */
-    fun retryPendingConnections(disconnect: Boolean)
+    suspend fun retryPendingConnections(disconnect: Boolean)
 
     /**
      * Checks whether the user's Business Account is currently active or not

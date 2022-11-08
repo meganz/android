@@ -198,7 +198,8 @@ interface MegaApiGateway {
     /**
      * Get the fingerprint of a file by path
      *
-     * @param filePath
+     * @param filePath file path
+     * @return fingerprint
      */
     suspend fun getFingerprint(filePath: String): String?
 
@@ -900,7 +901,7 @@ interface MegaApiGateway {
      * @param name the name of the set
      * @param listener [MegaRequestListenerInterface]
      */
-    suspend fun createSet(name: String, listener: MegaRequestListenerInterface)
+    fun createSet(name: String, listener: MegaRequestListenerInterface)
 
     /**
      * Create a new element for the set

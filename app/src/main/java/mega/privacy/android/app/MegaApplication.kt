@@ -18,6 +18,7 @@ import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
@@ -49,6 +50,7 @@ import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -86,6 +88,7 @@ import javax.inject.Inject
  * @property localIpAddress
  * @property isEsid
  * @property monitorStorageStateEvent
+ * @property isDatabaseEntryStale
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLifecycleObserver {
@@ -159,6 +162,9 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
 
     @Inject
     lateinit var monitorStorageStateEvent: MonitorStorageStateEvent
+
+    @Inject
+    lateinit var isDatabaseEntryStale: IsDatabaseEntryStale
 
     var localIpAddress: String? = ""
 
@@ -348,7 +354,8 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
      */
     fun refreshAccountInfo() {
         //Check if the call is recently
-        if (dbH.callToAccountDetails() || myAccountInfo.usedFormatted.trim().isEmpty()) {
+        if (runBlocking { isDatabaseEntryStale() }
+            || myAccountInfo.usedFormatted.trim().isEmpty()) {
             Timber.d("megaApi.getAccountDetails SEND")
             askForAccountDetails()
         }

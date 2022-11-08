@@ -10,12 +10,15 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_CHANGE
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBanner
@@ -29,7 +32,8 @@ class HomePageViewModel @Inject constructor(
     private val repository: HomepageRepository,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     getCallUseCase: GetCallUseCase,
-) : BaseRxViewModel(){
+    private val monitorConnectivity: MonitorConnectivity,
+) : BaseRxViewModel() {
 
     private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
@@ -42,6 +46,11 @@ class HomePageViewModel @Inject constructor(
     val chatStatus: LiveData<Int> = _chatStatus
     private val showCallIcon: MutableLiveData<Boolean> = MutableLiveData()
     val bannerList: LiveData<MutableList<MegaBanner>?> = _bannerList
+
+    /**
+     * Is network connected state
+     */
+    val isConnected = monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val notificationCountObserver = androidx.lifecycle.Observer<Int> {
         _notificationCount.value = it

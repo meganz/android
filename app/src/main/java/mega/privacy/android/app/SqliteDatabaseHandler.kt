@@ -4470,28 +4470,6 @@ class SqliteDatabaseHandler(
     override val isCompletedTransfersEmpty: Boolean
         get() = completedTransfers.isEmpty()
 
-    override fun callToAccountDetails(): Boolean {
-        val attributes = attributes ?: run {
-            Timber.d("Attributes is NULL - API call getAccountDetails")
-            return true
-        }
-        val oldTimestamp = attributes.accountDetailsTimeStamp
-        return if (oldTimestamp.isNullOrBlank().not()) {
-            val timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp)
-            Timber.d("Last call made: %d min ago", timestampMinDifference)
-            if (timestampMinDifference > Constants.ACCOUNT_DETAILS_MIN_DIFFERENCE) {
-                Timber.d("API call getAccountDetails")
-                true
-            } else {
-                Timber.d("NOT call getAccountDetails")
-                false
-            }
-        } else {
-            Timber.d("Not valid value - API call getAccountDetails")
-            true
-        }
-    }
-
     /**
      * Get the index of a column in a cursor.
      * Avoid to access column with hardcode index.
