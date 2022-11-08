@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -47,7 +46,7 @@ class ChatViewModel @Inject constructor(
     private val monitorStorageStateEvent: MonitorStorageStateEvent,
     private val startChatCall: StartChatCall,
     private val chatApiGateway: MegaChatApiGateway,
-    monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivity: MonitorConnectivity,
     private val answerChatCall: AnswerChatCall,
     private val passcodeManagement: PasscodeManagement,
     private val cameraGateway: CameraGateway,
@@ -77,8 +76,8 @@ class ChatViewModel @Inject constructor(
     val monitorConnectivityEvent =
         monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly)
 
-    val isConnected =
-        monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false).value
+    val isConnected: Boolean
+        get() = monitorConnectivity().value
 
     /**
      * Starts a call.

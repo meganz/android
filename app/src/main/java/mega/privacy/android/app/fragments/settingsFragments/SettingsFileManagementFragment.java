@@ -13,8 +13,6 @@ import static mega.privacy.android.app.constants.SettingsConstants.KEY_OFFLINE;
 import static mega.privacy.android.app.constants.SettingsConstants.KEY_RUBBISH;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
-import static mega.privacy.android.app.utils.Util.isOffline;
-import static mega.privacy.android.app.utils.Util.isOnline;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -24,6 +22,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
@@ -33,9 +32,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import kotlin.Unit;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
+import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
@@ -132,8 +133,11 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(FilePreferencesViewModel.class);
         viewModel.getFilePreferencesStateLiveData().observe(getViewLifecycleOwner(), this::observeState);
+        ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), viewModel.getMonitorConnectivityEvent(), Lifecycle.State.STARTED, isConnected -> {
+            setOnlineOptions(isConnected);
+            return Unit.INSTANCE;
+        });
     }
 
     private void observeState(FilePreferencesState filePreferencesState) {
@@ -185,7 +189,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
                 break;
 
             case KEY_ENABLE_RB_SCHEDULER:
-                if (isOffline(context))
+                if (!viewModel.isConnected())
                     return false;
 
                 if (enableRbSchedulerSwitch.isChecked()) {
@@ -201,14 +205,14 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
                 break;
 
             case KEY_DAYS_RB_SCHEDULER:
-                if (isOffline(context))
+                if (!viewModel.isConnected())
                     return false;
 
                 ((FileManagementPreferencesActivity) context).showRbSchedulerValueDialog(false);
                 break;
 
             case KEY_ENABLE_VERSIONS:
-                if (isOffline(context))
+                if (!viewModel.isConnected())
                     return false;
 
                 if (!enableVersionsSwitch.isChecked()) {
@@ -251,7 +255,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
      * Method for enable or disable the file versions.
      */
     public void updateEnabledFileVersions() {
-Timber.d("updateEnabledFileVersions: %s",  MegaApplication.isDisableFileVersions());
+        Timber.d("updateEnabledFileVersions: %s", MegaApplication.isDisableFileVersions());
         enableVersionsSwitch.setOnPreferenceClickListener(null);
 
         if (MegaApplication.isDisableFileVersions() == 1) {
@@ -345,7 +349,8 @@ Timber.d("updateEnabledFileVersions: %s",  MegaApplication.isDisableFileVersions
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
-        rubbishFileManagement.setEnabled(isOnline(context) && megaApi != null && megaApi.getRootNode() != null);
+        viewModel = new ViewModelProvider(this).get(FilePreferencesViewModel.class);
+        rubbishFileManagement.setEnabled(viewModel.isConnected() && megaApi != null && megaApi.getRootNode() != null);
         return v;
     }
 

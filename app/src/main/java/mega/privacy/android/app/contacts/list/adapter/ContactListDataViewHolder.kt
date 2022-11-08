@@ -21,6 +21,7 @@ class ContactListDataViewHolder(
         binding.txtLastSeen.text = item.lastSeen
         binding.txtLastSeen.isVisible = !item.lastSeen.isNullOrBlank()
         binding.chipNew.isVisible = item.isNew
+        binding.verifiedIcon.isVisible = item.isVerified
         binding.imgThumbnail.hierarchy.setPlaceholderImage(item.placeholder)
         if (item.avatarUri != null) {
             binding.imgThumbnail.setImageRequestFromUri(item.avatarUri)

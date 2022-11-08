@@ -1,0 +1,78 @@
+import java.text.SimpleDateFormat
+
+// Setting this property to true will make the artifactoryPublish task
+// skip this module (in our case, the root module):
+artifactoryPublish.skip = true
+
+/**
+ * Generate the SDK version string. This version is used in the published SDK library and
+ * is used by library users.
+ *
+ * @return SDK lib's version
+ */
+String sdkVersion() {
+    String pattern = "yyyyMMdd.HHmmss"
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern)
+    return simpleDateFormat.format(new Date())
+}
+
+/**
+ * Get the library type from environment.
+ *
+ * @return If environment variable SDK_PUBLISH_TYPE exists with value "rel", then
+ * return "rel". Otherwise return "dev".
+ */
+String sdkLibType() {
+    String type = System.getenv("SDK_PUBLISH_TYPE")
+    if (type == "rel") {
+        return "rel"
+    } else {
+        return "dev"
+    }
+}
+
+project('sdk') {
+    artifactoryPublish.dependsOn('build')
+    publishing {
+        publications {
+            aar(MavenPublication) {
+                groupId = 'nz.mega.sdk'
+                artifactId = 'sdk'
+                version = sdkVersion() + "-" + sdkLibType()
+                // Tell maven to prepare the generated "*.aar" file for publishing
+                artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+            }
+        }
+    }
+
+    artifactoryPublish {
+        publications(publishing.publications.aar)
+    }
+}
+
+artifactory {
+    clientConfig.setIncludeEnvVars(true)
+
+    contextUrl = "https://artifactory.developers.mega.co.nz/artifactory/mega-gradle"
+    publish {
+        repository {
+            repoKey = "mega-sdk-android" // The Artifactory repository key to publish to
+            username = "${System.env.ARTIFACTORY_USER}" // The publisher user name
+            password = "${System.env.ARTIFACTORY_ACCESS_TOKEN}" // The publisher password
+        }
+        defaults {
+            // Reference to Gradle publications defined in the build script.
+            // This is how we tell the Artifactory Plugin which artifacts should be
+            // published to Artifactory.
+            publishArtifacts = true
+            // Properties to be attached to the published artifacts.
+            properties = [
+                    'qa.level'   : 'basic',
+                    'dev.team'   : 'core',
+                    'sdk-commit' : "123456",
+                    'chat-commit': '987654',
+            ]
+            publishPom = true // Publish generated POM files to Artifactory (true by default)
+        }
+    }
+}

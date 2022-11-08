@@ -25,4 +25,14 @@ interface FileNode : UnTypedNode {
      * Thumbnail path
      */
     val thumbnailPath: String?
+
+    /**
+     * Fingerprint
+     */
+    val fingerprint: String?
+
+    /**
+     * Duration
+     */
+    val duration: Int
 }

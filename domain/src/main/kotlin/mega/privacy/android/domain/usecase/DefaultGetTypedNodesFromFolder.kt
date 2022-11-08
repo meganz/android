@@ -24,12 +24,12 @@ class DefaultGetTypedNodesFromFolder @Inject constructor(
     private val addNodeType: AddNodeType,
 ) : GetTypedNodesFromFolder {
 
-    override fun invoke(folderNodeId: NodeId): Flow<List<TypedNode>> {
+    override fun invoke(folderId: NodeId): Flow<List<TypedNode>> {
         return flow {
-            val nodes = getChildren(folderNodeId)
+            val nodes = getChildren(folderId)
             emit(nodes)
-            val nodeIds = nodes.map { it.id } + folderNodeId
-            emitAll(getMonitoredList(folderNodeId, nodeIds))
+            val nodeIds = nodes.map { it.id } + folderId
+            emitAll(getMonitoredList(folderId, nodeIds))
         }.mapLatest { nodeList ->
             nodeList.map { addNodeType(it) }
         }

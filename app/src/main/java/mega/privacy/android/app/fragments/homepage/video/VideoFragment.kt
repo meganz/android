@@ -167,7 +167,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
     }
 
     private fun doIfOnline(operation: () -> Unit) {
-        if (Util.isOnline(context)) {
+        if (viewModel.isConnected) {
             operation()
         } else {
             callManager {
