@@ -19,18 +19,6 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
-import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
-import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
-import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
-import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted
-import mega.privacy.android.app.utils.ColorUtils.getThemeColor
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryLocalFolder
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryLocalFolder
-import androidx.preference.SwitchPreferenceCompat
-import mega.privacy.android.app.components.TwoLineCheckPreference
-import nz.mega.sdk.MegaNode
-import mega.privacy.android.app.listeners.SetAttrUserListener
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.appcompat.app.AlertDialog
@@ -40,17 +28,12 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
-import nz.mega.sdk.MegaApiJava
-import mega.privacy.android.app.utils.SDCardUtils
-import mega.privacy.android.app.utils.JobUtil
-import mega.privacy.android.app.utils.CameraUploadUtil
-import mega.privacy.android.app.main.FileStorageActivity
-import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.components.TwoLineCheckPreference
 import mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS
 import mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS
 import mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_FILE_UPLOAD_VIDEOS
@@ -79,12 +62,30 @@ import mega.privacy.android.app.constants.SettingsConstants.REQUEST_LOCAL_SECOND
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_CAMERA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_SECONDARY_MEDIA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER
+import mega.privacy.android.app.listeners.SetAttrUserListener
+import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
-import mega.privacy.android.domain.entity.SyncStatus
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryLocalFolder
+import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryLocalFolder
+import mega.privacy.android.app.utils.CameraUploadUtil
+import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.JobUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted
+import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
+import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
+import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.data.model.MegaPreferences
+import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 
 /**
@@ -184,7 +185,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         val v = super.onCreateView(inflater, container, savedInstanceState)
         val lv = v.findViewById<ListView>(android.R.id.list)
         lv?.setPadding(0, 0, 0, 0)
-        setOnlineOptions(Util.isOnline(context) && megaApi != null && megaApi.rootNode != null)
+        setOnlineOptions(viewModel.isConnected && megaApi != null && megaApi.rootNode != null)
         setAttrUserListener = SetAttrUserListener(context)
         return v
     }
@@ -230,6 +231,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     }
                 }
         }
+        viewLifecycleOwner.collectFlow(viewModel.monitorConnectivityEvent) { isConnected ->
+            setOnlineOptions(isConnected)
+        }
     }
 
     /**
@@ -256,7 +260,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         cameraUploadOnOff?.let {
             it.isEnabled = true
             it.setOnPreferenceChangeListener { _, _ ->
-                if (!Util.isOffline(context)) {
+                if (viewModel.isConnected) {
                     dbH.setCamSyncTimeStamp(0)
                     cameraUpload = !cameraUpload
                     refreshCameraUploadsSettings()
@@ -584,14 +588,14 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 startActivityForResult(intent, REQUEST_CAMERA_FOLDER)
             }
             KEY_CAMERA_UPLOAD_MEGA_FOLDER -> {
-                if (Util.isOffline(context)) return false
+                if (viewModel.isConnected.not()) return false
                 intent = Intent(context, FileExplorerActivity::class.java).apply {
                     action = FileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC
                 }
                 startActivityForResult(intent, REQUEST_MEGA_CAMERA_FOLDER)
             }
             KEY_SECONDARY_MEDIA_FOLDER_ON -> {
-                if (Util.isOffline(context)) return false
+                if (viewModel.isConnected.not()) return false
                 secondaryUpload = !secondaryUpload
                 if (secondaryUpload) {
                     Timber.d("Enable Media Uploads.")
@@ -637,7 +641,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 startActivityForResult(intent, REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER)
             }
             KEY_MEGA_SECONDARY_MEDIA_FOLDER -> {
-                if (Util.isOffline(context)) return false
+                if (viewModel.isConnected.not()) return false
                 intent = Intent(context, FileExplorerActivity::class.java).apply {
                     action = FileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC
                 }
@@ -1291,7 +1295,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      *
      * @param isOnline Set "true" to enable the Camera Uploads switch and "false" to disable it
      */
-    fun setOnlineOptions(isOnline: Boolean) {
+    private fun setOnlineOptions(isOnline: Boolean) {
         cameraUploadOnOff?.isEnabled = isOnline
     }
 
