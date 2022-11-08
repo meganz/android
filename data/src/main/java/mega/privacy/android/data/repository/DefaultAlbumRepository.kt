@@ -39,7 +39,7 @@ internal class DefaultAlbumRepository @Inject constructor(
                                         newSet.id(),
                                         newSet.name(),
                                         newSet.cover(),
-                                        newSet.ts()
+                                        newSet.ts(),
                                     )
                                 )
                             )
