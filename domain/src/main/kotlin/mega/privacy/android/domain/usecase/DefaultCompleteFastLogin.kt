@@ -11,6 +11,7 @@ import javax.inject.Inject
  */
 class DefaultCompleteFastLogin @Inject constructor(
     private val loginRepository: LoginRepository,
+    private val initialiseMegaChat: InitialiseMegaChat,
 ) : CompleteFastLogin {
 
     override suspend fun invoke(session: String) {
@@ -20,7 +21,7 @@ class DefaultCompleteFastLogin @Inject constructor(
 
         loginRepository.startLoginProcess()
 
-        runCatching { loginRepository.initMegaChat(session) }
+        runCatching { initialiseMegaChat(session) }
             .onFailure { exception -> finishWithException(exception) }
             .onSuccess {
                 runCatching { loginRepository.fastLogin(session) }

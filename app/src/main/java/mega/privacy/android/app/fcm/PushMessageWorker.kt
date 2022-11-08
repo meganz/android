@@ -12,14 +12,17 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.LoginAlreadyRunningException
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.CompleteFastLogin
 import mega.privacy.android.domain.usecase.GetSession
+import mega.privacy.android.domain.usecase.InitialiseMegaChat
 import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.RootNodeExists
@@ -45,10 +48,12 @@ class PushMessageWorker @AssistedInject constructor(
     private val pushReceived: PushReceived,
     private val retryPendingConnections: RetryPendingConnections,
     private val pushMessageMapper: PushMessageMapper,
+    private val initialiseMegaChat: InitialiseMegaChat,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val session = getSession() ?: return@withContext Result.failure().also {
                 Timber.e("No user credentials, process terminates!")
             }
@@ -72,7 +77,19 @@ class PushMessageWorker @AssistedInject constructor(
                         }
                     )
             } else {
-                retryPendingConnections(disconnect = false)
+                kotlin.runCatching { retryPendingConnections(disconnect = false) }
+                    .onFailure { error ->
+                        if (error is ChatNotInitializedException) {
+                            Timber.d("chat engine not ready. try to initialise megachat.")
+                            kotlin.runCatching { initialiseMegaChat(session) }
+                                .onFailure { exception ->
+                                    Timber.e("Initialise MEGAChat failed: $exception")
+                                    return@withContext Result.failure()
+                                }
+                        } else {
+                            Timber.w(error)
+                        }
+                    }
             }
 
             Timber.d("PushMessage.type: ${pushMessage.type}")
