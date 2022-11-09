@@ -975,9 +975,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * @return true if the Primary Folder handle is a valid handle, and false if otherwise
      */
     private suspend fun isPrimaryFolderEstablished(): Boolean {
-        val isPrimaryFolderInRubbish = isNodeInRubbish(getPrimaryFolderHandle())
-        return !isPrimaryFolderInRubbish || (isPrimaryFolderInRubbish && (getDefaultNodeHandle(
-            getString(R.string.section_photo_sync)) != MegaApiJava.INVALID_HANDLE))
+        val isPrimaryFolderInRubbish = isNodeInRubbish(getPrimarySyncHandle())
+        return !isPrimaryFolderInRubbish || (isPrimaryFolderInRubbish && (getPrimaryFolderHandle() != MegaApiJava.INVALID_HANDLE))
     }
 
     /**
