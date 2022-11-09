@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import nz.mega.sdk.MegaRecentActionBucket
 
 /**
@@ -15,7 +16,7 @@ typealias RecentActionBucketMapper = @JvmSuppressWildcards suspend (
     @JvmSuppressWildcards FileTypeInfoMapper,
     @JvmSuppressWildcards MapPendingShare,
     @JvmSuppressWildcards MapInRubbish,
-) -> @JvmSuppressWildcards RecentActionBucket
+) -> @JvmSuppressWildcards RecentActionBucketUnTyped
 
 internal suspend fun toRecentActionBucket(
     megaRecentActionBucket: MegaRecentActionBucket,
@@ -26,12 +27,13 @@ internal suspend fun toRecentActionBucket(
     fileTypeInfoMapper: FileTypeInfoMapper,
     isPendingShare: MapPendingShare,
     isInRubbish: MapInRubbish,
-) = RecentActionBucket(timestamp = megaRecentActionBucket.timestamp,
+) = RecentActionBucketUnTyped(
+    timestamp = megaRecentActionBucket.timestamp,
     userEmail = megaRecentActionBucket.userEmail,
     parentHandle = megaRecentActionBucket.parentHandle,
     isUpdate = megaRecentActionBucket.isUpdate,
     isMedia = megaRecentActionBucket.isMedia,
-    nodes = (1..megaRecentActionBucket.nodes.size()).map {
+    nodes = (0 until megaRecentActionBucket.nodes.size()).map {
         toNode(
             megaRecentActionBucket.nodes.get(it),
             thumbnailPath,
@@ -42,5 +44,5 @@ internal suspend fun toRecentActionBucket(
             isPendingShare,
             isInRubbish,
         )
-    }
+    },
 )
