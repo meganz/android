@@ -28,6 +28,7 @@ import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodMapper
 import mega.privacy.android.data.mapper.RecentActionBucketMapper
+import mega.privacy.android.data.mapper.PricingMapper
 import mega.privacy.android.data.mapper.RecentActionsMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderMapper
@@ -67,11 +68,13 @@ import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toOnlineStatus
 import mega.privacy.android.data.mapper.toPaymentMethodType
+import mega.privacy.android.data.mapper.toPricing
 import mega.privacy.android.data.mapper.toRecentActionBucket
 import mega.privacy.android.data.mapper.toRecentActionBucketList
 import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toSortOrder
 import mega.privacy.android.data.mapper.toStorageState
+import mega.privacy.android.data.mapper.toSubscriptionPlan
 import mega.privacy.android.data.mapper.toSubscriptionPlanList
 import mega.privacy.android.data.mapper.toSyncRecordType
 import mega.privacy.android.data.mapper.toSyncRecordTypeInt
@@ -82,7 +85,6 @@ import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
 import mega.privacy.android.domain.entity.Currency
-import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
 
@@ -308,7 +310,13 @@ internal class MapperModule {
      * Provide subscription plan mapper
      */
     @Provides
-    fun provideSubscriptionPlanMapper(): SubscriptionPlanMapper = ::SubscriptionPlan
+    fun provideSubscriptionPlanMapper(): SubscriptionPlanMapper = ::toSubscriptionPlan
+
+    /**
+     * Provide pricing mapper
+     */
+    @Provides
+    fun providePricingMapper(): PricingMapper = ::toPricing
 
     /**
      * Provide currency mapper
