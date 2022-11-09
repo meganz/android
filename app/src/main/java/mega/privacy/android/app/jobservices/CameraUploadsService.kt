@@ -748,7 +748,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             if (canRunCameraUploads()) {
                 hideLocalFolderPathNotifications()
                 startCameraUploads()
-            } else handleFailedConditions()
+            } else handleFailedCanRunCameraUploadsConditions()
         }.onFailure { exception ->
             Timber.e("Calling startWorker() failed with exception $exception")
             endService()
@@ -797,7 +797,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * If at least one condition failed in [canRunCameraUploads], this function checks each
      * condition and executes certain behavior should the condition fail
      */
-    private suspend fun handleFailedConditions() {
+    private suspend fun handleFailedCanRunCameraUploadsConditions() {
         val hasLocalPrimaryFolder = hasLocalPrimaryFolder()
         val hasLocalSecondaryFolder = hasLocalSecondaryFolder()
 
