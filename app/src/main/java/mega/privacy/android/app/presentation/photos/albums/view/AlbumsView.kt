@@ -135,7 +135,7 @@ fun AlbumsView(
                             .clip(RoundedCornerShape(10.dp))
                             .aspectRatio(1f)
                     )
-                    Text(
+                    MiddleEllipsisText(
                         modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
                         text = album.title(LocalContext.current),
                         style = MaterialTheme.typography.subtitle2,
