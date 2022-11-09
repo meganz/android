@@ -13,10 +13,12 @@ buildscript {
     ext.firebaseAppDistribution = "3.0.1"
     ext.jacocoVersion = '0.8.8'
     ext.paparazziVersion = "1.0.0"
+    ext.jfrogArtifactoryVersion = '4.29.2'
     repositories {
         google()
-        jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
         maven { url 'https://developer.huawei.com/repo/' }
+        jcenter()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradleVersion"
@@ -31,7 +33,8 @@ buildscript {
         //Jacoco Plugin for code coverage
         classpath "org.jacoco:org.jacoco.core:$jacocoVersion"
         classpath "app.cash.paparazzi:paparazzi-gradle-plugin:$paparazziVersion"
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:latest.release'
+        // jfrog artifactory publish&resolve
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:$jfrogArtifactoryVersion"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

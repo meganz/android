@@ -1,4 +1,5 @@
-import java.text.SimpleDateFormat
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 // Setting this property to true will make the artifactoryPublish task
 // skip this module (in our case, the root module):
@@ -7,13 +8,15 @@ artifactoryPublish.skip = true
 /**
  * Generate the SDK version string. This version is used in the published SDK library and
  * is used by library users.
+ * Note: the sdk version is in the pattern of yyyyMMdd.HHmmss and is formatted to UTC,
+ * not local time.
  *
  * @return SDK lib's version
  */
 String sdkVersion() {
-    String pattern = "yyyyMMdd.HHmmss"
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern)
-    return simpleDateFormat.format(new Date())
+    OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC)
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd.HHmmss")
+    return now.format(formatter)
 }
 
 /**
