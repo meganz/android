@@ -61,7 +61,7 @@ class DefaultProcessMediaForUploadTest {
     }
 
     @Test
-    fun `primary photos are prepared when video upload is disabled`() = runTest {
+    fun `test that primary photos are prepared when video upload is disabled`() = runTest {
         whenever(getSyncFileUploadUris.invoke()).thenReturn(listOf(
             MediaStore.Images.Media.INTERNAL_CONTENT_URI,
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
