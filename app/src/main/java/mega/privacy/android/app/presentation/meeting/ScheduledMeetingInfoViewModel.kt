@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -56,14 +56,23 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val addNewContacts: AddNewContacts,
     private val requestLastGreen: RequestLastGreen,
-    monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivity: MonitorConnectivity,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
     val state: StateFlow<ScheduledMeetingInfoState> = _state
 
-    private val isConnected =
-        monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    /**
+     * Monitor connectivity event
+     */
+    val monitorConnectivityEvent =
+        monitorConnectivity().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
+    /**
+     * Is network connected
+     */
+    val isConnected: Boolean
+        get() = monitorConnectivity().value
 
     init {
         getContacts()
@@ -156,7 +165,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Edit scheduled meeting if there is internet connection, shows an error if not.
      */
     fun onEditTap() {
-        if (isConnected.value) {
+        if (isConnected) {
             Timber.d("Edit scheduled meeting")
         } else {
             showError()
@@ -179,7 +188,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Add participants to the chat room if there is internet connection, shows an error if not.
      */
     fun onAddParticipantsTap() {
-        if (isConnected.value) {
+        if (isConnected) {
             Timber.d("Add participants to the chat room")
         } else {
             showError()
@@ -197,7 +206,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Create or removed meeting link if there is internet connection, shows an error if not.
      */
     fun onMeetingLinkTap() {
-        if (isConnected.value) {
+        if (isConnected) {
             Timber.d("Add participants to the chat room")
         } else {
             showError()
@@ -208,7 +217,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Share meeting link if there is internet connection, shows an error if not.
      */
     fun onShareMeetingLinkTap() {
-        if (isConnected.value) {
+        if (isConnected) {
             Timber.d("Add participants to the chat room")
         } else {
             showError()
@@ -219,7 +228,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Enable or disable chat notifications if there is internet connection, shows an error if not.
      */
     fun onChatNotificationsTap() {
-        if (isConnected.value) {
+        if (isConnected) {
             Timber.d("Add participants to the chat room")
         } else {
             showError()
@@ -230,7 +239,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Enable or disable the option Allow non-host add participants to the chat room if there is internet connection, shows an error if not.
      */
     fun onAllowAddParticipantsTap() {
-        if (isConnected.value) {
+        if (isConnected) {
             Timber.d("Allow non host add participants to the chat room")
         } else {
             showError()
@@ -248,7 +257,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Manage chat history if there is internet connection, shows an error if not.
      */
     fun onManageChatHistoryTap() {
-        if (isConnected.value) {
+        if (isConnected) {
             Timber.d("Manage chat history")
         } else {
             showError()
@@ -259,7 +268,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Enable encrypted key rotation if there is internet connection, shows an error if not.
      */
     fun onEnableEncryptedKeyRotationTap() {
-        if (isConnected.value) {
+        if (isConnected) {
             Timber.d("Enable Encrypted Key Rotation")
         } else {
             showError()

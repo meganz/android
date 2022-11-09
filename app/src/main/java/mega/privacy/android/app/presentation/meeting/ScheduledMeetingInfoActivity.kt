@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
+import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -61,7 +62,7 @@ class ScheduledMeetingInfoActivity : ComponentActivity() {
         val uiState by viewModel.state.collectAsState()
 
         AndroidTheme(isDark = isDark) {
-            mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView(
+            ScheduledMeetingInfoView(
                 state = uiState,
                 onButtonClicked = ::onActionTap,
                 onEditClicked = viewModel::onEditTap,

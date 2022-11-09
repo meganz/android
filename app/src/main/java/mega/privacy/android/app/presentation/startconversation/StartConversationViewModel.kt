@@ -97,7 +97,6 @@ class StartConversationViewModel @Inject constructor(
 
     init {
         observeStateChanges()
-        observeStateChanges()
         getContacts()
         observeContactUpdates()
         observeLastGreenUpdates()

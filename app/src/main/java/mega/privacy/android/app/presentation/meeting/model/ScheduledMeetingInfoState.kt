@@ -1,10 +1,11 @@
 package mega.privacy.android.app.presentation.meeting.model
 
 import mega.privacy.android.app.meeting.list.adapter.ScheduledMeetingItem
+import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
 import mega.privacy.android.domain.entity.contacts.ContactItem
 
 /**
- * Data class defining the state of [mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel]
+ * Data class defining the state of [ScheduledMeetingInfoViewModel]
  *
  * @property buttons                                    List of available action buttons.
  * @property scheduledMeeting                           Current scheduled meeting item.
