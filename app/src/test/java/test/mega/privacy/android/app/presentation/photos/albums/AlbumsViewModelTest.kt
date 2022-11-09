@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
+import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
@@ -35,6 +36,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @ExperimentalCoroutinesApi
 class AlbumsViewModelTest {
@@ -49,6 +51,7 @@ class AlbumsViewModelTest {
     private val getDefaultAlbumsMap = mock<GetDefaultAlbumsMap>()
     private val removeFavourites = mock<RemoveFavourites>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
+    private val createAlbum = mock<CreateAlbum>()
 
     @Before
     fun setUp() {
@@ -63,6 +66,7 @@ class AlbumsViewModelTest {
             getFeatureFlag = getFeatureFlag,
             removeFavourites = removeFavourites,
             getNodeListByIds = getNodeListByIds,
+            createAlbum = createAlbum,
             defaultDispatcher = UnconfinedTestDispatcher(),
         )
     }
@@ -201,6 +205,33 @@ class AlbumsViewModelTest {
         underTest.state.drop(1).test {
             val actualUserAlbums = (1..3).map { awaitItem() }.last().albums.map { it.id }
             assertThat(expectedUserAlbums).isEqualTo(actualUserAlbums)
+        }
+    }
+
+    @Test
+    fun `test that create album returns an album with the right name`() = runTest {
+        val expectedAlbumName = "Album 1"
+
+        whenever(createAlbum(expectedAlbumName)).thenReturn(
+            createUserAlbum(title = expectedAlbumName)
+        )
+
+        underTest.createNewAlbum(expectedAlbumName)
+
+        underTest.state.drop(1).test {
+            val actualAlbum = awaitItem().currentAlbum as Album.UserAlbum
+            assertEquals(expectedAlbumName, actualAlbum.title)
+        }
+    }
+
+    @Test
+    fun `test that an error in creating an album would keep current album as null`() = runTest {
+        whenever(createAlbum(any())).thenAnswer { throw Exception() }
+
+        underTest.createNewAlbum("ABD")
+
+        underTest.state.test {
+            assertNull(awaitItem().currentAlbum)
         }
     }
 
