@@ -269,7 +269,7 @@ fun CreateNewAlbumDialog(
                         horizontalArrangement = Arrangement.End
                     ) {
                         Button(
-                            onClick = { onDismissRequest() },
+                            onClick = onDismissRequest,
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = Color.Transparent,
                             ),
@@ -288,7 +288,10 @@ fun CreateNewAlbumDialog(
                             )
                         }
                         Button(
-                            onClick = { onDialogPositiveButtonClicked(textState) },
+                            onClick = {
+                                onDismissRequest()
+                                onDialogPositiveButtonClicked(textState)
+                            },
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = Color.Transparent,
                             ),
