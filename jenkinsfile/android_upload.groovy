@@ -14,6 +14,13 @@ SDK_TAG = ""
 MEGACHAT_TAG = ""
 
 /**
+ * GitLab commands that can trigger this job.
+ */
+DELIVER_QA_CMD = "deliver_qa"
+PUBLISH_SDK_CMD = "publish_sdk"
+
+
+/**
  * Flag to decide whether we do clean before build SDK.
  * Possible values: yes|no
  */
@@ -44,28 +51,35 @@ pipeline {
 
         APK_VERSION_NAME_FOR_CD = "_${new Date().format('MMddHHmm')}"
 
+        // SDK build log. ${LOG_FILE} will be used by build.sh to export SDK build log.
+        SDK_LOG_FILE_NAME = "sdk_build_log.txt"
+        LOG_FILE = "${WORKSPACE}/${SDK_LOG_FILE_NAME}"
+
         // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
         BUILD_ARCHS = "arm64-v8a"
     }
     post {
         failure {
             script {
-                // download Jenkins console log to a file
-                withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
-                    sh 'curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o console.txt'
-                }
+
+                downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
                 if (hasGitLabMergeRequest()) {
-                    // if build is triggered by MR, send result to MR.
-                    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-                        // upload Jenkins console log to GitLab and get download link
-                        final String response = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
-                        def json = new groovy.json.JsonSlurperClassic().parseText(response)
+                    // upload Jenkins console log
+                    String jsonJenkinsLog = uploadFileToGitLab(CONSOLE_LOG_FILE)
 
-                        String message = failureMessage("<br/>") +
-                                "<br/>Build Log:\t${json.markdown}"
-                        sendMRComment(message)
+                    // upload SDK build log if SDK build fails
+                    String sdkBuildMessage = ""
+                    if (BUILD_STEP == "Build SDK For Publish") {
+                        def jsonSdkLog = uploadFileToGitLab(SDK_LOG_FILE_NAME)
+                        sdkBuildMessage = "<br/>SDK Build failed. Log:${jsonSdkLog}"
                     }
+
+                    String message = failureMessage("<br/>") +
+                            "<br/>Build Log:\t${jsonJenkinsLog}" +
+                            sdkBuildMessage
+
+                    sendToMR(message)
                 } else {
                     // if build is triggered by PUSH, send result only to Slack
                     withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
@@ -78,12 +92,15 @@ pipeline {
         success {
             script {
                 slackSend color: "good", message: successMessage("\n")
-                sendMRComment(successMessage("<br/>"))
+                sendToMR(successMessage("<br/>"))
             }
         }
     }
     stages {
         stage('Preparation') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Preparation'
@@ -97,6 +114,9 @@ pipeline {
             }
         }
         stage('Fetch SDK Submodules') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Fetch SDK Submodules'
@@ -124,6 +144,9 @@ pipeline {
             }
         }
         stage('Select SDK Version') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Select SDK Version'
@@ -153,6 +176,9 @@ pipeline {
         }
 
         stage('Download Dependency Lib for SDK') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Download Dependency Lib for SDK'
@@ -185,6 +211,9 @@ pipeline {
             }
         }
         stage('Build SDK') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Build SDK'
@@ -208,7 +237,59 @@ pipeline {
                 }
             }
         }
+
+        stage('Build SDK For Publish') {
+            when {
+                expression { triggerByPublishSdkCmd() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Build SDK For Publish'
+                    String buildArchs = "x86 armeabi-v7a x86_64 arm64-v8a"
+                    withEnv(["BUILD_ARCHS=${buildArchs}"]) {
+                        sh """
+                                cd ${WORKSPACE}/sdk/src/main/jni
+                                echo CLEANING SDK
+                                bash build.sh clean
+                            
+                                echo "=== START SDK BUILD===="
+                                bash build.sh all
+                            """
+                    }
+                }
+
+            }
+        }
+        stage('Publish SDK to Artifactory') {
+            when {
+                expression { triggerByPublishSdkCmd() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Publish SDK to Artifactory'
+
+                    withCredentials([
+                            string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+                            string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN'),
+                    ]) {
+                        withEnv([
+                                "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
+                                "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}",
+                                "SDK_PUBLISH_TYPE=dev"
+                        ]) {
+                            sh """
+                                cd ${WORKSPACE}
+                                ./gradlew sdk:artifactoryPublish
+                            """
+                        }
+                    }
+                }
+            }
+        }
         stage('Clean Android build') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Clean Android'
@@ -217,6 +298,9 @@ pipeline {
             }
         }
         stage('Build APK(GMS)') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Build APK (GMS)'
@@ -230,6 +314,9 @@ pipeline {
             }
         }
         stage('Sign APK(GMS)') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Sign APK(GMS)'
@@ -256,6 +343,9 @@ pipeline {
             }
         }
         stage('Upload APK(GMS) to Firebase') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Upload APK(GMS) to Firebase'
@@ -279,6 +369,9 @@ pipeline {
             }
         }
         stage('Build APK(HMS)') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Build APK(HMS)'
@@ -291,6 +384,9 @@ pipeline {
             }
         }
         stage('Sign APK(HMS)') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Sign APK(HMS)'
@@ -317,6 +413,9 @@ pipeline {
             }
         }
         stage('Upload HMS APK to Firebase') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Upload HMS APK to Firebase'
@@ -338,6 +437,9 @@ pipeline {
             }
         }
         stage('Build QA APK(GMS)') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Build QA APK(GMS)'
@@ -351,6 +453,9 @@ pipeline {
         }
 
         stage('Upload QA APK(GMS) to Firebase') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Upload QA APK(GMS) to Firebase'
@@ -374,6 +479,9 @@ pipeline {
 
 
         stage('Clean up') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Clean Up'
@@ -535,21 +643,6 @@ private boolean hasGitLabMergeRequest() {
 }
 
 /**
- * send message to GitLab MR comment
- * @param message message to send
- */
-private void sendMRComment(String message) {
-    if (hasGitLabMergeRequest()) {
-        def mrNumber = env.gitlabMergeRequestIid
-        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-            env.MARKDOWN_LINK = message
-            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
-        }
-    }
-}
-
-/**
  * compose the success message, which might be used for Slack or GitLab MR.
  * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
  * while GitLab MR uses "<br/>".
@@ -564,6 +657,35 @@ private String successMessage(String lineBreak) {
             "${lineBreak}Author:\t${gitlabUserName}" +
             "${lineBreak}Commit:\t${GIT_COMMIT}" +
             "${lineBreak}Trigger Reason: ${getTriggerReason()}"
+}
+
+/**
+ * Check this build is triggered by PUSH to a branch
+ * @return
+ */
+private boolean triggerByPush() {
+    return env.gitlabActionType == "PUSH"
+}
+
+
+/**
+ * Check if this build is triggered by a deliver_qa command
+ * @return
+ */
+private boolean triggerByDeliverQaCmd() {
+    return env.gitlabActionType == "NOTE" &&
+            env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase.startsWith(DELIVER_QA_CMD)
+}
+
+/**
+ * Check if this build is triggered by a publish_sdk command
+ * @return
+ */
+private boolean triggerByPublishSdkCmd() {
+    return env.gitlabActionType == "NOTE" &&
+            env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase.startsWith(PUBLISH_SDK_CMD)
 }
 
 /**
@@ -605,11 +727,11 @@ def parseDeliverQaParams() {
     result[KEY_TESTER_GROUP] = ""
 
     String command = env.gitlabTriggerPhrase
-    println("[DEBUG] parsing deliver_qa command parameters. \nuser input: $command")
-    if (command == null || !command.startsWith("deliver_qa")) {
+    println("[DEBUG] parsing ${DELIVER_QA_CMD} command parameters. \nuser input: $command")
+    if (command == null || !command.startsWith(DELIVER_QA_CMD)) {
         return result
     }
-    String params = command.substring("deliver_qa".length()).trim()
+    String params = command.substring(DELIVER_QA_CMD.length()).trim()
 
     // get release notes from parameter.
     int notesPos = params.indexOf(PARAM_NOTES)
@@ -701,5 +823,44 @@ private String readAppVersion() {
  */
 private String lastCommitMessage() {
     return sh(script: "git log --pretty=format:\"%x09%s\" -1", returnStdout: true).trim()
+}
+
+/**
+ * download jenkins build console log and save to file.
+ */
+private void downloadJenkinsConsoleLog(String downloaded) {
+    withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
+        sh "curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o ${downloaded}"
+    }
+}
+
+/**
+ * upload file to GitLab and return the GitLab link
+ * @param fileName the local file to be uploaded
+ * @return file link on GitLab
+ */
+private String uploadFileToGitLab(String fileName) {
+    String link = ""
+    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
+        link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
+        return link
+    }
+    return link
+}
+
+/**
+ * send message to GitLab MR comment
+ * @param message message to send
+ */
+private void sendToMR(String message) {
+    if (hasGitLabMergeRequest()) {
+        def mrNumber = env.gitlabMergeRequestIid
+        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+            env.MARKDOWN_LINK = message
+            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
+        }
+    }
 }
 
