@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -56,6 +57,7 @@ class MediaDiscoveryFragment : Fragment() {
 
     private val photosViewModel: PhotosViewModel by viewModels()
     internal val mediaDiscoveryViewModel: MediaDiscoveryViewModel by viewModels()
+    private val mediaDiscoveryZoomViewModel: MediaDiscoveryZoomViewModel by activityViewModels()
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -123,22 +125,30 @@ class MediaDiscoveryFragment : Fragment() {
     private fun setupFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mediaDiscoveryViewModel.state.collect { state ->
-                    if (state.selectedPhotoIds.isEmpty()) {
-                        if (actionMode != null) {
-                            exitActionMode()
+                launch {
+                    mediaDiscoveryViewModel.state.collect { state ->
+                        if (state.selectedPhotoIds.isEmpty()) {
+                            if (actionMode != null) {
+                                exitActionMode()
+                            }
+                        } else {
+                            if (actionMode == null) {
+                                enterActionMode()
+                            }
+                            actionMode?.title = state.selectedPhotoIds.size.toString()
                         }
-                    } else {
-                        if (actionMode == null) {
-                            enterActionMode()
+                        menu?.let {
+                            handleMenuIconsVisibility(isShowing = state.selectedTimeBarTab == TimeBarTab.All)
+                            if (state.selectedTimeBarTab == TimeBarTab.All) {
+                                handleZoomMenuEnableStatus()
+                            }
                         }
-                        actionMode?.title = state.selectedPhotoIds.size.toString()
                     }
-                    menu?.let {
-                        handleMenuIconsVisibility(isShowing = state.selectedTimeBarTab == TimeBarTab.All)
-                        if (state.selectedTimeBarTab == TimeBarTab.All) {
-                            handleZoomMenuEnableStatus()
-                        }
+                }
+
+                launch {
+                    mediaDiscoveryZoomViewModel.state.collect { zoomLevel ->
+                        mediaDiscoveryViewModel.updateZoomLevel(zoomLevel)
                     }
                 }
             }
@@ -281,10 +291,10 @@ class MediaDiscoveryFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_zoom_in -> {
-                mediaDiscoveryViewModel.zoomIn()
+                mediaDiscoveryZoomViewModel.zoomIn()
             }
             R.id.action_zoom_out -> {
-                mediaDiscoveryViewModel.zoomOut()
+                mediaDiscoveryZoomViewModel.zoomOut()
             }
             R.id.action_menu_sort_by -> {
                 showSortByDialog(
