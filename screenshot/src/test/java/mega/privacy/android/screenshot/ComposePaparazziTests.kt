@@ -21,7 +21,7 @@ class ComponentPreview(
 ) {
     val content: @Composable () -> Unit = showkaseBrowserComponent.component
     override fun toString(): String =
-        showkaseBrowserComponent.group + ":" + showkaseBrowserComponent.componentName
+        showkaseBrowserComponent.group + "--" + showkaseBrowserComponent.componentName
 }
 
 @RunWith(TestParameterInjector::class)
