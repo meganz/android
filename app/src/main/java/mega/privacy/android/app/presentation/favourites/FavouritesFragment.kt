@@ -169,7 +169,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.favouritesState.collect { favouritesState ->
                     setViewVisible(favouritesState)
-                    if (!viewModel.searchMode) {
+                    if (!favouritesState.showSearch) {
                         requireActivity().invalidateOptionsMenu()
                     }
                     if (favouritesState is FavouriteLoadState.Success) {
@@ -347,7 +347,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         if (actionMode != null) {
             RunOnUIThreadUtils.post { callManager { it.hideKeyboardSearch() } }
         }
-        viewModel.searchMode = true
+        viewModel.enableSearch()
         hideFabButton()
     }
 
