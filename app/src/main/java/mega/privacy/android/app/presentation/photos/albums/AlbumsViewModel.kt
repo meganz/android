@@ -175,6 +175,7 @@ class AlbumsViewModel @Inject constructor(
             _state.update {
                 it.copy(currentAlbum = album)
             }
+            Timber.d("Current album: ${album.title}")
         } catch (exception: Exception) {
             Timber.e(exception)
         }

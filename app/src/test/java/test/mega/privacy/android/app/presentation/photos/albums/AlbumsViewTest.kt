@@ -64,9 +64,12 @@ class AlbumsViewTest {
     @Test
     fun `test that without input clicking the positive dialog button calls the correct function`() {
         val onDialogPositiveButtonClicked = mock<(String) -> Unit>()
+        val onDismissRequest = mock<() -> Unit>()
+
         composeRule.setContent {
             CreateNewAlbumDialog(
-                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked
+                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
+                onDismissRequest = onDismissRequest,
             )
         }
 
@@ -79,9 +82,11 @@ class AlbumsViewTest {
     fun `test that with input clicking the positive dialog button calls the correct function`() {
         val expectedAlbumName = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         val onDialogPositiveButtonClicked = mock<(String) -> Unit>()
+        val onDismissRequest = mock<() -> Unit>()
         composeRule.setContent {
             CreateNewAlbumDialog(
-                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked
+                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
+                onDismissRequest = onDismissRequest,
             )
         }
 
