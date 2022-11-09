@@ -40,4 +40,20 @@ data class ImageResult constructor(
      */
     fun getLowestResolutionAvailableUri(): Uri? =
         thumbnailUri ?: previewUri ?: fullSizeUri
+
+    /**
+     * Get Progress percentage while Image is getting downloaded
+     *
+     * @return Int or null.
+     */
+    fun getProgressPercentage(): Int? {
+        transferredBytes?.let { transferred ->
+            totalBytes?.let { total ->
+                if (total != 0L && transferred != 0L) {
+                    return ((transferred * 1.0 / total) * 100).toInt()
+                }
+            }
+        }
+        return null
+    }
 }
