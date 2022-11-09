@@ -30,7 +30,7 @@ class DefaultGetFolderTypeTest {
 
 
     private val chatRepository = mock<ChatRepository>()
-    private val backupFolderId = NodeId(folderId.id + 1)
+    private val backupFolderId = Result.success(NodeId(folderId.id + 1))
 
     private val monitorBackupFolder = mock<MonitorBackupFolder> {
         onBlocking { invoke() }.thenReturn(flow {
@@ -41,7 +41,7 @@ class DefaultGetFolderTypeTest {
     }
     private val cameraUploadRepository = mock<CameraUploadRepository>()
     private val hasAncestor = mock<HasAncestor> {
-        onBlocking { invoke(folderId, backupFolderId) }.thenReturn(false)
+        onBlocking { invoke(folderId, backupFolderId.getOrThrow()) }.thenReturn(false)
     }
     private val getDeviceType =
         mock<GetDeviceType> { onBlocking { invoke(any()) }.thenReturn(DeviceType.Unknown) }
@@ -98,7 +98,7 @@ class DefaultGetFolderTypeTest {
     fun `test that backup folder is marked as root backup type`() = runTest {
         monitorBackupFolder.stub {
             onBlocking { invoke() }.thenReturn(flow {
-                emit(folderId)
+                emit(Result.success(folderId))
                 awaitCancellation()
             }
             )
@@ -112,7 +112,7 @@ class DefaultGetFolderTypeTest {
     @Test
     fun `test that a child of the backup folder is marked as child backup type`() = runTest {
         hasAncestor.stub {
-            onBlocking { invoke(folderId, backupFolderId) }.thenReturn(true)
+            onBlocking { invoke(folderId, backupFolderId.getOrThrow()) }.thenReturn(true)
         }
 
         val actual = underTest(testFolder)
@@ -145,5 +145,21 @@ class DefaultGetFolderTypeTest {
 
         assertThat(actual).isEqualTo(FolderType.DeviceBackup(expected))
     }
+
+    @Test
+    fun `test that default folder with failed backup folder result still returns default folder result`() =
+        runTest {
+            monitorBackupFolder.stub {
+                onBlocking { invoke() }.thenReturn(flow {
+                    emit(Result.failure(Throwable()))
+                    awaitCancellation()
+                }
+                )
+            }
+
+            val actual = underTest(testFolder)
+
+            assertThat(actual).isEqualTo(FolderType.Default)
+        }
 
 }

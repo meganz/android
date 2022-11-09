@@ -8,8 +8,8 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.exception.ChatLoggingOutException
 import mega.privacy.android.domain.exception.ChatNotInitializedException
-import mega.privacy.android.domain.exception.LoginAlreadyRunningException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.LoginRepository
 import nz.mega.sdk.MegaChatApi
@@ -40,25 +40,33 @@ class DefaultLoginRepository @Inject constructor(
             suspendCoroutine { continuation ->
                 var state = megaChatApiGateway.initState
 
-                if (state == MegaChatApi.INIT_NOT_DONE || state == MegaChatApi.INIT_ERROR) {
-                    state = megaChatApiGateway.init(session)
+                when (state) {
+                    MegaChatApi.INIT_NOT_DONE, MegaChatApi.INIT_ERROR -> {
+                        state = megaChatApiGateway.init(session)
 
-                    when (state) {
-                        MegaChatApi.INIT_NO_CACHE -> Timber.d("INIT_NO_CACHE")
-                        MegaChatApi.INIT_ERROR -> {
-                            val exception = ChatNotInitializedException()
-                            Timber.e("Init chat error: ${exception.message}. Logout...")
-                            megaChatApiGateway.logout()
-                            continuation.resumeWith(Result.failure(exception))
-                            return@suspendCoroutine
+                        when (state) {
+                            MegaChatApi.INIT_NO_CACHE -> Timber.d("INIT_NO_CACHE")
+                            MegaChatApi.INIT_ERROR -> {
+                                val exception = ChatNotInitializedException()
+                                Timber.e("Init chat error: ${exception.message}. Logout...")
+                                megaChatApiGateway.logout()
+                                continuation.resumeWith(Result.failure(exception))
+                                return@suspendCoroutine
+                            }
+                            else -> Timber.d("Chat correctly initialized")
                         }
-                        else -> Timber.d("Chat correctly initialized")
+                    }
+                    MegaChatApi.INIT_TERMINATED -> {
+                        Timber.w("Chat with terminated state, a logout is in progress.")
+                        continuation.resumeWith(Result.failure(ChatLoggingOutException()))
+                        return@suspendCoroutine
                     }
                 }
 
                 continuation.resumeWith(Result.success(Unit))
             }
         }
+
 
     override suspend fun fastLogin(session: String) =
         withContext(ioDispatcher) {

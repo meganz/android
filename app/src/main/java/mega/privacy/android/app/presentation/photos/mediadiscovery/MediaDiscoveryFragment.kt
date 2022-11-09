@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -37,6 +38,7 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDi
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
@@ -55,6 +57,7 @@ class MediaDiscoveryFragment : Fragment() {
 
     private val photosViewModel: PhotosViewModel by viewModels()
     internal val mediaDiscoveryViewModel: MediaDiscoveryViewModel by viewModels()
+    private val mediaDiscoveryZoomViewModel: MediaDiscoveryZoomViewModel by activityViewModels()
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -122,19 +125,30 @@ class MediaDiscoveryFragment : Fragment() {
     private fun setupFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mediaDiscoveryViewModel.state.collect { state ->
-                    if (state.selectedPhotoIds.isEmpty()) {
-                        if (actionMode != null) {
-                            exitActionMode()
+                launch {
+                    mediaDiscoveryViewModel.state.collect { state ->
+                        if (state.selectedPhotoIds.isEmpty()) {
+                            if (actionMode != null) {
+                                exitActionMode()
+                            }
+                        } else {
+                            if (actionMode == null) {
+                                enterActionMode()
+                            }
+                            actionMode?.title = state.selectedPhotoIds.size.toString()
                         }
-                    } else {
-                        if (actionMode == null) {
-                            enterActionMode()
+                        menu?.let {
+                            handleMenuIconsVisibility(isShowing = state.selectedTimeBarTab == TimeBarTab.All)
+                            if (state.selectedTimeBarTab == TimeBarTab.All) {
+                                handleZoomMenuEnableStatus()
+                            }
                         }
-                        actionMode?.title = state.selectedPhotoIds.size.toString()
                     }
-                    menu?.let {
-                        handleMenuIcons(isShowing = state.selectedTimeBarTab == TimeBarTab.All)
+                }
+
+                launch {
+                    mediaDiscoveryZoomViewModel.state.collect { zoomLevel ->
+                        mediaDiscoveryViewModel.updateZoomLevel(zoomLevel)
                     }
                 }
             }
@@ -147,12 +161,24 @@ class MediaDiscoveryFragment : Fragment() {
     ) {
         val uiState by viewModel.state.collectAsStateWithLifecycle()
 
+        val lazyGridState: LazyGridState =
+            rememberSaveable(
+                uiState.scrollStartIndex,
+                uiState.scrollStartOffset,
+                saver = LazyGridState.Saver,
+            ) {
+                LazyGridState(
+                    uiState.scrollStartIndex,
+                    uiState.scrollStartOffset,
+                )
+            }
+
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomEnd,
         ) {
             if (uiState.selectedTimeBarTab == TimeBarTab.All) {
-                PhotosGridView(uiState = uiState)
+                PhotosGridView(uiState = uiState, lazyGridState = lazyGridState)
             } else {
                 val dateCards = when (uiState.selectedTimeBarTab) {
                     TimeBarTab.Years -> uiState.yearsCardList
@@ -160,44 +186,37 @@ class MediaDiscoveryFragment : Fragment() {
                     TimeBarTab.Days -> uiState.daysCardList
                     else -> uiState.daysCardList
                 }
-                CardListView(dateCards = dateCards, uiState = uiState)
+                CardListView(dateCards = dateCards, lazyGridState = lazyGridState)
             }
 
-
-            TimeSwitchBar(uiState = uiState)
+            if (uiState.selectedPhotoIds.isEmpty()) {
+                TimeSwitchBar(uiState = uiState)
+            }
         }
-
     }
 
     @Composable
     fun CardListView(
         dateCards: List<DateCard>,
-        uiState: MediaDiscoveryViewState,
+        lazyGridState: LazyGridState,
     ) = CardListView(
         dateCards = dateCards,
         photoDownload = photosViewModel::downloadPhoto,
         onCardClick = mediaDiscoveryViewModel::onCardClick,
-        state = rememberSaveable(
-            uiState.scrollStartIndex,
-            uiState.scrollStartOffset,
-            saver = LazyGridState.Saver
-        ) {
-            LazyGridState(
-                uiState.scrollStartIndex,
-                uiState.scrollStartOffset
-            )
-        }
+        state = lazyGridState,
     )
 
     @Composable
-    fun PhotosGridView(uiState: MediaDiscoveryViewState) = PhotosGridView(
-        currentZoomLevel = uiState.currentZoomLevel,
-        photoDownland = photosViewModel::downloadPhoto,
-        onClick = this::onClick,
-        onLongPress = this::onLongPress,
-        selectedPhotoIds = mediaDiscoveryViewModel.state.value.selectedPhotoIds,
-        uiPhotoList = uiState.uiPhotoList,
-    )
+    fun PhotosGridView(uiState: MediaDiscoveryViewState, lazyGridState: LazyGridState) =
+        PhotosGridView(
+            currentZoomLevel = uiState.currentZoomLevel,
+            photoDownland = photosViewModel::downloadPhoto,
+            lazyGridState = lazyGridState,
+            onClick = this::onClick,
+            onLongPress = this::onLongPress,
+            selectedPhotoIds = mediaDiscoveryViewModel.state.value.selectedPhotoIds,
+            uiPhotoList = uiState.uiPhotoList,
+        )
 
     @Composable
     fun TimeSwitchBar(uiState: MediaDiscoveryViewState) = TimeSwitchBar(
@@ -256,18 +275,27 @@ class MediaDiscoveryFragment : Fragment() {
         inflater.inflate(R.menu.fragment_media_discovery_toolbar, menu)
         super.onCreateOptionsMenu(menu, inflater)
         this.menu = menu
+        handleMenuIconsVisibility(
+            isShowing = mediaDiscoveryViewModel.state.value.selectedTimeBarTab == TimeBarTab.All
+        )
     }
 
-    private fun handleMenuIcons(isShowing: Boolean) {
+    private fun handleMenuIconsVisibility(isShowing: Boolean) {
         this.menu?.apply {
             findItem(R.id.action_zoom_in)?.isVisible = isShowing
             findItem(R.id.action_zoom_out)?.isVisible = isShowing
-            findItem(R.id.action_photos_sortby)?.isVisible = isShowing
+            findItem(R.id.action_menu_sort_by)?.isVisible = isShowing
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.action_zoom_in -> {
+                mediaDiscoveryZoomViewModel.zoomIn()
+            }
+            R.id.action_zoom_out -> {
+                mediaDiscoveryZoomViewModel.zoomOut()
+            }
             R.id.action_menu_sort_by -> {
                 showSortByDialog(
                     context = managerActivity,
@@ -279,6 +307,25 @@ class MediaDiscoveryFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun handleZoomMenuEnableStatus() {
+        val isZoomInValid =
+            mediaDiscoveryViewModel.state.value.currentZoomLevel != ZoomLevel.values()
+                .first()
+        val isZoomOutValid =
+            mediaDiscoveryViewModel.state.value.currentZoomLevel != ZoomLevel.values()
+                .last()
+        this.menu?.let { menu ->
+            menu.findItem(R.id.action_zoom_in)?.let {
+                it.isEnabled = isZoomInValid
+                it.icon?.alpha = if (isZoomInValid) 255 else 125
+            }
+            menu.findItem(R.id.action_zoom_out)?.let {
+                it.isEnabled = isZoomOutValid
+                it.icon?.alpha = if (isZoomOutValid) 255 else 125
+            }
+        }
     }
 }
 

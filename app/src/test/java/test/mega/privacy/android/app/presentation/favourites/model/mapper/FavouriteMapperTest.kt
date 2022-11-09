@@ -8,12 +8,9 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -36,7 +33,7 @@ class FavouriteMapperTest {
         val expectedHasVersion = true
         val expectedIsAvailableOffline = false
         val expectedLabelColour = R.color.salmon_400_salmon_300
-        val expectedIsInRubbishBin = true
+        val expectedIsInRubbishBin = false
         val expectedIsIncomingShare = true
         val expectedIsShared = true
         val expectedIsPendingShare = true

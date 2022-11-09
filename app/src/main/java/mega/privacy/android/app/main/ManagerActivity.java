@@ -19,7 +19,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HO
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
@@ -132,7 +131,6 @@ import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.getSizeStringGBBased;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
 import static mega.privacy.android.app.utils.Util.hideKeyboardView;
-import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.isTablet;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
@@ -423,7 +421,6 @@ import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
-import mega.privacy.android.domain.entity.node.Node;
 import mega.privacy.android.domain.entity.transfer.TransferType;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import nz.mega.documentscanner.DocumentScannerActivity;
@@ -990,7 +987,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                     updateAccountDetailsVisibleInfo();
 
-                    if (megaApi.isBusinessAccount()) {
+                    if (isBusinessAccount()) {
                         supportInvalidateOptionsMenu();
                     }
                 } else if (actionType == UPDATE_PAYMENT_METHODS) {
@@ -1026,30 +1023,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 //update folder icon
                 onNodesCloudDriveUpdate();
-            }
-        }
-    };
-
-    private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Timber.d("Network broadcast received!");
-            int actionType;
-
-            if (intent != null) {
-                actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
-
-                if (actionType == GO_OFFLINE) {
-                    //stop cu process
-                    fireStopCameraUploadJob(ManagerActivity.this);
-                    showOfflineMode();
-                    LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean.class).post(false);
-                } else if (actionType == GO_ONLINE) {
-                    showOnlineMode();
-                    LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean.class).post(true);
-                } else if (actionType == START_RECONNECTION) {
-                    refreshSession();
-                }
             }
         }
     };
@@ -1557,9 +1530,6 @@ public class ManagerActivity extends TransfersManagementActivity
         filter.addAction(ACTION_STORAGE_STATE_CHANGED);
         registerReceiver(updateMyAccountReceiver, filter);
 
-        registerReceiver(networkReceiver,
-                new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
-
         registerReceiver(receiverCUAttrChanged,
                 new IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE));
 
@@ -1756,7 +1726,7 @@ public class ManagerActivity extends TransfersManagementActivity
              * @param refreshStorageInfo Parameter to indicate if refresh the storage info.
              */
             private void refreshDrawerInfo(boolean refreshStorageInfo) {
-                if (!isOnline(managerActivity) || megaApi == null || megaApi.getRootNode() == null) {
+                if (!viewModel.isConnected() || megaApi == null || megaApi.getRootNode() == null) {
                     disableNavigationViewLayout();
                 } else {
                     resetNavigationViewLayout();
@@ -2011,7 +1981,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         }
 
-        if (!isOnline(this)) {
+        if (!viewModel.isConnected()) {
             Timber.d("No network -> SHOW OFFLINE MODE");
 
             if (drawerItem == null) {
@@ -2648,6 +2618,17 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             return Unit.INSTANCE;
         });
+
+        ViewExtensionsKt.collectFlow(this, viewModel.getMonitorConnectivityEvent(), Lifecycle.State.STARTED, isConnected -> {
+            if (isConnected) {
+                showOnlineMode();
+            } else {
+                //stop cu process
+                fireStopCameraUploadJob(ManagerActivity.this);
+                showOfflineMode();
+            }
+            return Unit.INSTANCE;
+        });
     }
 
     /**
@@ -2688,7 +2669,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @return True if some warning has been shown, false otherwise.
      */
     private boolean checkBusinessStatus() {
-        if (!megaApi.isBusinessAccount()) {
+        if (!isBusinessAccount()) {
             return false;
         }
 
@@ -2758,7 +2739,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * Otherwise proceeds to enable CU.
      */
     public void checkIfShouldShowBusinessCUAlert() {
-        if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
+        if (isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
             showBusinessCUAlert();
         } else {
             enableCUClicked();
@@ -3574,7 +3555,6 @@ public class ManagerActivity extends TransfersManagementActivity
         unregisterReceiver(chatRoomMuteUpdateReceiver);
         unregisterReceiver(contactUpdateReceiver);
         unregisterReceiver(updateMyAccountReceiver);
-        unregisterReceiver(networkReceiver);
         unregisterReceiver(receiverUpdateOrder);
         unregisterReceiver(chatArchivedReceiver);
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
@@ -5298,7 +5278,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         setCallMenuItem(returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
 
-        if (isOnline(this)) {
+        if (viewModel.isConnected()) {
             switch (drawerItem) {
                 case CLOUD_DRIVE:
                     if (!isInMDMode) {
@@ -5438,7 +5418,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (searchExpand && openSearchView) {
             openSearchView();
         } else if (!searchExpand) {
-            if (isOnline(this)) {
+            if (viewModel.isConnected()) {
                 if (fullscreenOfflineFragment.getItemCount() > 0
                         && !fullscreenOfflineFragment.searchMode() && searchMenuItem != null) {
                     searchMenuItem.setVisible(true);
@@ -6925,7 +6905,7 @@ public class ManagerActivity extends TransfersManagementActivity
     @Override
     public void createFolder(@NotNull String title) {
         Timber.d("createFolder");
-        if (!isOnline(this)) {
+        if (!viewModel.isConnected()) {
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
@@ -7305,7 +7285,7 @@ public class ManagerActivity extends TransfersManagementActivity
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> {
                     if (finalNode != null) {
-                        if (!isOnline(managerActivity)) {
+                        if (!viewModel.isConnected()) {
                             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                             return;
                         }
@@ -7546,13 +7526,13 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         if (usedSpaceLayout != null) {
-            if (megaApi.isBusinessAccount()) {
+            if (isBusinessAccount()) {
                 usedSpaceLayout.setVisibility(View.GONE);
                 upgradeAccount.setVisibility(View.GONE);
                 if (settingsSeparator != null) {
                     settingsSeparator.setVisibility(View.GONE);
                 }
-                if (megaApi.isBusinessAccount()) {
+                if (isBusinessAccount()) {
                     businessLabel.setVisibility(View.VISIBLE);
                 }
             } else {
@@ -7833,7 +7813,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case R.id.navigation_drawer_account_section:
             case R.id.my_account_section: {
-                if (isOnline(this) && megaApi.getRootNode() != null) {
+                if (viewModel.isConnected() && megaApi.getRootNode() != null) {
                     showMyAccount();
                 }
                 break;
@@ -8424,7 +8404,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }
         } else if (requestCode == REQUEST_CODE_DELETE_VERSIONS_HISTORY && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
+            if (!viewModel.isConnected()) {
                 Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 return;
             }
@@ -8579,7 +8559,7 @@ public class ManagerActivity extends TransfersManagementActivity
     void resetNavigationViewMenu(Menu menu) {
         Timber.d("resetNavigationViewMenu()");
 
-        if (!isOnline(this) || megaApi == null || megaApi.getRootNode() == null) {
+        if (!viewModel.isConnected() || megaApi == null || megaApi.getRootNode() == null) {
             disableNavigationViewMenu(menu);
             return;
         }
@@ -10572,7 +10552,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void setCallBadge() {
-        if (!isOnline(this) || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall())) {
+        if (!viewModel.isConnected() || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall())) {
             callBadge.setVisibility(View.GONE);
             return;
         }
@@ -10950,7 +10930,7 @@ public class ManagerActivity extends TransfersManagementActivity
         } else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
             MegaNode node = megaApi.getNodeByHandle(Long.parseLong(transfer.getNodeHandle()));
             if (node == null) {
-                showSnackbar(SNACKBAR_TYPE, getString(!isOnline(this) ? R.string.error_server_connection_problem
+                showSnackbar(SNACKBAR_TYPE, getString(!viewModel.isConnected() ? R.string.error_server_connection_problem
                         : R.string.warning_folder_not_exists), MEGACHAT_INVALID_HANDLE);
                 return;
             }
@@ -11444,5 +11424,9 @@ public class ManagerActivity extends TransfersManagementActivity
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }
+    }
+
+    private boolean isBusinessAccount() {
+        return megaApi.isBusinessAccount() && myAccountInfo.getAccountType() == BUSINESS;
     }
 }

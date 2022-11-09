@@ -49,21 +49,21 @@ class MediaDiscoveryViewModel @Inject constructor(
     }
 
     private fun handlePhotoItems(sourcePhotos: List<Photo>, sort: Sort = _state.value.currentSort) {
-        val photos = sortPhotos(sourcePhotos, sort)
-        val dayPhotos = groupPhotosByDay(photos, sort)
-        val yearsCardList = createYearsCardList(dayPhotos)
-        val monthsCardList = createMonthsCardList(dayPhotos)
-        val daysCardList = createDaysCardList(dayPhotos)
+        val sortedPhotos = sortPhotos(photos = sourcePhotos, sort = sort)
+        val dayPhotos = groupPhotosByDay(sortedPhotos = sortedPhotos)
+        val yearsCardList = createYearsCardList(dayPhotos = dayPhotos)
+        val monthsCardList = createMonthsCardList(dayPhotos = dayPhotos)
+        val daysCardList = createDaysCardList(dayPhotos = dayPhotos)
         val currentZoomLevel = _state.value.currentZoomLevel
         val uiPhotoList = mutableListOf<UIPhoto>()
 
-        photos.forEachWithIndex { index, photo ->
+        sortedPhotos.forEachWithIndex { index, photo ->
             val shouldShowDate = if (index == 0)
                 true
             else
                 needsDateSeparator(
                     current = photo,
-                    previous = photos[index - 1],
+                    previous = sortedPhotos[index - 1],
                     currentZoomLevel = currentZoomLevel
                 )
             if (shouldShowDate) {
@@ -153,29 +153,29 @@ class MediaDiscoveryViewModel @Inject constructor(
     }
 
     fun onTimeBarTabSelected(timeBarTab: TimeBarTab) {
-        _state.update {
-            it.copy(selectedTimeBarTab = timeBarTab)
-        }
+        updateSelectedTimeBarState(selectedTimeBarTab = timeBarTab)
     }
 
     fun onCardClick(dateCard: DateCard) {
         when (dateCard) {
             is DateCard.YearsCard -> {
                 updateSelectedTimeBarState(TimeBarTab.Months,
-                    _state.value.monthsCardList.toMutableList().indexOfFirst {
+                    _state.value.monthsCardList.indexOfFirst {
                         it.photo.modificationTime == dateCard.photo.modificationTime
                     })
             }
             is DateCard.MonthsCard -> {
                 updateSelectedTimeBarState(TimeBarTab.Days,
-                    _state.value.daysCardList.toMutableList()
-                        .indexOfFirst { it.photo.modificationTime == dateCard.photo.modificationTime })
+                    _state.value.daysCardList.indexOfFirst {
+                        it.photo.modificationTime == dateCard.photo.modificationTime
+                    })
             }
             is DateCard.DaysCard -> {
                 updateSelectedTimeBarState(
                     TimeBarTab.All,
-                    _state.value.uiPhotoList.toMutableList()
-                        .indexOfFirst { it.key == dateCard.photo.id.toString() }
+                    _state.value.uiPhotoList.indexOfFirst {
+                        it.key == dateCard.photo.id.toString()
+                    },
                 )
             }
         }
@@ -192,6 +192,12 @@ class MediaDiscoveryViewModel @Inject constructor(
                 scrollStartIndex = startIndex,
                 scrollStartOffset = startOffset
             )
+        }
+    }
+
+    fun updateZoomLevel(zoomLevel: ZoomLevel) {
+        _state.update {
+            it.copy(currentZoomLevel = zoomLevel)
         }
     }
 }

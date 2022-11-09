@@ -38,12 +38,15 @@ class DefaultGetFolderType @Inject constructor(
         chatRepository.getChatFilesFolderId() == folder
 
     private suspend fun isRootBackup(folder: NodeId) =
-        monitorBackupFolder().firstOrNull() == folder
+        monitorBackupFolder().firstOrNull()?.getOrNull() == folder
 
     private suspend fun isChildBackup(
         nodeId: NodeId,
-    ) = monitorBackupFolder().firstOrNull()?.let { hasAncestor(nodeId, it) } ?: false
+    ) = monitorBackupFolder()
+        .firstOrNull()
+        ?.getOrNull()
+        ?.let { hasAncestor(nodeId, it) } ?: false
 
     private fun isDeviceFolder(folder: FolderNode) =
-        folder.device != null
+        !folder.device.isNullOrEmpty()
 }

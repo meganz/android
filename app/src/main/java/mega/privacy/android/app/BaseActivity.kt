@@ -29,12 +29,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
@@ -48,7 +50,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.LoginActivity
-import mega.privacy.android.app.main.LoginFragment
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.middlelayer.iab.BillingManager
@@ -82,6 +83,7 @@ import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
+import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.DISABLED_BUSINESS_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
@@ -126,6 +128,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.LogsType
 import mega.privacy.android.domain.entity.PurchaseType
+import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -179,6 +182,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     @Inject
     lateinit var loggingSettings: LegacyLoggingSettings
 
+    @Inject
+    lateinit var isDatabaseEntryStale: IsDatabaseEntryStale
+
     @JvmField
     var composite = CompositeDisposable()
 
@@ -214,7 +220,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * True if is a business account and is expired.
      */
     protected val isBusinessExpired: Boolean
-        get() = megaApi.isBusinessAccount && megaApi.businessStatus == MegaApiJava.BUSINESS_STATUS_EXPIRED
+        get() = megaApi.isBusinessAccount &&
+                myAccountInfo.accountType == BUSINESS &&
+                megaApi.businessStatus == MegaApiJava.BUSINESS_STATUS_EXPIRED
 
     /**
      * Get snackbar instance
@@ -909,9 +917,11 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
         //Check if the call is recently
         Timber.d("Check the last call to getAccountDetails")
-        if (dbH.callToAccountDetails()) {
-            Timber.d("megaApi.getAccountDetails SEND")
-            app?.askForAccountDetails()
+        lifecycleScope.launch {
+            if (isDatabaseEntryStale()) {
+                Timber.d("megaApi.getAccountDetails SEND")
+                app?.askForAccountDetails()
+            }
         }
     }
 
@@ -1114,10 +1124,14 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     /**
      * Launches an intent to navigate to Login screen.
      */
-    protected fun navigateToLogin() {
+    protected fun navigateToLogin(isNewTask: Boolean = false) {
         val intent = Intent(this, LoginActivity::class.java)
         intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        if (isNewTask) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        } else {
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
         startActivity(intent)
     }
 

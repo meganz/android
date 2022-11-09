@@ -193,7 +193,7 @@ class GetContactsUseCase @Inject constructor(
                         if (emitter.isCancelled) return@subscribeBy
 
                         users.forEach { user ->
-                            val index = contacts.indexOfFirst { it.email == user.email }
+                            val index = contacts.indexOfFirst { it.handle == user.handle }
                             when {
                                 index != INVALID_POSITION -> {
                                     when {
@@ -217,6 +217,27 @@ class GetContactsUseCase @Inject constructor(
                                     contacts.add(contact)
                                     emitter.onNext(contacts.sortedAlphabetically())
                                     contact.requestMissingFields(userAttrsListener)
+                                }
+                                user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING) -> {
+                                    mutableListOf<ContactItem.Data>()
+                                        .apply { addAll(contacts) }
+                                        .forEachIndexed { i, _ ->
+                                            val currentContact = contacts[i]
+                                            val currentUser =
+                                                megaApi.getContact(currentContact.email)
+
+                                            currentUser?.let {
+                                                val isVerified = megaApi.areCredentialsVerified(it)
+
+                                                if (currentContact.isVerified != isVerified) {
+                                                    contacts[i] = currentContact.copy(
+                                                        isVerified = isVerified
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                    emitter.onNext(contacts.sortedAlphabetically())
                                 }
                             }
                         }
@@ -261,6 +282,7 @@ class GetContactsUseCase @Inject constructor(
             null
         }
         val isNew = wasRecentlyAdded() && megaChatApi.getChatRoomByUser(handle) == null
+        val isVerified = megaApi.areCredentialsVerified(this)
 
         return ContactItem.Data(
             handle = handle,
@@ -271,7 +293,8 @@ class GetContactsUseCase @Inject constructor(
             statusColor = getUserStatusColor(userStatus),
             avatarUri = userAvatar,
             placeholder = placeholder,
-            isNew = isNew
+            isNew = isNew,
+            isVerified = isVerified
         )
     }
 

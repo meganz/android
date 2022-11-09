@@ -2,9 +2,7 @@ package mega.privacy.android.data.mapper
 
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import nz.mega.sdk.MegaNode
 
@@ -73,6 +71,8 @@ internal suspend fun toNode(
         isExported = megaNode.isExported,
         isTakenDown = megaNode.isTakenDown,
         isIncomingShare = megaNode.isInShare,
+        fingerprint = megaNode.fingerprint,
+        duration = megaNode.duration
     )
 }
 

@@ -26,9 +26,10 @@ sealed class ContactItem(val id: Long) {
      * @property status         User status code
      * @property statusColor    User status color
      * @property avatarUri      User avatar uri
-     * @property placeholder    User avatar placehodler
+     * @property placeholder    User avatar placeholder
      * @property lastSeen       User last seen description
      * @property isNew          User flag to know if it has been added recently
+     * @property isVerified     User flag to know if the contact has been verified
      */
     data class Data constructor(
         val handle: Long,
@@ -40,7 +41,8 @@ sealed class ContactItem(val id: Long) {
         var avatarUri: Uri? = null,
         val placeholder: Drawable,
         val lastSeen: String? = null,
-        val isNew: Boolean = false
+        val isNew: Boolean = false,
+        val isVerified: Boolean = false,
     ) : ContactItem(handle) {
 
         fun getTitle(): String =

@@ -94,16 +94,16 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    internal suspend fun handleAndUpdatePhotosUIState(
+    internal fun handleAndUpdatePhotosUIState(
         sourcePhotos: List<Photo>,
         showingPhotos: List<Photo>,
     ) {
         sortPhotos(showingPhotos)
-        val photosListItems = handleAllPhotoItems(showingPhotos)
-        val dayPhotos = groupPhotosByDay(showingPhotos, _state.value.currentSort)
-        val yearCardList = createYearsCardList(dayPhotos)
-        val monthCardList = createMonthsCardList(dayPhotos)
-        val dayCardList = createDaysCardList(dayPhotos)
+        val photosListItems = handleAllPhotoItems(showingPhotos = showingPhotos)
+        val dayPhotos = groupPhotosByDay(sortedPhotos = showingPhotos)
+        val yearCardList = createYearsCardList(dayPhotos = dayPhotos)
+        val monthCardList = createMonthsCardList(dayPhotos = dayPhotos)
+        val dayCardList = createDaysCardList(dayPhotos = dayPhotos)
 
         _state.update {
             it.copy(

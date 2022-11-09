@@ -105,7 +105,6 @@ import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_PLAY_VOICE_
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CHAT_ARCHIVED;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
@@ -175,7 +174,6 @@ import static mega.privacy.android.app.utils.Constants.SELECTED_USERS;
 import static mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE;
 import static mega.privacy.android.app.utils.Constants.SHOW_SNACKBAR;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.START_RECONNECTION;
 import static mega.privacy.android.app.utils.Constants.TOUR_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.TYPE_END_RECORD;
 import static mega.privacy.android.app.utils.Constants.TYPE_ERROR_RECORD;
@@ -9689,7 +9687,7 @@ public class ChatActivity extends PasscodeActivity
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        startConnection();
+                        navigateToLogin(true);
                         finish();
                         break;
 
@@ -9706,13 +9704,6 @@ public class ChatActivity extends PasscodeActivity
                     .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
         } catch (Exception e) {
         }
-    }
-
-    public void startConnection() {
-        Timber.d("Broadcast to ManagerActivity");
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-        intent.putExtra(ACTION_TYPE, START_RECONNECTION);
-        sendBroadcast(intent);
     }
 
     public int getDeviceDensity() {
