@@ -84,6 +84,9 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+/**
+ * Scheduled meeting info View
+ */
 @Composable
 fun ScheduledMeetingInfoView(
     state: ScheduledMeetingInfoState,
@@ -115,7 +118,7 @@ fun ScheduledMeetingInfoView(
     ) { paddingValues ->
         LazyColumn(state = listState,
             modifier = Modifier.padding(paddingValues)) {
-            item(key = "Scheduled meeting title") { ScheduledMeetingTitleView(uiState = state) }
+            item(key = "Scheduled meeting title") { ScheduledMeetingTitleView(state = state) }
 
             state.apply {
                 items(buttons) { button ->
@@ -177,6 +180,16 @@ fun ScheduledMeetingInfoView(
     onScrollChange(!firstItemVisible)
 }
 
+/**
+ * Scheduled meeting info App bar view
+ *
+ * @param state                     [ScheduledMeetingInfoState]
+ * @param onEditClicked             When edit option is clicked
+ * @param onAddParticipantsClicked  When add participants option is clicked
+ * @param onBackPressed             When on back pressed option is clicked
+ * @param titleId                   Title id
+ * @param elevation                 True if it has elevation. False, if it does not.
+ */
 @Composable
 private fun ScheduledMeetingInfoAppBar(
     state: ScheduledMeetingInfoState,
@@ -226,8 +239,13 @@ private fun ScheduledMeetingInfoAppBar(
     )
 }
 
+/**
+ * Scheduled meeting info title view
+ *
+ * @param state [ScheduledMeetingInfoState]
+ */
 @Composable
-private fun ScheduledMeetingTitleView(uiState: ScheduledMeetingInfoState) {
+private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
     Column {
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -236,19 +254,19 @@ private fun ScheduledMeetingTitleView(uiState: ScheduledMeetingInfoState) {
             Box(modifier = Modifier
                 .size(40.dp)
                 .background(Color.Transparent)) {
-                MeetingAvatar(scheduledMeetingItem = uiState.scheduledMeeting)
+                MeetingAvatar(scheduledMeetingItem = state.scheduledMeeting)
             }
             Column(modifier = Modifier
                 .padding(start = 16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = uiState.scheduledMeeting.title,
+                    Text(text = state.scheduledMeeting.title,
                         style = MaterialTheme.typography.subtitle1,
                         color = if (MaterialTheme.colors.isLight) black else white,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
                 }
-                Text(text = uiState.scheduledMeeting.date,
+                Text(text = state.scheduledMeeting.date,
                     style = MaterialTheme.typography.subtitle2,
                     color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
                     maxLines = 1,
@@ -260,10 +278,15 @@ private fun ScheduledMeetingTitleView(uiState: ScheduledMeetingInfoState) {
     }
 }
 
+/**
+ * Create meeting avatar view
+ *
+ * @param scheduledMeetingItem [ScheduledMeetingItem]
+ */
 @Composable
 private fun MeetingAvatar(scheduledMeetingItem: ScheduledMeetingItem) {
     if (scheduledMeetingItem.isEmptyMeeting()) {
-        DefaultAvatar(titleChat = scheduledMeetingItem.title)
+        DefaultAvatar(title = scheduledMeetingItem.title)
     } else if (scheduledMeetingItem.isSingleMeeting()) {
         OneParticipantAvatar(firstUser = scheduledMeetingItem.firstUser ?: return)
     } else {
@@ -272,8 +295,13 @@ private fun MeetingAvatar(scheduledMeetingItem: ScheduledMeetingItem) {
     }
 }
 
+/**
+ * Create default avatar of a meeting
+ *
+ * @param title Title of the meeting
+ */
 @Composable
-private fun DefaultAvatar(titleChat: String) {
+private fun DefaultAvatar(title: String) {
     Box(contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
@@ -292,7 +320,7 @@ private fun DefaultAvatar(titleChat: String) {
                 }
             }) {
         Text(
-            text = AvatarUtil.getFirstLetter(titleChat),
+            text = AvatarUtil.getFirstLetter(title),
             textAlign = TextAlign.Center,
             color = Color.White,
             style = MaterialTheme.typography.h6
@@ -300,6 +328,11 @@ private fun DefaultAvatar(titleChat: String) {
     }
 }
 
+/**
+ * Meeting avatar with one participant view
+ *
+ * @param firstUser [GroupChatParticipant]
+ */
 @Composable
 fun OneParticipantAvatar(firstUser: GroupChatParticipant) {
     Box(contentAlignment = Alignment.Center,
@@ -326,6 +359,12 @@ fun OneParticipantAvatar(firstUser: GroupChatParticipant) {
     }
 }
 
+/**
+ * Meeting avatar with several participants view
+ *
+ * @param firstUser [GroupChatParticipant]
+ * @param lastUser  [GroupChatParticipant]
+ */
 @Composable
 fun SeveralParticipantsAvatar(
     firstUser: GroupChatParticipant,
@@ -370,18 +409,14 @@ fun SeveralParticipantsAvatar(
     }
 }
 
-@Composable
-private fun ParticipantsHeader(state: ScheduledMeetingInfoState) {
-    Text(modifier = Modifier.padding(start = 16.dp,
-        top = 17.dp,
-        end = 16.dp,
-        bottom = 12.dp),
-        text = stringResource(id = R.string.participants_number, state.participantItemList.size),
-        style = MaterialTheme.typography.body2,
-        fontWeight = FontWeight.Medium,
-        color = if (MaterialTheme.colors.isLight) black else white)
-}
-
+/**
+ * Control and show the available buttons
+ *
+ * @param state             [ScheduledMeetingInfoState]
+ * @param action            [ScheduledMeetingInfoAction]
+ * @param scheduledMeeting  [ScheduledMeetingItem]
+ * @param onButtonClicked
+ */
 @Composable
 private fun ActionButton(
     state: ScheduledMeetingInfoState,
@@ -455,6 +490,29 @@ private fun ActionButton(
     }
 }
 
+/**
+ * Participants header view
+ *
+ * @param state [ScheduledMeetingInfoState]
+ */
+@Composable
+private fun ParticipantsHeader(state: ScheduledMeetingInfoState) {
+    Text(modifier = Modifier.padding(start = 16.dp,
+        top = 17.dp,
+        end = 16.dp,
+        bottom = 12.dp),
+        text = stringResource(id = R.string.participants_number, state.participantItemList.size),
+        style = MaterialTheme.typography.body2,
+        fontWeight = FontWeight.Medium,
+        color = if (MaterialTheme.colors.isLight) black else white)
+}
+
+/**
+ * Add participants button view
+ *
+ * @param state [ScheduledMeetingInfoState]
+ * @param onAddParticipantsClicked
+ */
 @Composable
 private fun AddParticipantsButton(
     state: ScheduledMeetingInfoState,
@@ -485,6 +543,11 @@ private fun AddParticipantsButton(
     }
 }
 
+/**
+ * See more participants in the list button view
+ *
+ * @param onSeeMoreClicked
+ */
 @Composable
 private fun SeeMoreParticipantsButton(
     onSeeMoreClicked: () -> Unit,
@@ -509,6 +572,11 @@ private fun SeeMoreParticipantsButton(
     }
 }
 
+/**
+ * Leave group button view
+ *
+ * @param onLeaveGroupClicked
+ */
 @Composable
 private fun LeaveGroupButton(
     onLeaveGroupClicked: () -> Unit,
@@ -527,6 +595,11 @@ private fun LeaveGroupButton(
     }
 }
 
+/**
+ * Divider options view
+ *
+ * @param withStartPadding True, if has start padding. False, if not
+ */
 @Composable
 fun divider(withStartPadding: Boolean) {
     Divider(
@@ -536,6 +609,13 @@ fun divider(withStartPadding: Boolean) {
         thickness = 1.dp)
 }
 
+/**
+ * Show action buttons options
+ *
+ * @param action        [ScheduledMeetingInfoAction]
+ * @param isEnabled     True, if the option must be enabled. False if not
+ * @param hasSwitch     True, if the option has a switch. False if not
+ */
 @Composable
 private fun ActionOption(
     action: ScheduledMeetingInfoAction,
@@ -577,6 +657,9 @@ private fun ActionOption(
     }
 }
 
+/**
+ * Control the colours of the switch depending on the status
+ */
 @Composable
 private fun switchColors() = SwitchDefaults.colors(
     checkedThumbColor = colorResource(id = R.color.teal_300_teal_200),
@@ -585,6 +668,11 @@ private fun switchColors() = SwitchDefaults.colors(
     uncheckedTrackColor = colorResource(id = R.color.grey_700_grey_050_038),
 )
 
+/**
+ * Text of the available options
+ *
+ * @param actionText Title of the option
+ */
 @Composable
 private fun ActionText(actionText: Int) {
     Text(modifier = Modifier
@@ -594,6 +682,12 @@ private fun ActionText(actionText: Int) {
         color = if (MaterialTheme.colors.isLight) black else white)
 }
 
+/**
+ * View of a participant in the list
+ *
+ * @param participant   [ContactItem]
+ * @param onClick       Detect when a participant is clicked
+ */
 @Composable
 private fun ParticipantItemView(participant: ContactItem, onClick: () -> Unit) {
     Column {
@@ -605,7 +699,7 @@ private fun ParticipantItemView(participant: ContactItem, onClick: () -> Unit) {
             Row(modifier = Modifier
                 .weight(1f)) {
                 Box {
-                    ContactAvatar(contactItem = participant)
+                    ParticipantAvatar(contactItem = participant)
                 }
 
                 Column(modifier = Modifier
@@ -663,6 +757,12 @@ private fun ParticipantItemView(participant: ContactItem, onClick: () -> Unit) {
     }
 }
 
+/**
+ * Last seen text
+ *
+ * @param lastGreen     User last seen.
+ * @return              Text with the info of last seen of a participant
+ */
 @Composable
 private fun getLastSeenString(lastGreen: Int?): String? {
     if (lastGreen == null) return null
@@ -695,6 +795,12 @@ private fun getLastSeenString(lastGreen: Int?): String? {
     }.replace("[A]", "").replace("[/A]", "")
 }
 
+/**
+ * Compare last seen with today
+ *
+ * @param lastGreen     Calendar with last green
+ * @return              User last seen.
+ */
 private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
     val today = Calendar.getInstance()
 
@@ -711,6 +817,11 @@ private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
     }
 }
 
+/**
+ * Contact status view
+ *
+ * @param status [UserStatus]
+ */
 @Composable
 private fun ContactStatus(
     modifier: Modifier = Modifier.padding(start = 5.dp, top = 2.dp),
@@ -737,8 +848,13 @@ private fun ContactStatus(
         contentDescription = "Contact status")
 }
 
+/**
+ * Participant avatar
+ *
+ * @param contactItem [ContactItem]
+ */
 @Composable
-private fun ContactAvatar(
+private fun ParticipantAvatar(
     modifier: Modifier = Modifier
         .padding(16.dp)
         .size(40.dp)
@@ -750,12 +866,17 @@ private fun ContactAvatar(
     if (avatarUri != null) {
         UriAvatar(modifier = modifier, uri = avatarUri)
     } else {
-        DefaultContactAvatar(modifier = modifier,
+        DefaultParticipantAvatar(modifier = modifier,
             color = Color(contactItem.defaultAvatarColor.toColorInt()),
             content = contactItem.getAvatarFirstLetter())
     }
 }
 
+/**
+ * Show avatar image view
+ *
+ * @param uri Uri
+ */
 @Composable
 private fun UriAvatar(modifier: Modifier, uri: String) {
     Image(modifier = modifier,
@@ -763,8 +884,18 @@ private fun UriAvatar(modifier: Modifier, uri: String) {
         contentDescription = "User avatar")
 }
 
+/**
+ * Default participant avatar
+ *
+ * @param color     Avatar color
+ * @param content   First letter
+ */
 @Composable
-fun DefaultContactAvatar(modifier: Modifier = Modifier.size(40.dp), color: Color, content: String) {
+fun DefaultParticipantAvatar(
+    modifier: Modifier = Modifier.size(40.dp),
+    color: Color,
+    content: String,
+) {
     Box(contentAlignment = Alignment.Center,
         modifier = modifier
             .background(color = color, shape = CircleShape)
@@ -788,6 +919,9 @@ fun DefaultContactAvatar(modifier: Modifier = Modifier.size(40.dp), color: Color
     }
 }
 
+/**
+ * Meeting link action button View Preview
+ */
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewActionButton")
 @Composable
@@ -800,6 +934,9 @@ fun PreviewActionButton() {
     }
 }
 
+/**
+ * Add participants button View Preview
+ */
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkAddParticipantsButton")
 @Composable
@@ -809,6 +946,9 @@ fun PreviewAddParticipantsButton() {
     }
 }
 
+/**
+ * Scheduled meeting info View Preview
+ */
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewScheduledMeetingInfoView")
 @Composable
