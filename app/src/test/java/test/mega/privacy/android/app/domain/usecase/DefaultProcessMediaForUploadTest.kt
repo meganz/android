@@ -75,36 +75,38 @@ class DefaultProcessMediaForUploadTest {
     }
 
     @Test
-    fun `primary and secondary photos are prepared when secondary folder is enabled`() = runTest {
-        whenever(getSyncFileUploadUris.invoke()).thenReturn(listOf(
-            MediaStore.Images.Media.INTERNAL_CONTENT_URI,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-        ))
-        whenever(isSecondaryFolderEnabled.invoke()).thenReturn(true)
-        underTest(null, null, null)
-        val inOrder = inOrder(updateTimeStamp, cameraUploadSyncManagerWrapper)
-        inOrder.verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
-        inOrder.verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.SECONDARY_PHOTO)
-        inOrder.verify(cameraUploadSyncManagerWrapper, Times(1))
-            .updateSecondaryFolderBackupState(BackupState.ACTIVE)
-    }
+    fun `test that primary and secondary photos are prepared when secondary folder is enabled`() =
+        runTest {
+            whenever(getSyncFileUploadUris.invoke()).thenReturn(listOf(
+                MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            ))
+            whenever(isSecondaryFolderEnabled.invoke()).thenReturn(true)
+            underTest(null, null, null)
+            val inOrder = inOrder(updateTimeStamp, cameraUploadSyncManagerWrapper)
+            inOrder.verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
+            inOrder.verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.SECONDARY_PHOTO)
+            inOrder.verify(cameraUploadSyncManagerWrapper, Times(1))
+                .updateSecondaryFolderBackupState(BackupState.ACTIVE)
+        }
 
     @Test
-    fun `both primary photos and videos are prepared when video upload is enabled`() = runTest {
-        whenever(getSyncFileUploadUris.invoke()).thenReturn(listOf(
-            MediaStore.Images.Media.INTERNAL_CONTENT_URI,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-            MediaStore.Video.Media.INTERNAL_CONTENT_URI,
-        ))
-        whenever(isSecondaryFolderEnabled.invoke()).thenReturn(false)
-        underTest(null, null, null)
-        verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
-        verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.PRIMARY_VIDEO)
-    }
+    fun `test that both primary photos and videos are prepared when video upload is enabled`() =
+        runTest {
+            whenever(getSyncFileUploadUris.invoke()).thenReturn(listOf(
+                MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                MediaStore.Video.Media.INTERNAL_CONTENT_URI,
+            ))
+            whenever(isSecondaryFolderEnabled.invoke()).thenReturn(false)
+            underTest(null, null, null)
+            verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
+            verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.PRIMARY_VIDEO)
+        }
 
     @Test
-    fun `both primary and secondary photos and videos are prepared when secondary folder upload is enabled`() =
+    fun `test that both primary and secondary photos and videos are prepared when secondary folder upload is enabled`() =
         runTest {
             whenever(getSyncFileUploadUris.invoke()).thenReturn(listOf(
                 MediaStore.Images.Media.INTERNAL_CONTENT_URI,
@@ -121,7 +123,7 @@ class DefaultProcessMediaForUploadTest {
         }
 
     @Test
-    fun `cancellation exception is thrown when the operation is cancelled`() =
+    fun `test that cancellation exception is thrown when the operation is cancelled`() =
         runTest {
             val job = launch {
                 whenever(getSyncFileUploadUris.invoke()).thenReturn(listOf(
