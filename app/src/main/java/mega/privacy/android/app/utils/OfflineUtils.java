@@ -46,17 +46,17 @@ import java.util.List;
 import java.util.Map;
 
 import kotlin.Unit;
-import mega.privacy.android.app.LegacyDatabaseHandler;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.data.gateway.api.MegaApiGateway;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.gateway.api.MegaApiGateway;
 import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -203,7 +203,6 @@ public class OfflineUtils {
     }
 
     public static boolean availableOffline(Context context, MegaNode node) {
-
         LegacyDatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
 
         if (dbH.exists(node.getHandle())) {

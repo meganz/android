@@ -1,6 +1,6 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase
 
-import nz.mega.sdk.MegaRecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionBucket
 
 /**
  * Update the recent action bucket given in parameter
@@ -16,7 +16,7 @@ interface UpdateRecentAction {
      * @return the update current bucket, null if the bucket does not exist anymore
      */
     suspend operator fun invoke(
-        currentBucket: MegaRecentActionBucket,
-        cachedActionList: List<MegaRecentActionBucket>?,
-    ): MegaRecentActionBucket?
+        currentBucket: RecentActionBucket,
+        cachedActionList: List<RecentActionBucket>?,
+    ): RecentActionBucket?
 }

@@ -13,15 +13,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.domain.usecase.UpdateRecentAction
+import mega.privacy.android.domain.usecase.UpdateRecentAction
 import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.RecentActionBucket
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRecentActionBucket
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -55,10 +55,10 @@ class RecentsBucketViewModel @Inject constructor(
     /**
      * Current bucket
      */
-    private val _bucket: MutableStateFlow<MegaRecentActionBucket?> = MutableStateFlow(null)
+    private val _bucket: MutableStateFlow<RecentActionBucket?> = MutableStateFlow(null)
     val bucket = _bucket.asStateFlow()
 
-    private var cachedActionList: List<MegaRecentActionBucket>? = null
+    private var cachedActionList: List<RecentActionBucket>? = null
 
     private val _shouldCloseFragment: MutableLiveData<Boolean> = MutableLiveData(false)
 
@@ -99,7 +99,7 @@ class RecentsBucketViewModel @Inject constructor(
      *
      * @param selectedBucket
      */
-    fun setBucket(selectedBucket: MegaRecentActionBucket?) = viewModelScope.launch {
+    fun setBucket(selectedBucket: RecentActionBucket?) = viewModelScope.launch {
         _bucket.emit(selectedBucket)
     }
 
@@ -108,7 +108,7 @@ class RecentsBucketViewModel @Inject constructor(
      *
      * @param cachedActions
      */
-    fun setCachedActionList(cachedActions: List<MegaRecentActionBucket>?) {
+    fun setCachedActionList(cachedActions: List<RecentActionBucket>?) {
         cachedActionList = cachedActions
     }
 
@@ -232,4 +232,3 @@ class RecentsBucketViewModel @Inject constructor(
             }
     }
 }
-

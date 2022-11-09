@@ -135,7 +135,7 @@ class FileBrowserFragment : RotatableFragment() {
     private var density = 0f
     private var outMetrics: DisplayMetrics? = null
     private var display: Display? = null
-    private var _nodes = mutableListOf<MegaNode>()
+    private var _nodes = mutableListOf<MegaNode?>()
     private var actionMode: ActionMode? = null
     private var mLayoutManager: LinearLayoutManager? = null
     private var gridLayoutManager: CustomizedGridLayoutManager? = null
@@ -188,7 +188,7 @@ class FileBrowserFragment : RotatableFragment() {
                 }
                 R.id.cab_menu_rename -> {
                     if (documents?.size == 1) {
-                        (context as? ManagerActivity)?.showRenameDialog(documents[0])
+                        (activity as? ManagerActivity)?.showRenameDialog(documents[0])
                     }
                     clearSelections()
                     hideMultipleSelect()
@@ -196,14 +196,14 @@ class FileBrowserFragment : RotatableFragment() {
                 R.id.cab_menu_copy -> {
                     documents?.map { it.handle }?.let {
                         handleList.addAll(it)
-                        val nC = NodeController(context)
+                        val nC = NodeController(activity)
                         nC.chooseLocationToCopyNodes(handleList)
                     }
                     clearSelections()
                     hideMultipleSelect()
                 }
                 R.id.cab_menu_move -> {
-                    val nC = NodeController(context)
+                    val nC = NodeController(activity)
                     documents?.map { it.handle }?.let {
                         handleList.addAll(it)
                         nC.chooseLocationToMoveNodes(handleList)
@@ -215,7 +215,7 @@ class FileBrowserFragment : RotatableFragment() {
                     documents?.filter { it.isFolder }
                         ?.map { it.handle }?.let {
                             handleList.addAll(it)
-                            val nC = NodeController(context)
+                            val nC = NodeController(activity)
                             fileBackupManager?.let { backupManager ->
                                 if (!backupManager.shareBackupFolderInMenu(
                                         nC,
@@ -864,7 +864,7 @@ class FileBrowserFragment : RotatableFragment() {
             Timber.d("itemClick:isFile:otherOption")
 
             val managerActivity = activity as? ManagerActivity ?: return
-            onNodeTapped(requireContext(),
+            onNodeTapped(requireActivity(),
                 node,
                 { saveNode: MegaNode? -> (activity as? ManagerActivity)?.saveNodeByTap(saveNode) },
                 managerActivity,
@@ -912,7 +912,7 @@ class FileBrowserFragment : RotatableFragment() {
                 }
             } else {
                 //Is file
-                openFile(_nodes[position], position)
+                _nodes[position]?.let { openFile(it, position) }
             }
         }
     }
@@ -1129,7 +1129,7 @@ class FileBrowserFragment : RotatableFragment() {
     }
 
     @Suppress("DEPRECATION")
-    fun setNodes(nodes: MutableList<MegaNode>) {
+    fun setNodes(nodes: MutableList<MegaNode?>) {
         Timber.d("Nodes size: ${nodes.size}")
         visibilityFastScroller()
         this._nodes = nodes
@@ -1231,8 +1231,10 @@ class FileBrowserFragment : RotatableFragment() {
     }
 
     private fun updateNode(handle: Long) {
-        val index = _nodes.indexOfFirst { it.handle == handle }
-        _nodes[index] = megaApi.getNodeByHandle(handle)
+        val index = _nodes.indexOfFirst { it?.handle == handle }.takeUnless { it == -1 }
+        if (index != null) {
+            _nodes[index] = megaApi.getNodeByHandle(handle)
+        }
     }
 
     /**
@@ -1334,7 +1336,7 @@ class FileBrowserFragment : RotatableFragment() {
      *
      * @return the list of selected nodes
      */
-    val nodeList: List<MegaNode>
+    val nodeList: List<MegaNode?>
         get() = _nodes
 
     fun showMediaDiscovery() {
@@ -1375,9 +1377,9 @@ class FileBrowserFragment : RotatableFragment() {
     /**
      * When user tap View in Folder option from Recents tab, animate the node once view is loaded
      */
-    fun animateNode(nodes: List<MegaNode>) {
+    fun animateNode(nodes: List<MegaNode?>) {
         val node = (activity as? ManagerActivity)?.viewInFolderNode
-        nodePosition = nodes.indexOfFirst { it.handle == node?.handle }.coerceAtLeast(0)
+        nodePosition = nodes.indexOfFirst { it?.handle == node?.handle }.coerceAtLeast(0)
 
         //Scroll the position to the 3rd position before of the target position.
         recyclerView?.scrollToPosition(nodePosition - 3)

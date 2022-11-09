@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity
 
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedFileNode
 
 /**
  * RecentActionBucket
@@ -18,5 +18,5 @@ data class RecentActionBucket(
     val parentHandle: Long,
     val isUpdate: Boolean,
     val isMedia: Boolean,
-    val nodes: List<Node>,
+    val nodes: List<TypedFileNode>,
 )
