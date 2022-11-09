@@ -1073,7 +1073,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 chrono.base =
                                     SystemClock.elapsedRealtime() - it * MILLISECONDS_IN_ONE_SECOND
                                 chrono.start()
-                                chrono.format = " %s"
                                 chrono.isVisible = true
                             }
                         }
@@ -1099,7 +1098,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 StringResourcesUtils.getString(R.string.outgoing_call_starting)
                         }
                         InMeetingViewModel.SubtitleCallType.TYPE_ESTABLISHED -> {
-                            it.text = StringResourcesUtils.getString(R.string.duration_meeting)
+                            it.text = ""
                         }
                     }
                 }

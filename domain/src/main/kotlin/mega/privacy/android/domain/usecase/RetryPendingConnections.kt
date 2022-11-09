@@ -10,5 +10,5 @@ fun interface RetryPendingConnections {
      *
      * @param disconnect True if should disconnect megaChatApi, false otherwise.
      */
-    operator fun invoke(disconnect: Boolean)
+    suspend operator fun invoke(disconnect: Boolean)
 }

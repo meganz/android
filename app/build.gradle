@@ -88,6 +88,18 @@ String readTesterGroupList() {
     return groups
 }
 
+/**
+ * Check whether we should use prebuilt SDK or local sdk module
+ *
+ * @return false if environment variable "USE_REMOTE_SDK" is false. Otherwise return true.
+ */
+boolean shouldUsePrebuiltSdk() {
+    //FIXME uncomment this method once prebuilt sdk feature is ready
+    return false
+    /*String useRemoteSdk = System.getenv("USE_REMOTE_SDK")
+    return useRemoteSdk == null || useRemoteSdk != "false"*/
+}
+
 configurations {
     jacocoAnt
 }
@@ -289,9 +301,17 @@ android {
 dependencies {
     implementation fileTree(dir: "$rootProject.projectDir/sdk/src/main/jni/ExoPlayer/", include: ['*.aar'])
     implementation project(':domain')
-    implementation project(':sdk')
     implementation project(':presentation')
     implementation project(':data')
+
+    // decide SDK dependency
+    if (shouldUsePrebuiltSdk()) {
+        println("[app] use remote pre-built SDK")
+        implementation "nz.mega.sdk:sdk:$megaSdkVersion"
+    } else {
+        println("[app] use local SDK")
+        implementation project(':sdk')
+    }
 
     qaImplementation project(':screenshot')
 
