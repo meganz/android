@@ -1,5 +1,7 @@
 package mega.privacy.android.data.mapper
 
+import mega.privacy.android.domain.entity.Pricing
+import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.SubscriptionPlan
 import nz.mega.sdk.MegaCurrency
 import nz.mega.sdk.MegaPricing
@@ -10,7 +12,7 @@ import org.mockito.kotlin.mock
 
 class SubscriptionPlanListMapperTest {
 
-    private val subscriptionPlanMapper = ::SubscriptionPlan
+    private val subscriptionPlanMapper = ::toSubscriptionPlan
     private val currencyMapper = mock<CurrencyMapper>()
     private val skuMapper = mock<SkuMapper>()
 
@@ -34,14 +36,17 @@ class SubscriptionPlanListMapperTest {
     }
 
     private val subscriptionPlan = SubscriptionPlan(
-        handle = 1560943707714440503,
-        level = toAccountType(1),
-        months = 1,
-        storage = 450,
-        transfer = 450,
-        amount = 13,
-        currency = currencyMapper("EUR"),
-        sku = skuMapper(toAccountType(1), 1)
+        pricing = Pricing(
+            amount = 13,
+            currency = currencyMapper("EUR"),
+            sku = skuMapper(toAccountType(1), 1)),
+        subscription = Subscription(
+            handle = 1560943707714440503,
+            level = toAccountType(1),
+            months = 1,
+            storage = 450,
+            transfer = 450,
+        ),
     )
 
     @Test

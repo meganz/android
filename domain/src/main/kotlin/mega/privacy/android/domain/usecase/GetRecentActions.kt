@@ -1,6 +1,6 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase
 
-import nz.mega.sdk.MegaRecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionBucket
 
 /**
  * Get a list of recent actions
@@ -11,5 +11,5 @@ fun interface GetRecentActions {
      *
      * @return a list of recent actions
      */
-    suspend operator fun invoke(): List<MegaRecentActionBucket>
+    suspend operator fun invoke(): List<RecentActionBucket>
 }

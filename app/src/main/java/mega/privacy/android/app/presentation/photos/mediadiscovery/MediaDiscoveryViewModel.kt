@@ -153,9 +153,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     }
 
     fun onTimeBarTabSelected(timeBarTab: TimeBarTab) {
-        _state.update {
-            it.copy(selectedTimeBarTab = timeBarTab)
-        }
+        updateSelectedTimeBarState(selectedTimeBarTab = timeBarTab)
     }
 
     fun onCardClick(dateCard: DateCard) {
@@ -177,7 +175,7 @@ class MediaDiscoveryViewModel @Inject constructor(
                     TimeBarTab.All,
                     _state.value.uiPhotoList.indexOfFirst {
                         it.key == dateCard.photo.id.toString()
-                    }
+                    },
                 )
             }
         }
@@ -197,24 +195,9 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
-    fun zoomIn() {
-        if (_state.value.currentZoomLevel == ZoomLevel.values().first()
-        ) {
-            return
-        }
+    fun updateZoomLevel(zoomLevel: ZoomLevel) {
         _state.update {
-            it.copy(currentZoomLevel = ZoomLevel.values()[_state.value.currentZoomLevel.ordinal - 1])
-        }
-    }
-
-    fun zoomOut() {
-        if (_state.value.currentZoomLevel == ZoomLevel.values().last()
-        ) {
-            return
-        }
-
-        _state.update {
-            it.copy(currentZoomLevel = ZoomLevel.values()[_state.value.currentZoomLevel.ordinal + 1])
+            it.copy(currentZoomLevel = zoomLevel)
         }
     }
 }

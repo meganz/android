@@ -118,7 +118,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
     }
 
     private fun setupAccountDetails() {
-        if (megaApi.isBusinessAccount) {
+        if (viewModel.isBusinessAccount()) {
             usageBinding.updateBusinessOrProFlexi(viewModel)
             paymentAlertBinding.businessUpdate(
                 megaApi,

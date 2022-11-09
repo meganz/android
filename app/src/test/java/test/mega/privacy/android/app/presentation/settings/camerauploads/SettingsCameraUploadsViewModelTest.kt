@@ -35,7 +35,8 @@ class SettingsCameraUploadsViewModelTest {
         underTest = SettingsCameraUploadsViewModel(
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             restorePrimaryTimestamps = mock(),
-            restoreSecondaryTimestamps = mock()
+            restoreSecondaryTimestamps = mock(),
+            monitorConnectivity = mock(),
         )
     }
 
