@@ -217,13 +217,13 @@ class GlobalListener @Inject constructor(
         }
     }
 
-    override fun onSetsUpdate(api: MegaApiJava?, sets: java.util.ArrayList<MegaSet>?) {
+    override fun onSetsUpdate(api: MegaApiJava?, sets: ArrayList<MegaSet>?) {
         TODO("Not yet implemented")
     }
 
     override fun onSetElementsUpdate(
         api: MegaApiJava?,
-        elements: java.util.ArrayList<MegaSetElement>?,
+        elements: ArrayList<MegaSetElement>?,
     ) {
         TODO("Not yet implemented")
     }
