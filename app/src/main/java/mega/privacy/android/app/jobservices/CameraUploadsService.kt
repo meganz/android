@@ -986,8 +986,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun isSecondaryFolderEstablished(): Boolean {
         val isSecondaryFolderInRubbish = isNodeInRubbish(getSecondaryFolderHandle())
-        return !isSecondaryFolderInRubbish || (isSecondaryFolderInRubbish && (getDefaultNodeHandle(
-            getString(R.string.section_secondary_media_uploads)) != MegaApiJava.INVALID_HANDLE))
+        return !isSecondaryFolderInRubbish || (isSecondaryFolderInRubbish && (getSecondaryFolderHandle() != MegaApiJava.INVALID_HANDLE))
     }
 
     /**
