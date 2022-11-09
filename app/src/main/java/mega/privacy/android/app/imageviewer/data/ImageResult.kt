@@ -24,6 +24,7 @@ data class ImageResult constructor(
     var totalBytes: Long? = null,
     var transferredBytes: Long? = null,
 ) {
+
     /**
      * Get highest resolution image available.
      *
