@@ -16,7 +16,10 @@ import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.SkuMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanMapper
+import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.Pricing
+import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -75,14 +78,17 @@ class DefaultAccountRepositoryTest {
     }
 
     private val subscriptionPlan = SubscriptionPlan(
-        handle = 1560943707714440503,
-        level = accountTypeMapper(1),
-        months = 1,
-        storage = 450,
-        transfer = 450,
-        amount = 13,
-        currency = currencyMapper("EUR"),
-        sku = skuMapper(accountTypeMapper(1), 1)
+        pricing = Pricing(
+            amount = 13,
+            currency = currencyMapper("EUR"),
+            sku = skuMapper(toAccountType(1), 1)),
+        subscription = Subscription(
+            handle = 1560943707714440503,
+            level = toAccountType(1),
+            months = 1,
+            storage = 450,
+            transfer = 450,
+        ),
     )
 
     @Before
