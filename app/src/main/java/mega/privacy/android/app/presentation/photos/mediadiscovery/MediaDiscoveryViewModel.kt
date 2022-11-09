@@ -195,24 +195,9 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
-    fun zoomIn() {
-        if (_state.value.currentZoomLevel == ZoomLevel.values().first()
-        ) {
-            return
-        }
+    fun updateZoomLevel(zoomLevel: ZoomLevel) {
         _state.update {
-            it.copy(currentZoomLevel = ZoomLevel.values()[_state.value.currentZoomLevel.ordinal - 1])
-        }
-    }
-
-    fun zoomOut() {
-        if (_state.value.currentZoomLevel == ZoomLevel.values().last()
-        ) {
-            return
-        }
-
-        _state.update {
-            it.copy(currentZoomLevel = ZoomLevel.values()[_state.value.currentZoomLevel.ordinal + 1])
+            it.copy(currentZoomLevel = zoomLevel)
         }
     }
 }
