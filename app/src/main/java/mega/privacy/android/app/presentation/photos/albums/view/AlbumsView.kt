@@ -160,7 +160,7 @@ fun AlbumsView(
         ) {
             FloatingActionButton(
                 modifier = Modifier.padding(all = 16.dp),
-                onClick = { openDialog.value = true }
+                onClick = { openDialog.value = true },
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,

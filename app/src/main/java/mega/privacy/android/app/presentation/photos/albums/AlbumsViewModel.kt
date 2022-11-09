@@ -170,8 +170,13 @@ class AlbumsViewModel @Inject constructor(
      * @param name the name of the album
      */
     fun createNewAlbum(name: String) = viewModelScope.launch {
-        _state.update {
-            it.copy(currentAlbum = createAlbum(name))
+        try {
+            val album = createAlbum(name)
+            _state.update {
+                it.copy(currentAlbum = album)
+            }
+        } catch (exception: Exception) {
+            Timber.e(exception)
         }
     }
 
