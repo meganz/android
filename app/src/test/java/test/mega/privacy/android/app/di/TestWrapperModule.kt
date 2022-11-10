@@ -17,7 +17,6 @@ import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
-import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import org.mockito.kotlin.mock
 
 @Module
@@ -38,7 +37,6 @@ object TestWrapperModule {
     val fetchNodeWrapper = mock<FetchNodeWrapper>()
     val timeWrapper = mock<TimeWrapper>()
     val avatarWrapper = mock<AvatarWrapper>()
-    val monitorBackupFolder = mock<MonitorBackupFolder>()
 
     @Provides
     fun provideIsOnWifiWrapper(): IsOnWifiWrapper = isOnWifiWrapper
@@ -76,9 +74,6 @@ object TestWrapperModule {
 
     @Provides
     fun provideAvatarWrapper(): AvatarWrapper = avatarWrapper
-
-    @Provides
-    fun provideMonitorBackupFolder(): MonitorBackupFolder = monitorBackupFolder
 
     @Provides
     fun provideMegaNodeUtilWrapper(): MegaNodeUtilWrapper = mock()

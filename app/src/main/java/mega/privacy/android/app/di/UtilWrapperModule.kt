@@ -28,8 +28,6 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.AvatarWrapper
-import mega.privacy.android.domain.usecase.DefaultMonitorBackupFolder
-import mega.privacy.android.domain.usecase.MonitorBackupFolder
 
 /**
  * Util wrapper module
@@ -40,12 +38,6 @@ import mega.privacy.android.domain.usecase.MonitorBackupFolder
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class UtilWrapperModule {
-
-    /**
-     * Bind monitor backup folder
-     */
-    @Binds
-    abstract fun bindMonitorBackupFolder(implementation: DefaultMonitorBackupFolder): MonitorBackupFolder
 
     /**
      * Bind mega node util wrapper
