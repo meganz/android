@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
-import androidx.compose.foundation.background
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -31,11 +31,10 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -63,17 +62,11 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.presentation.theme.black
-import mega.privacy.android.presentation.theme.dark_grey
-import mega.privacy.android.presentation.theme.dark_grey_alpha_050
-import mega.privacy.android.presentation.theme.dark_grey_alpha_054
-import mega.privacy.android.presentation.theme.grey_100
 import mega.privacy.android.presentation.theme.grey_300
-import mega.privacy.android.presentation.theme.grey_700
 import mega.privacy.android.presentation.theme.grey_900
 import mega.privacy.android.presentation.theme.grey_alpha_054
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
-import mega.privacy.android.presentation.theme.white_alpha_038
 import mega.privacy.android.presentation.theme.white_alpha_054
 
 @Composable
