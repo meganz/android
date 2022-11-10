@@ -3857,7 +3857,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case INBOX: {
                 aB.setSubtitle(null);
-                // Set the corresponding title and first navigation level ff the current Inbox Parent ID is equal to the My Backups Folder ID or -1
+                // Set the corresponding title and first navigation level if the Inbox Parent ID is equal to the My Backups Folder ID or -1
                 if (viewModel.getState().getValue().getInboxParentHandle() == MegaNodeUtil.myBackupHandle || viewModel.getState().getValue().getInboxParentHandle() == -1) {
                     aB.setTitle(getResources().getString(R.string.home_side_menu_backups_title));
                     viewModel.setIsFirstNavigationLevel(true);

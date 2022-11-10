@@ -6,7 +6,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Inbox UI State
  *
- * @property currentParentNodeId The current Parent Node ID
+ * @property inboxNodeId The current Inbox Node ID
  * @property hideMultipleItemSelection Whether to hide the Multiple Item Selection or not
  * @property myBackupsFolderNodeId The My Backups Folder Node ID
  * @property nodes List of Inbox Nodes
@@ -14,7 +14,7 @@ import nz.mega.sdk.MegaNode
  * @property triggerBackPress Whether the User has triggered a Back Press behavior or not
  */
 data class InboxState(
-    val currentParentNodeId: NodeId = NodeId(-1L),
+    val inboxNodeId: NodeId = NodeId(-1L),
     val hideMultipleItemSelection: Boolean = false,
     val myBackupsFolderNodeId: NodeId = NodeId(-1L),
     val nodes: List<MegaNode> = emptyList(),

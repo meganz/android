@@ -51,8 +51,8 @@ class InboxViewModelTest {
     private val myBackupsNode = mock<NodeId> {
         on { this.id }.thenReturn(MY_BACKUPS_ID)
     }
-    private val parentNode = mock<MegaNode> {
-        on { this.handle }.thenReturn(PARENT_NODE_ID)
+    private val inboxNode = mock<MegaNode> {
+        on { this.handle }.thenReturn(INBOX_NODE_ID)
     }
     private val retrievedNode = mock<MegaNode> {
         on { this.handle }.thenReturn(RETRIEVED_NODE_ID)
@@ -82,9 +82,9 @@ class InboxViewModelTest {
     }
 
     private suspend fun setupData() {
-        whenever(getNodeByHandle(any())).thenReturn(parentNode)
+        whenever(getNodeByHandle(any())).thenReturn(inboxNode)
         whenever(getChildrenNode(
-            parent = parentNode,
+            parent = inboxNode,
             order = getCloudSortOrder(),
         )).thenReturn(listOf(retrievedNode))
     }
@@ -95,7 +95,7 @@ class InboxViewModelTest {
 
         underTest.state.test {
             val initialState = awaitItem()
-            assertThat(initialState.currentParentNodeId).isEqualTo(NodeId(-1L))
+            assertThat(initialState.inboxNodeId).isEqualTo(NodeId(-1L))
             assertThat(initialState.hideMultipleItemSelection).isFalse()
             assertThat(initialState.myBackupsFolderNodeId).isEqualTo(NodeId(-1L))
             assertThat(initialState.nodes).isEmpty()
@@ -109,7 +109,7 @@ class InboxViewModelTest {
         setupData()
         setUnderTest()
 
-        underTest.updateCurrentParentNodeId(PARENT_NODE_ID)
+        underTest.updateInboxNodeId(INBOX_NODE_ID)
         monitorNodeUpdates.emit(listOf(emittedNode))
 
         underTest.state.test {
@@ -139,12 +139,12 @@ class InboxViewModelTest {
             setupData()
             setUnderTest()
 
-            underTest.updateCurrentParentNodeId(PARENT_NODE_ID)
+            underTest.updateInboxNodeId(INBOX_NODE_ID)
             monitorBackupFolder.emit(Result.success(myBackupsNode))
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.currentParentNodeId).isEqualTo(NodeId(PARENT_NODE_ID))
+                assertThat(state.inboxNodeId).isEqualTo(NodeId(INBOX_NODE_ID))
                 assertThat(state.myBackupsFolderNodeId).isEqualTo(myBackupsNode)
                 assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
             }
@@ -160,7 +160,7 @@ class InboxViewModelTest {
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.currentParentNodeId).isEqualTo(myBackupsNode)
+                assertThat(state.inboxNodeId).isEqualTo(myBackupsNode)
                 assertThat(state.myBackupsFolderNodeId).isEqualTo(myBackupsNode)
                 assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
             }
@@ -213,19 +213,19 @@ class InboxViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.myBackupsFolderNodeId).isEqualTo(myBackupsNode)
-            assertThat(state.currentParentNodeId).isEqualTo(myBackupsNode)
+            assertThat(state.inboxNodeId).isEqualTo(myBackupsNode)
         }
     }
 
     @Test
-    fun `test that the user is currently on the backup folder level if the parent id is invalid`() =
+    fun `test that the user is currently on the backup folder level if the inbox node id is invalid`() =
         runTest {
             setUnderTest()
 
             assertThat(underTest.isCurrentlyOnBackupFolderLevel()).isTrue()
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.currentParentNodeId).isEqualTo(NodeId(-1L))
+                assertThat(state.inboxNodeId).isEqualTo(NodeId(-1L))
             }
         }
 
@@ -237,7 +237,7 @@ class InboxViewModelTest {
         setUnderTest()
 
         with(underTest) {
-            updateCurrentParentNodeId(PARENT_NODE_ID)
+            updateInboxNodeId(INBOX_NODE_ID)
             handleBackPress()
         }
 
@@ -248,7 +248,7 @@ class InboxViewModelTest {
     }
 
     @Test
-    fun `test that the user exits the inbox on back press if the grandparent node id is null`() =
+    fun `test that the user exits the inbox on back press if the parent node id is null`() =
         runTest {
             whenever(getParentNodeHandle(any())).thenReturn(null)
             whenever(getInboxNode()).thenReturn(rootInboxNode)
@@ -256,7 +256,7 @@ class InboxViewModelTest {
             setUnderTest()
 
             with(underTest) {
-                updateCurrentParentNodeId(PARENT_NODE_ID)
+                updateInboxNodeId(INBOX_NODE_ID)
                 handleBackPress()
             }
 
@@ -267,7 +267,7 @@ class InboxViewModelTest {
         }
 
     @Test
-    fun `test that the user exits the inbox on back press if both the root inbox and grandparent node have the same ids`() =
+    fun `test that the user exits the inbox on back press if both the root inbox and parent node have the same ids`() =
         runTest {
             val rootInboxNode = mock<MegaNode> {
                 on { it.handle }.thenReturn(987L)
@@ -278,7 +278,7 @@ class InboxViewModelTest {
             setUnderTest()
 
             with(underTest) {
-                updateCurrentParentNodeId(PARENT_NODE_ID)
+                updateInboxNodeId(INBOX_NODE_ID)
                 handleBackPress()
             }
 
@@ -290,27 +290,27 @@ class InboxViewModelTest {
 
     @Test
     fun `test that the nodes are updated on back press`() = runTest {
-        val grandParentNode = mock<MegaNode> {
+        val parentNode = mock<MegaNode> {
             on { it.handle }.thenReturn(654L)
         }
         whenever(getParentNodeHandle(any())).thenReturn(654L)
         whenever(getInboxNode()).thenReturn(rootInboxNode)
-        whenever(getNodeByHandle(any())).thenReturn(grandParentNode)
+        whenever(getNodeByHandle(any())).thenReturn(parentNode)
         whenever(getChildrenNode(
-            parent = grandParentNode,
+            parent = parentNode,
             order = getCloudSortOrder()
         )).thenReturn(listOf(retrievedNode))
 
         setUnderTest()
 
         with(underTest) {
-            updateCurrentParentNodeId(PARENT_NODE_ID)
+            updateInboxNodeId(INBOX_NODE_ID)
             handleBackPress()
         }
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.currentParentNodeId).isEqualTo(NodeId(654L))
+            assertThat(state.inboxNodeId).isEqualTo(NodeId(654L))
             assertThat(state.triggerBackPress).isTrue()
             assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
         }
@@ -328,7 +328,7 @@ class InboxViewModelTest {
 
     companion object {
         private const val MY_BACKUPS_ID = 12L
-        private const val PARENT_NODE_ID = 34L
+        private const val INBOX_NODE_ID = 34L
         private const val RETRIEVED_NODE_ID = 56L
         private const val EMITTED_NODE_ID = 78L
         private const val ROOT_INBOX_NODE_ID = 90L

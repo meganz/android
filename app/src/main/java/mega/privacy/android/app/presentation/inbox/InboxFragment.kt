@@ -186,7 +186,7 @@ class InboxFragment : RotatableFragment() {
                 adapter = MegaNodeAdapter(requireActivity(),
                     this,
                     emptyList(),
-                    state().currentParentNodeId.id,
+                    state().inboxNodeId.id,
                     recyclerView,
                     Constants.INBOX_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
@@ -223,7 +223,7 @@ class InboxFragment : RotatableFragment() {
                 adapter = MegaNodeAdapter(requireActivity(),
                     this,
                     emptyList(),
-                    state().currentParentNodeId.id,
+                    state().inboxNodeId.id,
                     recyclerView,
                     Constants.INBOX_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
@@ -710,12 +710,12 @@ class InboxFragment : RotatableFragment() {
                     // Update the last position stack
                     pushLastPositionStack()
 
-                    // Update to the new current Parent ID in the ViewModel and update the list of Inbox Nodes
+                    // Update to the new Inbox Node ID in the ViewModel and update the list of Inbox Nodes
                     with(viewModel) {
-                        updateCurrentParentNodeId(selectedNode.handle)
+                        updateInboxNodeId(selectedNode.handle)
                         refreshInboxNodes()
                     }
-                    // Notify ManagerActivity on the updated current Parent ID. Invalidate the Options
+                    // Notify ManagerActivity on the updated Inbox Node ID. Invalidate the Options
                     // Menu and set the new Toolbar Title
                     with(requireActivity() as ManagerActivity) {
                         parentHandleInbox = selectedNode.handle
@@ -787,7 +787,7 @@ class InboxFragment : RotatableFragment() {
             if (adapter == null) {
                 // Call the method from ManagerActivity to move back to the previous Drawer Item
                 exitInboxScreen()
-            } else if (comesFromNotifications && comesFromNotificationHandle == state().currentParentNodeId.id) {
+            } else if (comesFromNotifications && comesFromNotificationHandle == state().inboxNodeId.id) {
                 // Handle behavior if the Inbox is accessed through a Notification
                 comesFromNotifications = false
                 comesFromNotificationHandle = -1
@@ -809,7 +809,7 @@ class InboxFragment : RotatableFragment() {
         // new Toolbar Title
         with(requireActivity() as ManagerActivity) {
             invalidateOptionsMenu()
-            parentHandleInbox = state().currentParentNodeId.id
+            parentHandleInbox = state().inboxNodeId.id
             setToolbarTitle()
         }
 

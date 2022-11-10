@@ -115,7 +115,7 @@ class InboxViewModel @Inject constructor(
      *
      * Processes updates received from the My Backups Folder
      *
-     * If the current Parent Node ID is invalid, use the My Backups Folder Node ID to refresh the
+     * If the Inbox Node ID is invalid, use the My Backups Folder Node ID to refresh the
      * list of Nodes
      *
      * Update the UI State values after performing a successful refresh
@@ -124,11 +124,11 @@ class InboxViewModel @Inject constructor(
      */
     private suspend fun onMyBackupsFolderUpdateReceived(nodeId: NodeId) {
         _state.update { inboxState ->
-            if (inboxState.currentParentNodeId.id == -1L) {
+            if (inboxState.inboxNodeId.id == -1L) {
                 refreshNodes(nodeId).let { updatedNodes ->
                     inboxState.copy(
                         myBackupsFolderNodeId = nodeId,
-                        currentParentNodeId = nodeId,
+                        inboxNodeId = nodeId,
                         nodes = updatedNodes,
                     )
                 }
@@ -153,15 +153,15 @@ class InboxViewModel @Inject constructor(
     /**
      * Retrieves the list of Nodes by performing the following steps:
      *
-     * 2. Check if [InboxState.currentParentNodeId] equals -1L or [MegaApiJava.INVALID_HANDLE]. If either condition is true, return an empty list
-     * 3. Call the Use Case [getNodeByHandle] to retrieve the Parent Node from [InboxState.currentParentNodeId]. If the Parent Node is null, return an empty list
+     * 2. Check if [InboxState.inboxNodeId] equals -1L or [MegaApiJava.INVALID_HANDLE]. If either condition is true, return an empty list
+     * 3. Call the Use Case [getNodeByHandle] to retrieve the Parent Node from [InboxState.inboxNodeId]. If the Parent Node is null, return an empty list
      * 4. Call the Use Case [getChildrenNode] to retrieve and return the list of Nodes under the Parent Node
      *
-     * @param nodeId The Node ID used to retrieve the current list of Nodes. Defaults to [InboxState.currentParentNodeId]
+     * @param nodeId The Node ID used to retrieve the current list of Nodes. Defaults to [InboxState.inboxNodeId]
      *
      * @return a List of Inbox Nodes
      */
-    private suspend fun refreshNodes(nodeId: NodeId = _state.value.currentParentNodeId): List<MegaNode> =
+    private suspend fun refreshNodes(nodeId: NodeId = _state.value.inboxNodeId): List<MegaNode> =
         if (isValidNodeId(nodeId)) {
             getNodeByHandle(nodeId.id)?.let { retrievedParentNode ->
                 getChildrenNode(
@@ -188,18 +188,18 @@ class InboxViewModel @Inject constructor(
     fun handleBackPress() {
         viewModelScope.launch {
             // Either one of the following conditions will constitute the user exiting the screen:
-            // 1. The Grandparent Node ID does not exist
+            // 1. The Parent Node ID does not exist
             // 2. The Root Inbox Node does not exist
-            // 3. The Grandparent Node ID is the same with the Root Inbox ID
-            val grandParentNodeId = getParentNodeHandle(_state.value.currentParentNodeId.id)
-            if (grandParentNodeId == null || rootInboxNode == null || (grandParentNodeId == rootInboxNode?.handle)) {
+            // 3. The Parent Node ID is the same with the Root Inbox ID
+            val parentNodeId = getParentNodeHandle(_state.value.inboxNodeId.id)
+            if (parentNodeId == null || rootInboxNode == null || (parentNodeId == rootInboxNode?.handle)) {
                 onExitInbox(true)
             } else {
-                // Otherwise, proceed to retrieve the Nodes of the Grandparent Node
+                // Otherwise, proceed to retrieve the Nodes of the Parent Node
                 _state.update { inboxState ->
-                    refreshNodes(NodeId(grandParentNodeId)).let { updatedNodes ->
+                    refreshNodes(NodeId(parentNodeId)).let { updatedNodes ->
                         inboxState.copy(
-                            currentParentNodeId = NodeId(grandParentNodeId),
+                            inboxNodeId = NodeId(parentNodeId),
                             triggerBackPress = true,
                             nodes = updatedNodes,
                         )
@@ -243,31 +243,31 @@ class InboxViewModel @Inject constructor(
     }
 
     /**
-     * Notifies [InboxState.currentParentNodeId] that the Inbox screen has handled the current Parent Node ID
+     * Notifies [InboxState.inboxNodeId] that the Inbox screen has handled the Inbox Node ID
      *
-     * @param nodeId The new current Parent Node ID
+     * @param nodeId The new Inbox Node ID
      */
-    fun updateCurrentParentNodeId(nodeId: Long) {
-        onCurrentParentNodeId(nodeId)
+    fun updateInboxNodeId(nodeId: Long) {
+        onInboxNodeId(nodeId)
     }
 
     /**
      * Checks whether the the Inbox screen is currently on the Backups Folder level by comparing the values of
-     * [InboxState.currentParentNodeId] and [InboxState.myBackupsFolderNodeId]
+     * [InboxState.inboxNodeId] and [InboxState.myBackupsFolderNodeId]
      *
-     * @return true if both values are equal or [InboxState.currentParentNodeId] is -1L, and false if otherwise
+     * @return true if both values are equal or [InboxState.inboxNodeId] is -1L, and false if otherwise
      */
     fun isCurrentlyOnBackupFolderLevel(): Boolean = with(_state.value) {
-        (this.currentParentNodeId == this.myBackupsFolderNodeId) || this.currentParentNodeId.id == -1L
+        (this.inboxNodeId == this.myBackupsFolderNodeId) || this.inboxNodeId.id == -1L
     }
 
     /**
-     * Given a [Long], the function updates the value of [InboxState.currentParentNodeId]
+     * Given a [Long], the function updates the value of [InboxState.inboxNodeId]
      *
-     * @param currentParentNodeId The current Parent Node ID
+     * @param inboxNodeId The current Parent Node ID
      */
-    private fun onCurrentParentNodeId(currentParentNodeId: Long) {
-        _state.update { it.copy(currentParentNodeId = NodeId(currentParentNodeId)) }
+    private fun onInboxNodeId(inboxNodeId: Long) {
+        _state.update { it.copy(inboxNodeId = NodeId(inboxNodeId)) }
     }
 
     /**
