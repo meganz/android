@@ -75,6 +75,7 @@ class AlbumsViewTest {
 
         composeRule.onNodeWithText(R.string.general_create).performClick()
 
+        verify(onDismissRequest).invoke()
         verify(onDialogPositiveButtonClicked).invoke("")
     }
 
@@ -94,6 +95,7 @@ class AlbumsViewTest {
             .performTextInput(expectedAlbumName)
         composeRule.onNodeWithText(R.string.general_create).performClick()
 
+        verify(onDismissRequest).invoke()
         verify(onDialogPositiveButtonClicked).invoke(expectedAlbumName)
     }
 }

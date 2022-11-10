@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
-import androidx.compose.foundation.background
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -32,9 +32,9 @@ import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -53,6 +53,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -61,6 +62,8 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.presentation.theme.black
+import mega.privacy.android.presentation.theme.grey_300
+import mega.privacy.android.presentation.theme.grey_900
 import mega.privacy.android.presentation.theme.grey_alpha_054
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
@@ -143,6 +146,7 @@ fun AlbumsView(
                         color = if (MaterialTheme.colors.isLight) black else white,
                         fontWeight = FontWeight.Medium
                     )
+
                     Text(
                         text = album.count.toString(),
                         style = MaterialTheme.typography.caption,
@@ -199,14 +203,23 @@ fun CreateNewAlbumDialog(
         Dialog(onDismissRequest = onDismissRequest) {
             Surface(
                 shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colors.surface,
+                color = if (MaterialTheme.colors.isLight) {
+                    MaterialTheme.colors.surface
+                } else {
+                    grey_900
+                },
             ) {
                 Column {
                     // Dialog title
                     Text(
                         text = stringResource(id = R.string.photos_album_creation_dialog_title),
-                        style = MaterialTheme.typography.subtitle1,
+                        style = MaterialTheme.typography.h6,
                         modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp),
+                        color = if (MaterialTheme.colors.isLight) {
+                            Color.Black
+                        } else {
+                            Color.White
+                        }
                     )
 
                     val textFieldColors = TextFieldDefaults.textFieldColors(
@@ -219,9 +232,18 @@ fun CreateNewAlbumDialog(
                     val interactionSource = remember { MutableInteractionSource() }
 
                     val textColor = LocalTextStyle.current.color.takeOrElse {
-                        textFieldColors.textColor(isEnabled).value
+                        if (MaterialTheme.colors.isLight) {
+                            Color.Black
+                        } else {
+                            Color.White
+                        }
                     }
-                    val mergedTextStyle = LocalTextStyle.current.merge(TextStyle(color = textColor))
+                    val mergedTextStyle = LocalTextStyle.current.merge(
+                        TextStyle(
+                            color = textColor,
+                            fontSize = 16.sp,
+                        )
+                    )
 
                     BasicTextField(
                         value = textState,
@@ -252,9 +274,11 @@ fun CreateNewAlbumDialog(
                                 value = textState,
                                 innerTextField = innerTextField,
                                 placeholder = {
-                                    Text(text = stringResource(
-                                        id = R.string.photos_album_creation_dialog_input_placeholder
-                                    ))
+                                    Text(
+                                        text = stringResource(id = R.string.photos_album_creation_dialog_input_placeholder),
+                                        color = grey_300,
+                                        fontSize = 16.sp,
+                                    )
                                 },
                                 contentPadding = PaddingValues(vertical = 12.dp, horizontal = 0.dp),
                                 colors = textFieldColors,
