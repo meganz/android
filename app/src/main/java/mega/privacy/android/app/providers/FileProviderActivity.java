@@ -10,7 +10,6 @@ import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getCloudRootHandle;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
-import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import static mega.privacy.android.app.utils.Util.setPasswordToggle;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
@@ -129,7 +128,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
     @Inject
     DatabaseHandler dbH;
 
-    private FileProviderViewModel viewMode;
+    private FileProviderViewModel viewModel;
 
     private String lastEmail;
     private String lastPassword;
@@ -234,7 +233,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
         super.onCreate(savedInstanceState);
 
-        viewMode = new ViewModelProvider(this).get(FileProviderViewModel.class);
+        viewModel = new ViewModelProvider(this).get(FileProviderViewModel.class);
 
         ColorUtils.setStatusBarTextColor(this);
 
@@ -921,7 +920,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
                     Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
 
-        if (viewMode.getStorageState() == StorageState.PayWall) {
+        if (viewModel.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
@@ -1202,7 +1201,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
 
-        if (!isOnline(this)) {
+        if (!viewModel.isConnected()) {
             loginLoggingIn.setVisibility(View.GONE);
             loginLayout.setVisibility(View.VISIBLE);
             loginCreateAccount.setVisibility(View.INVISIBLE);
@@ -1248,7 +1247,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
     private void onKeysGeneratedLogin() {
 
-        if (!isOnline(this)) {
+        if (!viewModel.isConnected()) {
             loginLoggingIn.setVisibility(View.GONE);
             loginLayout.setVisibility(View.VISIBLE);
             loginCreateAccount.setVisibility(View.INVISIBLE);

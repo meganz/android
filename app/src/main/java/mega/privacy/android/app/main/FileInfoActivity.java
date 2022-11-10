@@ -70,7 +70,6 @@ import static mega.privacy.android.app.utils.Util.getScaleH;
 import static mega.privacy.android.app.utils.Util.getScaleW;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.isDarkMode;
-import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
@@ -1672,7 +1671,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
         final long handle = node.getHandle();
         moveToRubbish = false;
-        if (!isOnline(this)) {
+        if (!viewModel.isConnected()) {
             showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
             return;
         }
@@ -2009,7 +2008,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         }
 
         if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
+            if (!viewModel.isConnected()) {
                 showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 return;
             }
@@ -2029,7 +2028,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
             checkCollision(toHandle, NameCollisionType.MOVE);
         } else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
+            if (!viewModel.isConnected()) {
                 showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 return;
             }
@@ -2047,7 +2046,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
             checkCollision(toHandle, NameCollisionType.COPY);
         } else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
+            if (!viewModel.isConnected()) {
                 showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 return;
             }
@@ -2077,7 +2076,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 Timber.w("ERROR, the file is not folder");
             }
         } else if (requestCode == REQUEST_CODE_DELETE_VERSIONS_HISTORY && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
+            if (!viewModel.isConnected()) {
                 showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 return;
             }
