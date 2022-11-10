@@ -5932,8 +5932,10 @@ public class ManagerActivity extends TransfersManagementActivity
         } else if (drawerItem == DrawerItem.INBOX) {
             inboxFragment = (InboxFragment) getSupportFragmentManager()
                     .findFragmentByTag(FragmentTag.INBOX.getTag());
-            if (inboxFragment == null || inboxFragment.onBackPressed() == 0) {
+            if (inboxFragment == null) {
                 backToDrawerItem(bottomNavigationCurrentItem);
+            } else {
+                inboxFragment.onBackPressed();
             }
         } else if (drawerItem == DrawerItem.NOTIFICATIONS) {
             backToDrawerItem(bottomNavigationCurrentItem);

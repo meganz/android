@@ -779,31 +779,24 @@ class InboxFragment : RotatableFragment() {
 
     /**
      * onBackPressed behavior that has reference to [ManagerActivity]
-     *
-     * @return an Integer to be used by [ManagerActivity]
-     *
-     * Returning 0 means that [ManagerActivity] will go back to a previous Dashboard item. Otherwise,
-     * [ManagerActivity] will not do anything
      */
-    fun onBackPressed(): Int {
+    fun onBackPressed() {
         Timber.d("onBackPressed()")
 
-        if (adapter == null) {
-            return 0
-        }
         with(requireActivity() as ManagerActivity) {
-            // Handle behavior if the Inbox is accessed through a Notification
-            if (comesFromNotifications && comesFromNotificationHandle == state().currentParentNodeId.id) {
+            if (adapter == null) {
+                // Call the method from ManagerActivity to move back to the previous Drawer Item
+                exitInboxScreen()
+            } else if (comesFromNotifications && comesFromNotificationHandle == state().currentParentNodeId.id) {
+                // Handle behavior if the Inbox is accessed through a Notification
                 comesFromNotifications = false
                 comesFromNotificationHandle = -1
                 selectDrawerItem(DrawerItem.NOTIFICATIONS)
                 parentHandleInbox = comesFromNotificationHandleSaved
                 comesFromNotificationHandleSaved = -1
-                return 2
             } else {
                 // Otherwise, instruct the ViewModel to handle the Back Press
                 this@InboxFragment.viewModel.handleBackPress()
-                return 2
             }
         }
     }
