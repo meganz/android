@@ -702,9 +702,14 @@ def parseCommandParameter() {
     final PARAM_NOTES = "--notes"
 
     // key in the returned dictionary - delivery_qa command
+    final KEY_TESTER = "tester"
     final KEY_NOTES = "notes"
+    final KEY_TESTER_GROUP = "tester-group"
 
     def result = [:]
+    result[KEY_TESTER] = ""
+    result[KEY_NOTES] = ""
+    result[KEY_TESTER_GROUP] = ""
 
     String fullCommand = env.gitlabTriggerPhrase
     println("[DEBUG] parsing command parameters. \nuser input: $fullCommand")
@@ -861,16 +866,4 @@ private String getSdkPublishType() {
     }
 }
 
-/**
- * Get publish type of SDK.
- * @return return value can be either "dev" or "rel"
- */
-private String getSdkPublishType() {
-    String type = parseCommandParameter()["lib-type"]
-    if (type == "rel") {
-        return "rel"
-    } else {
-        return "dev"
-    }
-}
 
