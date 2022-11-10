@@ -62,6 +62,11 @@ class InboxViewModel @Inject constructor(
     private var rootInboxNode: MegaNode? = null
 
     /**
+     * The My Backups Folder Node
+     */
+    private var myBackupsFolderNode: NodeId = NodeId(-1L)
+
+    /**
      * Perform the following actions upon ViewModel initialization
      */
     init {
@@ -123,21 +128,19 @@ class InboxViewModel @Inject constructor(
      * @param nodeId The updated My Backups Node ID
      */
     private suspend fun onMyBackupsFolderUpdateReceived(nodeId: NodeId) {
+        myBackupsFolderNode = nodeId
+
         _state.update { inboxState ->
             if (inboxState.inboxNodeId.id == -1L) {
                 refreshNodes(nodeId).let { updatedNodes ->
                     inboxState.copy(
-                        myBackupsFolderNodeId = nodeId,
                         inboxNodeId = nodeId,
                         nodes = updatedNodes,
                     )
                 }
             } else {
                 refreshNodes().let { updatedNodes ->
-                    inboxState.copy(
-                        myBackupsFolderNodeId = nodeId,
-                        nodes = updatedNodes
-                    )
+                    inboxState.copy(nodes = updatedNodes)
                 }
             }
         }
@@ -253,12 +256,12 @@ class InboxViewModel @Inject constructor(
 
     /**
      * Checks whether the the Inbox screen is currently on the Backups Folder level by comparing the values of
-     * [InboxState.inboxNodeId] and [InboxState.myBackupsFolderNodeId]
+     * [InboxState.inboxNodeId] and [myBackupsFolderNode]
      *
      * @return true if both values are equal or [InboxState.inboxNodeId] is -1L, and false if otherwise
      */
     fun isCurrentlyOnBackupFolderLevel(): Boolean = with(_state.value) {
-        (this.inboxNodeId == this.myBackupsFolderNodeId) || this.inboxNodeId.id == -1L
+        (this.inboxNodeId == myBackupsFolderNode) || this.inboxNodeId.id == -1L
     }
 
     /**

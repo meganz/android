@@ -95,9 +95,8 @@ class InboxViewModelTest {
 
         underTest.state.test {
             val initialState = awaitItem()
-            assertThat(initialState.inboxNodeId).isEqualTo(NodeId(-1L))
             assertThat(initialState.hideMultipleItemSelection).isFalse()
-            assertThat(initialState.myBackupsFolderNodeId).isEqualTo(NodeId(-1L))
+            assertThat(initialState.inboxNodeId).isEqualTo(NodeId(-1L))
             assertThat(initialState.nodes).isEmpty()
             assertThat(initialState.shouldExitInbox).isFalse()
             assertThat(initialState.triggerBackPress).isFalse()
@@ -145,7 +144,6 @@ class InboxViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.inboxNodeId).isEqualTo(NodeId(INBOX_NODE_ID))
-                assertThat(state.myBackupsFolderNodeId).isEqualTo(myBackupsNode)
                 assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
             }
         }
@@ -161,7 +159,6 @@ class InboxViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.inboxNodeId).isEqualTo(myBackupsNode)
-                assertThat(state.myBackupsFolderNodeId).isEqualTo(myBackupsNode)
                 assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
             }
         }
@@ -212,7 +209,6 @@ class InboxViewModelTest {
         assertThat(underTest.isCurrentlyOnBackupFolderLevel()).isTrue()
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.myBackupsFolderNodeId).isEqualTo(myBackupsNode)
             assertThat(state.inboxNodeId).isEqualTo(myBackupsNode)
         }
     }
