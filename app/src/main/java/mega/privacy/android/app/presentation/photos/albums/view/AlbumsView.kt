@@ -146,21 +146,14 @@ fun AlbumsView(
                             .clip(RoundedCornerShape(10.dp))
                             .aspectRatio(1f)
                     )
-                    val title = album.title(LocalContext.current)
-                    if (title.isEmpty()) {
-                        Text(
-                            modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
-                            text = "album no name"
-                        )
-                    } else {
-                        MiddleEllipsisText(
-                            modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
-                            text = album.title(LocalContext.current),
-                            style = MaterialTheme.typography.subtitle2,
-                            color = if (MaterialTheme.colors.isLight) black else white,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                    MiddleEllipsisText(
+                        modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
+                        text = album.title(LocalContext.current),
+                        style = MaterialTheme.typography.subtitle2,
+                        color = if (MaterialTheme.colors.isLight) black else white,
+                        fontWeight = FontWeight.Medium
+                    )
+
                     Text(
                         text = album.count.toString(),
                         style = MaterialTheme.typography.caption,
