@@ -15,7 +15,6 @@ interface CompleteFastLogin {
     /**
      * Invoke.
      *
-     * @param session Required account session for login.
      */
-    suspend operator fun invoke(session: String)
+    suspend operator fun invoke(): String
 }
