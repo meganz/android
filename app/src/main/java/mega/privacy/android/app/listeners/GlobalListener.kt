@@ -218,14 +218,14 @@ class GlobalListener @Inject constructor(
     }
 
     override fun onSetsUpdate(api: MegaApiJava?, sets: ArrayList<MegaSet>?) {
-        TODO("Not yet implemented")
+        Timber.d("Sets Updated")
     }
 
     override fun onSetElementsUpdate(
         api: MegaApiJava?,
         elements: ArrayList<MegaSetElement>?,
     ) {
-        TODO("Not yet implemented")
+        Timber.d("Set elements updated")
     }
 
     private fun sendBroadcastUpdateAccountDetails() {
