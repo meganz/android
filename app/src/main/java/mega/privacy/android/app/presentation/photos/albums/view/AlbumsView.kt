@@ -71,6 +71,7 @@ fun AlbumsView(
     albumsViewState: AlbumsViewState,
     openAlbum: (album: UIAlbum) -> Unit,
     downloadPhoto: PhotoDownload,
+    onDialogPositiveButtonClicked: (name: String) -> Unit,
     isUserAlbumsEnabled: suspend () -> Boolean,
 ) {
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -135,7 +136,7 @@ fun AlbumsView(
                             .clip(RoundedCornerShape(10.dp))
                             .aspectRatio(1f)
                     )
-                    Text(
+                    MiddleEllipsisText(
                         modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
                         text = album.title(LocalContext.current),
                         style = MaterialTheme.typography.subtitle2,
@@ -159,7 +160,7 @@ fun AlbumsView(
         ) {
             FloatingActionButton(
                 modifier = Modifier.padding(all = 16.dp),
-                onClick = { openDialog.value = true }
+                onClick = { openDialog.value = true },
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -175,7 +176,8 @@ fun AlbumsView(
 
         if (openDialog.value) {
             CreateNewAlbumDialog(
-                onDismissRequest = { openDialog.value = false }
+                onDismissRequest = { openDialog.value = false },
+                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
             )
         }
     }
@@ -186,6 +188,7 @@ fun AlbumsView(
 @Composable
 fun CreateNewAlbumDialog(
     onDismissRequest: () -> Unit = {},
+    onDialogPositiveButtonClicked: (name: String) -> Unit,
 ) {
     var textState by rememberSaveable { mutableStateOf("") }
     val isEnabled by remember { mutableStateOf(true) }
@@ -266,7 +269,7 @@ fun CreateNewAlbumDialog(
                         horizontalArrangement = Arrangement.End
                     ) {
                         Button(
-                            onClick = { onDismissRequest() },
+                            onClick = onDismissRequest,
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = Color.Transparent,
                             ),
@@ -285,7 +288,10 @@ fun CreateNewAlbumDialog(
                             )
                         }
                         Button(
-                            onClick = { onDismissRequest() },
+                            onClick = {
+                                onDismissRequest()
+                                onDialogPositiveButtonClicked(textState)
+                            },
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = Color.Transparent,
                             ),

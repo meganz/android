@@ -1,5 +1,7 @@
 /**
- * This script is to build and upload Android APK to Firebase AppDistribution
+ * This script serves 2 purposes:
+ * 1. Build and upload Android APK to Firebase AppDistribution
+ * 2. Build SDK and publish to Artifactory
  */
 
 
@@ -12,6 +14,13 @@ SDK_COMMIT = ""
 MEGACHAT_COMMIT = ""
 SDK_TAG = ""
 MEGACHAT_TAG = ""
+
+/**
+ * GitLab commands that can trigger this job.
+ */
+DELIVER_QA_CMD = "deliver_qa"
+PUBLISH_SDK_CMD = "publish_sdk"
+
 
 /**
  * Flag to decide whether we do clean before build SDK.
@@ -44,28 +53,35 @@ pipeline {
 
         APK_VERSION_NAME_FOR_CD = "_${new Date().format('MMddHHmm')}"
 
+        // SDK build log. ${LOG_FILE} will be used by build.sh to export SDK build log.
+        SDK_LOG_FILE_NAME = "sdk_build_log.txt"
+        LOG_FILE = "${WORKSPACE}/${SDK_LOG_FILE_NAME}"
+
         // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
         BUILD_ARCHS = "arm64-v8a"
     }
     post {
         failure {
             script {
-                // download Jenkins console log to a file
-                withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
-                    sh 'curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o console.txt'
-                }
+
+                downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
                 if (hasGitLabMergeRequest()) {
-                    // if build is triggered by MR, send result to MR.
-                    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-                        // upload Jenkins console log to GitLab and get download link
-                        final String response = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
-                        def json = new groovy.json.JsonSlurperClassic().parseText(response)
+                    // upload Jenkins console log
+                    String jsonJenkinsLog = uploadFileToGitLab(CONSOLE_LOG_FILE)
 
-                        String message = failureMessage("<br/>") +
-                                "<br/>Build Log:\t${json.markdown}"
-                        sendMRComment(message)
+                    // upload SDK build log if SDK build fails
+                    String sdkBuildMessage = ""
+                    if (BUILD_STEP == "Build SDK For Publish") {
+                        def jsonSdkLog = uploadFileToGitLab(SDK_LOG_FILE_NAME)
+                        sdkBuildMessage = "<br/>SDK Build failed. Log:${jsonSdkLog}"
                     }
+
+                    String message = failureMessage("<br/>") +
+                            "<br/>Build Log:\t${jsonJenkinsLog}" +
+                            sdkBuildMessage
+
+                    sendToMR(message)
                 } else {
                     // if build is triggered by PUSH, send result only to Slack
                     withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
@@ -78,12 +94,15 @@ pipeline {
         success {
             script {
                 slackSend color: "good", message: successMessage("\n")
-                sendMRComment(successMessage("<br/>"))
+                sendToMR(successMessage("<br/>"))
             }
         }
     }
     stages {
         stage('Preparation') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Preparation'
@@ -92,11 +111,15 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Preparation') {
                     sh("rm -fv ${CONSOLE_LOG_FILE}")
+                    sh("rm -fv ${LOG_FILE}")  // sdk log file
                     sh('set')
                 }
             }
         }
         stage('Fetch SDK Submodules') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Fetch SDK Submodules'
@@ -124,6 +147,9 @@ pipeline {
             }
         }
         stage('Select SDK Version') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Select SDK Version'
@@ -153,6 +179,9 @@ pipeline {
         }
 
         stage('Download Dependency Lib for SDK') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Download Dependency Lib for SDK'
@@ -185,6 +214,9 @@ pipeline {
             }
         }
         stage('Build SDK') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Build SDK'
@@ -208,7 +240,59 @@ pipeline {
                 }
             }
         }
+
+        stage('Build SDK For Publish') {
+            when {
+                expression { triggerByPublishSdkCmd() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Build SDK For Publish'
+                    String buildArchs = "x86 armeabi-v7a x86_64 arm64-v8a"
+                    withEnv(["BUILD_ARCHS=${buildArchs}"]) {
+                        sh """
+                                cd ${WORKSPACE}/sdk/src/main/jni
+                                echo CLEANING SDK
+                                bash build.sh clean
+                            
+                                echo "=== START SDK BUILD===="
+                                bash build.sh all
+                            """
+                    }
+                }
+
+            }
+        }
+        stage('Publish SDK to Artifactory') {
+            when {
+                expression { triggerByPublishSdkCmd() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Publish SDK to Artifactory'
+
+                    withCredentials([
+                            string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+                            string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN'),
+                    ]) {
+                        withEnv([
+                                "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
+                                "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}",
+                                "SDK_PUBLISH_TYPE=${getSdkPublishType()}"
+                        ]) {
+                            sh """
+                                cd ${WORKSPACE}
+                                ./gradlew sdk:artifactoryPublish
+                            """
+                        }
+                    }
+                }
+            }
+        }
         stage('Clean Android build') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Clean Android'
@@ -217,6 +301,9 @@ pipeline {
             }
         }
         stage('Build APK(GMS)') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Build APK (GMS)'
@@ -230,6 +317,9 @@ pipeline {
             }
         }
         stage('Sign APK(GMS)') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Sign APK(GMS)'
@@ -256,6 +346,9 @@ pipeline {
             }
         }
         stage('Upload APK(GMS) to Firebase') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Upload APK(GMS) to Firebase'
@@ -267,8 +360,8 @@ pipeline {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
-                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}",
-                                "TESTER_GROUP_FOR_CD=${parseDeliverQaParams()["tester-group"]}"
+                                "TESTERS_FOR_CD=${parseCommandParameter()["tester"]}",
+                                "TESTER_GROUP_FOR_CD=${parseCommandParameter()["tester-group"]}"
                         ]) {
                             println("Upload GMS APK, TESTERS_FOR_CD = ${env.TESTERS_FOR_CD}")
                             println("Upload GMS APK, RELEASE_NOTES_FOR_CD = ${env.RELEASE_NOTES_FOR_CD}")
@@ -279,6 +372,9 @@ pipeline {
             }
         }
         stage('Build APK(HMS)') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Build APK(HMS)'
@@ -291,6 +387,9 @@ pipeline {
             }
         }
         stage('Sign APK(HMS)') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Sign APK(HMS)'
@@ -317,6 +416,9 @@ pipeline {
             }
         }
         stage('Upload HMS APK to Firebase') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Upload HMS APK to Firebase'
@@ -328,8 +430,8 @@ pipeline {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
-                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}",
-                                "TESTER_GROUP_FOR_CD=${parseDeliverQaParams()["tester-group"]}"
+                                "TESTERS_FOR_CD=${parseCommandParameter()["tester"]}",
+                                "TESTER_GROUP_FOR_CD=${parseCommandParameter()["tester-group"]}"
                         ]) {
                             sh './gradlew appDistributionUploadHmsRelease'
                         }
@@ -338,6 +440,9 @@ pipeline {
             }
         }
         stage('Build QA APK(GMS)') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Build QA APK(GMS)'
@@ -351,6 +456,9 @@ pipeline {
         }
 
         stage('Upload QA APK(GMS) to Firebase') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Upload QA APK(GMS) to Firebase'
@@ -362,8 +470,8 @@ pipeline {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
-                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}",
-                                "TESTER_GROUP_FOR_CD=${parseDeliverQaParams()["tester-group"]}"
+                                "TESTERS_FOR_CD=${parseCommandParameter()["tester"]}",
+                                "TESTER_GROUP_FOR_CD=${parseCommandParameter()["tester-group"]}"
                         ]) {
                             sh './gradlew appDistributionUploadGmsQa'
                         }
@@ -372,8 +480,10 @@ pipeline {
             }
         }
 
-
         stage('Clean up') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Clean Up'
@@ -535,21 +645,6 @@ private boolean hasGitLabMergeRequest() {
 }
 
 /**
- * send message to GitLab MR comment
- * @param message message to send
- */
-private void sendMRComment(String message) {
-    if (hasGitLabMergeRequest()) {
-        def mrNumber = env.gitlabMergeRequestIid
-        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-            env.MARKDOWN_LINK = message
-            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
-        }
-    }
-}
-
-/**
  * compose the success message, which might be used for Slack or GitLab MR.
  * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
  * while GitLab MR uses "<br/>".
@@ -567,6 +662,35 @@ private String successMessage(String lineBreak) {
 }
 
 /**
+ * Check this build is triggered by PUSH to a branch
+ * @return
+ */
+private boolean triggerByPush() {
+    return env.gitlabActionType == "PUSH"
+}
+
+
+/**
+ * Check if this build is triggered by a deliver_qa command
+ * @return
+ */
+private boolean triggerByDeliverQaCmd() {
+    return env.gitlabActionType == "NOTE" &&
+            env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase.startsWith(DELIVER_QA_CMD)
+}
+
+/**
+ * Check if this build is triggered by a publish_sdk command
+ * @return
+ */
+private boolean triggerByPublishSdkCmd() {
+    return env.gitlabActionType == "NOTE" &&
+            env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase.startsWith(PUBLISH_SDK_CMD)
+}
+
+/**
  * get trigger reason
  * @return description for the trigger reason
  */
@@ -581,37 +705,49 @@ private String getTriggerReason() {
 }
 
 /**
+ * Parse the parameter of command that triggers this build task. Both 'deliver_qa' and 'publish_sdk'
+ * are supported. Command examples:
+ * "deliver_qa --tester tester1@gmail.com,tester2@gmail.com --tester-group internal_dev,other_group --notes AND-99999 this build fixes the problem of layout in xxx page"
+ * "publish_sdk --type rel --sdk-commit 12345 --chat-commit 0987656"
  *
- * @return a map of the parameters and values. Below parameters should be included.
+ * @return a map of the parsed parameters and values. Below parameters should be included.
+ * For 'deliver_qa' command
  *     key "tester" - list of tester emails, separated by comma
  *     key "notes" - developer specified release notes.
  *     key "tester-group" - developer specified tester group, separated by comma
  *     If deliver_qa command is issued without parameters, then values of above keys are empty.
+ * For 'publish_sdk' command
+ *    key "sdk-type" - sdk build type. Possible values: "dev" or "rel"
+ *    key "sdk-commit" - MEGA SDK commit SHA-1. Can be short or long format.
+ *    key "chat-commit" - MEGAChat SDK commit SHA-1. Can be short or long format.
+ *    If publish_sdk command is issued without parameters, then "sdk-type" returns "dev"
+ *    , "sdk-commit" and "chat-commit" are empty.
  */
-def parseDeliverQaParams() {
+def parseCommandParameter() {
     // parameters in deliver_qa command
-    final PARAM_TESTER = "--tester"
     final PARAM_NOTES = "--notes"
-    final PARAM_TESTER_GROUP = "--tester-group"
 
-    // key in the result dictionary
-    def KEY_TESTER = "tester"
-    def KEY_NOTES = "notes"
-    def KEY_TESTER_GROUP = "tester-group"
+    // key in the returned dictionary - delivery_qa command
+    final KEY_NOTES = "notes"
 
     def result = [:]
-    result[KEY_TESTER] = ""
-    result[KEY_NOTES] = ""
-    result[KEY_TESTER_GROUP] = ""
 
-    String command = env.gitlabTriggerPhrase
-    println("[DEBUG] parsing deliver_qa command parameters. \nuser input: $command")
-    if (command == null || !command.startsWith("deliver_qa")) {
+    String fullCommand = env.gitlabTriggerPhrase
+    println("[DEBUG] parsing command parameters. \nuser input: $fullCommand")
+
+    String command
+    if (triggerByDeliverQaCmd()){
+        command = DELIVER_QA_CMD
+    } else if (triggerByPublishSdkCmd()) {
+        command = PUBLISH_SDK_CMD
+    } else {
         return result
     }
-    String params = command.substring("deliver_qa".length()).trim()
 
-    // get release notes from parameter.
+    String params = fullCommand.substring(command.length()).trim()
+
+    // get release notes param of deliver_qa command because it is always
+    // the last parameter when it exists
     int notesPos = params.indexOf(PARAM_NOTES)
     if (notesPos >= 0) {
         String notes = params.substring(notesPos + PARAM_NOTES.length()).trim()
@@ -626,27 +762,33 @@ def parseDeliverQaParams() {
     }
 
     String[] paramList = otherParams.split(" +")
+
+    if (paramList.length % 2 != 0) {
+        println("[ERROR] invalid parameter in command! parameter name and values are not in pair.")
+        println("[ERROR] parameter list = " + otherParams)
+        sh("exit 1")
+        return result
+    }
+
     def counter = 0
     while (counter < paramList.length) {
         String word = paramList[counter]
-        switch (word) {
-            case PARAM_TESTER:
-                result[KEY_TESTER] = paramList[++counter]
-                break
-            case PARAM_TESTER_GROUP:
-                result[KEY_TESTER_GROUP] = paramList[++counter]
-                break;
-            default:
-                println("[ERROR] invalid parameter of deliver_qa command!")
-                println("[ERROR] actual parameter: $params")
-                println("[ERROR] parsed parameters: $result")
-                println("[ERROR] parameter \"$word\" is unknown!")
-                break;
+
+        if (!word.startsWith("--")) {
+            println("[ERROR] invalid parameter in command! Parameter not start with --")
+            println("[ERROR] parsed parameters: $result")
+            println("[ERROR] parameter \"$word\" is unknown!")
+            sh("exit 1")
+            return result
         }
-        counter++
+
+        word = word.substring(2)
+        String value = paramList[counter + 1]
+        result[word] = value
+        counter += 2
     }
 
-    println("[DEBUG] deliverQa params = $result")
+    println("[DEBUG] parseParam params = $result")
     return result
 }
 
@@ -656,7 +798,7 @@ String readReleaseNotes() {
             "\nBranch: $gitlabSourceBranch " +
             "\nLast 5 git commits:\n${sh(script: "git log --pretty=format:\"(%h,%an)%x09%s\" -5", returnStdout: true).trim()}"
 
-    String customRelNotes = parseDeliverQaParams()["notes"]
+    String customRelNotes = parseCommandParameter()["notes"]
     if (!customRelNotes.isEmpty()) {
         return customRelNotes + "\n" + baseRelNotes
     } else {
@@ -701,5 +843,57 @@ private String readAppVersion() {
  */
 private String lastCommitMessage() {
     return sh(script: "git log --pretty=format:\"%x09%s\" -1", returnStdout: true).trim()
+}
+
+/**
+ * download jenkins build console log and save to file.
+ */
+private void downloadJenkinsConsoleLog(String downloaded) {
+    withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
+        sh "curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o ${downloaded}"
+    }
+}
+
+/**
+ * upload file to GitLab and return the GitLab link
+ * @param fileName the local file to be uploaded
+ * @return file link on GitLab
+ */
+private String uploadFileToGitLab(String fileName) {
+    String link = ""
+    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
+        link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
+        return link
+    }
+    return link
+}
+
+/**
+ * send message to GitLab MR comment
+ * @param message message to send
+ */
+private void sendToMR(String message) {
+    if (hasGitLabMergeRequest()) {
+        def mrNumber = env.gitlabMergeRequestIid
+        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+            env.MARKDOWN_LINK = message
+            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
+        }
+    }
+}
+
+/**
+ * Get publish type of SDK.
+ * @return return value can be either "dev" or "rel"
+ */
+private String getSdkPublishType() {
+    String type = parseCommandParameter()["lib-type"]
+    if (type == "rel") {
+        return "rel"
+    } else {
+        return "dev"
+    }
 }
 

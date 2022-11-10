@@ -16,17 +16,22 @@ import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
+import mega.privacy.android.domain.usecase.DefaultMapFavouriteSortOrder
+import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadThumbnail
 import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetAllFavorites
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
+import mega.privacy.android.domain.usecase.GetFavouriteSortOrder
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.GetTimelinePhotos
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
+import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import org.mockito.kotlin.mock
@@ -98,4 +103,14 @@ object FavouritesTestModule {
 
     @Provides
     fun provideIsCameraSyncPreferenceEnabled(): IsCameraSyncPreferenceEnabled = mock()
+
+    @Provides
+    fun provideGetFavouriteSortOrder(getSortOrder: GetCloudSortOrder, mapFavouriteSortOrder: MapFavouriteSortOrder): GetFavouriteSortOrder =
+        GetFavouriteSortOrder{ mapFavouriteSortOrder(getSortOrder()) }
+
+    @Provides
+    fun provideMapFavouriteSortOrder(): MapFavouriteSortOrder = DefaultMapFavouriteSortOrder()
+
+    @Provides
+    fun provideCreateAlbum(): CreateAlbum = mock()
 }

@@ -335,6 +335,7 @@ class PhotosFragment : Fragment() {
             albumsViewState = albumsViewState,
             openAlbum = this::openAlbum,
             downloadPhoto = photosViewModel::downloadPhoto,
+            onDialogPositiveButtonClicked = albumsViewModel::createNewAlbum,
         ) {
             getFeatureFlag(AppFeatures.UserAlbums)
         }

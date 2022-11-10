@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.recentactions.model
 
 import com.brandongogetap.stickyheaders.exposed.StickyHeader
+import mega.privacy.android.domain.entity.RecentActionBucket
 import nz.mega.sdk.MegaRecentActionBucket
 
 /**
@@ -20,7 +21,7 @@ sealed class RecentActionItemType(val timestamp: Long) {
      *  @property currentUserIsOwner true if the current user is the owner of the recent actions
      */
     class Item(
-        val bucket: MegaRecentActionBucket,
+        val bucket: RecentActionBucket,
         val userName: String = "",
         val parentFolderName: String = "",
         val parentFolderSharesType: RecentActionsSharesType = RecentActionsSharesType.NONE,

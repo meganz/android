@@ -1,9 +1,9 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import nz.mega.sdk.MegaRecentActionBucket
 import javax.inject.Inject
 
 /**
@@ -15,9 +15,9 @@ class DefaultUpdateRecentAction @Inject constructor(
 ) : UpdateRecentAction {
 
     override suspend fun invoke(
-        currentBucket: MegaRecentActionBucket,
-        cachedActionList: List<MegaRecentActionBucket>?,
-    ): MegaRecentActionBucket? = withContext(ioDispatcher) {
+        currentBucket: RecentActionBucket,
+        cachedActionList: List<RecentActionBucket>?,
+    ): RecentActionBucket? = withContext(ioDispatcher) {
 
         val recentActions = getRecentActions()
 
@@ -39,12 +39,12 @@ class DefaultUpdateRecentAction @Inject constructor(
 }
 
 /**
- * Compare two MegaRecentActionBucket
+ * Compare two [RecentActionBucket]
  *
  * @param bucket the MegaRecentActionBucket to compare with the current object
  * @return true if the two MegaRecentActionBucket are the same
  */
-fun MegaRecentActionBucket.isSameBucket(bucket: MegaRecentActionBucket): Boolean {
+fun RecentActionBucket.isSameBucket(bucket: RecentActionBucket): Boolean {
     return isMedia == bucket.isMedia &&
             isUpdate == bucket.isUpdate &&
             timestamp == bucket.timestamp &&

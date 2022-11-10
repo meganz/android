@@ -220,6 +220,11 @@ class UpgradeAccountFragment : Fragment(), Scrollable {
             viewModel.refreshPricing()
             return
         }
+        productAccounts.firstOrNull {
+            it.level == Constants.PRO_LITE
+        }.let {
+            binding.upgradeProliteLayout.isVisible = it != null
+        }
 
         for (i in productAccounts.indices) {
             val account = productAccounts[i]
