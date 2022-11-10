@@ -34,6 +34,11 @@ DATA_COVERAGE = ""
 COVERAGE_ARCHIVE = "coverage.zip"
 COVERAGE_FOLDER = "coverage"
 
+/**
+ * common.groovy file with common methods
+ */
+def common
+
 HTML_INDENT = "-- "
 /**
  * Decide whether we should skip the current build. If MR title starts with "Draft:"
@@ -270,6 +275,16 @@ pipeline {
         }
     }
     stages {
+        stage('Load Common Script') {
+            steps {
+                script {
+                    BUILD_STEP = 'Preparation'
+
+                    common = load('jenkinsfile/common.groovy')
+                    common.helloWorld()
+                }
+            }
+        }
         stage('Preparation') {
             when {
                 expression { (!shouldSkipBuild()) }
@@ -302,27 +317,8 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Fetch SDK Submodules"
-                }
 
-                gitlabCommitStatus(name: 'Fetch SDK Submodules') {
-                    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                        script {
-                            sh '''
-                            cd ${WORKSPACE}
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
-                            git submodule sync
-                            git submodule update --init --recursive --remote 
-                            cd sdk/src/main/jni/mega/sdk
-                            git fetch
-                            cd ../../megachat/sdk
-                            git fetch
-                            cd ${WORKSPACE}
-                        '''
-                        }
-                    }
+                    common.fetchSdkSubmodules()
                 }
             }
         }
