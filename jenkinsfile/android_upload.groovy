@@ -1,5 +1,7 @@
 /**
- * This script is to build and upload Android APK to Firebase AppDistribution
+ * This script serves 2 purposes:
+ * 1. Build and upload Android APK to Firebase AppDistribution
+ * 2. Build SDK and publish to Artifactory
  */
 
 
@@ -19,6 +21,10 @@ MEGACHAT_TAG = ""
 DELIVER_QA_CMD = "deliver_qa"
 PUBLISH_SDK_CMD = "publish_sdk"
 
+/**
+ * common.groovy file with common methods
+ */
+def common
 
 /**
  * Flag to decide whether we do clean before build SDK.
@@ -64,7 +70,7 @@ pipeline {
 
                 downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
-                if (hasGitLabMergeRequest()) {
+                if (common.hasGitLabMergeRequest()) {
                     // upload Jenkins console log
                     String jsonJenkinsLog = uploadFileToGitLab(CONSOLE_LOG_FILE)
 
@@ -79,7 +85,7 @@ pipeline {
                             "<br/>Build Log:\t${jsonJenkinsLog}" +
                             sdkBuildMessage
 
-                    sendToMR(message)
+                    common.sendToMR(message)
                 } else {
                     // if build is triggered by PUSH, send result only to Slack
                     withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
@@ -92,11 +98,22 @@ pipeline {
         success {
             script {
                 slackSend color: "good", message: successMessage("\n")
-                sendToMR(successMessage("<br/>"))
+                common.sendToMR(successMessage("<br/>"))
             }
         }
     }
     stages {
+        stage('Load Common Script') {
+            steps {
+                script {
+                    BUILD_STEP = 'Preparation'
+
+                    common = load('jenkinsfile/common.groovy')
+                    common.helloWorld()
+                    common.sendToMR("Hello! Load Common Script")
+                }
+            }
+        }
         stage('Preparation') {
             when {
                 expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
@@ -109,6 +126,7 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Preparation') {
                     sh("rm -fv ${CONSOLE_LOG_FILE}")
+                    sh("rm -fv ${LOG_FILE}")  // sdk log file
                     sh('set')
                 }
             }
@@ -120,26 +138,8 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Fetch SDK Submodules'
-                }
-                gitlabCommitStatus(name: 'Fetch SDK Submodules') {
-                    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                        script {
-                            sh '''
-                            cd ${WORKSPACE}
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
-                            git submodule sync
-                            git submodule update --init --recursive --remote 
-                            cd sdk/src/main/jni/mega/sdk
-                            git fetch
-                            cd ../../megachat/sdk
-                            git fetch
-                            cd ${WORKSPACE}
-                        '''
-                        }
-                    }
+
+                    common.fetchSdkSubmodules()
                 }
             }
         }
@@ -151,23 +151,37 @@ pipeline {
                 script {
                     BUILD_STEP = 'Select SDK Version'
                 }
-                gitlabCommitStatus(name: 'Fetch SDK Submodules') {
+                gitlabCommitStatus(name: 'Select SDK Version') {
                     withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
                         script {
-                            if (isDefined(SDK_COMMIT)) {
-                                checkoutSdkByCommit(SDK_COMMIT)
-                            } else if (isDefined(SDK_TAG)) {
-                                checkoutSdkByTag(SDK_TAG)
-                            } else {
-                                checkoutSdkByBranch(SDK_BRANCH)
-                            }
 
-                            if (isDefined(MEGACHAT_COMMIT)) {
-                                checkoutMegaChatSdkByCommit(MEGACHAT_COMMIT)
-                            } else if (isDefined(MEGACHAT_TAG)) {
-                                checkoutMegaChatSdkByTag(MEGACHAT_TAG)
-                            } else {
-                                checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
+                            if (triggerByDeliverQaCmd() || triggerByPush()) {
+                                if (isDefined(SDK_COMMIT)) {
+                                    common.checkoutSdkByCommit(SDK_COMMIT)
+                                } else if (isDefined(SDK_TAG)) {
+                                    checkoutSdkByTag(SDK_TAG)
+                                } else {
+                                    checkoutSdkByBranch(SDK_BRANCH)
+                                }
+
+                                if (isDefined(MEGACHAT_COMMIT)) {
+                                    common.checkoutMegaChatSdkByCommit(MEGACHAT_COMMIT)
+                                } else if (isDefined(MEGACHAT_TAG)) {
+                                    checkoutMegaChatSdkByTag(MEGACHAT_TAG)
+                                } else {
+                                    checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
+                                }
+                            } else if (triggerByPublishSdkCmd()) {
+                                // if building SDK lib, check out SDK versions if parameter is provided
+                                String sdkCommit = parseCommandParameter()["sdk-commit"]
+                                if (sdkCommit != null && sdkCommit.length() > 0) {
+                                    common.checkoutSdkByCommit(sdkCommit)
+                                }
+
+                                String chatCommit = parseCommandParameter()["chat-commit"]
+                                if (chatCommit != null && chatCommit.length() > 0) {
+                                    common.checkoutMegaChatSdkByCommit(chatCommit)
+                                }
                             }
                         }
                     }
@@ -275,7 +289,7 @@ pipeline {
                         withEnv([
                                 "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
                                 "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}",
-                                "SDK_PUBLISH_TYPE=dev"
+                                "SDK_PUBLISH_TYPE=${getSdkPublishType()}"
                         ]) {
                             sh """
                                 cd ${WORKSPACE}
@@ -357,8 +371,8 @@ pipeline {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
-                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}",
-                                "TESTER_GROUP_FOR_CD=${parseDeliverQaParams()["tester-group"]}"
+                                "TESTERS_FOR_CD=${parseCommandParameter()["tester"]}",
+                                "TESTER_GROUP_FOR_CD=${parseCommandParameter()["tester-group"]}"
                         ]) {
                             println("Upload GMS APK, TESTERS_FOR_CD = ${env.TESTERS_FOR_CD}")
                             println("Upload GMS APK, RELEASE_NOTES_FOR_CD = ${env.RELEASE_NOTES_FOR_CD}")
@@ -427,8 +441,8 @@ pipeline {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
-                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}",
-                                "TESTER_GROUP_FOR_CD=${parseDeliverQaParams()["tester-group"]}"
+                                "TESTERS_FOR_CD=${parseCommandParameter()["tester"]}",
+                                "TESTER_GROUP_FOR_CD=${parseCommandParameter()["tester-group"]}"
                         ]) {
                             sh './gradlew appDistributionUploadHmsRelease'
                         }
@@ -467,8 +481,8 @@ pipeline {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
-                                "TESTERS_FOR_CD=${parseDeliverQaParams()["tester"]}",
-                                "TESTER_GROUP_FOR_CD=${parseDeliverQaParams()["tester-group"]}"
+                                "TESTERS_FOR_CD=${parseCommandParameter()["tester"]}",
+                                "TESTER_GROUP_FOR_CD=${parseCommandParameter()["tester-group"]}"
                         ]) {
                             sh './gradlew appDistributionUploadGmsQa'
                         }
@@ -476,7 +490,6 @@ pipeline {
                 }
             }
         }
-
 
         stage('Clean up') {
             when {
@@ -552,34 +565,6 @@ static boolean isDefined(String value) {
 }
 
 /**
- * checkout SDK by commit ID
- * @param sdkCommitId the commit ID to checkout
- */
-private void checkoutSdkByCommit(String sdkCommitId) {
-    sh """
-    echo checkoutSdkByCommit
-    cd $WORKSPACE
-    cd sdk/src/main/jni/mega/sdk
-    git checkout $sdkCommitId
-    cd $WORKSPACE
-    """
-}
-
-/**
- * checkout MEGAchat SDK by commit ID
- * @param megaChatCommitId the commit ID to checkout
- */
-private void checkoutMegaChatSdkByCommit(String megaChatCommitId) {
-    sh """
-    echo checkoutMegaChatSdkByCommit
-    cd $WORKSPACE
-    cd sdk/src/main/jni/megachat/sdk
-    git checkout $megaChatCommitId
-    cd $WORKSPACE
-    """
-}
-
-/**
  * checkout SDK by git tag
  * @param sdkTag the tag to checkout
  */
@@ -631,15 +616,6 @@ private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
-}
-
-/**
- * Check if this build is triggered by a GitLab Merge Request.
- * @return true if this build is triggerd by a GitLab MR. False if this build is triggerd
- * by a plain git push.
- */
-private boolean hasGitLabMergeRequest() {
-    return env.gitlabMergeRequestIid != null && !env.gitlabMergeRequestIid.isEmpty()
 }
 
 /**
@@ -703,37 +679,49 @@ private String getTriggerReason() {
 }
 
 /**
+ * Parse the parameter of command that triggers this build task. Both 'deliver_qa' and 'publish_sdk'
+ * are supported. Command examples:
+ * "deliver_qa --tester tester1@gmail.com,tester2@gmail.com --tester-group internal_dev,other_group --notes AND-99999 this build fixes the problem of layout in xxx page"
+ * "publish_sdk --type rel --sdk-commit 12345 --chat-commit 0987656"
  *
- * @return a map of the parameters and values. Below parameters should be included.
+ * @return a map of the parsed parameters and values. Below parameters should be included.
+ * For 'deliver_qa' command
  *     key "tester" - list of tester emails, separated by comma
  *     key "notes" - developer specified release notes.
  *     key "tester-group" - developer specified tester group, separated by comma
  *     If deliver_qa command is issued without parameters, then values of above keys are empty.
+ * For 'publish_sdk' command
+ *    key "sdk-type" - sdk build type. Possible values: "dev" or "rel"
+ *    key "sdk-commit" - MEGA SDK commit SHA-1. Can be short or long format.
+ *    key "chat-commit" - MEGAChat SDK commit SHA-1. Can be short or long format.
+ *    If publish_sdk command is issued without parameters, then "sdk-type" returns "dev"
+ *    , "sdk-commit" and "chat-commit" are empty.
  */
-def parseDeliverQaParams() {
+def parseCommandParameter() {
     // parameters in deliver_qa command
-    final PARAM_TESTER = "--tester"
     final PARAM_NOTES = "--notes"
-    final PARAM_TESTER_GROUP = "--tester-group"
 
-    // key in the result dictionary
-    def KEY_TESTER = "tester"
-    def KEY_NOTES = "notes"
-    def KEY_TESTER_GROUP = "tester-group"
+    // key in the returned dictionary - delivery_qa command
+    final KEY_NOTES = "notes"
 
     def result = [:]
-    result[KEY_TESTER] = ""
-    result[KEY_NOTES] = ""
-    result[KEY_TESTER_GROUP] = ""
 
-    String command = env.gitlabTriggerPhrase
-    println("[DEBUG] parsing ${DELIVER_QA_CMD} command parameters. \nuser input: $command")
-    if (command == null || !command.startsWith(DELIVER_QA_CMD)) {
+    String fullCommand = env.gitlabTriggerPhrase
+    println("[DEBUG] parsing command parameters. \nuser input: $fullCommand")
+
+    String command
+    if (triggerByDeliverQaCmd()){
+        command = DELIVER_QA_CMD
+    } else if (triggerByPublishSdkCmd()) {
+        command = PUBLISH_SDK_CMD
+    } else {
         return result
     }
-    String params = command.substring(DELIVER_QA_CMD.length()).trim()
 
-    // get release notes from parameter.
+    String params = fullCommand.substring(command.length()).trim()
+
+    // get release notes param of deliver_qa command because it is always
+    // the last parameter when it exists
     int notesPos = params.indexOf(PARAM_NOTES)
     if (notesPos >= 0) {
         String notes = params.substring(notesPos + PARAM_NOTES.length()).trim()
@@ -747,28 +735,39 @@ def parseDeliverQaParams() {
         otherParams = params
     }
 
+    if (otherParams.isEmpty()) {
+        println("[DEBUG] parseCommandParameter() no extra params. Result = $result")
+        return result
+    }
+
     String[] paramList = otherParams.split(" +")
+
+    if (paramList.length % 2 != 0) {
+        println("[ERROR] invalid parameter in command! parameter name and values are not in pair.")
+        println("[ERROR] parameter list = " + otherParams)
+        sh("exit 1")
+        return result
+    }
+
     def counter = 0
     while (counter < paramList.length) {
         String word = paramList[counter]
-        switch (word) {
-            case PARAM_TESTER:
-                result[KEY_TESTER] = paramList[++counter]
-                break
-            case PARAM_TESTER_GROUP:
-                result[KEY_TESTER_GROUP] = paramList[++counter]
-                break;
-            default:
-                println("[ERROR] invalid parameter of deliver_qa command!")
-                println("[ERROR] actual parameter: $params")
-                println("[ERROR] parsed parameters: $result")
-                println("[ERROR] parameter \"$word\" is unknown!")
-                break;
+
+        if (!word.startsWith("--")) {
+            println("[ERROR] invalid parameter in command! Parameter not start with --")
+            println("[ERROR] parsed parameters: $result")
+            println("[ERROR] parameter \"$word\" is unknown!")
+            sh("exit 1")
+            return result
         }
-        counter++
+
+        word = word.substring(2)
+        String value = paramList[counter + 1]
+        result[word] = value
+        counter += 2
     }
 
-    println("[DEBUG] deliverQa params = $result")
+    println("[DEBUG] parseParam params = $result")
     return result
 }
 
@@ -778,7 +777,7 @@ String readReleaseNotes() {
             "\nBranch: $gitlabSourceBranch " +
             "\nLast 5 git commits:\n${sh(script: "git log --pretty=format:\"(%h,%an)%x09%s\" -5", returnStdout: true).trim()}"
 
-    String customRelNotes = parseDeliverQaParams()["notes"]
+    String customRelNotes = parseCommandParameter()["notes"]
     if (!customRelNotes.isEmpty()) {
         return customRelNotes + "\n" + baseRelNotes
     } else {
@@ -850,17 +849,15 @@ private String uploadFileToGitLab(String fileName) {
 }
 
 /**
- * send message to GitLab MR comment
- * @param message message to send
+ * Get publish type of SDK.
+ * @return return value can be either "dev" or "rel"
  */
-private void sendToMR(String message) {
-    if (hasGitLabMergeRequest()) {
-        def mrNumber = env.gitlabMergeRequestIid
-        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-            env.MARKDOWN_LINK = message
-            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
-        }
+private String getSdkPublishType() {
+    String type = parseCommandParameter()["lib-type"]
+    if (type == "rel") {
+        return "rel"
+    } else {
+        return "dev"
     }
 }
 
