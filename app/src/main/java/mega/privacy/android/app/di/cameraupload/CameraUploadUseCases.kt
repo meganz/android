@@ -7,7 +7,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.di.GetNodeModule
-import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
@@ -44,11 +43,14 @@ import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
+import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
+import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
@@ -95,6 +97,7 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
+import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
@@ -348,6 +351,20 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideClearCacheDirectory(cameraUploadRepository: CameraUploadRepository): ClearCacheDirectory =
             ClearCacheDirectory(cameraUploadRepository::clearCacheDirectory)
+
+        /**
+         * Provide the [MonitorCameraUploadPauseState] implementation
+         */
+        @Provides
+        fun provideMonitorCameraUploadPauseState(environmentRepository: EnvironmentRepository): MonitorCameraUploadPauseState =
+            MonitorCameraUploadPauseState(environmentRepository::monitorCameraUploadPauseState)
+
+        /**
+         * Provide the [BroadcastUploadPauseState] implementation
+         */
+        @Provides
+        fun provideBroadcastUploadPauseState(environmentRepository: EnvironmentRepository): BroadcastUploadPauseState =
+            BroadcastUploadPauseState(environmentRepository::broadcastUploadPauseState)
     }
 
     /**
@@ -535,6 +552,4 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindRestoreSecondaryTimestamps(defaultRestoreSecondaryTimestamps: DefaultRestoreSecondaryTimestamps): RestoreSecondaryTimestamps
-
-
 }

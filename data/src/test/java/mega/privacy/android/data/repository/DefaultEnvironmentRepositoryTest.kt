@@ -38,6 +38,7 @@ class DefaultEnvironmentRepositoryTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             appInfoGateway = appInfoGateway,
             appInfoPreferencesGateway = appInfoPreferencesGateway,
+            broadcastReceiverGateway = mock()
         )
     }
 

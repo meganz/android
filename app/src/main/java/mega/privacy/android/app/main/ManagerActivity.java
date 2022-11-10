@@ -350,6 +350,7 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
+import mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
@@ -421,9 +422,9 @@ import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
-import mega.privacy.android.domain.entity.node.Node;
 import mega.privacy.android.domain.entity.transfer.TransferType;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
+import mega.privacy.android.domain.usecase.BroadcastUploadPauseState;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -547,6 +548,8 @@ public class ManagerActivity extends TransfersManagementActivity
     ActivityLifecycleHandler activityLifecycleHandler;
     @Inject
     MegaNodeUtilWrapper megaNodeUtilWrapper;
+    @Inject
+    BroadcastUploadPauseState broadcastUploadPauseState;
 
     public ArrayList<Integer> transfersInProgress;
     public MegaTransferData transferData;
@@ -1492,7 +1495,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 mediaDiscoveryFragment = getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.MEDIA_DISCOVERY.getTag());
             }
             isInAlbumContent = savedInstanceState.getBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, false);
-            if (isInAlbumContent){
+            if (isInAlbumContent) {
                 albumContentFragment = getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.ALBUM_CONTENT.getTag());
             }
             isInFilterPage = savedInstanceState.getBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, false);
@@ -2615,7 +2618,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     setToolbarTitle();
                     supportInvalidateOptionsMenu();
                 }
-                viewModel.nodeUpdateHandled();  
+                viewModel.nodeUpdateHandled();
             }
             return Unit.INSTANCE;
         });
@@ -9423,8 +9426,7 @@ public class ManagerActivity extends TransfersManagementActivity
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
             Timber.d("MegaRequest.TYPE_PAUSE_TRANSFERS");
             //force update the pause notification to prevent missed onTransferUpdate
-            sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
-
+            ManagerActivityExtensionsKt.broadCastUploadStatus(this, broadcastUploadPauseState);
             if (e.getErrorCode() == MegaError.API_OK) {
                 updateTransfersWidgetState();
 

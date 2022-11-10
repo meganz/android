@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
 import mega.privacy.android.data.gateway.AppInfoGateway
+import mega.privacy.android.data.gateway.BroadcastReceiverGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
@@ -18,7 +19,6 @@ import javax.inject.Inject
 
 /**
  * [EnvironmentRepository] Implementation
- *
  */
 internal class DefaultEnvironmentRepository @Inject constructor(
     private val deviceGateway: DeviceGateway,
@@ -27,6 +27,7 @@ internal class DefaultEnvironmentRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val appInfoGateway: AppInfoGateway,
     private val appInfoPreferencesGateway: AppInfoPreferencesGateway,
+    private val broadcastReceiverGateway: BroadcastReceiverGateway,
 ) : EnvironmentRepository {
 
     override fun getDeviceInfo(): DeviceInfo {
@@ -66,4 +67,10 @@ internal class DefaultEnvironmentRepository @Inject constructor(
     override suspend fun getDeviceSdkVersionInt() = deviceGateway.getSdkVersionInt()
 
     override suspend fun getDeviceSdkVersionName() = deviceGateway.getSdkVersionName()
+
+    override fun monitorCameraUploadPauseState() =
+        broadcastReceiverGateway.monitorCameraUploadPauseState
+
+    override suspend fun broadcastUploadPauseState() =
+        broadcastReceiverGateway.broadcastUploadPauseState()
 }

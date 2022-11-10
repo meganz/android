@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.manager
 
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 
 /**
  * Get the ManagerState in ManagerViewModel
@@ -33,3 +36,15 @@ fun ManagerActivity.outgoingSharesState() = outgoingSharesViewModel.state.value
  * @return the LinksState hold in LinksViewModel
  */
 fun ManagerActivity.linksState() = linksViewModel.state.value
+
+
+/**
+ * broad cast upload pause state event
+ */
+fun ManagerActivity.broadCastUploadStatus(
+    broadcastUploadPauseState: BroadcastUploadPauseState,
+) {
+    this.lifecycleScope.launch {
+        broadcastUploadPauseState.invoke()
+    }
+}
