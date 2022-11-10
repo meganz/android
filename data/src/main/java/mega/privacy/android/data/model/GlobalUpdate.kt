@@ -4,6 +4,8 @@ import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaSet
+import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 
@@ -52,4 +54,18 @@ sealed class GlobalUpdate {
      * @property event
      */
     data class OnEvent(val event: MegaEvent?) : GlobalUpdate()
+
+    /**
+     * On Sets update
+     *
+     * @property sets
+     */
+    data class OnSetsUpdate(val sets: ArrayList<MegaSet>?) : GlobalUpdate()
+
+    /**
+     * On Set Elementsupdate
+     *
+     * @property elements
+     */
+    data class OnSetElementsUpdate(val elements: ArrayList<MegaSetElement>?) : GlobalUpdate()
 }
