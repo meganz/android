@@ -162,17 +162,15 @@ class InboxViewModel @Inject constructor(
      * @return a List of Inbox Nodes
      */
     private suspend fun refreshNodes(nodeId: NodeId = _state.value.currentParentNodeId): List<MegaNode> =
-        nodeId.let { parentNodeId ->
-            if (isValidNodeId(parentNodeId)) {
-                getNodeByHandle(parentNodeId.id)?.let { retrievedParentNode ->
-                    getChildrenNode(
-                        parent = retrievedParentNode,
-                        order = getCloudSortOrder(),
-                    )
-                }.orEmpty()
-            } else {
-                emptyList()
-            }
+        if (isValidNodeId(nodeId)) {
+            getNodeByHandle(nodeId.id)?.let { retrievedParentNode ->
+                getChildrenNode(
+                    parent = retrievedParentNode,
+                    order = getCloudSortOrder(),
+                )
+            }.orEmpty()
+        } else {
+            emptyList()
         }
 
     /**
