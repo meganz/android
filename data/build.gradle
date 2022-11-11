@@ -11,13 +11,13 @@ apply from: "$project.rootDir/tools/jacoco.gradle"
 /**
  * Check whether we should use prebuilt SDK or local sdk module
  *
- * @return false if environment variable "USE_REMOTE_SDK" is false. Otherwise return true.
+ * @return false if environment variable "USE_PREBUILT_SDK" is false. Otherwise return true.
  */
 boolean shouldUsePrebuiltSdk() {
     return false
     //FIXME uncomment this method once prebuilt sdk feature is ready
-    /*String useRemoteSdk = System.getenv("USE_REMOTE_SDK")
-    return useRemoteSdk == null || useRemoteSdk != "false"*/
+    /*String usePrebuiltSdk = System.getenv("USE_PREBUILT_SDK")
+    return usePrebuiltSdk == null || usePrebuiltSdk != "false"*/
 }
 
 android {
