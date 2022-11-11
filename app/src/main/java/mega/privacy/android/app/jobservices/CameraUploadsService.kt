@@ -769,40 +769,38 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      *
      * The following conditions should be satisfied in order:
      *
-     * 1. The User Session exists - [getSession],
-     * 2. The Preferences exist - [preferencesExist],
-     * 3. The Camera Uploads sync is enabled - [cameraUploadsSyncEnabled],
-     * 4. The User is online - [isUserOnline],
-     * 5. The Device battery level is above the minimum threshold - [isDeviceAboveBatteryLevel],
-     * 6. The Camera Uploads local path exists - [hasCameraUploadsLocalPath],
-     * 7. The Wi-Fi Constraint is satisfied - [isWifiConstraintSatisfied],
-     * 8. The local Primary Folder exists - [hasLocalPrimaryFolder],
-     * 9. The local Secondary Folder exists - [hasLocalSecondaryFolder],
-     * 10. The user is logged in - [isUserLoggedIn],
-     * 11. The user Camera Uploads attribute exists - [hasCameraUploadsUserAttribute],
-     * 12. The Primary Folder exists - [areFoldersEstablished],
-     * 13. The Secondary Folder exists if Enable Secondary Media Uploads is enabled - [areFoldersEstablished]
+     * 1. The Preferences exist - [preferencesExist],
+     * 2. The Camera Uploads sync is enabled - [cameraUploadsSyncEnabled],
+     * 3. The User is online - [isUserOnline],
+     * 4. The Device battery level is above the minimum threshold - [isDeviceAboveBatteryLevel],
+     * 5. The Camera Uploads local path exists - [hasCameraUploadsLocalPath],
+     * 6. The Wi-Fi Constraint is satisfied - [isWifiConstraintSatisfied],
+     * 7. The local Primary Folder exists - [hasLocalPrimaryFolder],
+     * 8. The local Secondary Folder exists - [hasLocalSecondaryFolder],
+     * 9. The user is logged in - [isUserLoggedIn],
+     * 10. The user Camera Uploads attribute exists - [hasCameraUploadsUserAttribute],
+     * 11. The Primary Folder exists - [areFoldersEstablished],
+     * 12. The Secondary Folder exists if Enable Secondary Media Uploads is enabled - [areFoldersEstablished]
      *
      * @return true if all conditions are satisfied, and false if at least one condition
      * is unsatisfied
      */
     private suspend fun canRunCameraUploads(): Boolean =
-        sessionExists() && preferencesExist() && cameraUploadsSyncEnabled() &&
+        preferencesExist() && cameraUploadsSyncEnabled() &&
                 isUserOnline() && isDeviceAboveBatteryLevel() &&
                 hasCameraUploadsLocalPath() && isWifiConstraintSatisfied() &&
                 hasLocalPrimaryFolder() && hasLocalSecondaryFolder() && isUserLoggedIn() &&
                 hasCameraUploadsUserAttribute() && areFoldersEstablished()
 
     /**
-     * If at least one condition failed in [canRunCameraUploads], this function checks each
-     * condition and executes certain behavior should the condition fail
+     * If at least one condition failed in [canRunCameraUploads], this function evaluates each
+     * condition in order
+     *
+     * The failing condition may execute further actions and exit the function
      */
     private suspend fun handleFailedCanRunCameraUploadsConditions() {
-        val hasLocalPrimaryFolder = hasLocalPrimaryFolder()
-        val hasLocalSecondaryFolder = hasLocalSecondaryFolder()
 
         booleanArrayOf(
-            sessionExists(),
             preferencesExist(),
             cameraUploadsSyncEnabled(),
             isUserOnline(),
@@ -810,15 +808,15 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             hasCameraUploadsLocalPath(),
             isWifiConstraintSatisfied(),
         ).also { array ->
-            // Any false Boolean found in the Array will cause the Service to end and exit the function
             if (array.contains(false)) {
                 endService()
                 return
             }
         }
 
-        // If any of the if-statements return false, immediately call return to stop the
-        // function from evaluating other statements
+        val hasLocalPrimaryFolder = hasLocalPrimaryFolder()
+        val hasLocalSecondaryFolder = hasLocalSecondaryFolder()
+
         if (!hasLocalPrimaryFolder) {
             handleLocalPrimaryFolderDisabled()
             endService()
@@ -844,13 +842,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * Checks if the Session from [getSession] exists
+     * Checks if the user is logged in by calling [getSession] and checking whether the
+     * session exists or not
      *
-     * @return true if the Session exists by having a non-null or non-empty [String], and false if otherwise
+     * @return true if the user session exists, and false if otherwise
      */
-    private suspend fun sessionExists(): Boolean =
+    private suspend fun isUserLoggedIn(): Boolean =
         getSession().orEmpty().isNotBlank().also {
-            if (!it) Timber.w("No session currently exists")
+            if (!it) Timber.w("No user session currently exists")
         }
 
     /**
@@ -931,16 +930,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private suspend fun hasLocalSecondaryFolder(): Boolean =
         isLocalSecondaryFolderSet().also {
             if (!it) Timber.w("Local Secondary Folder is not set")
-        }
-
-    /**
-     * Checks if the user is logged in through [rootNodeExists] and [LoginRepository.isLoginAlreadyRunning]
-     *
-     * @return true if the user is logged in, and false if otherwise
-     */
-    private suspend fun isUserLoggedIn(): Boolean =
-        (rootNodeExists() || loginRepository.isLoginAlreadyRunning()).also {
-            if (!it) Timber.w("The Root Node is null. Wait for the user to perform the Complete Fast Login procedure")
         }
 
     /**
@@ -1280,17 +1269,21 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         Timber.d("Waiting for the user to complete the Fast Login procedure")
 
-        runCatching {
-            runCatching { completeFastLogin(getSession().orEmpty()) }
-                .onFailure { error ->
-                    Timber.e("Complete Fast Login procedure unsuccessful with error $error")
-                    throw error
-                }
+        // Legacy support: isLoggingIn needs to be set in order to inform other parts of the
+        // app that a Login Procedure is occurring
+        MegaApplication.isLoggingIn = true
+        val result = runCatching { completeFastLogin() }
+        MegaApplication.isLoggingIn = false
+
+        if (result.isSuccess) {
             Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
             MegaApplication.getInstance().checkEnabledCookies()
             Timber.d("Start CameraUploadsService")
             startWorker()
-        }.onFailure { endService() }
+        } else {
+            Timber.e("Complete Fast Login procedure unsuccessful with error ${result.exceptionOrNull()}")
+            endService()
+        }
     }
 
     /**
