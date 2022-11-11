@@ -203,11 +203,6 @@ fun CreateNewAlbumDialog(
         Dialog(onDismissRequest = onDismissRequest) {
             Surface(
                 shape = MaterialTheme.shapes.medium,
-                color = if (MaterialTheme.colors.isLight) {
-                    MaterialTheme.colors.surface
-                } else {
-                    light_grey
-                },
             ) {
                 Column {
                     // Dialog title
@@ -215,11 +210,6 @@ fun CreateNewAlbumDialog(
                         text = stringResource(id = R.string.photos_album_creation_dialog_title),
                         style = MaterialTheme.typography.h6,
                         modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp),
-                        color = if (MaterialTheme.colors.isLight) {
-                            Color.Black
-                        } else {
-                            Color.White
-                        }
                     )
 
                     val textFieldColors = TextFieldDefaults.textFieldColors(
@@ -232,11 +222,7 @@ fun CreateNewAlbumDialog(
                     val interactionSource = remember { MutableInteractionSource() }
 
                     val textColor = LocalTextStyle.current.color.takeOrElse {
-                        if (MaterialTheme.colors.isLight) {
-                            Color.Black
-                        } else {
-                            Color.White
-                        }
+                        textFieldColors.textColor(isEnabled).value
                     }
                     val mergedTextStyle = LocalTextStyle.current.merge(
                         TextStyle(
