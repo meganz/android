@@ -20,6 +20,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -59,6 +61,7 @@ class DefaultPhotosRepository @Inject constructor(
     private val videoMapper: VideoMapper,
     private val nodeUpdateMapper: NodeUpdateMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val sortOrderIntMapper: SortOrderIntMapper,
 ) : PhotosRepository {
 
     private var thumbnailFolderPath: String? = null
@@ -117,16 +120,17 @@ class DefaultPhotosRepository @Inject constructor(
             }
     }
 
-    override suspend fun getPhotosByFolderId(id: Long): List<Photo> = withContext(ioDispatcher) {
-        val parent = megaApiFacade.getMegaNodeByHandle(id)
-        parent?.let { parentNode ->
-            val megaNodes = megaApiFacade.getChildren(
-                parent = parentNode,
-                order = MegaApiJava.ORDER_DEFAULT_ASC
-            )
-            mapMegaNodesToPhotos(megaNodes)
-        } ?: emptyList()
-    }
+    override suspend fun getPhotosByFolderId(id: Long, order: SortOrder): List<Photo> =
+        withContext(ioDispatcher) {
+            val parent = megaApiFacade.getMegaNodeByHandle(id)
+            parent?.let { parentNode ->
+                val megaNodes = megaApiFacade.getChildren(
+                    parent = parentNode,
+                    order = sortOrderIntMapper(order),
+                )
+                mapMegaNodesToPhotos(megaNodes)
+            } ?: emptyList()
+        }
 
     private suspend fun searchImages(): List<MegaNode> = withContext(ioDispatcher) {
         val token = MegaCancelToken.createInstance()
