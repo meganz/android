@@ -299,6 +299,12 @@ class MediaDiscoveryFragment : Fragment() {
             R.id.action_menu_sort_by -> {
                 showSortByDialog(
                     context = managerActivity,
+                    items = listOf(
+                        getString(R.string.sortby_date_newest),
+                        getString(R.string.sortby_date_oldest),
+                        getString(R.string.sortby_type_photo_first),
+                        getString(R.string.sortby_type_video_first),
+                    ),
                     checkedItem = mediaDiscoveryViewModel.state.value.currentSort.ordinal,
                     onClickListener = { _, i ->
                         mediaDiscoveryViewModel.setCurrentSort(Sort.values()[i])
