@@ -923,7 +923,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         lastPassword = passwdTemp
         loginEmailText.hideKeyboard()
 
-        if (viewModel.isConnected) {
+        if (viewModel.isConnected.not()) {
             loginLoggingInLayout.isVisible = false
             loginLayout.isVisible = true
             confirmLogoutDialog?.dismiss()
@@ -966,7 +966,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     private fun performLogin() = with(binding) {
         loginEmailText.hideKeyboard()
 
-        if (viewModel.isConnected) {
+        if (viewModel.isConnected.not()) {
             loginLoggingInLayout.isVisible = false
             loginLayout.isVisible = true
             confirmLogoutDialog?.dismiss()
@@ -1013,7 +1013,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         if (confirmLink == null) {
             onKeysGeneratedLogin(email, password)
         } else {
-            if (viewModel.isConnected) {
+            if (viewModel.isConnected.not()) {
                 (requireActivity() as LoginActivity).showSnackbar(requireContext().getFormattedStringOrDefault(
                     R.string.error_server_connection_problem))
                 return
@@ -1077,7 +1077,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      */
     private fun onKeysGeneratedLogin(email: String?, password: String?) {
         Timber.d("onKeysGeneratedLogin")
-        if (viewModel.isConnected) {
+        if (viewModel.isConnected.not()) {
             with(binding) {
                 loginLoggingInLayout.isVisible = false
                 loginLayout.isVisible = true
@@ -1212,7 +1212,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      * @param link Link to check.
      */
     private fun updateConfirmEmail(link: String?) {
-        if (viewModel.isConnected) {
+        if (viewModel.isConnected.not()) {
             (requireActivity() as LoginActivity).showSnackbar(requireContext().getFormattedStringOrDefault(
                 R.string.error_server_connection_problem))
             return
