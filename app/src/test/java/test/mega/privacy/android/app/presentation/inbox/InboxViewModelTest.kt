@@ -46,19 +46,19 @@ class InboxViewModelTest {
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
     private val rootInboxNode = mock<MegaNode> {
-        on { it.handle }.thenReturn(ROOT_INBOX_NODE_ID)
+        on { it.handle }.thenReturn(ROOT_INBOX_NODE_HANDLE)
     }
     private val myBackupsNode = mock<NodeId> {
-        on { this.id }.thenReturn(MY_BACKUPS_ID)
+        on { this.id }.thenReturn(MY_BACKUPS_HANDLE)
     }
     private val inboxNode = mock<MegaNode> {
-        on { this.handle }.thenReturn(INBOX_NODE_ID)
+        on { this.handle }.thenReturn(INBOX_NODE_HANDLE)
     }
     private val retrievedNode = mock<MegaNode> {
-        on { this.handle }.thenReturn(RETRIEVED_NODE_ID)
+        on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
     }
     private val emittedNode = mock<Node> {
-        on { this.id }.thenReturn(NodeId(EMITTED_NODE_ID))
+        on { this.id }.thenReturn(NodeId(EMITTED_NODE_HANDLE))
     }
 
     @get:Rule
@@ -96,7 +96,7 @@ class InboxViewModelTest {
         underTest.state.test {
             val initialState = awaitItem()
             assertThat(initialState.hideMultipleItemSelection).isFalse()
-            assertThat(initialState.inboxNodeId).isEqualTo(NodeId(-1L))
+            assertThat(initialState.inboxHandle).isEqualTo(-1L)
             assertThat(initialState.nodes).isEmpty()
             assertThat(initialState.shouldExitInbox).isFalse()
             assertThat(initialState.triggerBackPress).isFalse()
@@ -108,7 +108,7 @@ class InboxViewModelTest {
         setupData()
         setUnderTest()
 
-        underTest.updateInboxNodeId(INBOX_NODE_ID)
+        underTest.updateInboxHandle(INBOX_NODE_HANDLE)
         monitorNodeUpdates.emit(listOf(emittedNode))
 
         underTest.state.test {
@@ -119,7 +119,7 @@ class InboxViewModelTest {
     }
 
     @Test
-    fun `test that nodes are not refreshed when receiving a node update and the parent id is invalid`() =
+    fun `test that nodes are not refreshed when receiving a node update and the inbox handle is invalid`() =
         runTest {
             setupData()
             setUnderTest()
@@ -138,18 +138,18 @@ class InboxViewModelTest {
             setupData()
             setUnderTest()
 
-            underTest.updateInboxNodeId(INBOX_NODE_ID)
+            underTest.updateInboxHandle(INBOX_NODE_HANDLE)
             monitorBackupFolder.emit(Result.success(myBackupsNode))
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.inboxNodeId).isEqualTo(NodeId(INBOX_NODE_ID))
+                assertThat(state.inboxHandle).isEqualTo(INBOX_NODE_HANDLE)
                 assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
             }
         }
 
     @Test
-    fun `test that when receiving a my backups folder update, the nodes are refreshed using the my backups folder node id`() =
+    fun `test that when receiving a my backups folder update, the nodes are refreshed using the my backups folder node handle`() =
         runTest {
             setupData()
             setUnderTest()
@@ -158,7 +158,7 @@ class InboxViewModelTest {
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.inboxNodeId).isEqualTo(myBackupsNode)
+                assertThat(state.inboxHandle).isEqualTo(myBackupsNode.id)
                 assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
             }
         }
@@ -209,19 +209,19 @@ class InboxViewModelTest {
         assertThat(underTest.isCurrentlyOnBackupFolderLevel()).isTrue()
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.inboxNodeId).isEqualTo(myBackupsNode)
+            assertThat(state.inboxHandle).isEqualTo(myBackupsNode.id)
         }
     }
 
     @Test
-    fun `test that the user is currently on the backup folder level if the inbox node id is invalid`() =
+    fun `test that the user is currently on the backup folder level if the inbox handle is invalid`() =
         runTest {
             setUnderTest()
 
             assertThat(underTest.isCurrentlyOnBackupFolderLevel()).isTrue()
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.inboxNodeId).isEqualTo(NodeId(-1L))
+                assertThat(state.inboxHandle).isEqualTo(-1L)
             }
         }
 
@@ -233,7 +233,7 @@ class InboxViewModelTest {
         setUnderTest()
 
         with(underTest) {
-            updateInboxNodeId(INBOX_NODE_ID)
+            updateInboxHandle(INBOX_NODE_HANDLE)
             handleBackPress()
         }
 
@@ -244,7 +244,7 @@ class InboxViewModelTest {
     }
 
     @Test
-    fun `test that the user exits the inbox on back press if the parent node id is null`() =
+    fun `test that the user exits the inbox on back press if the parent node handle is null`() =
         runTest {
             whenever(getParentNodeHandle(any())).thenReturn(null)
             whenever(getInboxNode()).thenReturn(rootInboxNode)
@@ -252,7 +252,7 @@ class InboxViewModelTest {
             setUnderTest()
 
             with(underTest) {
-                updateInboxNodeId(INBOX_NODE_ID)
+                updateInboxHandle(INBOX_NODE_HANDLE)
                 handleBackPress()
             }
 
@@ -263,7 +263,7 @@ class InboxViewModelTest {
         }
 
     @Test
-    fun `test that the user exits the inbox on back press if both the root inbox and parent node have the same ids`() =
+    fun `test that the user exits the inbox on back press if both the root inbox and parent node have the same handles`() =
         runTest {
             val rootInboxNode = mock<MegaNode> {
                 on { it.handle }.thenReturn(987L)
@@ -274,7 +274,7 @@ class InboxViewModelTest {
             setUnderTest()
 
             with(underTest) {
-                updateInboxNodeId(INBOX_NODE_ID)
+                updateInboxHandle(INBOX_NODE_HANDLE)
                 handleBackPress()
             }
 
@@ -300,13 +300,13 @@ class InboxViewModelTest {
         setUnderTest()
 
         with(underTest) {
-            updateInboxNodeId(INBOX_NODE_ID)
+            updateInboxHandle(INBOX_NODE_HANDLE)
             handleBackPress()
         }
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.inboxNodeId).isEqualTo(NodeId(654L))
+            assertThat(state.inboxHandle).isEqualTo(654L)
             assertThat(state.triggerBackPress).isTrue()
             assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
         }
@@ -323,10 +323,10 @@ class InboxViewModelTest {
     }
 
     companion object {
-        private const val MY_BACKUPS_ID = 12L
-        private const val INBOX_NODE_ID = 34L
-        private const val RETRIEVED_NODE_ID = 56L
-        private const val EMITTED_NODE_ID = 78L
-        private const val ROOT_INBOX_NODE_ID = 90L
+        private const val MY_BACKUPS_HANDLE = 12L
+        private const val INBOX_NODE_HANDLE = 34L
+        private const val RETRIEVED_NODE_HANDLE = 56L
+        private const val EMITTED_NODE_HANDLE = 78L
+        private const val ROOT_INBOX_NODE_HANDLE = 90L
     }
 }

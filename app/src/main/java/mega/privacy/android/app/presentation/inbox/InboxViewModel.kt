@@ -110,9 +110,9 @@ class InboxViewModel @Inject constructor(
                 Timber.e("Unable to retrieve the My Backups Folder")
                 it.getOrDefault(NodeId(MegaApiJava.INVALID_HANDLE))
             }
-            .collectLatest { myBackupsFolderNodeId ->
-                Timber.d("The My Backups ID is: ${myBackupsFolderNodeId.id}")
-                onMyBackupsFolderUpdateReceived(myBackupsFolderNodeId)
+            .collectLatest { newMyBackupsFolder ->
+                Timber.d("The My Backups Folder Handle is: ${newMyBackupsFolder.id}")
+                onMyBackupsFolderUpdateReceived(newMyBackupsFolder)
             }
     }
 
@@ -120,21 +120,21 @@ class InboxViewModel @Inject constructor(
      *
      * Processes updates received from the My Backups Folder
      *
-     * If the Inbox Node ID is invalid, use the My Backups Folder Node ID to refresh the
+     * If the Inbox Handle is invalid, use the My Backups Folder Handle to refresh the
      * list of Nodes
      *
      * Update the UI State values after performing a successful refresh
      *
-     * @param nodeId The updated My Backups Node ID
+     * @param newMyBackupsFolder The updated My Backups Folder
      */
-    private suspend fun onMyBackupsFolderUpdateReceived(nodeId: NodeId) {
-        myBackupsFolderNode = nodeId
+    private suspend fun onMyBackupsFolderUpdateReceived(newMyBackupsFolder: NodeId) {
+        myBackupsFolderNode = newMyBackupsFolder
 
         _state.update { inboxState ->
-            if (inboxState.inboxNodeId.id == -1L) {
-                refreshNodes(nodeId).let { updatedNodes ->
+            if (inboxState.inboxHandle == -1L) {
+                refreshNodes(newMyBackupsFolder.id).let { updatedNodes ->
                     inboxState.copy(
-                        inboxNodeId = nodeId,
+                        inboxHandle = newMyBackupsFolder.id,
                         nodes = updatedNodes,
                     )
                 }
@@ -156,19 +156,19 @@ class InboxViewModel @Inject constructor(
     /**
      * Retrieves the list of Nodes by performing the following steps:
      *
-     * 2. Check if [InboxState.inboxNodeId] equals -1L or [MegaApiJava.INVALID_HANDLE]. If either condition is true, return an empty list
-     * 3. Call the Use Case [getNodeByHandle] to retrieve the Parent Node from [InboxState.inboxNodeId]. If the Parent Node is null, return an empty list
+     * 2. Check if [InboxState.inboxHandle] equals -1L or [MegaApiJava.INVALID_HANDLE]. If either condition is true, return an empty list
+     * 3. Call the Use Case [getNodeByHandle] to retrieve the Parent Node from [InboxState.inboxHandle]. If the Parent Node is null, return an empty list
      * 4. Call the Use Case [getChildrenNode] to retrieve and return the list of Nodes under the Parent Node
      *
-     * @param nodeId The Node ID used to retrieve the current list of Nodes. Defaults to [InboxState.inboxNodeId]
+     * @param nodeHandle The Node Handle used to retrieve the current list of Nodes. Defaults to [InboxState.inboxHandle]
      *
      * @return a List of Inbox Nodes
      */
-    private suspend fun refreshNodes(nodeId: NodeId = _state.value.inboxNodeId): List<MegaNode> =
-        if (isValidNodeId(nodeId)) {
-            getNodeByHandle(nodeId.id)?.let { retrievedParentNode ->
+    private suspend fun refreshNodes(nodeHandle: Long = _state.value.inboxHandle): List<MegaNode> =
+        if (isValidNodeHandle(nodeHandle)) {
+            getNodeByHandle(nodeHandle)?.let { parentNode ->
                 getChildrenNode(
-                    parent = retrievedParentNode,
+                    parent = parentNode,
                     order = getCloudSortOrder(),
                 )
             }.orEmpty()
@@ -177,13 +177,13 @@ class InboxViewModel @Inject constructor(
         }
 
     /**
-     * Checks whether the [NodeId] is valid or not
+     * Checks whether the Node Handle is valid or not
      *
-     * @param nodeId The Node ID
-     * @return true if the Node ID satisfies either condition, and false if otherwise
+     * @param nodeHandle The Node Handle
+     * @return true if the Node Handle satisfies either condition, and false if otherwise
      */
-    private fun isValidNodeId(nodeId: NodeId): Boolean =
-        nodeId.id != -1L || nodeId.id != MegaApiJava.INVALID_HANDLE
+    private fun isValidNodeHandle(nodeHandle: Long): Boolean =
+        nodeHandle != -1L || nodeHandle != MegaApiJava.INVALID_HANDLE
 
     /**
      * Handles the Back Press Behavior from Inbox after checking certain conditions
@@ -191,18 +191,18 @@ class InboxViewModel @Inject constructor(
     fun handleBackPress() {
         viewModelScope.launch {
             // Either one of the following conditions will constitute the user exiting the screen:
-            // 1. The Parent Node ID does not exist
+            // 1. The Parent Node Handle does not exist
             // 2. The Root Inbox Node does not exist
-            // 3. The Parent Node ID is the same with the Root Inbox ID
-            val parentNodeId = getParentNodeHandle(_state.value.inboxNodeId.id)
-            if (parentNodeId == null || rootInboxNode == null || (parentNodeId == rootInboxNode?.handle)) {
+            // 3. The Parent Node Handle is the same with the Root Inbox Handle
+            val parentNodeHandle = getParentNodeHandle(_state.value.inboxHandle)
+            if (parentNodeHandle == null || rootInboxNode == null || (parentNodeHandle == rootInboxNode?.handle)) {
                 onExitInbox(true)
             } else {
                 // Otherwise, proceed to retrieve the Nodes of the Parent Node
                 _state.update { inboxState ->
-                    refreshNodes(NodeId(parentNodeId)).let { updatedNodes ->
+                    refreshNodes(parentNodeHandle).let { updatedNodes ->
                         inboxState.copy(
-                            inboxNodeId = NodeId(parentNodeId),
+                            inboxHandle = parentNodeHandle,
                             triggerBackPress = true,
                             nodes = updatedNodes,
                         )
@@ -246,31 +246,31 @@ class InboxViewModel @Inject constructor(
     }
 
     /**
-     * Notifies [InboxState.inboxNodeId] that the Inbox screen has handled the Inbox Node ID
+     * Notifies [InboxState.inboxHandle] that the Inbox screen has handled the Inbox Handle
      *
-     * @param nodeId The new Inbox Node ID
+     * @param nodeHandle The new Inbox Handle
      */
-    fun updateInboxNodeId(nodeId: Long) {
-        onInboxNodeId(nodeId)
+    fun updateInboxHandle(nodeHandle: Long) {
+        onInboxHandle(nodeHandle)
     }
 
     /**
-     * Checks whether the the Inbox screen is currently on the Backups Folder level by comparing the values of
-     * [InboxState.inboxNodeId] and [myBackupsFolderNode]
+     * Checks whether the the Inbox screen is currently on the Backups Folder level by comparing
+     * the Node Handles of [InboxState.inboxHandle] and [myBackupsFolderNode]
      *
-     * @return true if both values are equal or [InboxState.inboxNodeId] is -1L, and false if otherwise
+     * @return true if both values are equal or [InboxState.inboxHandle] is -1L, and false if otherwise
      */
     fun isCurrentlyOnBackupFolderLevel(): Boolean = with(_state.value) {
-        (this.inboxNodeId == myBackupsFolderNode) || this.inboxNodeId.id == -1L
+        (this.inboxHandle == myBackupsFolderNode.id) || this.inboxHandle == -1L
     }
 
     /**
-     * Given a [Long], the function updates the value of [InboxState.inboxNodeId]
+     * Given a [Long], the function updates the value of [InboxState.inboxHandle]
      *
-     * @param inboxNodeId The current Parent Node ID
+     * @param inboxHandle The Inbox Handle
      */
-    private fun onInboxNodeId(inboxNodeId: Long) {
-        _state.update { it.copy(inboxNodeId = NodeId(inboxNodeId)) }
+    private fun onInboxHandle(inboxHandle: Long) {
+        _state.update { it.copy(inboxHandle = inboxHandle) }
     }
 
     /**
