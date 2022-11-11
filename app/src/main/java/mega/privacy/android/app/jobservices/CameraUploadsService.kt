@@ -92,7 +92,6 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompleteFastLogin
 import mega.privacy.android.domain.usecase.CompressedVideoPending
@@ -493,12 +492,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var isNodeInRubbish: IsNodeInRubbish
-
-    /**
-     * Login Repository
-     */
-    @Inject
-    lateinit var loginRepository: LoginRepository
 
     /**
      * Coroutine Scope for camera upload work
