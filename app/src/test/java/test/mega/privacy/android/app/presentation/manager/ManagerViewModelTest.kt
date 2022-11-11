@@ -26,7 +26,6 @@ import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.contacts.ContactRequest
@@ -72,7 +71,6 @@ class ManagerViewModelTest {
     private val checkCameraUpload = mock<CheckCameraUpload>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val monitorConnectivity = mock<MonitorConnectivity>()
-    private val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -106,7 +104,8 @@ class ManagerViewModelTest {
             getSecondarySyncHandle = getSecondarySyncHandle,
             checkCameraUpload = checkCameraUpload,
             getCloudSortOrder = getCloudSortOrder,
-            monitorConnectivity = monitorConnectivity
+            monitorConnectivity = monitorConnectivity,
+            broadcastUploadPauseState = mock()
         )
     }
 

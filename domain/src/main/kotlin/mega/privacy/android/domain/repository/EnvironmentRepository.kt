@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.repository
 
-import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.AppInfo
 import mega.privacy.android.domain.entity.DeviceInfo
 
@@ -53,14 +52,4 @@ interface EnvironmentRepository {
      *
      */
     suspend fun getDeviceSdkVersionName(): String
-
-    /**
-     * monitor upload service pause State
-     */
-    fun monitorCameraUploadPauseState(): Flow<Boolean>
-
-    /**
-     * Broadcast upload pause state
-     */
-    suspend fun broadcastUploadPauseState()
 }

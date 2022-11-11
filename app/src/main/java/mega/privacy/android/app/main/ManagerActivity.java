@@ -548,8 +548,6 @@ public class ManagerActivity extends TransfersManagementActivity
     ActivityLifecycleHandler activityLifecycleHandler;
     @Inject
     MegaNodeUtilWrapper megaNodeUtilWrapper;
-    @Inject
-    BroadcastUploadPauseState broadcastUploadPauseState;
 
     public ArrayList<Integer> transfersInProgress;
     public MegaTransferData transferData;
@@ -9426,7 +9424,7 @@ public class ManagerActivity extends TransfersManagementActivity
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
             Timber.d("MegaRequest.TYPE_PAUSE_TRANSFERS");
             //force update the pause notification to prevent missed onTransferUpdate
-            ManagerActivityExtensionsKt.broadCastUploadStatus(this, broadcastUploadPauseState);
+            viewModel.broadcastUploadPauseStatus();
             if (e.getErrorCode() == MegaError.API_OK) {
                 updateTransfersWidgetState();
 

@@ -140,6 +140,7 @@ internal abstract class GatewayModule {
      * Provide default implementation of [BroadcastReceiverGateway]
      */
     @Binds
+    @Singleton
     abstract fun bindBroadcastReceiverGateway(implementation: BroadcastReceiverFacade): BroadcastReceiverGateway
 
 }
