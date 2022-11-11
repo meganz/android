@@ -5,16 +5,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
-import mega.privacy.android.data.gateway.BroadcastReceiverGateway
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import javax.inject.Inject
 
 /**
- * Default implementation of [BroadcastReceiverGateway]
+ * Default implementation of [AppEventGateway]
  */
-internal class BroadcastReceiverFacade @Inject constructor(
+internal class AppEventFacade @Inject constructor(
     @ApplicationScope private val appScope: CoroutineScope,
-) : BroadcastReceiverGateway {
+) : AppEventGateway {
 
     private val _monitorCameraUploadPauseState = MutableSharedFlow<Boolean>()
 

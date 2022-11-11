@@ -1,13 +1,13 @@
-package mega.privacy.android.domain.repository
+package mega.privacy.android.data.gateway
 
 import kotlinx.coroutines.flow.Flow
 
-interface EventRepository {
+internal interface AppEventGateway {
 
     /**
      * monitor upload service pause State
      */
-    fun monitorCameraUploadPauseState(): Flow<Boolean>
+    val monitorCameraUploadPauseState: Flow<Boolean>
 
     /**
      * Broadcast upload pause state

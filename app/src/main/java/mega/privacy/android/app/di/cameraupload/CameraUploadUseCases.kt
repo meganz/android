@@ -47,7 +47,6 @@ import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.repository.EventRepository
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
@@ -356,15 +355,15 @@ abstract class CameraUploadUseCases {
          * Provide the [MonitorCameraUploadPauseState] implementation
          */
         @Provides
-        fun provideMonitorCameraUploadPauseState(eventRepository: EventRepository): MonitorCameraUploadPauseState =
-            MonitorCameraUploadPauseState(eventRepository::monitorCameraUploadPauseState)
+        fun provideMonitorCameraUploadPauseState(cameraUploadRepository: CameraUploadRepository): MonitorCameraUploadPauseState =
+            MonitorCameraUploadPauseState(cameraUploadRepository::monitorCameraUploadPauseState)
 
         /**
          * Provide the [BroadcastUploadPauseState] implementation
          */
         @Provides
-        fun provideBroadcastUploadPauseState(eventRepository: EventRepository): BroadcastUploadPauseState =
-            BroadcastUploadPauseState(eventRepository::broadcastUploadPauseState)
+        fun provideBroadcastUploadPauseState(cameraUploadRepository: CameraUploadRepository): BroadcastUploadPauseState =
+            BroadcastUploadPauseState(cameraUploadRepository::broadcastUploadPauseState)
     }
 
     /**
