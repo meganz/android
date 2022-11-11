@@ -18,6 +18,7 @@ import javax.inject.Inject
 
 /**
  * [EnvironmentRepository] Implementation
+ *
  */
 internal class DefaultEnvironmentRepository @Inject constructor(
     private val deviceGateway: DeviceGateway,
@@ -25,7 +26,7 @@ internal class DefaultEnvironmentRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val appInfoGateway: AppInfoGateway,
-    private val appInfoPreferencesGateway: AppInfoPreferencesGateway
+    private val appInfoPreferencesGateway: AppInfoPreferencesGateway,
 ) : EnvironmentRepository {
 
     override fun getDeviceInfo(): DeviceInfo {
