@@ -109,11 +109,9 @@ val white_alpha_087 = Color(0xDEFFFFFF)
 @ShowkaseColor("white_alpha_090", "white")
 val white_alpha_090 = Color(0xE6FFFFFF)
 
+
 @ShowkaseColor("black", "black")
 val black = Color(0xFF000000)
-
-@ShowkaseColor("light_grey", "light_grey")
-val light_grey = Color(0xFF343434)
 
 @ShowkaseColor("dark_grey", "dark_grey")
 val dark_grey = Color(0xFF121212)

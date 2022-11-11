@@ -64,7 +64,6 @@ import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.grey_300
 import mega.privacy.android.presentation.theme.grey_alpha_054
-import mega.privacy.android.presentation.theme.light_grey
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_054
