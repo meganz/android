@@ -3,14 +3,12 @@ package mega.privacy.android.app.globalmanagement
 import android.app.Application
 import android.content.Intent
 import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
-import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
+import mega.privacy.android.app.main.LoginActivity.Companion.ACTION_FETCH_NODES_FINISHED
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -26,7 +24,10 @@ import mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob
 import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
 import mega.privacy.android.app.utils.TimeUtils.formatDateAndTime
 import mega.privacy.android.app.utils.Util.convertToBitSet
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaAccountSession
 import nz.mega.sdk.MegaApiAndroid
@@ -242,6 +243,8 @@ class BackgroundRequestListener @Inject constructor(
 
     private fun handleFetchNodeRequest(e: MegaError) {
         Timber.d("TYPE_FETCH_NODES")
+        application.sendBroadcast(Intent(ACTION_FETCH_NODES_FINISHED))
+
         if (e.errorCode == MegaError.API_OK) {
             askForFullAccountInfo()
             var listener: GetAttrUserListener? = GetAttrUserListener(application)

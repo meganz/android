@@ -25,6 +25,8 @@ import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
+import mega.privacy.android.app.main.LoginActivity
+import mega.privacy.android.app.main.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
@@ -214,6 +216,7 @@ class GlobalListener @Inject constructor(
             }
             MegaEvent.EVENT_BUSINESS_STATUS -> sendBroadcastUpdateAccountDetails()
             MegaEvent.EVENT_MISC_FLAGS_READY -> checkEnabledCookies()
+            MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()
         }
     }
 
@@ -305,5 +308,17 @@ class GlobalListener @Inject constructor(
                     }
                 }
             }
+    }
+
+    /**
+     * A force reload account has been received. A fetch nodes is in progress and the
+     * Login screen should be shown.
+     */
+    private fun showLoginFetchingNodes() {
+        appContext.startActivity(Intent(appContext, LoginActivity::class.java).apply {
+            putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+            action = ACTION_FORCE_RELOAD_ACCOUNT
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        })
     }
 }

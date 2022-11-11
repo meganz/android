@@ -34,7 +34,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -51,6 +51,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.FragmentLoginBinding
 import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.logging.LegacyLoggingSettings
+import mega.privacy.android.app.main.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.main.controllers.AccountController.Companion.localLogoutApp
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.login.LoginViewModel
@@ -142,7 +143,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     var emailTemp: String? = null
     var passwdTemp: String? = null
 
-    private val viewModel by viewModels<LoginViewModel>()
+    private val viewModel: LoginViewModel by activityViewModels()
 
     private lateinit var binding: FragmentLoginBinding
 
@@ -496,12 +497,12 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
             action?.let { action ->
                 Timber.d("action is: %s", action)
-                when {
-                    Constants.ACTION_CONFIRM == action -> {
+                when (action) {
+                    Constants.ACTION_CONFIRM -> {
                         handleConfirmationIntent(intent)
                         return
                     }
-                    action == Constants.ACTION_RESET_PASS -> {
+                    Constants.ACTION_RESET_PASS -> {
                         val link = intent.dataString
                         if (link != null) {
                             Timber.d("Link to resetPass: %s", link)
@@ -509,7 +510,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                             return
                         }
                     }
-                    action == Constants.ACTION_PASS_CHANGED -> {
+                    Constants.ACTION_PASS_CHANGED -> {
                         when (intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
                             MegaError.API_OK -> (requireActivity() as LoginActivity).showSnackbar(
                                 requireContext().getFormattedStringOrDefault(
@@ -523,15 +524,21 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         }
                         return
                     }
-                    action == Constants.ACTION_CANCEL_DOWNLOAD -> {
+                    Constants.ACTION_CANCEL_DOWNLOAD -> {
                         (requireActivity() as LoginActivity).showConfirmationCancelAllTransfers()
                     }
-                    action == Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED -> {
+                    Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED -> {
                         val accountBlockedString =
                             intent.getStringExtra(Constants.ACCOUNT_BLOCKED_STRING)
                         if (!TextUtil.isTextEmpty(accountBlockedString)) {
                             Util.showErrorAlertDialog(accountBlockedString, false, activity)
                         }
+                    }
+                    ACTION_FORCE_RELOAD_ACCOUNT -> {
+                        viewModel.intentAction = ACTION_FORCE_RELOAD_ACCOUNT
+                        isLoggingIn = true
+                        showFetchingNodesScreen()
+                        return
                     }
                 }
             } ?: Timber.w("ACTION NULL")
@@ -750,6 +757,20 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 }
             }
         }
+    }
+
+    /**
+     * Shows fetching nodes screen.
+     */
+    private fun showFetchingNodesScreen() = with(binding) {
+        loginLayout.isVisible = false
+        loginLoggingInLayout.isVisible = true
+        loginProgressBar.isVisible = true
+        loginFetchingNodesBar.isVisible = false
+        loginLoggingInText.isVisible = true
+        loginFetchNodesText.isVisible = true
+        loginPrepareNodesText.isVisible = false
+        loginServersBusyText.isVisible = false
     }
 
     /**
@@ -1261,9 +1282,10 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 firstRequestUpdate = false
             }
             binding.loginFetchingNodesBar.apply {
-                isVisible = true
                 layoutParams.width = Util.dp2px(250 * scaleW)
+
                 if (request.totalBytes > 0) {
+                    isVisible = true
                     var progressValue = 100.0 * request.transferredBytes / request.totalBytes
                     if (progressValue > 99 || progressValue < 0) {
                         progressValue = 100.0
@@ -1271,6 +1293,8 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         binding.loginProgressBar.isVisible = true
                     }
                     progress = progressValue.toInt()
+                } else {
+                    isVisible = false
                 }
             }
         }
@@ -1456,11 +1480,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             disableLoginButton()
         }
         if (request.type == MegaRequest.TYPE_FETCH_NODES) {
-            binding.loginFetchingNodesBar.apply {
-                isVisible = true
-                layoutParams.width = Util.dp2px(250 * scaleW)
-                progress = 0
-            }
             isFetchingNodes = true
             disableLoginButton()
         }
@@ -1563,14 +1582,8 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         login2fa.isVisible = false
                         (requireActivity() as LoginActivity).hideAB()
                     }
-                    loginLayout.isVisible = false
-                    loginLoggingInLayout.isVisible = true
-                    loginProgressBar.isVisible = true
-                    loginFetchingNodesBar.isVisible = false
-                    loginLoggingInText.isVisible = true
-                    loginFetchNodesText.isVisible = true
-                    loginPrepareNodesText.isVisible = false
-                    loginServersBusyText.isVisible = false
+
+                    showFetchingNodesScreen()
                 }
 
                 saveCredentials()
@@ -1630,37 +1643,41 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         intentReceived?.getSerializableExtra(FileExplorerActivity.EXTRA_SHARE_INFOS)
                     } as ArrayList<ShareInfo>?
 
-                    if (shareInfos?.isNotEmpty() == true) {
-                        val permissions = arrayOf(
-                            getImagePermissionByVersion(),
-                            getAudioPermissionByVersion(),
-                            getVideoPermissionByVersion(),
-                            getReadExternalStoragePermission()
-                        )
-                        if (hasPermissions(requireContext(), *permissions)) {
-                            toSharePage()
-                        } else {
-                            requestMediaPermission.launch(permissions)
+                    when {
+                        shareInfos?.isNotEmpty() == true -> {
+                            val permissions = arrayOf(
+                                getImagePermissionByVersion(),
+                                getAudioPermissionByVersion(),
+                                getVideoPermissionByVersion(),
+                                getReadExternalStoragePermission()
+                            )
+                            if (hasPermissions(requireContext(), *permissions)) {
+                                toSharePage()
+                            } else {
+                                requestMediaPermission.launch(permissions)
+                            }
+                            return
                         }
-                        return
-                    } else if (Constants.ACTION_FILE_EXPLORER_UPLOAD == action && Constants.TYPE_TEXT_PLAIN == receivedIntent?.type) {
-                        startActivity(Intent(requireContext(), FileExplorerActivity::class.java)
-                            .putExtra(Intent.EXTRA_TEXT,
-                                receivedIntent?.getStringExtra(Intent.EXTRA_TEXT))
-                            .putExtra(Intent.EXTRA_SUBJECT,
-                                receivedIntent?.getStringExtra(Intent.EXTRA_SUBJECT))
-                            .putExtra(Intent.EXTRA_EMAIL,
-                                receivedIntent?.getStringExtra(Intent.EXTRA_EMAIL))
-                            .setAction(Intent.ACTION_SEND)
-                            .setType(Constants.TYPE_TEXT_PLAIN))
-                        requireActivity().finish()
-                        return
-                    } else if (Constants.ACTION_REFRESH == action && activity != null) {
-                        requireActivity().apply {
-                            setResult(Activity.RESULT_OK)
-                            finish()
+                        Constants.ACTION_FILE_EXPLORER_UPLOAD == action && Constants.TYPE_TEXT_PLAIN == receivedIntent?.type -> {
+                            startActivity(Intent(requireContext(), FileExplorerActivity::class.java)
+                                .putExtra(Intent.EXTRA_TEXT,
+                                    receivedIntent?.getStringExtra(Intent.EXTRA_TEXT))
+                                .putExtra(Intent.EXTRA_SUBJECT,
+                                    receivedIntent?.getStringExtra(Intent.EXTRA_SUBJECT))
+                                .putExtra(Intent.EXTRA_EMAIL,
+                                    receivedIntent?.getStringExtra(Intent.EXTRA_EMAIL))
+                                .setAction(Intent.ACTION_SEND)
+                                .setType(Constants.TYPE_TEXT_PLAIN))
+                            requireActivity().finish()
+                            return
                         }
-                        return
+                        Constants.ACTION_REFRESH == action && activity != null -> {
+                            requireActivity().apply {
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            }
+                            return
+                        }
                     }
                 }
                 readyToManager()
