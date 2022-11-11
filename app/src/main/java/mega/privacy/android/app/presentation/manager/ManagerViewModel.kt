@@ -265,15 +265,6 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Set the current inbox parent handle to the UI state
-     *
-     * @param handle the id of the current inbox parent handle to set
-     */
-    fun setInboxParentHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(inboxParentHandle = handle) }
-    }
-
-    /**
      * Set a flag to know if the current navigation level is the first one
      *
      * @param isFirstNavigationLevel true if the current navigation level corresponds to the first level

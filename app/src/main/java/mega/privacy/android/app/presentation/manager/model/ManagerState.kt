@@ -5,7 +5,6 @@ package mega.privacy.android.app.presentation.manager.model
  *
  * @param browserParentHandle current browser parent handle
  * @param rubbishBinParentHandle current rubbish bin parent handle
- * @param inboxParentHandle current inbox parent handle
  * @param isFirstNavigationLevel true if the navigation level is the first level
  * @param sharesTab current tab in shares screen
  * @param transfersTab current tab in transfers screen
@@ -18,7 +17,6 @@ package mega.privacy.android.app.presentation.manager.model
 data class ManagerState(
     val browserParentHandle: Long = -1L,
     val rubbishBinParentHandle: Long = -1L,
-    val inboxParentHandle: Long = -1L,
     val isFirstNavigationLevel: Boolean = true,
     val sharesTab: SharesTab = SharesTab.INCOMING_TAB,
     val transfersTab: TransfersTab = TransfersTab.NONE,

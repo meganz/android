@@ -24,7 +24,7 @@ import androidx.constraintlayout.widget.Group
 import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -110,7 +110,7 @@ class InboxFragment : RotatableFragment() {
     private var lastPositionStack: Stack<Int>? = null
     private var actionMode: ActionMode? = null
 
-    private val viewModel by viewModels<InboxViewModel>()
+    private val viewModel by activityViewModels<InboxViewModel>()
 
     companion object {
         /**
@@ -715,10 +715,8 @@ class InboxFragment : RotatableFragment() {
                         updateInboxHandle(selectedNode.handle)
                         refreshInboxNodes()
                     }
-                    // Notify ManagerActivity on the updated Inbox Handle. Invalidate the Options
-                    // Menu and set the new Toolbar Title
+                    // Notify ManagerActivity to invalidate the Options Menu and set the new Toolbar Title
                     with(requireActivity() as ManagerActivity) {
-                        parentHandleInbox = selectedNode.handle
                         invalidateOptionsMenu()
                         setToolbarTitle()
                     }
@@ -792,7 +790,7 @@ class InboxFragment : RotatableFragment() {
                 comesFromNotifications = false
                 comesFromNotificationHandle = -1
                 selectDrawerItem(DrawerItem.NOTIFICATIONS)
-                parentHandleInbox = comesFromNotificationHandleSaved
+                this@InboxFragment.viewModel.updateInboxHandle(comesFromNotificationHandle)
                 comesFromNotificationHandleSaved = -1
             } else {
                 // Otherwise, instruct the ViewModel to handle the Back Press
@@ -805,11 +803,9 @@ class InboxFragment : RotatableFragment() {
      * Executes certain behavior when a Back Press is handled
      */
     private fun onBackPressedHandled() {
-        // Notify ManagerActivity to update the current Parent Handle and to set the
-        // new Toolbar Title
+        // Notify ManagerActivity to invalidate the Options Menu and set the new Toolbar Title
         with(requireActivity() as ManagerActivity) {
             invalidateOptionsMenu()
-            parentHandleInbox = state().inboxHandle
             setToolbarTitle()
         }
 

@@ -5,6 +5,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -162,6 +164,19 @@ class InboxViewModelTest {
                 assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
             }
         }
+
+    @Test
+    fun `test that the inbox handle is updated if a new value is provided`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.inboxHandle }.distinctUntilChanged()
+            .test {
+                val newHandle = 123456L
+                assertThat(awaitItem()).isEqualTo(-1L)
+                underTest.updateInboxHandle(newHandle)
+                assertThat(awaitItem()).isEqualTo(newHandle)
+            }
+    }
 
     @Test
     fun `test that the multiple item selection has been handled`() = runTest {
