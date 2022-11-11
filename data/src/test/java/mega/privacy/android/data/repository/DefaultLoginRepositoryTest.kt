@@ -1,23 +1,20 @@
-package test.mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.repository.DefaultLoginRepository
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.exception.ChatLoggingOutException
 import mega.privacy.android.domain.exception.ChatNotInitializedException
 import nz.mega.sdk.MegaChatApi
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultLoginRepositoryTest {
@@ -27,7 +24,6 @@ class DefaultLoginRepositoryTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
-
 
     @Before
     fun setUp() {

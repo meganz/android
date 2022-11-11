@@ -30,7 +30,6 @@ import static mega.privacy.android.app.utils.PreviewUtils.previewCache;
 import static mega.privacy.android.app.utils.Util.getMediaIntent;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.isDarkMode;
-import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -63,6 +62,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -78,11 +78,9 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
@@ -90,6 +88,8 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel;
+import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -97,6 +97,7 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -164,6 +165,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 
     @Inject
     CookieDialogHandler cookieDialogHandler;
+    private FileLinkViewModel viewModel;
 
     @Override
     public void onDestroy() {
@@ -182,6 +184,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
+        viewModel = new ViewModelProvider(this).get(FileLinkViewModel.class);
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -431,7 +434,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 
     private void importLink(String url) {
 
-        if (!isOnline(this)) {
+        if (!viewModel.isConnected()) {
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
             return;
         }
@@ -814,7 +817,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
             pdfIntent.putExtra("FILENAME", document.getName());
             pdfIntent.putExtra(URL_FILE_LINK, url);
 
-            if (isOnline(this)) {
+            if (viewModel.isConnected()) {
                 if (megaApi.httpServerIsRunning() == 0) {
                     megaApi.httpServerStart();
                     pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
@@ -874,7 +877,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
         }
 
         if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
+            if (!viewModel.isConnected()) {
                 try {
                     statusDialog.dismiss();
                 } catch (Exception ex) {

@@ -21,6 +21,10 @@ MEGACHAT_TAG = ""
 DELIVER_QA_CMD = "deliver_qa"
 PUBLISH_SDK_CMD = "publish_sdk"
 
+/**
+ * common.groovy file with common methods
+ */
+def common
 
 /**
  * Flag to decide whether we do clean before build SDK.
@@ -66,7 +70,7 @@ pipeline {
 
                 downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
-                if (hasGitLabMergeRequest()) {
+                if (common.hasGitLabMergeRequest()) {
                     // upload Jenkins console log
                     String jsonJenkinsLog = uploadFileToGitLab(CONSOLE_LOG_FILE)
 
@@ -81,7 +85,7 @@ pipeline {
                             "<br/>Build Log:\t${jsonJenkinsLog}" +
                             sdkBuildMessage
 
-                    sendToMR(message)
+                    common.sendToMR(message)
                 } else {
                     // if build is triggered by PUSH, send result only to Slack
                     withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
@@ -94,11 +98,22 @@ pipeline {
         success {
             script {
                 slackSend color: "good", message: successMessage("\n")
-                sendToMR(successMessage("<br/>"))
+                common.sendToMR(successMessage("<br/>"))
             }
         }
     }
     stages {
+        stage('Load Common Script') {
+            steps {
+                script {
+                    BUILD_STEP = 'Preparation'
+
+                    common = load('jenkinsfile/common.groovy')
+                    common.helloWorld()
+                    common.sendToMR("Hello! Load Common Script")
+                }
+            }
+        }
         stage('Preparation') {
             when {
                 expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
@@ -123,26 +138,8 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Fetch SDK Submodules'
-                }
-                gitlabCommitStatus(name: 'Fetch SDK Submodules') {
-                    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                        script {
-                            sh '''
-                            cd ${WORKSPACE}
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
-                            git submodule sync
-                            git submodule update --init --recursive --remote 
-                            cd sdk/src/main/jni/mega/sdk
-                            git fetch
-                            cd ../../megachat/sdk
-                            git fetch
-                            cd ${WORKSPACE}
-                        '''
-                        }
-                    }
+
+                    common.fetchSdkSubmodules()
                 }
             }
         }
@@ -154,23 +151,37 @@ pipeline {
                 script {
                     BUILD_STEP = 'Select SDK Version'
                 }
-                gitlabCommitStatus(name: 'Fetch SDK Submodules') {
+                gitlabCommitStatus(name: 'Select SDK Version') {
                     withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
                         script {
-                            if (isDefined(SDK_COMMIT)) {
-                                checkoutSdkByCommit(SDK_COMMIT)
-                            } else if (isDefined(SDK_TAG)) {
-                                checkoutSdkByTag(SDK_TAG)
-                            } else {
-                                checkoutSdkByBranch(SDK_BRANCH)
-                            }
 
-                            if (isDefined(MEGACHAT_COMMIT)) {
-                                checkoutMegaChatSdkByCommit(MEGACHAT_COMMIT)
-                            } else if (isDefined(MEGACHAT_TAG)) {
-                                checkoutMegaChatSdkByTag(MEGACHAT_TAG)
-                            } else {
-                                checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
+                            if (triggerByDeliverQaCmd() || triggerByPush()) {
+                                if (isDefined(SDK_COMMIT)) {
+                                    common.checkoutSdkByCommit(SDK_COMMIT)
+                                } else if (isDefined(SDK_TAG)) {
+                                    checkoutSdkByTag(SDK_TAG)
+                                } else {
+                                    checkoutSdkByBranch(SDK_BRANCH)
+                                }
+
+                                if (isDefined(MEGACHAT_COMMIT)) {
+                                    common.checkoutMegaChatSdkByCommit(MEGACHAT_COMMIT)
+                                } else if (isDefined(MEGACHAT_TAG)) {
+                                    checkoutMegaChatSdkByTag(MEGACHAT_TAG)
+                                } else {
+                                    checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
+                                }
+                            } else if (triggerByPublishSdkCmd()) {
+                                // if building SDK lib, check out SDK versions if parameter is provided
+                                String sdkCommit = parseCommandParameter()["sdk-commit"]
+                                if (sdkCommit != null && sdkCommit.length() > 0) {
+                                    common.checkoutSdkByCommit(sdkCommit)
+                                }
+
+                                String chatCommit = parseCommandParameter()["chat-commit"]
+                                if (chatCommit != null && chatCommit.length() > 0) {
+                                    common.checkoutMegaChatSdkByCommit(chatCommit)
+                                }
                             }
                         }
                     }
@@ -554,34 +565,6 @@ static boolean isDefined(String value) {
 }
 
 /**
- * checkout SDK by commit ID
- * @param sdkCommitId the commit ID to checkout
- */
-private void checkoutSdkByCommit(String sdkCommitId) {
-    sh """
-    echo checkoutSdkByCommit
-    cd $WORKSPACE
-    cd sdk/src/main/jni/mega/sdk
-    git checkout $sdkCommitId
-    cd $WORKSPACE
-    """
-}
-
-/**
- * checkout MEGAchat SDK by commit ID
- * @param megaChatCommitId the commit ID to checkout
- */
-private void checkoutMegaChatSdkByCommit(String megaChatCommitId) {
-    sh """
-    echo checkoutMegaChatSdkByCommit
-    cd $WORKSPACE
-    cd sdk/src/main/jni/megachat/sdk
-    git checkout $megaChatCommitId
-    cd $WORKSPACE
-    """
-}
-
-/**
  * checkout SDK by git tag
  * @param sdkTag the tag to checkout
  */
@@ -633,15 +616,6 @@ private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
-}
-
-/**
- * Check if this build is triggered by a GitLab Merge Request.
- * @return true if this build is triggerd by a GitLab MR. False if this build is triggerd
- * by a plain git push.
- */
-private boolean hasGitLabMergeRequest() {
-    return env.gitlabMergeRequestIid != null && !env.gitlabMergeRequestIid.isEmpty()
 }
 
 /**
@@ -728,9 +702,14 @@ def parseCommandParameter() {
     final PARAM_NOTES = "--notes"
 
     // key in the returned dictionary - delivery_qa command
+    final KEY_TESTER = "tester"
     final KEY_NOTES = "notes"
+    final KEY_TESTER_GROUP = "tester-group"
 
     def result = [:]
+    result[KEY_TESTER] = ""
+    result[KEY_NOTES] = ""
+    result[KEY_TESTER_GROUP] = ""
 
     String fullCommand = env.gitlabTriggerPhrase
     println("[DEBUG] parsing command parameters. \nuser input: $fullCommand")
@@ -759,6 +738,11 @@ def parseCommandParameter() {
         otherParams = params.substring(0, notesPos).trim()
     } else {
         otherParams = params
+    }
+
+    if (otherParams.isEmpty()) {
+        println("[DEBUG] parseCommandParameter() no extra params. Result = $result")
+        return result
     }
 
     String[] paramList = otherParams.split(" +")
@@ -870,21 +854,6 @@ private String uploadFileToGitLab(String fileName) {
 }
 
 /**
- * send message to GitLab MR comment
- * @param message message to send
- */
-private void sendToMR(String message) {
-    if (hasGitLabMergeRequest()) {
-        def mrNumber = env.gitlabMergeRequestIid
-        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-            env.MARKDOWN_LINK = message
-            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
-        }
-    }
-}
-
-/**
  * Get publish type of SDK.
  * @return return value can be either "dev" or "rel"
  */
@@ -896,4 +865,5 @@ private String getSdkPublishType() {
         return "dev"
     }
 }
+
 

@@ -1,13 +1,12 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.domain.exception.ChatLoggingOutException
 import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -28,7 +27,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaChatApiGateway
  * @property ioDispatcher
  */
-class DefaultLoginRepository @Inject constructor(
+internal class DefaultLoginRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
@@ -115,14 +114,4 @@ class DefaultLoginRepository @Inject constructor(
                 continuation.failWithError(error)
             }
         }
-
-    override fun isLoginAlreadyRunning(): Boolean = MegaApplication.isLoggingIn
-
-    override fun startLoginProcess() {
-        MegaApplication.isLoggingIn = true
-    }
-
-    override fun finishLoginProcess() {
-        MegaApplication.isLoggingIn = false
-    }
 }

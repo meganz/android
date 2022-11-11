@@ -4037,4 +4037,10 @@
     <string name="photos_album_creation_dialog_title">Enter album name</string>
     <!-- Album creation input name placeholder -->
     <string name="photos_album_creation_dialog_input_placeholder">New album</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Share meeting link</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave group</string>
 </resources>

@@ -26,6 +26,8 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSet
+import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
@@ -144,6 +146,17 @@ internal class MegaApiFacade @Inject constructor(
 
             override fun onEvent(api: MegaApiJava?, event: MegaEvent?) {
                 trySend(GlobalUpdate.OnEvent(event))
+            }
+
+            override fun onSetsUpdate(api: MegaApiJava?, sets: java.util.ArrayList<MegaSet>?) {
+                trySend(GlobalUpdate.OnSetsUpdate(sets))
+            }
+
+            override fun onSetElementsUpdate(
+                api: MegaApiJava?,
+                elements: java.util.ArrayList<MegaSetElement>?,
+            ) {
+                trySend(GlobalUpdate.OnSetElementsUpdate(elements))
             }
         }
 

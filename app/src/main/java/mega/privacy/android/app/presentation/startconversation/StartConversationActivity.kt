@@ -51,14 +51,6 @@ class StartConversationActivity : ComponentActivity() {
 
     private val viewModel by viewModels<StartConversationViewModel>()
 
-    private val transparentColor by lazy {
-        ContextCompat.getColor(this, android.R.color.transparent)
-    }
-
-    private val whiteColor by lazy {
-        ContextCompat.getColor(this, android.R.color.white)
-    }
-
     lateinit var resultLauncher: ActivityResultLauncher<Intent?>
 
     override fun onCreate(savedInstanceState: Bundle?) {

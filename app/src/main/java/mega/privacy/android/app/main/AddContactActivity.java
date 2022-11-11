@@ -125,6 +125,8 @@ import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaSet;
+import nz.mega.sdk.MegaSetElement;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
@@ -3308,6 +3310,16 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     @Override
     public void onEvent(MegaApiJava api, MegaEvent event) {
+
+    }
+
+    @Override
+    public void onSetsUpdate(MegaApiJava api, ArrayList<MegaSet> sets) {
+
+    }
+
+    @Override
+    public void onSetElementsUpdate(MegaApiJava api, ArrayList<MegaSetElement> elements) {
 
     }
 
