@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
@@ -69,7 +68,7 @@ class FavouritesViewModel @Inject constructor(
 ) :
     ViewModel() {
     private val _favouritesState =
-        MutableStateFlow<FavouriteLoadState>(FavouriteLoadState.Loading)
+        MutableStateFlow<FavouriteLoadState>(FavouriteLoadState.Loading(false))
 
     /**
      * The favouritesState for observing the favourites state.
@@ -92,9 +91,24 @@ class FavouritesViewModel @Inject constructor(
     private val itemsSelected = mutableMapOf<Long, Favourite>()
 
     /**
-     * Determine whether is search mode. ture is search mode, otherwise false.
+     * Enable search
      */
-    var searchMode = false
+    fun enableSearch() {
+        searchMode = true
+    }
+
+    private var searchMode = false
+        set(value) {
+            field = value
+            _favouritesState.update { state ->
+                when (state) {
+                    is FavouriteLoadState.Empty -> state.copy(showSearch = value)
+                    is FavouriteLoadState.Error -> state.copy(showSearch = value)
+                    is FavouriteLoadState.Loading -> state.copy(showSearch = value)
+                    is FavouriteLoadState.Success -> state.copy(showSearch = value)
+                }
+            }
+        }
 
     private var searchQuery: String? = null
 
@@ -109,7 +123,7 @@ class FavouritesViewModel @Inject constructor(
      */
     fun getFavourites() {
         _favouritesState.update {
-            FavouriteLoadState.Loading
+            FavouriteLoadState.Loading(false)
         }
         // Cancel the previous job avoid to repeatedly observed
         currentNodeJob?.cancel()
@@ -119,7 +133,7 @@ class FavouritesViewModel @Inject constructor(
                     _favouritesState.update {
                         when {
                             favouriteInfoList.isEmpty() -> {
-                                FavouriteLoadState.Empty
+                                FavouriteLoadState.Empty(false)
                             }
                             else -> {
                                 withContext(ioDispatcher) {
@@ -134,7 +148,8 @@ class FavouritesViewModel @Inject constructor(
                                                     null
                                                 }),
                                             isList = isList
-                                        )
+                                        ),
+                                        showSearch = searchMode
                                     )
                                 }
                             }
@@ -280,7 +295,11 @@ class FavouritesViewModel @Inject constructor(
             favouriteList.addAll(items)
             _favouritesState.update {
                 FavouriteLoadState.Success(
-                    favouriteListToFavouriteItemList(items, isList)
+                    favourites = favouriteListToFavouriteItemList(
+                        favouriteList = items,
+                        isList = isList
+                    ),
+                    showSearch = searchMode
                 )
             }
         }
@@ -355,7 +374,7 @@ class FavouritesViewModel @Inject constructor(
         return favouriteItemList
     }
 
-    private fun getFavouriteSortHeaderStringIdentifier(order: FavouriteSortOrder) = when(order){
+    private fun getFavouriteSortHeaderStringIdentifier(order: FavouriteSortOrder) = when (order) {
         FavouriteSortOrder.Label -> R.string.title_label
         is FavouriteSortOrder.ModifiedDate -> R.string.sortby_date
         is FavouriteSortOrder.Name -> R.string.sortby_name
@@ -377,7 +396,8 @@ class FavouritesViewModel @Inject constructor(
                             isList = isList,
                             forceUpdate = true,
                             headerForceUpdate = true
-                        )
+                        ),
+                        showSearch = searchMode
                     )
                 }
             }
@@ -405,7 +425,8 @@ class FavouritesViewModel @Inject constructor(
                                 null
                             }),
                         isList = isList
-                    )
+                    ),
+                    showSearch = searchMode
                 )
             }
         }

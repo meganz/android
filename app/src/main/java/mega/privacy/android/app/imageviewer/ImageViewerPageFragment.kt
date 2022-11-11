@@ -170,6 +170,9 @@ class ImageViewerPageFragment : Fragment() {
                 }
             }
 
+            imageResult.getProgressPercentage()?.let {
+                binding.progress.progress = it
+            }
             if (imageResult.isFullyLoaded) binding.progress.hide()
         }
 

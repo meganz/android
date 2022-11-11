@@ -1,14 +1,10 @@
-package test.mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.DefaultUpdateRecentAction
-import mega.privacy.android.app.domain.usecase.GetRecentActions
-import mega.privacy.android.app.domain.usecase.UpdateRecentAction
-import mega.privacy.android.app.domain.usecase.isSameBucket
-import nz.mega.sdk.MegaRecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionBucket
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -33,14 +29,15 @@ class DefaultUpdateRecentActionTest {
         timestamp: Long,
         parentHandle: Long,
         userEmail: String,
-    ): MegaRecentActionBucket =
-        mock {
-            on { this.isMedia }.thenReturn(isMedia)
-            on { this.isUpdate }.thenReturn(isUpdate)
-            on { this.timestamp }.thenReturn(timestamp)
-            on { this.parentHandle }.thenReturn(parentHandle)
-            on { this.userEmail }.thenReturn(userEmail)
-        }
+    ): RecentActionBucket =
+        RecentActionBucket(
+            isMedia = isMedia,
+            isUpdate = isUpdate,
+            timestamp = timestamp,
+            parentHandle = parentHandle,
+            userEmail = userEmail,
+            nodes = emptyList(),
+        )
 
     @Test
     fun `test that is same bucket return true if two buckets have same properties`() = runTest {
@@ -64,7 +61,7 @@ class DefaultUpdateRecentActionTest {
     fun `test that when updated action list contains the current action, then return this action`() =
         runTest {
             val expected = createBucket(isMedia = true, isUpdate = true, 0L, 1L, "1")
-            val list = listOf(expected, mock(), mock())
+            val list = listOf(expected, expected, expected)
             whenever(getRecentActions()).thenReturn(list)
 
             assertThat(underTest.invoke(expected, null)).isEqualTo(expected)
@@ -103,6 +100,4 @@ class DefaultUpdateRecentActionTest {
 
             assertThat(underTest.invoke(current, cachedActionList)).isEqualTo(null)
         }
-
-
 }

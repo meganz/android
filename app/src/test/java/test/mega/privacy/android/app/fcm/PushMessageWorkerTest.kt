@@ -22,13 +22,11 @@ import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.fcm.PushMessageWorker
 import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.EmptyFolderException
+import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.usecase.CompleteFastLogin
-import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.InitialiseMegaChat
 import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnections
-import mega.privacy.android.domain.usecase.RootNodeExists
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,8 +50,6 @@ class PushMessageWorkerTest {
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var workDatabase: WorkDatabase
 
-    private val getSession = mock<GetSession>()
-    private val rootNodeExists = mock<RootNodeExists>()
     private val completeFastLogin = mock<CompleteFastLogin>()
     private val pushReceived = mock<PushReceived>()
     private val retryPendingConnections = mock<RetryPendingConnections>()
@@ -91,8 +87,6 @@ class PushMessageWorkerTest {
                     override fun stopForeground(workSpecId: String) {}
                 }, workExecutor)
             ),
-            getSession = getSession,
-            rootNodeExists = rootNodeExists,
             completeFastLogin = completeFastLogin,
             pushReceived = pushReceived,
             retryPendingConnections = retryPendingConnections,
@@ -103,16 +97,15 @@ class PushMessageWorkerTest {
     }
 
     @Test
-    fun `test that doWork returns failure if user session is not valid`() = runTest {
-        whenever(getSession()).thenReturn(null)
+    fun `test that doWork returns failure if fast login failed`() = runTest {
+        whenever(completeFastLogin()).thenThrow(SessionNotRetrievedException::class.java)
         val result = underTest.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }
 
     @Test
-    fun `test that retryPendingConnections is invoked if rootNode exists`() = runTest {
-        whenever(getSession()).thenReturn("good_session")
-        whenever(rootNodeExists()).thenReturn(true)
+    fun `test that retryPendingConnections is invoked if fast login success`() = runTest {
+        whenever(completeFastLogin()).thenReturn("good_session")
         whenever(pushMessageMapper(any())).thenReturn(mock())
 
         underTest.doWork()
@@ -122,8 +115,7 @@ class PushMessageWorkerTest {
     @Test
     fun `test that MegaChat is initialised if rootNode exists and retryPendingConnections raises ChatNotInitializedException`() =
         runTest {
-            whenever(getSession()).thenReturn("good_session")
-            whenever(rootNodeExists()).thenReturn(true)
+            whenever(completeFastLogin()).thenReturn("good_session")
             whenever(pushMessageMapper(any())).thenReturn(mock())
             whenever(retryPendingConnections(any())).thenThrow(
                 ChatNotInitializedException())
@@ -135,8 +127,7 @@ class PushMessageWorkerTest {
     @Test
     fun `test that initialiseMegaChat is not invoked if rootNode exists and retryPendingConnections raises exception other than ChatNotInitializedException`() =
         runTest {
-            whenever(getSession()).thenReturn("good_session")
-            whenever(rootNodeExists()).thenReturn(true)
+            whenever(completeFastLogin()).thenReturn("good_session")
             whenever(pushMessageMapper(any())).thenReturn(mock())
             whenever(retryPendingConnections(any())).thenThrow(
                 EmptyFolderException())
@@ -149,8 +140,7 @@ class PushMessageWorkerTest {
     fun `test that doWork returns failure if rootNode exists and retryPendingConnections raises ChatNotInitializedException and initialiseMegaChat fails`() =
         runTest {
             val sessionId = "good_session"
-            whenever(getSession()).thenReturn(sessionId)
-            whenever(rootNodeExists()).thenReturn(true)
+            whenever(completeFastLogin()).thenReturn(sessionId)
             whenever(pushMessageMapper(any())).thenReturn(mock())
             whenever(retryPendingConnections(any())).thenThrow(
                 ChatNotInitializedException())

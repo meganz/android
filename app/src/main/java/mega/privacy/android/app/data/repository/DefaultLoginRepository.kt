@@ -2,7 +2,6 @@ package mega.privacy.android.app.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -115,14 +114,4 @@ class DefaultLoginRepository @Inject constructor(
                 continuation.failWithError(error)
             }
         }
-
-    override fun isLoginAlreadyRunning(): Boolean = MegaApplication.isLoggingIn
-
-    override fun startLoginProcess() {
-        MegaApplication.isLoggingIn = true
-    }
-
-    override fun finishLoginProcess() {
-        MegaApplication.isLoggingIn = false
-    }
 }
