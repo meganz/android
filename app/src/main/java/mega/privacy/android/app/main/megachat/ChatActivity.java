@@ -105,7 +105,6 @@ import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_PLAY_VOICE_
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CHAT_ARCHIVED;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;

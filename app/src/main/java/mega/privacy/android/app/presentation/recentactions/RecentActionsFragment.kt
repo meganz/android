@@ -129,8 +129,13 @@ class RecentActionsFragment : Fragment() {
     private fun initAdapter() {
         adapter.setOnItemClickListener { item, position ->
             // If only one element in the bucket
-            if (item.bucket.nodes.size() == 1) {
-                openFile(position, item.bucket.nodes[0])
+            if (item.bucket.nodes.size == 1) {
+                lifecycleScope.launch {
+                    val node = item.bucket.nodes[0]
+                    viewModel.getMegaNode(node.id.id)?.let {
+                        openFile(position, it)
+                    }
+                }
             }
             // If more element in the bucket
             else {
@@ -150,8 +155,11 @@ class RecentActionsFragment : Fragment() {
                 (requireActivity() as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
                     requireContext().getString(R.string.error_server_connection_problem), -1)
             } else {
-                (requireActivity() as ManagerActivity).showNodeOptionsPanel(node,
-                    NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
+                lifecycleScope.launch {
+                    val megaNode = viewModel.getMegaNode(node.id.id)
+                    (requireActivity() as ManagerActivity).showNodeOptionsPanel(megaNode,
+                        NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
+                }
             }
         }
 

@@ -73,7 +73,7 @@ class AlbumDynamicContentFragment : Fragment() {
         super.onCreate(savedInstanceState)
         managerActivity = activity as ManagerActivity
         actionModeCallback =
-            AlbumContentActionModeCallback(this, albumsViewModel.state.value.currentAlbumId)
+            AlbumContentActionModeCallback(this, albumsViewModel.state.value.currentAlbum)
     }
 
     override fun onCreateView(
@@ -123,7 +123,7 @@ class AlbumDynamicContentFragment : Fragment() {
                         actionMode?.title = state.selectedPhotoIds.size.toString()
                     }
                     menu?.let { menu ->
-                        state.currentAlbumId?.let { album ->
+                        state.currentAlbum?.let { album ->
                             val photos = state.albums.getAlbumPhotos(album)
                             menu.findItem(R.id.action_menu_sort_by)?.isVisible =
                                 photos.isNotEmpty()
@@ -145,7 +145,7 @@ class AlbumDynamicContentFragment : Fragment() {
         }
 
         val photos = remember(uiState.albums, uiState.currentSort) {
-            uiState.currentAlbumId?.let { album ->
+            uiState.currentAlbum?.let { album ->
                 val sourcePhotos = uiState.albums.getAlbumPhotos(album)
                 if (uiState.currentSort == Sort.NEWEST) {
                     sourcePhotos.sortedByDescending { it.modificationTime }
@@ -165,7 +165,7 @@ class AlbumDynamicContentFragment : Fragment() {
                 selectedPhotoIds = uiState.selectedPhotoIds
             )
         } else {
-            when (uiState.currentAlbumId) {
+            when (uiState.currentAlbum) {
                 Album.FavouriteAlbum -> EmptyView()
                 Album.GifAlbum -> Back()
                 Album.RawAlbum -> Back()
@@ -185,7 +185,7 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun openPhoto(photo: Photo) {
-        albumsViewModel.state.value.currentAlbumId?.let { album ->
+        albumsViewModel.state.value.currentAlbum?.let { album ->
             val albumPhotosHandles =
                 albumsViewModel.state.value.albums.getAlbumPhotos(album).map { photo ->
                     photo.id
@@ -248,7 +248,7 @@ class AlbumDynamicContentFragment : Fragment() {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        albumsViewModel.state.value.currentAlbumId?.let { album ->
+        albumsViewModel.state.value.currentAlbum?.let { album ->
             val photos = albumsViewModel.state.value.albums.getAlbumPhotos(album)
             menu.findItem(R.id.action_menu_sort_by)?.isVisible = photos.isNotEmpty()
         }
@@ -273,7 +273,7 @@ class AlbumDynamicContentFragment : Fragment() {
      * Get current page title
      */
     fun getCurrentAlbumTitle(): String {
-        val currentAlbum = albumsViewModel.state.value.currentAlbumId
+        val currentAlbum = albumsViewModel.state.value.currentAlbum
         val currentUIAlbum =
             albumsViewModel.state.value.albums.find { UIAlbum -> UIAlbum.id == currentAlbum }
         return if (context != null && currentUIAlbum != null) {

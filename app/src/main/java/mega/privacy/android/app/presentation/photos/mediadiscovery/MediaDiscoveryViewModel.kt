@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -21,26 +22,43 @@ import mega.privacy.android.app.presentation.photos.util.createDaysCardList
 import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
 import mega.privacy.android.app.presentation.photos.util.createYearsCardList
 import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetPhotosByFolderId
+import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import org.jetbrains.anko.collections.forEachWithIndex
 import javax.inject.Inject
 
 @HiltViewModel
 class MediaDiscoveryViewModel @Inject constructor(
     private val getNodeListByIds: GetNodeListByIds,
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val getPhotosByFolderId: GetPhotosByFolderId,
+    private val getCameraSortOrder: GetCameraSortOrder,
+    private val setCameraSortOrder: SetCameraSortOrder,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MediaDiscoveryViewState())
     val state = _state.asStateFlow()
 
+    private var fetchPhotosJob: Job? = null
+
     init {
+        viewModelScope.launch {
+            val sortOrder = getCameraSortOrder()
+            setCurrentSort(sort = mapSortOrderToSort(sortOrder))
+        }
+    }
+
+    private fun fetchPhotos() {
+        fetchPhotosJob?.cancel()
+
         val currentFolderId = savedStateHandle.get<Long>(INTENT_KEY_CURRENT_FOLDER_ID)
-        currentFolderId?.let {
+        fetchPhotosJob = currentFolderId?.let {
             viewModelScope.launch {
-                getPhotosByFolderId(currentFolderId)
+                val sortOrder = mapSortToSortOrder(_state.value.currentSort)
+                getPhotosByFolderId(it, sortOrder)
                     .collectLatest { sourcePhotos ->
                         handlePhotoItems(sourcePhotos)
                     }
@@ -48,8 +66,22 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
-    private fun handlePhotoItems(sourcePhotos: List<Photo>, sort: Sort = _state.value.currentSort) {
-        val sortedPhotos = sortPhotos(photos = sourcePhotos, sort = sort)
+    private fun mapSortOrderToSort(sortOrder: SortOrder): Sort = when (sortOrder) {
+        SortOrder.ORDER_MODIFICATION_DESC -> Sort.NEWEST
+        SortOrder.ORDER_MODIFICATION_ASC -> Sort.OLDEST
+        SortOrder.ORDER_PHOTO_DESC -> Sort.PHOTOS
+        SortOrder.ORDER_VIDEO_DESC -> Sort.VIDEOS
+        else -> Sort.NEWEST
+    }
+
+    private fun mapSortToSortOrder(sort: Sort): SortOrder = when (sort) {
+        Sort.NEWEST -> SortOrder.ORDER_MODIFICATION_DESC
+        Sort.OLDEST -> SortOrder.ORDER_MODIFICATION_ASC
+        Sort.PHOTOS -> SortOrder.ORDER_PHOTO_DESC
+        Sort.VIDEOS -> SortOrder.ORDER_VIDEO_DESC
+    }
+
+    private fun handlePhotoItems(sortedPhotos: List<Photo>) {
         val dayPhotos = groupPhotosByDay(sortedPhotos = sortedPhotos)
         val yearsCardList = createYearsCardList(dayPhotos = dayPhotos)
         val monthsCardList = createMonthsCardList(dayPhotos = dayPhotos)
@@ -77,7 +109,6 @@ class MediaDiscoveryViewModel @Inject constructor(
                 yearsCardList = yearsCardList,
                 monthsCardList = monthsCardList,
                 daysCardList = daysCardList,
-                currentSort = sort
             )
         }
     }
@@ -95,15 +126,6 @@ class MediaDiscoveryViewModel @Inject constructor(
             currentDate.month != previousDate.month
         }
     }
-
-    private fun sortPhotos(
-        photos: List<Photo>,
-        sort: Sort = _state.value.currentSort,
-    ): List<Photo> = when (sort) {
-        Sort.NEWEST -> photos.sortedByDescending { it.modificationTime }
-        Sort.OLDEST -> photos.sortedBy { it.modificationTime }
-    }
-
 
     fun togglePhotoSelection(id: Long) {
         val selectedPhotoIds = _state.value.selectedPhotoIds.toMutableSet()
@@ -131,11 +153,6 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
-    private fun getAllPhotos() = _state.value.uiPhotoList.filterIsInstance<UIPhoto.PhotoItem>()
-        .map { (photo) ->
-            photo
-        }
-
     fun getAllPhotoIds() = _state.value.uiPhotoList
         .filterIsInstance<UIPhoto.PhotoItem>()
         .map { (photo) ->
@@ -146,16 +163,20 @@ class MediaDiscoveryViewModel @Inject constructor(
         getNodeListByIds(_state.value.selectedPhotoIds.toList())
 
     fun setCurrentSort(sort: Sort) {
-        handlePhotoItems(
-            sourcePhotos = getAllPhotos(),
-            sort = sort
-        )
+        _state.update {
+            it.copy(currentSort = sort)
+        }
+
+        viewModelScope.launch {
+            val sortOrder = mapSortToSortOrder(sort)
+            setCameraSortOrder(sortOrder)
+
+            fetchPhotos()
+        }
     }
 
     fun onTimeBarTabSelected(timeBarTab: TimeBarTab) {
-        _state.update {
-            it.copy(selectedTimeBarTab = timeBarTab)
-        }
+        updateSelectedTimeBarState(selectedTimeBarTab = timeBarTab)
     }
 
     fun onCardClick(dateCard: DateCard) {
@@ -177,7 +198,7 @@ class MediaDiscoveryViewModel @Inject constructor(
                     TimeBarTab.All,
                     _state.value.uiPhotoList.indexOfFirst {
                         it.key == dateCard.photo.id.toString()
-                    }
+                    },
                 )
             }
         }
@@ -197,24 +218,9 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
-    fun zoomIn() {
-        if (_state.value.currentZoomLevel == ZoomLevel.values().first()
-        ) {
-            return
-        }
+    fun updateZoomLevel(zoomLevel: ZoomLevel) {
         _state.update {
-            it.copy(currentZoomLevel = ZoomLevel.values()[_state.value.currentZoomLevel.ordinal - 1])
-        }
-    }
-
-    fun zoomOut() {
-        if (_state.value.currentZoomLevel == ZoomLevel.values().last()
-        ) {
-            return
-        }
-
-        _state.update {
-            it.copy(currentZoomLevel = ZoomLevel.values()[_state.value.currentZoomLevel.ordinal + 1])
+            it.copy(currentZoomLevel = zoomLevel)
         }
     }
 }

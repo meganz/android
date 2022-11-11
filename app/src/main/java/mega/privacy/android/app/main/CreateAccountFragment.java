@@ -45,7 +45,6 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.LegacyDatabaseHandler;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.data.model.MegaAttributes;
@@ -663,11 +662,15 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                     return;
                 }
             } else {
-                ((LoginActivity) context).setEmailTemp(userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim());
-                ((LoginActivity) context).setFirstNameTemp(userName.getText().toString());
-                ((LoginActivity) context).setLastNameTemp(userLastName.getText().toString());
-                ((LoginActivity) context).setPasswdTemp(userPassword.getText().toString());
-                ((LoginActivity) context).setWaitingForConfirmAccount(true);
+                if (userEmail.getText() != null && userName.getText() != null
+                        && userLastName.getText() != null && userPassword.getText() != null) {
+                    ((LoginActivity) context).setTemporalDataForAccountCreation(
+                            userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim(),
+                            userName.getText().toString(),
+                            userLastName.getText().toString(),
+                            userPassword.getText().toString()
+                    );
+                }
 
                 if (dbH != null) {
                     dbH.clearEphemeral();

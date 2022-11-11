@@ -78,6 +78,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -110,6 +111,8 @@ import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFrag
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel;
+import mega.privacy.android.app.presentation.clouddrive.FolderLinkViewModel;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.data.CopyRequestResult;
@@ -206,6 +209,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
     @Inject
     CookieDialogHandler cookieDialogHandler;
+    private FolderLinkViewModel viewModel;
 
     public void activateActionMode() {
         Timber.d("activateActionMode");
@@ -364,6 +368,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
+        viewModel = new ViewModelProvider(this).get(FolderLinkViewModel.class);
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -665,7 +670,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
         }
 
         if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
+            if (!viewModel.isConnected()) {
                 try {
                     statusDialog.dismiss();
                 } catch (Exception ex) {

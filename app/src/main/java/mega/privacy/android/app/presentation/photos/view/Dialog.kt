@@ -11,6 +11,10 @@ import mega.privacy.android.app.R
 
 fun Fragment.showSortByDialog(
     context: Activity,
+    items: List<String> = listOf(
+        getString(R.string.sortby_date_newest),
+        getString(R.string.sortby_date_oldest),
+    ),
     checkedItem: Int,
     onClickListener: (DialogInterface, Int) -> Unit,
     onDismissListener: (DialogInterface) -> Unit = {},
@@ -18,18 +22,7 @@ fun Fragment.showSortByDialog(
     val sortDialog: AlertDialog
     val dialogBuilder = MaterialAlertDialogBuilder(context)
 
-    val stringsArray: List<String> = listOf(
-        getString(R.string.sortby_date_newest),
-        getString(R.string.sortby_date_oldest),
-    )
-    val itemsAdapter =
-        ArrayAdapter(context, R.layout.checked_text_view_dialog_button, stringsArray)
-    val listView = ListView(context)
-    listView.adapter = itemsAdapter
-
-    dialogBuilder.setSingleChoiceItems(
-        itemsAdapter,
-        checkedItem) { dialog, i ->
+    dialogBuilder.setSingleChoiceItems(items.toTypedArray(), checkedItem) { dialog, i ->
         onClickListener(dialog, i)
         dialog.dismiss()
     }

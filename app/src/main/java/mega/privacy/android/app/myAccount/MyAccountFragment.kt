@@ -310,8 +310,7 @@ class MyAccountFragment : Fragment(), Scrollable {
 
     private fun setupAccountDetails() {
         binding.lastSessionSubtitle.text =
-            if (viewModel.getLastSession().isNotEmpty()) viewModel.getLastSession()
-            else gettingInfo
+            viewModel.getLastSession().ifEmpty { gettingInfo }
 
         usageBinding.root.setOnClickListener {
             findNavController().navigate(
@@ -322,7 +321,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             )
         }
 
-        if (megaApi.isBusinessAccount) {
+        if (viewModel.isBusinessAccount()) {
             setupBusinessAccount()
             return
         }
@@ -510,10 +509,12 @@ class MyAccountFragment : Fragment(), Scrollable {
                 } else if (!phoneNumberBottomSheet.isBottomSheetDialogShown()) {
                     phoneNumberBottomSheet = PhoneNumberBottomSheetDialogFragment()
                     activity?.supportFragmentManager?.let { fragmentManager ->
-                        phoneNumberBottomSheet!!.show(
-                            fragmentManager,
-                            phoneNumberBottomSheet!!.tag
-                        )
+                        phoneNumberBottomSheet?.let { fragment ->
+                            fragment.show(
+                                fragmentManager,
+                                fragment.tag
+                            )
+                        }
                     }
                 }
             }

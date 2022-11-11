@@ -26,8 +26,8 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.node.Node
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -62,7 +62,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
      * Parameters:
      * MegaNode: the node associated with the three dots
      */
-    private var onThreeDotsClickListener: ((MegaNode) -> Unit)? = null
+    private var onThreeDotsClickListener: ((Node) -> Unit)? = null
 
     /**
      * The Homepage bottom sheet has a calculated background for elevation, while the
@@ -163,7 +163,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                 binding.thumbnailView.setImageResource(MimeTypeList.typeForName(node.name).iconResourceId)
 
                 // only one item in the recent action
-                if (nodeList.size() == 1) {
+                if (nodeList.size == 1) {
                     binding.threeDots.visibility = View.VISIBLE
                     binding.threeDots.setOnClickListener {
                         onThreeDotsClickListener?.invoke(node)
@@ -195,7 +195,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                         binding.firstLineText.text =
                             context.getFormattedStringOrDefault(R.string.title_bucket,
                                 node.name,
-                                nodeList.size() - 1)
+                                nodeList.size - 1)
                     }
                 }
 
@@ -213,10 +213,8 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
             ?.asSequence()
             ?.filterIsInstance<RecentActionItemType.Item>()
             ?.mapIndexed { index, item ->
-                if (
-                    item.bucket.nodes != null
-                    && item.bucket.nodes.size() > 0
-                    && item.bucket.nodes.get(0).handle == handle
+                if (item.bucket.nodes.isNotEmpty()
+                    && item.bucket.nodes[0].id.id == handle
                 ) index
                 else null
             }
@@ -263,7 +261,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
      *
      * @param listener function to trigger
      */
-    fun setOnThreeDotsClickListener(listener: (MegaNode) -> Unit) {
+    fun setOnThreeDotsClickListener(listener: (Node) -> Unit) {
         onThreeDotsClickListener = listener
     }
 
@@ -299,8 +297,8 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
      * @param nodeList list of nodes contained in the recent action item
      * @return a string corresponding to the title
      */
-    private fun getMediaTitle(context: Context, nodeList: MegaNodeList): String {
-        val partition = (0 until nodeList.size())
+    private fun getMediaTitle(context: Context, nodeList: List<Node>): String {
+        val partition = (nodeList.indices)
             .map { nodeList[it] }
             .partition { MimeTypeList.typeForName(it.name).isImage }
         val numImages = partition.first.size

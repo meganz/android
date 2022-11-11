@@ -11,12 +11,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.app.domain.usecase.GetRecentActions
+import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.app.domain.usecase.IsPendingShare
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsState
+import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetVisibleContacts
@@ -48,7 +49,7 @@ class RecentActionsViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
-    private var _buckets = listOf<MegaRecentActionBucket>()
+    private var _buckets = listOf<RecentActionBucket>()
 
     /** private UI state */
     private val _state = MutableStateFlow(RecentActionsState())
@@ -59,12 +60,12 @@ class RecentActionsViewModel @Inject constructor(
     /**
      * Selected recent actions bucket
      */
-    var selected: MegaRecentActionBucket? = null
+    var selected: RecentActionBucket? = null
 
     /**
      * Snapshot of recent actions bucket list when a user select one item
      */
-    var snapshotActionList: List<MegaRecentActionBucket>? = null
+    var snapshotActionList: List<RecentActionBucket>? = null
 
     init {
         updateRecentActions()
@@ -138,7 +139,7 @@ class RecentActionsViewModel @Inject constructor(
      * @return a list of [RecentActionItemType]
      */
     private suspend fun formatRecentActions(
-        buckets: List<MegaRecentActionBucket>,
+        buckets: List<RecentActionBucket>,
         visibleContacts: List<ContactItem>,
     ): List<RecentActionItemType> {
 
@@ -147,7 +148,7 @@ class RecentActionsViewModel @Inject constructor(
 
         buckets.forEach { bucket ->
             // if nodes is null or empty, do not add to the list
-            if (bucket.nodes == null || bucket.nodes.size() == 0) return@forEach
+            if (bucket.nodes.isEmpty()) return@forEach
 
             val currentDate = bucket.timestamp
 
@@ -175,6 +176,11 @@ class RecentActionsViewModel @Inject constructor(
 
         return recentItemList
     }
+
+    /**
+     * get a MegaNode by id
+     */
+    suspend fun getMegaNode(handle: Long) = getNodeByHandle(handle)
 
     /**
      * Retrieve the parent folder shares type of a node

@@ -59,7 +59,7 @@
     <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
     <string name="api_emasteronly">ปฏิเสธการเข้าถึงสำหรับผู้ใช้ที่ไม่ใช่ผู้ดูแลระบบ</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="api_ebusinesspastdue">Account deactivated</string>
+    <string name="api_ebusinesspastdue">บัญชีถูกปิดใช้งาน</string>
     <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
     <string name="payment_ecard">บัตรเครดิตถูกปฏิเสธ</string>
     <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->

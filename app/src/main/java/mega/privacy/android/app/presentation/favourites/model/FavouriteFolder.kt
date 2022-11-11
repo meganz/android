@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.favourites.model
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
 import nz.mega.sdk.MegaNode
 
 /**
@@ -29,4 +30,6 @@ data class FavouriteFolder(
     override val modificationTime: Long
         get() = 0L
     override val thumbnailPath: String? = null
+    override fun getComparableField(order: FavouriteSortOrder): Comparable<*> =
+        if (order is FavouriteSortOrder.Label) label else name
 }

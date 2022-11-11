@@ -9,7 +9,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
@@ -27,6 +26,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
+import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
@@ -49,6 +49,7 @@ class AlbumsViewModel @Inject constructor(
     private var getFeatureFlag: GetFeatureFlagValue,
     private val removeFavourites: RemoveFavourites,
     private val getNodeListByIds: GetNodeListByIds,
+    private val createAlbum: CreateAlbum,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -87,10 +88,10 @@ class AlbumsViewModel @Inject constructor(
                             val userAlbums = state.albums.filter { it.id is Album.UserAlbum }
                             systemAlbums + userAlbums
                         }
-                        val currentAlbumId = checkCurrentAlbumExists(albums = albums)
+                        val currentAlbum = checkCurrentAlbumExists(albums = albums)
                         state.copy(
                             albums = albums,
-                            currentAlbumId = currentAlbumId,
+                            currentAlbum = currentAlbum,
                         )
                     }
                 }
@@ -131,7 +132,7 @@ class AlbumsViewModel @Inject constructor(
 
             state.copy(
                 albums = albums,
-                currentAlbumId = currentAlbumId,
+                currentAlbum = currentAlbumId,
             )
         }
     }
@@ -163,8 +164,26 @@ class AlbumsViewModel @Inject constructor(
         systemAlbums + updatedUserAlbums
     }
 
+    /**
+     * Create a new album
+     *
+     * @param name the name of the album
+     */
+    fun createNewAlbum(name: String) = viewModelScope.launch {
+        try {
+            val album = createAlbum(name)
+            _state.update {
+                it.copy(currentAlbum = album)
+            }
+            Timber.d("Current album: ${album.title}")
+        } catch (exception: Exception) {
+            Timber.e(exception)
+        }
+    }
+
+
     private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? =
-        albums.find { uiAlbum -> uiAlbum.id == _state.value.currentAlbumId }?.id
+        albums.find { uiAlbum -> uiAlbum.id == _state.value.currentAlbum }?.id
 
 
     private fun shouldAddAlbum(
@@ -175,7 +194,7 @@ class AlbumsViewModel @Inject constructor(
 
     fun setCurrentAlbum(album: Album?) {
         _state.update {
-            it.copy(currentAlbumId = album)
+            it.copy(currentAlbum = album)
         }
     }
 
@@ -198,7 +217,7 @@ class AlbumsViewModel @Inject constructor(
     }
 
     fun selectAllPhotos() {
-        _state.value.currentAlbumId?.let { album ->
+        _state.value.currentAlbum?.let { album ->
             val albumPhotosHandles =
                 _state.value.albums.getAlbumPhotos(album).map { photo ->
                     photo.id
@@ -210,7 +229,7 @@ class AlbumsViewModel @Inject constructor(
     }
 
     fun getAlbumPhotosCount() =
-        _state.value.albums.find { it.id == _state.value.currentAlbumId }?.count ?: 0
+        _state.value.albums.find { it.id == _state.value.currentAlbum }?.count ?: 0
 
     fun removeFavourites() {
         viewModelScope.launch {

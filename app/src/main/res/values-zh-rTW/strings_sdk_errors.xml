@@ -19,7 +19,7 @@
     <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
     <string name="api_erange">超出範圍</string>
     <!-- State to indicate something has expired (achivements of business status account for instance) -->
-    <string name="api_eexpired">過期</string>
+    <string name="api_eexpired">已過期</string>
     <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
     <string name="api_enoent">未找到</string>
     <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
@@ -59,7 +59,7 @@
     <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
     <string name="api_emasteronly">非管理員拒絕存取</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="api_ebusinesspastdue">Account deactivated</string>
+    <string name="api_ebusinesspastdue">帳戶已停用</string>
     <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
     <string name="payment_ecard">信用卡被拒絕</string>
     <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->

@@ -43,6 +43,8 @@ import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaSet
+import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
@@ -213,6 +215,17 @@ class GlobalListener @Inject constructor(
             MegaEvent.EVENT_BUSINESS_STATUS -> sendBroadcastUpdateAccountDetails()
             MegaEvent.EVENT_MISC_FLAGS_READY -> checkEnabledCookies()
         }
+    }
+
+    override fun onSetsUpdate(api: MegaApiJava?, sets: ArrayList<MegaSet>?) {
+        Timber.d("Sets Updated")
+    }
+
+    override fun onSetElementsUpdate(
+        api: MegaApiJava?,
+        elements: ArrayList<MegaSetElement>?,
+    ) {
+        Timber.d("Set elements updated")
     }
 
     private fun sendBroadcastUpdateAccountDetails() {

@@ -11,6 +11,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.text.InputType
 import android.util.Base64
 import android.util.TypedValue
@@ -63,6 +65,7 @@ import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL
+import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
@@ -158,6 +161,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     private var resumeSession = false
     private var confirmLink: String? = null
 
+    private var isFetchingNodes = false
     private var firstTime = true
     private var backWhileLogin = false
     private var loginClicked = false
@@ -644,9 +648,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                                 newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                    (requireActivity() as LoginActivity).startCameraUploadService(
-                                        false,
-                                        5 * 60 * 1000)
+                                    startCameraUploadService(false, 5 * 60 * 1000)
                                 }
 
                                 startActivity(newIntent)
@@ -661,7 +663,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 }
             }
 
-            if (megaApi.rootNode != null && !LoginActivity.isFetchingNodes && !isIsHeartBeatAlive) {
+            if (megaApi.rootNode != null && !isFetchingNodes && !isIsHeartBeatAlive) {
                 Timber.d("rootNode != null")
 
                 var intent = Intent(requireContext(), ManagerActivity::class.java)
@@ -707,9 +709,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 dbH.preferences?.let { preferences ->
                     preferences.camSyncEnabled?.let { enabled ->
                         if (enabled.toBoolean() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                            (requireActivity() as LoginActivity).startCameraUploadService(
-                                false,
-                                30 * 1000)
+                            startCameraUploadService(false, 30 * 1000)
                         }
                     }
                 }
@@ -923,7 +923,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         lastPassword = passwdTemp
         loginEmailText.hideKeyboard()
 
-        if (!Util.isOnline(requireActivity())) {
+        if (viewModel.isConnected.not()) {
             loginLoggingInLayout.isVisible = false
             loginLayout.isVisible = true
             confirmLogoutDialog?.dismiss()
@@ -966,7 +966,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     private fun performLogin() = with(binding) {
         loginEmailText.hideKeyboard()
 
-        if (!Util.isOnline(requireActivity())) {
+        if (viewModel.isConnected.not()) {
             loginLoggingInLayout.isVisible = false
             loginLayout.isVisible = true
             confirmLogoutDialog?.dismiss()
@@ -1013,7 +1013,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         if (confirmLink == null) {
             onKeysGeneratedLogin(email, password)
         } else {
-            if (!Util.isOnline(requireActivity())) {
+            if (viewModel.isConnected.not()) {
                 (requireActivity() as LoginActivity).showSnackbar(requireContext().getFormattedStringOrDefault(
                     R.string.error_server_connection_problem))
                 return
@@ -1077,7 +1077,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      */
     private fun onKeysGeneratedLogin(email: String?, password: String?) {
         Timber.d("onKeysGeneratedLogin")
-        if (!Util.isOnline(requireActivity())) {
+        if (viewModel.isConnected.not()) {
             with(binding) {
                 loginLoggingInLayout.isVisible = false
                 loginLayout.isVisible = true
@@ -1212,7 +1212,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      * @param link Link to check.
      */
     private fun updateConfirmEmail(link: String?) {
-        if (!Util.isOnline(requireActivity())) {
+        if (viewModel.isConnected.not()) {
             (requireActivity() as LoginActivity).showSnackbar(requireContext().getFormattedStringOrDefault(
                 R.string.error_server_connection_problem))
             return
@@ -1351,12 +1351,12 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                             if (prefs.camSyncEnabled != null) {
                                 if (java.lang.Boolean.parseBoolean(prefs.camSyncEnabled)) {
                                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                        loginActivity.startCameraUploadService(false, 30 * 1000)
+                                        startCameraUploadService(false, 30 * 1000)
                                     }
                                 }
                             } else {
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                    loginActivity.startCameraUploadService(true, 30 * 1000)
+                                    startCameraUploadService(true, 30 * 1000)
                                 }
                                 initialCam = true
                             }
@@ -1461,7 +1461,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 layoutParams.width = Util.dp2px(250 * scaleW)
                 progress = 0
             }
-            LoginActivity.isFetchingNodes = true
+            isFetchingNodes = true
             disableLoginButton()
         }
     }
@@ -1616,10 +1616,10 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 Timber.d("Terminate login process when fetch nodes")
                 return
             }
-            LoginActivity.isFetchingNodes = false
+            isFetchingNodes = false
             isLoggingIn = false
             if (error.errorCode == MegaError.API_OK) {
-                receivedIntent = (requireActivity() as LoginActivity).getIntentReceived()
+                receivedIntent = (requireActivity() as LoginActivity).intent
                 if (receivedIntent != null) {
                     @Suppress("UNCHECKED_CAST")
                     shareInfos = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -1685,9 +1685,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
                 if (error.errorCode == MegaError.API_EACCESS) {
                     Timber.e("Error API_EACCESS")
-                    if ((requireActivity() as LoginActivity).accountBlocked != null) {
-                        Timber.e("Account blocked")
-                    } else if (!backWhileLogin) {
+                    if (!backWhileLogin) {
                         (requireActivity() as LoginActivity).showSnackbar(error.errorString)
                     }
                 } else if (error.errorCode != MegaError.API_EBLOCKED) {
@@ -1963,7 +1961,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         backToLoginForm()
                         backWhileLogin = true
                         isLoggingIn = false
-                        LoginActivity.isFetchingNodes = false
+                        isFetchingNodes = false
                         loginClicked = false
                         firstTime = true
                         megaChatApi.logout(ChatLogoutListener(requireActivity(), loggingSettings))
@@ -1994,7 +1992,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         //login is in process
         val onLoginPage = binding.loginLayout.isVisible
         val on2faPage = binding.login2fa.isVisible
-        return if ((isLoggingIn || LoginActivity.isFetchingNodes) && !onLoginPage && !on2faPage) {
+        return if ((isLoggingIn || isFetchingNodes) && !onLoginPage && !on2faPage) {
             showConfirmLogoutDialog()
             2
         } else {
@@ -2120,6 +2118,35 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         setNegativeButton(R.string.general_cancel, null)
         setCancelable(false)
         show()
+    }
+
+    /**
+     * Starts CU service.
+     *
+     * @param firstTimeCam
+     * @param time
+     */
+    private fun startCameraUploadService(firstTimeCam: Boolean, time: Int) {
+        Timber.d("firstTimeCam: $firstTimeCam: $time")
+
+        with(requireActivity()) {
+            if (firstTimeCam) {
+                setStartScreenTimeStamp(this)
+
+                startActivity(Intent(this,
+                    ManagerActivity::class.java).apply {
+                    putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+                })
+
+                finish()
+            } else {
+                Timber.d("Start the Camera Uploads service")
+                Handler(Looper.getMainLooper()).postDelayed({
+                    Timber.d("Now I start the service")
+                    JobUtil.scheduleCameraUploadJob(this)
+                }, time.toLong())
+            }
+        }
     }
 
     companion object {

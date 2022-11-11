@@ -13,4 +13,14 @@ enum class Sort {
      * Sort by oldest first
      */
     OLDEST,
+
+    /**
+     * Sort by photos with newest first
+     */
+    PHOTOS,
+
+    /**
+     * Sort by videos with newest first
+     */
+    VIDEOS,
 }

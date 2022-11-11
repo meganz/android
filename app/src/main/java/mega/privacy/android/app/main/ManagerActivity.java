@@ -989,7 +989,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                     updateAccountDetailsVisibleInfo();
 
-                    if (megaApi.isBusinessAccount()) {
+                    if (isBusinessAccount()) {
                         supportInvalidateOptionsMenu();
                     }
                 } else if (actionType == UPDATE_PAYMENT_METHODS) {
@@ -2671,7 +2671,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @return True if some warning has been shown, false otherwise.
      */
     private boolean checkBusinessStatus() {
-        if (!megaApi.isBusinessAccount()) {
+        if (!isBusinessAccount()) {
             return false;
         }
 
@@ -2741,7 +2741,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * Otherwise proceeds to enable CU.
      */
     public void checkIfShouldShowBusinessCUAlert() {
-        if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
+        if (isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
             showBusinessCUAlert();
         } else {
             enableCUClicked();
@@ -7528,13 +7528,13 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         if (usedSpaceLayout != null) {
-            if (megaApi.isBusinessAccount()) {
+            if (isBusinessAccount()) {
                 usedSpaceLayout.setVisibility(View.GONE);
                 upgradeAccount.setVisibility(View.GONE);
                 if (settingsSeparator != null) {
                     settingsSeparator.setVisibility(View.GONE);
                 }
-                if (megaApi.isBusinessAccount()) {
+                if (isBusinessAccount()) {
                     businessLabel.setVisibility(View.VISIBLE);
                 }
             } else {
@@ -11425,5 +11425,9 @@ public class ManagerActivity extends TransfersManagementActivity
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }
+    }
+
+    private boolean isBusinessAccount() {
+        return megaApi.isBusinessAccount() && myAccountInfo.getAccountType() == BUSINESS;
     }
 }

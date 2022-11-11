@@ -209,8 +209,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     // Meeting failed Dialog
     private var failedDialog: Dialog? = null
 
-    private var assignModeratorDialog:AssignModeratorBottomSheetDialogFragment? = null
-    private var endMeetingAsModeratorDialog:EndMeetingAsModeratorBottomSheetDialogFragment? = null
+    private var assignModeratorDialog: AssignModeratorBottomSheetDialogFragment? = null
+    private var endMeetingAsModeratorDialog: EndMeetingAsModeratorBottomSheetDialogFragment? = null
 
     // Only me in the call Dialog
     private var onlyMeDialog: Dialog? = null
@@ -674,9 +674,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                                         )
 
                                                     camIsEnable =
-                                                        sharedModel.cameraLiveData.value!!
+                                                        (sharedModel.cameraLiveData.value
+                                                            ?: false)
                                                     speakerIsEnable =
-                                                        sharedModel.speakerLiveData.value!! == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+                                                        (sharedModel.speakerLiveData.value
+                                                            ?: false) == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
 
                                                     inMeetingViewModel.joinPublicChat(
                                                         args.chatId,
@@ -1073,7 +1075,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 chrono.base =
                                     SystemClock.elapsedRealtime() - it * MILLISECONDS_IN_ONE_SECOND
                                 chrono.start()
-                                chrono.format = " %s"
                                 chrono.isVisible = true
                             }
                         }
@@ -1099,7 +1100,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 StringResourcesUtils.getString(R.string.outgoing_call_starting)
                         }
                         InMeetingViewModel.SubtitleCallType.TYPE_ESTABLISHED -> {
-                            it.text = StringResourcesUtils.getString(R.string.duration_meeting)
+                            it.text = ""
                         }
                     }
                 }
@@ -1233,11 +1234,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         ))
                         text =
                             StringResourcesUtils.getString(R.string.calls_call_screen_poor_network_quality)
-
-                        reconnecting()
-                    } else {
-                        inMeetingViewModel.checkBannerInfo()
                     }
+                }
+
+                if (shouldBeShown) {
+                    reconnecting()
+                } else {
+                    checkChildFragments()
                 }
             }
         }
@@ -2629,7 +2632,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         const val MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC = 6
 
-        const val MILLISECONDS_IN_ONE_SECOND:Long = 1000
+        const val MILLISECONDS_IN_ONE_SECOND: Long = 1000
 
         const val INFO_ANIMATION = MILLISECONDS_IN_ONE_SECOND
     }
@@ -2690,8 +2693,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method that updates the microphone and camera values
      */
     private fun updateMicAndCam() {
-        camIsEnable = sharedModel.cameraLiveData.value!!
-        micIsEnable = sharedModel.micLiveData.value!!
+        camIsEnable = sharedModel.cameraLiveData.value ?: false
+        micIsEnable = sharedModel.micLiveData.value ?: false
         bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
         bottomFloatingPanelViewHolder.updateMicIcon(micIsEnable)
         updateParticipantsBottomPanel()

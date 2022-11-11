@@ -1,19 +1,16 @@
 package mega.privacy.android.domain.usecase
 
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.exception.ChatNotInitializedException
-import mega.privacy.android.domain.exception.LoginAlreadyRunningException
-import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.repository.LoginRepository
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultCompleteFastLoginTest {
@@ -21,65 +18,82 @@ class DefaultCompleteFastLoginTest {
     private lateinit var underTest: CompleteFastLogin
 
     private val loginRepository = mock<LoginRepository>()
+    private val initialiseMegaChat = mock<InitialiseMegaChat>()
+    private val getSession = mock<GetSession>()
+    private val getRootNodeExists = mock<RootNodeExists>()
     private val session = "User session"
 
     @Before
     fun setUp() {
-        underTest = DefaultCompleteFastLogin(loginRepository)
+        underTest = DefaultCompleteFastLogin(
+            loginRepository = loginRepository,
+            initialiseMegaChat = initialiseMegaChat,
+            getSession = getSession,
+            getRootNodeExists = getRootNodeExists
+        )
     }
 
     @Test
-    fun `test that LoginAlreadyRunningException is thrown if a login process is already running`() =
+    fun `test that login is failed if get session null`() = runTest {
+        whenever(getSession()).thenReturn(null)
+        assertThrows(SessionNotRetrievedException::class.java) {
+            runBlocking { underTest() }
+        }
+    }
+
+    @Test
+    fun `test that login is success if get session differ null and root node exist`() = runTest {
+        whenever(getSession()).thenReturn(session)
+        whenever(getRootNodeExists()).thenReturn(true)
+        val result = underTest()
+        assertEquals(session, result)
+    }
+
+    @Test
+    fun `test that login is failed if root node not exist and init mega chat throw exception`() =
         runTest {
-            whenever(loginRepository.isLoginAlreadyRunning()).thenReturn(true)
-            assertThrows(LoginAlreadyRunningException::class.java) {
-                runBlocking { underTest(session) }
+            whenever(getSession()).thenReturn(session)
+            whenever(getRootNodeExists()).thenReturn(false)
+            whenever(initialiseMegaChat(session)).thenThrow(RuntimeException())
+            assertThrows(RuntimeException::class.java) {
+                runBlocking { underTest() }
             }
         }
 
     @Test
-    fun `test that startLoginProcess is called if there is not a login process already running`() =
+    fun `test that login is failed if root node not exist and fastLogin throw exception`() =
         runTest {
-            whenever(!loginRepository.isLoginAlreadyRunning()).thenReturn(false)
-            underTest(session)
-            verify(loginRepository).startLoginProcess()
+            whenever(getSession()).thenReturn(session)
+            whenever(getRootNodeExists()).thenReturn(false)
+            whenever(initialiseMegaChat(session)).thenReturn(Unit)
+            whenever(loginRepository.fastLogin(session)).thenThrow(RuntimeException())
+            assertThrows(RuntimeException::class.java) {
+                runBlocking { underTest() }
+            }
         }
 
     @Test
-    fun `test that login is finished if initMegaChat request finish with an error`() = runTest {
-        whenever(loginRepository.initMegaChat(session)).thenAnswer { throw ChatNotInitializedException() }
-        assertThrows(ChatNotInitializedException::class.java) {
-            runBlocking { underTest(session) }
+    fun `test that login is failed if root node not exist and fetchNodes throw exception`() =
+        runTest {
+            whenever(getSession()).thenReturn(session)
+            whenever(getRootNodeExists()).thenReturn(false)
+            whenever(initialiseMegaChat(session)).thenReturn(Unit)
+            whenever(loginRepository.fastLogin(session)).thenReturn(Unit)
+            whenever(loginRepository.fetchNodes()).thenThrow(RuntimeException())
+            assertThrows(RuntimeException::class.java) {
+                runBlocking { underTest() }
+            }
         }
-        verify(loginRepository).finishLoginProcess()
-        assertThat(loginRepository.isLoginAlreadyRunning()).isFalse()
-    }
 
     @Test
-    fun `test that login is finished if fastLogin request finish with an error`() = runTest {
-        whenever(loginRepository.fastLogin(session)).thenAnswer { throw MegaException(0, null) }
-        assertThrows(MegaException::class.java) {
-            runBlocking { underTest(session) }
+    fun `test that login is success if root node not exist and init mega chat and fast login and fetch nodes success`() =
+        runTest {
+            whenever(getSession()).thenReturn(session)
+            whenever(getRootNodeExists()).thenReturn(false)
+            whenever(initialiseMegaChat(session)).thenReturn(Unit)
+            whenever(loginRepository.fastLogin(session)).thenReturn(Unit)
+            whenever(loginRepository.fetchNodes()).thenReturn(Unit)
+            val result = underTest()
+            assertEquals(session, result)
         }
-        verify(loginRepository).finishLoginProcess()
-        assertThat(loginRepository.isLoginAlreadyRunning()).isFalse()
-    }
-
-    @Test
-    fun `test that login is finished if fetchNodes request finish with an error`() = runTest {
-        whenever(loginRepository.fetchNodes()).thenAnswer { throw MegaException(0, null) }
-        assertThrows(MegaException::class.java) {
-            runBlocking { underTest(session) }
-        }
-        verify(loginRepository).finishLoginProcess()
-        assertThat(loginRepository.isLoginAlreadyRunning()).isFalse()
-    }
-
-    @Test
-    fun `test that a new login is allowed if complete process finish with success`() = runTest {
-        whenever(loginRepository.fetchNodes()).thenAnswer { Result.success(Unit) }
-        underTest(session)
-        verify(loginRepository).finishLoginProcess()
-        assertThat(loginRepository.isLoginAlreadyRunning()).isFalse()
-    }
 }

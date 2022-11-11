@@ -55,7 +55,7 @@ abstract class UtilWrapperModule {
     @Binds
     abstract fun bindMegaNodeUtilWrapper(implementation: MegaNodeUtilFacade): MegaNodeUtilWrapper
 
-    companion object{
+    companion object {
 
         @Provides
         fun provideIsOnWifiWrapper(): IsOnWifiWrapper {

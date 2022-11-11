@@ -11,7 +11,7 @@
     <!-- Action text to retake current scan picture (Document scanner) -->
     <string name="scan_action_retake">Переснять</string>
     <!-- Document scanner file name -->
-    <string name="scan_file_name">Имя файла</string>
+    <string name="scan_file_name">Название файла</string>
     <!-- Input field description in the document save screen (Document scanner) -->
     <string name="scan_file_type">Тип файла</string>
     <!-- Input field description in the document save screen (Document scanner) -->
@@ -39,7 +39,7 @@
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">Для сканирования документов нужно разрешить доступ к камере</string>
     <!-- Error text for incorrect name -->
-    <string name="scan_incorrect_name">Неправильное имя</string>
+    <string name="scan_incorrect_name">Неправильное название</string>
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">Недопустимые символы</string>
     <!-- Snackbar text for incorrect name -->

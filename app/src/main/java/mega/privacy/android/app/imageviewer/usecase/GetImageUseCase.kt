@@ -242,6 +242,7 @@ class GetImageUseCase @Inject constructor(
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
 
                                 image.transferTag = transfer.tag
+                                image.totalBytes = transfer.totalBytes
                                 emitter.onNext(image)
                             },
                             onTransferFinish = { _: MegaTransfer, error: MegaError ->
@@ -286,6 +287,10 @@ class GetImageUseCase @Inject constructor(
                                     emitter.onNext(image)
                                     emitter.onError(megaException)
                                 }
+                            },
+                            onTransferUpdate = {
+                                image.transferredBytes = it.transferredBytes
+                                emitter.onNext(image)
                             }
                         )
 
