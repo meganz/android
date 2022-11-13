@@ -199,9 +199,12 @@ fun CreateNewAlbumDialog(
 
     val singleLine = true
     MaterialTheme {
-        Dialog(onDismissRequest = onDismissRequest) {
+        Dialog(
+            onDismissRequest = onDismissRequest,
+        ) {
             Surface(
                 shape = MaterialTheme.shapes.medium,
+                elevation = 24.dp,
             ) {
                 Column {
                     // Dialog title
