@@ -733,15 +733,17 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * Function that starts the Camera Uploads functionality once all conditions
-     * specified in [canRunCameraUploads] are met
+     * Function that starts the Camera Uploads functionality
      */
     private suspend fun startWorker() {
         runCatching {
-            if (canRunCameraUploads()) {
+            val state = canRunCameraUploads()
+            if (state == StartCameraUploadsState.CAN_ENABLE_CAMERA_UPLOADS) {
                 hideLocalFolderPathNotifications()
                 startCameraUploads()
-            } else handleFailedCanRunCameraUploadsConditions()
+            } else {
+                handleFailedStartCameraUploadsState(state)
+            }
         }.onFailure { exception ->
             Timber.e("Calling startWorker() failed with exception $exception")
             endService()
@@ -758,9 +760,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * Given certain conditions, the function checks whether Camera Uploads can run
-     *
-     * The following conditions should be satisfied in order:
+     * Checks if Camera Uploads can run by evaluating the following conditions in order:
      *
      * 1. The Preferences exist - [preferencesExist],
      * 2. The Camera Uploads sync is enabled - [cameraUploadsSyncEnabled],
@@ -775,62 +775,73 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * 11. The Primary Folder exists - [areFoldersEstablished],
      * 12. The Secondary Folder exists if Enable Secondary Media Uploads is enabled - [areFoldersEstablished]
      *
-     * @return true if all conditions are satisfied, and false if at least one condition
-     * is unsatisfied
+     * If all conditions are met, [StartCameraUploadsState.CAN_ENABLE_CAMERA_UPLOADS] is returned.
+     * Otherwise, a specific [StartCameraUploadsState] is returned depending on what condition has failed
+     *
+     * @return A specific [StartCameraUploadsState]
      */
-    private suspend fun canRunCameraUploads(): Boolean =
-        preferencesExist() && cameraUploadsSyncEnabled() &&
-                isUserOnline() && isDeviceAboveBatteryLevel() &&
-                hasCameraUploadsLocalPath() && isWifiConstraintSatisfied() &&
-                hasLocalPrimaryFolder() && hasLocalSecondaryFolder() && isUserLoggedIn() &&
-                hasCameraUploadsUserAttribute() && areFoldersEstablished()
+    private suspend fun canRunCameraUploads(): StartCameraUploadsState =
+        if (!preferencesExist()) {
+            StartCameraUploadsState.MISSING_PREFERENCES
+        } else if (!cameraUploadsSyncEnabled()) {
+            StartCameraUploadsState.DISABLED_SYNC
+        } else if (!isUserOnline()) {
+            StartCameraUploadsState.OFFLINE_USER
+        } else if (!isDeviceAboveBatteryLevel()) {
+            StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL
+        } else if (!hasCameraUploadsLocalPath()) {
+            StartCameraUploadsState.MISSING_LOCAL_PATH
+        } else if (!isWifiConstraintSatisfied()) {
+            StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT
+        } else if (!hasLocalPrimaryFolder()) {
+            StartCameraUploadsState.MISSING_LOCAL_PRIMARY_FOLDER
+        } else if (!hasLocalSecondaryFolder()) {
+            StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER
+        } else if (!isUserLoggedIn()) {
+            StartCameraUploadsState.LOGGED_OUT_USER
+        } else if (!hasCameraUploadsUserAttribute()) {
+            StartCameraUploadsState.MISSING_USER_ATTRIBUTE
+        } else if (!areFoldersEstablished()) {
+            StartCameraUploadsState.UNESTABLISHED_FOLDERS
+        } else {
+            StartCameraUploadsState.CAN_ENABLE_CAMERA_UPLOADS
+        }
 
     /**
-     * If at least one condition failed in [canRunCameraUploads], this function evaluates each
-     * condition in order
+     * When Camera Uploads cannot be enabled, the function executes specific actions depending
+     * on the [StartCameraUploadsState] that was passed
      *
-     * The failing condition may execute further actions and exit the function
+     * @param state The failing [StartCameraUploadsState]
      */
-    private suspend fun handleFailedCanRunCameraUploadsConditions() {
-
-        booleanArrayOf(
-            preferencesExist(),
-            cameraUploadsSyncEnabled(),
-            isUserOnline(),
-            isDeviceAboveBatteryLevel(),
-            hasCameraUploadsLocalPath(),
-            isWifiConstraintSatisfied(),
-        ).also { array ->
-            if (array.contains(false)) {
+    private suspend fun handleFailedStartCameraUploadsState(state: StartCameraUploadsState) {
+        when (state) {
+            StartCameraUploadsState.MISSING_PREFERENCES,
+            StartCameraUploadsState.DISABLED_SYNC,
+            StartCameraUploadsState.OFFLINE_USER,
+            StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL,
+            StartCameraUploadsState.MISSING_LOCAL_PATH,
+            StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT,
+            -> {
                 endService()
-                return
             }
-        }
-
-        val hasLocalPrimaryFolder = hasLocalPrimaryFolder()
-        val hasLocalSecondaryFolder = hasLocalSecondaryFolder()
-
-        if (!hasLocalPrimaryFolder) {
-            handleLocalPrimaryFolderDisabled()
-            endService()
-            return
-        }
-        if (!hasLocalSecondaryFolder) {
-            handleLocalSecondaryFolderDisabled()
-            endService()
-            return
-        }
-        if (!isUserLoggedIn()) {
-            performCompleteFastLogin()
-            return
-        }
-        if (!hasCameraUploadsUserAttribute()) {
-            handleMissingCameraUploadsUserAttribute()
-            return
-        }
-        if (!areFoldersEstablished()) {
-            establishFolders()
-            return
+            StartCameraUploadsState.MISSING_LOCAL_PRIMARY_FOLDER -> {
+                handleLocalPrimaryFolderDisabled()
+                endService()
+            }
+            StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER -> {
+                handleLocalSecondaryFolderDisabled()
+                endService()
+            }
+            StartCameraUploadsState.LOGGED_OUT_USER -> {
+                performCompleteFastLogin()
+            }
+            StartCameraUploadsState.MISSING_USER_ATTRIBUTE -> {
+                handleMissingCameraUploadsUserAttribute()
+            }
+            StartCameraUploadsState.UNESTABLISHED_FOLDERS -> {
+                establishFolders()
+            }
+            else -> Unit
         }
     }
 
