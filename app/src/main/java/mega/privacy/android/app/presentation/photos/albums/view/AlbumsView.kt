@@ -63,7 +63,6 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.grey_300
-import mega.privacy.android.presentation.theme.grey_900
 import mega.privacy.android.presentation.theme.grey_alpha_054
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
@@ -203,11 +202,6 @@ fun CreateNewAlbumDialog(
         Dialog(onDismissRequest = onDismissRequest) {
             Surface(
                 shape = MaterialTheme.shapes.medium,
-                color = if (MaterialTheme.colors.isLight) {
-                    MaterialTheme.colors.surface
-                } else {
-                    grey_900
-                },
             ) {
                 Column {
                     // Dialog title
@@ -215,11 +209,6 @@ fun CreateNewAlbumDialog(
                         text = stringResource(id = R.string.photos_album_creation_dialog_title),
                         style = MaterialTheme.typography.h6,
                         modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp),
-                        color = if (MaterialTheme.colors.isLight) {
-                            Color.Black
-                        } else {
-                            Color.White
-                        }
                     )
 
                     val textFieldColors = TextFieldDefaults.textFieldColors(
@@ -232,11 +221,7 @@ fun CreateNewAlbumDialog(
                     val interactionSource = remember { MutableInteractionSource() }
 
                     val textColor = LocalTextStyle.current.color.takeOrElse {
-                        if (MaterialTheme.colors.isLight) {
-                            Color.Black
-                        } else {
-                            Color.White
-                        }
+                        textFieldColors.textColor(isEnabled).value
                     }
                     val mergedTextStyle = LocalTextStyle.current.merge(
                         TextStyle(

@@ -607,7 +607,7 @@ String getBuildWarnings() {
         String gmsBuildWarnings = sh(script: "cat ${GMS_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
         println("gmsBuildWarnings = $gmsBuildWarnings")
         if (!gmsBuildWarnings.isEmpty()) {
-            result = "<br/><b>:warning: GMS Build Warnings :warning:</b><br/>" + wrapBuildWarnings(gmsBuildWarnings)
+            result = "<details><summary>:warning: GMS Build Warnings :warning:</summary>" + wrapBuildWarnings(gmsBuildWarnings) + "</details>"
         }
     }
 
@@ -615,7 +615,7 @@ String getBuildWarnings() {
         String hmsBuildWarnings = sh(script: "cat ${HMS_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
         println("hmsBuildWarnings = $hmsBuildWarnings")
         if (!hmsBuildWarnings.isEmpty()) {
-            result += "<br/><b>:warning: HMS Build Warnings :warning:</b><br/>" + wrapBuildWarnings(hmsBuildWarnings)
+            result += "<details><summary>:warning: HMS Build Warnings :warning:</summary>" + wrapBuildWarnings(hmsBuildWarnings) + "</details>"
         }
     }
 
@@ -623,7 +623,7 @@ String getBuildWarnings() {
         String qaBuildWarnings = sh(script: "cat ${QA_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
         println("qaGmsBuildWarnings = $qaBuildWarnings")
         if (!qaBuildWarnings.isEmpty()) {
-            result += "<br/><b>:warning: QA GMS Build Warnings :warning:</b><br/>" + wrapBuildWarnings(qaBuildWarnings)
+            result += "<details><summary>:warning: QA GMS Build Warnings :warning:</summary>" + wrapBuildWarnings(qaBuildWarnings) + "</details>"
         }
     }
 
