@@ -170,7 +170,7 @@ class FavouritesViewModel @Inject constructor(
         viewModelScope.launch {
             _favouritesEventState.emit(
                 if (favourite.isFolder) {
-                    FavouritesEventState.OpenFolder(favourite.handle)
+                    FavouritesEventState.OpenFolder(favourite.nodeId.id)
                 } else {
                     FavouritesEventState.OpenFile(favourite as FavouriteFile)
                 }
@@ -224,11 +224,11 @@ class FavouritesViewModel @Inject constructor(
      */
     fun itemSelected(item: Favourite) {
         val items = favouriteList.map { favourite ->
-            if (favourite.handle == item.handle) {
+            if (favourite.nodeId == item.nodeId) {
                 if (favourite.isSelected) {
-                    itemsSelected.remove(favourite.handle)
+                    itemsSelected.remove(favourite.nodeId.id)
                 } else {
-                    itemsSelected[favourite.handle] = favourite
+                    itemsSelected[favourite.nodeId.id] = favourite
                 }
                 (favourite as? FavouriteFile)?.copy(isSelected = !favourite.isSelected)
                     ?: (favourite as FavouriteFolder).copy(
@@ -253,7 +253,7 @@ class FavouritesViewModel @Inject constructor(
         }
         itemsSelected.putAll(
             items.map {
-                Pair(it.handle, it)
+                Pair(it.nodeId.id, it)
             }
         )
         updateFavouritesStateUnderActionMode(items)

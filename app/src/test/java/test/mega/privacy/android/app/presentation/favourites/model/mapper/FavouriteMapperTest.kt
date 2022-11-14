@@ -21,7 +21,7 @@ class FavouriteMapperTest {
 
     @Test
     fun `test that values returned when FavouriteInfo is folder`() {
-        val expectedHandle = 1L
+        val expectedNodeId = NodeId(1L)
         val expectedName = "TestFolder"
         val expectedLabel = MegaNode.NODE_LBL_RED
         val expectedInfo = "Test folder info"
@@ -43,10 +43,10 @@ class FavouriteMapperTest {
         }
 
         val favouriteInfo = mock<TypedFolderNode> {
-            on { id }.thenReturn(NodeId(expectedHandle))
+            on { id }.thenReturn(expectedNodeId)
             on { name }.thenReturn(expectedName)
             on { label }.thenReturn(expectedLabel)
-            on { parentId }.thenReturn(NodeId(expectedHandle))
+            on { parentId }.thenReturn(expectedNodeId)
             on { base64Id }.thenReturn("")
             on { hasVersion }.thenReturn(expectedHasVersion)
             on { childFileCount }.thenReturn(0)
@@ -89,13 +89,13 @@ class FavouriteMapperTest {
             .isEqualTo(expectedLabelColour)
         assertWithMessage("Icon not mapped correctly").that(actual.icon).isEqualTo(expectedIcon)
         assertWithMessage("Node not mapped correctly").that(actual.node).isSameInstanceAs(testNode)
-        assertWithMessage("Handle not mapped correctly").that(actual.handle)
-            .isEqualTo(expectedHandle)
+        assertWithMessage("Handle not mapped correctly").that(actual.nodeId)
+            .isEqualTo(expectedNodeId)
     }
 
     @Test
     fun `test that values returned when FavouriteInfo is file`() {
-        val expectedHandle = 1L
+        val expectedNodeId = NodeId(1L)
         val expectedName = "TestFile.test"
         val expectedInfo = "Size · Modification"
         val expectedLabel = MegaNode.NODE_LBL_RED
@@ -111,7 +111,7 @@ class FavouriteMapperTest {
         val expectedModificationTime = 1000L
 
         val testNode = mock<MegaNode> {
-            on { handle }.thenReturn(expectedHandle)
+            on { handle }.thenReturn(expectedNodeId.id)
             on { name }.thenReturn(expectedName)
             on { label }.thenReturn(expectedLabel)
             on { isFavourite }.thenReturn(expectedIsFavourite)
@@ -127,11 +127,11 @@ class FavouriteMapperTest {
         }
 
         val favouriteInfo = mock<TypedFileNode> {
-            on { id }.thenReturn(NodeId(expectedHandle))
+            on { id }.thenReturn(expectedNodeId)
             on { name }.thenReturn(expectedName)
             on { size }.thenReturn(expectedSize)
             on { label }.thenReturn(expectedLabel)
-            on { parentId }.thenReturn(NodeId(expectedHandle))
+            on { parentId }.thenReturn(expectedNodeId)
             on { base64Id }.thenReturn("")
             on { modificationTime }.thenReturn(expectedModificationTime)
             on { hasVersion }.thenReturn(expectedHasVersion)
@@ -152,7 +152,7 @@ class FavouriteMapperTest {
 
         val actual = toFavourite(testNode, favouriteInfo, false, stringUtil, getFileIcon)
 
-        assertThat(actual.handle).isEqualTo(expectedHandle)
+        assertThat(actual.nodeId).isEqualTo(expectedNodeId)
         assertThat(actual.name).isEqualTo(expectedName)
         assertThat(actual.hasVersion).isEqualTo(expectedHasVersion)
         assertThat(actual.showLabel).isEqualTo(expectedShowLabel)
