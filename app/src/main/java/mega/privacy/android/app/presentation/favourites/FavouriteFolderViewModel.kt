@@ -28,7 +28,6 @@ import mega.privacy.android.app.presentation.favourites.model.FavouritesEventSta
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import javax.inject.Inject
@@ -156,7 +155,7 @@ class FavouriteFolderViewModel @Inject constructor(
      */
     fun openFile(favourite: Favourite) {
         if (favourite.isFolder) {
-            getChildrenNodes(favourite.handle)
+            getChildrenNodes(favourite.nodeId.id)
         } else {
             viewModelScope.launch {
                 _favouritesEventState.emit(FavouritesEventState.OpenFile(favourite as FavouriteFile))
