@@ -97,8 +97,7 @@ class ManagerViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorConnectivity: MonitorConnectivity,
     private val broadcastUploadPauseState: BroadcastUploadPauseState,
-
-    ) : ViewModel() {
+) : ViewModel() {
 
     /**
      * private UI state
