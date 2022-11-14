@@ -527,6 +527,7 @@ dependencies {
 
     implementation "com.google.auto.value:auto-value-annotations:$autovalueAnnotationVersion"
     kapt "com.google.auto.value:auto-value:$autovalueVersion"
+    lintChecks project(':lint')
 
 }
 
