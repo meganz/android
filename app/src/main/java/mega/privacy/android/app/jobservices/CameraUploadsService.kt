@@ -545,7 +545,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private val batteryInfoReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             batteryIntent = intent
-            if (!isDeviceNotLowOnBattery(batteryIntent)) {
+            if (!isDeviceAboveBatteryLevel()) {
                 coroutineScope?.cancel("Low Battery - Cancel Camera Upload")
                 for (transfer in cuTransfers) {
                     megaApi?.cancelTransfer(transfer)
@@ -887,14 +887,19 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
 
     /**
-     * Checks if the device is above battery level through [isDeviceNotLowOnBattery]
+     * Checks whether the device battery level is above [LOW_BATTERY_LEVEL]
      *
-     * @return true if the device is above battery level, and false if otherwise
+     * @return true if the device battery level is above [LOW_BATTERY_LEVEL] or if it is charging,
+     * and false if both conditions are unsatisfied
      */
     private fun isDeviceAboveBatteryLevel(): Boolean =
-        isDeviceNotLowOnBattery(batteryIntent).also {
-            if (!it) Timber.w("Device is low on battery")
-        }
+        batteryIntent?.let { intent ->
+            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            Timber.d("Device battery level is %s", level)
+            level > LOW_BATTERY_LEVEL || Util.isCharging(this@CameraUploadsService).also {
+                if (!it) Timber.w("Device is low on battery")
+            }
+        } ?: false
 
     /**
      * Checks if the Camera Uploads local path from [localPath] exists
@@ -2201,22 +2206,5 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 ex.printStackTrace()
             }
         }
-    }
-
-    /**
-     * Checks whether the device battery level is above [LOW_BATTERY_LEVEL]
-     *
-     * @param intent [Intent] to retrieve the device battery level from [BatteryManager]
-     *
-     * @return true if the device battery level is above [LOW_BATTERY_LEVEL] or if it is charging,
-     * and false if both conditions are unsatisfied
-     */
-    private fun isDeviceNotLowOnBattery(intent: Intent?): Boolean {
-        if (intent == null) {
-            return false
-        }
-        val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-        Timber.d("Device battery level is %s", level)
-        return level > LOW_BATTERY_LEVEL || Util.isCharging(this@CameraUploadsService)
     }
 }
