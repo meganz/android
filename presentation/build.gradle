@@ -53,6 +53,7 @@ dependencies {
     //Showkase
     implementation "com.airbnb.android:showkase:$showkaseVersion"
     kapt "com.airbnb.android:showkase-processor:$showkaseVersion"
+    lintChecks project(':lint')
 
     testImplementation 'junit:junit:4.13.2'
 
