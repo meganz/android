@@ -11,7 +11,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
-import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.inbox.InboxViewModel
 import mega.privacy.android.domain.entity.SortOrder
@@ -40,16 +39,12 @@ class InboxViewModelTest {
     private val getCloudSortOrder = mock<GetCloudSortOrder> {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
-    private val getInboxNode = mock<GetInboxNode>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getParentNodeHandle = mock<GetParentNodeHandle>()
 
     private val monitorBackupFolder = FakeMonitorBackupFolder()
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
-    private val rootInboxNode = mock<MegaNode> {
-        on { it.handle }.thenReturn(ROOT_INBOX_NODE_HANDLE)
-    }
     private val myBackupsNode = mock<NodeId> {
         on { this.id }.thenReturn(MY_BACKUPS_HANDLE)
     }
@@ -75,7 +70,6 @@ class InboxViewModelTest {
         underTest = InboxViewModel(
             getChildrenNode = getChildrenNode,
             getCloudSortOrder = getCloudSortOrder,
-            getInboxNode = getInboxNode,
             getNodeByHandle = getNodeByHandle,
             getParentNodeHandle = getParentNodeHandle,
             monitorBackupFolder = monitorBackupFolder,
@@ -241,62 +235,56 @@ class InboxViewModelTest {
         }
 
     @Test
-    fun `test that the user exits inbox on back press if the root inbox node is null`() = runTest {
-        whenever(getParentNodeHandle(any())).thenReturn(987L)
-        whenever(getInboxNode()).thenReturn(null)
+    fun `test that the user exits the inbox on back press if the my backups folder handle is -1L`() =
+        runTest {
+            setUnderTest()
 
-        setUnderTest()
+            monitorBackupFolder.emit(Result.success(NodeId(-1L)))
 
-        with(underTest) {
-            updateInboxHandle(INBOX_NODE_HANDLE)
-            handleBackPress()
+            underTest.state.map { it.shouldExitInbox }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isFalse()
+                    underTest.handleBackPress()
+                    assertThat(awaitItem()).isTrue()
+                }
         }
 
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.shouldExitInbox).isTrue()
+    @Test
+    fun `test that the user exits the inbox on back press if both the my backups folder and inbox ui state have the same handles`() =
+        runTest {
+            setUnderTest()
+
+            monitorBackupFolder.emit(Result.success(myBackupsNode))
+
+            underTest.state.map { it.shouldExitInbox }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isFalse()
+                    with(underTest) {
+                        updateInboxHandle(MY_BACKUPS_HANDLE)
+                        handleBackPress()
+                    }
+                    assertThat(awaitItem()).isTrue()
+                }
         }
-    }
 
     @Test
     fun `test that the user exits the inbox on back press if the parent node handle is null`() =
         runTest {
             whenever(getParentNodeHandle(any())).thenReturn(null)
-            whenever(getInboxNode()).thenReturn(rootInboxNode)
 
             setUnderTest()
 
-            with(underTest) {
-                updateInboxHandle(INBOX_NODE_HANDLE)
-                handleBackPress()
-            }
+            monitorBackupFolder.emit(Result.success(myBackupsNode))
 
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.shouldExitInbox).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that the user exits the inbox on back press if both the root inbox and parent node have the same handles`() =
-        runTest {
-            val rootInboxNode = mock<MegaNode> {
-                on { it.handle }.thenReturn(987L)
-            }
-            whenever(getParentNodeHandle(any())).thenReturn(987L)
-            whenever(getInboxNode()).thenReturn(rootInboxNode)
-
-            setUnderTest()
-
-            with(underTest) {
-                updateInboxHandle(INBOX_NODE_HANDLE)
-                handleBackPress()
-            }
-
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.shouldExitInbox).isTrue()
-            }
+            underTest.state.map { it.shouldExitInbox }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isFalse()
+                    with(underTest) {
+                        updateInboxHandle(INBOX_NODE_HANDLE)
+                        handleBackPress()
+                    }
+                    assertThat(awaitItem()).isTrue()
+                }
         }
 
     @Test
@@ -305,7 +293,6 @@ class InboxViewModelTest {
             on { it.handle }.thenReturn(654L)
         }
         whenever(getParentNodeHandle(any())).thenReturn(654L)
-        whenever(getInboxNode()).thenReturn(rootInboxNode)
         whenever(getNodeByHandle(any())).thenReturn(parentNode)
         whenever(getChildrenNode(
             parent = parentNode,
@@ -313,6 +300,8 @@ class InboxViewModelTest {
         )).thenReturn(listOf(retrievedNode))
 
         setUnderTest()
+
+        monitorBackupFolder.emit(Result.success(myBackupsNode))
 
         with(underTest) {
             updateInboxHandle(INBOX_NODE_HANDLE)
@@ -342,6 +331,5 @@ class InboxViewModelTest {
         private const val INBOX_NODE_HANDLE = 34L
         private const val RETRIEVED_NODE_HANDLE = 56L
         private const val EMITTED_NODE_HANDLE = 78L
-        private const val ROOT_INBOX_NODE_HANDLE = 90L
     }
 }

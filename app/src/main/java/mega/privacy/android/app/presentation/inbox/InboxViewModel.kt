@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
-import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.inbox.model.InboxState
@@ -29,7 +28,6 @@ import javax.inject.Inject
  *
  * @property getChildrenNode Get Children Node
  * @property getCloudSortOrder Get Cloud Sort Order
- * @property getInboxNode Get Inbox Node
  * @property getNodeByHandle Get Node By Handle
  * @property getParentNodeHandle Get Parent Node Handle
  * @property monitorBackupFolder Monitor Backup Folder
@@ -39,7 +37,6 @@ import javax.inject.Inject
 class InboxViewModel @Inject constructor(
     private val getChildrenNode: GetChildrenNode,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val getInboxNode: GetInboxNode,
     private val getNodeByHandle: GetNodeByHandle,
     private val getParentNodeHandle: GetParentNodeHandle,
     private val monitorBackupFolder: MonitorBackupFolder,
@@ -57,11 +54,6 @@ class InboxViewModel @Inject constructor(
     val state: StateFlow<InboxState> = _state
 
     /**
-     * The Root Inbox Node
-     */
-    private var rootInboxNode: MegaNode? = null
-
-    /**
      * The My Backups Folder Node
      */
     private var myBackupsFolderNode: NodeId = NodeId(-1L)
@@ -70,7 +62,6 @@ class InboxViewModel @Inject constructor(
      * Perform the following actions upon ViewModel initialization
      */
     init {
-        getRootInboxNode()
         observeNodeUpdates()
         observeMyBackupsFolderUpdates()
     }
@@ -91,13 +82,6 @@ class InboxViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    /**
-     * Retrieves the Root Inbox Node
-     */
-    private fun getRootInboxNode() = viewModelScope.launch {
-        rootInboxNode = getInboxNode()
     }
 
     /**
@@ -191,21 +175,27 @@ class InboxViewModel @Inject constructor(
     fun handleBackPress() {
         viewModelScope.launch {
             // Either one of the following conditions will constitute the user exiting the screen:
-            // 1. The Parent Node Handle does not exist
-            // 2. The Root Inbox Node does not exist
-            // 3. The Parent Node Handle is the same with the Root Inbox Handle
-            val parentNodeHandle = getParentNodeHandle(_state.value.inboxHandle)
-            if (parentNodeHandle == null || rootInboxNode == null || (parentNodeHandle == rootInboxNode?.handle)) {
+            // 1. The My Backups Folder Handle is -1L
+            // 2. The Handles of the My Backups Folder and the UI State are the same
+            // 3. The retrieved Parent Node Handle does not exist
+            val inboxHandle = _state.value.inboxHandle
+
+            if (myBackupsFolderNode.id == -1L || myBackupsFolderNode.id == inboxHandle) {
                 onExitInbox(true)
             } else {
-                // Otherwise, proceed to retrieve the Nodes of the Parent Node
-                _state.update { inboxState ->
-                    refreshNodes(parentNodeHandle).let { updatedNodes ->
-                        inboxState.copy(
-                            inboxHandle = parentNodeHandle,
-                            triggerBackPress = true,
-                            nodes = updatedNodes,
-                        )
+                getParentNodeHandle(inboxHandle).also { parentNodeHandle ->
+                    if (parentNodeHandle == null) onExitInbox(true)
+                    else {
+                        // Otherwise, proceed to retrieve the Nodes of the Parent Node
+                        _state.update { inboxState ->
+                            refreshNodes(parentNodeHandle).let { updatedNodes ->
+                                inboxState.copy(
+                                    inboxHandle = parentNodeHandle,
+                                    triggerBackPress = true,
+                                    nodes = updatedNodes,
+                                )
+                            }
+                        }
                     }
                 }
             }
