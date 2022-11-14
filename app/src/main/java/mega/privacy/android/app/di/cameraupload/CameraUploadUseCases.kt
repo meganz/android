@@ -98,6 +98,7 @@ import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryLevelState
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
+import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
@@ -372,6 +373,13 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideMonitorBatteryLevelState(cameraUploadRepository: CameraUploadRepository): MonitorBatteryLevelState =
             MonitorBatteryLevelState(cameraUploadRepository::monitorBatteryInfo)
+
+        /**
+         * Provide the [MonitorChargingStoppedState] implementation
+         */
+        @Provides
+        fun provideMonitorChargingStoppedState(cameraUploadRepository: CameraUploadRepository): MonitorChargingStoppedState =
+            MonitorChargingStoppedState(cameraUploadRepository::monitorChargingStoppedInfo)
     }
 
     /**

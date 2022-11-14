@@ -33,6 +33,11 @@ internal class AppEventFacade @Inject constructor(
             return@map it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
         }.toSharedFlow(appScope)
 
+    override val monitorChargingStoppedState =
+        context.registerReceiverAsFlow(Intent.ACTION_POWER_DISCONNECTED).map {
+            true
+        }.toSharedFlow(appScope)
+
     override suspend fun broadcastUploadPauseState() =
         _monitorCameraUploadPauseState.emit(true)
 }

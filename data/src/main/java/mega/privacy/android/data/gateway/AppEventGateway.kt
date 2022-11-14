@@ -16,6 +16,11 @@ internal interface AppEventGateway {
     val monitorBatteryInfo: Flow<Int>
 
     /**
+     * monitor charging state
+     */
+    val monitorChargingStoppedState: Flow<Boolean>
+
+    /**
      * Broadcast upload pause state
      */
     suspend fun broadcastUploadPauseState()
