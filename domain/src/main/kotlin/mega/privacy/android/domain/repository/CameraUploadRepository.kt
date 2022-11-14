@@ -413,4 +413,9 @@ interface CameraUploadRepository {
      * Broadcast upload pause state
      */
     suspend fun broadcastUploadPauseState()
+
+    /**
+     * monitor battery info
+     */
+    fun monitorBatteryInfo(): Flow<Int>
 }

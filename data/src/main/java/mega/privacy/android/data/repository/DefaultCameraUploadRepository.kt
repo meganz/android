@@ -347,4 +347,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override fun monitorCameraUploadPauseState() = appEventGateway.monitorCameraUploadPauseState
 
     override suspend fun broadcastUploadPauseState() = appEventGateway.broadcastUploadPauseState()
+
+    override fun monitorBatteryInfo() = appEventGateway.monitorBatteryInfo
 }
