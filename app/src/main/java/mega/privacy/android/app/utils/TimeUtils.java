@@ -379,7 +379,7 @@ public class TimeUtils implements Comparator<Calendar> {
         return dateString;
     }
 
-    public static String formatBucketDate(Context context, long ts) {
+    public static String formatBucketDate(long ts) {
         Calendar cal = Util.calculateDateFromTimestamp(ts);
         Calendar calToday = Calendar.getInstance();
         Calendar calYesterday = Calendar.getInstance();
@@ -387,9 +387,9 @@ public class TimeUtils implements Comparator<Calendar> {
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
         if (tc.compare(cal, calToday) == 0) {
-            return context.getString(R.string.label_today);
+            return getString(R.string.label_today);
         } else if (tc.compare(cal, calYesterday) == 0) {
-            return context.getString(R.string.label_yesterday);
+            return getString(R.string.label_yesterday);
         } else {
             Date date = cal.getTime();
             return new SimpleDateFormat("EEEE, d MMM yyyy").format(date);

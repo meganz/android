@@ -6,12 +6,14 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.MediaCardType
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import java.io.File
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
@@ -90,6 +92,24 @@ class DateCardsProviderTest() {
     }
 
     @Test
+    fun `test that cards for month tab are sorted by latest`() = runTest {
+        val numberOfYears = 1
+        val numberOfMonthsPerYear = 3
+        val numberOfDaysPerMonth = 20
+        val items = getGalleryItems(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+        val expectedLatestSortedMonths = listOf(
+            createLocalDate(year = 1, month = 3, day = 20),
+            createLocalDate(year = 1, month = 2, day = 20),
+            createLocalDate(year = 1, month = 1, day = 20),
+        )
+
+        underTest.processGalleryItems(items)
+
+        val actualLatestSortedMonths = underTest.latestSortedMonths.map { it.localDate }
+        assertThat(expectedLatestSortedMonths).isEqualTo(actualLatestSortedMonths)
+    }
+
+    @Test
     fun `test that only one year card is returned if all dates are in the same year`() = runTest {
         val numberOfYears = 1
         val numberOfMonthsPerYear = 6
@@ -109,6 +129,24 @@ class DateCardsProviderTest() {
 
         underTest.processGalleryItems(items)
         assertThat(underTest.getYears()).hasSize(numberOfYears)
+    }
+
+    @Test
+    fun `test that cards for year tab are sorted by latest`() = runTest {
+        val numberOfYears = 3
+        val numberOfMonthsPerYear = 12
+        val numberOfDaysPerMonth = 20
+        val items = getGalleryItems(numberOfYears, numberOfMonthsPerYear, numberOfDaysPerMonth)
+        val expectedLatestSortedYears = listOf(
+            createLocalDate(year = 3, month = 12, day = 20),
+            createLocalDate(year = 2, month = 12, day = 20),
+            createLocalDate(year = 1, month = 12, day = 20),
+        )
+
+        underTest.processGalleryItems(items)
+
+        val actualLatestSortedYears = underTest.latestSortedYears.map { it.localDate }
+        assertThat(expectedLatestSortedYears).isEqualTo(actualLatestSortedYears)
     }
 
     @Test
@@ -184,4 +222,9 @@ class DateCardsProviderTest() {
 
     private fun appendIdentifier(identifier: Int?) = identifier?.let { " ($it)" } ?: ""
 
+    private fun createLocalDate(year: Int, month: Int, day: Int): LocalDate {
+        val offset = OffsetDateTime.now().offset
+        val localDateTime = LocalDateTime.of(year, month, day, 12, 0)
+        return Util.fromEpoch(localDateTime.atOffset(offset).toEpochSecond())
+    }
 }

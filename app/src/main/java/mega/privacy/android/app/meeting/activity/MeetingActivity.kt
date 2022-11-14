@@ -198,6 +198,7 @@ class MeetingActivity : BaseActivity() {
 
     override fun onDestroy() {
         navController?.removeOnDestinationChangedListener(destinationChangedListener)
+
         super.onDestroy()
     }
 
@@ -381,9 +382,16 @@ class MeetingActivity : BaseActivity() {
         showSnackbar(binding.navHostFragment, content)
     }
 
+    override fun onStop() {
+        super.onStop()
+        val currentFragment = getCurrentFragment()
+        if (currentFragment is InMeetingFragment) {
+            meetingViewModel.sendEnterCallEvent(false)
+        }
+    }
+
     override fun onPause() {
         super.onPause()
-
         val timeRequired = passcodeUtil.timeRequiredForPasscode()
         if (timeRequired != REQUIRE_PASSCODE_INVALID) {
             if (isLockingEnabled) {
@@ -396,7 +404,6 @@ class MeetingActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-
         isLockingEnabled = passcodeUtil.shouldLock()
 
         @Suppress("DEPRECATION")
@@ -404,7 +411,7 @@ class MeetingActivity : BaseActivity() {
 
         val currentFragment = getCurrentFragment()
         if (currentFragment is InMeetingFragment) {
-            currentFragment.sendEnterCallEvent()
+            meetingViewModel.sendEnterCallEvent(true)
         }
     }
 

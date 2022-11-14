@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.search
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -39,7 +38,6 @@ import javax.inject.Inject
  * @param rootNodeExists Check if the root node exists
  * @param searchNodesUseCase Perform a search request
  * @param getCloudSortOrder Get the Cloud Sort Order
- * @param sortOrderIntMapper Sort Order Int Mapper
  */
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -48,7 +46,6 @@ class SearchViewModel @Inject constructor(
     private val getRootFolder: GetRootFolder,
     private val searchNodesUseCase: SearchNodesUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val sortOrderIntMapper: SortOrderIntMapper,
 ) : ViewModel() {
 
     /**
@@ -71,7 +68,7 @@ class SearchViewModel @Inject constructor(
     /**
      * Monitor global node updates
      */
-    var updateNodes: LiveData<Event<List<MegaNode>>> =
+    var updateNodes =
         monitorNodeUpdates()
             .also { Timber.d("onNodesUpdate") }
             .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
@@ -326,5 +323,5 @@ class SearchViewModel @Inject constructor(
     /**
      * Get Cloud Sort Order
      */
-    fun getOrder() = runBlocking { sortOrderIntMapper(getCloudSortOrder()) }
+    fun getOrder() = runBlocking { getCloudSortOrder() }
 }

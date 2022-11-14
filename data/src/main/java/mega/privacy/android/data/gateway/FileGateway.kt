@@ -12,6 +12,7 @@ interface FileGateway {
     /**
      * Get dir size
      *
+     * @return total size of dir in bytes
      */
     suspend fun getDirSize(dir: File?): Long
 

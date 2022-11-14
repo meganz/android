@@ -1,7 +1,6 @@
 package mega.privacy.android.app.smsVerification;
 
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
-import static mega.privacy.android.app.main.LoginFragment.NAME_USER_LOCKED;
 import static mega.privacy.android.app.smsVerification.SMSVerificationActivity.ENTERED_PHONE_NUMBER;
 import static mega.privacy.android.app.smsVerification.SMSVerificationActivity.SELECTED_COUNTRY_CODE;
 

@@ -55,8 +55,6 @@ import static mega.privacy.android.app.utils.CallUtil.getCallsParticipating;
 import static mega.privacy.android.app.utils.CallUtil.isMeetingEnded;
 import static mega.privacy.android.app.utils.CallUtil.isSessionOnHold;
 import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
-import static mega.privacy.android.app.utils.CallUtil.openMeetingInProgress;
-import static mega.privacy.android.app.utils.CallUtil.openMeetingWithAudioOrVideo;
 import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
 import static mega.privacy.android.app.utils.CallUtil.returnCall;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationInACall;
@@ -108,7 +106,6 @@ import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PRO
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CHAT_ARCHIVED;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
@@ -204,7 +201,6 @@ import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.getMediaIntent;
-import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.mutateIcon;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
@@ -286,6 +282,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
@@ -324,6 +321,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.MarqueeTextView;
@@ -390,17 +388,16 @@ import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment;
+import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
-import mega.privacy.android.app.usecase.call.AnswerCallUseCase;
 import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase;
 import mega.privacy.android.app.usecase.call.GetCallUseCase;
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase;
-import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -543,10 +540,6 @@ public class ChatActivity extends PasscodeActivity
     GetPublicNodeUseCase getPublicNodeUseCase;
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
-    @Inject
-    AnswerCallUseCase answerCallUseCase;
-    @Inject
-    StartCallUseCase startCallUseCase;
     @Inject
     EndCallUseCase endCallUseCase;
     @Inject
@@ -1091,17 +1084,17 @@ public class ChatActivity extends PasscodeActivity
      */
     private void answerCall(long chatId, Boolean video, Boolean audio, Boolean speaker) {
         callInProgressLayout.setEnabled(false);
-        answerCallUseCase.answerCall(chatId, video, audio, speaker)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result, throwable) -> {
-                    if (throwable == null) {
-                        callInProgressLayout.setEnabled(true);
-                        openMeetingInProgress(this, chatId, true, passcodeManagement);
-                    } else {
-                        showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
-                    }
-                });
+        var enableAudio = audio;
+        if (enableAudio) {
+            enableAudio = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
+        }
+
+        var enableVideo = video;
+        if (enableVideo) {
+            enableVideo = hasPermissions(this, Manifest.permission.CAMERA);
+        }
+
+        viewModel.onAnswerCall(chatId, enableVideo, enableAudio, speaker);
     }
 
     /**
@@ -1286,16 +1279,6 @@ public class ChatActivity extends PasscodeActivity
                 if (adapter != null) {
                     adapter.finishedVoiceClipDownload(nodeHandle, resultTransfer);
                 }
-            }
-        }
-    };
-
-    private BroadcastReceiver dialogConnectReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Timber.d("Network broadcast received on chatActivity!");
-            if (intent != null) {
-                showConfirmationConnect();
             }
         }
     };
@@ -1523,8 +1506,10 @@ public class ChatActivity extends PasscodeActivity
 
         chatActivity = this;
         chatC = new ChatController(chatActivity);
+
+        collectFlows();
+
         registerReceiver(historyTruncatedByRetentionTimeReceiver, new IntentFilter(BROADCAST_ACTION_UPDATE_HISTORY_BY_RT));
-        registerReceiver(dialogConnectReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
         registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
 
         IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
@@ -2056,6 +2041,26 @@ public class ChatActivity extends PasscodeActivity
         }
 
         emojiKeyboard.showLetterKeyboard();
+    }
+
+    /**
+     * Collecting Flows from ViewModels
+     */
+    private void collectFlows() {
+        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, chatState -> {
+            if (chatState.getError() != null) {
+                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
+            } else if (chatState.isCallAnswered()) {
+                callInProgressLayout.setEnabled(true);
+            }
+            return Unit.INSTANCE;
+        });
+        ViewExtensionsKt.collectFlow(this, viewModel.getMonitorConnectivityEvent(), Lifecycle.State.STARTED, isConnected -> {
+            if (isConnected && megaApi.getRootNode() == null) {
+                showConfirmationConnect();
+            }
+            return Unit.INSTANCE;
+        });
     }
 
     public void checkScroll() {
@@ -3651,20 +3656,7 @@ public class ChatActivity extends PasscodeActivity
      */
     private void startCall() {
         enableCallMenuItems(false);
-        startCallUseCase.startCallFromChatId(chatRoom.getChatId(), startVideo, true)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result, throwable) -> {
-                    enableCallMenuItems(true);
-                    if (throwable == null) {
-                        long chatId = result.component1();
-                        if (chatId == chatRoom.getChatId()) {
-                            boolean videoEnable = result.component2();
-                            boolean audioEnable = result.component3();
-                            openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
-                        }
-                    }
-                });
+        viewModel.onCallTap(chatRoom.getChatId(), startVideo, true);
     }
 
     private void enableCallMenuItems(Boolean enable) {
@@ -3846,7 +3838,10 @@ public class ChatActivity extends PasscodeActivity
         if (megaApi != null && megaApi.getRootNode() != null) {
             ArrayList<MegaUser> contacts = megaApi.getContacts();
             if (contacts == null || contacts.isEmpty() || contacts.stream().noneMatch(it -> it.getVisibility() == MegaUser.VISIBILITY_VISIBLE)) {
-                AddParticipantsNoContactsDialogFragment dialog = AddParticipantsNoContactsDialogFragment.newInstance();
+                var dialog = AddParticipantsNoContactsDialogFragment.newInstance();
+                dialog.show(getSupportFragmentManager(), dialog.getTag());
+            } else if (ChatUtil.areAllMyContactsChatParticipants(chatRoom)) {
+                var dialog = AddParticipantsNoContactsLeftToAddDialogFragment.newInstance();
                 dialog.show(getSupportFragmentManager(), dialog.getTag());
             } else {
                 Intent in = new Intent(this, AddContactActivity.class);
@@ -3975,7 +3970,7 @@ public class ChatActivity extends PasscodeActivity
                 new InviteToChatRoomListener(this).inviteToChat(chatRoom.getChatId(), contactsData);
             }
         } else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
-            if (!isOnline(this) || megaApi == null) {
+            if (!viewModel.isConnected() || megaApi == null) {
                 removeProgressDialog();
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
@@ -4030,7 +4025,7 @@ public class ChatActivity extends PasscodeActivity
         } else if (requestCode == REQUEST_CODE_SELECT_CHAT) {
             isForwardingMessage = false;
             if (resultCode != RESULT_OK) return;
-            if (!isOnline(this)) {
+            if (!viewModel.isConnected()) {
                 removeProgressDialog();
 
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
@@ -5164,7 +5159,7 @@ public class ChatActivity extends PasscodeActivity
                 boolean isMyOwnMsg = chatMessage.getUserHandle() == myUserHandle;
 
                 boolean isRemovedMsg = ChatUtil.isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, chatMessage);
-                boolean shouldForwardOptionVisible = !isRemovedMsg && isOnline(chatActivity) && !chatC.isInAnonymousMode();
+                boolean shouldForwardOptionVisible = !isRemovedMsg && viewModel.isConnected() && !chatC.isInAnonymousMode();
                 forwardIcon.setVisible(shouldForwardOptionVisible);
 
                 boolean shouldDeleteOptionVisible = !isRemovedMsg && isMyOwnMsg &&
@@ -5174,7 +5169,7 @@ public class ChatActivity extends PasscodeActivity
                 switch (typeMessage) {
                     case MegaChatMessage.TYPE_NODE_ATTACHMENT:
                         MegaNodeList nodeList = chatMessage.getMegaNodeList();
-                        boolean isOnlineNotAnonymousAndNotRemoved = isOnline(chatActivity) && !chatC.isInAnonymousMode() && !isRemovedMsg;
+                        boolean isOnlineNotAnonymousAndNotRemoved = viewModel.isConnected() && !chatC.isInAnonymousMode() && !isRemovedMsg;
                         if (nodeList != null && nodeList.size() > 0 && isOnlineNotAnonymousAndNotRemoved) {
                             if (isMyOwnMsg) {
                                 getNodeUseCase.checkNodeAvailable(nodeList.get(0).getHandle())
@@ -5206,7 +5201,7 @@ public class ChatActivity extends PasscodeActivity
 
                     case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:
                         Timber.d("Message selected is a contact attachment");
-                        if (isOnline(chatActivity)) {
+                        if (viewModel.isConnected()) {
                             String userEmail = chatMessage.getUserEmail(0);
                             long messageUserHandle = chatMessage.getUserHandle(0);
                             MegaUser contact = megaApi.getContact(userEmail);
@@ -5231,7 +5226,7 @@ public class ChatActivity extends PasscodeActivity
 
                         copyIcon.setVisible((typeMessage != MegaChatMessage.TYPE_CONTAINS_META && typeMessage != MegaChatMessage.TYPE_VOICE_CLIP) || (messageSelected.getContainsMeta() != null && messageSelected.getContainsMeta().getType() != MegaChatContainsMeta.CONTAINS_META_GIPHY));
 
-                        forwardIcon.setVisible(!isRemovedMsg && isOnline(chatActivity) && !chatC.isInAnonymousMode() && typeMessage != MegaChatMessage.TYPE_TRUNCATE &&
+                        forwardIcon.setVisible(!isRemovedMsg && viewModel.isConnected() && !chatC.isInAnonymousMode() && typeMessage != MegaChatMessage.TYPE_TRUNCATE &&
                                 typeMessage != MegaChatMessage.TYPE_ALTER_PARTICIPANTS && typeMessage != MegaChatMessage.TYPE_CHAT_TITLE && typeMessage != MegaChatMessage.TYPE_PRIV_CHANGE &&
                                 typeMessage != MegaChatMessage.TYPE_CALL_ENDED & typeMessage != MegaChatMessage.TYPE_CALL_STARTED);
 
@@ -5326,7 +5321,7 @@ public class ChatActivity extends PasscodeActivity
             }
 
             boolean isNotUploadingNotAnonymousNotRemoved = !isUploading && !chatC.isInAnonymousMode() && !isRemoved;
-            boolean isOnlineNotUploadingNotAnonymousNotRemoved = isOnline(chatActivity) && isNotUploadingNotAnonymousNotRemoved;
+            boolean isOnlineNotUploadingNotAnonymousNotRemoved = viewModel.isConnected() && isNotUploadingNotAnonymousNotRemoved;
 
             if (someNodeIsAttachmentAndSent) {
                 getNodeUseCase.checkNodesAvailable(selected)
@@ -5648,7 +5643,7 @@ public class ChatActivity extends PasscodeActivity
                 }
                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             } else {
-                if (isOnline(this)) {
+                if (viewModel.isConnected()) {
                     if (megaApi.httpServerIsRunning() == 0) {
                         Timber.d("megaApi.httpServerIsRunning() == 0");
                         megaApi.httpServerStart();
@@ -5716,7 +5711,7 @@ public class ChatActivity extends PasscodeActivity
                     }
                 }
                 pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            } else if (isOnline(this)) {
+            } else if (viewModel.isConnected()) {
                 if (megaApi.httpServerIsRunning() == 0) {
                     megaApi.httpServerStart();
                     pdfIntent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true);
@@ -5819,7 +5814,7 @@ public class ChatActivity extends PasscodeActivity
                                 }
                             } else if (m.getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
                                 Timber.d("show contact attachment panel");
-                                if (!isOnline(this)) {
+                                if (!viewModel.isConnected()) {
                                     //No shown - is not possible to know is it already contact or not - megaApi not working
                                     showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
                                 } else if (!chatC.isInAnonymousMode()) {
@@ -8048,7 +8043,7 @@ public class ChatActivity extends PasscodeActivity
         selectedMessageId = message.getMessage().getMsgId();
 
         if (MegaApplication.getInstance().getMegaChatApi().getMessage(idChat, selectedMessageId) == null) {
-            if (!isOnline(this)) {
+            if (!viewModel.isConnected()) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
             }
             return;
@@ -8443,7 +8438,6 @@ public class ChatActivity extends PasscodeActivity
 
         unregisterReceiver(historyTruncatedByRetentionTimeReceiver);
         unregisterReceiver(chatRoomMuteUpdateReceiver);
-        unregisterReceiver(dialogConnectReceiver);
         unregisterReceiver(voiceclipDownloadedReceiver);
         unregisterReceiver(userNameReceiver);
         unregisterReceiver(chatArchivedReceiver);

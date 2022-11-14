@@ -29,7 +29,6 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,24 +47,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
-import mega.privacy.android.app.presentation.photos.timeline.model.DateCard
-import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
-import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.app.presentation.photos.view.CardListView
+import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.presentation.theme.AndroidTheme
 
 /**
  * Base Compose Timeline View
  */
 @Composable
 fun TimelineView(
-    downloadPhotoCover: suspend (
-        isPreview: Boolean,
-        photo: Photo,
-        callback: (success: Boolean) -> Unit,
-    ) -> Unit,
+    photoDownload: PhotoDownload,
     timelineViewState: TimelineViewState,
     lazyGridState: LazyGridState,
     onTextButtonClick: () -> Unit,
@@ -116,7 +113,7 @@ fun TimelineView(
                     CardListView(
                         state = lazyGridState,
                         dateCards = dateCards,
-                        downloadPhotoCover = downloadPhotoCover,
+                        photoDownload = photoDownload,
                         onCardClick = onCardClick,
                     )
                 }

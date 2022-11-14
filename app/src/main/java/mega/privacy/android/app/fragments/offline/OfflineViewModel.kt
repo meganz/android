@@ -13,7 +13,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
@@ -22,8 +21,6 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
@@ -37,9 +34,10 @@ import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getURLOfflineFileContent
 import mega.privacy.android.app.utils.RxUtil.logErr
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.GetThumbnail
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import java.util.Stack
@@ -56,7 +54,7 @@ class OfflineViewModel @Inject constructor(
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
-    private var order = ORDER_DEFAULT_ASC
+    private var order = SortOrder.ORDER_DEFAULT_ASC
     private var searchQuery: String? = null
     private var historySearchQuery: String? = null
     private var historySearchPath: String? = null
@@ -112,7 +110,7 @@ class OfflineViewModel @Inject constructor(
     /**
      * Monitor global node updates
      */
-    var updateNodes: Flow<List<MegaNode>> =
+    var updateNodes =
         monitorNodeUpdates()
             .also { Timber.d("onNodesUpdate") }
             .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
@@ -377,7 +375,7 @@ class OfflineViewModel @Inject constructor(
         loadOfflineNodes(autoScrollPos = autoScrollPos)
     }
 
-    fun setOrder(order: Int) {
+    fun setOrder(order: SortOrder) {
         if (!rootFolderOnly) {
             this.order = order
             loadOfflineNodes()
@@ -406,7 +404,7 @@ class OfflineViewModel @Inject constructor(
         isList: Boolean,
         spanCount: Int,
         path: String,
-        order: Int,
+        order: SortOrder,
     ) {
         Timber.d("setDisplayParam rootFolderOnly $rootFolderOnly, isList $isList")
 

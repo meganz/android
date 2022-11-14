@@ -41,9 +41,7 @@ class SettingsViewModelTest {
         )
     }
     private val toggleAutoAcceptQRLinks = mock<ToggleAutoAcceptQRLinks>()
-    private val fetchMultiFactorAuthSetting = mock<FetchMultiFactorAuthSetting> {
-        on { invoke() }.thenReturn(emptyFlow())
-    }
+    private val fetchMultiFactorAuthSetting = mock<FetchMultiFactorAuthSetting>()
     private val isChatLoggedInValue = MutableStateFlow(true)
     private val isChatLoggedIn =
         mock<IsChatLoggedIn> { on { invoke() }.thenReturn(isChatLoggedInValue) }
@@ -103,6 +101,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `test that the subsequent value auto accept is returned from the use case`() = runTest {
+        whenever(fetchMultiFactorAuthSetting()).thenReturn(false)
         whenever(monitorAutoAcceptQRLinks()).thenReturn(
             flow {
                 emit(true)
@@ -122,7 +121,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `test that logging out of chat disables chat settings`() = runTest {
-
+        whenever(fetchMultiFactorAuthSetting()).thenReturn(false)
         underTest.uiState
             .map { it.chatEnabled }
             .distinctUntilChanged()
@@ -176,8 +175,8 @@ class SettingsViewModelTest {
     @Test
     fun `test that multi factor is enabled when fetching multi factor enabled returns true`() =
         runTest {
-            whenever(fetchMultiFactorAuthSetting()).thenReturn(flowOf(true))
-
+            whenever(fetchMultiFactorAuthSetting()).thenReturn(true)
+            underTest.refreshMultiFactorAuthSetting()
             underTest.uiState
                 .map { it.multiFactorAuthChecked }
                 .distinctUntilChanged()
@@ -190,8 +189,8 @@ class SettingsViewModelTest {
     @Test
     fun `test that multi factor is disabled when fetching multi factor enabled returns false`() =
         runTest {
-            whenever(fetchMultiFactorAuthSetting()).thenReturn(flowOf(false))
-
+            whenever(fetchMultiFactorAuthSetting()).thenReturn(false)
+            underTest.refreshMultiFactorAuthSetting()
             underTest.uiState
                 .map { it.multiFactorAuthChecked }
                 .distinctUntilChanged()
@@ -203,6 +202,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that hideRecentActivityChecked is set with return value of monitorHideRecentActivity`() =
         runTest {
+            whenever(fetchMultiFactorAuthSetting()).thenReturn(false)
             whenever(monitorHideRecentActivity()).thenReturn(
                 flow {
                     emit(true)

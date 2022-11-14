@@ -2,7 +2,6 @@ package mega.privacy.android.app.di
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import dagger.Binds
@@ -13,7 +12,6 @@ import dagger.hilt.android.components.FragmentComponent
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.AvatarUtil
@@ -21,8 +19,6 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
-import mega.privacy.android.app.utils.wrapper.AvatarWrapper
-import mega.privacy.android.app.utils.wrapper.BitmapFactoryWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
@@ -33,6 +29,8 @@ import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.domain.usecase.DefaultMonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 
@@ -148,15 +146,5 @@ abstract class UtilWrapperModule {
             override fun getSpecificAvatarColor(typeColor: String): Int =
                 AvatarUtil.getSpecificAvatarColor(typeColor)
         }
-
-        /**
-         * provide Bitmap Factory Wrapper
-         */
-        @Provides
-        fun provideBitmapFactoryWrapper() = object : BitmapFactoryWrapper {
-            override fun decodeFile(pathName: String?, opts: BitmapFactory.Options): Bitmap? =
-                BitmapFactory.decodeFile(pathName, opts)
-        }
-
     }
 }

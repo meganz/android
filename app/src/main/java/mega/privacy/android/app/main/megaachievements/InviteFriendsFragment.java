@@ -1,7 +1,5 @@
 package mega.privacy.android.app.main.megaachievements;
 
-import static mega.privacy.android.app.main.megaachievements.AchievementsActivity.INVALID_TYPE;
-import static mega.privacy.android.app.main.megaachievements.AchievementsActivity.sFetcher;
 import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
 import static mega.privacy.android.app.utils.Util.getSizeString;
@@ -24,12 +22,12 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
-import mega.privacy.android.data.qualifier.MegaApi;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.main.InviteContactActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.data.qualifier.MegaApi;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import timber.log.Timber;
@@ -43,6 +41,9 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener
     @Inject
     @MegaApi
     MegaApiAndroid megaApi;
+
+    @Inject
+    GetAchievementsListener getAchievementsListener;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -80,9 +81,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener
         }
 
         // The root view has been created, fill it with the data when data ready
-        if (sFetcher != null) {
-            sFetcher.setDataCallback(this);
-        }
+        getAchievementsListener.setDataCallback(this);
     }
 
     @Override
@@ -98,13 +97,12 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener
     public int onBackPressed() {
         Timber.d("onBackPressed");
 
-        ((AchievementsActivity) requireActivity()).showFragment(ACHIEVEMENTS_FRAGMENT, INVALID_TYPE);
+        ((AchievementsActivity) requireActivity()).showFragment(ACHIEVEMENTS_FRAGMENT);
         return 0;
     }
 
     private void updateUI() {
-        if (sFetcher == null) return;
-        MegaAchievementsDetails details = sFetcher.getAchievementsDetails();
+        MegaAchievementsDetails details = getAchievementsListener.getAchievementsDetails();
         if (details == null || getContext() == null) return;
 
         long referralsStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);

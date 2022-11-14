@@ -38,26 +38,12 @@ interface SettingsRepository {
     suspend fun fetchContactLinksOption(): Boolean
 
     /**
-     * Get start screen
-     *
-     * @return start screen key
-     */
-    fun getStartScreen(): Int
-
-    /**
      * Set auto accept qr requests
      *
      * @param accept
      * @return true if option is enabled, else false
      */
     suspend fun setAutoAcceptQR(accept: Boolean): Boolean
-
-    /**
-     * Monitor start screen
-     *
-     * @return start screen key changes as a flow
-     */
-    fun monitorStartScreen(): Flow<Int>
 
     /**
      * Monitor hide recent activity setting

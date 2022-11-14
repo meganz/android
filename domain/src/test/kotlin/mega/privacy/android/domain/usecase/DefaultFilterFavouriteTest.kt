@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -13,6 +14,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DefaultFilterFavouriteTest {
 
     lateinit var underTest: FilterFavourite

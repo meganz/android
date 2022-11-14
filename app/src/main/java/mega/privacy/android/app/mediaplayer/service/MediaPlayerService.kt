@@ -18,14 +18,11 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.R
-import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
@@ -35,7 +32,6 @@ import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
-import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.STREAM_MUSIC_DEFAULT
@@ -45,8 +41,6 @@ import mega.privacy.android.app.utils.ChatUtil.getRequest
 import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
-import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
-import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,38 +53,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     MediaPlayerServiceGateway {
 
     /**
-     * MegaApiAndroid for megaApi
-     */
-    @MegaApi
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
-
-    /**
-     * MegaApiAndroid for megaApiFolder
-     */
-    @MegaApiFolder
-    @Inject
-    lateinit var megaApiFolder: MegaApiAndroid
-
-    /**
-     * DatabaseHandler
-     */
-    @Inject
-    lateinit var dbHandler: DatabaseHandler
-
-    /**
-     * GetOfflineThumbnailFileWrapper
-     */
-    @Inject
-    lateinit var offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper
-
-    /**
-     * GetGlobalTransferUseCase
-     */
-    @Inject
-    lateinit var getGlobalTransferUseCase: GetGlobalTransferUseCase
-
-    /**
      * MediaPlayerGateway
      */
     abstract var mediaPlayerGateway: MediaPlayerGateway
@@ -98,6 +60,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     /**
      * ServiceViewModelGateway
      */
+    @Inject
     lateinit var viewModelGateway: PlayerServiceViewModelGateway
 
     private val binder by lazy { MediaPlayerServiceBinder(this, viewModelGateway) }
@@ -147,15 +110,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     override fun onCreate() {
         super.onCreate()
-
-        viewModelGateway = MediaPlayerServiceViewModel(
-            context = this,
-            megaApi = megaApi,
-            megaApiFolder = megaApiFolder,
-            dbHandler = dbHandler,
-            offlineThumbnailFileWrapper = offlineThumbnailFileWrapper,
-            getGlobalTransferUseCase = getGlobalTransferUseCase
-        )
 
         viewModelGateway.setAudioPlayer(this is AudioPlayerService)
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
@@ -317,10 +271,11 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                 if (MediaPlayerActivity.isAudioPlayer(intent)) {
                     createPlayerControlNotification()
                 }
-
-                if (viewModelGateway.buildPlayerSource(intent)) {
-                    if (viewModelGateway.isAudioPlayer()) {
-                        MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                lifecycleScope.launch {
+                    if (viewModelGateway.buildPlayerSource(intent)) {
+                        if (viewModelGateway.isAudioPlayer()) {
+                            MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                        }
                     }
                 }
             }
@@ -450,7 +405,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     /**
      * Service is moved to foreground
      */
-    fun onMoveToForeground() {
+    private fun onMoveToForeground() {
         if (needPlayWhenGoForeground) {
             setPlayWhenReady(true)
             needPlayWhenGoForeground = false
@@ -486,7 +441,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     override fun getPlaybackState() = mediaPlayerGateway.getPlaybackState()
 
     override fun setupPlayerView(
-        playerView: PlayerView,
+        playerView: StyledPlayerView,
         useController: Boolean,
         controllerShowTimeoutMs: Int,
         controllerHideOnTouch: Boolean,

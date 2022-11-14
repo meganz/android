@@ -13,12 +13,11 @@ import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
-import mega.privacy.android.data.mapper.SortOrderIntMapper
-import mega.privacy.android.domain.entity.NodeFolder
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -40,7 +39,6 @@ class FavouritesViewModelTest {
 
     private val fetchNodeWrapper =
         mock<FetchNodeWrapper> { onBlocking { invoke(any()) }.thenReturn(megaNode) }
-    private val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     @Before
     fun setUp() {
@@ -55,7 +53,6 @@ class FavouritesViewModelTest {
             removeFavourites = mock(),
             favouriteMapper = favouriteMapper,
             fetchNode = fetchNodeWrapper,
-            sortOrderIntMapper = sortOrderIntMapper,
         )
     }
 
@@ -90,27 +87,9 @@ class FavouritesViewModelTest {
         whenever(node.isFolder).thenReturn(true)
         whenever(node.isInShare).thenReturn(true)
         whenever(node.name).thenReturn("testName.txt")
-        val favourite = NodeFolder(
-            id = node.handle,
-            name = node.name,
-            label = node.label,
-            parentId = node.parentHandle,
-            base64Id = node.base64Handle,
-            hasVersion = false,
-            numChildFolders = 0,
-            numChildFiles = 0,
-            isFavourite = true,
-            isExported = false,
-            isTakenDown = false,
-            isInRubbishBin = false,
-            isIncomingShare = false,
-            isShared = false,
-            isPendingShare = false,
-            device = ""
-        )
+        val favourite = mock<TypedNode>()
         val list = listOf(favourite)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(sortOrderIntMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(MegaApiJava.ORDER_DEFAULT_ASC)
         whenever(getAllFavorites()).thenReturn(
             flowOf(list)
         )

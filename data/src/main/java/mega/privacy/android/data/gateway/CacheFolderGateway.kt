@@ -33,9 +33,9 @@ interface CacheFolderGateway {
     fun getCacheFile(folderName: String, fileName: String?): File?
 
     /**
-     * Calculates and returns the cache size for the app files
+     * Calculates and returns the cache size for the app files in bytes
      */
-    fun getCacheSize(): String
+    fun getCacheSize(): Long
 
     /**
      * Clears the cache folder of app

@@ -38,49 +38,6 @@ class GetCameraUploadAttributeListener(val context: Context?) : MegaRequestListe
         // Do nothing
     }
 
-
-    /**
-     * Callback function for onRequestFinish
-     *
-     * @param api : MegaApiJava
-     * @param request : MegaRequest
-     * @param e: MegaError
-     */
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        if (request.type == MegaRequest.TYPE_GET_ATTR_USER ||
-            request.paramType == MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER
-        ) {
-            when (e.errorCode) {
-                MegaError.API_OK -> {
-                    val handles = getCUHandles(request)
-                    Timber.d("Get CU folders successfully primary: %d, secondary: %d",
-                        handles[0],
-                        handles[1])
-                    synchronized(this) {
-                        handle(handles[0], false, e)
-                        handle(handles[1], true, e)
-                    }
-                }
-
-                MegaError.API_ENOENT -> {
-                    // only when both CU and MU are not set, will return API_ENOENT
-                    Timber.d("First time set CU attribute.")
-                    CameraUploadUtil.initCUFolderFromScratch(context, false)
-                    (context as? CameraUploadsService)?.onGetPrimaryFolderAttribute(MegaApiJava.INVALID_HANDLE,
-                        e.errorCode,
-                        true)
-                }
-
-                else -> {
-                    Timber.w("Get CU attributes failed, error code: %d, %s",
-                        e.errorCode,
-                        e.errorString)
-                    JobUtil.fireStopCameraUploadJob(context)
-                }
-            }
-        }
-    }
-
     /**
      * Callback function for onRequestTemporaryError
      *
@@ -93,12 +50,51 @@ class GetCameraUploadAttributeListener(val context: Context?) : MegaRequestListe
     }
 
     /**
-     * Get CU and MU folders handle from MegaRequest object.
+     * Callback function for onRequestFinish
      *
-     * @param request MegaRequest object which contains CU and MU folders handle.
-     * @return An array with CU folder handle at the first element, and MU folder handle at the second element.
+     * @param api : MegaApiJava
+     * @param request : MegaRequest
+     * @param error: MegaError
      */
-    private fun getCUHandles(request: MegaRequest): LongArray {
+    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, error: MegaError) {
+        if (request.type == MegaRequest.TYPE_GET_ATTR_USER
+            || request.paramType == MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER
+        ) {
+            when (error.errorCode) {
+                MegaError.API_OK -> {
+                    val handles = getCUHandles(request)
+                    Timber.d("Get Camera Upload Folders SUCCESS, Primary: ${handles.first}, Secondary: ${handles.second}")
+                    // Guarantee Primary is called first, then Secondary Attributes
+                    synchronized(this) {
+                        handle(handles.first, false)
+                        handle(handles.second, true)
+                    }
+                }
+                MegaError.API_ENOENT -> {
+                    // Happens when both Primary and Secondary folders are not set
+                    Timber.d("First time setting Camera Upload Attributes")
+                    CameraUploadUtil.initCUFolderFromScratch(context, false)
+                    // TODO Move call here after this class is use case
+                    (context as? CameraUploadsService)?.onGetPrimaryFolderAttribute(
+                        MegaApiJava.INVALID_HANDLE,
+                        true
+                    )
+                }
+                else -> {
+                    Timber.w("Get Camera Upload Attributes FAIL, Error Code: ${error.errorCode}, ${error.errorString}")
+                    JobUtil.fireStopCameraUploadJob(context)
+                }
+            }
+        }
+    }
+
+    /**
+     * Get Primary and Secondary Folders handle from MegaRequest object
+     *
+     * @param request MegaRequest object which contains Primary and Secondary folders handle
+     * @return A Pair with Primary and Secondary folder handle
+     */
+    private fun getCUHandles(request: MegaRequest): Pair<Long, Long> {
         var primaryHandle = MegaApiJava.INVALID_HANDLE
         var secondaryHandle = MegaApiJava.INVALID_HANDLE
         request.megaStringMap?.let {
@@ -111,19 +107,18 @@ class GetCameraUploadAttributeListener(val context: Context?) : MegaRequestListe
                 secondaryHandle = MegaApiJava.base64ToHandle(sh)
             }
         } ?: run {
-            Timber.e("MegaStringMap is null.")
+            Timber.e("MegaStringMap is NULL")
         }
-        return longArrayOf(primaryHandle, secondaryHandle)
+        return Pair(primaryHandle, secondaryHandle)
     }
 
     /**
-     * Process CU or MU folder handle after get them from CU attributes.
+     * Process Primary or Secondary folder handle after getting them from the attributes
      *
-     * @param handle      Folder handle.
-     * @param isSecondary Is the handle CU handle or MU handle.
-     * @param e           MegaError object.
+     * @param handle      Folder handle
+     * @param isSecondary Is the handle Secondary
      */
-    private fun handle(handle: Long, isSecondary: Boolean, e: MegaError) {
+    private fun handle(handle: Long, isSecondary: Boolean) {
         var shouldStopCameraUpload = false
         if (isNodeInRubbishOrDeleted(handle)) {
             Timber.d("Folder in rubbish bin, is secondary: %s", isSecondary)
@@ -138,13 +133,15 @@ class GetCameraUploadAttributeListener(val context: Context?) : MegaRequestListe
             CameraUploadUtil.forceUpdateCameraUploadFolderIcon(isSecondary, handle)
         }
         if (!shouldStopCameraUpload) {
-            if (isSecondary) {
-                (context as? CameraUploadsService)?.onGetSecondaryFolderAttribute(handle,
-                    e.errorCode)
+            if (!isSecondary) {
+                // Primary is set first, camera upload will not get started, do not call a start service worker
+                // TODO Move call here after this class is use case
+                (context as? CameraUploadsService)?.onGetPrimaryFolderAttribute(handle, false)
             } else {
-                (context as? CameraUploadsService)?.onGetPrimaryFolderAttribute(handle,
-                    e.errorCode,
-                    false)
+                // Secondary is set after primary, camera upload will get started
+                // TODO pass isPrimaryHandleSynced = true as intent extra and call start service worker
+                // TODO Move call here after this class is use case
+                (context as? CameraUploadsService)?.onGetSecondaryFolderAttribute(handle)
             }
         }
     }

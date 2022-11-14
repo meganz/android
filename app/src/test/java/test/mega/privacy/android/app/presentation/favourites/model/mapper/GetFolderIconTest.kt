@@ -5,18 +5,18 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.favourites.model.mapper.getFolderIcon
 import mega.privacy.android.domain.entity.BackupType
 import mega.privacy.android.domain.entity.DeviceType
-import mega.privacy.android.domain.entity.Folder
+import mega.privacy.android.domain.entity.node.FolderNode
 import org.junit.Test
 import org.mockito.kotlin.mock
 
 class GetFolderIconTest {
     @Test
     fun `test that folders in the rubbish bin returns folder icon`() {
-        val folder = mock<Folder> { on { isInRubbishBin }.thenReturn(true) }
+        val folderNode = mock<FolderNode> { on { isInRubbishBin }.thenReturn(true) }
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = false,
                 backupType = BackupType.None,
@@ -26,11 +26,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that incoming share returns the incoming folder icon`() {
-        val folder = mock<Folder> { on { isIncomingShare }.thenReturn(true) }
+        val folderNode = mock<FolderNode> { on { isIncomingShare }.thenReturn(true) }
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = false,
                 backupType = BackupType.None,
@@ -40,11 +40,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that camera backup folders return camera backup icon`() {
-        val folder = mock<Folder>()
+        val folderNode = mock<FolderNode>()
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = true,
                 isChatFilesFolder = false,
                 backupType = BackupType.None,
@@ -54,11 +54,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that chat files folder returns chat folder icon`() {
-        val folder = mock<Folder>()
+        val folderNode = mock<FolderNode>()
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = true,
                 backupType = BackupType.None,
@@ -68,11 +68,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that shared folder returns shared icon`() {
-        val folder = mock<Folder> { on { isShared }.thenReturn(true) }
+        val folderNode = mock<FolderNode> { on { isShared }.thenReturn(true) }
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = false,
                 backupType = BackupType.None,
@@ -82,11 +82,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that pending share folder returns shared icon`() {
-        val folder = mock<Folder> { on { isPendingShare }.thenReturn(true) }
+        val folderNode = mock<FolderNode> { on { isPendingShare }.thenReturn(true) }
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = false,
                 backupType = BackupType.None,
@@ -96,11 +96,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that root backup folder returns cloud backup icon`() {
-        val folder = mock<Folder>()
+        val folderNode = mock<FolderNode>()
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = false,
                 backupType = BackupType.Root,
@@ -110,11 +110,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that windows device backup returns windows icon`() {
-        val folder = mock<Folder>()
+        val folderNode = mock<FolderNode>()
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = false,
                 backupType = BackupType.Device(DeviceType.Windows),
@@ -124,11 +124,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that linux device backup returns linux icon`() {
-        val folder = mock<Folder>()
+        val folderNode = mock<FolderNode>()
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = false,
                 backupType = BackupType.Device(DeviceType.Linux),
@@ -138,11 +138,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that mac device backup returns mac icon`() {
-        val folder = mock<Folder>()
+        val folderNode = mock<FolderNode>()
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = false,
                 backupType = BackupType.Device(DeviceType.Mac),
@@ -152,11 +152,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that external device backup returns external icon`() {
-        val folder = mock<Folder>()
+        val folderNode = mock<FolderNode>()
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = false,
                 backupType = BackupType.Device(DeviceType.ExternalDrive),
@@ -166,11 +166,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that unknown device backup returns generic pc icon`() {
-        val folder = mock<Folder>()
+        val folderNode = mock<FolderNode>()
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = false,
                 backupType = BackupType.Device(DeviceType.Unknown),
@@ -180,11 +180,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that child backup folder returns backup icon`() {
-        val folder = mock<Folder>()
+        val folderNode = mock<FolderNode>()
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = false,
                 backupType = BackupType.Child,
@@ -194,11 +194,11 @@ class GetFolderIconTest {
 
     @Test
     fun `test that normal folder returns folder icon`() {
-        val folder = mock<Folder>()
+        val folderNode = mock<FolderNode>()
 
         assertThat(
             getFolderIcon(
-                folder = folder,
+                folderNode = folderNode,
                 isMediaSyncFolder = false,
                 isChatFilesFolder = false,
                 backupType = BackupType.None,

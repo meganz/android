@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
@@ -31,7 +30,6 @@ class OutgoingSharesViewModel @Inject constructor(
     private val getOutgoingSharesChildrenNode: GetOutgoingSharesChildrenNode,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
-    private val sortOrderIntMapper: SortOrderIntMapper,
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
@@ -100,8 +98,8 @@ class OutgoingSharesViewModel @Inject constructor(
                 outgoingTreeDepth = depth,
                 outgoingHandle = handle,
                 outgoingParentHandle = getParentNodeHandle(handle),
-                sortOrder = if (depth == 0) sortOrderIntMapper(getOthersSortOrder()) else sortOrderIntMapper(
-                    getCloudSortOrder())
+                sortOrder = if (depth == 0) getOthersSortOrder() else
+                    getCloudSortOrder()
             )
         }
 
@@ -122,7 +120,7 @@ class OutgoingSharesViewModel @Inject constructor(
                     isInvalidHandle = true,
                     isLoading = false,
                     outgoingParentHandle = null,
-                    sortOrder = sortOrderIntMapper(getOthersSortOrder())
+                    sortOrder = getOthersSortOrder()
                 )
             }
         }

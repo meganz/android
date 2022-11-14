@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.exoplayer2.ui.PlayerView
+    <com.google.android.exoplayer2.ui.StyledPlayerView
         android:id="@+id/player_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -12,6 +12,23 @@
         app:controller_layout_id="@layout/video_player_control"
         app:shutter_background_color="@color/dark_grey"
         app:surface_type="surface_view" />
+
+    <LinearLayout
+        android:id="@+id/screenshot_scale_animation_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/screenshot_round_background"
+        android:padding="8dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/screenshot_scale_animation_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop" />
+    </LinearLayout>
+
 
     <ProgressBar
         android:id="@+id/loading"

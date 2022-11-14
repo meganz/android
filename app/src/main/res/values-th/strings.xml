@@ -1668,8 +1668,6 @@
     <string name="pass_strong">คาดเดาได้ยากมาก</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">กำลังโทรหา</string>
-    <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">แตะเพื่อกลับไปที่สายสนทนา</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">กลับไปที่สายสนทนา</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2700,9 +2698,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">เกิดปัญหากับการชำระเงินครั้งล่าสุดของคุณ กรุณาไปที่เว็บ MEGA ผ่านเบราว์เซอร์เดสก์ท็อปเพื่อดูข้อมูลเพิ่มเติม</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account deactivated</string>
+    <string name="expired_business_title">บัญชีถูกปิดใช้งาน</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
+    <string name="expired_admin_business_text">บัญชีธุรกิจของคุณถูกปิดใช้งานเนื่องจากการชำระเงินไม่สำเร็จ คุณจะไม่สามารถเข้าถึงข้อมูลของคุณได้ กรุณาเข้าสู่ระบบ MEGA ผ่านเบราว์เซอร์เพื่อดำเนินการชำระเงินและเปิดใช้การสมัครใช้งานของคุณอีกครั้ง</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">บัญชีของคุณ[B]ถูกระงับ[/B]ในขณะนี้ คุณสามารถเรียกดูได้แค่ข้อมูลของคุณเท่านั้น</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3608,9 +3606,9 @@
     <!-- Button in the delete confirmation dialog to delete permanently items from Rubbish Bin -->
     <string name="rubbish_bin_delete_confirmation_dialog_button_delete">ลบ</string>
     <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
-    <string name="account_info_renews_on">[A]วันที่ต่ออายุ[/A] [B]%s[/B]</string>
+    <string name="account_info_renews_on">[A]ต่ออายุเมื่อ[/A] [B]%s[/B]</string>
     <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
-    <string name="account_info_expires_on">[A]วันที่หมดอายุ[/A] [B]%s[/B]</string>
+    <string name="account_info_expires_on">[A]หมดอายุเมื่อ[/A] [B]%s[/B]</string>
     <!-- Title of favourite category. -->
     <string name="favourites_category_title">รายการโปรด</string>
     <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
@@ -3929,4 +3927,6 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">คุณได้เพิ่มผู้ติดต่อทั้งหมดในแชทนี้แล้ว หากคุณต้องการเพิ่มผู้เข้าร่วมคนอื่น ขั้นแรกให้ส่งคำเชิญเพื่อเพิ่มไปที่รายชื่อผู้ติดต่อของคุณก่อน</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">บันทึกภาพไว้ในแกลเลอรี่อุปกรณ์ของคุณแล้ว</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]วันที่ต่ออายุ:[/A] [B]%s[/B]</string>
 </resources>

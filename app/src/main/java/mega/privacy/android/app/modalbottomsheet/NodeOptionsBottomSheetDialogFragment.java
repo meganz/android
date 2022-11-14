@@ -51,7 +51,6 @@ import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -97,6 +96,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ViewUtils;
+import mega.privacy.android.domain.entity.SortOrder;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
@@ -971,7 +971,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 Intent intent = ImageViewerActivity.getIntentForParentNode(
                         requireContext(),
                         megaApi.getParentNode(node).getHandle(),
-                        ORDER_PHOTO_ASC,
+                        SortOrder.ORDER_PHOTO_ASC,
                         node.getHandle(),
                         true
                 );

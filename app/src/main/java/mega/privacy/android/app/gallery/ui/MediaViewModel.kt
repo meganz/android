@@ -62,7 +62,7 @@ class MediaViewModel @Inject constructor(
 
     var mZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
 
-    fun getOrder() = runBlocking { sortOrderIntMapper(getCameraSortOrder()) }
+    fun getOrder() = runBlocking { getCameraSortOrder() }
 
     var currentHandle: Long? = null
 
@@ -154,8 +154,9 @@ class MediaViewModel @Inject constructor(
             emit(
                 listOf(
                     days.sortDescending(),
-                    cardsProvider.getMonths().sortDescending(),
-                    cardsProvider.getYears().sortDescending())
+                    cardsProvider.latestSortedMonths,
+                    cardsProvider.latestSortedYears,
+                )
             )
 
             fetchMissingPreviews(days)

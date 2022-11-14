@@ -274,11 +274,8 @@ import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
-import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
@@ -294,7 +291,6 @@ import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
-import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
@@ -303,10 +299,8 @@ import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
-import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
-import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
@@ -329,7 +323,6 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment;
-import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.main.managerSections.NotificationsFragment;
 import mega.privacy.android.app.main.managerSections.TransfersFragment;
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment;
@@ -358,6 +351,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
+import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
@@ -365,6 +359,7 @@ import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment;
 import mega.privacy.android.app.presentation.photos.PhotosFragment;
+import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment;
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
@@ -419,7 +414,12 @@ import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
+import mega.privacy.android.data.mapper.SortOrderIntMapperKt;
+import mega.privacy.android.data.model.MegaAttributes;
+import mega.privacy.android.data.model.MegaPreferences;
+import mega.privacy.android.data.model.UserCredentials;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
@@ -764,14 +764,14 @@ public class ManagerActivity extends TransfersManagementActivity
     private CompletedTransfersFragment completedTransfersFragment;
     private SearchFragment searchFragment;
     private PhotosFragment photosFragment;
-    private AlbumContentFragment albumContentFragment;
+    private Fragment albumContentFragment;
     private PhotosFilterFragment photosFilterFragment;
     private ChatTabsFragment chatTabsFragment;
     private NotificationsFragment notificationsFragment;
     private TurnOnNotificationsFragment turnOnNotificationsFragment;
     private PermissionsFragment permissionsFragment;
     private SMSVerificationFragment smsVerificationFragment;
-    private MediaDiscoveryFragment mediaDiscoveryFragment;
+    private Fragment mediaDiscoveryFragment;
 
     private boolean mStopped = true;
     private int bottomItemBeforeOpenFullscreenOffline = INVALID_VALUE;
@@ -989,7 +989,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                     updateAccountDetailsVisibleInfo();
 
-                    if (megaApi.isBusinessAccount()) {
+                    if (isBusinessAccount()) {
                         supportInvalidateOptionsMenu();
                     }
                 } else if (actionType == UPDATE_PAYMENT_METHODS) {
@@ -1126,7 +1126,7 @@ public class ManagerActivity extends TransfersManagementActivity
             ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
                             ? parentNode
                             : megaApi.getRootNode(),
-                    viewModel.getOrder());
+                    SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
 
             fileBrowserFragment.setNodes(nodes);
             fileBrowserFragment.getRecyclerView().invalidate();
@@ -1363,13 +1363,13 @@ public class ManagerActivity extends TransfersManagementActivity
         outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog));
 
         outState.putBoolean(STATE_KEY_IS_IN_MD_MODE, isInMDMode);
-        mediaDiscoveryFragment = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
+        mediaDiscoveryFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
         if (mediaDiscoveryFragment != null) {
             getSupportFragmentManager().putFragment(outState, FragmentTag.MEDIA_DISCOVERY.getTag(), mediaDiscoveryFragment);
         }
 
         outState.putBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, isInAlbumContent);
-        albumContentFragment = (AlbumContentFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.ALBUM_CONTENT.getTag());
+        albumContentFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.ALBUM_CONTENT.getTag());
         if (albumContentFragment != null) {
             getSupportFragmentManager().putFragment(outState, FragmentTag.ALBUM_CONTENT.getTag(), albumContentFragment);
         }
@@ -1434,11 +1434,6 @@ public class ManagerActivity extends TransfersManagementActivity
         viewModel.getUpdateUserAlerts().observe(this,
                 new EventObserver<>(userAlerts -> {
                     updateUserAlerts(userAlerts);
-                    return null;
-                }));
-        viewModel.getUpdateNodes().observe(this,
-                new EventObserver<>(nodes -> {
-                    onUpdateNodes(nodes);
                     return null;
                 }));
         viewModel.getUpdateContactsRequests().observe(this,
@@ -1506,7 +1501,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 smsVerificationFragment = (SMSVerificationFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.SMS_VERIFICATION.getTag());
             }
             mElevationCause = savedInstanceState.getInt("elevation", 0);
-            storageState = (StorageState)savedInstanceState.getSerializable("storageState");
+            storageState = (StorageState) savedInstanceState.getSerializable("storageState");
             isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
             comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", INVALID_VALUE);
             openLinkDialogIsShown = savedInstanceState.getBoolean(OPEN_LINK_DIALOG_SHOWN, false);
@@ -1518,9 +1513,14 @@ public class ManagerActivity extends TransfersManagementActivity
             linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
             isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
             isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false);
+            if (isInMDMode) {
+                mediaDiscoveryFragment = getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.MEDIA_DISCOVERY.getTag());
+            }
             isInAlbumContent = savedInstanceState.getBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, false);
+            if (isInAlbumContent){
+                albumContentFragment = getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.ALBUM_CONTENT.getTag());
+            }
             isInFilterPage = savedInstanceState.getBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, false);
-
 
             nodeAttacher.restoreState(savedInstanceState);
             nodeSaver.restoreState(savedInstanceState);
@@ -2635,6 +2635,16 @@ public class ManagerActivity extends TransfersManagementActivity
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
             updateInboxSectionVisibility(managerState.getHasInboxChildren());
             stopUploadProcessAndSendBroadcast(managerState.getShouldStopCameraUpload(), managerState.getShouldSendCameraBroadcastEvent());
+            if (managerState.getNodeUpdateReceived()) {
+                // Invalidate the menu will collapse/expand the search view and set the query text to ""
+                // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
+                // text changed to "" for once)
+                if (drawerItem != DrawerItem.HOMEPAGE) {
+                    setToolbarTitle();
+                    supportInvalidateOptionsMenu();
+                }
+                viewModel.nodeUpdateHandled();  
+            }
             return Unit.INSTANCE;
         });
     }
@@ -2677,7 +2687,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * @return True if some warning has been shown, false otherwise.
      */
     private boolean checkBusinessStatus() {
-        if (!megaApi.isBusinessAccount()) {
+        if (!isBusinessAccount()) {
             return false;
         }
 
@@ -2747,7 +2757,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * Otherwise proceeds to enable CU.
      */
     public void checkIfShouldShowBusinessCUAlert() {
-        if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
+        if (isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
             showBusinessCUAlert();
         } else {
             enableCUClicked();
@@ -3603,7 +3613,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void skipToMediaDiscoveryFragment(Fragment f, Long mediaHandle) {
-        mediaDiscoveryFragment = (MediaDiscoveryFragment) f;
+        mediaDiscoveryFragment = f;
         replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
         viewModel.onMediaDiscoveryOpened(mediaHandle);
         isInMDMode = true;
@@ -3611,7 +3621,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void skipToAlbumContentFragment(Fragment f) {
-        albumContentFragment = (AlbumContentFragment) f;
+        albumContentFragment = f;
         replaceFragment(f, FragmentTag.ALBUM_CONTENT.getTag());
         isInAlbumContent = true;
         viewModel.setIsFirstNavigationLevel(false);
@@ -3625,10 +3635,6 @@ public class ManagerActivity extends TransfersManagementActivity
         isInFilterPage = true;
         viewModel.setIsFirstNavigationLevel(false);
         showHideBottomNavigationView(true);
-    }
-
-    public void changeMDMode(boolean targetMDMode) {
-        isInMDMode = targetMDMode;
     }
 
     void replaceFragment(Fragment f, String fTag) {
@@ -3926,7 +3932,13 @@ public class ManagerActivity extends TransfersManagementActivity
             case PHOTOS: {
                 aB.setSubtitle(null);
                 if (isInAlbumContent) {
-                    aB.setTitle(getString(R.string.title_favourites_album));
+                    if (albumContentFragment instanceof AlbumDynamicContentFragment) {
+                        String title = ((AlbumDynamicContentFragment) albumContentFragment)
+                                .getCurrentAlbumTitle();
+                        aB.setTitle(title);
+                    } else {
+                        aB.setTitle(getString(R.string.title_favourites_album));
+                    }
                 } else if (isInFilterPage) {
                     aB.setTitle(getString(R.string.photos_action_filter));
                 } else if (getPhotosFragment() != null && photosFragment.shouldUpdateTitle()) {
@@ -4055,13 +4067,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     checkCurrentStorageStatus(false);
                 } else {
                     Timber.w("showOnlineMode - Root is NULL");
-                    if (getApplicationContext() != null) {
-                        if (MegaApplication.getOpenChatId() != MEGACHAT_INVALID_HANDLE) {
-                            Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG);
-                            sendBroadcast(intent);
-                        } else {
-                            showConfirmationConnect();
-                        }
+                    if (MegaApplication.getOpenChatId() == MEGACHAT_INVALID_HANDLE) {
+                        showConfirmationConnect();
                     }
                 }
             }
@@ -4410,6 +4417,8 @@ public class ManagerActivity extends TransfersManagementActivity
 
         switch (drawerItem) {
             case SHARED_ITEMS:
+                if (!(currentTab instanceof SharesTab)) break;
+
                 switch ((SharesTab) currentTab) {
                     case INCOMING_TAB:
                         if (!isIncomingAdded() || (!hide && incomingSharesState(this).getIncomingHandle() != INVALID_HANDLE)) {
@@ -4561,18 +4570,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         switch (item) {
             case CLOUD_DRIVE: {
-                if (isInMDPage()) {
-                    mediaDiscoveryFragment = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
-
-                    if (mediaDiscoveryFragment == null) {
-                        selectDrawerItemCloudDrive();
-                        mediaDiscoveryFragment = fileBrowserFragment.showMediaDiscovery(Unit.INSTANCE);
-                    } else {
-                        refreshFragment(FragmentTag.MEDIA_DISCOVERY.getTag());
-                    }
-
-                    replaceFragment(mediaDiscoveryFragment, FragmentTag.MEDIA_DISCOVERY.getTag());
-                } else {
+                if (!isInMDMode) {
                     selectDrawerItemCloudDrive();
                 }
 
@@ -4643,10 +4641,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
             }
             case PHOTOS: {
-                if (isInAlbumContent) {
-                    skipToAlbumContentFragment(AlbumContentFragment.getInstance());
-                } else if (isInFilterPage) {
-                    skipToFilterFragment(PhotosFilterFragment.getInstance());
+                if (isInAlbumContent || isInFilterPage) {
+                    showHideBottomNavigationView(true);
                 } else {
                     abL.setVisibility(View.VISIBLE);
                     if (getPhotosFragment() == null) {
@@ -5829,10 +5825,10 @@ public class ManagerActivity extends TransfersManagementActivity
         if (rubbishBinFragment != null) {
             ArrayList<MegaNode> nodes;
             if (viewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
-                nodes = megaApi.getChildren(megaApi.getRubbishNode(), viewModel.getOrder());
+                nodes = megaApi.getChildren(megaApi.getRubbishNode(), SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
             } else {
                 nodes = megaApi.getChildren(megaApi.getNodeByHandle(viewModel.getState().getValue().getRubbishBinParentHandle()),
-                        viewModel.getOrder());
+                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
             }
 
             rubbishBinFragment.hideMultipleSelect();
@@ -5943,7 +5939,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
             if (isInMDMode) {
-                changeMDMode(false);
+                isInMDMode = false;
                 backToDrawerItem(bottomNavigationCurrentItem);
             } else {
                 if (!isCloudAdded() || fileBrowserFragment.onBackPressed() == 0) {
@@ -6003,9 +5999,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 isInAlbumContent = false;
 
                 backToDrawerItem(bottomNavigationCurrentItem);
-                if (photosFragment == null) {
-                    backToDrawerItem(bottomNavigationCurrentItem);
-                } else {
+                if (photosFragment != null) {
                     photosFragment.switchToAlbum();
                 }
             } else if (isInFilterPage) {
@@ -6148,7 +6142,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case R.id.bottom_navigation_item_cloud_drive: {
                 if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                     if (isInMDMode) {
-                        changeMDMode(false);
+                        isInMDMode = false;
                     }
                     MegaNode rootNode = megaApi.getRootNode();
                     if (rootNode == null) {
@@ -7551,13 +7545,13 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         if (usedSpaceLayout != null) {
-            if (megaApi.isBusinessAccount()) {
+            if (isBusinessAccount()) {
                 usedSpaceLayout.setVisibility(View.GONE);
                 upgradeAccount.setVisibility(View.GONE);
                 if (settingsSeparator != null) {
                     settingsSeparator.setVisibility(View.GONE);
                 }
-                if (megaApi.isBusinessAccount()) {
+                if (isBusinessAccount()) {
                     businessLabel.setVisibility(View.VISIBLE);
                 }
             } else {
@@ -7648,12 +7642,12 @@ public class ManagerActivity extends TransfersManagementActivity
         if (isCloudAdded()) {
             ArrayList<MegaNode> nodes;
             if (viewModel.getState().getValue().getBrowserParentHandle() == -1) {
-                nodes = megaApi.getChildren(parentNode, viewModel.getOrder());
+                nodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
             } else {
                 parentNode = megaApi.getNodeByHandle(viewModel.getState().getValue().getBrowserParentHandle());
                 if (parentNode == null) return;
 
-                nodes = megaApi.getChildren(parentNode, viewModel.getOrder());
+                nodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
             }
             Timber.d("Nodes: %s", nodes.size());
             if (comesFromNotificationChildNodeHandleList == null) {
@@ -8235,7 +8229,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
                                 ? parentNode
                                 : megaApi.getRootNode(),
-                        viewModel.getOrder());
+                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
 
                 fileBrowserFragment.setNodes(nodes);
                 fileBrowserFragment.getRecyclerView().invalidate();
@@ -8462,7 +8456,7 @@ public class ManagerActivity extends TransfersManagementActivity
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
             if (isCloudAdded()) {
                 ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(viewModel.getState().getValue().getBrowserParentHandle()),
-                        viewModel.getOrder());
+                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
                 fileBrowserFragment.setNodes(nodes);
                 fileBrowserFragment.getRecyclerView().invalidate();
             }
@@ -8693,7 +8687,7 @@ public class ManagerActivity extends TransfersManagementActivity
         // event informing about the storage state  during login, the ManagerActivity
         // wasn't active and for this reason the value is stored in the MegaApplication object.
         StorageState storageStateToCheck = (storageState != StorageState.Unknown) ?
-                storageState :  viewModel.getStorageState();
+                storageState : viewModel.getStorageState();
 
         checkStorageStatus(storageStateToCheck, onCreate);
     }
@@ -9524,6 +9518,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                     if (isCloudAdded()) {
+                        viewModel.setBrowserParentHandle(folderNode.getHandle());
                         fileBrowserFragment.setFolderInfoNavigation(folderNode);
                     }
                 } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
@@ -9861,22 +9856,6 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshLinks();
 
         refreshSharesPageAdapter();
-    }
-
-    private void onUpdateNodes(@NonNull List<MegaNode> updatedNodes) {
-        dismissAlertDialogIfExists(statusDialog);
-
-        viewModel.checkCameraUploadFolder(false, updatedNodes);
-
-        LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
-
-        // Invalidate the menu will collapse/expand the search view and set the query text to ""
-        // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
-        // text changed to "" for once)
-        if (drawerItem == DrawerItem.HOMEPAGE) return;
-
-        setToolbarTitle();
-        supportInvalidateOptionsMenu();
     }
 
     public void updateContactRequests(List<ContactRequest> requests) {
@@ -11146,11 +11125,11 @@ public class ManagerActivity extends TransfersManagementActivity
         return permissionsFragment = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
     }
 
-    public MediaDiscoveryFragment getMDFragment() {
+    public Fragment getMDFragment() {
         return mediaDiscoveryFragment;
     }
 
-    public AlbumContentFragment getAlbumContentFragment() {
+    public Fragment getAlbumContentFragment() {
         return albumContentFragment;
     }
 
@@ -11464,5 +11443,9 @@ public class ManagerActivity extends TransfersManagementActivity
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }
+    }
+
+    private boolean isBusinessAccount() {
+        return megaApi.isBusinessAccount() && myAccountInfo.getAccountType() == BUSINESS;
     }
 }

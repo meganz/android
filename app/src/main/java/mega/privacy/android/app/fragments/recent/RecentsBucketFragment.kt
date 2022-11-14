@@ -217,7 +217,7 @@ class RecentsBucketFragment : Fragment() {
             )
 
             binding.dateText.text =
-                TimeUtils.formatBucketDate(activity, viewModel.bucket.value?.timestamp ?: return)
+                TimeUtils.formatBucketDate(viewModel.bucket.value?.timestamp ?: return)
             binding.headerInfoLayout.visibility = View.VISIBLE
         }
     }

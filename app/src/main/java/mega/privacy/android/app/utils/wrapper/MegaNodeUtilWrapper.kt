@@ -217,14 +217,6 @@ interface MegaNodeUtilWrapper {
     fun isNodeInRubbishOrDeleted(handle: Long): Boolean
 
     /**
-     * Gets the parent outgoing or incoming MegaNode folder of a node.
-     *
-     * @param node  MegaNode to get its parent
-     * @return The outgoing or incoming parent folder.
-     */
-    fun getOutgoingOrIncomingParent(node: MegaNode): MegaNode?
-
-    /**
      * Check if all nodes can be moved to rubbish bin.
      *
      * @param nodes nodes to check

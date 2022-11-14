@@ -4,14 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.contacts.list.data.ContactActionItem
 import mega.privacy.android.app.contacts.list.data.ContactActionItem.Type
 import mega.privacy.android.app.contacts.list.data.ContactItem
@@ -19,12 +22,15 @@ import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
+import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.usecase.call.StartCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.RxUtil.debounceImmediate
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.notifyObserver
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.ChatRequestParamType
+import mega.privacy.android.domain.usecase.StartChatCall
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -37,6 +43,11 @@ import javax.inject.Inject
  * @property getContactRequestsUseCase  Use case to retrieve contact requests
  * @property getChatRoomUseCase         Use case to get current chat room for existing user
  * @property removeContactUseCase       Use case to remove existing contact
+ * @property passcodeManagement         [PasscodeManagement]
+ * @property startChatCall              [StartChatCall]
+ * @property chatApiGateway             [MegaChatApiGateway]
+ * @property cameraGateway              [CameraGateway]
+ * @property chatManagement             [ChatManagement]
  */
 @HiltViewModel
 class ContactListViewModel @Inject constructor(
@@ -44,8 +55,11 @@ class ContactListViewModel @Inject constructor(
     private val getContactRequestsUseCase: GetContactRequestsUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val removeContactUseCase: RemoveContactUseCase,
-    private val startCallUseCase: StartCallUseCase,
-    private val passcodeManagement: PasscodeManagement
+    private val startChatCall: StartChatCall,
+    private val passcodeManagement: PasscodeManagement,
+    private val chatApiGateway: MegaChatApiGateway,
+    private val cameraGateway: CameraGateway,
+    private val chatManagement: ChatManagement,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -171,20 +185,71 @@ class ContactListViewModel @Inject constructor(
     }
 
     /**
-     * Method for checking the necessary actions to start a call.
+     * Method for processing when clicking on the call option
+     *
+     * @param video Start call with video on or off
+     * @param audio Start call with audio on or off
      */
-    fun startCall() {
-        startCallUseCase.startCallFromUserHandle(MegaApplication.userWaitingForCall, enableVideo = false, enableAudio = true)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                        onSuccess = { resultStartCall ->
-                            CallUtil.openMeetingWithAudioOrVideo(MegaApplication.getInstance().applicationContext, resultStartCall.chatHandle, resultStartCall.enableAudio, resultStartCall.enableVideo, passcodeManagement)
-                        },
-                        onError = { error ->
-                            Timber.e(error.stackTraceToString())
+    fun onCallTap(video: Boolean, audio: Boolean) {
+        getChatRoomUseCase.get(MegaApplication.userWaitingForCall)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { chatId ->
+                    startCall(chatId, video, audio)
+                },
+                onError = Timber::e
+            )
+            .addTo(composite)
+    }
+
+    /**
+     * Starts a call
+     *
+     * @param chatId Chat id
+     * @param video Start call with video on or off
+     * @param audio Start call with audio on or off
+     */
+    private fun startCall(chatId: Long, video: Boolean, audio: Boolean) {
+        if (chatApiGateway.getChatCall(chatId) != null) {
+            Timber.d("There is a call, open it")
+            CallUtil.openMeetingInProgress(MegaApplication.getInstance().applicationContext,
+                chatId,
+                true,
+                passcodeManagement)
+            return
+        }
+
+        MegaApplication.isWaitingForCall = false
+
+        cameraGateway.setFrontCamera()
+
+        viewModelScope.launch {
+            runCatching {
+                startChatCall(chatId, video, audio)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { resultStartCall ->
+                val resultChatId = resultStartCall.chatHandle
+                if (resultChatId != null) {
+                    val videoEnable = resultStartCall.flag
+                    val paramType = resultStartCall.paramType
+                    val audioEnable: Boolean = paramType == ChatRequestParamType.Video
+                    CallUtil.addChecksForACall(resultChatId, videoEnable)
+
+                    chatApiGateway.getChatCall(resultChatId)?.let { call ->
+                        if (call.isOutgoing) {
+                            chatManagement.setRequestSentCall(call.callId, true)
                         }
-                )
-                .addTo(composite)
+                    }
+
+                    CallUtil.openMeetingWithAudioOrVideo(MegaApplication.getInstance().applicationContext,
+                        resultChatId,
+                        audioEnable,
+                        videoEnable,
+                        passcodeManagement)
+                }
+            }
+        }
     }
 }

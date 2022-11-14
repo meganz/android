@@ -342,7 +342,6 @@ public class ChatManagement {
         clearIncomingCallNotification(callId);
         removeValues(chatId);
         removeStatusVideoAndSpeaker(chatId);
-        setRequestSentCall(callId, false);
         unregisterScreenReceiver();
     }
 

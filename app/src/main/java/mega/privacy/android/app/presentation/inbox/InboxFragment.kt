@@ -18,24 +18,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import mega.privacy.android.app.utils.MegaNodeUtil.shareNodes
-import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
-import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
-import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
-import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
-import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
-import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
-import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
-import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
-import mega.privacy.android.app.globalmanagement.SortOrderManagement
-import mega.privacy.android.app.components.CustomizedGridLayoutManager
-import mega.privacy.android.app.main.adapters.MegaNodeAdapter
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaApiAndroid
-import mega.privacy.android.app.main.adapters.RotatableAdapter
-import timber.log.Timber
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.constraintlayout.widget.Group
@@ -47,26 +29,42 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.components.PositionDividerItemDecoration
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.main.PdfViewerActivity
+import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
+import mega.privacy.android.app.components.PositionDividerItemDecoration
+import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
+import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
 import mega.privacy.android.app.main.DrawerItem
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.PdfViewerActivity
+import mega.privacy.android.app.main.adapters.MegaNodeAdapter
+import mega.privacy.android.app.main.adapters.RotatableAdapter
+import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.managerSections.RotatableFragment
+import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
+import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
+import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
+import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
+import mega.privacy.android.app.utils.MegaNodeUtil.shareNodes
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
-import java.lang.Exception
 import java.util.Stack
-import kotlin.collections.ArrayList
+import javax.inject.Inject
 
 /**
  * An instance of [RotatableFragment] that displays all content that were backed up by the user
@@ -80,6 +78,12 @@ class InboxFragment : RotatableFragment() {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
+
+    /**
+     * SortOrderIntMapper
+     */
+    @Inject
+    lateinit var sortOrderIntMapper: SortOrderIntMapper
 
     /**
      * [Boolean] referenced from [ManagerActivity]
@@ -161,7 +165,7 @@ class InboxFragment : RotatableFragment() {
             EventObserver { showSortByPanel() })
 
         viewModel.updateNodes.observe(viewLifecycleOwner,
-            EventObserver<List<MegaNode?>> {
+            EventObserver {
                 hideMultipleSelect()
                 refresh()
             }
@@ -175,14 +179,14 @@ class InboxFragment : RotatableFragment() {
             if (megaApi.inboxNode != null) {
                 Timber.d("InboxNode != null")
                 inboxNode = megaApi.inboxNode
-                nodes = megaApi.getChildren(inboxNode, viewModel.getOrder())
+                nodes = megaApi.getChildren(inboxNode, sortOrderIntMapper(viewModel.getOrder()))
             }
         } else {
             Timber.d("Parent Handle: %d", parentHandleInbox)
             val parentNode = megaApi.getNodeByHandle(parentHandleInbox)
             if (parentNode != null) {
                 logParentNodeHandle(parentNode)
-                nodes = megaApi.getChildren(parentNode, viewModel.getOrder())
+                nodes = megaApi.getChildren(parentNode, sortOrderIntMapper(viewModel.getOrder()))
             }
         }
         (requireActivity() as ManagerActivity).invalidateOptionsMenu()
@@ -492,12 +496,13 @@ class InboxFragment : RotatableFragment() {
 
         inboxNode?.let {
             if (parentHandleInbox == -1L || parentHandleInbox == it.handle) {
-                nodes = megaApi.getChildren(it, viewModel.getOrder())
+                nodes = megaApi.getChildren(it, sortOrderIntMapper(viewModel.getOrder()))
             } else {
                 val parentNode = megaApi.getNodeByHandle(parentHandleInbox)
                 if (parentNode != null) {
                     logParentNodeHandle(parentNode)
-                    nodes = megaApi.getChildren(parentNode, viewModel.getOrder())
+                    nodes =
+                        megaApi.getChildren(parentNode, sortOrderIntMapper(viewModel.getOrder()))
                 }
             }
         }
@@ -737,7 +742,7 @@ class InboxFragment : RotatableFragment() {
                     (requireActivity() as ManagerActivity).parentHandleInbox = it[position].handle
                 }
                 nodes = megaApi.getChildren((nodes ?: return)[position],
-                    viewModel.getOrder())
+                    sortOrderIntMapper(viewModel.getOrder()))
                 adapter?.setNodes(nodes)
                 setContent()
                 recyclerView?.scrollToPosition(0)
@@ -789,7 +794,7 @@ class InboxFragment : RotatableFragment() {
                 (requireActivity() as ManagerActivity).invalidateOptionsMenu()
                 (requireActivity() as ManagerActivity).parentHandleInbox = parentNode.handle
                 (requireActivity() as ManagerActivity).setToolbarTitle()
-                nodes = megaApi.getChildren(parentNode, viewModel.getOrder())
+                nodes = megaApi.getChildren(parentNode, sortOrderIntMapper(viewModel.getOrder()))
                 setNodes(nodes)
 
                 var lastVisiblePosition = 0

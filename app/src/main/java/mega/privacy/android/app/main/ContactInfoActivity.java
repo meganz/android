@@ -81,6 +81,7 @@ import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -124,6 +125,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.palette.graphics.Palette;
@@ -149,6 +151,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.data.model.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.ManageChatHistoryActivity;
@@ -179,7 +182,6 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity;
 import mega.privacy.android.app.presentation.contact.ContactInfoViewModel;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
-import mega.privacy.android.app.usecase.call.StartCallUseCase;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -219,8 +221,6 @@ public class ContactInfoActivity extends PasscodeActivity
     PasscodeManagement passcodeManagement;
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
-    @Inject
-    StartCallUseCase startCallUseCase;
     @Inject
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
@@ -480,6 +480,8 @@ public class ContactInfoActivity extends PasscodeActivity
         scaleW = getScaleW(outMetrics, density);
         scaleH = getScaleH(outMetrics, density);
 
+        viewModel = new ViewModelProvider(this).get(ContactInfoViewModel.class);
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
 
@@ -712,6 +714,8 @@ public class ContactInfoActivity extends PasscodeActivity
         } else {
             Timber.w("Extras is NULL");
         }
+
+        collectFlows();
 
         registerReceiver(manageShareReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
@@ -1026,22 +1030,45 @@ public class ContactInfoActivity extends PasscodeActivity
     }
 
     /**
+     * Start call with chat created
+     *
+     * @param chatId Chat id.
+     */
+    private void startCallWithChat(long chatId) {
+        if (chatId != MEGACHAT_INVALID_HANDLE) {
+            enableCallLayouts(false);
+
+            boolean audio = PermissionUtils.hasPermissions(this, Manifest.permission.RECORD_AUDIO);
+            boolean video = startVideo;
+            if (video) {
+                video = PermissionUtils.hasPermissions(this, Manifest.permission.RECORD_AUDIO);
+            }
+
+            viewModel.onCallTap(chatId, video, audio);
+        }
+    }
+
+    /**
      * Start call
      */
     private void startCall() {
-        enableCallLayouts(false);
-        startCallUseCase.startCallFromUserHandle(user.getHandle(), startVideo, true)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result, throwable) -> {
-                    enableCallLayouts(true);
-                    if (throwable == null) {
-                        long chatId = result.component1();
-                        boolean videoEnable = result.component2();
-                        boolean audioEnable = result.component3();
-                        openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
-                    }
-                });
+        viewModel.getChatRoomId(user.getHandle()).observe(this, this::startCallWithChat);
+    }
+
+    /**
+     * Collecting Flows from ViewModel
+     */
+    private void collectFlows() {
+        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, chatState -> {
+
+            if (chatState.getError() != null) {
+                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
+            } else if (chatState.isCallStarted()) {
+                enableCallLayouts(true);
+            }
+
+            return Unit.INSTANCE;
+        });
     }
 
     @Override
@@ -1961,23 +1988,6 @@ public class ContactInfoActivity extends PasscodeActivity
         }
     }
 
-    private void startCallWithChatOnline(MegaChatRoom chatRoom) {
-        enableCallLayouts(false);
-
-        startCallUseCase.startCallFromChatId(chatRoom.getChatId(), startVideo, true)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result, throwable) -> {
-                    enableCallLayouts(true);
-                    if (throwable == null) {
-                        long chatId = result.component1();
-                        boolean videoEnable = result.component2();
-                        boolean audioEnable = result.component3();
-                        openMeetingWithAudioOrVideo(this, chatId, audioEnable, videoEnable, passcodeManagement);
-                    }
-                });
-    }
-
     private void enableCallLayouts(Boolean enable) {
         videoCallLayout.setEnabled(enable);
         audioCallLayout.setEnabled(enable);
@@ -2079,7 +2089,7 @@ public class ContactInfoActivity extends PasscodeActivity
                         int newState = ((GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) next).component2();
                         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
                         if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
-                            startCallWithChatOnline(megaChatApi.getChatRoom(chatId));
+                            startCall();
                         }
                     }
 

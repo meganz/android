@@ -610,7 +610,7 @@
     <!-- Label of button on account page that ask user to add their phone number -->
     <string name="add_phone_number_label">Добавьте номер телефона</string>
     <!-- enter verification code page title -->
-    <string name="verify_account_title">Подтвердить аккаунт</string>
+    <string name="verify_account_title">Подтвердите аккаунт</string>
     <!-- Text to explain to user why to verify phone number (account suspended use case) -->
     <string name="verify_account_helper_locked">Ваш аккаунт был временно заблокирован из-за возможного злоупотребления. Пожалуйста, подтвердите номер телефона, чтобы разблокировать аккаунт.</string>
     <!-- Hint text of the region edittext for choosing dial code. -->
@@ -632,7 +632,7 @@
     <!-- Label tell user to enter received txt to below input boxes -->
     <string name="verify_account_enter_txt_label">Пожалуйста, введите отправленный проверочный код</string>
     <!-- enter verification code page title -->
-    <string name="verify_account_enter_code_title">Подтвердить аккаунт</string>
+    <string name="verify_account_enter_code_title">Подтвердите аккаунт</string>
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_incorrect_code">Неправильный код. Пожалуйста, попробуйте ещё раз или отправьте повторно.</string>
     <!-- text message to remind user to resend verification code -->
@@ -754,7 +754,7 @@
     <!--  -->
     <string name="free_account">Бесплатно</string>
     <!-- category in sort by action -->
-    <string name="sortby_name">Имя</string>
+    <string name="sortby_name">Название</string>
     <!-- sort files alphabetically ascending -->
     <string name="sortby_name_ascending">По возрастанию</string>
     <!-- sort files alphabetically descending -->
@@ -762,17 +762,17 @@
     <!-- category in sort by action -->
     <string name="sortby_date">Дата</string>
     <!-- sort files by date newest first -->
-    <string name="sortby_date_newest">Новейшие</string>
+    <string name="sortby_date_newest">От новых к старым</string>
     <!-- sort files by date oldest first -->
-    <string name="sortby_date_oldest">старейшие</string>
+    <string name="sortby_date_oldest">От старых к новым</string>
     <!-- category in sort by action -->
     <string name="sortby_size">Размер</string>
     <!-- sort files by size largest first -->
-    <string name="sortby_size_largest_first">Самые большие</string>
+    <string name="sortby_size_largest_first">От больших к маленьким</string>
     <!-- sort files by size smallest first -->
-    <string name="sortby_size_smallest_first">самые маленькие</string>
+    <string name="sortby_size_smallest_first">От маленьких к большим</string>
     <!-- sort option, sort media files by photos first -->
-    <string name="sortby_type_photo_first">Фотографии</string>
+    <string name="sortby_type_photo_first">Фото</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">Видео</string>
     <!-- Passcode with 4 digits -->
@@ -790,7 +790,7 @@
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
     <string name="servers_busy">Процесс длится дольше ожидаемого. Пожалуйста, подождите.</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_free">Бесплатный</string>
+    <string name="my_account_free">Бесплатный аккаунт</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro1">Аккаунт Pro&#160;I</string>
     <!-- Label in My Account section to show user account type -->
@@ -804,7 +804,7 @@
     <!-- Subtitle of the screen to backup the master key -->
     <string name="backup_subtitle">Пароль разблокирует ключ восстановления</string>
     <!-- First paragraph of the screen to backup the master key -->
-    <string name="backup_first_paragraph">Ваши данные могут быть прочитаны только после цепочки операций дешифрирования, которая начинается с ключа дешифрирования, который мы храним зашифрованным вместе с паролем. Это значит, что если вы потеряете пароль, мастер-ключ нельзя будет расшифровать, а вы потеряете доступ к своим данным.</string>
+    <string name="backup_first_paragraph">Ваши данные могут быть прочитаны только цепочки операций дешифрования, которая начинается с ключа дешифрования, который мы храним зашифрованным вместе с паролем. Это значит, что если вы потеряете пароль, ключ восстановления нельзя будет расшифровать, а вы потеряете доступ к своим данным.</string>
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="backup_second_paragraph">Экспорт ключа восстановления и его хранение в надёжном месте позволит задать новый пароль без потери данных.</string>
     <!-- Third paragraph of the screen to backup the master key -->
@@ -828,7 +828,7 @@
     <!-- Hint of the text where the user can write his password -->
     <string name="edit_text_insert_pass">пароль</string>
     <!-- Text shown in the last alert dialog to confirm delete user account -->
-    <string name="delete_account_text_last_step">Остался один шаг перед удалением учётной записи. Все данные в облаке будут безвозвратно утрачены. Введите пароль.</string>
+    <string name="delete_account_text_last_step">Остался один шаг перед удалением аккаунта. Все данные в облаке будут безвозвратно утрачены. Введите пароль.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">Проверка электронной почты</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
@@ -848,7 +848,7 @@
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_title">Неверный адрес электронной почты</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">Пожалуйста, проверьте свой электронный почтовый ящик и попробуйте заново.</string>
+    <string name="invalid_email_text">Пожалуйста, проверьте свою электронную почту и попробуйте снова.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Сброс пароля</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -890,7 +890,7 @@
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">Удалить изображение</string>
     <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">Введённый ключ не подходит к этой учётной записи. Пожалуйста, убедитесь, что это правильный ключ восстановления и попробуйте снова.</string>
+    <string name="incorrect_MK">Введённый ключ не подходит к этому аккаунту. Пожалуйста, убедитесь, что это правильный ключ восстановления, и попробуйте снова.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK_title">Неверный ключ восстановления</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
@@ -933,7 +933,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Слишком много неудачных попыток войти. Пожалуйста, подождите час.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Учётная запись ещё не подтверждена. Проверьте почту.</string>
+    <string name="account_not_validated_login">Аккаунт ещё не подтверждён. Проверьте почту.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Ссылка на папку недоступна</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -1045,7 +1045,7 @@
         <item quantity="other">Отключены до %1$s</item>
     </plurals>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
-    <string name="title_properties_chat_contact_notifications">Оповещения</string>
+    <string name="title_properties_chat_contact_notifications">Уведомления</string>
     <!-- Title of the section to choose the sound of incoming messages in the Contact Properties screen -->
     <string name="title_properties_chat_contact_message_sound">Звук сообщения</string>
     <!-- Title of the section to share the contact in the Contact Properties screen -->
@@ -1254,7 +1254,7 @@
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
     <string name="general_allow">Разрешить</string>
     <!-- Dialog to confirm the action of enabling logs -->
-    <string name="enable_log_text_dialog">Журнал может содержать информацию о вашей учётной записи</string>
+    <string name="enable_log_text_dialog">Журнал может содержать информацию о вашем аккаунте</string>
     <!-- Dialog to confirm the reconnect action -->
     <string name="confirmation_to_reconnect">Соединение восстановлено. Подключиться к MEGA?</string>
     <!-- Error when a message cannot be edited -->
@@ -1345,9 +1345,9 @@
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Недостаточная квота передач</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
-    <string name="current_text_depleted_transfer_overquota">Ваша поставленное в очередь скачивание превышает текущую квоту передачи, доступную для вашего IP-адреса, и поэтому было прервано. Улучшите аккаунт или подождите %s, чтобы продолжить.</string>
+    <string name="current_text_depleted_transfer_overquota">Поставленное в очередь скачивание превысило текущую квоту передачи, доступную для вашего IP-адреса, и поэтому было прервано. Улучшите аккаунт или подождите %s, чтобы продолжить.</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
-    <string name="text_depleted_transfer_overquota">Истекла квота передачи, доступная для вашего IP-адреса. Улучшите аккаунт или подождите %s, чтобы продолжить скачивание.</string>
+    <string name="text_depleted_transfer_overquota">Исчерпана квота передачи, доступная для вашего IP-адреса. Улучшите аккаунт или подождите %s, чтобы продолжить скачивание.</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
     <string name="plans_depleted_transfer_overquota">Посмотреть подписки</string>
     <!-- Button option of the alert when the transfer quota is depleted -->
@@ -1491,7 +1491,7 @@
     <!-- messages string in chat notification -->
     <string name="messages_chat_notification">сообщения</string>
     <!-- part of the string in incoming shared folder notification -->
-    <string name="incoming_folder_notification">От</string>
+    <string name="incoming_folder_notification">от</string>
     <!-- title of incoming shared folder notification -->
     <string name="title_incoming_folder_notification">Новая папка с общим доступом</string>
     <!-- title of the notification for a new incoming contact request -->
@@ -1517,7 +1517,7 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Переместить в корзину?</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_delete_from_mega">Удалить с MEGA?</string>
+    <string name="confirmation_delete_from_mega">Удалить из MEGA?</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_contact_notifications_for_chat">Уведомления чата</string>
     <!-- title of the section for achievements -->
@@ -1567,7 +1567,7 @@
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Подтвердив номер телефона, вы получите %1$s в виде бонуса на 365 дней.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Вы получили %1$s места на диске за установку приложения MEGA на компьютер.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Вы получили %1$s на диске за установку приложения MEGA на компьютер.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">Вы получили %1$s места на диске за установку мобильного приложения MEGA.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
@@ -1607,7 +1607,7 @@
     <!-- Title of the dialog to create a new text file by inserting the name -->
     <string name="dialog_title_new_text_file">Новый текстовый файл</string>
     <!-- Input field description in the create file dialog. -->
-    <string name="context_new_file_name">Имя файла</string>
+    <string name="context_new_file_name">Название файла</string>
     <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="dialog_title_new_link">Название ссылки</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1617,13 +1617,13 @@
     <!-- Title of the field email when a new contact is created to upload -->
     <string name="new_file_email_when_uploading">EMAIL</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
-    <string name="forward_menu_item">Вперёд</string>
+    <string name="forward_menu_item">Переслать</string>
     <!-- name of the button to attach file from MEGA to another app -->
     <string name="general_attach">Прикрепить</string>
     <!-- Error shown when the user left a name empty -->
     <string name="empty_name">Неправильное имя</string>
     <!-- Error shown when the user left names empty and names typed with not allowed characters -->
-    <string name="general_incorrect_names">Пожалуйста, исправьте имена файлов, прежде чем продолжить</string>
+    <string name="general_incorrect_names">Пожалуйста, исправьте названия файлов, прежде чем продолжить</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Недопустимые символы</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
@@ -1638,7 +1638,7 @@
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">Ошибка. Файл pdf повреждён или не существует.</string>
     <!-- Label to include info of the user email in the feedback form -->
-    <string name="user_account_feedback">Учётная запись пользователя</string>
+    <string name="user_account_feedback">Аккаунт пользователя</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
     <string name="save_to_mega">Сохранить на мой \nоблачный диск</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
@@ -1714,7 +1714,7 @@
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">Сканировать QR-код</string>
     <!-- get the contact link and copy it -->
-    <string name="button_copy_link">Скопировать ссылку</string>
+    <string name="button_copy_link">Копировать ссылку</string>
     <!-- Create QR code -->
     <string name="button_create_qr">Создать QR-код</string>
     <!-- Text shown when it has been created the QR code successfully -->
@@ -1730,7 +1730,7 @@
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]Корзина [/A][B]пуста[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]Нет файлов на [/B][A]облачнов диске[/A]</string>
+    <string name="context_empty_cloud_drive">[B]Нет файлов на [/B][A]облачном диске[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Нет файлов, [/B][A]сохранённых локально[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
@@ -1756,19 +1756,19 @@
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Неверный пароль ссылки</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
-    <string name="open_link_not_valid_link">Ссылка, которую вы пытаетесь открыть, не является действительной ссылкой MEGA.</string>
+    <string name="open_link_not_valid_link">Ссылка, которую вы пытаетесь открыть, недействительна.</string>
     <!-- Message shown when a link is being processing -->
     <string name="processing_link">Обработка ссылки&#8230;</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
     <string name="passwd_weak">Ваш пароль легко подбирается. Попробуйте использовать более длинный пароль. Используйте сочетания прописных и строчных букв. Используйте символы. Не используйте имена или словарные слова.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
-    <string name="passwd_medium">Ваш пароль достаточно надежен для продолжения, но мы рекомендуем все же усилить надежность пароля.</string>
+    <string name="passwd_medium">Ваш пароль достаточно надёжен для продолжения, но мы рекомендуем все же усилить надёжность пароля.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a good password -->
     <string name="passwd_good">Этот пароль не поддастся самым распространённым атакам с применением полного перебора. Убедитесь, что запомнили его.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a strong password -->
     <string name="passwd_strong">Этот пароль не поддастся самым самым мощным атакам с применением полного перебора. Убедитесь, что запомнили его.</string>
     <!-- Password very weak -->
-    <string name="pass_very_weak">Очень слабый</string>
+    <string name="pass_very_weak">Совсем ненадёжный</string>
     <!-- Password weak -->
     <string name="pass_weak">Ненадёжный</string>
     <!-- Password medium -->
@@ -1779,10 +1779,8 @@
     <string name="pass_strong">Надёжный</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">Идёт вызов</string>
-    <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">Нажмите, чтобы вернуться к вызову</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
-    <string name="button_notification_call_in_progress">Вернуться к вызову</string>
+    <string name="button_notification_call_in_progress">Вернуться к звонку</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
     <string name="contacts_mega">В MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
@@ -1830,7 +1828,7 @@
         <item quantity="other">Предыдущие версии</item>
     </plurals>
     <!-- option menu to revert a file version -->
-    <string name="general_revert">Отменить</string>
+    <string name="general_revert">Вернуть</string>
     <!-- Title of the dialog to confirm that a version os going to be deleted, version items -->
     <plurals name="title_dialog_delete_version">
         <item quantity="one">Удалить версию?</item>
@@ -1849,7 +1847,7 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Качество видео</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Для загрузок из камеры требуется доступ к фотографиям и другим медиафайлам на устройстве. Пожалуйста, перейдите в настройки и дайте разрешение.</string>
+    <string name="on_refuse_storage_permission">Для загрузок из камеры требуется доступ к фотографиям и другим медиафайлам на устройстве. Пожалуйста, разрешите его в настройках.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Низкое</item>
@@ -1954,7 +1952,7 @@
         <item quantity="other">%1$d непрочитанных чата</item>
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
-    <string name="chat_loading_messages">[A]Загрузка[/A] [B]Сообщений&#8230;[/B]</string>
+    <string name="chat_loading_messages">[A]Загрузка[/A] [B]сообщений&#8230;[/B]</string>
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Безопасность</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -2033,7 +2031,7 @@
     <!-- Text button -->
     <string name="general_verify">Подтвердить</string>
     <!-- Text button -->
-    <string name="general_next">Вперёд</string>
+    <string name="general_next">Далее</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Произошла ошибка при генерации seed-ключа или QR-кода, попробуйте снова.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
@@ -2106,13 +2104,13 @@
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Пропущенный вызов[/A]</string>
     <!-- Message shown when a call ends. -->
-    <string name="call_rejected_messages">[A]Вызов отклонён[/A]</string>
+    <string name="call_rejected_messages">[A]Звонок отклонён[/A]</string>
     <!-- Message shown when a call ends. -->
-    <string name="call_cancelled_messages">[A]Вызов отменён[/A]</string>
+    <string name="call_cancelled_messages">[A]Звонок отменён[/A]</string>
     <!-- Message shown when a call ends. -->
-    <string name="call_failed_messages">[A]Вызов не удался[/A]</string>
+    <string name="call_failed_messages">[A]Звонок не удался[/A]</string>
     <!-- Message shown when a call ends. -->
-    <string name="call_not_answered_messages">[A]Вызов не получил ответа[/A]</string>
+    <string name="call_not_answered_messages">[A]На звонок не ответили[/A]</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Вы уже добавили этот контакт.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2140,7 +2138,7 @@
     <!-- Title of the option on the chat list to unarchive a chat -->
     <string name="unarchive_chat_option">Разархивировать чат</string>
     <!-- Confirmation button of the dialog to archive a chat -->
-    <string name="general_archive">Архив</string>
+    <string name="general_archive">Архивировать</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">Разархивировать</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
@@ -2211,17 +2209,17 @@
     <!-- Label shown when the user wants to add contacts into a chat conversation -->
     <string name="send_contacts">Добавить контакты</string>
     <!-- Title of the alert when the account have been logged out from another client -->
-    <string name="title_alert_logged_out">Выйти из системы</string>
+    <string name="title_alert_logged_out">Вышел из системы</string>
     <!-- Text shown to indicate user that his account has already been confirmed -->
     <string name="account_confirmed">Ваш аккаунт активирован. Пожалуйста, авторизируйтесь.</string>
     <!-- Text shown to indicate user that his account should be confirmed typing his password -->
-    <string name="confirm_account">Пожалуйста, введите пароль, чтобы подтвердить свою учётную запись</string>
+    <string name="confirm_account">Пожалуйста, введите пароль, чтобы подтвердить свой аккаунт</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
     <string name="error_own_email_as_contact">Не обязательно добавлять свой собственный email адрес</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Недействительный код</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">Облачный диск почти полон. Перейдите на Pro и получите до %1$s места на дискe и %2$s трафика.</string>
+    <string name="text_almost_full_warning">Облачный диск почти полон. Перейдите на Pro и получите до %1$s на дискe и %2$s трафика.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
     <string name="text_almost_full_warning_pro_account">Облачный диск почти заполнен. Улучшите аккаунт сейчас и получите до %1$s места для хранения и %2$s трафика.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
@@ -2239,13 +2237,13 @@
     <!-- Button of the dialog shown when the storage is almost full to get bonus -->
     <string name="button_bonus_almost_full_warning">Бонусы</string>
     <!-- Mail title to upgrade to a custom plan -->
-    <string name="title_mail_upgrade_plan">Собственный план</string>
+    <string name="title_mail_upgrade_plan">Индивидуальный план</string>
     <!-- Mail subject to upgrade to a custom plan -->
-    <string name="subject_mail_upgrade_plan">Спросите нас, как вы можете перейти на собственный план:</string>
+    <string name="subject_mail_upgrade_plan">Спросите нас, как вы можете перейти на индивидуальный план:</string>
     <!-- Used in chat list screen to indicate in a chat list item that the message was sent by me, followed by the message -->
     <string name="word_me">Я:</string>
     <!-- Title of the button in the contact info screen to start an audio call -->
-    <string name="call_button">Вызов</string>
+    <string name="call_button">Звонок</string>
     <!-- Title of the button in the contact info screen to send a message -->
     <string name="message_button">Сообщение</string>
     <!-- Title of the button in the contact info screen to start a video call -->
@@ -2272,13 +2270,13 @@
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="subtitle_read_only_permissions">Только чтение</string>
     <!-- Label shown the total space and the used space in an account -->
-    <string name="used_space">[A]%1$s [/A][B]из %2$s использовано[/B]</string>
+    <string name="used_space">[A]%1$s [/A][B]из %2$s используется[/B]</string>
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
     <string name="staging_api_url_text">Действительно перейти на тестовый сервер? Это может вызвать непоправимые сбои в работе аккаунта.</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="title_confirmation_open_camera_on_chat">Открыть камеру?</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
-    <string name="confirmation_open_camera_on_chat">Если вы откроете камеру, ваша передача видео будет приостановлена в текущем вызове.</string>
+    <string name="confirmation_open_camera_on_chat">Если вы откроете камеру, трансляция видео в текущем звонке будет приостановлена.</string>
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">У вас могут быть новые сообщения</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
@@ -2324,7 +2322,7 @@
     <!-- Title of the alert when a chat link is invalid -->
     <string name="title_alert_chat_link_error">Ссылка на чат</string>
     <!-- Text of the dialog to confirm after closing all other sessions -->
-    <string name="confirmation_close_sessions_text">Будут закрыты все активные сеансы кроме текущего.</string>
+    <string name="confirmation_close_sessions_text">Будут закрыты все активные сеансы, кроме текущего.</string>
     <!-- Title of the dialog to confirm after closing all other sessions -->
     <string name="confirmation_close_sessions_title">Хотите закрыть все остальные сеансы?</string>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
@@ -2342,7 +2340,7 @@
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A][B] включил чередование ключей шифрования.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
-    <string name="invalid_chat_link">Эта беседа больше не доступна</string>
+    <string name="invalid_chat_link">Этот разговор больше не доступна</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Чередование ключей шифрования</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -2374,7 +2372,7 @@
     <!-- Subtitle of the historic notification for a reminder new contact request -->
     <string name="notification_reminder_contact_request">[A]Напоминание: [/A][B]%s [/B][C]прислал вам запрос.[/C]</string>
     <!-- Title of the historic notification for a contact request cancelled -->
-    <string name="title_contact_request_notification_cancelled">Запрос на контакт отменён</string>
+    <string name="title_contact_request_notification_cancelled">Запрос в контакты отменён</string>
     <!-- Subtitle of the historic notification for contact request cancelled -->
     <string name="subtitle_contact_request_notification_cancelled">[A]%s [/A][B]отменил запрос.[/B]</string>
     <!-- Title of the historic notification when an user deletes you as contact -->
@@ -2402,7 +2400,7 @@
     <!-- Popup notification text on mouse-over taken down folder. -->
     <string name="message_folder_takedown_pop_out_notification">К этой папке предъявлено заявления на изъятие.</string>
     <!-- option to dispute taken down file or folder -->
-    <string name="dispute_takendown_file">Оспорить блокировку</string>
+    <string name="dispute_takendown_file">Оспорить изъятие</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">Недоступно из-за нарушения наших условий использования</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
@@ -2471,7 +2469,7 @@
     <!-- message will be shown when there is not enough space to perform camera upload. -->
     <string name="message_out_of_space">Недостаточно места для сжатия видео.</string>
     <!-- the title of the notification that displays when compression larger than setting -->
-    <string name="title_compression_size_over_limit">Объём для сжатия видео слишком большой</string>
+    <string name="title_compression_size_over_limit">Размер для сжатия видео слишком большой</string>
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
     <string name="message_compression_size_over_limit">Общий размер сжимаемого видео превышает %s. Пожалуйста, подключите зарядное устройство, чтобы продолжить.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
@@ -2560,7 +2558,7 @@
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">Чтобы делиться файлами, MEGA требуется ваше разрешение на доступ к файлам.</string>
     <!-- Title of the screen asking permissions for camera -->
-    <string name="allow_acces_camera_title">Разрешить доступ к камере</string>
+    <string name="allow_acces_camera_title">Разрешите доступ к камере</string>
     <!-- Subtitle of the screen asking permissions for camera -->
     <string name="allow_acces_camera_subtitle">Разрешите доступ к камере для сканирования документов, фотографирования и видеозвонков.</string>
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
@@ -2625,7 +2623,7 @@
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">Произошла ошибка, и файл не может быть открыт в этом приложении.</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
-    <string name="outgoing_call_starting">Вызов&#8230;</string>
+    <string name="outgoing_call_starting">Звонок&#8230;</string>
     <!-- Content of a invalid meta message -->
     <string name="error_meta_message_invalid">Сообщение содержит неверные метаданные</string>
     <!-- Title of the activity that sends a location -->
@@ -2643,7 +2641,7 @@
     <!-- Title of the dialog shown when the location is disabled -->
     <string name="gps_disabled">GPS отключен</string>
     <!-- Text of the dialog shown when the location is disabled for open location settings -->
-    <string name="open_location_settings">Хотите открыть настройки местоположения?</string>
+    <string name="open_location_settings">Открыть настройки местоположения?</string>
     <!-- Info shown in the subtitle of each row of the shared files to chat: sender name . date -->
     <string name="second_row_info_item_shared_file_chat">%1$s . %2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
@@ -2734,7 +2732,7 @@
     <!-- Title of first tour screen -->
     <string name="title_tour_one">Ключи хранятся у вас</string>
     <!-- Content of first tour screen -->
-    <string name="content_tour_one">Безопасность — это то, для чего существуем. Ваши файлы в безопасности за нашей хорошо смазанной шифровальной машиной, где только вы можете получить доступ к ним.</string>
+    <string name="content_tour_one">Безопасность — это то, для чего мы существуем. Ваши файлы в безопасности за хорошо смазанной шифровальной машиной, где только вы можете получить доступ к ним.</string>
     <!-- Title of second tour screen -->
     <string name="title_tour_two">Зашифрованный чат</string>
     <!-- Content of second tour screen -->
@@ -2742,11 +2740,11 @@
     <!-- Title of third tour screen -->
     <string name="title_tour_three">Создайте свою сеть</string>
     <!-- Content of third tour screen -->
-    <string name="content_tour_three">Добавление контактов, создание сети, совместное использование, голосовые и видеозвонки без выхода из MEGA</string>
+    <string name="content_tour_three">Добавляйте контакты, создавайте сообщество, сотрудничайте и совершайте голосовые и видеозвонки, не покидая MEGA</string>
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Ваши фотографии в облаке</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Загрузка из камеры — важная функция для любого мобильного устройства, и мы о ней позаботились. Зарегистрируйтесь сейчас.</string>
+    <string name="content_tour_four">Загрузки из камеры — важная функция для любого мобильного устройства, и мы о ней позаботились. Зарегистрируйтесь сейчас.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Введите пароль</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2764,7 +2762,7 @@
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] вошёл в чат.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
-    <string name="context_remove_chat_link_warning_text">Беседа больше не будет доступна по ссылке на чат после удаления.</string>
+    <string name="context_remove_chat_link_warning_text">Разговор больше не будет доступен по ссылке на чат после удаления.</string>
     <!-- Description text of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_warning_text">Чередование ключей шифрования не позволяет получить ссылку на чат без создания нового группового чата.</string>
     <!-- Question of the dialog to generate a public chat link -->
@@ -2782,9 +2780,9 @@
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
     <string name="muted_contact_micro">%s заглушил этот вызов</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
-    <string name="muted_own_micro">Приглушен</string>
+    <string name="muted_own_micro">Приглушён</string>
     <!-- Subtitle of the call screen when the call is on hold -->
-    <string name="call_on_hold">Вызов на удержании</string>
+    <string name="call_on_hold">Звонок на удержании</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other. -->
     <string name="hold_and_answer_call_incoming">Удержать и ответить</string>
     <!-- The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other. -->
@@ -2798,7 +2796,7 @@
     <!-- Title of the dialog shown when you want to join a group call -->
     <string name="title_join_call">Присоединиться к вызову</string>
     <!-- Text of the dialog shown when you want to join a group call -->
-    <string name="text_join_call">Чтобы присоединиться к этому вызову, вы должны завершить текущий вызов.</string>
+    <string name="text_join_call">Чтобы присоединиться к этому звонку, вы должны завершить текущий.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Чтобы присоединиться к этому вызову, вы должны завершить текущий вызов или удержать его.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
@@ -2919,9 +2917,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Возникла проблема с вашим последним платежом. Пожалуйста, войдите в MEGA с помощью настольного браузера для получения дополнительной информации.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account deactivated</string>
+    <string name="expired_business_title">Аккаунт деактивирован</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
+    <string name="expired_admin_business_text">Ваш бизнес-аккаунт был деактивирован из-за сбоя оплаты. Вы не сможете получить доступ к данным, хранящимся в вашем аккаунте. Для оплаты и возобновления подписки войдите в MEGA через веб-браузер.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Ваш аккаунт [B]приостановлен[/B]. Вы можете только просматривать данные.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -2947,7 +2945,7 @@
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
     <string name="my_chat_files_folder">Мои файлы из чата</string>
     <!-- Error shown when it was not possible to create a folder for any reason -->
-    <string name="error_creating_folder">Ошибка. Папка %1$s не была создана</string>
+    <string name="error_creating_folder">Ошибка. Папка «%1$s» не была создана</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
     <string name="verify_email_label">Проверьте свой адрес электронной почты</string>
     <!-- Text informing user that their account has been suspended -->
@@ -3054,15 +3052,15 @@
     <!-- Time in hours. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_hours">%d ч</string>
     <!-- Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="label_time_in_minutes">%d мин</string>
+    <string name="label_time_in_minutes">%d&#160;мин</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="label_time_in_seconds">%d с</string>
+    <string name="label_time_in_seconds">%d&#160;с</string>
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
     <string name="label_verify_credentials">Подтвердить учётные данные</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Не подтверждено</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
-    <string name="label_verified">Проверен</string>
+    <string name="label_verified">Подтверждены</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Подлинность учётных данных</string>
     <!-- ”Verify user” dialog description -->
@@ -3084,9 +3082,9 @@
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
     <string name="search_hint">Поиск в MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
-    <string name="error_reset_account_blocked">Учётная запись, к которой вы пытаетесь получить доступ, заблокирована.</string>
+    <string name="error_reset_account_blocked">Аккаунт, к которому вы пытаетесь получить доступ, заблокирован.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
-    <string name="error_business_disabled">Администратор заблокировал ваш аккаунт. Пожалуйста, обратитесь к администратору вашего бизнес-аккаунта за подробностями.</string>
+    <string name="error_business_disabled">Администратор деактивировал ваш аккаунт. Пожалуйста, обратитесь к администратору вашего бизнес-аккаунта за подробностями.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
     <string name="error_business_removed">Ваш аккаунт был удалён администратором. Пожалуйста, свяжитесь с администратором вашего бизнес-аккаунта для получения более подробной информации.</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
@@ -3098,7 +3096,7 @@
     <!-- Message showing to explain what will happen when the operation of -->
     <string name="modify_phone_number_message">Эта операция удалит ваш текущий номер телефона и начнёт привязку нового номера к вашему аккаунту.</string>
     <!-- Message for action to remove the registered phone number. -->
-    <string name="remove_phone_number_message">Это удалит привязанный номер телефона из вашего аккаунта. Если позжк вы решите добавить номер телефона, вам потребуется подтвердить его.</string>
+    <string name="remove_phone_number_message">Это удалит привязанный номер телефона из вашего аккаунта. Если позже вы решите добавить номер телефона, вам потребуется подтвердить его.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Посмотреть</string>
     <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
@@ -3134,7 +3132,7 @@
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">Чтобы продолжить загрузку, возобновите передачу.</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
-    <string name="progress_size_indicator">%1$d&#160;%% из %2$s</string>
+    <string name="progress_size_indicator">%1$d%% из %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Включена отладочная информация для сообщений чата</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
@@ -3271,9 +3269,9 @@
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
     <string name="files_required_permissions_warning">MEGA требуется ваше разрешение, чтобы делиться файлами.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
-    <string name="file_properties_favourite">Популярные</string>
+    <string name="file_properties_favourite">Избранное</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
-    <string name="file_properties_unfavourite">Удалить популярные</string>
+    <string name="file_properties_unfavourite">Удалить из избранного</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
     <string name="file_properties_label">Метка</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
@@ -3315,7 +3313,7 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Принять куки</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_essential_title">Основные куки-файлы</string>
+    <string name="preference_cookies_essential_title">Обязательные куки-файлы</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Необходимы для предоставления вам важных функций и безопасного доступа к нашим услугам. По этой причине согласие на них не требуется.</string>
     <!-- Preference screen item title -->
@@ -4241,4 +4239,6 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">Вы уже добавили все свои контакты в этот чат. Если хотите добавить больше участников, сначала пригласите их в свой список контактов.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">Изображение сохранено в галерею устройства</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]Дата продления:[/A] [B]%s[/B]</string>
 </resources>

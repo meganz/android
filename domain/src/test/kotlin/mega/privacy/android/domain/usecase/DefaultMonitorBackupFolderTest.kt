@@ -31,9 +31,9 @@ class DefaultMonitorBackupFolderTest {
 
     @Test
     fun `test that current backup folder id is returned`() = runTest {
-        val expected = NodeId(1L)
+        val expected = Result.success(NodeId(1L))
         fileRepository.stub {
-            onBlocking { getBackupFolderId() }.thenReturn(expected)
+            onBlocking { getBackupFolderId() }.thenReturn(expected.getOrThrow())
         }
 
         underTest().test {
@@ -46,13 +46,14 @@ class DefaultMonitorBackupFolderTest {
     fun `test that when user update of type backup folder is received, the new id is fetched`() =
         runTest {
             val updates = List(5) { UserChanges.MyBackupsFolder }
-            val expected = NodeId(1L)
-            val expectedUpdates = updates.mapIndexed { index, _ -> NodeId(index.toLong()) }
+            val expected = Result.success(NodeId(1L))
+            val expectedUpdates =
+                List(updates.size) { index -> Result.success(NodeId(index.toLong())) }
 
             fileRepository.stub {
                 onBlocking { getBackupFolderId() }.thenReturn(
-                    expected,
-                    *expectedUpdates.toTypedArray()
+                    expected.getOrThrow(),
+                    *expectedUpdates.map { it.getOrThrow() }.toTypedArray()
                 )
             }
             whenever(monitorUserUpdates()).thenReturn(updates.asFlow())
@@ -70,10 +71,10 @@ class DefaultMonitorBackupFolderTest {
     fun `test that if non backup folder user updates are emitted, no new id is fetched`() =
         runTest {
             val updates = UserChanges.values().filterNot { it == UserChanges.MyBackupsFolder }
-            val expected = NodeId(1L)
+            val expected = Result.success(NodeId(1L))
             val notExpected = NodeId(2L)
             fileRepository.stub {
-                onBlocking { getBackupFolderId() }.thenReturn(expected, notExpected)
+                onBlocking { getBackupFolderId() }.thenReturn(expected.getOrThrow(), notExpected)
             }
             whenever(monitorUserUpdates()).thenReturn(updates.asFlow())
 
@@ -82,5 +83,20 @@ class DefaultMonitorBackupFolderTest {
                 awaitComplete()
             }
         }
+
+    @Test
+    fun `test that an error from the repository returns a failed result`() = runTest {
+
+        fileRepository.stub {
+            onBlocking { getBackupFolderId() }.thenAnswer {
+                throw Throwable()
+            }
+        }
+        underTest().test {
+            assertThat(awaitItem().isFailure).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+
+    }
 
 }

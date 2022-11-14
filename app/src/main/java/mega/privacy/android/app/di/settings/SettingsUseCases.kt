@@ -9,8 +9,6 @@ import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.DefaultCanDeleteAccount
-import mega.privacy.android.domain.usecase.DefaultFetchMultiFactorAuthSetting
-import mega.privacy.android.domain.usecase.DefaultGetStartScreen
 import mega.privacy.android.domain.usecase.DefaultIsChatLoggedIn
 import mega.privacy.android.domain.usecase.DefaultMonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.DefaultMonitorHideRecentActivity
@@ -21,7 +19,6 @@ import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
-import mega.privacy.android.domain.usecase.GetStartScreen
 import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
@@ -51,16 +48,10 @@ abstract class SettingsUseCases {
     abstract fun bindRefreshPasscodeLockPreference(useCase: DefaultRefreshPasscodeLockPreference): RefreshPasscodeLockPreference
 
     @Binds
-    abstract fun bindStartScreen(useCase: DefaultGetStartScreen): GetStartScreen
-
-    @Binds
     abstract fun bindToggleAutoAcceptQRLinks(useCase: DefaultToggleAutoAcceptQRLinks): ToggleAutoAcceptQRLinks
 
     @Binds
     abstract fun bindIsChatLoggedIn(useCase: DefaultIsChatLoggedIn): IsChatLoggedIn
-
-    @Binds
-    abstract fun bindFetchMultiFactorAuthSetting(useCase: DefaultFetchMultiFactorAuthSetting): FetchMultiFactorAuthSetting
 
     @Binds
     abstract fun bindMonitorAutoAcceptQRLinks(implementation: DefaultMonitorAutoAcceptQRLinks): MonitorAutoAcceptQRLinks
@@ -69,6 +60,10 @@ abstract class SettingsUseCases {
     abstract fun bindMonitorHideRecentActivity(implementation: DefaultMonitorHideRecentActivity): MonitorHideRecentActivity
 
     companion object {
+        @Provides
+        fun provideFetchMultiFactorAuthSetting(accountRepository: AccountRepository): FetchMultiFactorAuthSetting =
+            FetchMultiFactorAuthSetting(accountRepository::isMultiFactorAuthEnabled)
+
         @Provides
         fun providePutStringPreference(settingsRepository: SettingsRepository): PutPreference<String> =
             PutPreference(settingsRepository::setStringPreference)

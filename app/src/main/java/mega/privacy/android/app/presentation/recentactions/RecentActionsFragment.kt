@@ -14,6 +14,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,9 +28,11 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.databinding.FragmentRecentsBinding
+import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForSingleNode
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
@@ -51,14 +55,18 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RecentActionsFragment : Fragment() {
 
-    private var _binding: FragmentRecentsBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentRecentsBinding
 
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
 
-    private var adapter: RecentActionsAdapter? = null
+    /**
+     * Adapter holding the list of recent action
+     */
+    @Inject
+    lateinit var adapter: RecentActionsAdapter
+
     private lateinit var emptyLayout: ScrollView
     private lateinit var emptyText: TextView
     private lateinit var showActivityButton: Button
@@ -67,15 +75,38 @@ class RecentActionsFragment : Fragment() {
     private lateinit var listView: RecyclerView
     private lateinit var fastScroller: FastScroller
 
-    val viewModel: RecentActionsViewModel by activityViewModels()
+    private val viewModel: RecentActionsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentRecentsBinding.inflate(inflater, container, false)
+        binding = FragmentRecentsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupView()
+        observeDragSupportEvents(viewLifecycleOwner, listView, Constants.VIEWER_FROM_RECETS)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    Timber.d("Collect ui state")
+                    setRecentActions(it.recentActionItems)
+                    displayRecentActionsActivity(
+                        it.hideRecentActivity,
+                        it.recentActionItems.size
+                    )
+                }
+            }
+        }
+    }
+
+    private fun setupView() {
         emptyLayout = binding.emptyStateRecents
         emptyText = binding.emptyTextRecents
         showActivityButton = binding.showActivityButton
@@ -90,43 +121,40 @@ class RecentActionsFragment : Fragment() {
         fastScroller = binding.fastscroll
 
         initAdapter()
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        observeDragSupportEvents(viewLifecycleOwner, listView, Constants.VIEWER_FROM_RECETS)
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect {
-                    Timber.d("Collect ui state")
-                    setRecentActions(it.recentActionItems)
-                    displayRecentActionsActivity(
-                        it.hideRecentActivity,
-                        it.recentActionItems.size
-                    )
-
-                }
-            }
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     /**
      * Initialize the adapter
      */
     private fun initAdapter() {
-        adapter = RecentActionsAdapter(
-            requireActivity(),
-            this,
-        )
+        adapter.setOnItemClickListener { item, position ->
+            // If only one element in the bucket
+            if (item.bucket.nodes.size() == 1) {
+                openFile(position, item.bucket.nodes[0])
+            }
+            // If more element in the bucket
+            else {
+                viewModel.select(item)
+                val currentDestination =
+                    Navigation.findNavController(requireView()).currentDestination
+                if (currentDestination != null && currentDestination.id == R.id.homepageFragment) {
+                    Navigation.findNavController(requireView())
+                        .navigate(HomepageFragmentDirections.actionHomepageToRecentBucket(),
+                            NavOptions.Builder().build())
+                }
+            }
+        }
+
+        adapter.setOnThreeDotsClickListener { node ->
+            if (!Util.isOnline(context)) {
+                (requireActivity() as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
+                    requireContext().getString(R.string.error_server_connection_problem), -1)
+            } else {
+                (requireActivity() as ManagerActivity).showNodeOptionsPanel(node,
+                    NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
+            }
+        }
+
         listView.adapter = adapter
         listView.addItemDecoration(HeaderItemDecoration(requireContext()))
         listView.clipToPadding = false
@@ -139,7 +167,7 @@ class RecentActionsFragment : Fragment() {
      * @param recentActionItems
      */
     private fun setRecentActions(recentActionItems: List<RecentActionItemType>) {
-        adapter?.setItems(recentActionItems)
+        adapter.setItems(recentActionItems)
         listView.layoutManager =
             TopSnappedStickyLayoutManager(requireContext()) { recentActionItems }
     }
@@ -253,7 +281,7 @@ class RecentActionsFragment : Fragment() {
             manageTextFileIntent(requireContext(), node, Constants.RECENTS_ADAPTER)
         } else {
             Timber.d("itemClick:isFile:otherOption")
-            onNodeTapped(requireContext(),
+            onNodeTapped(requireActivity(),
                 node,
                 { n: MegaNode? -> (requireActivity() as ManagerActivity).saveNodeByTap(n) },
                 (requireActivity() as ManagerActivity),

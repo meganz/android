@@ -5,22 +5,17 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.database.Cursor
-import android.net.Uri
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.WifiLock
 import android.os.BatteryManager
 import android.os.Build
-import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.StatFs
-import android.provider.MediaStore
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
@@ -32,7 +27,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.yield
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
@@ -57,6 +51,7 @@ import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
+import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
@@ -89,19 +84,16 @@ import mega.privacy.android.app.utils.ImageProcessor
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted
 import mega.privacy.android.app.utils.PreviewUtils
-import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
-import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
-import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
@@ -136,10 +128,7 @@ import nz.mega.sdk.MegaTransferListenerInterface
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
-import java.util.LinkedList
-import java.util.Queue
 import javax.inject.Inject
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
@@ -192,6 +181,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
          * Ignore extra attributes
          */
         const val EXTRA_IGNORE_ATTR_CHECK = "EXTRA_IGNORE_ATTR_CHECK"
+
+        /**
+         * Primary sync handle successfully set
+         */
+        const val EXTRA_PRIMARY_SYNC_SUCCESS = "EXTRA_PRIMARY_SYNC_SUCCESS"
 
         /**
          * Camera Uploads Cache Folder
@@ -426,6 +420,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var getPendingUploadList: GetPendingUploadList
 
     /**
+     * ProcessMediaForUpload
+     */
+    @Inject
+    lateinit var processMediaForUpload: ProcessMediaForUpload
+
+    /**
      * GetPrimarySyncHandle
      */
     @Inject
@@ -650,6 +650,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         if (intent != null) {
             ignoreAttr = intent.getBooleanExtra(EXTRA_IGNORE_ATTR_CHECK, false)
+            isPrimaryHandleSynced = intent.getBooleanExtra(EXTRA_PRIMARY_SYNC_SUCCESS, false)
         }
 
         Timber.d("Start Service - Create Coroutine")
@@ -788,116 +789,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             pendingIntent,
             false
         )
-        // Start the real uploading process, before is checking settings.
-        filesFromMediaStore()
+        checkUploadNodes()
     }
 
-    private fun isFilePathValid(media: CameraUploadMedia, parentPath: String?) =
-        media.filePath != null && !parentPath.isNullOrBlank()
-                && media.filePath!!.startsWith(parentPath)
-
-    private fun getUploadMediaFromCursor(
-        cursor: Cursor,
-        dataColumn: Int,
-        addedColumn: Int,
-        modifiedColumn: Int,
-    ): CameraUploadMedia {
-        val filePath = cursor.getString(dataColumn)
-        val addedTime = cursor.getLong(addedColumn) * 1000
-        val modifiedTime = cursor.getLong(modifiedColumn) * 1000
-        val timestamp = max(addedTime, modifiedTime)
-        val media = CameraUploadMedia(filePath = filePath, timestamp = timestamp)
-        Timber.d("Extract from cursor, add time: $addedTime, modify time: $modifiedTime, chosen time: $timestamp")
-        return media
-    }
-
-    private fun extractMedia(cursor: Cursor, parentPath: String?): Queue<CameraUploadMedia> {
-        return LinkedList<CameraUploadMedia>().apply {
-            try {
-                @Suppress("DEPRECATION")
-                val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
-                val addedColumn =
-                    cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED)
-                val modifiedColumn =
-                    cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED)
-                while (cursor.moveToNext()) {
-                    getUploadMediaFromCursor(
-                        cursor,
-                        dataColumn,
-                        addedColumn,
-                        modifiedColumn
-                    ).takeIf {
-                        isFilePathValid(it, parentPath)
-                    }?.let(this::add)
-                }
-            } catch (exception: Exception) {
-                Timber.e(exception)
-            }
-        }
-    }
-
-    private fun buildMediaQueue(
-        uri: Uri,
-        parentPath: String?,
-        pageSize: Int,
-        selectionQuery: String?,
-    ): Queue<CameraUploadMedia> =
-        createMediaCursor(parentPath, selectionQuery, pageSize, uri)?.let {
-            Timber.d("Extract ${it.count} Media from Cursor")
-            extractMedia(it, parentPath)
-        } ?: LinkedList<CameraUploadMedia>().also {
-            Timber.d("Extract 0 Media - Cursor is NULL")
-        }
-
-    private fun createMediaCursor(
-        parentPath: String?,
-        selectionQuery: String?,
-        pageSize: Int,
-        uri: Uri,
-    ): Cursor? {
-        val projection = getProjection()
-        val mediaOrder = MediaStore.MediaColumns.DATE_MODIFIED + " ASC "
-        return if (shouldPageCursor(parentPath)) {
-            mediaOrder.getPagedMediaCursor(selectionQuery, pageSize, uri, projection)
-        } else {
-            app?.contentResolver?.query(uri, projection, selectionQuery, null, mediaOrder)
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun getProjection() = arrayOf(
-        MediaStore.MediaColumns.DATA,
-        MediaStore.MediaColumns.DATE_ADDED,
-        MediaStore.MediaColumns.DATE_MODIFIED
-    )
-
-    /**
-     *  Only paging for files in internal storage
-     *  Files on SD card usually have the same timestamp (the time when the SD is loaded)
-     */
-    private fun shouldPageCursor(parentPath: String?) =
-        !SDCardUtils.isLocalFolderOnSDCard(this, parentPath)
-
-    private fun String.getPagedMediaCursor(
-        selectionQuery: String?,
-        pageSize: Int,
-        uri: Uri,
-        projection: Array<String>,
-    ): Cursor? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val args = Bundle()
-            args.putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, this)
-            args.putString(ContentResolver.QUERY_ARG_OFFSET, "0")
-            args.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selectionQuery)
-            args.putString(ContentResolver.QUERY_ARG_SQL_LIMIT, pageSize.toString())
-            app?.contentResolver?.query(uri, projection, args, null)
-        } else {
-            val mediaOrderPreR = "$this LIMIT 0,$pageSize"
-            app?.contentResolver?.query(uri, projection, selectionQuery, null, mediaOrderPreR)
-        }
-    }
-
-    private suspend fun filesFromMediaStore() {
+    private suspend fun checkUploadNodes() {
         Timber.d("Get Pending Files from Media Store Database")
         val primaryUploadNode = getNodeByHandle(getPrimarySyncHandle())
         if (primaryUploadNode == null) {
@@ -905,154 +800,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             endService()
             return
         }
-        val secondaryEnabled = isSecondaryFolderEnabled()
-        val secondaryUploadNode = if (secondaryEnabled) {
+        val secondaryUploadNode = if (isSecondaryFolderEnabled()) {
             Timber.d("Secondary Upload is ENABLED")
             getNodeByHandle(getSecondarySyncHandle())
         } else {
             null
         }
-
-        val primaryPhotos: Queue<CameraUploadMedia> = LinkedList()
-        val primaryVideos: Queue<CameraUploadMedia> = LinkedList()
-        val secondaryPhotos: Queue<CameraUploadMedia> = LinkedList()
-        val secondaryVideos: Queue<CameraUploadMedia> = LinkedList()
-
-        val pageSize = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) 1000 else 400
-        val pageSizeVideo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) 50 else 10
-        val uris = getSyncFileUploadUris()
-
-        for (uri in uris) {
-            if (uri == MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                || uri == MediaStore.Images.Media.INTERNAL_CONTENT_URI
-            ) {
-                // Photos
-                primaryPhotos.addAll(
-                    buildMediaQueue(
-                        uri,
-                        localPath(),
-                        pageSize,
-                        selectionQuery(SyncTimeStamp.PRIMARY_PHOTO)
-                    )
-                )
-                if (secondaryEnabled) {
-                    secondaryPhotos.addAll(
-                        buildMediaQueue(
-                            uri,
-                            localPathSecondary(),
-                            pageSize,
-                            selectionQuery(SyncTimeStamp.SECONDARY_PHOTO)
-                        )
-                    )
-                }
-            } else if (uri == MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                || uri == MediaStore.Video.Media.INTERNAL_CONTENT_URI
-            ) {
-                // Videos
-                primaryVideos.addAll(
-                    buildMediaQueue(
-                        uri,
-                        localPath(),
-                        pageSizeVideo,
-                        selectionQuery(SyncTimeStamp.PRIMARY_VIDEO)
-                    )
-                )
-                if (secondaryEnabled) {
-                    secondaryVideos.addAll(
-                        buildMediaQueue(
-                            uri,
-                            localPathSecondary(),
-                            pageSizeVideo,
-                            selectionQuery(SyncTimeStamp.SECONDARY_VIDEO)
-                        )
-                    )
-                }
-            }
-        }
-
         totalUploaded = 0
-        prepareUpload(
-            primaryPhotos,
-            primaryVideos,
-            secondaryPhotos,
-            secondaryVideos,
-            secondaryEnabled,
-            primaryUploadNode,
-            secondaryUploadNode
-        )
+        processMediaForUpload(primaryUploadNode, secondaryUploadNode, tempRoot)
+        gatherSyncRecordsForUpload()
     }
 
-    private suspend fun prepareUpload(
-        primaryPhotos: Queue<CameraUploadMedia>,
-        primaryVideos: Queue<CameraUploadMedia>,
-        secondaryPhotos: Queue<CameraUploadMedia>,
-        secondaryVideos: Queue<CameraUploadMedia>,
-        secondaryEnabled: Boolean,
-        primaryUploadNode: MegaNode?,
-        secondaryUploadNode: MegaNode?,
-    ) {
-        Timber.d(
-            """
-            |Primary photo count from media store database: ${primaryPhotos.size}
-            |Secondary photo count from media store database: ${secondaryPhotos.size}
-            |Primary video count from media store database: ${primaryVideos.size}
-            |Secondary video count from media store database: ${secondaryVideos.size}
-            """.trimMargin()
-        )
-
-        val pendingUploadsList = getPendingUploadList(
-            primaryPhotos,
-            isSecondary = false,
-            isVideo = false
-        )
-        Timber.d("Primary photo pending list size: %s", pendingUploadsList.size)
-        saveSyncRecordsToDB(
-            pendingUploadsList, primaryUploadNode, secondaryUploadNode, tempRoot
-        )
-
-        val pendingVideoUploadsList = getPendingUploadList(
-            primaryVideos,
-            isSecondary = false,
-            isVideo = true
-        )
-        Timber.d("Primary video pending list size: %s", pendingVideoUploadsList.size)
-        saveSyncRecordsToDB(
-            pendingVideoUploadsList, primaryUploadNode, secondaryUploadNode, tempRoot
-        )
-
-        if (secondaryEnabled) {
-            val pendingUploadsListSecondary = getPendingUploadList(
-                secondaryPhotos,
-                isSecondary = true,
-                isVideo = false
-            )
-            Timber.d("Secondary photo pending list size: %s", pendingUploadsListSecondary.size)
-            saveSyncRecordsToDB(
-                pendingUploadsListSecondary, primaryUploadNode, secondaryUploadNode, tempRoot
-            )
-
-            val pendingVideoUploadsListSecondary = getPendingUploadList(
-                secondaryVideos,
-                isSecondary = true,
-                isVideo = true
-            )
-            Timber.d("Secondary video pending list size: %s", pendingVideoUploadsListSecondary.size)
-            saveSyncRecordsToDB(
-                pendingVideoUploadsListSecondary, primaryUploadNode, secondaryUploadNode, tempRoot
-            )
-        }
-        yield()
-
-        // Need to maintain timestamp for better performance
-        updateTimeStamp(null, SyncTimeStamp.PRIMARY_PHOTO)
-        updateTimeStamp(null, SyncTimeStamp.PRIMARY_VIDEO)
-        updateTimeStamp(null, SyncTimeStamp.SECONDARY_PHOTO)
-        updateTimeStamp(null, SyncTimeStamp.SECONDARY_VIDEO)
-
-        // Reset backup state as active.
-        updatePrimaryFolderBackupState(BackupState.ACTIVE)
-        updateSecondaryFolderBackupState(BackupState.ACTIVE)
-
+    private suspend fun gatherSyncRecordsForUpload() {
         val finalList = getPendingSyncRecords()
         if (finalList.isEmpty()) {
             if (compressedVideoPending()) {
@@ -1581,27 +1340,21 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * Callback when getting CU folder handle from CU attributes completes.
+     * Callback when getting Primary folder handle from Primary attributes completes.
      *
-     * @param handle      CU folder handle stored in CU attributes.
-     * @param errorCode   Used to get error code to see if the request is successful.
-     * @param shouldStart If should start CU process.
+     * @param handle      Primary folder handle stored in Primary attributes.
+     * @param shouldStart If should start worker for camera upload.
      */
-    fun onGetPrimaryFolderAttribute(handle: Long, errorCode: Int, shouldStart: Boolean) {
-        if (errorCode == MegaError.API_OK || errorCode == MegaError.API_ENOENT) {
-            isPrimaryHandleSynced = true
-            coroutineScope?.launch {
-                if (getPrimarySyncHandle() != handle) {
-                    setPrimarySyncHandle(handle)
-                }
-                if (shouldStart) {
-                    Timber.d("On Get Primary - Start Coroutine")
-                    startWorker()
-                }
+    fun onGetPrimaryFolderAttribute(handle: Long, shouldStart: Boolean) {
+        isPrimaryHandleSynced = true
+        coroutineScope?.launch {
+            if (getPrimarySyncHandle() != handle) {
+                setPrimarySyncHandle(handle)
             }
-        } else {
-            Timber.w("On Get Primary - Failed")
-            endService()
+            if (shouldStart) {
+                Timber.d("On Get Primary - Start Coroutine")
+                startWorker()
+            }
         }
     }
 
@@ -1609,21 +1362,15 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * Callback when getting MU folder handle from CU attributes completes.
      *
      * @param handle    MU folder handle stored in CU attributes.
-     * @param errorCode Used to get error code to see if the request is successful.
      */
-    fun onGetSecondaryFolderAttribute(handle: Long, errorCode: Int) {
-        if (errorCode == MegaError.API_OK || errorCode == MegaError.API_ENOENT) {
-            coroutineScope?.launch {
-                if (getSecondarySyncHandle() != handle) {
-                    setSecondarySyncHandle(handle)
-                }
-                // Start upload now - unlike in onGetPrimaryFolderAttribute where it needs to wait for getting Media Uploads folder handle to complete
-                Timber.d("On Get Secondary - Start Coroutine")
-                startWorker()
+    fun onGetSecondaryFolderAttribute(handle: Long) {
+        coroutineScope?.launch {
+            if (getSecondarySyncHandle() != handle) {
+                setSecondarySyncHandle(handle)
             }
-        } else {
-            Timber.w("On Get Secondary - Failed")
-            endService()
+            // Start upload now - unlike in onGetPrimaryFolderAttribute where it needs to wait for getting Media Uploads folder handle to complete
+            Timber.d("On Get Secondary - Start Coroutine")
+            startWorker()
         }
     }
 

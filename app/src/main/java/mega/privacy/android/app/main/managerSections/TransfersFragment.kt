@@ -71,6 +71,7 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
             getString(R.string.transfers_empty_new))
 
         setupFlow()
+
         viewModel.setActiveTransfers((requireActivity() as ManagerActivity).transfersInProgress)
 
         binding.transfersListView.let { recyclerView ->

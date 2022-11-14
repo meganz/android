@@ -11,6 +11,8 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSetElementList
+import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -588,6 +590,14 @@ interface MegaApiGateway {
     ): List<MegaNode>
 
     /**
+     * Get children nodes by megaNodeList
+     * @param parent parent node
+     * @param order order for the returned list
+     * @return children nodes list
+     */
+    suspend fun getChildren(parent: MegaNode, order: Int, ): List<MegaNode>
+
+    /**
      * Get a list with all public links
      *
      * @return List of MegaNode objects that are shared with everyone via public link
@@ -708,9 +718,23 @@ interface MegaApiGateway {
     /**
      * Get the list of recent actions
      *
-     * @return a list of recent actions
+     * @param days     Age of actions since added/modified nodes will be considered (in days).
+     * @param maxNodes Maximum amount of nodes to be considered.
+     * @param listener [MegaRequestListenerInterface]
      */
-    suspend fun getRecentActions(): List<MegaRecentActionBucket>
+    fun getRecentActionsAsync(
+        days: Long,
+        maxNodes: Long,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Creates a copy of MegaRecentActionBucket required for its usage in the app.
+     *
+     * @param bucket The MegaRecentActionBucket received.
+     * @return A copy of MegaRecentActionBucket.
+     */
+    fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket
 
     /**
      * Check access error extended
@@ -775,4 +799,132 @@ interface MegaApiGateway {
      * Get the selected user attribute for the logged in user
      */
     fun getUserAttribute(attributeIdentifier: Int, listener: MegaRequestListenerInterface)
+
+    /**
+     * Returns if accounts achievements enabled
+     */
+    suspend fun isAccountAchievementsEnabled(): Boolean
+
+    /**
+     * Get account achievements
+     *
+     * @param listener : MegaRequestListenerInterface
+     */
+    fun getAccountAchievements(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Returns a MegaNode that can be downloaded with any instance of MegaApi
+     *
+     * @param node MegaNode to authorize
+     * @return Authorized node, or NULL if the node can't be authorized
+     */
+    suspend fun authorizeNode(node: MegaNode): MegaNode?
+
+    /**
+     * Returns a URL to a node in the local HTTP proxy server
+     *
+     * @param node Node to generate the local HTTP link
+     * @return URL to the node in the local HTTP proxy server, otherwise NULL
+     */
+    suspend fun httpServerGetLocalLink(node: MegaNode): String?
+
+    /**
+     * Check if the HTTP proxy server is running
+     *
+     * @return 0 if the server is not running. Otherwise the port in which it's listening to
+     */
+    suspend fun httpServerIsRunning(): Int
+
+    /**
+     * Start an HTTP proxy server in specified port
+     *
+     * @return True if the server is ready, false if the initialization failed
+     */
+    suspend fun httpServerStart(): Boolean
+
+    /**
+     * Stop the HTTP proxy server
+     */
+    suspend fun httpServerStop()
+
+    /**
+     * Set the maximum buffer size for the internal buffer
+     *
+     * @param bufferSize Maximum buffer size (in bytes) or a number <= 0 to use the
+     *                   internal default value
+     */
+    suspend fun httpServerSetMaxBufferSize(bufferSize: Int)
+
+    /**
+     * Get a list with all public links
+     *
+     * @param order Sorting order to use
+     * @return List of MegaNode objects that are shared with everyone via public link
+     */
+    suspend fun getPublicLinks(order: Int): List<MegaNode>
+
+    /**
+     * Get a list with all inbound sharings
+     *
+     * @param order Sorting order to use
+     * @return List of MegaNode objects that other users are sharing with this account
+     */
+    suspend fun getInShares(order: Int): List<MegaNode>
+
+    /**
+     * Get a list with all inbound sharings from one MegaUser
+     *
+     * @param user MegaUser sharing folders with this account
+     * @return List of MegaNode objects that this user is sharing with this account
+     */
+    suspend fun getInShares(user: MegaUser): List<MegaNode>
+
+    /**
+     * Get a list with all active and pending outbound sharings
+     *
+     * @param order Sorting order to use
+     * @return List of MegaShare objects
+     */
+    suspend fun getOutShares(order: Int): List<MegaShare>
+
+    /**
+     * Returns the rubbish node of the account.
+     *
+     * @return Rubbish node of the account.
+     */
+    suspend fun getRubbishNode(): MegaNode
+
+    /**
+     * Create a new MegaSet item
+     *
+     * @param name the name of the set
+     * @param listener [MegaRequestListenerInterface]
+     */
+    suspend fun createSet(name: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Create a new element for the set
+     *
+     * @param sid the ID of the set
+     * @param node the node handle of the node which will be assigned as the set's new element
+     */
+    suspend fun createSetElement(sid: Long, node: Long)
+
+    /**
+     * Get a list of all Sets available for current user.
+     * The response value is stored as a MegaSetList.
+     * You take the ownership of the returned value
+     *
+     * @return list of Sets
+     */
+    suspend fun getSets(): MegaSetList
+
+    /**
+     * Get all Elements in the Set with given id, for current user.
+     * The response value is stored as a MegaSetElementList.
+     *
+     * @param sid the id of the Set owning the Elements
+     * @return all Elements in that Set, or null if not found or none added
+     */
+    suspend fun getSetElements(sid: Long): MegaSetElementList
 }

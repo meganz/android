@@ -89,7 +89,9 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
+import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
 import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_IS_FROM_MEETING
@@ -115,6 +117,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.VideoCaptureUtils
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -723,14 +726,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         // Keep screen on
         meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
-        sendEnterCallEvent()
     }
-
-    fun sendEnterCallEvent() = LiveEventBus.get(
-        EVENT_ENTER_IN_MEETING,
-        Boolean::class.java
-    ).post(true)
 
     /**
      * Observe the Orientation changes and Update the layout for landscape and portrait screen
@@ -2575,6 +2571,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (contacts.isNullOrEmpty() || !contacts.any { it.visibility == VISIBILITY_VISIBLE }) {
             val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
             dialog.show(childFragmentManager, dialog.tag)
+        } else if (ChatUtil.areAllMyContactsChatParticipants(inMeetingViewModel.getChat())) {
+            val dialog = AddParticipantsNoContactsLeftToAddDialogFragment.newInstance()
+            dialog.show(childFragmentManager, dialog.tag)
         } else {
             val inviteParticipantIntent =
                 Intent(meetingActivity, AddContactActivity::class.java).apply {
@@ -2744,11 +2743,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to answer the call
      */
     private fun answerCall() {
-        sharedModel.answerCall(camIsEnable, micIsEnable, speakerIsEnable)
-            .observe(viewLifecycleOwner) { (chatHandle, enableVideo) ->
-                MegaApplication.getChatManagement().setSpeakerStatus(chatHandle,
-                    enableVideo
-                )
+        var audio = micIsEnable
+        if (audio) {
+            audio =
+                PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
+        }
+
+        var video = camIsEnable
+        if (video) {
+            video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
+        }
+
+        sharedModel.answerCall(video, audio, speakerIsEnable)
+            .observe(viewLifecycleOwner) { (chatHandle) ->
                 checkCallStarted(chatHandle)
             }
     }
@@ -2757,11 +2764,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to start the call
      */
     private fun startCall() {
-        inMeetingViewModel.startMeeting(camIsEnable, micIsEnable)
-            .observe(viewLifecycleOwner) { result ->
-                result?.let {
-                    checkCallStarted(result.chatHandle)
-                }
+        var audio = micIsEnable
+        if (audio) {
+            audio =
+                PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
+        }
+
+        var video = camIsEnable
+        if (video) {
+            video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
+        }
+
+        inMeetingViewModel.startMeeting(video, audio)
+            .observe(viewLifecycleOwner) { chatIdResult ->
+                checkCallStarted(chatIdResult)
             }
     }
 

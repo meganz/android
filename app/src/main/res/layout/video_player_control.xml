@@ -21,25 +21,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@id/exo_play"
+            android:id="@id/exo_play_pause"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:background="@null"
-            android:src="@drawable/media_player_play"
             app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
             app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
             app:tint="@color/white" />
-
-        <ImageButton
-            android:id="@id/exo_pause"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:background="@null"
-            android:src="@drawable/media_player_pause"
-            app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
-            app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
-            app:tint="@color/white"
-            tools:visibility="invisible" />
 
         <ImageButton
             android:id="@id/exo_prev"
@@ -160,7 +148,18 @@
                 android:src="@drawable/ic_lock"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.6"
+                app:layout_constraintHorizontal_bias="0.35"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/image_screenshot"
+                style="@style/VideoPlayerButton"
+                android:enabled="false"
+                android:src="@drawable/ic_screenshot"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.65"
                 app:layout_constraintStart_toStartOf="parent"
                 app:tint="@color/white" />
 

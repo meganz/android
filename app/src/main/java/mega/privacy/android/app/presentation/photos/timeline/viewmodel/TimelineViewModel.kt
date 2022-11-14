@@ -14,17 +14,17 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
-import mega.privacy.android.app.presentation.photos.timeline.model.Sort
-import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
-import mega.privacy.android.app.presentation.photos.timeline.model.ZoomLevel
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
@@ -206,9 +206,7 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    fun getAllShowingPhotosIds() = _state.value.currentShowingPhotos.map { it.id }.toLongArray()
-
-    fun getSelectedId(): List<Long> =
+    fun getSelectedIds(): List<Long> =
         selectedPhotosIds.toList()
 
     suspend fun getSelectedNodes(): List<MegaNode> =

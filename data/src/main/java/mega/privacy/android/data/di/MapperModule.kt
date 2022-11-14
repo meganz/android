@@ -13,18 +13,21 @@ import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
-import mega.privacy.android.data.mapper.FavouriteFolderInfoMapper
-import mega.privacy.android.data.mapper.NodeInfoMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
+import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
+import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
+import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.MegaTransferMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
+import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodMapper
+import mega.privacy.android.data.mapper.RecentActionsMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
@@ -38,6 +41,7 @@ import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
+import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.getFileTypeInfo
@@ -53,13 +57,16 @@ import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toEvent
-import mega.privacy.android.data.mapper.toFavouriteFolderInfo
-import mega.privacy.android.data.mapper.toNodeInfo
 import mega.privacy.android.data.mapper.toImage
+import mega.privacy.android.data.mapper.toMediaStoreFileType
+import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
+import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
+import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toOnlineStatus
 import mega.privacy.android.data.mapper.toPaymentMethodType
+import mega.privacy.android.data.mapper.toRecentActionBucketList
 import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toSortOrder
 import mega.privacy.android.data.mapper.toStorageState
@@ -69,6 +76,7 @@ import mega.privacy.android.data.mapper.toSyncRecordTypeInt
 import mega.privacy.android.data.mapper.toTransferEventModel
 import mega.privacy.android.data.mapper.toTransferModel
 import mega.privacy.android.data.mapper.toUserAlert
+import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
 import mega.privacy.android.domain.entity.Currency
@@ -191,6 +199,19 @@ internal class MapperModule {
     fun provideSyncRecordTypeIntMapper(): SyncRecordTypeIntMapper = ::toSyncRecordTypeInt
 
     /**
+     * Provide media store file type mapper
+     */
+    @Provides
+    fun provideMediaStoreFileTypeMapper(): MediaStoreFileTypeMapper = ::toMediaStoreFileType
+
+    /**
+     * Provide media store file type uri mapper
+     */
+    @Provides
+    fun provideMediaStoreFileTypeUriMapper(): MediaStoreFileTypeUriMapper =
+        ::toMediaStoreFileTypeUri
+
+    /**
      * Provide storage state mapper
      */
     @Provides
@@ -249,12 +270,6 @@ internal class MapperModule {
     }
 
     /**
-     * Provide favourite folder info mapper
-     */
-    @Provides
-    fun provideFavouriteFolderInfoMapper(): FavouriteFolderInfoMapper = ::toFavouriteFolderInfo
-
-    /**
      * Provide contact request mapper
      */
     @Provides
@@ -277,7 +292,7 @@ internal class MapperModule {
      * Provide favourite info mapper
      */
     @Provides
-    fun provideFavouriteInfoMapper(): NodeInfoMapper = ::toNodeInfo
+    fun provideFavouriteInfoMapper(): NodeMapper = ::toNode
 
 
     /**
@@ -311,4 +326,22 @@ internal class MapperModule {
     @Provides
     fun provideSubscriptionPlanListMapper(): SubscriptionPlanListMapper =
         ::toSubscriptionPlanList
+
+    /**
+     * Provide mega achievement mapper
+     */
+    @Provides
+    fun provideMegaAchievementMapper(): MegaAchievementMapper = ::toMegaAchievement
+
+    /**
+     * Provide [RecentActionsMapper] mapper
+     */
+    @Provides
+    fun provideRecentActionsMapper(): RecentActionsMapper = ::toRecentActionBucketList
+
+    /**
+     * Provide [UserSetMapper] mapper
+     */
+    @Provides
+    fun provideUserSetMapper(): UserSetMapper = ::toUserSet
 }
