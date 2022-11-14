@@ -5,9 +5,9 @@ package mega.privacy.android.app.jobservices
  */
 enum class StartCameraUploadsState {
     /**
-     * Camera Uploads can be enabled
+     * Camera Uploads can be ran
      */
-    CAN_ENABLE_CAMERA_UPLOADS,
+    CAN_RUN_CAMERA_UPLOADS,
 
     /**
      * The Preferences does not exist

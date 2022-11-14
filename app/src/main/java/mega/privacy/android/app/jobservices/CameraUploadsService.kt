@@ -738,7 +738,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private suspend fun startWorker() {
         runCatching {
             val state = canRunCameraUploads()
-            if (state == StartCameraUploadsState.CAN_ENABLE_CAMERA_UPLOADS) {
+            if (state == StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS) {
                 hideLocalFolderPathNotifications()
                 startCameraUploads()
             } else {
@@ -775,7 +775,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * 11. The Primary Folder exists - [areFoldersEstablished],
      * 12. The Secondary Folder exists if Enable Secondary Media Uploads is enabled - [areFoldersEstablished]
      *
-     * If all conditions are met, [StartCameraUploadsState.CAN_ENABLE_CAMERA_UPLOADS] is returned.
+     * If all conditions are met, [StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS] is returned.
      * Otherwise, a specific [StartCameraUploadsState] is returned depending on what condition has failed
      *
      * @return A specific [StartCameraUploadsState]
@@ -804,7 +804,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         } else if (!areFoldersEstablished()) {
             StartCameraUploadsState.UNESTABLISHED_FOLDERS
         } else {
-            StartCameraUploadsState.CAN_ENABLE_CAMERA_UPLOADS
+            StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS
         }
 
     /**
