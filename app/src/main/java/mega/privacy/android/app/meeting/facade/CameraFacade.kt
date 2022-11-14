@@ -16,14 +16,19 @@ class CameraFacade @Inject constructor(
 ) : CameraGateway {
 
     override fun setFrontCamera() {
-        getFrontCamera().let { frontCamera ->
+        val frontCamera = getFrontCamera()
+        if (frontCamera != null) {
             chatGateway.setChatVideoInDevice(frontCamera, null)
+        } else {
+            getBackCamera()?.let { backCamera ->
+                chatGateway.setChatVideoInDevice(backCamera, null)
+            }
         }
     }
 
-    override fun getFrontCamera(): String =
-        VideoCaptureUtils.getFrontCamera()
+    override fun getFrontCamera(): String? = VideoCaptureUtils.getFrontCamera()
 
-    override fun getBackCamera(): String =
+
+    override fun getBackCamera(): String? =
         VideoCaptureUtils.getBackCamera()
 }

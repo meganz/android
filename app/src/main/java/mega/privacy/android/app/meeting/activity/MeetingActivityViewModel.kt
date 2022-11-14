@@ -595,8 +595,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun setChatVideoInDevice(listener: MegaChatRequestListenerInterface?) {
         // Always try to start the video using the front camera
-        val cameraDevice = VideoCaptureUtils.getFrontCamera()
-        if (cameraDevice != null) {
+        VideoCaptureUtils.getFrontCamera()?.let { cameraDevice ->
             meetingActivityRepository.setChatVideoInDevice(cameraDevice, listener)
         }
     }
