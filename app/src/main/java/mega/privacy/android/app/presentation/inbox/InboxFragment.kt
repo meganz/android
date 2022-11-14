@@ -192,6 +192,7 @@ class InboxFragment : RotatableFragment() {
                     MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
                     sortByHeaderViewModel)
             } else {
+                adapter?.parentHandle = state().inboxHandle
                 adapter?.setListFragment(recyclerView)
                 adapter?.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
             }
@@ -230,6 +231,7 @@ class InboxFragment : RotatableFragment() {
                     sortByHeaderViewModel)
             } else {
                 adapter?.let {
+                    it.parentHandle = state().inboxHandle
                     it.setListFragment(recyclerView)
                     it.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
                 }
