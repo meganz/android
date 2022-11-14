@@ -488,13 +488,6 @@ class InboxFragment : RotatableFragment() {
     }
 
     /**
-     * Refreshes the list of Nodes displayed
-     *
-     * This function is used by [ManagerActivity.refreshInboxFragment] and [ManagerActivity.onNodesInboxUpdate]
-     */
-    fun refreshNodes() = viewModel.refreshInboxNodes()
-
-    /**
      * Opens the file
      *
      * @param node The [MegaNode] to be opened

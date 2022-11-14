@@ -5829,7 +5829,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     private void refreshInboxFragment() {
         if (inboxFragment != null) {
-            inboxFragment.refreshNodes();
+            inboxViewModel.refreshInboxNodes();
         }
     }
 
@@ -9759,7 +9759,7 @@ public class ManagerActivity extends TransfersManagementActivity
         inboxFragment = (InboxFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
         if (inboxFragment != null) {
             inboxFragment.hideMultipleSelect();
-            inboxFragment.refreshNodes();
+            inboxViewModel.refreshInboxNodes();
         }
     }
 
