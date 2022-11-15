@@ -42,7 +42,7 @@ class ImageViewerPageFragment : Fragment() {
 
     companion object {
         private const val EXTRA_ENABLE_ZOOM = "EXTRA_ENABLE_ZOOM"
-        private const val ZOOM_MAX_SCALE_FACTOR = 6f
+        private const val ZOOM_MAX_SCALE_FACTOR = 20f
 
         /**
          * Main method to create a ImageViewerPageFragment.
