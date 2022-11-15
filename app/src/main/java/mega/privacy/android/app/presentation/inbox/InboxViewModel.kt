@@ -183,21 +183,18 @@ class InboxViewModel @Inject constructor(
             if (myBackupsFolderNode.id == -1L || myBackupsFolderNode.id == inboxHandle) {
                 onExitInbox(true)
             } else {
-                getParentNodeHandle(inboxHandle).also { parentNodeHandle ->
-                    if (parentNodeHandle == null) onExitInbox(true)
-                    else {
-                        // Otherwise, proceed to retrieve the Nodes of the Parent Node
-                        _state.update { inboxState ->
-                            refreshNodes(parentNodeHandle).let { updatedNodes ->
-                                inboxState.copy(
-                                    inboxHandle = parentNodeHandle,
-                                    triggerBackPress = true,
-                                    nodes = updatedNodes,
-                                )
-                            }
+                getParentNodeHandle(inboxHandle)?.let { parentNodeHandle ->
+                    // Proceed to retrieve the Nodes of the Parent Node
+                    _state.update { inboxState ->
+                        refreshNodes(parentNodeHandle).let { updatedNodes ->
+                            inboxState.copy(
+                                inboxHandle = parentNodeHandle,
+                                triggerBackPress = true,
+                                nodes = updatedNodes,
+                            )
                         }
                     }
-                }
+                } ?: run { onExitInbox(true) }
             }
         }
     }
