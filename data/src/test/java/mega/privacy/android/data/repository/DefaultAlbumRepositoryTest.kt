@@ -226,6 +226,29 @@ class DefaultAlbumRepositoryTest {
         }
     }
 
+    @Test
+    fun `test that get user set returns correct result`() = runTest {
+        val albumId = AlbumId(1L)
+        val expectedUserSet = createUserSet(
+            id = 1L,
+            name = "Album 1",
+            cover = 0L,
+            modificationTime = 0L,
+        )
+
+        val megaSet = mock<MegaSet> {
+            with(expectedUserSet) {
+                on { id() }.thenReturn(id)
+                on { name() }.thenReturn(name)
+            }
+        }
+
+        whenever(megaApiGateway.getSet(any())).thenReturn(megaSet)
+
+        val actualUserSet = underTest.getUserSet(albumId)
+        assertThat(expectedUserSet).isEqualTo(actualUserSet)
+    }
+
     private fun createUserSet(
         id: Long,
         name: String,
