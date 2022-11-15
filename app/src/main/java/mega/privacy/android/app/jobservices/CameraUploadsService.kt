@@ -781,30 +781,19 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * @return A specific [StartCameraUploadsState]
      */
     private suspend fun canRunCameraUploads(): StartCameraUploadsState =
-        if (!preferencesExist()) {
-            StartCameraUploadsState.MISSING_PREFERENCES
-        } else if (!cameraUploadsSyncEnabled()) {
-            StartCameraUploadsState.DISABLED_SYNC
-        } else if (!isUserOnline()) {
-            StartCameraUploadsState.OFFLINE_USER
-        } else if (!isDeviceAboveBatteryLevel()) {
-            StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL
-        } else if (!hasCameraUploadsLocalPath()) {
-            StartCameraUploadsState.MISSING_LOCAL_PATH
-        } else if (!isWifiConstraintSatisfied()) {
-            StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT
-        } else if (!hasLocalPrimaryFolder()) {
-            StartCameraUploadsState.MISSING_LOCAL_PRIMARY_FOLDER
-        } else if (!hasLocalSecondaryFolder()) {
-            StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER
-        } else if (!isUserLoggedIn()) {
-            StartCameraUploadsState.LOGGED_OUT_USER
-        } else if (!hasCameraUploadsUserAttribute()) {
-            StartCameraUploadsState.MISSING_USER_ATTRIBUTE
-        } else if (!areFoldersEstablished()) {
-            StartCameraUploadsState.UNESTABLISHED_FOLDERS
-        } else {
-            StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS
+        when {
+            !preferencesExist() -> StartCameraUploadsState.MISSING_PREFERENCES
+            !cameraUploadsSyncEnabled() -> StartCameraUploadsState.DISABLED_SYNC
+            !isUserOnline() -> StartCameraUploadsState.OFFLINE_USER
+            !isDeviceAboveBatteryLevel() -> StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL
+            !hasCameraUploadsLocalPath() -> StartCameraUploadsState.MISSING_LOCAL_PATH
+            !isWifiConstraintSatisfied() -> StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT
+            !hasLocalPrimaryFolder() -> StartCameraUploadsState.MISSING_LOCAL_PRIMARY_FOLDER
+            !hasLocalSecondaryFolder() -> StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER
+            !isUserLoggedIn() -> StartCameraUploadsState.LOGGED_OUT_USER
+            !hasCameraUploadsUserAttribute() -> StartCameraUploadsState.MISSING_USER_ATTRIBUTE
+            !areFoldersEstablished() -> StartCameraUploadsState.UNESTABLISHED_FOLDERS
+            else -> StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS
         }
 
     /**
