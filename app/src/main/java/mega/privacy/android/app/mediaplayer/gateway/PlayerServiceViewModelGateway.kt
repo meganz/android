@@ -211,12 +211,6 @@ interface PlayerServiceViewModelGateway {
     fun isPaused(): Boolean
 
     /**
-     * Set the duration for playing item
-     * @param currentPosition the current position of audio
-     */
-    fun setCurrentPosition(currentPosition: Long)
-
-    /**
      * Judge the shuffle if is enabled
      *
      * @return true is enabled, otherwise is false.

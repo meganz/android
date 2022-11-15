@@ -18,7 +18,6 @@ import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.MonitorConnectivity
@@ -33,14 +32,12 @@ import javax.inject.Inject
  *
  * @param repository
  * @param getCloudSortOrder
- * @param sortOrderIntMapper
  * @param monitorNodeUpdates
  */
 @HiltViewModel
 class AudioViewModel @Inject constructor(
     private val repository: TypedFilesRepository,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val sortOrderIntMapper: SortOrderIntMapper,
     monitorNodeUpdates: MonitorNodeUpdates,
     private val monitorConnectivity: MonitorConnectivity,
 ) : ViewModel(), SearchCallback.Data {
@@ -77,11 +74,13 @@ class AudioViewModel @Inject constructor(
         if (forceUpdate || repository.fileNodeItems.value == null) {
             viewModelScope.launch {
                 cancelToken = initNewSearch()
-                repository.getFiles(
-                    cancelToken!!,
-                    MegaApiJava.FILE_TYPE_AUDIO,
-                    sortOrderIntMapper(sortOrder),
-                )
+                cancelToken?.let {
+                    repository.getFiles(
+                        it,
+                        MegaApiJava.FILE_TYPE_AUDIO,
+                        sortOrder,
+                    )
+                }
             }
         } else {
             repository.emitFiles()

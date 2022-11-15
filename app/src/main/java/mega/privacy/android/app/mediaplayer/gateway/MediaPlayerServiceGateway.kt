@@ -85,6 +85,13 @@ interface MediaPlayerServiceGateway {
     fun getCurrentMediaItem(): MediaItem?
 
     /**
+     * Get current playing position
+     *
+     * @return current playing position
+     */
+    fun getCurrentPlayingPosition(): Long
+
+    /**
      * Set repeat mode for video
      *
      * @param repeatToggleMode RepeatToggleMode

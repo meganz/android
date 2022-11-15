@@ -34,6 +34,23 @@ String sdkLibType() {
     }
 }
 
+def getEnvironmentVariable = { param ->
+    def value = System.getenv(param)
+    if (value == null || value.isEmpty()) {
+        return "N/A"
+    } else {
+        return value
+    }
+}
+
+def SDK_COMMIT = getEnvironmentVariable("SDK_COMMIT")
+def CHAT_COMMIT = getEnvironmentVariable("CHAT_COMMIT")
+def SDK_BUILDER_NAME = getEnvironmentVariable("gitlabUserName")
+
+println("SDK_COMMIT = $SDK_COMMIT")
+println("CHAT_COMMIT = $CHAT_COMMIT")
+println("SDK_BUILDER_NAME = $SDK_BUILDER_NAME")
+
 project('sdk') {
     artifactoryPublish.dependsOn('build')
     publishing {
@@ -70,10 +87,9 @@ artifactory {
             publishArtifacts = true
             // Properties to be attached to the published artifacts.
             properties = [
-                    'qa.level'   : 'basic',
-                    'dev.team'   : 'core',
-                    'sdk-commit' : "123456",
-                    'chat-commit': '987654',
+                    'sdk-commit' : "$SDK_COMMIT",
+                    'chat-commit': "$CHAT_COMMIT",
+                    'builder': "$SDK_BUILDER_NAME"
             ]
             publishPom = true // Publish generated POM files to Artifactory (true by default)
         }

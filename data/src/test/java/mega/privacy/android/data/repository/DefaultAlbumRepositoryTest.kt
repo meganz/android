@@ -1,11 +1,15 @@
 package mega.privacy.android.data.repository
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.UserSetMapper
+import mega.privacy.android.data.model.GlobalUpdate.OnSetElementsUpdate
+import mega.privacy.android.data.model.GlobalUpdate.OnSetsUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.set.UserSet
@@ -150,7 +154,6 @@ class DefaultAlbumRepositoryTest {
             assertThat(actualUserSets.size).isEqualTo(expectedSize)
         }
 
-
     @Test
     fun `getAlbumElementIDs should return correct result`() = runTest {
         val expectedNode = 1L
@@ -171,6 +174,81 @@ class DefaultAlbumRepositoryTest {
         assertThat(actualElementIds[0].id).isEqualTo(expectedNode)
     }
 
+    @Test
+    fun `test that monitorUserSetsUpdate emits correct result`() = runTest {
+        val expectedUserSets = (1..3L).map {
+            createUserSet(
+                id = it,
+                name = "Album $it",
+                cover = 0L,
+                modificationTime = it,
+            )
+        }
+
+        val megaSets = expectedUserSets.map { set ->
+            mock<MegaSet> {
+                on { id() }.thenReturn(set.id)
+                on { name() }.thenReturn(set.name)
+                on { cover() }.thenReturn(set.cover)
+                on { ts() }.thenReturn(set.modificationTime)
+            }
+        }
+
+        whenever(megaApiGateway.globalUpdates)
+            .thenReturn(flowOf(OnSetsUpdate(ArrayList(megaSets))))
+
+        underTest.monitorUserSetsUpdate().test {
+            val actualUserSets = awaitItem()
+            assertThat(expectedUserSets).isEqualTo(actualUserSets)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that monitorAlbumElementIds emits correct result`() = runTest {
+        val expectedElementIds = (1..3L).map {
+            NodeId(it)
+        }
+
+        val megaSetElements = expectedElementIds.map { node ->
+            mock<MegaSetElement> {
+                on { node() }.thenReturn(node.id)
+            }
+        }
+
+        whenever(megaApiGateway.globalUpdates)
+            .thenReturn(flowOf(OnSetElementsUpdate(ArrayList(megaSetElements))))
+
+        underTest.monitorAlbumElementIds().test {
+            val actualElementIds = awaitItem()
+            assertThat(expectedElementIds).isEqualTo(actualElementIds)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test that get user set returns correct result`() = runTest {
+        val albumId = AlbumId(1L)
+        val expectedUserSet = createUserSet(
+            id = 1L,
+            name = "Album 1",
+            cover = 0L,
+            modificationTime = 0L,
+        )
+
+        val megaSet = mock<MegaSet> {
+            with(expectedUserSet) {
+                on { id() }.thenReturn(id)
+                on { name() }.thenReturn(name)
+            }
+        }
+
+        whenever(megaApiGateway.getSet(any())).thenReturn(megaSet)
+
+        val actualUserSet = underTest.getUserSet(albumId)
+        assertThat(expectedUserSet).isEqualTo(actualUserSet)
+    }
+
     private fun createUserSet(
         id: Long,
         name: String,
@@ -184,5 +262,13 @@ class DefaultAlbumRepositoryTest {
         override val cover: Long? = cover
 
         override val modificationTime: Long = modificationTime
+
+        override fun equals(other: Any?): Boolean {
+            val other = other as? UserSet ?: return false
+            return id == other.id
+                    && name == other.name
+                    && cover == other.cover
+                    && modificationTime == other.modificationTime
+        }
     }
 }

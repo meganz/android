@@ -71,7 +71,7 @@ private fun TypedFolderNode.createFolder(
     folderInfo: String,
     isAvailableOffline: Boolean,
 ) = FavouriteFolder(
-    handle = id.id,
+    nodeId = id,
     icon = getFolderIcon(this),
     name = name,
     label = label,
@@ -100,7 +100,7 @@ private fun TypedFileNode.createFile(
     isAvailableOffline: Boolean,
     getFileIcon: (String) -> Int,
 ) = FavouriteFile(
-    handle = id.id,
+    nodeId = id,
     icon = getFileIcon(name),
     name = name,
     label = label,
