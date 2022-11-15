@@ -8,19 +8,21 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
+import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import javax.inject.Inject
 import mega.privacy.android.app.listeners.GetAchievementsListener
-import timber.log.Timber
-import nz.mega.sdk.MegaAchievementsDetails
+import mega.privacy.android.app.presentation.achievements.AchievementsViewModel
+import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.achievement.AchievementType
+import nz.mega.sdk.MegaAchievementsDetails
+import timber.log.Timber
 import java.util.Calendar
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class InfoAchievementsFragment : Fragment(), GetAchievementsListener.DataCallback {
@@ -39,6 +41,8 @@ class InfoAchievementsFragment : Fragment(), GetAchievementsListener.DataCallbac
     var rewardId = -1
     var diffDays: Long = 0
     var indexAward = 0
+
+    val achievementsViewModel: AchievementsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,28 +74,45 @@ class InfoAchievementsFragment : Fragment(), GetAchievementsListener.DataCallbac
     override fun onAttach(context: Context) {
         super.onAttach(context)
         getAchievementsListener.setDataCallback(this)
-        updateBarTitle()
-    }
-
-    private fun updateBarTitle() {
-        (requireActivity() as AppCompatActivity).supportActionBar?.let {
-            it.title = when (achievementType) {
-                MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL ->
-                    getString(R.string.title_install_app)
-                MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE ->
-                    getString(R.string.title_add_phone)
-                MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL ->
-                    getString(R.string.title_install_desktop)
-                MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME ->
-                    getString(R.string.title_regitration)
-                else -> ""
-            }
+        getAchievementsTitleAndType(achievementType = achievementType).run {
+            achievementsViewModel.setToolbarTitle(this.first)
+            achievementsViewModel.setAchievementType(this.second)
         }
     }
 
+    private fun getAchievementsTitleAndType(achievementType: Int): Pair<String, AchievementType> {
+        val title: String
+        val type: AchievementType
+        when (achievementType) {
+            MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL -> {
+                title = getString(R.string.title_install_app)
+                type = AchievementType.MEGA_ACHIEVEMENT_MOBILE_INSTALL
+            }
+            MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE -> {
+                title = getString(R.string.title_add_phone)
+                type = AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE
+            }
+            MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL -> {
+                title = getString(R.string.title_install_desktop)
+                type = AchievementType.MEGA_ACHIEVEMENT_DESKTOP_INSTALL
+            }
+            MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME -> {
+                title = getString(R.string.title_regitration)
+                type = AchievementType.MEGA_ACHIEVEMENT_WELCOME
+            }
+            else -> {
+                title = ""
+                type = AchievementType.INVALID_ACHIEVEMENT
+            }
+        }
+
+        return Pair(title, type)
+    }
+
     private fun updateUI() {
-        val details = (getAchievementsListener ?: return).achievementsDetails ?: return
+        val details = getAchievementsListener.achievementsDetails ?: return
         with(details) {
+            achievementsViewModel.setAwardCount(awardsCount)
             for (i in 0 until awardsCount) {
                 val type = getAwardClass(i)
                 if (type == achievementType) {
