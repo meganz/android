@@ -19,18 +19,17 @@ import mega.privacy.android.app.databinding.ItemPlaylistBinding
  * RecyclerView adapter for playlist screen.
  * @param context Context
  * @param itemOperation PlaylistItemOperation
- * @param paused Whether is paused
  * @param isAudio whether is audio
  * @param dragStartListener DragStartListener
  */
 class PlaylistAdapter(
     private val context: Context,
     private val itemOperation: PlaylistItemOperation,
-    var paused: Boolean = false,
     val isAudio: Boolean,
     private val dragStartListener: DragStartListener
 ) : ListAdapter<PlaylistItem, PlaylistViewHolder>(PlaylistItemDiffCallback()) {
 
+    private var isPaused = false
     private var playingItemIndex: Int = 0
     private var currentPlayingPosition: Long = 0
 
@@ -58,13 +57,13 @@ class PlaylistAdapter(
                 false
             }
         val playlistItem = getItem(holder.absoluteAdapterPosition)
-        val playingItemIndex = holder.absoluteAdapterPosition
+        val currentItemIndex = holder.absoluteAdapterPosition
 
         with(holder.itemView.findViewById<TextView>(R.id.duration)) {
             isVisible = playlistItem.duration > 0L
 
             if (playlistItem.type == PlaylistItem.TYPE_PLAYING) {
-                this@PlaylistAdapter.playingItemIndex = holder.absoluteAdapterPosition
+                playingItemIndex = holder.absoluteAdapterPosition
                 text = playlistItem.formatCurrentPositionAndDuration(currentPlayingPosition)
             } else {
                 text = playlistItem.formatDuration()
@@ -74,9 +73,9 @@ class PlaylistAdapter(
         holder.itemView.findViewById<FrameLayout>(R.id.header_layout).isVisible =
             playlistItem.headerIsVisible
         holder.itemView.findViewById<FrameLayout>(R.id.next_layout).isVisible =
-            playingItemIndex != itemCount - 1 && playlistItem.type == PlaylistItem.TYPE_PLAYING
+            currentItemIndex != itemCount - 1 && playlistItem.type == PlaylistItem.TYPE_PLAYING
 
-        holder.bind(paused, playlistItem, itemOperation, holder, isAudio, playingItemIndex)
+        holder.bind(isPaused, playlistItem, itemOperation, holder, isAudio, currentItemIndex)
     }
 
     /**
@@ -115,6 +114,25 @@ class PlaylistAdapter(
     fun setCurrentPlayingPosition(currentPosition: Long?) {
         currentPlayingPosition = currentPosition ?: 0
         notifyItemChanged(playingItemIndex)
+    }
+
+    /**
+     * Refresh UI when the paused state is changed
+     *
+     * @param paused true is paused, otherwise is false.
+     */
+    fun refreshPausedState(paused: Boolean) {
+        isPaused = paused
+        notifyItemChanged(playingItemIndex)
+    }
+
+    /**
+     * Set paused state
+     *
+     * @param paused true is paused, otherwise is false.
+     */
+    fun setPaused(paused: Boolean) {
+        isPaused = paused
     }
 
     companion object {

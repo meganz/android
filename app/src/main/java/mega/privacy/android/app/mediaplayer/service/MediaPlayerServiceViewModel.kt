@@ -180,7 +180,6 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun setPaused(paused: Boolean, currentPosition: Long?) {
         this.paused = paused
-        postPlaylistItems(currentPosition = currentPosition, isScroll = false)
         mediaPlayback.value = paused
     }
 

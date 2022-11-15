@@ -250,7 +250,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                     viewLifecycleOwner.lifecycle,
                     Lifecycle.State.RESUMED
                 ).onEach {
-                    adapter?.paused = isPaused()
+                    adapter?.setPaused(isPaused())
 
                     adapter?.submitList(it.first) {
                         if (it.second != -1) {
@@ -310,6 +310,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                     } else {
                         positionUpdateHandler.post(positionUpdateRunnable)
                     }
+                    adapter?.refreshPausedState(paused)
                 }.launchIn(viewLifecycleOwner.lifecycleScope)
             }
         }
